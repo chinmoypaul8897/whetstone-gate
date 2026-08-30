@@ -42,6 +42,108 @@ def test_gitattributes_is_correct_and_in_the_first_commit(repo_root):
     assert results["A3 no CRLF in any tracked file"].ok is True, (
         results["A3 no CRLF in any tracked file"].detail
     )
+    assert results["A4 working tree and object store hold identical bytes"].ok is True, (
+        results["A4 working tree and object store hold identical bytes"].detail
+    )
+
+
+def test_the_crlf_check_still_fires_on_text_and_no_longer_lies_about_binary(tmp_path):
+    """⚠️ The proof that A3's narrowing is **exactly** the false positive and nothing more.
+
+    A3 used to scan every tracked file's raw bytes for ``\\r\\n``. A PNG's deflate stream
+    contains those bytes as *data*, so committing the two dashboard screenshots turned
+    ``make check-roles`` and ``make test`` red on a repository that was sound
+    (`INCIDENTS.md` INC-09). A3 now asks **git** which files are text.
+
+    `CLAUDE.md` hard rule 6 forbids loosening an assertion to get green, so the narrowing
+    is not taken on trust — it is asserted, in a throwaway repository, that:
+
+      * a **text** file carrying CRLF still fails A3 (the assertion is intact), **and**
+      * a **binary** file carrying the same bytes does not (the false positive is gone),
+        while A4 covers it with the stronger byte-identity assertion instead.
+
+    Run this against the old code and the binary case fails. That is what makes the change
+    provably meaningful rather than merely convenient.
+    """
+    import subprocess as sp
+
+    for cmd in (
+        ["git", "init", "-q"],
+        ["git", "config", "user.email", "fixture@example.invalid"],
+        ["git", "config", "user.name", "fixture"],
+    ):
+        sp.run(cmd, cwd=tmp_path, check=True, capture_output=True)
+
+    (tmp_path / ".gitattributes").write_bytes(b"* text=auto eol=lf\n")
+    # Text: CRLF here is a line ending, and it is a real defect.
+    (tmp_path / "text_with_crlf.md").write_bytes(b"one\r\ntwo\r\n")
+    # Binary: the NUL byte is what makes git say `-text`, exactly as in a PNG. The same
+    # CRLF bytes here are payload, not line endings.
+    (tmp_path / "binary_with_crlf.bin").write_bytes(
+        b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\r\npayload\r\n"
+    )
+    sp.run(["git", "add", "-A"], cwd=tmp_path, check=True, capture_output=True)
+    sp.run(["git", "commit", "-qm", "fixture"], cwd=tmp_path, check=True, capture_output=True)
+
+    results = _results(check_roles.check_gitattributes(tmp_path))
+    a3 = results["A3 no CRLF in any tracked file"]
+
+    assert a3.ok is False, (
+        "A3 passed on a text file that genuinely carries CRLF — the assertion has been "
+        f"gutted, which is hard rule 6's forbidden move. detail: {a3.detail}"
+    )
+    assert "text_with_crlf.md" in a3.detail, (
+        f"A3 no longer names the real CRLF offender. detail: {a3.detail}"
+    )
+    assert "binary_with_crlf.bin" not in a3.detail, (
+        "A3 still reports a binary file's payload bytes as a line-ending defect — this is "
+        f"INC-09 unfixed. detail: {a3.detail}"
+    )
+
+    # And A4 — the assertion that REPLACED the proxy — catches the real defect on the text
+    # file (git would rewrite it on checkin) and leaves the binary file alone.
+    a4 = results["A4 working tree and object store hold identical bytes"]
+    assert a4.ok is False, (
+        f"A4 passed on a file git would rewrite on checkin. detail: {a4.detail}"
+    )
+    assert "text_with_crlf.md" in a4.detail, f"A4 does not name the offender: {a4.detail}"
+    assert "binary_with_crlf.bin" not in a4.detail, (
+        f"A4 claims git rewrites a binary file, which it does not: {a4.detail}"
+    )
+
+
+def test_a4_does_not_fire_merely_because_the_tree_is_dirty(tmp_path):
+    """A4 must not confuse *"you have unsaved work"* with *"your files are corrupting"*.
+
+    A4 asks git's round-trip question — would the filter chain rewrite these bytes? — which
+    is `PROCESS.md` §6a's actual property and is answerable on a dirty tree. Comparing
+    against the index or ``HEAD`` instead would report every uncommitted edit as a
+    line-ending defect and leave this check red through the ordinary middle of a session,
+    which is how a check earns its way onto the ignore list.
+    """
+    import subprocess as sp
+
+    for cmd in (
+        ["git", "init", "-q"],
+        ["git", "config", "user.email", "fixture@example.invalid"],
+        ["git", "config", "user.name", "fixture"],
+    ):
+        sp.run(cmd, cwd=tmp_path, check=True, capture_output=True)
+
+    (tmp_path / ".gitattributes").write_bytes(b"* text=auto eol=lf\n")
+    (tmp_path / "clean.md").write_bytes(b"committed\n")
+    sp.run(["git", "add", "-A"], cwd=tmp_path, check=True, capture_output=True)
+    sp.run(["git", "commit", "-qm", "fixture"], cwd=tmp_path, check=True, capture_output=True)
+
+    # Now dirty the tree — an ordinary uncommitted edit, still LF.
+    (tmp_path / "clean.md").write_bytes(b"committed\nand then edited\n")
+
+    results = _results(check_roles.check_gitattributes(tmp_path))
+    assert results["A3 no CRLF in any tracked file"].ok is True
+    assert results["A4 working tree and object store hold identical bytes"].ok is True, (
+        "A4 fired on an ordinary uncommitted LF edit — it is asking the wrong question. "
+        f"detail: {results['A4 working tree and object store hold identical bytes'].detail}"
+    )
 
 
 def test_the_object_store_and_the_working_tree_agree(repo_root):
