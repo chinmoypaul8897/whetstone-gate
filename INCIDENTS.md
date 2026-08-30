@@ -347,3 +347,56 @@ reviewer can overturn it on the reasoning rather than on the conclusion. This se
 structural invariant and should not be the only one who thinks the change was sound.*
 
 ---
+
+## INC-10 — the same Python-write defect INC-06 names, three commits after writing INC-06, this time corrupting content and not only line endings
+
+**Date:** 2026-08-30 (C0-COMPLETION build, **after** the first build commit `ee3cf93`)
+**Event:** Committing the documentation updates emitted
+`warning: in the working copy of 'PROGRESS.md', CRLF will be replaced by LF the next time Git touches
+it`, and the next `make check-roles` failed **both** new checks:
+`[FAIL] A3 no CRLF in any tracked file - CRLF found in 1 TEXT file(s): ['PROGRESS.md']` and
+`[FAIL] A4 - git would REWRITE 1 file(s) on checkin: ['PROGRESS.md']`. `git ls-files --eol` reported
+`w/mixed` against `i/lf`. **One** CR byte in 13,299.
+**Action:** Located the byte exactly (offset 3522, line 60) rather than reflexively normalising, which
+is what exposed the second and worse half: **the content was wrong, not merely its line endings.**
+The text `\r\n` — written to describe INC-09's own defect — had been emitted as a **real** CR and LF,
+splitting the sentence across two lines. Git had already normalised the CR away on checkin, so the
+committed blob read *"scanned every tracked file's raw bytes for `"* and then, on the next line,
+*"`, and a PNG's deflate stream…"*. **Normalising the working tree would have hidden the corruption
+instead of revealing it.** Repaired with a byte-level replacement built from character codes, written
+with `write_bytes`, and re-verified with `git hash-object` against `--no-filters`.
+**Expectation:** A file this session wrote should contain the literal text it intended, and a
+document describing a control-character defect should not contain that control character.
+**Missing:** Nothing checks a tracked document's **content** — only its line endings. A3 and A4 both
+fired, correctly and immediately, but both report *"there is a CR here"*; neither can say *"and it
+has eaten a sentence."* The content damage was found by choosing to look at the byte, not by any
+check.
+**Missed:** ⚠️ **`INCIDENTS.md` INC-06 names this exact cause, in this exact file, and this session
+had just finished reading it.** INC-06's `Missed` field reads: *"each was written or rewritten by an
+in-session **Python** script rather than by an editor tool or a shell heredoc. Python's text mode
+translates `\n` to `\r\n` on Windows by default."* This session then wrote `PROGRESS.md` with an
+in-session Python script — three commits after committing INC-09, which cites INC-06 as its own
+missed signal. **The warning was read as a known nuisance rather than as the recurrence of a
+documented defect.** The mechanism differed in detail (escape interpretation through stacked quoting,
+not text-mode translation) but the class, the tool and the file are the ones INC-06 already named.
+**Diagnosis:** The two-character sequences intended as **literal text** passed through three quoting
+layers — tool call, shell heredoc, Python string literal — and were interpreted at the last one,
+emitting real control bytes into a document. The first repair attempt failed for the *same reason at
+the same layer*, which is what identified the mechanism.
+**Fix:** **`a47bc62`**. Content repaired to the literal text; the replacement built from
+`bytes([92])`, `bytes([13])`, `bytes([96])` and friends so **no backslash escape appears in the
+repair script at all** and no layer above it has anything to reinterpret; written with `write_bytes`,
+never `write_text`. Verified: zero CR bytes in the file, and `git hash-object` equals
+`git hash-object --no-filters`, i.e. git's filter chain is now a no-op on it.
+**Systemic guardrail:** Partial, and the honest split is worth stating.
+**What worked:** the guardrail added **one commit earlier** for INC-09 caught this **within a single
+command**, before it could reach a second file. A3 fired on `PROGRESS.md` as a **TEXT** file — which
+is the live demonstration that INC-09's narrowing did not gut it — and A4 fired independently on the
+round-trip question. Two checks, two entry points, one real defect, caught on the next command.
+**What is NOT prevented:** nothing stops a session writing a tracked file through a stacked-quoting
+path, and **nothing at all** checks that a document says what its author meant. The line-ending
+guardrail is now solid; there is no content guardrail and this entry does not pretend otherwise.
+*Recorded because it is exactly the failure this project claims to record: the second occurrence of a
+defect whose first occurrence we had already written up, found in our own work, one hour later.*
+
+---
