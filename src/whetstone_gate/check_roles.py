@@ -9,6 +9,11 @@ own, because they are facts about the repository rather than about any module:
      fraud rather than a line-ending bug. The property it buys is asserted two ways: no
      CRLF in any file **git classifies as text**, and — over **every** tracked file, text
      or binary — the working tree and the object store holding the *same bytes*.
+     **A5 adds the byte-sanity pair neither of those can see**: no C0 control byte in a
+     text-classified file (INC-13's 0x08 BACKSPACE, which sat inside `CONTEXT.md` §16 for
+     two days), and no binary-classified file without a NUL (OF-01's lone CR, which makes
+     git call textual content binary and so lands it where A3 does not scan and A4 cannot
+     fail).
   B. No ``.env`` is tracked, and ``.env.example`` carries key **names** with **no values**.
   C. No secret-shaped string appears in any tracked file. (The *history* scan is C21's,
      and its remedy is constrained: revoke at the provider, never rewrite history.)
@@ -173,17 +178,46 @@ def _round_trips_unchanged(root: Path, rel: str) -> bool | None:
 # --------------------------------------------------------------------------------------
 
 
+#: Bytes that no prose document should contain: **C0 controls other than TAB, LF and CR.**
+#: Built by construction rather than typed out, so no escape sequence in this file can be
+#: eaten on the way to disk — which is the very defect A5 exists to catch (INC-13, INC-16).
+#: CR (``0x0D``) is excluded because **A3 owns it**; TAB and LF are legitimate text.
+_C0_CONTROL_BYTES = frozenset(b for b in range(0x20) if b not in (0x09, 0x0A, 0x0D))
+
+#: git decides text-vs-binary on the first 8000 bytes, so the NUL search matches its window.
+_GIT_BINARY_SNIFF_BYTES = 8000
+
+A5_CHECK = "A5 no control byte in text; no NUL-free binary"
+
+
 def check_gitattributes(root: Path) -> list[Result]:
     out: list[Result] = []
     path = root / ".gitattributes"
     if not path.is_file():
+        # ⚠️ OPEN_FINDINGS OF-03 / INCIDENTS.md INC-07. This used to `return` ONE result, so
+        # A2…A5 were not reported at all — weaker than `n/a`, and against this module's own
+        # docstring: *"Checks that cannot yet apply report `n/a` with the reason, and `n/a`
+        # is never silently a pass."* They reported NOTHING, and the summary line silently
+        # printed four fewer checks than the group owns. INC-07 diagnosed exactly this shape
+        # in `check_secrets`, fixed it there, and named this function as the surviving
+        # instance with *"Systemic guardrail: none — accepted"*. REVIEW_C0_1 did not accept
+        # it, and neither does this.
+        #
+        # ⚠️ A1 keeps THE SAME check name in both branches. Emitting a different key on pass
+        # and on fail is INC-07's other half — it made a caller's lookup raise KeyError
+        # instead of reporting a failure — and it was still present here.
+        unevaluated = "not evaluated — .gitattributes is missing; see A1"
         return [
             Result(
-                "A1 .gitattributes exists",
+                "A1 .gitattributes content",
                 False,
                 "missing — PROCESS.md §6a makes it a first-commit deliverable, and it is "
                 "fixable only in the first commit",
-            )
+            ),
+            Result("A2 .gitattributes in the FIRST commit", None, unevaluated),
+            Result("A3 no CRLF in any tracked file", None, unevaluated),
+            Result("A4 working tree and object store hold identical bytes", None, unevaluated),
+            Result(A5_CHECK, None, unevaluated),
         ]
 
     content = path.read_text(encoding="utf-8")
@@ -255,11 +289,44 @@ def check_gitattributes(root: Path) -> list[Result]:
     # NOT a regression — old A3 searched for CRLF pairs and missed a lone CR too — but it is
     # precisely INC-06's and INC-10's defect class. Closing it needs a new check and belongs
     # to C0's review, not to this session's fence.
+    #
+    # ⚠️ A5 CLOSES THE GAP THE PARAGRAPH ABOVE LEAVES OPEN, IN TWO BRANCHES, BECAUSE IT IS
+    # TWO HOLES ON OPPOSITE SIDES OF GIT'S OWN VERDICT AND ONE BRANCH WOULD CLOSE NEITHER
+    # HONESTLY:
+    #
+    #   BRANCH T — files git classifies as TEXT must carry no C0 control byte other than
+    #     TAB, LF or CR. This is INCIDENTS.md **INC-13**: `CONTEXT.md` §16 carried a literal
+    #     0x08 BACKSPACE — the eaten `\b` of a Windows path — for two days, inside the
+    #     project's own specification, read by three build sessions and one full adversarial
+    #     review and written up by one of them as a spelling mistake. A backspace does not
+    #     survive rendering, so every display tool showed a plausible wrong path; and every
+    #     check this repository owned asked about line endings or worktree-versus-blob
+    #     equality, **both of which a lone 0x08 satisfies perfectly**.
+    #
+    #   BRANCH B — files git classifies as BINARY (`-text`) must carry at least one NUL in
+    #     their first 8000 bytes. This is OPEN_FINDINGS **OF-01**: a single stray CR makes
+    #     git call an otherwise-textual file binary on CR statistics alone, and it then lands
+    #     in the bucket A3 does not scan and A4 cannot fail on.
+    #
+    # ⚠️ ONE BRANCH WOULD NOT DO. A control-byte scan over TEXT-classified files is **not** a
+    # superset of OF-01's discriminator: OF-01's whole point is that the file in question is
+    # classified BINARY, so a text-only scan skips exactly the file OF-01 is about. INC-13's
+    # byte, conversely, sits in a file git correctly calls TEXT. Building one branch would
+    # close OF-01 on paper and leave it open — which is this chunk's entire failure mode.
+    #
+    # ⚠️ The text/binary verdict comes FROM GIT (`git ls-files --eol`, the `w/` side), never
+    # from a reimplementation of git's heuristic. A second copy of the predicate under test
+    # is hard rule 8's spike defect, and INC-09 already made that mistake once. Branch B's
+    # NUL search is **not** such a copy: it compares git's verdict against an INDEPENDENT
+    # signal, which is the opposite of circularity.
     classification = _eol_classification(root)
     crlf_in_text: list[str] = []
     divergent: list[str] = []
     unverifiable: list[str] = []
+    unread: list[str] = []
     not_regular: list[str] = []
+    control_bytes: list[str] = []
+    nul_free_binaries: list[str] = []
     text_checked = 0
     binary_checked = 0
     tracked = _tracked_files(root)
@@ -278,14 +345,29 @@ def check_gitattributes(root: Path) -> list[Result]:
             worktree = p.read_bytes()
         except OSError:
             unverifiable.append(rel)
+            unread.append(rel)
             continue
 
         if classification.get(rel) == "-text":
             binary_checked += 1
+            # BRANCH B — git calls it binary. A binary file with no NUL in git's own sniff
+            # window is textual content classified binary on CR statistics alone (OF-01).
+            if 0 not in worktree[:_GIT_BINARY_SNIFF_BYTES]:
+                nul_free_binaries.append(rel)
         else:
             text_checked += 1
             if b"\r\n" in worktree:
                 crlf_in_text.append(rel)
+            # BRANCH T — git calls it text. Set intersection so the scan runs in C, and the
+            # LOWEST offending byte is reported at its first offset, so the answer is
+            # deterministic and a reader can go straight to it (INC-13 took three attempts
+            # to locate by hand).
+            offenders = set(worktree) & _C0_CONTROL_BYTES
+            if offenders:
+                byte = min(offenders)
+                control_bytes.append(
+                    f"{rel}: byte 0x{byte:02X} at offset {worktree.find(bytes([byte]))}"
+                )
 
         round_trips = _round_trips_unchanged(root, rel)
         if round_trips is None:
@@ -354,6 +436,67 @@ def check_gitattributes(root: Path) -> list[Result]:
                     else ""
                 )
                 + reconciliation
+            ),
+        )
+    )
+
+    # ⚠️ A5's OWN denominator, reconciled out loud exactly as A3's and A4's are (hard rule
+    # 11). A path A5 did not look at is NAMED, and it is a FAILURE, not a footnote.
+    a5_skipped = sorted(set(not_regular) | set(unread))
+    a5_limit = (
+        " ⚠️ WHAT A5 DOES NOT CATCH, stated because a check is worth only what its limit is "
+        "honest about. (1) An escape sequence that resolves to a PRINTABLE character, or to "
+        "a TAB, is invisible to it: A5 is a CONTROL-BYTE check, NOT a content check, and it "
+        "could not have caught INC-10's eaten sentence had the CR been a space. (2) A NUL "
+        "(0x00) inside a prose document is invisible to BOTH branches — a NUL makes git "
+        "classify the file binary at any size (MEASURED, 2026-08-31), so branch T never sees "
+        "it and branch B accepts it as the very signal it looks for. Closing that needs a "
+        "judgement about which paths are prose, which is a second copy of a decision this "
+        "check deliberately takes from git. So INCIDENTS.md INC-10's `Missing` field — "
+        "'nothing checks a tracked document's CONTENT, only its line endings' — STAYS OPEN. "
+        "A5 narrows it; it does not close it."
+    )
+    out.append(
+        Result(
+            A5_CHECK,
+            not (control_bytes or nul_free_binaries or a5_skipped),
+            (
+                f"BRANCH T: none of the {text_checked} file(s) git classifies as TEXT carries "
+                f"a byte in 0x00-0x08, 0x0B, 0x0C, 0x0E-0x1F (TAB, LF and CR excluded; A3 "
+                f"owns CR) — the class that put a literal 0x08 BACKSPACE inside CONTEXT.md "
+                f"§16 for two days (INC-13). BRANCH B: each of the {binary_checked} file(s) "
+                f"git classifies as BINARY carries a NUL in its first "
+                f"{_GIT_BINARY_SNIFF_BYTES} bytes, so none is textual content made binary by "
+                f"stray CR statistics alone (OF-01). {reconciliation}.{a5_limit}"
+                if not (control_bytes or nul_free_binaries or a5_skipped)
+                else (
+                    (
+                        f"CONTROL BYTE in {len(control_bytes)} TEXT file(s): "
+                        f"{sorted(control_bytes)[:5]}. A byte no prose document should hold, "
+                        f"invisible to every renderer — see INCIDENTS.md INC-13. "
+                        if control_bytes
+                        else ""
+                    )
+                    + (
+                        f"{len(nul_free_binaries)} file(s) git classifies as BINARY hold NO "
+                        f"NUL byte in their first {_GIT_BINARY_SNIFF_BYTES}: "
+                        f"{sorted(nul_free_binaries)[:5]}. That is the signature of textual "
+                        f"content made binary by stray CR statistics — and in that state "
+                        f"NEITHER A3 NOR A4 will look at it (OPEN_FINDINGS OF-01; INC-06, "
+                        f"INC-10). "
+                        if nul_free_binaries
+                        else ""
+                    )
+                    + (
+                        f"{len(a5_skipped)} tracked path(s) A5 could not read and therefore "
+                        f"did not check: {a5_skipped[:5]} — reported as a FAILURE, never as a "
+                        f"pass. "
+                        if a5_skipped
+                        else ""
+                    )
+                    + reconciliation
+                    + a5_limit
+                )
             ),
         )
     )

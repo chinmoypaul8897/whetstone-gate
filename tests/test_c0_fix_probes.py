@@ -754,3 +754,272 @@ def test_a4_still_says_it_asserts_nothing_on_binary_files(tmp_path):
         "A4 must state the size of the set it REALLY asserts over, not only the size of the "
         f"set it walked. detail: {a4.detail}"
     )
+
+
+# =======================================================================================
+# A5 — ONE CHECK, TWO BRANCHES, on OPPOSITE SIDES OF GIT'S OWN TEXT/BINARY VERDICT.
+#
+# There was no A5 before this session, so each probe below is fired at a fixture built to
+# violate it and would fail against a tree with no A5 at all.
+#
+# ⚠️ Branch T is NOT a superset of branch B, and the argument that it is must not be
+# rebuilt: OF-01's whole point is that a lone CR makes git classify the file BINARY, so a
+# control-byte scan over TEXT-classified files SKIPS EXACTLY THE FILE OF-01 IS ABOUT.
+# INC-13's byte sits in a file git correctly calls TEXT. Two holes, opposite sides of one
+# verdict. Closing one and claiming both is this chunk's own failure mode repeated.
+# =======================================================================================
+
+_A5 = check_roles.A5_CHECK
+
+
+def test_a5_branch_T_fires_on_a_control_byte_in_a_text_file(tmp_path):
+    """INCIDENTS.md **INC-13**: a literal 0x08 BACKSPACE inside the specification.
+
+    It sat in `CONTEXT.md` §16 from **v1.0** — which is a byte-identical copy of
+    `PROJECT_SPEC.md`, whose digest has been verified at source twice, **so the corruption
+    predates this repository** — and it was read by three build sessions and one full
+    adversarial review. Nothing could see it: a backspace does not survive rendering, so
+    every display tool showed a *plausible wrong path* rather than a corrupted one, and A1
+    through A4 all pass over it because it is not a CR and it round-trips unchanged.
+    """
+    repo = _init(tmp_path / "r")
+    # The exact shape: a Windows path whose `\b` was eaten as a backspace escape.
+    (repo / "spec.md").write_bytes(b"the shim lives at C:" + bytes([92]) + b"MinGW" + bytes([8]) + b"in\n")
+    (repo / "clean.md").write_bytes(b"ordinary prose\n")
+    _commit(repo)
+
+    results = _results(check_roles.check_gitattributes(repo))
+    a5 = results[_A5]
+    assert a5.ok is False, (
+        f"A5 passed over a text file carrying a 0x08 BACKSPACE — INC-13's byte: {a5.detail}"
+    )
+    assert "spec.md" in a5.detail and "0x08" in a5.detail, (
+        f"A5 must name the FILE and the BYTE, or it is not actionable: {a5.detail}"
+    )
+
+    # ⚠️ And the reason A5 had to exist at all: every other A-check is happy with this file.
+    assert results["A3 no CRLF in any tracked file"].ok is True
+    assert results["A4 working tree and object store hold identical bytes"].ok is True, (
+        "A4 passes on a lone control byte because it is not a line ending and git converts "
+        "nothing — which is exactly why INC-13 survived four checks for two days."
+    )
+
+
+#: Enough printable prose either side of the offending byte that git's ratio heuristic still
+#: calls the file TEXT — i.e. the situation INC-13 actually was: ONE 0x08 in 158 KB of spec.
+_PROSE_PAD = b"the quick brown fox jumps over the lazy dog. " * 45
+
+
+@pytest.mark.parametrize("byte", [0x01, 0x07, 0x08, 0x0B, 0x0C, 0x0E, 0x1B, 0x1F])
+def test_a5_branch_T_covers_the_control_range_and_spares_tab_and_lf(tmp_path, byte):
+    """The range, asserted rather than assumed — and its exclusions asserted too.
+
+    ⚠️ **The padding is not decoration.** git's text/binary verdict is a ratio, not a
+    lookup: MEASURED on 2026-08-31, ``before\\x1bafter\\n`` is classified **binary** while the
+    same byte inside a page of prose is classified **text**. Branch T is defined over what
+    git calls text, so the fixture must be the shape the defect really takes — one control
+    byte in a document, which is exactly INC-13 (one 0x08 in 158 KB of specification).
+
+    TAB and LF are legitimate text and A3 owns CR, so a file made only of those must pass —
+    a check that flagged a tab would be switched off on its first run.
+    """
+    repo = _init(tmp_path / "r")
+    (repo / "f.md").write_bytes(_PROSE_PAD + bytes([byte]) + _PROSE_PAD)
+    (repo / "tabs.md").write_bytes(b"a\tb\nc\td\n")
+    _commit(repo)
+
+    classification = check_roles._eol_classification(repo)
+    assert classification.get("f.md") != "-text", (
+        f"git classifies the 0x{byte:02X} fixture as BINARY, so it does not exercise branch "
+        f"T at all: {classification}"
+    )
+
+    a5 = _results(check_roles.check_gitattributes(repo))[_A5]
+    assert a5.ok is False, f"A5 passed over byte 0x{byte:02X} in a text file: {a5.detail}"
+    assert "f.md" in a5.detail and f"0x{byte:02X}" in a5.detail, a5.detail
+    assert "tabs.md" not in a5.detail, (
+        "A5 fired on TAB or LF. A check that flags a tab would be switched off on its first "
+        f"run, and then the real control byte ships. detail: {a5.detail}"
+    )
+
+
+def test_a5_states_the_NUL_in_prose_gap_it_cannot_close(tmp_path):
+    """⚠️ **A KNOWN GAP, ASSERTED SO IT CANNOT BE FORGOTTEN OR OVERCLAIMED.**
+
+    A NUL (``0x00``) makes git classify a file binary **at any size** — measured here, not
+    assumed. Branch T therefore never sees it, and branch B *accepts* it, because a NUL is
+    the very signal branch B looks for. **So a NUL inside a prose document is invisible to
+    both branches of A5.**
+
+    Closing it would need a judgement about which tracked paths are prose, which is a second
+    copy of a decision A5 deliberately takes from git — hard rule 8's circularity, and the
+    mistake INC-09 already made once. So it is not closed; it is **printed**, in A5's own
+    detail, where a future reader cannot skip it. That is the same remedy Q-012 applied to
+    A4's vacuity on binary content, for the same reason.
+    """
+    repo = _init(tmp_path / "r")
+    (repo / "prose.md").write_bytes(_PROSE_PAD + bytes([0]) + _PROSE_PAD)
+    _commit(repo)
+
+    classification = check_roles._eol_classification(repo)
+    assert classification.get("prose.md") == "-text", (
+        "git no longer classifies a NUL-bearing prose file as binary. If that is true, this "
+        "gap may be closeable and A5's stated limit must be revisited."
+    )
+
+    a5 = _results(check_roles.check_gitattributes(repo))[_A5]
+    assert a5.ok is True, (
+        "A5 unexpectedly caught a NUL in prose. If a later change made it do so, this test "
+        "and A5's printed limit must both be updated — do not simply delete the assertion."
+    )
+    assert "A NUL (0x00) inside a prose document is invisible to BOTH branches" in a5.detail, (
+        f"A5 must PRINT the gap it cannot close, or the check overstates its reach: {a5.detail}"
+    )
+
+
+def test_a5_branch_B_fires_on_the_OF01_reproduction(tmp_path):
+    """`OPEN_FINDINGS.md` **OF-01**, reproduced exactly as the review wrote it.
+
+        printf 'line one\\rline two\\nline three\\n' > loneCR.md
+
+    git reports ``i/-text w/-text``. The file then lands in the BINARY bucket, where **A3
+    does not scan it** and **A4 cannot fail on it** — git converts nothing on ``-text``
+    content, so its two hashes are equal by construction. INC-06's and INC-10's defect class
+    goes green, and INC-10 was caught only because that CR happened to be followed by LF.
+
+    ⚠️ Branch T cannot catch this, and that is why there are two branches: git calls this
+    file BINARY, so a control-byte scan over TEXT-classified files never looks at it.
+    """
+    repo = _init(tmp_path / "r")
+    (repo / "loneCR.md").write_bytes(b"line one" + bytes([13]) + b"line two\nline three\n")
+    _commit(repo)
+
+    eol = sp.run(
+        ["git", "ls-files", "--eol", "loneCR.md"],
+        cwd=repo, check=True, capture_output=True, text=True,
+    ).stdout
+    assert "w/-text" in eol, (
+        f"the fixture is not exercising the binary branch at all; git says: {eol!r}"
+    )
+
+    results = _results(check_roles.check_gitattributes(repo))
+    a5 = results[_A5]
+    assert a5.ok is False, (
+        f"A5 passed over OF-01's reproduction — the file both A3 and A4 are blind to: {a5.detail}"
+    )
+    assert "loneCR.md" in a5.detail, a5.detail
+
+    assert results["A3 no CRLF in any tracked file"].ok is True, (
+        "A3 is not supposed to catch this and OF-01 says so — do not re-litigate Q-012."
+    )
+    assert results["A4 working tree and object store hold identical bytes"].ok is True
+
+
+def test_a5_branch_B_passes_the_two_dashboard_pngs(repo_root):
+    """The false-positive half. Both committed PNGs carry NULs in their IHDR.
+
+    OF-01's discriminator was kept out of `check_roles` on an anti-circularity objection —
+    that it would be a second copy of git's text/binary heuristic. It is not: it compares
+    **git's own verdict** against an **independent** signal, which is the opposite of hard
+    rule 8's circularity. This probe is the evidence that it costs no false positive on the
+    only binary files this repository holds.
+    """
+    classification = check_roles._eol_classification(repo_root)
+    pngs = sorted(rel for rel, kind in classification.items() if rel.endswith(".png"))
+    assert pngs, "the two dashboard screenshots are not tracked, so this proves nothing"
+    for rel in pngs:
+        assert classification[rel] == "-text", f"{rel} is not classified binary by git"
+        assert 0 in (repo_root / rel).read_bytes()[:8000], (
+            f"{rel} carries no NUL in its first 8000 bytes, so A5 branch B would fire on a "
+            f"genuine binary file — a false positive, and the fastest way to get a check "
+            f"switched off."
+        )
+
+    a5 = _results(check_roles.check_gitattributes(repo_root))[_A5]
+    assert a5.ok is True, f"A5 fires on this repository as it stands: {a5.detail}"
+
+
+def test_a5_reconciles_its_denominator_and_states_its_own_limit(repo_root):
+    """Hard rule 11 applies to a check's own denominator, and honesty applies to its claim.
+
+    A3 and A4 both print ``<text> + <binary> + <non-regular> = <tracked>``; A5 must too, or
+    *"no control byte found"* is unreadable without knowing how many files were looked at.
+    And A5's stated limit is load-bearing in the same way A4's is: **it is a control-byte
+    check, not a content check**, so an escape resolving to a printable character or a TAB
+    is invisible to it and INC-10's `Missing` field stays open. Claiming otherwise would
+    close OF-01 and INC-10 on paper.
+    """
+    a5 = _results(check_roles.check_gitattributes(repo_root))[_A5]
+    assert "= " in a5.detail and "tracked" in a5.detail, a5.detail
+    assert "text +" in a5.detail and "binary +" in a5.detail and "non-regular" in a5.detail, (
+        f"A5 does not reconcile its denominator out loud: {a5.detail}"
+    )
+    assert "WHAT A5 DOES NOT CATCH" in a5.detail, a5.detail
+    assert "PRINTABLE" in a5.detail and "TAB" in a5.detail, a5.detail
+    assert "INC-10" in a5.detail and "STAYS OPEN" in a5.detail, (
+        "A5 must say that INC-10's Missing field is NOT closed by it. A check that "
+        f"overstates its reach is how OF-01 was left open under a green report: {a5.detail}"
+    )
+
+
+def test_a5_fails_rather_than_skips_a_path_it_could_not_read(tmp_path):
+    """A tracked path with no regular file behind it is COUNTED, NAMED and FAILED.
+
+    Hard rule 11: *"Every dropped episode is counted, categorised and printed as a number."*
+    The same applies to a check's denominator — `b0a4855` established that for A4 and A5
+    must not reintroduce the shape A4 was fixed to avoid.
+    """
+    repo = _init(tmp_path / "r")
+    (repo / "kept.md").write_bytes(b"kept\n")
+    (repo / "vanished.md").write_bytes(b"gone\n")
+    _commit(repo)
+    (repo / "vanished.md").unlink()
+
+    a5 = _results(check_roles.check_gitattributes(repo))[_A5]
+    assert a5.ok is False, f"A5 passed while one tracked path was checked by nothing: {a5.detail}"
+    assert "vanished.md" in a5.detail
+
+
+# =======================================================================================
+# OF-03 — the early return removed A2…A5 from the report with no `n/a` at all
+# =======================================================================================
+
+
+def test_every_A_check_is_still_emitted_when_gitattributes_is_missing(tmp_path):
+    """`OPEN_FINDINGS.md` **OF-03**; `INCIDENTS.md` **INC-07**, whose diagnosis this is.
+
+    With `.gitattributes` deleted the function returned **one** result, so A2, A3, A4 (and
+    now A5) reported **nothing at all** — weaker than `n/a`, and against this module's own
+    docstring: *"Checks that cannot yet apply report `n/a` with the reason, and `n/a` is
+    never silently a pass."* The summary line then silently printed four fewer checks than
+    the group owns. INC-07 fixed exactly this in `check_secrets`, named this function as the
+    surviving instance, and accepted it with *"none — accepted"*. It is not accepted here.
+
+    ⚠️ The second assertion is INC-07's OTHER half: A1 used to be emitted under a DIFFERENT
+    check name on the failing branch (*"A1 .gitattributes exists"*) from the passing one
+    (*"A1 .gitattributes content"*), so a caller's lookup raised `KeyError` instead of
+    reporting a failure. That is INC-07's literal one-line diagnosis, still present here.
+    """
+    repo = _init(tmp_path / "r")
+    (repo / "a.md").write_bytes(b"hello\n")
+    _commit(repo)
+    (repo / ".gitattributes").unlink()
+
+    results = check_roles.check_gitattributes(repo)
+    by_name = _results(results)
+    assert len(results) == 5, (
+        f"the A group owns five checks and emitted {len(results)}. A check's ABSENCE and a "
+        f"check's PASS must not be the same thing to a caller (INC-07)."
+    )
+    assert by_name["A1 .gitattributes content"].ok is False, (
+        "A1 must be emitted under the SAME check name on both branches, or a caller's "
+        "lookup raises KeyError instead of reporting a failure — INC-07's own diagnosis."
+    )
+    for name in (
+        "A2 .gitattributes in the FIRST commit",
+        "A3 no CRLF in any tracked file",
+        "A4 working tree and object store hold identical bytes",
+        _A5,
+    ):
+        assert by_name[name].ok is None, f"{name} must be n/a, not absent and not a pass"
+        assert "not evaluated" in by_name[name].detail, by_name[name].detail
