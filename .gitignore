@@ -1,0 +1,85 @@
+# ── Secrets ───────────────────────────────────────────────────────────────────
+# PROCESS.md §8: API keys live only in .env. Never committed, never echoed.
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+sdist/
+wheels/
+*.egg-info/
+*.egg
+.eggs/
+.installed.cfg
+MANIFEST
+
+# ── Virtual environments ──────────────────────────────────────────────────────
+.venv/
+venv/
+ENV/
+env/
+.python-version
+
+# ── Test / tooling caches ─────────────────────────────────────────────────────
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+
+# ── vendor/ BUILD ARTEFACTS ONLY ──────────────────────────────────────────────
+# The pinned third-party SOURCE trees are part of the repository (CONTEXT.md §16:
+# "vendor/  # pinned third-party checkouts (tau2-bench, agentdojo, CaMeL) + manifest").
+# C13's done-when requires a diff against the vendored SHA to be reproducible, so
+# only build output and nested VCS metadata are ignored here.
+vendor/**/build/
+vendor/**/dist/
+vendor/**/.git/
+vendor/**/*.egg-info/
+vendor/**/__pycache__/
+vendor/**/.pytest_cache/
+vendor/**/.venv/
+
+# ── evals/ TRANSIENT ARTEFACTS ONLY ───────────────────────────────────────────
+# ⚠️ evals/ CONTENT IS COMMITTED EVIDENCE, NOT IGNORED OUTPUT. See QUESTIONS.md Q-003.
+# CONTEXT.md §16 requires evals/episodes/ to hold "every transcript, including boring
+# ones"; PROCESS.md §9 requires every claim-from-data to ship its committed output
+# under docs/evidence/ or evals/; PROCESS.md §6b requires evals/cal/RUN_DECLARED.md and
+# evals/pilot/RUN_DECLARED.md to be pushed BEFORE their runs start. Ignoring evals/
+# outputs would make the submission's central evidence unshippable. Only genuinely
+# transient in-flight files are ignored.
+evals/**/*.partial
+evals/**/*.tmp
+evals/**/*.lock
+evals/**/tmp/
+evals/**/.checkpoint-inflight/
+
+# ── OS / editor ───────────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+!.vscode/extensions.json
