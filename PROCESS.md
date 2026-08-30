@@ -1026,6 +1026,77 @@ These rules override anything above that conflicts.
 
 ---
 
+## 11a. RECORDED DEVIATION — OVERNIGHT AUTONOMOUS OPERATION (2026-08-31)
+
+**Removing the operator from the loop removes a check. That belongs on the record, with its bounds,
+rather than in a chat.**
+
+Authorised by the operator on **2026-08-31**, for the overnight window of 31 August only. §1's role
+table has the operator carrying every prompt and making the final calls; overnight he is asleep, and
+this section says exactly what that does and does not permit.
+
+### MAY PROCEED WITHOUT THE OPERATOR
+
+- **Class B decisions** (hard rule 2 — implementation choice within spec; done, recorded, judged at
+  review).
+- **Build → review → fix → re-review cycles**, always in **different fresh sessions** (§1: build and
+  review are never the same session).
+- **The architect writing fix prompts after a FAIL.**
+- **Moving to the next independent chunk** when one is blocked.
+
+### MUST STOP AND WAIT — NO EXCEPTIONS
+
+- **Any Class A decision.**
+- **Anything touching the frozen set, the freeze, or the pre-registration** (§6, §6a, `CONTEXT.md`
+  §15.0).
+- **Anything that would fire a §14 degradation rung.**
+- **Anything that changes a number that will be published.**
+- **A review verdict** — because **a session never decides its own PASS** (`CLAUDE.md` §6.9).
+
+### THE TWICE-FAILED-CHUNK RULE
+
+As the operator **revised** it on 2026-08-31. ⚠️ **His first formulation — *"stop the whole queue"* —
+was withdrawn by him as too blunt**, and the revision is what binds:
+
+- **The twice-failed chunk stops. There is no third attempt.**
+- **Anything depending on it does not start.**
+- **INDEPENDENT HEALTHY CHUNKS CONTINUE.**
+- **The architect writes a clearly-labelled STOP entry** naming *what failed*, *what it failed on
+  twice*, and *its read on whether the repeat is **SYSTEMIC** rather than local*.
+- **If the architect judges it systemic, the whole queue stops and the reason is stated.**
+  **That judgement is the architect's.**
+
+### HARD BOUNDS
+
+- ⚠️ **ZERO PROVIDER MODEL CALLS OVERNIGHT.** No Groq call, no Google call, nothing that consumes a
+  lane's quota.
+- ⚠️ **RULED 2026-08-31 RATHER THAN ASSUMED: HTTP GETs to public third-party DOCUMENTATION are NOT
+  provider model calls and are inside the bound.** C1 needs them to satisfy §9's URL-and-date rule.
+- **Do not approach the pilot, the calibration or the freeze overnight** — they are the operator's
+  and **he must be awake** (§6b, `CONTEXT.md` §15.4: both are single-shot).
+- **Every stop writes an entry the operator can read in one pass:** what blocked, what it needs from
+  him, and what the queue did instead.
+
+### THE NEVER-CUT LIST, RESTATED HERE
+
+**Not negotiable at any hour, INCLUDING ON THE OPERATOR'S OWN INSTRUCTION:**
+
+τ²-bench · the competence probe and the void rule · the freeze, **both tags** and the external
+witness gist · `INCIDENTS.md` · the counter-metric · the seeded-defect test · C21's two form
+paragraphs and git-history secret scan.
+
+### AND: WHICH INSTRUCTION GOVERNS WHEN
+
+Instruction **(a)** — *fire the §14 ladder rather than move the freeze* — governs the **DAYTIME** of
+31 August, when the operator is awake. **§11a governs the OVERNIGHT WINDOW, and overnight it WINS:
+the architect STOPS rather than CUTS.**
+
+⚠️ **NO RUNG IS PRE-AUTHORISED TO FIRE UNATTENDED, INCLUDING RUNG 1** — because rung 1 collapses a
+review, and **the reviews are what this submission's credibility rests on.** **A stalled queue costs
+hours; an unattended review cut costs the argument.**
+
+---
+
 ## 12. THE CHUNK PLAN *(this section is `plan.md`; it is no longer a draft)*
 
 **Twenty-two chunks, C0–C21, plus seven OPERATOR RUNS.** Every chunk carries a **calendar date**, a
@@ -1089,7 +1160,7 @@ in the plan and the ladder's first rung exists for it.**
 | **C8** | 10:00–12:00 | **Scorer** — deterministic replay; E1–E3, S1, S2, **S2-amt**, S3, S4; `INDETERMINATE` at construction; **no model imports**; **no first-party module shared with `gates/`** | C7 | **full** | golden 2 passes on **all eight** predicates; **S2 and S2-amt disagree on the instalment fixture**; `test_scorer_imports_no_model_client` **and** `test_scorer_and_gates_share_no_first_party_module` both pass; the replay reconstructs state from the local chain and **never queries the world** |
 | **C9** | 10:00–12:00 | **Gates** — arms 1, 2, 2S, 3, 4 as five separate modules behind one interface; `policy.txt`, `arm3_safety.txt` verbatim; arm 2S's folded-state JSON exactly as spec §8.6 gives it; the single generic denial string; **arm 4's kernel shares no code with the scorer** | C4, C7 | **full** | golden 9 passes; **each arm emits exactly its spec §8.6 verdict set and no other** (arm 1 → `ALLOWED` only; 2/2S/3 → `ALLOWED`/`DENIED`; 4 → + `INDETERMINATE`); `test_arm4_kernel_imports_no_model_client` passes; the module-graph test confirms `gates/` ↔ `scorer/` isolation; **arms 2 and 2S differ in exactly one input — the folded state** |
 | **C10** | 12:00–14:30 | **Probe machinery + THE STATISTICS MODULE + the four non-use tests.** CANARY-A, CANARY-B (**counted over blocked entries too**), the ARM CONFOUNDED rule at 0.50 of arm 1's reach; **Wilson score interval, McNemar exact, paired bootstrap over seeds (10,000 resamples), rule-of-three at n ≥ 30 and exact one-sided Clopper–Pearson below it** | C7, C8, C2 | **full** | golden 4 passes; **reach counts a `DENIED` entry naming `pay_CANARYRECON`**; the statistics module reproduces `CONTEXT.md` §12.4's published table by computation — **±13.9 pp at n=50 / ±17.9 at n=30 / ±43.8 at n=5, and 6.0% / 10.0% / 45.1% upper bounds for an observed 0/n**; **all four non-use tests exist and pass** (spec §14). ⚠️ **This chunk must land before C14, because the Wilson LOWER BOUND is what sets the frozen void threshold** — revision 1 mentioned Wilson, McNemar, bootstrap and rule-of-three **zero times each** |
-| **C11** | 12:00–15:00 | **Runner** — a **lane-aware scheduler, not a thread pool**; independent token buckets for RPM/TPM/RPD per model; per-episode checkpoint keyed `(block, arm, seed_or_task, attacker_model)`, skipped on re-run; **resume across DAY boundaries**; 429 = backoff-with-jitter and re-queue **within the lane**, a 429 storm parks the lane; live per-model usage to `evals/usage/<model>-<date>.jsonl`; **lane reservation enforced** (§8); **the ladder's arms-{1,4} × 4-points × n=5 matrix is a supported run mode** | C0, C9 | **full** | kill mid-run and resume with **zero duplicates and zero re-runs of completed episodes**; the usage file reconciles against API-reported totals; golden 8 reproduces (incl. the 429 and truncated-episode cases); **every dropped, errored, retried and truncated episode is counted, categorised and printable** (rule 11); a day-boundary resume is demonstrated, not asserted. *(Upgraded from `code` to `full`: this chunk owns denominator integrity, 429 handling and episode dropping — squarely persona 1's territory.)* |
+| **C11** | 12:00–15:00 | **Runner** — a **lane-aware scheduler, not a thread pool**; independent token buckets for RPM/TPM/RPD per model; per-episode checkpoint keyed `(block, arm, seed_or_task, attacker_model)`, skipped on re-run; **resume across DAY boundaries**; 429 = backoff-with-jitter and re-queue **within the lane**, a 429 storm parks the lane; live per-model usage to `evals/usage/<model>-<date>.jsonl`; **lane reservation enforced** (§8); **the ladder's arms-{1,4} × 4-points × n=5 matrix is a supported run mode** | C0, C9 | **full** | kill mid-run and resume with **zero duplicates and zero re-runs of completed episodes**; the usage file reconciles against API-reported totals; golden 8 reproduces (incl. the 429 and truncated-episode cases); **every dropped, errored, retried and truncated episode is counted, categorised and printable** (rule 11); a day-boundary resume is demonstrated, not asserted; **a runner checkpoint and an episode output are `git status`-visible against the committed `.gitignore`, demonstrated** (Q-003's rider). *(Upgraded from `code` to `full`: this chunk owns denominator integrity, 429 handling and episode dropping — squarely persona 1's territory.)* |
 | **C12** | 15:00–17:30 | **Benign solver + the 30 benign scenarios + the paired-FP harness.** A second policy-blind LLM loop that **tries to succeed**; **30 mock-world scenarios derived from Razorpay's documented happy-path examples**, each shipping its own end-state predicate; the FP paired delta over `{gate OFF} × {arms 2, 2S, 3, 4}` | C4, C5, C9, C11 | **full** | all 30 scenarios are **traceable to a Razorpay documented example by URL** — none builder-invented (this is the counter-metric, and builder-written scenarios are the exact criticism this project levels at others); FP is computed as **solved-gate-OFF-and-failed-gate-ON with a gate denial in the trace**, with **both numerator and denominator printed**; "Solved" is `db_reward == 1.0` for τ² and the scenario predicate for the mock world |
 | **C13** | 15:00–16:30 | **`src/camel_comparator/`** — vendor CaMeL at its pinned SHA and invoke it **UNMODIFIED** on AgentDojo banking. ⚠️ **Separate component from the AgentDojo adapter (C16); revision 1 conflated the two into one `code`-reviewed chunk** | C0 | **full** | the branch decision is **made and recorded**: **Branch A** — `google:gemini-2.0-flash-lite-001+camel+secpol` runs live; or **Branch B** — the model id is not served / the run does not complete, and the comparator ships as a **citation of Tables 5–7 of arXiv 2503.18813v2** with the one-line reason verbatim from spec §8.5.1. **Branch B is published as a result, not hidden as a failure.** No CaMeL source file is modified — a diff against the vendored SHA is empty and is committed as proof |
 | **RUN-1** | 16:30–18:00 | ⚙️ **OPERATOR RUN — the 90-minute CaMeL branch test** (spec §17 step a, §8.5.1) | C13 | *audited inside C13's review* | timeboxed to **90 minutes**; at 18:00 the branch is decided either way and written into `PROTOCOL.md` |
@@ -1128,14 +1199,14 @@ are for the submission, not the build.
 
 | # | Time-box | Chunk | Deps | Review | Done when |
 |---|---|---|---|---|---|
-| **C19** | 09:00–14:00 | **README + architecture + PROVENANCE final pass + the Agent-Ready conventions.** Results above the fold; **§2's merchant loss first, never the methodological critique**; prior art named — CaMeL, PRAMANA, `argus`, `AgentProof`, `HydraLoop`, `reserve-gate`, OCELOT; the honest negative; the attacker-strength figure with its **measured** x-axis; **§ "Verifying the pre-registration" carrying §6a.3 verbatim and §6a.4's honesty sentence**; the `(unreviewed)` explainer; the §7a statement of what session tokens do and do not prove; `AGENTS.md`, `docs/adr/`, `bench/` | C18 | **full** | **the clean-clone test passes in a fresh directory, on the free tier, with no card attached**; ⚠️ **a fresh session runs §6a.3's verification procedure start to finish from that clean clone and reproduces the published fingerprint**; **no unsourced claim remains** — every third-party statement carries a URL and a date; `docs/reviews/OPEN_FINDINGS.md` is empty or every remaining item is explicitly accepted with a reason |
+| **C19** | 09:00–14:00 | **README + architecture + PROVENANCE final pass + the Agent-Ready conventions.** Results above the fold; **§2's merchant loss first, never the methodological critique**; prior art named — CaMeL, PRAMANA, `argus`, `AgentProof`, `HydraLoop`, `reserve-gate`, OCELOT; the honest negative; the attacker-strength figure with its **measured** x-axis; **§ "Verifying the pre-registration" carrying §6a.3 verbatim and §6a.4's honesty sentence**; the `(unreviewed)` explainer; the §7a statement of what session tokens do and do not prove; `AGENTS.md`, `docs/adr/`, `bench/` | C18 | **full** | **the clean-clone test passes in a fresh directory, on the free tier, with no card attached**; ⚠️ **a fresh session runs §6a.3's verification procedure start to finish from that clean clone and reproduces the published fingerprint**; **no unsourced claim remains** — every third-party statement carries a URL and a date; `docs/reviews/OPEN_FINDINGS.md` is empty or every remaining item is explicitly accepted with a reason; ⚠️ **the clean-clone test EXECUTES ALL THREE bootstrap steps** — clone; venv + `pip install -e ".[dev]"`; the `vendor/MANIFEST.md` §2 fetch commands followed by `pip install -e vendor/tau2-bench` — **and the README prints all three beside the clone command.** Until then `CONTEXT.md` §20's first box is FALSE. (Q-010.) |
 | **C20** | 14:00–20:00 | **The video.** The §18 shot list, its 0:35–1:25 RACE beat driven by C17's renderer. As many takes as it takes | C17, C18, C19 | **code** + **submission** | every beat in spec §18 is present and in order; **the RACE says on screen that it is a replay of a stored hash-chained ledger, and names the seed and the pre-registered N**; the void banner and the ceiling are **spoken out loud**; the ladder's **n=5 and ±44 pp** are spoken out loud; it **ends on `git show prereg-v1`** with its commit hash and date; it is uploaded and an **unlisted** link plays for a logged-out viewer |
 
 #### 4 SEPTEMBER — the submission *(spec §17 row 6)*
 
 | # | Time-box | Chunk | Deps | Review | Done when |
 |---|---|---|---|---|---|
-| **C21** | 09:00–14:00 | ⚠️ **THE SUBMISSION PACK — the deliverable revision 1 left entirely unowned.** Write `docs/submission/FORM_ANSWERS.md` containing, verbatim and final: the project name; the **Project Objectives** paragraph (**opening on the merchant's loss, never on the methodological critique** — spec §21.3); the **Build Challenges & Technical Obstacles** paragraph in the **Event / Action / Expectation / Missing / Missed** format, sourced from **≥2 `INCIDENTS.md` entries of which at least one is dated after the first build commit**, carrying the §9 limitation sentence; the exact public repo URL; the exact video URL. Then **re-verify every perishable fact of spec §21.5** (incl. that the pre-registration gist still resolves and still reports its original `created_at`). Then run the **git-history secret scan** and commit its output. **Then flip the repository to public** | C19, C20 | **full** + **submission** | both paragraphs are **pasted into the live form's preview WITHOUT SUBMITTING and screenshotted into `docs/submission/`**; a **logged-out** browser loads the repo URL and plays the video; the history-scan output is committed; the repository is public; **≥2 `INCIDENTS.md` entries are dated after the first build commit** |
+| **C21** | 09:00–14:00 | ⚠️ **THE SUBMISSION PACK — the deliverable revision 1 left entirely unowned.** Write `docs/submission/FORM_ANSWERS.md` containing, verbatim and final: the project name; the **Project Objectives** paragraph (**opening on the merchant's loss, never on the methodological critique** — spec §21.3); the **Build Challenges & Technical Obstacles** paragraph in the **Event / Action / Expectation / Missing / Missed** format, sourced from **≥2 `INCIDENTS.md` entries of which at least one is dated after the first build commit**, carrying the §9 limitation sentence; the exact public repo URL; the exact video URL. Then **re-verify every perishable fact of spec §21.5** (incl. that the pre-registration gist still resolves and still reports its original `created_at`). Then run the **git-history secret scan** and commit its output. **Then flip the repository to public** | C19, C20 | **full** + **submission** | both paragraphs are **pasted into the live form's preview WITHOUT SUBMITTING and screenshotted into `docs/submission/`**; a **logged-out** browser loads the repo URL and plays the video; the history-scan output is committed; the repository is public; **≥2 `INCIDENTS.md` entries are dated after the first build commit**; ⚠️ **no payment method is attached to either provider account, RE-CONFIRMED on 4 September and recorded in `PROVENANCE.md` §1.5 with the new date** — it is the only claim in the frozen set that can go stale with NO file changing, and a card attached on 3 September would silently convert every subsequent 429 into a bill while this repository still read NONE ATTACHED |
 | **SUBMIT** | by 18:00 IST | 🚩 **OPERATOR ACTION.** Paste the reviewed paragraphs, the repo URL and the video URL. Submit | **REVIEW_21 = PASS** | *gated on `REVIEW_21` = PASS; the reviewed artefact is what is pasted* | ⚠️ **The operator does not open the submission form until `REVIEW_21` is PASS.** The form is one-shot: *"no further changes or edits can be made after submitting."* **15:00 — no code changes.** The 5th is buffer, not plan |
 
 ### 12.2 Orphans closed, and the two deliberately dropped
