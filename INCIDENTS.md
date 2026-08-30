@@ -683,3 +683,57 @@ new check with its own registry row and its own review, and it is outside this s
 **Recorded as a known gap rather than claimed as closed.**
 
 ---
+
+## INC-16 — the INC-06 quoting defect, FIFTH occurrence, in the session that had just written INC-13 about the fourth
+
+**Date:** 2026-08-31 (C0 FIX `c9521aac`, **after** the first build commit `ee3cf93`)
+**Event:** Renaming one import line in `tests/test_c0_fix_probes.py`, this session reached for a
+four-line Python script — `p.write_text(t.replace(old, new), encoding="utf-8")` — instead of the
+editor tool. On Windows, `Path.write_text` applies the platform's newline translation, so **every
+one of the file's 705 line endings was rewritten from LF to CRLF.** `make test` went from 1 failure
+(the known dirty-tree one, OF-07) to **3**, and `check-roles` printed:
+
+```
+[FAIL] A3 no CRLF in any tracked file
+       CRLF found in 1 TEXT file(s): ['tests/test_c0_fix_probes.py']
+[FAIL] A4 working tree and object store hold identical bytes
+       git would REWRITE 1 file(s) on checkin: ['tests/test_c0_fix_probes.py']
+```
+
+**Action:** The file was repaired at the byte level with `read_bytes` / `write_bytes` and no escape
+sequence anywhere — `CR = bytes([13])`, `LF = bytes([10])` — which is the form this session's own
+prompt prescribes for exactly this reason. Verified afterwards: **0 CR bytes, 0 control bytes,
+`git hash-object` equal to `git hash-object --no-filters`**, A3 and A4 back to PASS, and the suite
+back to its single known failure. **The damage never reached a commit.**
+**Expectation:** A tool that replaces one string in a file should change one string in that file.
+**Missing:** Nothing new — this is INC-12's `Missing` field verbatim: *"nothing checks that a newly
+authored file is syntactically what its author meant before it is committed."* What is worth adding
+is that the gap is now **half closed by accident of file type and half by A3**: a `.py` file gets a
+parser, a `.md` file gets nothing, and A3 catches the line endings of both but not their content.
+**Missed:** ⚠️ **The warning was in this session's own prompt, in capitals, at the top: *"WRITE FILES
+WITH YOUR EDITOR/WRITE TOOLS, NOT SHELL HEREDOCS OR PYTHON SCRIPTS."* This session had, minutes
+earlier, written INC-13 — the entry that makes the recurrence count four — and had *already been
+bitten once in this same session* by the same class in the other direction, when a `bytes` literal
+sent through a heredoc arrived as a real 0x08 and made a byte-count check silently report zero. Two
+signals, one of them self-inflicted and observed, and the script was written anyway.**
+**Diagnosis:** `Path.write_text` performs platform newline translation by default, so a
+round-trip through it rewrites every line ending on Windows — the write side of the same
+tool-stack-interprets-your-literal defect INC-06, INC-10, INC-12 and INC-13 record on the read side.
+The habit INC-12 accepted as its only guardrail — *"author files with the editor tools"* — is
+precisely the guardrail that failed, which is what a habit does when the task looks too small to
+deserve one.
+**Fix:** No repository source defect: the damage was uncommitted and is repaired in the same commit
+that lands B-04, **`FIXSHA-B04`**. The repaired file's correctness is asserted by the 23 probes it
+contains and by A3/A4 returning to PASS.
+**Systemic guardrail:** **None new — accepted, because the mechanism already exists and it worked.**
+`check-roles` **A3 and A4 caught this inside two minutes, before any commit**, which is the whole
+reason `.gitattributes` was a first-commit deliverable (`PROCESS.md` §6a). *What is NOT prevented:*
+nothing stops a session writing a file through a translating API; the honest remedy remains a habit,
+and this entry is the fifth piece of evidence that the habit is unreliable.
+*⚠️ Recorded because leaving it out is the exact dishonesty INC-08 and INC-12 both name — and because
+it is the one entry in this file where a control that the project built for this class caught the
+class, on the same day the project discovered the class had been operating since before the
+repository existed (INC-13). **Five occurrences, five sessions, five tools. The entry that warns
+about it has now failed to prevent it four times.***
+
+---

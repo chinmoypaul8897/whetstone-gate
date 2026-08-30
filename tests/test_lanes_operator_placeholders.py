@@ -25,6 +25,26 @@ live in different tiers, so:
 The alternative - dropping the placeholder check into the unit suite - would leave a
 suite that cannot be green before 31 August, and a suite nobody can make green is a suite
 nobody reads.
+
+⚠️ **REVIEW_C0_1 B-04, and why this file now looks the way it does.** Both gates below
+used to read `config/` **around** the loader:
+
+    branch = cfg.load("lanes").data.get("camel_comparator", {}).get("branch")
+    assert not cfg.is_sentinel(branch)
+
+`.data.get(..., {})` is the defaulting accessor `config.py`'s own docstring says *"does not
+exist and must not be added"*, and `is_sentinel(None)` is `False` - **so ABSENCE READ AS
+DECIDED.** Deleting the `camel_comparator:` block flipped `make selftest` from correctly
+RED to **GREEN**, and deleting `config/lanes.yaml` entirely left the other gate passing
+too. The gate standing between this project and spending its finite free tier against a
+guessed model id **passed vacuously whenever the file it guards was absent.** See
+`INCIDENTS.md` **INC-15**.
+
+Both predicates now go **through** `require()`, so a missing file, a missing key and an
+undetermined value are each a hard refusal. Each is a helper returning either ``None`` or
+the operator-facing message, so that `tests/test_c0_fix_probes.py` can fire the gate at a
+broken fixture and assert it goes red - `PROCESS.md` S5.4: *a release gate that has never
+gone red is only decorative.*
 """
 
 from __future__ import annotations
@@ -36,29 +56,82 @@ from whetstone_gate import config as cfg
 pytestmark = pytest.mark.operator_gate
 
 
-def test_no_operator_placeholder_remains_in_config():
-    outstanding = [s for s in cfg.outstanding_sentinels() if s[2] == "TODO_OPERATOR"]
+_WHAT_TO_DO = (
+    "  WHAT TO DO: open Google AI Studio -> the model list, and copy the EXACT API id\n"
+    "  string for each dashboard label (the `models/gemma-...` / `models/gemini-...`\n"
+    "  form, not the display name). Write each into config/lanes.yaml in place of\n"
+    "  TODO_OPERATOR:\n"
+    "      gemma-26b       <- 'Gemma 4 26B'\n"
+    "      gemma-31b       <- 'Gemma 4 31B'\n"
+    "      flash-lite-3.1  <- 'Gemini 3.1 Flash Lite'\n"
+    "      flash-lite-3.5  <- 'Gemini 3.5 Flash Lite'\n\n"
+    "  WHY IT CANNOT BE GUESSED: CONTEXT.md S13.3.2 - 'Building against a dashboard\n"
+    "  label rather than an id would be a defect; this is the one place the spec\n"
+    "  cannot supply the string first-hand.' A wrong id fails at the first API call\n"
+    "  of the sweep, after the freeze, on a day with no slack.\n\n"
+    "  See QUESTIONS.md Q-006. The exact ids are written into PROTOCOL.md at prereg-v1."
+)
 
-    assert not outstanding, (
+
+def operator_placeholder_problem() -> str | None:
+    """Return the operator-facing message, or ``None`` if nothing is owed.
+
+    ⚠️ Goes through :func:`config.outstanding_sentinels`, which now **raises** when a
+    REQUIRED config file is absent (B-03). Before that, deleting `config/lanes.yaml`
+    entirely left this gate passing over a file that was not there.
+    """
+    try:
+        outstanding = [s for s in cfg.outstanding_sentinels() if s[2] == "TODO_OPERATOR"]
+    except cfg.ConfigError as exc:
+        return (
+            "CONFIG REFUSAL - the pre-spend gate cannot even READ config/, so it certainly\n"
+            "cannot certify that no placeholder remains. A gate that passes when the file\n"
+            "it guards is absent is worse than no gate (INCIDENTS.md INC-15).\n\n"
+            f"    {exc}"
+        )
+    if not outstanding:
+        return None
+    return (
         "OPERATOR ACTION REQUIRED - "
         f"{len(outstanding)} value(s) can only come from the operator's provider "
         "dashboard:\n\n"
         + "\n".join(f"    - config/{name}.yaml : {dotted}" for name, dotted, _ in outstanding)
         + "\n\n"
-        "  WHAT TO DO: open Google AI Studio -> the model list, and copy the EXACT API id\n"
-        "  string for each dashboard label (the `models/gemma-...` / `models/gemini-...`\n"
-        "  form, not the display name). Write each into config/lanes.yaml in place of\n"
-        "  TODO_OPERATOR:\n"
-        "      gemma-26b       <- 'Gemma 4 26B'\n"
-        "      gemma-31b       <- 'Gemma 4 31B'\n"
-        "      flash-lite-3.1  <- 'Gemini 3.1 Flash Lite'\n"
-        "      flash-lite-3.5  <- 'Gemini 3.5 Flash Lite'\n\n"
-        "  WHY IT CANNOT BE GUESSED: CONTEXT.md S13.3.2 - 'Building against a dashboard\n"
-        "  label rather than an id would be a defect; this is the one place the spec\n"
-        "  cannot supply the string first-hand.' A wrong id fails at the first API call\n"
-        "  of the sweep, after the freeze, on a day with no slack.\n\n"
-        "  See QUESTIONS.md Q-006. The exact ids are written into PROTOCOL.md at prereg-v1."
+        + _WHAT_TO_DO
     )
+
+
+def camel_branch_problem() -> str | None:
+    """Return why the CaMeL branch is not yet decided, or ``None`` if it is.
+
+    ⚠️ `require()` is the ONLY read path. It raises :class:`config.ConfigFileMissing` if
+    `lanes.yaml` is gone, :class:`config.MissingRequiredValue` if the key is gone, and
+    :class:`config.UndeterminedValue` while the value is a ``TODO_`` sentinel. All three
+    are the same answer to this gate - *"nobody has decided"* - and all three used to be
+    invisible to it.
+    """
+    try:
+        branch = cfg.load("lanes").require("camel_comparator.branch")
+    except cfg.ConfigError as exc:
+        return (
+            "the CaMeL branch is still undecided. It is decided by RUN-1 on 31 August, "
+            "inside a 90-minute box, and written into PROTOCOL.md. Branch B - shipping the "
+            "comparator as a citation - is a RESULT, and publishing it as one is the "
+            "point.\n\n"
+            f"    {type(exc).__name__}: {exc}"
+        )
+    if not isinstance(branch, str) or not branch.strip():
+        return (
+            f"config/lanes.yaml states camel_comparator.branch = {branch!r}, which names no "
+            "branch. RUN-1 records Branch A or Branch B; anything else is a value nobody "
+            "chose."
+        )
+    return None
+
+
+def test_no_operator_placeholder_remains_in_config():
+    problem = operator_placeholder_problem()
+    assert problem is None, problem
 
 
 def test_the_camel_branch_is_decided_before_any_camel_run():
@@ -68,9 +141,5 @@ def test_the_camel_branch_is_decided_before_any_camel_run():
     ships as a citation of Tables 5-7 of arXiv 2503.18813v2 with the `CONTEXT.md` S8.5.1
     reason verbatim. Either way the answer is recorded in `PROTOCOL.md` before the tag.
     """
-    branch = cfg.load("lanes").data.get("camel_comparator", {}).get("branch")
-    assert not cfg.is_sentinel(branch), (
-        "the CaMeL branch is still undecided. It is decided by RUN-1 on 31 August, inside "
-        "a 90-minute box, and written into PROTOCOL.md. Branch B - shipping the comparator "
-        "as a citation - is a RESULT, and publishing it as one is the point."
-    )
+    problem = camel_branch_problem()
+    assert problem is None, problem

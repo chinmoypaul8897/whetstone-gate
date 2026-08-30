@@ -611,3 +611,95 @@ def test_a_not_yet_config_is_reported_as_not_yet_and_never_as_nothing(tmp_path, 
     assert f4.ok is None, f"a not-yet file must be n/a, never a pass: {f4.detail}"
     assert "ladder.yaml" in f4.detail and "C15" in f4.detail, f4.detail
     assert results["F1 config/ loads"].ok is True
+
+
+# =======================================================================================
+# B-04 — THE PRE-SPEND GATE FLIPPED GREEN WHEN THE KEY IT GUARDS WAS DELETED.
+#
+# PROCESS.md §8: "A spend-free self-test runs before any token is spent. If the harness is
+# broken, it fails for free." `.data.get("camel_comparator", {}).get("branch")` reached
+# AROUND the loader with the defaulting accessor config.py's own docstring says "does not
+# exist and must not be added", and `is_sentinel(None)` is False — so absence read as
+# DECIDED. Both probes below PASSED before the fix.
+# REVIEW_C0.md B-04 · ARCHITECT_CHECK_0.md §3 · INCIDENTS.md INC-15.
+# =======================================================================================
+
+
+def test_the_camel_gate_goes_RED_when_the_key_it_guards_is_deleted(tmp_path, monkeypatch):
+    """Delete the ``camel_comparator:`` block; the gate must still refuse.
+
+    As shipped: ``1 failed, 1 passed`` — correctly RED. With the block removed it was
+    ``2 passed`` — **GREEN**, declaring the CaMeL branch *decided* because the key did not
+    exist. Q-009's split is what created this gate, and the gate the split created was
+    itself vacuous.
+    """
+    import test_lanes_operator_placeholders as gate  # noqa: PLC0415  (tests/ is on sys.path)
+
+    lanes_without_camel = "schema_version: 1\nlanes:\n  - name: gemma-26b\n"
+    _config_fixture(
+        tmp_path,
+        monkeypatch,
+        {"protocol.yaml": _MINIMAL_PROTOCOL, "lanes.yaml": lanes_without_camel},
+    )
+
+    problem = gate.camel_branch_problem()
+    assert problem is not None, (
+        "the pre-spend gate declared the CaMeL branch DECIDED over a config/lanes.yaml "
+        "from which camel_comparator was deleted. Absence is not a decision."
+    )
+    assert "MissingRequiredValue" in problem, (
+        f"the gate must go through require(), so absence is a typed refusal: {problem}"
+    )
+
+
+def test_the_camel_gate_goes_RED_when_lanes_yaml_is_gone_entirely(tmp_path, monkeypatch):
+    """And the file-level case: no ``lanes.yaml`` at all is not a decision either."""
+    import test_lanes_operator_placeholders as gate  # noqa: PLC0415  (tests/ is on sys.path)
+
+    _config_fixture(tmp_path, monkeypatch, {"protocol.yaml": _MINIMAL_PROTOCOL})
+    problem = gate.camel_branch_problem()
+    assert problem is not None and "ConfigFileMissing" in problem, (
+        f"the gate passed with no config/lanes.yaml on disk at all: {problem}"
+    )
+
+
+def test_the_operator_placeholder_gate_goes_RED_when_lanes_yaml_is_gone(tmp_path, monkeypatch):
+    """`REVIEW_C0.md` B-04, second half — and it is the half that guards the money.
+
+    ``test_no_operator_placeholder_remains_in_config`` is the check that stopped a token
+    being spent against a guessed model id. With `config/lanes.yaml` removed it **still
+    passed**, because ``outstanding_sentinels()`` skipped missing files (B-03's cause). The
+    two BLOCKERs meet here: the sweep's silent skip made the spending gate vacuous.
+    """
+    import test_lanes_operator_placeholders as gate  # noqa: PLC0415  (tests/ is on sys.path)
+
+    _config_fixture(tmp_path, monkeypatch, {"protocol.yaml": _MINIMAL_PROTOCOL})
+    problem = gate.operator_placeholder_problem()
+    assert problem is not None, (
+        "the operator-placeholder gate passed with no config/lanes.yaml on disk. That is "
+        "the gate between this project and spending its finite free tier against a guessed "
+        "model id, passing over the file it guards."
+    )
+    assert "CONFIG REFUSAL" in problem, problem
+
+
+def test_the_operator_placeholder_gate_still_fires_on_a_real_placeholder(tmp_path, monkeypatch):
+    """The gate must still do its ORIGINAL job — a fix that only added refusals could hide
+    a regression in the thing the gate was built for. Q-006 is why it exists."""
+    import test_lanes_operator_placeholders as gate  # noqa: PLC0415  (tests/ is on sys.path)
+
+    _config_fixture(
+        tmp_path,
+        monkeypatch,
+        {
+            "protocol.yaml": _MINIMAL_PROTOCOL,
+            "lanes.yaml": "schema_version: 1\nlanes:\n  - name: gemma-26b\n"
+            "    api_model_id: TODO_OPERATOR\ncamel_comparator:\n  branch: A\n",
+        },
+    )
+    problem = gate.operator_placeholder_problem()
+    assert problem is not None and "OPERATOR ACTION REQUIRED" in problem, problem
+    assert "lanes[gemma-26b].api_model_id" in problem, problem
+    assert gate.camel_branch_problem() is None, (
+        "a DECIDED branch must satisfy the gate, or `make selftest` can never go green"
+    )
