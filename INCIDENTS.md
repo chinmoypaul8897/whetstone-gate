@@ -516,3 +516,170 @@ value is not its size — it is that it makes the recurrence count three, which 
 made a mistake" into "this tool path is unsafe and the warning does not work."*
 
 ---
+
+## INC-13 — a BACKSPACE byte sat inside the specification for two days, and every tool that could see it rendered it away
+
+**Date:** 2026-08-31 (found by the architect-artefact landing session `e210c6f5`; written up here by
+C0 FIX `c9521aac`, **after** the first build commit `ee3cf93`)
+**Event:** While landing Q-005's one-word path correction, the editor tool refused **three times** to
+match the string `MinGWin` in `CONTEXT.md` §16 — a string that `grep`, the file viewer, and four
+prior sessions had all displayed. The tool was right and the display was wrong. The bytes on disk
+were `C:\MinGW`, then **0x08 — BACKSPACE** — then `in\`.
+**Action:** The byte was located at the byte level rather than argued about, and the whole line was
+rewritten to `C:\MinGW\bin\mingw32-make.exe` as Q-005's ruling directs. The architect then verified
+the extent of the class, and every one of those checks is re-runnable: `104fc74`, `310488d` and
+`759d989` each carry **exactly one** C0 control byte, at the same context; **HEAD carries zero** and
+its worktree equals its blob; and at `759d989` `CONTEXT.md` was **the only tracked non-PNG file
+carrying one**.
+**Expectation:** A project whose entire freeze rests on byte-level integrity — running four dedicated
+checks over every tracked file, and publishing a fingerprint computed from git objects — should not
+carry an invisible control character inside its own specification for two days. Still less should
+that character be read by three build sessions and one full adversarial review, and then be written
+up by one of them as a spelling mistake.
+**Missing:** Any check on tracked-document **content**. A1 asks whether `.gitattributes` says the
+right thing, A2 whether it was in the first commit, A3 whether a text file carries CRLF, A4 whether
+the worktree and the object store hold the same bytes. Between them they answer *"are the line
+endings right"* and *"do the worktree and the object store agree"*. **Nothing asks "does this
+document contain a byte that no prose document should contain."**
+**Missed:** **Two signals, both present in the repository.** (1) `CONTEXT.md` §16 gave **two different
+paths for the same executable four lines apart**. Q-005 spotted the discrepancy, measured the
+filesystem, and concluded correctly that the command was right — and then stopped at *"typo"*
+without asking why a typo would reproduce the neighbouring string so exactly. `C:\MinGWin\` is not a
+plausible mistyping of `C:\MinGW\bin\`; it is that string **with one character eaten**. (2)
+`REVIEW_C0` re-derived the line-ending property over all 40 tracked files and read this very line
+while doing it.
+**Diagnosis:** A backspace does not survive rendering, so every tool that displayed the file — grep,
+the viewer, four sessions and one full review — showed a **plausible wrong path** rather than a
+corrupted one, and the single tool that compared bytes was the one everybody assumed was broken.
+And every integrity check this repository owns asks either about line endings or about
+worktree-versus-blob equality, **both of which a lone 0x08 satisfies perfectly**: it is not a CR, and
+it is committed and checked out unchanged.
+**Fix:** The byte is already gone, removed in **`63da93a`** (`CONTEXT.md` v1.2, Q-005's correction).
+That SHA is correct whatever number this entry lands at.
+**Systemic guardrail:** **`check-roles` A5**, built by this session — branch T asserts that no file
+git classifies as **text** carries a byte in `0x00`–`0x08`, `0x0B`, `0x0C`, `0x0E`–`0x1F` (TAB, LF and
+CR excluded; A3 owns CR). ⚠️ **State honestly what A5 does NOT catch: an escape sequence that
+resolves to a PRINTABLE character, or to a TAB, is invisible to it.** A5 is a **control-byte** check,
+not a content check. **INC-10's `Missing` field — *"nothing checks a tracked document's CONTENT, only
+its line endings"* — stays open**, and A5 narrows it rather than closing it.
+*⚠️ THE FACT THAT MAKES THIS ENTRY WORTH WRITING, and which the session that found the byte did not
+state: the bytes are `C:\MinGW` + 0x08 + `in\`, and the intended string is `C:\MinGW\bin\`. **The*
+`\b` *of* `\bin` *WAS EATEN AS A BACKSPACE ESCAPE.** That is **INC-06's exact mechanism** — literal
+text carried through a quoting layer and interpreted at the last one — which **INC-10 and INC-12 also
+record. This is the FOURTH OCCURRENCE and chronologically the FIRST.** It is present in `CONTEXT.md`
+**v1.0 (`104fc74`)**; v1.0 is a byte-identical copy of `PROJECT_SPEC.md`; and that file's digest
+`10f6746c…` has been verified **at source, twice**. **So the corruption predates this repository. The
+class was operating before the project began recording it.***
+
+---
+
+## INC-14 — three of C0's own checks reported PASS over input built to break them, because none had ever been fired at one
+
+**Date:** 2026-08-31 (C0 FIX `c9521aac`, **after** the first build commit `ee3cf93`)
+**Event:** `REVIEW_C0_1` returned **FAIL** with four BLOCKERs. Three of them — **B-01**, **B-02** and
+**B-03** — are one defect in three places, and each was reproduced from a fresh clone:
+- **B-01.** `check_session_tokens` builds `issued[token] = (chunk, role)`, **keyed by token**, so a
+  token appearing in two rows keeps only the last. Every token then lands in exactly one
+  `(chunk, role)` bucket: **E3's count is always 1** and **E2's BUILD∩REVIEW is always empty**. Two of
+  `PROCESS.md` §7a's three named conditions were **structurally unable to fire**.
+- **B-02.** `check-roles` **D3** — the check `check_roles.py`'s own docstring calls *"the whole
+  moat"* — passed on **three of the four** attack forms the review built, including
+  `from whetstone_gate import shared_predicate` on both sides, which is **hard rule 8's own named
+  spike defect transliterated into Python** and the most natural way to write it in this layout.
+  Three causes: an unruled allow-list holding the package root, `""` recorded for a relative import,
+  and a **one-hop-deep walk where hard rule 8 says transitive**.
+- **B-03.** `outstanding_sentinels()` carried a blanket `if not path.is_file(): continue`, written so
+  a legitimately-absent `ladder.yaml` was not an error — and it silently excused **`protocol.yaml`**
+  too. With that pre-registration artefact deleted, the F group printed **`PASS F1 config/ loads —
+  protocol.yaml and lanes.yaml parse`** over a file that did not exist, five sentinels vanished from
+  the count including the void threshold, and `check-roles` **exited 0**.
+**Action:** This session wrote these entries first, then rebuilt each of the three checks so that it
+can go red, and — this is the part that matters — added a **kept probe per fix that FAILS on the old
+code and PASSES on the new**, with both results shown in the session report. `_TOKEN_ROW`'s parse now
+maps one token to **many** `(chunk, role)` pairs; D3 walks the module graph **transitively**, resolves
+relative imports against the importing file's own package, resolves `from whetstone_gate import X` to
+`whetstone_gate.X`, and carries the **empty** allow-list hard rule 8 describes; and the sentinel sweep
+distinguishes a **required** config (a hard refusal when absent) from a **not-yet** one (reported as
+not-yet, never as nothing).
+**Expectation:** C0's deliverable **is a set of checks**. `PROCESS.md` §5.4 is the governing line —
+*"a release gate that has never gone red is only decorative"* — and it is quoted in this project's own
+`§0` and `§13`. A check that cannot fail is not a weak check; it is a **false statement printed on
+every run**, and C19 is scheduled to tell a panelist that these checks exist.
+**Missing:** A convention that a check ships **with the input that makes it fail**. `PROCESS.md` §12.1
+requires mutants at review time, which is after the fact and by a different session; nothing required
+the **building** session to fire its own check at a failing fixture. The four defects are exactly the
+branches that had therefore never executed.
+**Missed:** **The signal was already in the record, measured and printed.** `REVIEW_C0.md` **F-05**
+counted it: **only THREE tests in the entire suite build a fixture intended to make a check FAIL, and
+all three came from INC-09's CRLF work** — i.e. the only place a check had ever been fired at breaking
+input was the one place a check had already been caught being wrong. Twelve of nineteen mutants
+survived on exactly that account, and the root cause F-05 records — *"the suite asserts `result.ok is
+True` against a repository in which every check passes trivially"* — is this entry's `Diagnosis`,
+written by the review a day before this session read it.
+**Diagnosis:** Each of the three checks was written against a repository in which it passes, and none
+was ever executed against input constructed to make it fail — so E2/E3's parse could collapse two rows
+into one, D3's comparison could discard the commonest import string in the project, and F1's sweep
+could skip a missing pre-registration artefact, and **every one of them still printed `clean`**. The
+defect is uniform and it is in none of the three predicates: it is that the suite's oracle was *"the
+check passes here"*, which is satisfied perfectly by a check that cannot fail anywhere.
+**Fix:** B-01 in **`FIXSHA-B01`**; B-02 in **`FIXSHA-B02`**; B-03 in **`FIXSHA-B03`**. Each carries its
+kept probe in the same commit, and each probe was run against the pre-fix code and observed to fail
+before the fix landed.
+**Systemic guardrail:** **Partial, and the limit is stated.** *What works from now on:* every check
+this session touched now has a probe that fires it at input built to break it, and those probes live
+in `tests/test_c0_fix_probes.py` beside the review's own — the suite's ratio of *fires-on-failure*
+tests goes from **3** to well over twenty. *What is NOT prevented:* **nothing enforces the convention.**
+No rule in `PROCESS.md` or `CLAUDE.md` says a build session must ship a failing fixture with each
+check, so the next chunk that adds a check can add it exactly the way C0 did. Closing that needs a
+process change, which is the architect's and not this session's.
+
+---
+
+## INC-15 — the one test that guards spending reached around the loader with the accessor the loader was deliberately built without
+
+**Date:** 2026-08-31 (C0 FIX `c9521aac`, **after** the first build commit `ee3cf93`)
+**Event:** `REVIEW_C0_1` **B-04**. `make selftest` is the **pre-spend gate** — `PROCESS.md` §8:
+*"A spend-free self-test runs before any token is spent. If the harness is broken, it fails for
+free."* Deleting the `camel_comparator:` block from `config/lanes.yaml` flipped it from `1 failed,
+1 passed` (correctly **RED**) to **`2 passed`** (**GREEN**). Deleting `config/lanes.yaml` entirely left
+`test_no_operator_placeholder_remains_in_config` passing as well. **The gate that stands between this
+project and spending its finite free tier against a guessed model id passed vacuously whenever the
+file it guards was absent.**
+**Action:** Both operator-gate tests were rewritten to go **through** the loader's required-value path,
+so that a missing file, a missing key and an undetermined value are each a hard refusal rather than a
+`None` that reads as decided. The predicate of each was extracted into a helper returning either
+`None` or the operator-facing message, so a probe can fire the gate at a broken fixture and assert it
+goes red — which the two probes in `tests/test_c0_fix_probes.py` now do, one per half.
+⚠️ **`make selftest` is still RED, and that is the correct outcome** (Q-009, upheld): it is red until
+RUN-1 decides the CaMeL branch. What changed is that it is now red **for the right reason, on a gate
+that can actually go red.**
+**Expectation:** `config.py`'s own module docstring, first bullet: *"There is **no**
+`get(key, default=...)`. It does not exist and must not be added. … You cannot get a silent fallback
+out of this API by accident, **because the API has no place to put one**."* That design holds only if
+callers use the API. This caller did not.
+**Missing:** Anything that notices a caller reaching past `require()` to `.data`. `Config.data` is a
+public dataclass field, `dict.get` is built in, and no test, tripwire or check looks for the pattern
+`.data.get(`. The loader's austerity is documented in prose and enforced by nothing.
+**Missed:** **`config.py`'s docstring says it in as many words, and the session that wrote the test had
+read it** — it is item 1 of the module's own opening list, in the file the test imports on its second
+line. The reasoning it gives is the exact failure that then occurred: *"if a missing threshold silently
+read as `0.0`, every run would pass the void check and the project's central control would be inert —
+and nothing would have raised."* Substitute *"a missing branch key"* for *"a missing threshold"* and
+that sentence is B-04.
+**Diagnosis:** `cfg.load("lanes").data.get("camel_comparator", {}).get("branch")` bypasses the one
+refusal path the loader exposes, and `is_sentinel(None)` is `False` — so **absence read as decided**,
+in the single test whose job is to be red until a decision exists. The mechanism is not that the
+loader was wrong but that the gate did not use it, and nothing in the repository could tell the
+difference.
+**Fix:** **`FIXSHA-B04`**, with two kept probes: deleting the `camel_comparator:` block makes the gate
+fail, and deleting `config/lanes.yaml` entirely makes the operator-placeholder gate fail. **Both
+passed before this fix**, which is what made them worth writing.
+**Systemic guardrail:** **Partial.** *What works from now on:* the two operator-gate predicates are
+helpers that a test can call against a fixture directory, so *"this gate can go red"* is now asserted
+rather than assumed, and `WHETSTONE_CONFIG_DIR` makes that assertion cheap for every future gate.
+*What is NOT prevented:* **nothing stops the next caller writing `.data.get(...)` again.** A tripwire
+scanning first-party source for `.data.get(` and `.data[` outside the loader would close it; that is a
+new check with its own registry row and its own review, and it is outside this session's scope fence.
+**Recorded as a known gap rather than claimed as closed.**
+
+---
