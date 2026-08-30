@@ -888,24 +888,47 @@ def _malformed_trailer_result(malformed: list[tuple[str, str]]) -> Result:
 
 
 def check_config_sentinels(root: Path) -> list[Result]:
+    where = cfg.config_dir()
     try:
-        outstanding = cfg.outstanding_sentinels()
+        sweep = cfg.sweep_configs()
     except cfg.ConfigError as exc:
-        return [Result("F1 config/ loads", False, str(exc))]
+        # ⚠️ OF-03's remedy, applied here too: when F1 fails, the other three are still
+        # EMITTED, as `n/a` with the reason. A check's absence and a check's pass must not
+        # be the same thing to a caller (INCIDENTS.md INC-07), and the summary line must not
+        # silently print fewer checks than the group owns.
+        unevaluated = "not evaluated — config/ did not load; see F1"
+        return [
+            Result("F1 config/ loads", False, f"{where}: {exc}"),
+            Result("F2 undetermined values are DECLARED, not defaulted", None, unevaluated),
+            Result("F3 OPERATOR-owed values", None, unevaluated),
+            Result("F4 config files not yet written", None, unevaluated),
+        ]
 
+    outstanding = list(sweep.outstanding)
     operator_owed = [s for s in outstanding if s[2] == "TODO_OPERATOR"]
     detail = (
         "no undetermined values remain"
         if not outstanding
         else "; ".join(f"{name}:{path} = {sentinel}" for name, path, sentinel in outstanding)
     )
+    # ⚠️ F1 now reports WHAT ACTUALLY LOADED. It used to be the hardcoded string
+    # "protocol.yaml and lanes.yaml parse" — a conclusion, naming a file it had never
+    # opened, printed unchanged over a config/ from which protocol.yaml had been deleted.
+    loaded = ", ".join(f"{name}.yaml" for name in sweep.loaded) or "(nothing)"
     return [
-        Result("F1 config/ loads", True, "protocol.yaml and lanes.yaml parse"),
+        Result(
+            "F1 config/ loads",
+            True,
+            f"{where} — {len(sweep.loaded)} file(s) opened and parsed: {loaded}. "
+            f"REQUIRED: {', '.join(f'{n}.yaml' for n in cfg.REQUIRED_CONFIGS)} — a missing "
+            f"one is a hard refusal, never a skip",
+        ),
         Result(
             "F2 undetermined values are DECLARED, not defaulted",
             True,
-            f"{len(outstanding)} explicit TODO_ sentinel(s); the loader RAISES on each "
-            f"rather than substituting a value (hard rule 9). {detail}",
+            f"{len(outstanding)} explicit TODO_ sentinel(s) across {len(sweep.loaded)} "
+            f"parsed file(s); the loader RAISES on each rather than substituting a value "
+            f"(hard rule 9). {detail}",
         ),
         Result(
             "F3 OPERATOR-owed values",
@@ -915,6 +938,15 @@ def check_config_sentinels(root: Path) -> list[Result]:
             + " — see QUESTIONS.md Q-006"
             if operator_owed
             else "none outstanding",
+        ),
+        Result(
+            "F4 config files not yet written",
+            None if sweep.not_yet else True,
+            "; ".join(f"{name}.yaml — {who}" for name, who in sweep.not_yet)
+            + ". Reported as NOT-YET, never as nothing: an absent file contributes zero "
+            "sentinels, and 'zero' must not be readable as 'clean'"
+            if sweep.not_yet
+            else f"every known config exists: {', '.join(cfg.KNOWN_CONFIGS)}",
         ),
     ]
 

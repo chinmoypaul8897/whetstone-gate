@@ -496,3 +496,118 @@ def test_the_walk_sees_import_forms_a_single_capture_group_missed(tmp_path):
         f"imported that way crossed the moat unrecorded. detail: {d3.detail}"
     )
     assert "whetstone_gate.shared_predicate" in d3.detail
+
+
+# =======================================================================================
+# B-03 — the F group reported `config/` COMPLETE over a `config/` that had lost
+# `protocol.yaml`, a PRE-REGISTRATION ARTEFACT, while printing a hardcoded string naming a
+# file it never opened. Five sentinels vanished from the count — among them the void
+# threshold, which `config.py`'s own docstring calls "the single number that decides whether
+# the whole run is publishable" — and check-roles EXITED 0.
+# REVIEW_C0.md B-03 · ARCHITECT_CHECK_0.md §3 · INCIDENTS.md INC-14.
+# =======================================================================================
+
+
+def _config_fixture(tmp_path, monkeypatch, files: dict[str, str]):
+    """A throwaway ``config/`` reached through ``WHETSTONE_CONFIG_DIR``.
+
+    ⚠️ The repository's own ``config/`` is a **frozen pre-registration artefact** and is
+    never edited by a test. The loader honours this variable precisely so that it need not
+    be.
+    """
+    where = tmp_path / "config"
+    where.mkdir(parents=True, exist_ok=True)
+    for name, body in files.items():
+        (where / name).write_text(body, encoding="utf-8")
+    monkeypatch.setenv("WHETSTONE_CONFIG_DIR", str(where))
+    return where
+
+
+_MINIMAL_LANES = (
+    "schema_version: 1\n"
+    "lanes:\n"
+    "  - name: gemma-26b\n"
+    "    api_model_id: models/gemma-4-26b-a4b-it\n"
+    "camel_comparator:\n"
+    "  branch: TODO_C13_RUN1\n"
+)
+_MINIMAL_PROTOCOL = (
+    "schema_version: 1\n"
+    "probe:\n"
+    "  void_threshold_breach_rate: TODO_C14_CALIBRATION\n"
+    "vendor:\n"
+    "  agentdojo_sha: TODO_C13_C16\n"
+)
+
+
+def test_a_missing_REQUIRED_config_is_a_refusal_and_F1_fails(tmp_path, monkeypatch):
+    """`protocol.yaml` deleted. F1 must FAIL, and the sentinel count must NOT drop quietly.
+
+    `CLAUDE.md` hard rule 9 makes ``config/`` a pre-registration artefact and hard rule 11
+    forbids silent denominator shrinkage — *"every dropped episode is counted, categorised
+    and printed as a number"* — which applies to a check's own denominator too. The old
+    sweep's blanket ``if not path.is_file(): continue`` deliberately bypassed ``load()``'s
+    own ``ConfigFileMissing``, so the answer went from six sentinels to one and the report
+    said **PASS**.
+    """
+    _config_fixture(tmp_path, monkeypatch, {"lanes.yaml": _MINIMAL_LANES})
+
+    with pytest.raises(cfg.ConfigFileMissing):
+        cfg.outstanding_sentinels()
+
+    results = _results(check_roles.check_config_sentinels(tmp_path))
+    f1 = results["F1 config/ loads"]
+    assert f1.ok is False, (
+        f"F1 reported config/ loading over a config/ with no protocol.yaml: {f1.detail}"
+    )
+    assert "protocol.yaml" in f1.detail
+
+    f2 = results["F2 undetermined values are DECLARED, not defaulted"]
+    assert f2.ok is not True, (
+        f"F2 reported a sentinel count over a config/ it could not read: {f2.detail}"
+    )
+    assert "not evaluated" in f2.detail, (
+        "OF-03/INC-07: a check's ABSENCE and a check's PASS must not be the same thing to a "
+        f"caller. F2 must say it was not evaluated. detail: {f2.detail}"
+    )
+    assert len(results) == 4, (
+        "the F group must still EMIT all four checks when F1 fails, or the summary line "
+        f"silently prints fewer checks than the group owns. got {len(results)}"
+    )
+
+
+def test_F1_reports_what_actually_loaded_rather_than_a_hardcoded_string(tmp_path, monkeypatch):
+    """F1's detail was the fixed string *"protocol.yaml and lanes.yaml parse"*.
+
+    It named a file it had never opened, and it said so identically whether that file was
+    there or not. A check whose output is a conclusion rather than an observation cannot be
+    read as evidence of anything.
+    """
+    _config_fixture(
+        tmp_path,
+        monkeypatch,
+        {"protocol.yaml": _MINIMAL_PROTOCOL, "lanes.yaml": _MINIMAL_LANES, "ladder.yaml": "a: 1\n"},
+    )
+    f1 = _results(check_roles.check_config_sentinels(tmp_path))["F1 config/ loads"]
+    assert f1.ok is True, f1.detail
+    assert "3 file(s) opened and parsed" in f1.detail, (
+        f"F1 must report the files it OPENED, and there are three here: {f1.detail}"
+    )
+    assert "ladder.yaml" in f1.detail
+
+
+def test_a_not_yet_config_is_reported_as_not_yet_and_never_as_nothing(tmp_path, monkeypatch):
+    """`ladder.yaml` is legitimately absent until C15 — and its absence is REPORTED.
+
+    This is the distinction the blanket ``continue`` erased. A not-yet file contributes zero
+    sentinels, and *"zero"* must never be readable as *"clean"*: `check_roles.py`'s own
+    docstring says ``n/a`` is never silently a pass, and here it is not silent at all.
+    """
+    _config_fixture(
+        tmp_path, monkeypatch, {"protocol.yaml": _MINIMAL_PROTOCOL, "lanes.yaml": _MINIMAL_LANES}
+    )
+    results = _results(check_roles.check_config_sentinels(tmp_path))
+    f4 = results["F4 config files not yet written"]
+    assert f4.ok is None, f"a not-yet file must be n/a, never a pass: {f4.detail}"
+    assert "ladder.yaml" in f4.detail and "C15" in f4.detail, f4.detail
+    assert results["F1 config/ loads"].ok is True

@@ -90,8 +90,31 @@ _SENTINEL_OWNERS = {
     ),
 }
 
+#: ⚠️ **REQUIRED, and the distinction is load-bearing rather than tidy.**
+#:
+#: These files are **pre-registration artefacts** (`CONTEXT.md` §15.0). A sweep that skips
+#: one it cannot open reports a **smaller number than the truth**, which is `CLAUDE.md` hard
+#: rule 11's shape applied to a check's own denominator. That is exactly what happened:
+#: :func:`outstanding_sentinels` carried a blanket ``if not path.is_file(): continue``,
+#: written so a legitimately-absent ``ladder.yaml`` was not an error — and it **silently
+#: excused `protocol.yaml` too**, so with that file deleted `check-roles` printed
+#: *"PASS F1 config/ loads — protocol.yaml and lanes.yaml parse"*, five sentinels vanished
+#: from the count **including the void threshold**, and the process **exited 0**.
+#: `REVIEW_C0.md` **B-03**; `ARCHITECT_CHECK_0.md` §3; `INCIDENTS.md` **INC-14**.
+REQUIRED_CONFIGS: tuple[str, ...] = ("protocol", "lanes")
+
+#: **NOT YET WRITTEN, by plan, with the chunk that writes it named.** An absent file here is
+#: reported as *not yet* — never as *nothing*, and never as a pass. If one appears early it
+#: is loaded and swept like any other.
+NOT_YET_CONFIGS: dict[str, str] = {
+    "ladder": (
+        "C15 — the attacker-strength ladder harness. Absent until then, by plan, and its "
+        "absence is REPORTED rather than skipped"
+    ),
+}
+
 #: The config files this project reads. There are no others.
-KNOWN_CONFIGS = ("protocol", "lanes", "ladder")
+KNOWN_CONFIGS: tuple[str, ...] = REQUIRED_CONFIGS + tuple(NOT_YET_CONFIGS)
 
 
 def config_dir() -> Path:
@@ -219,19 +242,55 @@ def load(name: str) -> Config:
     return Config(name=name, path=path, data=data)
 
 
+@dataclass(frozen=True)
+class Sweep:
+    """What a full pass over ``config/`` found — **including what it could not read**.
+
+    The old sweep returned only the sentinel list, so *"no undetermined values remain"* and
+    *"I did not open the file that holds them"* were the same answer. This type makes the
+    denominator explicit, which is `CLAUDE.md` hard rule 11 applied to a check.
+    """
+
+    outstanding: tuple[tuple[str, str, str], ...]
+    """``(config_name, dotted_path, sentinel)`` for every undetermined value found."""
+
+    loaded: tuple[str, ...]
+    """The config files actually opened and parsed. F1 reports **this**, not a fixed string."""
+
+    not_yet: tuple[tuple[str, str], ...]
+    """``(config_name, who writes it)`` for a NOT-YET file that is legitimately absent."""
+
+
+def sweep_configs() -> Sweep:
+    """Sweep every config file for undetermined values.
+
+    ⚠️ **A missing REQUIRED config is a hard refusal, raised, not skipped.** ``load()``
+    already raises :class:`ConfigFileMissing`; the old sweep **deliberately bypassed the
+    loader's own refusal** with a blanket ``if not path.is_file(): continue``, so deleting
+    a pre-registration artefact made the count go DOWN and the process still exit 0. A
+    NOT-YET file is a different thing and is reported as one.
+    """
+    found: list[tuple[str, str, str]] = []
+    loaded: list[str] = []
+    not_yet: list[tuple[str, str]] = []
+    for name in KNOWN_CONFIGS:
+        path = config_dir() / f"{name}.yaml"
+        if name in NOT_YET_CONFIGS and not path.is_file():
+            not_yet.append((name, NOT_YET_CONFIGS[name]))
+            continue
+        cfg = load(name)  # RAISES ConfigFileMissing on a REQUIRED file that is not there
+        loaded.append(name)
+        for dotted, sentinel in cfg.sentinels():
+            found.append((name, dotted, sentinel))
+    return Sweep(tuple(found), tuple(loaded), tuple(not_yet))
+
+
 def outstanding_sentinels() -> list[tuple[str, str, str]]:
     """Return ``(config_name, dotted_path, sentinel)`` for every undetermined value.
 
     Used by ``check-roles`` and by the operator-gate test, so that "somebody still owes
     this project a value" is a number the repository can print rather than a thing
-    somebody has to remember.
+    somebody has to remember. **Raises if a REQUIRED config file is absent** — see
+    :func:`sweep_configs`.
     """
-    found: list[tuple[str, str, str]] = []
-    for name in KNOWN_CONFIGS:
-        path = config_dir() / f"{name}.yaml"
-        if not path.is_file():
-            continue  # ladder.yaml does not exist until C15. Absence is not a sentinel.
-        cfg = load(name)
-        for dotted, sentinel in cfg.sentinels():
-            found.append((name, dotted, sentinel))
-    return found
+    return list(sweep_configs().outstanding)
