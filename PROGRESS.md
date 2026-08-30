@@ -6,6 +6,88 @@ not a record; this file is.
 
 ---
 
+## C0-COMPLETION — BUILD — attempt 1 — 2026-08-30
+
+**SESSION-TOKEN:** ⚠️ **none issued.** This prompt, like C0's, carried no `SESSION-TOKEN`
+line, and this session **did not fabricate one** — the prompt said so explicitly and
+`QUESTIONS.md` **Q-001** already records the gap and the reasoning. Every commit here is
+permanently untrailered, and `check-roles` E4 reports that as `n/a` naming Q-001, never as
+a pass.
+
+**Scope:** the **three operator-owed items** that C0 reported as FAIL-pending-operator,
+now supplied. Nothing else. **No project logic** — no world, ledger, scorer, gates,
+attacker or adapters.
+
+**Token spend: NONE.** Zero calls to any Groq or Google model. Writing a model id into a
+config file is not a call, and validating an id against the live endpoint is a later
+chunk's job that needs the operator's key.
+
+### What landed
+
+1. **The four Google API model ids** (closes **Q-006**), captured by the operator from the
+   live models endpoint on 2026-08-30 — `models/gemma-4-26b-a4b-it`,
+   `models/gemma-4-31b-it`, `models/gemini-3.1-flash-lite`,
+   `models/gemini-3.5-flash-lite` — with each lane's `inputTokenLimit`,
+   `outputTokenLimit` and `supportedGenerationMethods`, and the **preview-vs-stable
+   ruling** written down so nobody re-derives it under time pressure.
+2. **Both dashboard screenshots** (closes half of **Q-008**), with byte sizes, SHA-256
+   digests, and a structural PNG validation.
+3. **The no-payment-method attestation** (closes the other half of **Q-008**), labelled
+   **OPERATOR-ATTESTED**, with what the property actually buys written out beside it.
+
+### The three things worth reading the diff for
+
+1. **`make selftest` is still red, and the report says so in the first paragraph.** The
+   placeholder gate is now green; the remaining failure is
+   `test_the_camel_branch_is_decided_before_any_camel_run` — `TODO_C13_RUN1`, owned by
+   RUN-1 on 31 August. A different reason, reported as a different reason. `STATUS.md`
+   now carries a *"what `make selftest` is still waiting on"* table so a red gate is never
+   mistaken for missing ids again.
+2. **The caching finding was verified, not accepted.** The prompt said the architect had
+   already checked that §13.4 is unaffected. It is — `grep -ic cach CONTEXT.md` returns
+   **0**, and §13.4's figures re-derive exactly from raw throughput (32,000 × 60 =
+   1.92M/h; 76.9M ÷ 1.92M = 40.05 h against its stated ≈40 h; ~37 h and ~34 h likewise).
+   **Q-011** records the fact, the verification, and the forward consequence: caching is
+   **not** an available lever for the §13.4 lane-hour gap, and it would not help on the
+   Flash Lite lanes either, because those are **request**-bound and caching reduces
+   *tokens*. The **rule-13 judgement is stated from rule 13's own text** — no `Event`, no
+   violated `Expectation`, no causal mechanism for `Diagnosis`, no ignored signal for
+   `Missed`; writing it as an incident would mean inventing two mandatory fields, which is
+   the dramatisation rule 13's closing note warns against. **QUESTIONS entry, not an
+   incident.**
+3. ⚠️ **The screenshots broke the build, and the break was real — INC-09.** They are the
+   repository's first binary files. `check-roles` **A3** scanned every tracked file's raw
+   bytes for `
+`, and a PNG's deflate stream carries those bytes as data, so `make
+   check-roles` and `make test` went red on a sound repository. **`.gitattributes` was
+   innocent** and is unchanged — `git ls-files --eol` says `i/-text w/-text` and
+   `git hash-object` with and without `--no-filters` agree, so `* text=auto` already
+   detects them as binary. The prompt's conditional *"if they are being treated as text"*
+   **did not fire**, and adding an image rule would have broken A1 anyway. What was fixed
+   is A3 itself, **without weakening it**: A3 keeps its assertion over every file **git**
+   calls text, and a new **A4** asserts the underlying property — would git's filter chain
+   rewrite these bytes? — over **every** tracked file. Proven meaningful against the
+   pre-fix module loaded out of the object store. **Q-012** records it as a Class B
+   deviation with the reasoning exposed, because a session that changes a structural
+   invariant should not be the only one who thinks the change was sound.
+
+### Corrections made rather than carried forward
+
+- **"six Google API model ids" → FOUR.** `config/lanes.yaml`'s header and `PROVENANCE.md`
+  §2.3 both said six; there are four Google lanes and the gate reported four placeholders.
+- **Q-006 names the gate file as `tests/test_lanes_no_placeholders.py`.** The file is
+  `tests/test_lanes_operator_placeholders.py` and never had the other name. Both
+  corrections are recorded **in Q-006's closure**, with the original text left standing —
+  a question log that edits its own history is worth less than one that shows the fix.
+
+### What was deliberately NOT touched
+
+The `check_gitattributes` **early-return shape** that C0's own report names as a candidate
+defect. The scope fence reserved it for C0's review and pre-empting it would remove the
+reviewer's finding. It is still there.
+
+---
+
 ## C0 — BUILD — attempt 1 — 2026-08-30
 
 **SESSION-TOKEN:** ⚠️ **none issued.** The C0 build prompt carried no `SESSION-TOKEN` line,

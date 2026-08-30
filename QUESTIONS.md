@@ -266,6 +266,45 @@ discovered the ids itself.**
 
 **RULING (architect, pending) — but the action is the OPERATOR's, not the architect's.**
 
+✅ **CLOSED 2026-08-30 by C0-COMPLETION (BUILD).** The operator captured the ids from the live models
+endpoint and supplied them. They are now in `config/lanes.yaml`; `PROVENANCE.md` §1.2.1 records them
+with their capability facts. **What closed it:**
+
+| Lane | `api_model_id` written |
+|---|---|
+| `gemma-26b` | `models/gemma-4-26b-a4b-it` |
+| `gemma-31b` | `models/gemma-4-31b-it` |
+| `flash-lite-3.1` | `models/gemini-3.1-flash-lite` |
+| `flash-lite-3.5` | `models/gemini-3.5-flash-lite` |
+
+`cfg.outstanding_sentinels()` now reports **0** `TODO_OPERATOR` values, the token does not appear
+anywhere in `config/` even as prose, and the operator gate
+`test_no_operator_placeholder_remains_in_config` **passes**.
+
+⚠️ **`make selftest` is still RED — for a DIFFERENT reason, which is not papered over.** The one
+remaining failure is `test_the_camel_branch_is_decided_before_any_camel_run`:
+`camel_comparator.branch` is `TODO_C13_RUN1`, decided by **RUN-1 on 31 August** inside its 90-minute
+box. That is C13's, not the operator's, and it is correct for the pre-spend gate to be red while it
+stands.
+
+⚠️ **Two corrections to this entry's own text, recorded rather than silently fixed:**
+1. It says *"the six Google `api_model_id` values"*. **There are FOUR.** `config/lanes.yaml` defines
+   four Google lanes; the gate reported four placeholders. The same "six" appeared in the
+   `config/lanes.yaml` header and in `PROVENANCE.md` §2.3, and all three are corrected. The original
+   sentence above is left as written, because a question log that edits its own history is worth less
+   than one that shows the correction.
+2. It names the gate file as `tests/test_lanes_no_placeholders.py`. **The file is
+   `tests/test_lanes_operator_placeholders.py`.** No file of the first name has ever existed.
+
+⚠️ **THE PREVIEW-VS-STABLE RULING — architect-ruled 2026-08-30, recorded so it is not re-derived.**
+The endpoint also returns `models/gemini-3.1-flash-lite-preview` ("Gemini 3.1 Flash Lite Preview",
+version `3.1-flash-lite-preview-03-2026`), a **separate, earlier build**. The dashboard limits table
+lists *"Gemini 3.1 Flash Lite"* at **500 RPD**, and that row is the **stable** model, version
+`3.1-flash-lite-05-2026`. The stable id is therefore the correct one and is what is written; pairing
+the preview id with the stable model's 500 RPD would attach a measured limit to a model it was not
+measured on. `config/lanes.yaml` carries the rejected id in a `not_this_id:` field on that lane so
+the distinction survives in the artefact the runner reads. **Do not re-open this.**
+
 ---
 
 ### Q-007 — the day-one dashboards show six models `CONTEXT.md` §13.2 does not list; no listed limit differs
@@ -328,6 +367,40 @@ verified that was not verified. **The two boxes are reported FAIL-pending-operat
 rather than quietly ticked.**
 
 **RULING (architect, pending) — the action is the OPERATOR's.**
+
+✅ **CLOSED 2026-08-30 by C0-COMPLETION (BUILD).** Both halves landed. **What closed each:**
+
+**Half 1 — the screenshots.** The operator captured both and they are committed at exactly the paths
+this entry named:
+
+| Path | Bytes | SHA-256 |
+|---|---|---|
+| `docs/evidence/limits/groq-2026-08-30.png` | 138,103 | `9fab79450fcfc4c4a2e181a3b4b1e4225bccbf53d312213741cbb573fa374f19` |
+| `docs/evidence/limits/gemini-2026-08-30.png` | 127,384 | `73b4dc71004a5e558ff74168da042f632b51dcf089d3de257351de18df955ec6` |
+
+Verified **here** as files: PNG signature present, `IHDR` first, `IEND` last, **every chunk CRC-32
+recomputes** (8 chunks / 7 chunks, walk terminating exactly at EOF), dimensions 1918×901 and
+1911×870. **Not verified here:** what the images depict. A session cannot read a dashboard, so the
+*content* of these screenshots remains **operator-attested** exactly as §1.2 of `PROVENANCE.md`
+already said. The images make the operator's figures auditable **by a human reviewer**; they do not
+convert them into session-verified facts, and this entry does not claim they do.
+
+**Half 2 — no payment method.** The operator opened the billing pages of the Groq console and of
+Google AI Studio / Google Cloud on **2026-08-30** and reports **NO PAYMENT METHOD ATTACHED** to
+either account. Recorded in `PROVENANCE.md` §1.5, labelled **OPERATOR-ATTESTED**. ⚠️ **This session
+cannot and must not read a provider account** — `CLAUDE.md` §4 — so it neither verified nor
+re-verified this, and says so rather than implying otherwise. **C21 must re-confirm it before
+submission**, because it is a fact about account state on the day, not about anything in the
+repository: a card attached on 3 September would silently convert every 429 into a bill and nothing
+in the repo would change to show it.
+
+⚠️ **Landing the screenshots broke `make check-roles` and `make test`, and that is now INC-09.** They
+are the repository's first binary files. `check_roles` A3 scanned every tracked file's raw bytes for
+`\r\n` and a PNG's deflate stream contains those bytes as data. `.gitattributes` itself was
+**innocent** — `git ls-files --eol` reports `i/-text w/-text` and `git hash-object` with and without
+`--no-filters` returns the same blob id, so `* text=auto` already detects them as binary and converts
+nothing. **No image rule was added, and adding one would have broken A1's exact-content
+requirement.** See **INC-09** and **Q-012**.
 
 ---
 
@@ -410,6 +483,143 @@ and it keeps the zero-cost clean-clone claim true.
 commands before `pip install -e vendor/tau2-bench` will work. **C19's clean-clone test
 must therefore include that step**, and the README must print it beside the clone command,
 or §20's first box is false.
+
+**RULING (architect, pending):**
+
+---
+
+### Q-011 — neither Gemma lane supports prompt caching, and the Gemma lanes carry the sweep
+**Raised by:** C0-COMPLETION BUILD · **Date:** 2026-08-30 · **Status:** OPEN (informational; no
+incident written — see the rule-13 judgement below)
+**Blocking:** nothing. **No stated assumption is violated.** Recorded because the *forward*
+consequence is a lever people reach for under schedule pressure.
+**Deviation class:** n/a — a fact about the world, not an ambiguity in the spec.
+
+**The fact, with its evidence.** The live models endpoint, read by the operator on 2026-08-30,
+returns `supportedGenerationMethods` as:
+
+| Model | `supportedGenerationMethods` | `createCachedContent`? |
+|---|---|---|
+| `models/gemma-4-26b-a4b-it` | `generateContent`, `countTokens` | ❌ **no** |
+| `models/gemma-4-31b-it` | `generateContent`, `countTokens` | ❌ **no** |
+| `models/gemini-3.1-flash-lite` | `generateContent`, `countTokens`, `createCachedContent`, `batchGenerateContent` | ✅ yes |
+| `models/gemini-3.5-flash-lite` | `generateContent`, `countTokens`, `createCachedContent`, `batchGenerateContent` | ✅ yes |
+
+**Why it matters.** `CONTEXT.md` §13.3.2 makes the two Gemma lanes the **reference attacker** *and*
+the **gate judge** — ≈33.0M + ≈15.3M = **≈48.3M of §13.4's 76.9M Google-side tokens directly**, plus
+the benign-solver and user-simulator volume that §13.4 says *"overwhelmingly SPILL to Gemma"*. So
+**prompt caching is unavailable on precisely the lanes that carry the sweep, and available only on
+the two 500-RPD lanes.**
+
+**§13.4's arithmetic is caching-free and is therefore UNAFFECTED — verified independently here, not
+taken on trust:**
+- `grep -ic cach CONTEXT.md` → **0**. The specification never mentions caching, so it can have
+  assumed no discount from it.
+- §13.4 computes on **raw** throughput: *"the two Gemma lanes (combined 32K TPM = 1.92M tokens/h),
+  which is ≈ 40 hours of Gemma lane time."* Re-derived here: 32,000 × 60 = 1,920,000 ✓;
+  76.9M ÷ 1.92M = **40.05 h** ✓; N=30's ~71M ÷ 1.92M = **36.98 h** ✓ (§13.4 says ~37 h); the
+  pre-declared T-FP reduction's ~65M ÷ 1.92M = **33.9 h** ✓ (says ~34 h). **Every figure reproduces
+  with no caching discount anywhere.** No assumption is violated and the N-branch decision rule
+  stands exactly as written.
+
+**⚠️ THE FORWARD CONSEQUENCE — the reason this entry exists.** **Caching is NOT an available lever
+for closing the §13.4 lane-hour gap.** That gap is real and load-bearing: N=50 needs ≈40 h against
+~32 h available, which is why the N=30 branch exists. When somebody on 1 September proposes
+"just cache the attacker's system prompt and it will fit" — **the answer is no, the Gemma lanes do
+not offer it.** The only pre-declared reductions remain the §13.4 ones: N=50 → N=30, then T-FP 40 →
+20 tasks. **N is not a degradation rung** (`PROCESS.md` §14) and no post-hoc adjustment is permitted.
+
+It remains a possible optimisation on the **two Flash Lite lanes only** — and even there its value is
+limited, because those lanes are bound by **500 RPD each**, i.e. by *requests*, while caching reduces
+*tokens*. §13.4 already says their 1,000 combined daily requests are why the benign-solver and
+user-simulator work spills to Gemma in the first place. **Caching does not move a request-bound
+constraint.**
+
+**⚠️ RULE-13 JUDGEMENT — this is a QUESTIONS entry and NOT an `INCIDENTS.md` entry.** The prompt
+invited this session to decide, and the decision is reached from rule 13's own text rather than by
+deferring: *"An entry with an empty `Diagnosis` or `Missed` is not an entry."* **Nothing broke.**
+There is no `Event` — no failure unfolded; no `Expectation` was violated — §13.4 assumed no caching
+and still assumes none; there is no causal mechanism to put in `Diagnosis`, because no effect
+occurred; and there is no `Missed` signal, because no signal was present and ignored — the endpoint
+was read for the first time today, and the fact was recorded within the hour. Writing it as an
+incident would require **inventing** a Diagnosis and a Missed to fill mandatory fields, which is the
+precise failure mode rule 13's closing note warns against: *"the pressure runs both ways — to
+under-report a failure that costs a fix session, and to **dramatise** one that reads well."* A
+provider capability that was never assumed is a finding about the world. It is recorded here, in
+`PROVENANCE.md` §1.2.1, and in `config/lanes.yaml`'s `supports_context_caching` field. **This
+concurs with the architect's view, and the reasoning is stated so a reviewer can overturn it on the
+reasoning rather than on the conclusion.**
+
+**RULING (architect, pending):**
+
+---
+
+### Q-012 — `check-roles` A3 read a PNG's payload bytes as line endings; is narrowing it a hard-rule-6 weakening?
+**Raised by:** C0-COMPLETION BUILD · **Date:** 2026-08-30 · **Status:** OPEN
+**Blocking:** nothing now — the fix is in and `make test` / `make check-roles` are green again.
+**Raised because a session that changes a structural check should not be the only one who thinks the
+change was sound.**
+**Deviation class:** **B** — implementation choice within spec: done, recorded with rationale, judged
+at review. ⚠️ **The session considered it Class A** (it changes the behaviour of a structural
+invariant) **and concluded B**, because the check's *stated property* is unchanged and the assertion
+is strictly wider, not narrower. **A reviewer who disagrees should treat it as A and rule.**
+
+**Context.** `docs/evidence/limits/*.png` are the repository's first binary files.
+`check_roles.check_gitattributes` **A3** read every tracked file's raw bytes and failed on any
+`b"\r\n"`. A PNG's deflate stream contains those bytes as **data** — 2 occurrences in the Groq image,
+3 in the Gemini one — so committing the evidence turned `make check-roles` and `make test` red on a
+repository that was sound. Recorded as **INC-09**.
+
+**The tension.** `CLAUDE.md` hard rule 6: *"**NEVER WEAKEN A TEST.** No deleting, skipping,
+loosening, or approximating an assertion to get green."* Narrowing A3's domain to text files is,
+read literally, narrowing an assertion in order to get green. That is why this is written down
+instead of being quietly done.
+
+**Options seen:**
+  1. **Do not commit the screenshots.** — Q-008 stays open, `PROVENANCE.md` §1.4 stays owed, and the
+     project's own evidence is withheld to protect a check that is wrong. Rejected: it subordinates
+     the record to a defect.
+  2. **Add a binary rule to `.gitattributes`** (what the prompt anticipated). — **Impossible without
+     breaking something else**, and unnecessary anyway. `check-roles` **A1** requires `.gitattributes`
+     to contain *exactly* `* text=auto eol=lf`, and `PROCESS.md` §6a makes it a first-commit
+     deliverable that is *"fixable only in the first commit."* And it would fix nothing: git already
+     treats these files as binary (`i/-text w/-text`) and applies no conversion (`git hash-object`
+     == `git hash-object --no-filters`). **The conditional in the prompt did not fire.**
+  3. **Leave A3 alone and commit anyway.** — `make test` is the gate every later chunk runs; leaving
+     it red on a false positive trains everyone to ignore it. Rejected.
+  4. **Split the check so nothing is lost.** — Taken. See below.
+
+**Default taken — option 4, constructed so that NOTHING is weakened:**
+  * **A3 keeps its CRLF assertion, unchanged**, over every file **git itself** classifies as text
+    (`git ls-files --eol`, whose `-text` token *is* git's answer to "do I convert this?"). The check
+    does not reimplement git's heuristic — a second copy of the predicate under test is exactly hard
+    rule 8's spike defect, where `gate.js` and `invariants.js` shared `world.js:intentKey`.
+  * **A4 is ADDED**, asserting the *underlying* property directly — `worktree bytes == stored blob
+    bytes` — over **every** tracked file, text and binary alike. On every file it covers, **A4 is
+    strictly stronger than A3 ever was**: it catches any divergence, not only the CRLF-shaped kind.
+    A binary file is therefore **not skipped; it is checked harder.**
+  * `A4` also reports *"could not verify"* as a **failure**, never as a pass.
+  * The count of binary files skipped by A3 is **printed** in A3's own detail line, so the narrowing
+    is visible in the output rather than silent (hard rule 11's spirit).
+
+**⚠️ The narrowing is PROVEN meaningful rather than asserted**, per hard rule 6's *"it fails on the
+old code"* standard. `tests/test_repo_invariants.py::
+test_the_crlf_check_still_fires_on_text_and_no_longer_lies_about_binary` builds a throwaway git repo
+holding one text file with CRLF and one binary file with the same bytes, and asserts A3 still fails
+on the text one and no longer names the binary one. Run against the **pre-fix module loaded out of
+the git object store** (not a reimplementation), A3's detail reads
+`CRLF found in 2 file(s): ['binary_with_crlf.bin', 'text_with_crlf.md']` — **the new test's third
+assertion fails against the old code.** Against the new code it reads
+`CRLF found in 1 TEXT file(s): ['text_with_crlf.md']`, and A4 independently flags the genuine
+divergence. **The change is exactly the false positive and nothing more.**
+
+**What the session is NOT claiming:** that this was clearly in its scope fence. The fence said *"these
+four tasks only"* and named one `check_gitattributes` defect to leave for C0's review — **the
+early-return shape, which was NOT touched and remains for the reviewer.** This is a different defect,
+discovered while executing Task 3, which Task 3 pre-authorised a fix and an incident for in this
+exact class. It was fixed because C0-COMPLETION's own done-when requires *both* the screenshots
+recorded *and* `make test` green, and those are jointly unsatisfiable otherwise. **If the architect
+rules this out of scope, the revert is one commit and the box goes back to FAIL-pending.**
 
 **RULING (architect, pending):**
 

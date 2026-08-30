@@ -44,7 +44,12 @@ submission day, so a reader has nothing but the operator's word that `prereg-v1`
 no browser, no dashboard access, and is forbidden by `CLAUDE.md` §4 from reading a provider
 credential at all. **The session did not verify them at source and does not claim to.** What the
 session did verify is arithmetic — the row-by-row comparison against `CONTEXT.md` §13.2 in §1.3
-below. See `QUESTIONS.md` **Q-008** for what remains owed.
+below.
+
+**Status of `QUESTIONS.md` Q-006 and Q-008 — both CLOSED on 2026-08-30 by C0-COMPLETION.** The
+operator supplied the four Google API model ids (§1.2.1), both dashboard screenshots (§1.4) and the
+no-payment-method attestation (§1.5). What each party verified is stated separately in each section,
+and **nothing operator-attested is presented as session-verified.**
 
 ### 1.1 GROQ — free plan, 2026-08-30
 
@@ -79,10 +84,51 @@ matches `CONTEXT.md` §13.2's note exactly, and it is the reason the Gemma lanes
 | Gemini 2.5 Flash Lite | **10** | 250K | **20** | **not listed** | ⚠️ **NOT a substitute for a 3.x Flash Lite** — 20 RPD vs 500. See Q-007 |
 | Gemini 2.5 Flash | 5 | 250K | 20 | **not listed** | unassigned |
 
-⚠️ **The exact Google API model id strings — the `models/gemma-…` and `models/gemini-…` form — are
-NOT yet captured.** `CONTEXT.md` §13.3.2: *"this is the one place the spec cannot supply the string
-first-hand."* They are `TODO_OPERATOR` in `config/lanes.yaml`, a test fails while any remains, and
-they must be written into `PROTOCOL.md` at `prereg-v1`. **`QUESTIONS.md` Q-006 — operator action.**
+#### 1.2.1 The exact Google API model id strings — **CAPTURED 2026-08-30** (closes Q-006)
+
+`CONTEXT.md` §13.3.2: *"this is the one place the spec cannot supply the string first-hand."* The
+operator read them off the **live models endpoint** on **2026-08-30** and they are now in
+`config/lanes.yaml`. They go into `PROTOCOL.md` at `prereg-v1`.
+
+⚠️ **Attribution, stated exactly.** **OPERATOR-ATTESTED.** No session called the endpoint, and under
+`CLAUDE.md` §4 none may — validating an id against the live API is a later chunk's job and needs the
+operator's key. What this session verified is that the strings are *in the config*, that the loader
+reads them, and that the operator gate that was red on them is now green.
+
+| Lane | Dashboard label | **`api_model_id`** | `displayName` returned | `inputTokenLimit` | `outputTokenLimit` | `createCachedContent`? |
+|---|---|---|---|---|---|---|
+| `gemma-26b` | Gemma 4 26B | **`models/gemma-4-26b-a4b-it`** | "Gemma 4 26B A4B IT" | 262,144 | 32,768 | ❌ **no** |
+| `gemma-31b` | Gemma 4 31B | **`models/gemma-4-31b-it`** | "Gemma 4 31B IT" | 262,144 | 32,768 | ❌ **no** |
+| `flash-lite-3.1` | Gemini 3.1 Flash Lite | **`models/gemini-3.1-flash-lite`** | "Gemini 3.1 Flash Lite" | 1,048,576 | 65,536 | ✅ yes |
+| `flash-lite-3.5` | Gemini 3.5 Flash Lite | **`models/gemini-3.5-flash-lite`** | "Gemini 3.5 Flash Lite" | 1,048,576 | 65,536 | ✅ yes |
+
+`supportedGenerationMethods` as returned: both Gemma lanes → `generateContent`, `countTokens`. Both
+Flash Lite lanes → `generateContent`, `countTokens`, `createCachedContent`, `batchGenerateContent`.
+
+⚠️ **THE PREVIEW-VS-STABLE DISAMBIGUATION — architect-ruled 2026-08-30. Recorded so nobody
+re-derives it under time pressure. Do not re-open it.**
+
+The endpoint **also** returns `models/gemini-3.1-flash-lite-preview` (displayName *"Gemini 3.1 Flash
+Lite Preview"*, version `3.1-flash-lite-preview-03-2026`). **It is a SEPARATE, EARLIER build, and it
+is the wrong id.** The operator's dashboard limits table lists *"Gemini 3.1 Flash Lite"* at **500
+RPD** — and that row is the **STABLE** model, version `3.1-flash-lite-05-2026`. So the 500 RPD in
+§1.2 above and in `config/lanes.yaml` is the *stable* model's number, and pairing it with the preview
+id would attach a measured limit to a model it was not measured on. The stable id
+`models/gemini-3.1-flash-lite` is what is written. `config/lanes.yaml` additionally carries the
+rejected id in a `not_this_id:` field on that lane, so the distinction survives in the artefact the
+runner actually reads and not only in this file.
+
+⚠️ **NO PROMPT CACHING ON EITHER GEMMA LANE — and the Gemma lanes are where all the volume is.**
+Neither Gemma model lists `createCachedContent`; both Flash Lite models do. Per §13.3.2 the Gemma
+lanes are the **reference attacker** *and* the **gate judge**, i.e. ≈48.3M of §13.4's 76.9M Google
+tokens directly, plus the benign-solver and user-simulator spill. **`CONTEXT.md` §13.4's feasibility
+arithmetic is computed on RAW token throughput** — *"combined 32K TPM = 1.92M tokens/h"*, ≈40 h at
+N=50 — **with no caching discount anywhere**, and `CONTEXT.md` contains **zero** occurrences of the
+substring "cach" `[VERIFIED HERE, 2026-08-30]`. **So no stated assumption is violated.** The forward
+consequence is the part that matters: **caching is NOT an available lever for closing the §13.4
+lane-hour gap**, and anyone reaching for it later under schedule pressure must be told no. It remains
+a possible optimisation on the two Flash Lite lanes only — where, note, the binding constraint is
+**500 RPD each**, i.e. *requests*, and caching reduces *tokens*. See `QUESTIONS.md` **Q-011**.
 
 ### 1.3 The §13.7 fourth-clause comparison — executed, with its result
 
@@ -114,20 +160,70 @@ the clause did not fire on them; they are recorded above and in `QUESTIONS.md` *
 was added to `config/lanes.yaml`**, because adding an unassigned lane to a frozen pre-registration
 artefact would be a Class A change.
 
-### 1.4 What is still owed on this section — `QUESTIONS.md` Q-008
+### 1.4 The dashboard screenshots — **LANDED 2026-08-30** (closes half of Q-008)
 
-| Owed | Path | Owner | Why it matters |
-|---|---|---|---|
-| **Screenshots of both dashboards**, dated 2026-08-30 | `docs/evidence/limits/groq-2026-08-30.png`, `docs/evidence/limits/gemini-2026-08-30.png` | **OPERATOR** | `PROCESS.md` §12.1 C0 done-when; the figures above are currently text without an image behind them |
-| **Confirmation that no payment method is attached to either account** | a row in §1.5 below, with the date | **OPERATOR** | it is the project's **hard cost guarantee**: with no card, exceeding a limit returns HTTP 429 and the runner stops — **it cannot bill** (`CONTEXT.md` §13.1, `PROCESS.md` §8) |
-| The exact Google API model id strings | `config/lanes.yaml` | **OPERATOR** | Q-006 |
+Both images were captured by the **operator** on **2026-08-30** and are committed. This session
+verified them as *files* — existence, size, digest, structural validity as PNG, and git's handling of
+them — which is everything a session can verify about an image it cannot interpret.
 
-### 1.5 No payment method attached
+| Path | Bytes | Dimensions | SHA-256 of the file | Captured |
+|---|---|---|---|---|
+| `docs/evidence/limits/groq-2026-08-30.png` | **138,103** | 1918 × 901 | `9fab79450fcfc4c4a2e181a3b4b1e4225bccbf53d312213741cbb573fa374f19` | 2026-08-30 |
+| `docs/evidence/limits/gemini-2026-08-30.png` | **127,384** | 1911 × 870 | `73b4dc71004a5e558ff74168da042f632b51dcf089d3de257351de18df955ec6` | 2026-08-30 |
+
+**Structural validity, checked rather than assumed** `[VERIFIED HERE, 2026-08-30]`: each file carries
+the 8-byte PNG signature `89 50 4E 47 0D 0A 1A 0A`, opens with an `IHDR` chunk, ends with `IEND`,
+and **every chunk's CRC-32 recomputes correctly** — 8 chunks in the Groq image, 7 in the Gemini one,
+with the chunk walk terminating exactly at end-of-file in both. A truncated or line-ending-mangled
+PNG fails at least one of those.
+
+⚠️ **The end-of-line question, answered with evidence rather than assumption.** These are the first
+binary files in the repository, and `.gitattributes` is `* text=auto eol=lf` — so the question is
+whether git normalises them and silently corrupts the evidence. It does not, and here is why:
+
+| Check | Result |
+|---|---|
+| `git check-attr text eol` | `text: auto`, `eol: lf` — the attributes *are* set on these paths |
+| `git ls-files --eol` | **`i/-text w/-text attr/text=auto eol=lf`** for both — `-text` is git's own token for **"binary; apply no conversion"**. `text=auto` auto-detects on NUL bytes, which a PNG has in its `IHDR` |
+| `git hash-object` vs `git hash-object --no-filters` | **identical blob id** for both files — the filter path is a no-op, i.e. nothing is being rewritten |
+| `sha256(working tree)` vs `sha256(git show :<path>)` | **identical**, 138,103 and 127,384 bytes each way |
+
+**Conclusion: `.gitattributes` needed no image rule, and none was added.** Adding one would have
+broken `check-roles` A1, which requires that file to contain *exactly* `* text=auto eol=lf`
+(`PROCESS.md` §6a makes it a first-commit deliverable that cannot be amended).
+
+⚠️ **What committing them DID break, and what was done about it.** `check_roles.check_gitattributes`
+check **A3** scanned every tracked file's raw bytes for `\r\n`. A PNG's deflate stream contains those
+bytes as *data* — 2 occurrences in the Groq image, 3 in the Gemini one — so adding the screenshots
+turned `make check-roles` and `make test` red on a repository that was sound. That is a false
+positive in the CRLF machinery, the same class as **INC-06**. See **INC-09** and **Q-012**.
+
+**What is still owed on this section:** nothing from §1.4. `QUESTIONS.md` Q-006 and Q-008 are both
+closed by this session; Q-011 and Q-012 are opened by it.
+
+### 1.5 No payment method attached — **OPERATOR-ATTESTED 2026-08-30** (closes the other half of Q-008)
 
 | Provider | Payment method attached? | Verified by | Date | Evidence |
 |---|---|---|---|---|
-| Groq | *stated as none by the operator* | **OPERATOR — not yet re-confirmed in C0** | 2026-08-30 (carried from `CONTEXT.md` §13.1) | **owed** |
-| Google AI Studio / Gemini | *stated as none by the operator* | **OPERATOR — not yet re-confirmed in C0** | 2026-08-30 (carried from `CONTEXT.md` §13.1) | **owed** |
+| **Groq** (Groq Console → billing) | **NONE ATTACHED** | **OPERATOR-ATTESTED** — the operator opened the billing page and read it | **2026-08-30** | operator attestation, recorded here. ⚠️ **No session can hold this**: a session has no browser and no provider credentials it is permitted to use, and `CLAUDE.md` §4 forbids it from reading a key value at all |
+| **Google AI Studio / Google Cloud** (billing) | **NONE ATTACHED** | **OPERATOR-ATTESTED** — the operator opened the billing pages and read them | **2026-08-30** | operator attestation, recorded here. Same limitation as above |
+
+⚠️ **This is a SAFETY PROPERTY, not paperwork, and the distinction is the whole point.** With no card
+on file, exceeding a free-tier limit returns **HTTP 429 and the runner stops. It cannot bill.** That
+is what makes `CONTEXT.md`'s zero-cost claim **structural** rather than a promise: the guarantee is
+enforced by the provider refusing the call, not by anyone remembering to watch a meter. A budget
+someone has to watch is a budget that gets exceeded at 03:00 on the second sweep day.
+
+**Two consequences that follow from it, stated so they are not forgotten:**
+
+1. **`PROCESS.md` §8's session rule reads differently in this light.** *"A 429 means the window is
+   already spent: STOP and report. Never retry into another lane."* With no card, a 429 is the
+   **only** thing that can happen at the ceiling — there is no silent overage path for a session to
+   fall into. The rule is belt-and-braces on top of a structural stop, not the stop itself.
+2. ⚠️ **C21 must RE-CONFIRM this before submission**, because the property is about *account state on
+   the day*, not about anything in this repository. A card attached on 3 September would silently
+   convert every subsequent 429 into a bill, and nothing in the repo would change to show it. It is
+   therefore a C21 checklist item, and it is listed as one.
 
 **The claim this guarantees, stated exactly:** *"the total monetary cost of the published run was
 ₹0"*, and it is a **safety property**, not a boast — a 429 is a stop, not a bill. `RESULTS.md`
@@ -191,7 +287,7 @@ loader **raises** on access rather than substituting anything.
 |---|---|---|---|
 | the probe-breach **void threshold** | `TODO_C14_CALIBRATION` | **C14**, from the arm-1 calibration: the **95% Wilson lower bound rounded DOWN to 5 pp** | it is the single number that decides whether the run is publishable. It is calibrated **once**, after `probe-v1` is cut, and never re-run (`CLAUDE.md` §3) |
 | the selected **N branch** | `TODO_C14_PILOT` | **C14**, from the pilot's **measured** tokens/episode, by the §13.4 rule | choosing it early would be choosing it by preference |
-| the six **Google API model ids** | `TODO_OPERATOR` | **OPERATOR** — Q-006 | `CONTEXT.md` §13.3.2: the spec cannot supply them first-hand |
+| ~~the six **Google API model ids**~~ | ~~`TODO_OPERATOR`~~ | ~~**OPERATOR** — Q-006~~ | ✅ **RESOLVED 2026-08-30. There were FOUR, not six** — `config/lanes.yaml` defines four Google lanes and the operator gate reported four placeholders. Both the count and the values are in §1.2.1. **Q-006 closed.** The row is struck through rather than deleted, because this file's job is to show what was owed and when it landed |
 | the **AgentDojo** and **CaMeL** pinned SHAs | `TODO_C13_C16` | C13 / C16 | must be pinned at the SHA actually vendored |
 | `genesis_hash` **after** the freeze | currently the literal `PRE-FREEZE` | **C14** sets it to the `prereg-v1` tag object id | **the one free proof available:** a ledger cannot contain a hash of a tag that did not exist when it was written, so **pre-freeze episodes are cryptographically distinguishable from scored ones** (`PROCESS.md` §6a) |
 
@@ -214,6 +310,10 @@ INC-05). It is a rule, not a habit.
 | `git-scm.com/docs/git-tag` documents backdating a tag under its own heading, *"On Backdating Tags"* — which is why a git timestamp cannot witness the freeze | `[VERIFIED — git-scm.com/docs/git-tag, 2026-08-30]`, carried from `CONTEXT.md` §15.3 / `PROCESS.md` §6a | 2026-08-30 |
 | GitHub assigns a gist's `created_at` and each history entry's `committed_at` **server-side**, and the create endpoint accepts **no** client-settable date field | `[VERIFIED — docs.github.com/en/rest/gists/gists + api.github.com, 2026-08-30]`, carried from `PROCESS.md` §6a | 2026-08-30 |
 | GNU Make **3.82.90** exists at `C:\MinGW\bin\mingw32-make.exe` and runs a recipe | verified **here** — see `QUESTIONS.md` Q-005 for the path typo in `CONTEXT.md` §16 | 2026-08-30 |
+| **`CONTEXT.md` contains ZERO occurrences of the substring "cach"** (case-insensitive), so §13.4's feasibility arithmetic assumes no prompt caching and no stated assumption is violated by the Gemma lanes lacking it | `grep -ic cach CONTEXT.md` → **0** — verified **here**. See §1.2.1 and `QUESTIONS.md` Q-011 | 2026-08-30 |
+| **§13.4's Gemma throughput figure is internally consistent and caching-free**: *"combined 32K TPM = 1.92M tokens/h"* — 32,000 × 60 = 1,920,000 ✓; 76.9M ÷ 1.92M = **40.05 h** ✓ (§13.4 says ≈40 h); N=30's ~71M ÷ 1.92M = **36.98 h** ✓ (says ~37 h); the T-FP reduction's ~65M ÷ 1.92M = **33.9 h** ✓ (says ~34 h) | arithmetic re-derived **here** from §13.4's own inputs | 2026-08-30 |
+| **Git applies no end-of-line conversion to the two dashboard PNGs**, so `.gitattributes` needed no image rule | `git ls-files --eol` → `i/-text w/-text`; `git hash-object` == `git hash-object --no-filters`; `sha256(worktree)` == `sha256(git show :<path>)` — all verified **here**. See §1.4 | 2026-08-30 |
+| **Both dashboard PNGs are structurally valid**: PNG signature, `IHDR` first, `IEND` last, and **every chunk CRC-32 recomputes** | chunk-walk performed **here** over both files; 8 and 7 chunks, walk terminates exactly at EOF. See §1.4 | 2026-08-30 |
 
 ### 3.2 Owed — one row per external claim the submission makes
 

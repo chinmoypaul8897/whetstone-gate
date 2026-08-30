@@ -277,3 +277,73 @@ because it was a real defect found by running the thing — and because leaving 
 list look weightier would be the same dishonesty as inventing one.
 
 ---
+
+## INC-09 — the CRLF invariant read a PNG's payload bytes as line endings, and the repository's own evidence turned it red
+
+**Date:** 2026-08-30 (C0-COMPLETION build, **after** the first build commit `ee3cf93`)
+**Event:** Landing the two operator dashboard screenshots — the repository's **first binary files** —
+turned `make check-roles` and `make test` red. `check-roles` printed
+`[FAIL] A3 no CRLF in any tracked file — CRLF found in 2 file(s):
+['docs/evidence/limits/gemini-2026-08-30.png', 'docs/evidence/limits/groq-2026-08-30.png']`,
+and three tests failed with it. The repository was **sound**; the check was wrong. The Groq image
+carries 2 `\r\n` byte pairs inside its deflate stream and the Gemini image carries 3, as *data*.
+**Action:** Established first that `.gitattributes` was innocent, before changing anything:
+`git check-attr text eol` confirmed the attributes are set on those paths; `git ls-files --eol`
+returned **`i/-text w/-text`** — git's own token for *"binary, apply no conversion"* — and
+`git hash-object` with and without `--no-filters` returned the **same blob id**, so `* text=auto`
+already detects them as binary and rewrites nothing. `sha256(working tree)` equals
+`sha256(git show HEAD:<path>)` for both, at 138,103 and 127,384 bytes. **No image rule was added to
+`.gitattributes`**, which would in any case have broken check **A1** (that file must contain
+*exactly* `* text=auto eol=lf`, and `PROCESS.md` §6a makes it fixable only in the first commit).
+Instead A3 was narrowed to files **git** classifies as text, and a new check **A4** was added
+asserting the underlying property directly over **every** tracked file.
+**Expectation:** A check that exists to protect the pre-registration fingerprint should fire on
+line-ending corruption and stay silent on a byte that merely looks like one. Committing correct
+evidence should not turn the suite red.
+**Missing:** A3's failure message named the files but not **how git classifies them**. It said
+*"CRLF found"*, which reads as a corruption event, when one extra field — git's own `-text` verdict,
+which A3 could have asked for and did not — would have said *"category error"* immediately. The
+output described what it had found and not the one thing needed to judge whether it mattered.
+**Missed:** Two signals, both already inside this repository, both ignored.
+**First:** `INCIDENTS.md` **INC-06** — *the same class*, recorded earlier the same day, three commits
+back. Its fix **was** A3. Nothing in writing that fix asked whether a tracked file might ever not be
+text.
+**Second, and sharper:** INC-06's *other* fix, `test_the_object_store_and_the_working_tree_agree`,
+asks the property **directly** — does the working tree hash-match the object store? — and would
+**never** have false-positived on a PNG. **The correct formulation of the check was already sitting
+in the repository, in the same commit, next to the wrong one**, and A3 was written as an independent,
+weaker restatement of it rather than as the same question. And `QUESTIONS.md` **Q-008**, written by
+C0 in that same session, names `docs/evidence/limits/groq-2026-08-30.png` and
+`docs/evidence/limits/gemini-2026-08-30.png` as owed — **C0 recorded the exact paths of the two PNG
+files that were coming, and in the same session shipped a check that would fail on them.**
+**Diagnosis:** A3 asserted a **proxy** — the absence of CRLF bytes — where the property is *"git's
+filter chain is a no-op on this path"*, and the proxy is valid only for content git treats as text.
+Because it read raw bytes rather than asking git, it had no way to tell a line ending from a byte
+that happens to equal one.
+**Fix:** **`1be73e4`**. A3 keeps its CRLF assertion **unchanged** over every file
+`git ls-files --eol` classifies as text — the classification comes from **git**, not from a
+reimplementation of git's NUL-byte heuristic, because a second copy of the predicate under test is
+exactly hard rule 8's spike defect. **A4** is added, asking the property directly of every tracked
+file, text and binary alike: would `git hash-object` and `git hash-object --no-filters` disagree,
+i.e. would the filter chain rewrite these bytes? A4 is **strictly stronger than A3 ever was on every
+file it covers** — it catches any divergence, not only the CRLF-shaped kind — so a binary file is
+not skipped here, it is checked harder. A3 also now **prints the count of binary files it skipped**,
+so the narrowing is visible in the output rather than silent.
+**Systemic guardrail:** Partial, and stated as partial.
+**What is now impossible:** this specific false positive, and its silent inverse. A4 asks the real
+question over the whole tree, so a future binary file cannot produce it, and
+`test_the_crlf_check_still_fires_on_text_and_no_longer_lies_about_binary` builds a throwaway repo
+holding one text file and one binary file carrying the same CRLF bytes and asserts A3 still fails on
+the text one — so the narrowing **cannot quietly widen into an amnesty**. Run against the pre-fix
+module loaded out of the git object store, that test **fails**, which is hard rule 6's *"provably
+meaningful"* bar met rather than claimed. A second test pins A4 to the round-trip question rather
+than a diff against `HEAD`, so it cannot regress into reporting ordinary uncommitted edits as
+corruption — a check that is red through the middle of every session is a check people learn to
+ignore.
+**What is NOT prevented:** nothing forces the *next* structural check to ask git rather than
+reimplement a heuristic. The guardrail here is one worked example and a docstring, not a mechanism.
+*Recorded as a Class B deviation in `QUESTIONS.md` **Q-012**, with the reasoning written out so a
+reviewer can overturn it on the reasoning rather than on the conclusion. This session changed a
+structural invariant and should not be the only one who thinks the change was sound.*
+
+---

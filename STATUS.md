@@ -10,7 +10,7 @@ mutants · `code` = persona 2 only, ≥4 mutants · `submission` = persona 3 + p
 **No chunk is `PASS` without `docs/reviews/ARCHITECT_CHECK_<N>.md`.** An unrecorded gate is not a
 gate.
 
-*Last updated: 2026-08-30, end of C0 build.*
+*Last updated: 2026-08-30, end of C0-COMPLETION build.*
 
 ---
 
@@ -18,7 +18,7 @@ gate.
 
 | # | Date | Chunk | Review | Status | Review history (append-only) |
 |---|---|---|---|---|---|
-| **C0** | 30 Aug | Repo, toolchain, remote, canonical files, day-one setup | `code` | **built (unreviewed)** | built |
+| **C0** | 30 Aug | Repo, toolchain, remote, canonical files, day-one setup | `code` | **built (unreviewed)** | built → completed (3 operator-owed items landed; Q-006 + Q-008 closed) |
 | **C1** | 30 Aug | `RAZORPAY_SEMANTICS.md` + `PROVENANCE.md` attack rows A1–A6 | `full` | todo | — |
 | **C2** | 30 Aug | World generator + **the probe planted** (`pay_CANARYRECON`) | `full` | todo | — |
 | **C3** | 30 Aug | τ² adapter A — the 34/164 must-not-write enumeration, the T-FP id list | `full` | todo | — |
@@ -70,3 +70,26 @@ These are not chunks — they execute in the **operator's terminal**, never insi
 ⚠️ **No calibration episode runs before `probe-v1` exists. No scored episode runs before `prereg-v1`
 exists.** The freeze never moves earlier to fit the schedule; it is the one thing the project is
 staked on.
+
+---
+
+## Pre-spend readiness — what `make selftest` is still waiting on
+
+`make selftest` is the **pre-spend gate**. It is *supposed* to be red until every value it guards is
+determined; `make test` deselects it and prints the count rather than hiding it (`QUESTIONS.md`
+Q-009).
+
+| Gate | State | Owner |
+|---|---|---|
+| `test_no_operator_placeholder_remains_in_config` | ✅ **GREEN as of 2026-08-30** — the four Google API model ids landed; `cfg.outstanding_sentinels()` reports **0** `TODO_OPERATOR` values | ~~OPERATOR~~ — **done**, Q-006 closed |
+| `test_the_camel_branch_is_decided_before_any_camel_run` | ❌ **RED** — `camel_comparator.branch` is `TODO_C13_RUN1` | **C13 / RUN-1**, 31 Aug, inside the 90-minute box |
+
+⚠️ **`make selftest` therefore still exits non-zero, and that is correct.** The remaining failure is
+**not** the operator's and **not** the model ids — it is the CaMeL branch, which RUN-1 decides. **Do
+not read a red `selftest` as "the ids are still missing."**
+
+**Remaining `TODO_` sentinels in `config/`, all with named owners:**
+`protocol:probe.void_threshold_breach_rate` (C14 calibration) · `protocol:n_decision.selected_branch`
+and `protocol:n_decision.measured_tokens_per_episode` (C14 pilot) · `protocol:vendor.agentdojo_sha`
+and `protocol:vendor.camel_sha` (C13 / C16) · `lanes:camel_comparator.branch` (C13 / RUN-1).
+**Six sentinels, zero of them operator-owed.**
