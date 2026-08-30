@@ -12,10 +12,14 @@ own, because they are facts about the repository rather than about any module:
   B. No ``.env`` is tracked, and ``.env.example`` carries key **names** with **no values**.
   C. No secret-shaped string appears in any tracked file. (The *history* scan is C21's,
      and its remedy is constrained: revoke at the provider, never rewrite history.)
-  D. ``gates/`` and ``scorer/`` share no first-party module. **This one line is the whole
-     moat** — in the spike, the gate and the invariant checker both called
+  D. ``gates/`` and ``scorer/`` share no first-party module, on **any** path. **This one
+     line is the whole moat** — in the spike, the gate and the invariant checker both called
      ``world.js:intentKey``, so the invariant could not have fired unless the gate had a
-     bug. That is not a result; it is a definition.
+     bug. That is not a result; it is a definition. The walk is over both packages'
+     **transitive** first-party imports, with relative imports resolved against the
+     importing file's own package and ``from whetstone_gate import X`` resolved to
+     ``whetstone_gate.X``, against an allow-list (:data:`MOAT_ALLOW_LIST`) that is **empty**
+     and that may not be added to without an architect ruling.
   E. Session-token discipline (`PROCESS.md` §7a): no commit carries a token that was never
      issued, and no token is reused across roles or shared by a chunk's build and review.
      **E5 additionally FAILS on a trailer that is PRESENT but MALFORMED** — Q-014 (i):
@@ -31,6 +35,7 @@ reason, and ``n/a`` is never silently a pass.
 
 from __future__ import annotations
 
+import ast
 import re
 import subprocess
 from dataclasses import dataclass
@@ -55,9 +60,12 @@ SECRET_PATTERNS: tuple[tuple[str, str], ...] = (
     ("private key block", r"-----BEGIN (?:RSA |EC |OPENSSH |PGP )?PRIVATE KEY-----"),
 )
 
-#: Where `gates/` and `scorer/` may live. Both layouts are checked because `CONTEXT.md`
-#: §16's tree is ambiguous about it and the architect has not yet ruled — see
-#: QUESTIONS.md Q-004. Checking both means this file needs no edit when the ruling lands.
+#: Where `gates/` and `scorer/` may live. **Q-004 ruled OPTION 1 on 2026-08-31** — the
+#: subpackages are CHILDREN of `whetstone_gate/`, on a fact verified at source: tau2-bench
+#: installs a top-level package called `tau2`, so a sibling layout would publish a second
+#: one in collision with the benchmark §21.4 calls undroppable. **The ruled layout is
+#: therefore first.** The sibling layout is still checked because doing so costs nothing and
+#: this file then needs no edit if a stray tree ever appears there.
 _PACKAGE_LAYOUTS = (
     ("src/whetstone_gate/gates", "src/whetstone_gate/scorer"),
     ("src/gates", "src/scorer"),
@@ -446,26 +454,121 @@ def check_secrets(root: Path) -> list[Result]:
 # --------------------------------------------------------------------------------------
 
 
-def _first_party_imports(py: Path, package_roots: set[str]) -> set[str]:
-    """Return first-party modules imported by ``py``, by source inspection.
+#: ⚠️ **THE ALLOW-LIST HARD RULE 8 DESCRIBES. IT IS CREATED EMPTY, AND IT IS EMPTY TODAY.**
+#:
+#: Hard rule 8, verbatim: the module-graph walk fails *"on any shared first-party module
+#: **outside a short, explicit allow-list of pure value types (enums, the harm-record
+#: dataclass, the paise integer wrapper) that carry no predicate logic**. **Adding to that
+#: allow-list is a Class A deviation** requiring an architect ruling in `QUESTIONS.md`."*
+#:
+#: **NONE OF THE THREE NAMED VALUE TYPES EXISTS YET** — the harm-record dataclass is C4's,
+#: the enums and the paise wrapper are C4's and C8's — so this ships empty and a test pins
+#: it empty. **ADDING AN ENTRY IS A CLASS A DEVIATION AND REQUIRES AN ARCHITECT RULING IN
+#: `QUESTIONS.md`, RECORDED VERBATIM (hard rule 5), NAMING THAT ONE MODULE.** C4, C8 and C9
+#: will each ask; **each ask is a separate ruling, judged on whether that specific module
+#: carries predicate logic, and none is ever granted in bulk** (Q-015's ruling).
+#:
+#: ⚠️ **THERE IS NO ENTRY FOR THE PACKAGE ROOT AND NONE MAY BE CREATED.** The first version
+#: of this code ended with ``shared = (gate_imports & scorer_imports) - {"whetstone_gate"}``,
+#: an unruled one-entry allow-list holding a *package*, not a pure value type — and under
+#: Q-004's ruling the package root is now the **commonest import string in the project**, so
+#: allow-listing it would make D3 permanently blind. Q-015 rejected that explicitly. The
+#: root stops being a value either side can record because ``from whetstone_gate import X``
+#: is RESOLVED to ``whetstone_gate.X`` below, which is the module the two sides actually
+#: share.
+MOAT_ALLOW_LIST: frozenset[str] = frozenset()
 
-    Deliberately textual rather than import-driven: importing ``gates`` to find out what
-    ``gates`` imports would execute it, and this check must work on a tree that does not
-    yet run.
+
+def _module_name(py: Path, src_root: Path) -> str:
+    """The dotted first-party module name of ``py``, relative to ``src/``.
+
+    ``src/whetstone_gate/gates/arm4_kernel.py`` → ``whetstone_gate.gates.arm4_kernel``;
+    ``src/whetstone_gate/gates/__init__.py`` → ``whetstone_gate.gates``.
     """
+    parts = list(py.relative_to(src_root).with_suffix("").parts)
+    if parts and parts[-1] == "__init__":
+        parts.pop()
+    return ".".join(parts)
+
+
+def _first_party_modules(src_root: Path) -> dict[str, Path]:
+    """Every first-party module under ``src/``, as ``{dotted name: file}``."""
+    index: dict[str, Path] = {}
+    for py in sorted(src_root.rglob("*.py")):
+        if ".venv" in py.parts or "vendor" in py.parts:
+            continue
+        name = _module_name(py, src_root)
+        if name:
+            index[name] = py
+    return index
+
+
+def _resolve_imports(
+    py: Path, module: str, known: dict[str, Path], package_roots: set[str]
+) -> set[str]:
+    """First-party modules ``py`` imports, **resolved**, by parsing — never by importing.
+
+    ⚠️ **Parsing, not importing.** Importing ``gates`` to learn what ``gates`` imports would
+    execute it, and this check must work on a tree that does not yet run. ``ast.parse``
+    executes nothing; it only reads. That was the original textual scan's whole argument and
+    it is preserved — what changes is that a parser sees the import forms a single regex
+    with one capture group did not (``import a, b``; a parenthesised multi-line
+    ``from x import (a, b)``; every alias form).
+
+    **Three resolutions, and each closes one of `REVIEW_C0.md` B-02's causes:**
+
+    1. ``from whetstone_gate import X`` resolves to ``whetstone_gate.X`` **when that is a
+       real first-party module**, and to ``whetstone_gate`` otherwise. The old code recorded
+       the bare string ``whetstone_gate`` for both sides and then subtracted it away, so
+       ``gates/`` and ``scorer/`` both importing one ``shared_predicate`` — **hard rule 8's
+       own named spike defect, in Python** — reported ``PASS``. (Q-015's ruling, option 1.)
+    2. A **relative** import is resolved against the importing file's own package.
+       ``head = module.lstrip(".").split(".")[0]`` yielded ``""`` for ``from .. import
+       scorer``, and ``""`` is in no package root, so **an import crossing the moat was not
+       recorded at all**.
+    3. Every recorded edge is followed **transitively** by the caller, because hard rule 8
+       says *transitive* and the old walk was one hop deep — so the one-hop attack (each
+       side imports its own helper; both helpers import the shared predicate) passed.
+
+    Raises :class:`SyntaxError` if the file does not parse. The caller reports that as a
+    **failure**, never as a pass: *"could not verify"* is not agreement.
+    """
+    tree = ast.parse(py.read_text(encoding="utf-8", errors="replace"), filename=str(py))
+    package = module if py.name == "__init__.py" else module.rpartition(".")[0]
+
     found: set[str] = set()
-    try:
-        text = py.read_text(encoding="utf-8", errors="ignore")
-    except OSError:
-        return found
-    for match in re.finditer(
-        r"^\s*(?:from\s+([.\w]+)\s+import|import\s+([.\w]+))", text, re.MULTILINE
-    ):
-        module = match.group(1) or match.group(2)
-        head = module.lstrip(".").split(".")[0]
-        if head in package_roots:
-            found.add(module)
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                if alias.name.split(".")[0] in package_roots:
+                    found.add(alias.name)
+        elif isinstance(node, ast.ImportFrom):
+            if node.level:
+                base = package
+                for _ in range(node.level - 1):
+                    base = base.rpartition(".")[0]
+                target = f"{base}.{node.module}" if node.module else base
+            else:
+                target = node.module or ""
+            if not target or target.split(".")[0] not in package_roots:
+                continue
+            for alias in node.names:
+                candidate = f"{target}.{alias.name}"
+                found.add(candidate if candidate in known else target)
     return found
+
+
+def _transitive_closure(seeds: set[str], graph: dict[str, set[str]]) -> set[str]:
+    """Every first-party module reachable from ``seeds``. Hard rule 8 says *transitive*."""
+    seen: set[str] = set()
+    stack = list(seeds)
+    while stack:
+        module = stack.pop()
+        if module in seen:
+            continue
+        seen.add(module)
+        stack.extend(graph.get(module, ()))
+    return seen
 
 
 def check_gate_scorer_isolation(root: Path) -> list[Result]:
@@ -478,9 +581,10 @@ def check_gate_scorer_isolation(root: Path) -> list[Result]:
         Result(
             "D1 gates/ and scorer/ share no first-party module",
             None,
-            "neither directory exists yet — gates/ is built by C9, scorer/ by C8. Both "
-            "candidate layouts were checked (src/whetstone_gate/… and src/…) because "
-            "CONTEXT.md §16's tree is ambiguous; see QUESTIONS.md Q-004",
+            "neither directory exists yet — gates/ is built by C9, scorer/ by C8. Q-004 "
+            "ruled OPTION 1 on 2026-08-31: both live UNDER the package, at "
+            "src/whetstone_gate/gates/ and src/whetstone_gate/scorer/. Both candidate "
+            "layouts are still checked — it costs nothing and the ruled one is now first",
         )
     ]
 
@@ -488,45 +592,88 @@ def check_gate_scorer_isolation(root: Path) -> list[Result]:
 def _walk_isolation(
     root: Path, gates: Path, scorer: Path, gates_rel: str, scorer_rel: str
 ) -> list[Result]:
+    src_root = root / "src"
     package_roots = {"whetstone_gate", "gates", "scorer"} | {
-        p.name for p in (root / "src").iterdir() if p.is_dir()
+        p.name for p in src_root.iterdir() if p.is_dir()
     }
-    gate_imports = set().union(
-        *(_first_party_imports(f, package_roots) for f in gates.rglob("*.py")), set()
+    known = _first_party_modules(src_root)
+
+    graph: dict[str, set[str]] = {}
+    unparseable: list[str] = []
+    for module, py in known.items():
+        try:
+            graph[module] = _resolve_imports(py, module, known, package_roots)
+        except (SyntaxError, OSError, ValueError) as exc:
+            unparseable.append(f"{py.relative_to(root).as_posix()} ({type(exc).__name__})")
+            graph[module] = set()
+
+    gates_pkg = _module_name(gates / "__init__.py", src_root)
+    scorer_pkg = _module_name(scorer / "__init__.py", src_root)
+
+    def _under(prefix: str) -> set[str]:
+        return {m for m in known if m == prefix or m.startswith(prefix + ".")}
+
+    def _crosses(closure: set[str], prefix: str) -> set[str]:
+        return {m for m in closure if m == prefix or m.startswith(prefix + ".")}
+
+    gate_seeds, scorer_seeds = _under(gates_pkg), _under(scorer_pkg)
+    gate_closure = _transitive_closure(gate_seeds, graph)
+    scorer_closure = _transitive_closure(scorer_seeds, graph)
+
+    # "Could not verify" is reported as a failure, never as a pass — the same doctrine A4
+    # applies to a tracked path it could not hash. A file the parser choked on is a file
+    # whose imports nobody has seen, and the moat is the one claim that may not rest on one.
+    blocked = (
+        f" ⚠️ COULD NOT PARSE {len(unparseable)} first-party file(s), so this verdict is "
+        f"NOT supported by evidence: {sorted(unparseable)[:5]}"
+        if unparseable
+        else ""
     )
-    scorer_imports = set().union(
-        *(_first_party_imports(f, package_roots) for f in scorer.rglob("*.py")), set()
+    reconciliation = (
+        f"{len(known)} first-party module(s) indexed; {len(gate_closure)} reachable from "
+        f"{gates_rel} ({len(gate_seeds)} seed(s)), {len(scorer_closure)} from {scorer_rel} "
+        f"({len(scorer_seeds)} seed(s)), TRANSITIVELY"
     )
 
     results = []
-    crossing_into_scorer = {m for m in gate_imports if "scorer" in m.split(".")}
-    crossing_into_gates = {m for m in scorer_imports if "gates" in m.split(".")}
+    crossing_into_scorer = _crosses(gate_closure, scorer_pkg)
+    crossing_into_gates = _crosses(scorer_closure, gates_pkg)
     results.append(
         Result(
             "D1 gates/ imports nothing from scorer/",
-            not crossing_into_scorer,
-            "clean" if not crossing_into_scorer else f"CROSSES: {sorted(crossing_into_scorer)}",
+            not (crossing_into_scorer or unparseable),
+            f"clean. {reconciliation}"
+            if not (crossing_into_scorer or unparseable)
+            else f"CROSSES: {sorted(crossing_into_scorer)}.{blocked} {reconciliation}",
         )
     )
     results.append(
         Result(
             "D2 scorer/ imports nothing from gates/",
-            not crossing_into_gates,
-            "clean" if not crossing_into_gates else f"CROSSES: {sorted(crossing_into_gates)}",
+            not (crossing_into_gates or unparseable),
+            f"clean. {reconciliation}"
+            if not (crossing_into_gates or unparseable)
+            else f"CROSSES: {sorted(crossing_into_gates)}.{blocked} {reconciliation}",
         )
     )
 
-    shared = (gate_imports & scorer_imports) - {"whetstone_gate"}
+    shared = (gate_closure & scorer_closure) - MOAT_ALLOW_LIST
     results.append(
         Result(
             "D3 no shared first-party module",
-            not shared,
-            f"{gates_rel} and {scorer_rel} share no first-party import"
-            if not shared
+            not (shared or unparseable),
+            f"{gates_rel} and {scorer_rel} share no first-party module on any path. "
+            f"The allow-list holds {len(MOAT_ALLOW_LIST)} entr(y/ies). {reconciliation}"
+            if not (shared or unparseable)
             else (
-                f"SHARED: {sorted(shared)}. Any logic they both need is written TWICE, on "
-                f"purpose. Adding to the allow-list of pure value types is a Class A "
-                f"deviation requiring an architect ruling in QUESTIONS.md"
+                f"SHARED: {sorted(shared)}. **Any logic they both need is written TWICE, on "
+                f"purpose** — once against the live call, once against the replayed ledger. "
+                f"In the spike, gate.js and invariants.js both called world.js:intentKey, so "
+                f"the invariant COULD NOT HAVE FIRED unless the gate had a bug: that is not a "
+                f"result, it is a definition. Adding to MOAT_ALLOW_LIST is a CLASS A "
+                f"deviation requiring an architect ruling in QUESTIONS.md, naming that one "
+                f"module and judging whether it carries predicate logic.{blocked} "
+                f"{reconciliation}"
             ),
         )
     )

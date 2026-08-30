@@ -285,3 +285,214 @@ def test_the_permissive_trailer_matcher_does_not_widen_the_strict_one():
     assert check_roles._TOKEN_TRAILER_ANY.findall(
         body.format("WG-2026-08-30-CTX-13.4-A")
     ) == ["WG-2026-08-30-CTX-13.4-A"]
+
+
+# =======================================================================================
+# B-02 — THE MOAT. `check_roles.py`'s own docstring calls D "the whole moat", and three of
+# the four attack forms the review built walked straight through it.
+#
+# ⚠️ Q-004 ruled OPTION 1: the layout is src/whetstone_gate/{gates,scorer}/. Every fixture
+# below is built there, which is also the layout in which the defect is worst — under it
+# the package root is the COMMONEST import string in the project, and the old code
+# subtracted the package root away.
+# REVIEW_C0.md B-02 · Q-015's ruling · INCIDENTS.md INC-14.
+# =======================================================================================
+
+
+def _moat_tree(tmp_path, gates_src: str, scorer_src: str, extra: dict[str, str] | None = None):
+    """A throwaway ``src/whetstone_gate/{gates,scorer}/`` tree, in Q-004's ruled layout."""
+    root = tmp_path / "tree"
+    pkg = root / "src" / "whetstone_gate"
+    for sub in ("gates", "scorer"):
+        (pkg / sub).mkdir(parents=True, exist_ok=True)
+        (pkg / sub / "__init__.py").write_text("", encoding="utf-8")
+    (pkg / "__init__.py").write_text("", encoding="utf-8")
+    (pkg / "gates" / "arm4_kernel.py").write_text(gates_src, encoding="utf-8")
+    (pkg / "scorer" / "replay.py").write_text(scorer_src, encoding="utf-8")
+    for rel, source in (extra or {}).items():
+        target = pkg / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(source, encoding="utf-8")
+    return root
+
+
+_SHARED_PREDICATE = "def intent_key(action):\n    return (action['tool'], action['payment_id'])\n"
+
+
+@pytest.mark.parametrize(
+    "form, gates_src, scorer_src, extra",
+    [
+        (
+            "1 — both import the module directly (the ONE form the old code caught)",
+            "from whetstone_gate.shared_predicate import intent_key\n",
+            "from whetstone_gate.shared_predicate import intent_key\n",
+            {"shared_predicate.py": _SHARED_PREDICATE},
+        ),
+        (
+            "2 — both import it THROUGH the package root (the spike defect, in Python)",
+            "from whetstone_gate import shared_predicate\n\nk = shared_predicate.intent_key\n",
+            "from whetstone_gate import shared_predicate\n\nk = shared_predicate.intent_key\n",
+            {"shared_predicate.py": _SHARED_PREDICATE},
+        ),
+        (
+            "3 — a RELATIVE import crossing the moat",
+            "from .. import scorer\n",
+            "x = 1\n",
+            {},
+        ),
+        (
+            "4 — ONE HOP: each side imports its own helper, both helpers import the predicate",
+            "from whetstone_gate.gate_helper import prepare\n",
+            "from whetstone_gate.scorer_helper import prepare\n",
+            {
+                "shared_predicate.py": _SHARED_PREDICATE,
+                "gate_helper.py": "from whetstone_gate.shared_predicate import intent_key\n"
+                "\n\ndef prepare(a):\n    return intent_key(a)\n",
+                "scorer_helper.py": "from whetstone_gate.shared_predicate import intent_key\n"
+                "\n\ndef prepare(a):\n    return intent_key(a)\n",
+            },
+        ),
+    ],
+)
+def test_d3_fires_on_every_one_of_b02s_four_attack_forms(
+    tmp_path, form, gates_src, scorer_src, extra
+):
+    """⚠️ **THE ONE LINE THAT IS THE WHOLE MOAT** (`CLAUDE.md` hard rule 8).
+
+    Forms **2, 3 and 4 all PASSED** before this fix. Each has its own cause and Q-015's
+    ruling names all three:
+
+      * form 2 — ``from whetstone_gate import X`` recorded the bare package root for both
+        sides, and ``shared = … - {"whetstone_gate"}`` then discarded it. That subtraction
+        was an unruled one-entry allow-list holding a **package**, which hard rule 8 permits
+        only for *"pure value types … that carry no predicate logic"*.
+      * form 3 — ``module.lstrip(".").split(".")[0]`` is ``""`` for ``from .. import
+        scorer``, so an import crossing the moat was **not recorded at all**.
+      * form 4 — the walk was **one hop deep** where hard rule 8 says **transitive**.
+
+    Form 1 is included deliberately: it is the one form that already worked, so a fix that
+    broke it would be caught here rather than at C8.
+    """
+    root = _moat_tree(tmp_path, gates_src, scorer_src, extra)
+    results = _results(check_roles.check_gate_scorer_isolation(root))
+    d3 = results["D3 no shared first-party module"]
+    d1 = results["D1 gates/ imports nothing from scorer/"]
+
+    if form.startswith("3"):
+        assert d1.ok is False, (
+            f"D1 passed over `from .. import scorer` — a relative import straight across the "
+            f"moat. detail: {d1.detail}"
+        )
+    assert d3.ok is False, (
+        f"D3 passed on attack form {form}. That is hard rule 8's own named spike defect "
+        f"reaching the repository through the check written to stop it. detail: {d3.detail}"
+    )
+    assert "written TWICE" in d3.detail, (
+        "D3's failure must say WHAT to do about it — write it twice, on purpose — or the "
+        f"next reader's cheapest move is the allow-list. detail: {d3.detail}"
+    )
+
+
+def test_d3_stays_clean_when_the_two_sides_genuinely_share_nothing(tmp_path):
+    """The other half of a usable check: it must not cry wolf.
+
+    Each side imports its **own** helper and the helpers share nothing. A check that fired
+    here would be switched off inside a day, and then form 2 would ship.
+    """
+    root = _moat_tree(
+        tmp_path,
+        "from whetstone_gate.gate_helper import prepare\n",
+        "from whetstone_gate.scorer_helper import prepare\n",
+        {
+            "gate_helper.py": "def prepare(a):\n    return a\n",
+            "scorer_helper.py": "def prepare(a):\n    return a\n",
+        },
+    )
+    results = _results(check_roles.check_gate_scorer_isolation(root))
+    for key in (
+        "D1 gates/ imports nothing from scorer/",
+        "D2 scorer/ imports nothing from gates/",
+        "D3 no shared first-party module",
+    ):
+        assert results[key].ok is True, f"{key} fired on a clean tree: {results[key].detail}"
+    assert "TRANSITIVELY" in results["D3 no shared first-party module"].detail
+
+
+def test_the_moat_allow_list_is_empty(tmp_path):
+    """⚠️ Q-015: *"THE ALLOW-LIST … IS CREATED, AND IT IS CREATED EMPTY."*
+
+    None of hard rule 8's three named pure value types exists yet — the harm-record
+    dataclass is C4's, the enums and the paise wrapper are C4's and C8's. C4, C8 and C9 will
+    each ask for entries; **each ask is a separate ruling and none is ever granted in bulk.**
+    Pinning it empty means the first entry cannot arrive as a quiet line in a diff.
+
+    The second half of this probe is the one that matters: an allow-list entry must actually
+    be able to make D3 blind, or pinning it proves nothing.
+    """
+    assert check_roles.MOAT_ALLOW_LIST == frozenset(), (
+        f"MOAT_ALLOW_LIST holds {sorted(check_roles.MOAT_ALLOW_LIST)}. Adding an entry is a "
+        f"CLASS A DEVIATION (CLAUDE.md hard rule 8) and requires an architect ruling in "
+        f"QUESTIONS.md naming that one module. It may not be widened in a code change."
+    )
+    assert "whetstone_gate" not in check_roles.MOAT_ALLOW_LIST, (
+        "the PACKAGE ROOT may never be allow-listed: Q-015 rejected that explicitly, and "
+        "under Q-004's ruling it is the commonest import string in the project, so the "
+        "entry would make D3 permanently blind."
+    )
+
+    root = _moat_tree(
+        tmp_path,
+        "from whetstone_gate.shared_predicate import intent_key\n",
+        "from whetstone_gate.shared_predicate import intent_key\n",
+        {"shared_predicate.py": _SHARED_PREDICATE},
+    )
+    import unittest.mock
+
+    with unittest.mock.patch.object(
+        check_roles, "MOAT_ALLOW_LIST", frozenset({"whetstone_gate.shared_predicate"})
+    ):
+        d3 = _results(check_roles.check_gate_scorer_isolation(root))[
+            "D3 no shared first-party module"
+        ]
+    assert d3.ok is True, (
+        "an allow-list entry did not suppress the finding it names, so MOAT_ALLOW_LIST is "
+        "decorative and pinning it empty proves nothing."
+    )
+
+
+def test_a_file_the_parser_cannot_read_is_reported_as_a_failure_not_a_pass(tmp_path):
+    """*"Could not verify"* is not a pass — the doctrine A4 already applies to a bad path.
+
+    A first-party file the parser chokes on is a file whose imports nobody has seen. The
+    moat is the one claim in this repository that may not rest on an unread file, and the
+    textual scan this replaced would have silently recorded zero imports for it.
+    """
+    root = _moat_tree(tmp_path, "x = 1\n", "y = 2\n", {"broken.py": "def f(:\n"})
+    results = _results(check_roles.check_gate_scorer_isolation(root))
+    d3 = results["D3 no shared first-party module"]
+    assert d3.ok is False, f"D3 passed while a first-party file did not parse: {d3.detail}"
+    assert "COULD NOT PARSE" in d3.detail and "broken.py" in d3.detail
+
+
+def test_the_walk_sees_import_forms_a_single_capture_group_missed(tmp_path):
+    """`OPEN_FINDINGS.md` **OF-11**, first half: ``import a, b`` recorded only ``a``.
+
+    The regex had one capture group per alternative, so the second name on a comma-separated
+    ``import`` line was invisible. Parsing sees every alias. ⚠️ **OF-11's second half —
+    ``importlib.import_module(…)`` — is NOT closed by this**: it is a runtime call, not an
+    import statement, and no parser of import statements can see it.
+    """
+    root = _moat_tree(
+        tmp_path,
+        "import whetstone_gate.other, whetstone_gate.shared_predicate\n",
+        "from whetstone_gate.shared_predicate import intent_key\n",
+        {"shared_predicate.py": _SHARED_PREDICATE, "other.py": "z = 0\n"},
+    )
+    d3 = _results(check_roles.check_gate_scorer_isolation(root))[
+        "D3 no shared first-party module"
+    ]
+    assert d3.ok is False, (
+        "the SECOND name on an `import a, b` line was invisible, so a shared predicate "
+        f"imported that way crossed the moat unrecorded. detail: {d3.detail}"
+    )
+    assert "whetstone_gate.shared_predicate" in d3.detail
