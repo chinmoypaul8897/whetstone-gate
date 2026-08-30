@@ -1,4 +1,4 @@
-# CONTEXT.md — v1.0
+# CONTEXT.md — v1.1
 
 > **THIS FILE IS LAW.** It is the complete specification for WHETSTONE GATE. It outranks the chunk
 > plan, the code, the tests and anyone's memory (`CLAUDE.md` hard rule 4). **The one thing that
@@ -6,18 +6,37 @@
 > `HOLES.md`, `PROVENANCE.md`, `RAZORPAY_SEMANTICS.md` and `config/` — once its tag exists
 > (`PROCESS.md` §6, §15.0 below). Only the **architect** authors changes to this file.
 
-**Version:** v1.0 · **Adopted:** 2026-08-30 · **Chunk:** C0
+**Version:** v1.1 · **Adopted:** 2026-08-30 · **Chunk:** C0 (v1.0) · **Amended:** 2026-08-30, Q-013
 
-**Provenance.** Everything below the rule at the end of this header is a **byte-identical** copy of
-the audited `PROJECT_SPEC.md`. That file is internal working material and is not itself shipped; this
-is the shipped form of it. Nothing was added, removed, reworded or reformatted in the body.
+**Provenance.** ⚠️ **THE BYTE-IDENTITY CLAIM BELOW IS SUPERSEDED AS OF v1.1. `CONTEXT.md` HAS
+DELIBERATELY DIVERGED FROM `PROJECT_SPEC.md` AND IS NO LONGER A COPY OF IT.** At v1.0 everything
+below the rule at the end of this header was a **byte-identical** copy of the audited
+`PROJECT_SPEC.md` — that file is internal working material and is not itself shipped; this is the
+shipped form of it, and at v1.0 nothing had been added, removed, reworded or reformatted in the body.
+**From v1.1 that is no longer true**, and the digest is retained rather than deleted because it is
+now the record of the **common ancestor**: it is what the body hashed to at v1.0, and it is how a
+reader confirms the divergence is exactly the change log below and nothing else.
 
-- Source: `PROJECT_SPEC.md`, SHA-256 `10f6746c46973112e4129cd9f44fa1bf6f8b146ee7927861ee26e7146f07ac1b`, copied 2026-08-30.
-- **Anyone can check the byte-identity claim** against that digest:
+- **Sections that diverge from `PROJECT_SPEC.md` at v1.1: §13.4 only** — the two N=30 fallback
+  figures, corrected under Q-013, together with the per-branch component breakdown and the
+  consequence note added alongside them. Everything else in the body is still the v1.0 bytes.
+- **`PROJECT_SPEC.md` is NOT the authority on the diverged sections. `CONTEXT.md` is** — hard rule 4
+  names this file, not its source, and the source is not shipped. Where the two now disagree, the
+  disagreement is the correction, and `PROJECT_SPEC.md` carries the error.
+- Common ancestor: `PROJECT_SPEC.md`, SHA-256 `10f6746c46973112e4129cd9f44fa1bf6f8b146ee7927861ee26e7146f07ac1b`, copied 2026-08-30.
+- **The v1.0 body — and only the v1.0 body — hashes to that digest.** The check below therefore
+  **PASSES against the v1.0 body and is EXPECTED TO FAIL against v1.1 and after**; a failure here is not a defect,
+  it is the divergence this note declares. To check the ancestor, run it against the v1.0 file:
 
   ```bash
-  tail -n +35 CONTEXT.md | sha256sum
+  # 310488d is the last commit at which CONTEXT.md was v1.0. No tag is cut for this;
+  # the commit is the record, and `git log --follow CONTEXT.md` finds it.
+  git show 310488d:CONTEXT.md | tail -n +35 | sha256sum
   # -> 10f6746c46973112e4129cd9f44fa1bf6f8b146ee7927861ee26e7146f07ac1b
+  #
+  # At v1.0 the same check ran directly on the working file. It no longer reproduces,
+  # BY DESIGN, and that is what this note declares:
+  #   tail -n +35 CONTEXT.md | sha256sum
   ```
 
 ## Change log
@@ -28,8 +47,7 @@ authorised it |`.
 
 | Version | Date | What changed | Why / authorising ruling |
 |---|---|---|---|
-
-*(No entries. v1.0 is the initial copy and has not been amended.)*
+| **v1.1** | 2026-08-30 | **§13.4's two N=30 fallback projections corrected** — *"~71M tokens ≈ 37 h"* → **69.10M = 35.99 h**, and *"(−6M tokens → ~34 h)"* → **−9.80M → 59.30M = 30.89 h**. A per-branch **component breakdown table** was added so every total is reconstructible rather than trusted, with the consequence stated: as published the chain ran 40 → 37 → 34 h against a 32 h budget and **never reached its own budget**; corrected, it lands at **30.89 h and fits**. The **header's byte-identity claim is marked SUPERSEDED** and the v1.0 digest retained as the common-ancestor record. **The decision rule itself — its thresholds, its branches and its *"No other branch. No post-hoc adjustment."* clause — is UNCHANGED.** | **`QUESTIONS.md` Q-013, UPHELD** — raised as a Class A stop by C0-COMPLETION BUILD, recomputed independently by the **architect**, who reproduced the figures exactly and ruled. Both fallbacks subtracted the reference attacker's reduction and omitted the **gate judge's**, which §13.4's own per-arm formula scales with N and T-FP; the T-FP cut also omitted the **τ² user simulator's**. Second ruling recorded with it: **gate-judge volume scales with N and T-FP; it is not fixed across branches.** Landed **before** `prereg-v1`, while `CONTEXT.md` is still amendable (`PROCESS.md` §6). Vehicle: session `WG-2026-08-30-CTX-13.4-A`. |
 
 ---
 # WHETSTONE GATE — project specification
@@ -1379,14 +1397,52 @@ user tasks is 80 episodes; **the dropped pairs are named in `PROTOCOL.md`** — 
   Almost all 76.9M tokens therefore land on the two Gemma lanes (combined 32K TPM = 1.92M tokens/h),
   which is **≈ 40 hours of Gemma lane time**. Against two run-days at ~16 usable h/day (32 h) **the
   N=50 branch does NOT fit** — so the N=30 decision rule is **load-bearing, not slack**: N=30 removes
-  100 M-ADV episodes and drops the total to ~71M tokens ≈ 37 h, and the pre-declared further fallback,
-  fired by the pilot's measured tokens/episode, is **cutting T-FP from 40 to 20 τ² tasks** (−6M
-  tokens → ~34 h). **The pilot decides whether the full N=50 sweep is attempted at all; if its measured
+  100 M-ADV attacker episodes **and 20 judged episodes per arm**, dropping the total to **69.10M
+  tokens = 35.99 h**, and the pre-declared further fallback, fired by the pilot's measured
+  tokens/episode, is **cutting T-FP from 40 to 20 τ² tasks** (**−9.80M → 59.30M tokens = 30.89 h**).
+  `[CORRECTED v1.1 — Q-013]` — both fallback figures are broken out by component in the table
+  immediately below the list, which is where they come from and how they are checked.
+  **The pilot decides whether the full N=50 sweep is attempted at all; if its measured
   tokens/episode or projected lane-hours exceed budget, the run is N=30 with the reduced T-FP.**
   Requests (35,600) fit inside two days' combined RPD (59,600).
 - Ladder: L1 and L3 each need 10 episodes = 600K tokens against 200K/day → **3 daily windows each**
   (31 Aug, 1 Sep, 2 Sep), which is why they start on 31 Aug. L2 (2M TPD) hosts its own cell plus the
   pilot share comfortably.
+
+⚠️ **EVERY BRANCH IS SHOWN BY COMPONENT, BECAUSE A BARE TOTAL IS WHAT HID THE LAST ERROR.**
+`[CORRECTED v1.1 — Q-013]` Until v1.1 the two fallback rows read *"~71M tokens ≈ 37 h"* and
+*"(−6M tokens → ~34 h)"*, and **both were wrong**: each subtracted the reference attacker's
+reduction and omitted the gate judge's, and the T-FP cut omitted the τ² user simulator's as well.
+Nothing below is new evidence — every cell is the four bullets above, re-evaluated at each branch.
+Two of those components **scale**, which is the whole mechanism: the gate-judge per-arm count is
+`N M-ADV + 34 T-NEG + 16 AD-CMP + 30 M-BEN + T-FP T-FP`, so it shrinks with **N and with T-FP**;
+the τ² user-simulator count is `170 T-NEG + 5 × T-FP` episodes, so it shrinks with **T-FP** too.
+
+| Branch | Attacker @ 60K/ep | Benign solver @ 50K/ep | Gate judge, 3 arms × 20 calls × 1.5K | τ² user sim, 20 turns × 1.5K | Total | Gemma lane-time |
+|---|---|---|---|---|---|---|
+| **N=50, T-FP 40** | 550 ep = **33.00M** | 350 ep = **17.50M** | 3 × 170 = 510 ep = **15.30M** | 370 ep = **11.10M** | **76.90M** | **40.05 h** |
+| **N=30, T-FP 40** | 450 ep = **27.00M** | 350 ep = **17.50M** | 3 × 150 = 450 ep = **13.50M** | 370 ep = **11.10M** | **69.10M** | **35.99 h** |
+| **N=30, T-FP 20** | 450 ep = **27.00M** | 250 ep = **12.50M** | 3 × 130 = 390 ep = **11.70M** | 270 ep = **8.10M** | **59.30M** | **30.89 h** |
+
+**Lane-time is `total ÷ 1.92M tokens/h`** (the two Gemma lanes' combined 32K TPM). Every episode
+count moves exactly as the block table above requires: **N=50→30** removes 100 M-ADV episodes from
+the attacker (550→450) and 20 judged episodes per arm (170→150); **T-FP 40→20** removes 100
+benign-solver episodes (350→250), 100 τ² user-simulator episodes (370→270) **and** a further 20
+judged episodes per arm (150→130). The attacker's 60K, the solver's 50K and the judge's 1.5K are
+§13.3's pre-registered per-episode targets, unchanged.
+
+⚠️ **WHY THE CORRECTION MATTERS — it is the reason it was made, not decoration on a sound plan.**
+**As previously published the reduction chain ran 40 h → 37 h → 34 h against a 32 h budget and
+therefore never reached its own budget**, with the rule's *"No other branch. No post-hoc
+adjustment."* leaving nothing left to try — the decision rule terminated in an infeasible state;
+**corrected, the final rung lands at 30.89 h and fits.** The **branch decision at the top of the
+rule does not move**: N=50 is 40.05 h on either arithmetic and fails the ≤ 32 h test either way.
+**Both slips were conservative** — they made the budget look tighter than it is, never looser.
+The decision rule's thresholds (≤ 60,000 measured attacker tokens/episode, ≤ 32 h projected Gemma
+lane-time) are **criteria, not projections, and are UNCHANGED**; only the projected figures were
+wrong. **Gate-judge volume SCALES with N and with T-FP and is not fixed across branches**
+(architect ruling, Q-013): holding it constant would budget the gate for judging episodes that do
+not exist.
 
 ## 13.5 Runner requirements — hard build requirements, not niceties
 
