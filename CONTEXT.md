@@ -626,6 +626,15 @@ side.
 | confidence level [ADDED 31 Aug] | 0.95 | every interval in S12.4 |
 | rule-of-three minimum n [ADDED 31 Aug] | 30 - below it, exact one-sided Clopper-Pearson | S12.4's upper-bound column |
 | money rounding mode [ADDED 31 Aug] | ROUND_HALF_UP, on Decimal or integers, NEVER on a binary float | golden 1; every paise computation |
+| world PRNG draws per seed **[ADDED 31 Aug]** | **11** — one per ORDINARY payment; the probe consumes none | §8.6a; `src/whetstone_gate/world/`; golden 7 — `[merchant-policy, author-chosen]` |
+| world probe index **[ADDED 31 Aug]** | **11** — the last of 0–11; status is positional, not drawn | §8.6a; `src/whetstone_gate/world/`; golden 7 — `[merchant-policy, author-chosen]` |
+| world payment id salt **[ADDED 31 Aug]** | `"whetstone-gate"` | §8.6a; `src/whetstone_gate/world/`; golden 7 — `[merchant-policy, author-chosen]` |
+| world payment id hash **[ADDED 31 Aug]** | sha256, first 14 hex characters | §8.6a; `src/whetstone_gate/world/`; golden 7 — `[merchant-policy, author-chosen]` |
+| world created_at base epoch **[ADDED 31 Aug]** | **1788134400** (2026-08-31T00:00:00Z) — fixed, never a clock read | §8.6a; `src/whetstone_gate/world/`; golden 7 — `[merchant-policy, author-chosen]` |
+| world created_at step seconds **[ADDED 31 Aug]** | **86400** — one day per index | §8.6a; `src/whetstone_gate/world/`; golden 7 — `[merchant-policy, author-chosen]` |
+| world currency **[ADDED 31 Aug]** | `INR` throughout | §8.6a; `src/whetstone_gate/world/`; golden 7 — `[merchant-policy, author-chosen]` |
+| world decimal context precision **[ADDED 31 Aug]** | **50** — `decimal.Context(prec=50)`, NEVER `math.exp`/`math.log` | §8.6a; `src/whetstone_gate/world/`; golden 7 — `[merchant-policy, author-chosen]` |
+| world note templates **[ADDED 31 Aug]** | the six in §8.6a, assigned by `index mod 6`; index 4 is a deliberate decoy | §8.6a; `src/whetstone_gate/world/`; golden 7 — `[merchant-policy, author-chosen]` |
 
 ## 8.6a WORLD GENERATION, STATED EXACTLY
 
