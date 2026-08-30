@@ -10,7 +10,16 @@ mutants · `code` = persona 2 only, ≥4 mutants · `submission` = persona 3 + p
 **No chunk is `PASS` without `docs/reviews/ARCHITECT_CHECK_<N>.md`.** An unrecorded gate is not a
 gate.
 
-*Last updated: 2026-08-31, end of the ARCHITECT-ARTEFACT LANDING session (`e210c6f5`).*
+*Last updated: 2026-08-31, end of the **C0 FIX** session (`c9521aac`), which ran concurrently with
+the **C1 BUILD** session (`20cd5b79`) as pair **P-01**. Before them: the ARCHITECT-ARTEFACT LANDING
+session (`e210c6f5`).*
+
+⚠️ **UPDATE, 2026-08-31, C0 FIX (`c9521aac`): ALL FOUR BLOCKERs ARE CLOSED AND C0 IS `fixing →
+fixed (unreviewed)`. THERE IS STILL NO `c0-pass` TAG AND THE TAG CHAIN HAS STILL NOT STARTED** — a
+fix session does not certify its own work, and only a REVIEW session cuts that tag. The paragraph
+below is left standing, unedited, because it is the record of what was found; what follows it in the
+C0 row is the record of what was done about it, with the review's own §4 evidence re-run old beside
+new. **A fresh adversarial review of C0 is owed before anything is tagged.**
 
 ⚠️ **C0 IS `FAILED`. NO `c0-pass` TAG EXISTS AND THE TAG CHAIN HAS NOT STARTED.** Four BLOCKERs, all
 the same shape — a check that reports PASS over nothing: `check-roles` **E2 and E3 cannot fire at
@@ -35,7 +44,7 @@ credential. **`docs/reviews/ARCHITECT_CHECK_0.md` now exists** and **UPHOLDS C0'
 
 | # | Date | Chunk | Review | Status | Review history (append-only) |
 |---|---|---|---|---|---|
-| **C0** | 30 Aug | Repo, toolchain, remote, canonical files, day-one setup | `code` | ⚠️ **FAILED** | built → completed (3 operator-owed items landed; Q-006 + Q-008 closed) → **REVIEW_C0_1 = FAIL** (`52f5307b`, 4 BLOCKERs; no tag) → **ARCHITECT_CHECK_0 committed** (`e210c6f5`, 31 Aug — **FAIL UPHELD**; B-01…B-04 each re-confirmed from source; §13.4 recomputed = MATCH; **no `c0-pass`**) → **fix owed** (`c9521aac`) |
+| **C0** | 30 Aug | Repo, toolchain, remote, canonical files, day-one setup | `code` | ⚠️ **fixed (unreviewed)** | built → completed (3 operator-owed items landed; Q-006 + Q-008 closed) → **REVIEW_C0_1 = FAIL** (`52f5307b`, 4 BLOCKERs; no tag) → **ARCHITECT_CHECK_0 committed** (`e210c6f5`, 31 Aug — **FAIL UPHELD**; B-01…B-04 each re-confirmed from source; §13.4 recomputed = MATCH; **no `c0-pass`**) → **fix owed** (`c9521aac`) → **FIXED, UNREVIEWED** (`c9521aac`, 31 Aug — all four BLOCKERs closed with the review's own §4 evidence re-run old-beside-new: **B-01** E2/E3 go `PASS/PASS` → `FAIL/FAIL` on §7a's two named violations; **B-02** attack forms 2, 3 and 4 go `PASS` → `FAIL` (form 1 already failed); **B-03** `config/` minus `protocol.yaml` goes `14 passed, 0 failed, exit 0` → `14 passed, 1 failed, exit 1`; **B-04** `make selftest` with `camel_comparator:` deleted goes `2 passed` (GREEN) → `1 failed, 1 passed` (RED), and with `lanes.yaml` deleted the operator gate goes `1 passed` → `1 failed`. Plus **A5** (2 branches, closes **OF-01** and is **INC-13**'s guardrail), **E5** + a 4-SHA exception list (Q-014, BLOCKER), the **empty** `MOAT_ALLOW_LIST` (Q-015), the **§8.6 → registry** direction with the **8** missing constants, and **OF-03/04/06/10 CLOSED** · **OF-02/09/11 updated, still OPEN**. **INC-13, INC-14, INC-15** written *before* any code changed; **INC-16** written when `check-roles` A3 caught this session writing CRLF. `make test` **61 → 116 passed**; `check-roles` **14/0/3 → 17 passed, 0 failed, 4 n/a, exit 0**; `make selftest` **still RED**, correctly. **52 kept probes, 46 of which fail against the pre-fix source.** ⚠️ **NO `c0-pass` TAG. Nothing is self-certified — a fresh review re-runs the evidence**) → **re-review owed** |
 | **C1** | 30 Aug | `RAZORPAY_SEMANTICS.md` + `PROVENANCE.md` attack rows A1–A6 | `full` | **built (unreviewed)** | built (`20cd5b79`, 31 Aug — **71 rows, 0 `[UNFETCHED]`**; 10 pages + 2 pinned source trees fetched first-hand, each page fetched twice and byte-identical; **0 Razorpay pages changed since 2026-08-30**; **6 findings raised against this project's own records**, F-06 HIGH; **Q-016 / Q-017 / Q-018 owed**; **no `INCIDENTS.md` entry owed**) → **review owed** |
 | **C2** | 30 Aug | World generator + **the probe planted** (`pay_CANARYRECON`) | `full` | todo | — |
 | **C3** | 30 Aug | τ² adapter A — the 34/164 must-not-write enumeration, the T-FP id list | `full` | todo | — |

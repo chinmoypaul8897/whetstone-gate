@@ -6,6 +6,84 @@ not a record; this file is.
 
 ---
 
+## C0 — the four BLOCKERs — FIX — attempt 1 — 2026-08-31
+
+**SESSION-TOKEN:** `c9521aac` — issued by the architect in the C0 fix prompt and recorded in
+`QUESTIONS.md` `## Session tokens` by the `e210c6f5` session **before this session ran**. Carried as
+the `Session-Token:` trailer on all eleven commits below.
+
+**Role:** FIX. Wrote the `INCIDENTS.md` entries **first, in `864c621`, before a line of code
+changed** (hard rule 13), then fixed only the findings named in the prompt. **Ran concurrently with
+the C1 BUILD session (`20cd5b79`) as pair P-01**, whose four commits are interleaved in the log
+below; every one of this session's eleven commits touched **only** files inside its own scope fence,
+and `git show --stat` per commit is the check.
+
+**Token spend: NONE.** Zero provider model calls — no Groq, no Google, nothing consuming a lane's
+quota. Mock and local only.
+
+### What landed — the four BLOCKERs, with the review's own §4 evidence re-run OLD beside NEW
+
+| | OLD (`864c621`) | NEW (`8ed108e`) |
+|---|---|---|
+| **B-01** — §7a's two named violations inserted into `QUESTIONS.md` | `PASS E2 \| clean` · `PASS E3 \| clean` | `FAIL E2 \| SHARED on ['C0']` · `FAIL E3 \| REUSED: cafebabe … deadbeef …` |
+| **B-02** — the four attack forms | 1 `FAIL` · 2 `PASS` · 3 `PASS` · 4 `PASS` | **1 · 2 · 3 · 4 all `FAIL`** (and form 3 fails `D1` too) |
+| **B-03** — `git rm config/protocol.yaml` | `14 passed, 0 failed, 3 n/a` · **exit 0** | `14 passed, 1 failed, 6 n/a` · **exit 1** |
+| **B-04a** — `camel_comparator:` block deleted | `make selftest` → **`2 passed`** (GREEN) | **`1 failed, 1 passed`** (RED) |
+| **B-04b** — `config/lanes.yaml` deleted entirely | operator gate → **`1 passed`** | **`1 failed`** |
+
+Each was run in a **clean clone** of the tree at that SHA — `git clone`, `git checkout <sha>`,
+`core.autocrlf=false` — not by editing this working tree, and the mutations are the review's own
+verbatim.
+
+### And the rest
+
+- **`A5`, one check with TWO branches** (`4a34c04`) — closes **OF-01** and is **INC-13**'s systemic
+  guardrail. ⚠️ **A claim in the record that must not be rebuilt: one branch would NOT have done
+  it.** A control-byte scan over TEXT-classified files is *not* a superset of OF-01's discriminator,
+  because a lone CR makes git call the file **BINARY** — so a text-only scan skips exactly the file
+  OF-01 is about. Two holes, opposite sides of git's own verdict.
+- **`E5` + a dated four-SHA exception list** (`0067b19`) — Q-014 (i)–(iv), which the architect raised
+  to **BLOCKER** for this cycle. E4's *"carry no trailer"* list drops **20 → 16** and stops printing
+  a false statement about four commits that do carry one.
+- **`MOAT_ALLOW_LIST`, created EMPTY** (`947a995`), with a probe that pins it empty **and** proves an
+  entry can actually blind D3 — so pinning it is not decorative.
+- **The §8.6 → registry direction, which never existed** (`8ed108e`). Measured: **21** §8.6 rows,
+  **14** pre-fix registry rows, **8** with no registry entry at all. All eight added.
+- **OF-03, OF-04, OF-06 and OF-10 CLOSED.** **OF-02, OF-09 and OF-11 updated but STILL OPEN**, each
+  with the part that was *not* closed named rather than rounded up.
+
+### What broke while doing it, and what caught it
+
+⚠️ **`INCIDENTS.md` INC-16.** Renaming one import line, this session used a **Python script** rather
+than the editor tool, and `Path.write_text`'s Windows newline translation rewrote **all 705 line
+endings** of `tests/test_c0_fix_probes.py` to CRLF. **`check-roles` A3 and A4 caught it, before any
+commit** — which is what `.gitattributes` was a first-commit deliverable for. Repaired at byte level
+with `read_bytes`/`write_bytes` and no escape sequence. **FIFTH occurrence of INC-06's class, in the
+session that had just written INC-13 about the fourth, against an explicit warning in its own
+prompt.** Recorded rather than quietly repaired.
+
+### Numbers
+
+`make test` **61 → 116 passed**, 1 skipped, 2 deselected · `check-roles` **14 passed / 0 failed / 3
+n/a → 17 passed / 0 failed / 4 n/a**, exit 0 · `make selftest` **1 failed, 1 passed → unchanged, and
+that is correct** (Q-009: red until RUN-1 decides the CaMeL branch) · F2 sentinel count **6 → 6**.
+
+**52 kept probes in `tests/test_c0_fix_probes.py`. 46 of them fail against `864c621`'s source**; the
+6 that pass there are regression guards by design, not defect probes, and are named as such.
+
+### Raised and NOT acted on
+
+⚠️ **`400` as a STRICT tripwire literal is also HTTP Bad Request**, which C11's runner is likely to
+write bare — and a hit there has **no legitimate remedy**, since an HTTP status cannot be read from
+`config/` and `spec_constants.py` offers no escape comment by design. Implemented STRICT as the
+architect directed (the failure mode is a stop-and-ask, never a silent pass) with the concern
+recorded in the row's own `note`. **This session's scope fence forbids `QUESTIONS.md`, so it could
+not be raised there and is raised in the session report instead — it needs a ruling.**
+
+⚠️ **This session certifies nothing and cut no tag.** A fresh adversarial review re-runs the evidence.
+
+---
+
 ## C1 — RAZORPAY_SEMANTICS.md + PROVENANCE.md A1–A6 — BUILD — attempt 1 — 2026-08-31
 
 **SESSION-TOKEN:** `20cd5b79` — issued by the architect in the C1 build prompt and recorded in
