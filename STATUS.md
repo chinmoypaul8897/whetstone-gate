@@ -10,7 +10,9 @@ mutants · `code` = persona 2 only, ≥4 mutants · `submission` = persona 3 + p
 **No chunk is `PASS` without `docs/reviews/ARCHITECT_CHECK_<N>.md`.** An unrecorded gate is not a
 gate.
 
-*Last updated: 2026-08-30, end of C0-COMPLETION build.*
+*Last updated: 2026-08-30, end of the CTX-13.4 correction session (`WG-2026-08-30-CTX-13.4-A`).*
+
+**Specification: `CONTEXT.md` v1.1.** See *Specification version* below — it matters because **C14 selects the N branch from §13.4 and writes it into `PROTOCOL.md` before the freeze.**
 
 ---
 
@@ -56,6 +58,33 @@ These are not chunks — they execute in the **operator's terminal**, never insi
 | **SWEEP-AUDIT-1** | 1 Sep 22:00–23:00 | 🔍 persona-1 **denominator audit** over day one's output | *is itself a `full` review* | todo |
 | **RUN-4** | 2 Sep 08:00 → | **Sweep day two** — M-BEN, T-FP, AD-CMP, CaMeL, ladder window 3 | inside C18's review | todo |
 | **SUBMIT** | 4 Sep by 18:00 IST | 🚩 Operator action. **Gated on `REVIEW_21` = PASS** | — | todo |
+
+---
+
+## Specification version
+
+`CONTEXT.md` is **the law** and is **not** a frozen artefact — `PROCESS.md` §6 leaves it amendable
+until `prereg-v1` exists, and it does not. Every amendment is a numbered row in its own change log
+and a row here. **Amendments are architect-authored only.**
+
+| Version | Date | Sections touched | Ruling | Session |
+|---|---|---|---|---|
+| **v1.0** | 2026-08-30 | — (initial copy of the audited `PROJECT_SPEC.md`) | — | C0 |
+| **v1.1** | 2026-08-30 | **§13.4 only** — the two N=30 fallback projections, plus a per-branch component breakdown and the consequence note | **Q-013, UPHELD** | `WG-2026-08-30-CTX-13.4-A` (BUILD) |
+
+**What v1.1 changed, in one line:** *"~71M ≈ 37 h"* → **69.10M = 35.99 h** and *"−6M → ~34 h"* →
+**59.30M = 30.89 h**. **The N=50 headline (76.90M / 40.05 h) was correct and is unchanged, and so
+is the decision rule** — its thresholds are criteria, not projections. ⚠️ **Why it was worth a
+session:** as published the reduction chain ran **40 → 37 → 34 h against a 32 h budget and never
+reached its own budget**, with *"No other branch. No post-hoc adjustment."* leaving nothing to try;
+corrected, the final rung lands at **30.89 h and fits**.
+
+⚠️ **The header's byte-identity claim against `PROJECT_SPEC.md` is SUPERSEDED from v1.1.**
+`CONTEXT.md` has deliberately diverged, **in §13.4 only**. The v1.0 digest is retained, not deleted:
+it is the record of the common ancestor and reproduces against commit `310488d`. **`CONTEXT.md`, not
+`PROJECT_SPEC.md`, is the authority on the diverged section** — hard rule 4 names this file.
+
+---
 
 ⚠️ **OWED TO THE ARCHITECT — a C21 done-when that does not exist yet.** `PROVENANCE.md` §1.5's
 no-payment-method attestation is dated **2026-08-30** and is the **only claim in the frozen set that

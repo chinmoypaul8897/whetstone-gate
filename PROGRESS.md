@@ -6,6 +6,79 @@ not a record; this file is.
 
 ---
 
+## CTX-13.4 — BUILD — attempt 1 — 2026-08-30
+
+**SESSION-TOKEN:** `WG-2026-08-30-CTX-13.4-A` — **the first token this project has issued.**
+Carried as the `Session-Token:` trailer on both commits, **verbatim as issued**. ⚠️ It is **not**
+the 8-hex shape `PROCESS.md` §7a specifies and `check_roles.py` enforces, so **`check-roles` cannot
+see it**: E4 counts these two commits among the *"carry no trailer"* list even though the trailer is
+there, and E1 — the forged-token check — is **silent**, not passing. Raised as **Q-014** and **not
+fixed**: the fence says record, and `CLAUDE.md` §5 forbids inventing a conforming token.
+
+**Scope:** one correction. `CONTEXT.md` §13.4 and its version header, plus `QUESTIONS.md`.
+**Nothing else** — no config, no test, no source, no `PROCESS.md`, no tag, and **the early-return
+shape in `check_gitattributes` is still untouched and still reserved for C0's review.**
+
+**Token spend: NONE.** Zero provider calls of any kind.
+
+### What landed
+
+1. **`CONTEXT.md` §13.4's two N=30 fallback projections corrected** under the Q-013 ruling:
+   *"~71M tokens ≈ 37 h"* → **69.10M = 35.99 h**, and *"(−6M tokens → ~34 h)"* → **−9.80M →
+   59.30M = 30.89 h**. The N=50 headline **76.90M / 40.05 h was correct as published** and is
+   unchanged, and so is the decision rule — structure, branches, thresholds and its *"No other
+   branch. No post-hoc adjustment."* clause.
+2. **A per-branch component breakdown table**, because **the absence of one is why the error
+   survived.** Every cell is §13.4's own four feasibility bullets re-evaluated at each branch.
+3. **`CONTEXT.md` at v1.1** with its first change-log row, and the header's byte-identity claim
+   against `PROJECT_SPEC.md` marked **SUPERSEDED** — diverged in §13.4 only, with the v1.0 digest
+   **retained** as the common-ancestor record.
+4. **Three rulings recorded in `QUESTIONS.md`, Q-013 CLOSED**; **Q-014 raised.**
+
+### The three things worth reading the diff for
+
+1. **The arithmetic was re-derived here before it was written, not taken on trust.** The prompt
+   said so in as many words — *"the architect has been wrong before and being told a number is
+   verified is not verification"* — so all three branches were recomputed from §13.4's four
+   component bullets. **All three matched the architect's figures exactly**, to the cent and to two
+   decimal places of lane-time: 76.90M/40.05 h, 69.10M/35.99 h, 59.30M/30.89 h. Had they not, the
+   instruction was to STOP rather than write them.
+2. **The consequence is the point, and it is now in the file.** As published the chain ran
+   **40 → 37 → 34 h against a 32 h budget** and therefore **never reached its own budget**, with no
+   branch left. Corrected, it lands at **30.89 h**. The error was not decoration on a sound plan;
+   the corrected numbers are what make the plan's own escape hatch work. **Both slips were
+   conservative** — they made the budget look tighter, never looser.
+3. **The byte-identity note was updated, not deleted.** Deleting the digest would have erased the
+   only evidence that the divergence is exactly §13.4 and nothing else. It is now labelled the
+   **common ancestor**, the check is rewritten to run against commit `310488d`, and **that command
+   was executed and reproduces the digest.** The working-file form is documented as
+   **expected to fail** from v1.1 on, so a later reader does not read the divergence as damage.
+
+### Checks, against their values before this session
+
+| Check | Before | After |
+|---|---|---|
+| `make test` | 41 passed, 1 skipped, 2 deselected | **identical** |
+| `make check-roles` | 14 passed, 0 failed, 3 n/a | **identical** — E4's *"carry no trailer"* list grew 16 → 18 (see Q-014); no result changed |
+| `make selftest` | 1 failed, 1 passed, 42 deselected — **red on purpose**, `camel_comparator.branch` is `TODO_C13_RUN1` | **identical** |
+
+⚠️ **`make test` was transiently red mid-session and is green again.**
+`test_the_object_store_and_the_working_tree_agree` compares the working tree against `HEAD:`, so it
+fires on **any** uncommitted edit to a tracked file, including this one. It is not a defect and it
+is not this session's to change; it means **`make test` is only meaningful once the work is
+committed.** Recorded here so the next session is not surprised by it. **Nothing was weakened,
+skipped or loosened to get green** (hard rule 6) — the commit is what made it pass.
+
+**`INCIDENTS.md`: no entry.** Nothing broke. No test failed on its merits, no artefact was damaged,
+no run aborted. Hard rule 13's *"an invented incident has no commit"* cuts both ways, and inventing
+one to look thorough would be the dramatisation it warns against. The one process point worth
+stating is not a failure: **hard rule 5 wants the ruling recorded before anything else is touched,
+and the working-tree edits were made before `QUESTIONS.md` was written.** The **permanent record is
+the commit order**, and the ruling commit `ec3064d` precedes the correction commit `d67550e`
+deliberately for that reason. Disclosed rather than smoothed over.
+
+---
+
 ## C0-COMPLETION — BUILD — attempt 1 — 2026-08-30
 
 **SESSION-TOKEN:** ⚠️ **none issued.** This prompt, like C0's, carried no `SESSION-TOKEN`
