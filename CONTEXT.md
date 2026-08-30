@@ -158,7 +158,7 @@ What it can do with them, **verified first-hand against `razorpay/razorpay-mcp-s
 | `capture_payment.amount` has **neither ceiling nor floor** — only a prose hint addressed to the model. The schema accepts `0` and accepts `99999999999`. | `pkg/razorpay/payments.go:199-204` |
 | `initiate_payment` — a **server-to-server charge against a saved `token` or a `vpa`**, registered in `AddWriteTools`. `amount` carries `Min(100)` and **no `Max`**. Added **9 Sept 2025** (PR #52); unchanged in substance since. | `pkg/razorpay/payments.go:712-778, 852-866`; `pkg/razorpay/tools.go:30` |
 | `create_instant_settlement` exposes **`settle_full_balance`** — one unconstrained boolean which, by its own description, *"will settle the maximum amount possible and ignore amount parameter"*, overriding the tool's only numeric floor. | `pkg/razorpay/settlements.go:221-247` |
-| `create_refund` passes **`nil`** where the Go SDK's `extraHeaders` go, so Razorpay's own documented `X-Refund-Idempotency` header **cannot be sent**. Its five parameters are `payment_id, amount, speed, notes, receipt` — none is a key. **`grep -rni "idempot"` over the whole repo → 0 hits.** Three retries produced three refunds in test mode. | `pkg/razorpay/refunds.go:73-75`; SDK sig `razorpay-go@v1.4.0 resources/payment.go:44`; reproduced in PR #128 |
+| `create_refund` passes **`nil`** where the Go SDK's `extraHeaders` go, so Razorpay's own documented `X-Refund-Idempotency` header is **structurally unsendable**. Its five parameters are `payment_id, amount, speed, notes, receipt`. ⚠️ **CORRECTED 31 Aug — this row read *"none is a key"*, and that was FALSE.** Razorpay documents `receipt` **as** an idempotency key: *"The value passed in the `receipt` parameter has already been used for an earlier refund on the same payment. `receipt` is treated as an idempotency key."* (400, *"Duplicate receipt found for this refund request."*), and `refunds.go:66` forwards it. **The finding is sharpened, not weakened, and this is the defensible sentence: Razorpay documents a dedicated idempotency header for refunds and their own MCP server structurally cannot send it; the only idempotency an agent can reach is an optional free-text field that nothing requires it to populate.** **`grep -rni "idempot"` over the whole repo → 0 hits.** Three retries produced three refunds in test mode. | `pkg/razorpay/refunds.go:73-75`, `:42-46`, `:66`; SDK sig `razorpay-go@v1.4.0 resources/payment.go:44`; `api/refunds/create-normal.md` (Errors); reproduced in PR #128. `RAZORPAY_SEMANTICS.md` **RS-05…RS-12** and **RS-27**. `[VERIFIED FIRST-HAND by C1 at 2026-08-30T20:42Z, AND RE-VERIFIED INDEPENDENTLY BY THE ARCHITECT AT SOURCE ON 2026-08-31]` |
 | **These `Min`/`Max` values are not enforced at runtime at all.** `mcpgo.Max` writes `schema["maximum"]` into the emitted JSON Schema; upstream `handleToolCall` performs no argument validation against the schema, and the repo's own `Validator` checks presence and type only. **Open PR #107 exists to fix exactly this.** | `pkg/mcpgo/tool.go:67-83`; `pkg/razorpay/tools_params.go` |
 | Razorpay wires only **no-return logging hooks** at the tool boundary, though `mcp-go v0.43.2` ships two error-returning veto points (`OnRequestInitializationFunc`, `ToolHandlerMiddleware`) it does not use. `grep -rn "Middleware"` → 0 hits. | `pkg/mcpgo/server.go:110-167` |
 | Governance grep `policy\|spend_cap\|guardrail\|budget\|approval\|consent\|dry_run` over the whole repo → **exactly 5 hits, and not one is a control**: one link to the security policy in an issue template, and four occurrences of `policy_name` in a payment-links **test fixture** (an insurance product name). **`grep -rni "audit"` → 0 hits.** | whole repo, `git grep -E` |
@@ -354,8 +354,26 @@ Razorpay itself**, 26 of them for that non-existent parameter. ₹2,004 cr colla
 
 **Doc sources for every error string above** `[VERIFIED 2026-08-30]`: A1 →
 `api/payments/capture.md` (Errors); A2, A6 → `api/refunds/create-normal.md` (Errors); A3 →
-`api/refunds/normal-refunds-idempotent.md`; A4 → `api/settlements/instant/create.md` +
-`payments/settlements/instant.md` (all under `razorpay.com/docs/build/llm-docs/`).
+`api/refunds/normal-refunds-idempotent.md`; **A4 → see the correction immediately below** (all doc
+pages under `razorpay.com/docs/build/llm-docs/`).
+
+⚠️ **A4'S ATTRIBUTION IS CORRECTED, 31 Aug, AND THE STRING WAS ON NEITHER PAGE IT WAS CREDITED TO.**
+This line previously read *"A4 → `api/settlements/instant/create.md` + `payments/settlements/instant.md`"*.
+The string A4's row quotes — *"will settle the maximum amount possible and ignore amount parameter"* —
+is on **neither**. It is the **MCP server's own tool-description string**,
+`pkg/razorpay/settlements.go:231-232`, which **§2's own table above cites correctly** — so one
+specification attributed one string to two different places. Razorpay's API reference words the same
+behaviour differently, and **that text is real too**:
+
+> Razorpay will settle the maximum amount possible. Values passed in the `amount` parameter are ignored.
+
+`[VERIFIED — api/settlements/instant/create.md, Parameters, `settle_full_balance`;
+`RAZORPAY_SEMANTICS.md` RS-13]`. **Both texts are real; each is now credited to the artefact it is
+actually in** — the tool description to `settlements.go`, the reference wording to the doc page.
+A4's **five documented ceilings** are unaffected and remain sourced to
+`api/settlements/instant/create.md` + `payments/settlements/instant.md` (`RAZORPAY_SEMANTICS.md`
+RS-15…RS-19). Found by C1 BUILD (`20cd5b79`) as finding **F-01**, recorded at
+`RAZORPAY_SEMANTICS.md` **RS-14**, and re-verified by the architect on 2026-08-31.
 
 **State the inversion in one sentence, in the README, before anyone else does:**
 
@@ -866,6 +884,11 @@ Payment entity catches **3 of 4**. What survives is smaller and must be stated t
   **Keep amount-equality as a clearly labelled second predicate, `S2-amt`, and report the
   false-positive delta between S2 and S2-amt. That delta is a finding**, and it is the cleanest
   demonstration in the repo that a plausible-looking invariant can be wrong.
+  ⚠️ **S2's PREDICATE ABOVE IS UNCHANGED, AND `QUESTIONS.md` Q-017 IS OPEN.** Razorpay **also**
+  documents `receipt` as an idempotency key and, unlike the header, the MCP tool **can** send it
+  (§2's corrected row; `RAZORPAY_SEMANTICS.md` **RS-27**). Whether S2 should also recognise a
+  repeated `receipt` is **Q-017 — Class A, OPEN, and the operator's ruling.** §2's correction fixed
+  a **fact about a third party**; it decided nothing here.
 - **S3 — capture unbound to an authorization.** A capture must reference an authorization that
   exists, is unconsumed, and matches on amount. `[Razorpay-defined]`
 - **S4 — THE STALE READ. The genuinely un-representable one.** A violation established by the ledger
