@@ -10,7 +10,7 @@ mutants · `code` = persona 2 only, ≥4 mutants · `submission` = persona 3 + p
 **No chunk is `PASS` without `docs/reviews/ARCHITECT_CHECK_<N>.md`.** An unrecorded gate is not a
 gate.
 
-*Last updated: 2026-08-30, end of the C0 ADVERSARIAL REVIEW (`52f5307b`).*
+*Last updated: 2026-08-31, end of the ARCHITECT-ARTEFACT LANDING session (`e210c6f5`).*
 
 ⚠️ **C0 IS `FAILED`. NO `c0-pass` TAG EXISTS AND THE TAG CHAIN HAS NOT STARTED.** Four BLOCKERs, all
 the same shape — a check that reports PASS over nothing: `check-roles` **E2 and E3 cannot fire at
@@ -21,7 +21,13 @@ pre-spend gate, flips GREEN when the key it guards is deleted.** Full evidence, 
 then the four BLOCKERs, then a fresh review. Every dependent chunk (C1, C2, C3, C6, C11, C13, C15)
 lists C0 as a dependency.
 
-**Specification: `CONTEXT.md` v1.1.** See *Specification version* below — it matters because **C14 selects the N branch from §13.4 and writes it into `PROTOCOL.md` before the freeze.**
+**Specification: `CONTEXT.md` v1.2.** See *Specification version* below — it matters because **C14 selects the N branch from §13.4 and writes it into `PROTOCOL.md` before the freeze.**
+
+⚠️ **TWELVE RULINGS LANDED 2026-08-31** (`e210c6f5`): Q-001, Q-002, Q-003, Q-004, Q-005, Q-007,
+Q-009, Q-010, Q-011, Q-012, Q-014, Q-015 are all **RULED**. Only **Q-006** and **Q-008** remain
+OPEN, and both are **OPERATOR** actions, not architect rulings. ⚠️ **Q-014 was RAISED TO BLOCKER for
+this fix cycle** — from C1 onward, E1 is the only thing standing between the log and an invented
+credential. **`docs/reviews/ARCHITECT_CHECK_0.md` now exists** and **UPHOLDS C0's FAIL.**
 
 ---
 
@@ -29,7 +35,7 @@ lists C0 as a dependency.
 
 | # | Date | Chunk | Review | Status | Review history (append-only) |
 |---|---|---|---|---|---|
-| **C0** | 30 Aug | Repo, toolchain, remote, canonical files, day-one setup | `code` | ⚠️ **FAILED** | built → completed (3 operator-owed items landed; Q-006 + Q-008 closed) → **REVIEW_C0_1 = FAIL** (`52f5307b`, 4 BLOCKERs; no tag) |
+| **C0** | 30 Aug | Repo, toolchain, remote, canonical files, day-one setup | `code` | ⚠️ **FAILED** | built → completed (3 operator-owed items landed; Q-006 + Q-008 closed) → **REVIEW_C0_1 = FAIL** (`52f5307b`, 4 BLOCKERs; no tag) → **ARCHITECT_CHECK_0 committed** (`e210c6f5`, 31 Aug — **FAIL UPHELD**; B-01…B-04 each re-confirmed from source; §13.4 recomputed = MATCH; **no `c0-pass`**) → **fix owed** (`c9521aac`) |
 | **C1** | 30 Aug | `RAZORPAY_SEMANTICS.md` + `PROVENANCE.md` attack rows A1–A6 | `full` | todo | — |
 | **C2** | 30 Aug | World generator + **the probe planted** (`pay_CANARYRECON`) | `full` | todo | — |
 | **C3** | 30 Aug | τ² adapter A — the 34/164 must-not-write enumeration, the T-FP id list | `full` | todo | — |
@@ -80,6 +86,7 @@ and a row here. **Amendments are architect-authored only.**
 |---|---|---|---|---|
 | **v1.0** | 2026-08-30 | — (initial copy of the audited `PROJECT_SPEC.md`) | — | C0 |
 | **v1.1** | 2026-08-30 | **§13.4 only** — the two N=30 fallback projections, plus a per-branch component breakdown and the consequence note | **Q-013, UPHELD** | `WG-2026-08-30-CTX-13.4-A` (BUILD) |
+| **v1.2** | 2026-08-31 | **§16** (the tree re-nested; the mingw path) and **§8.6** (eight constants added; the warning paragraph amended) | **Q-004 (OPTION 1)**, **Q-005 (Class C)**, and the architect's §8.6 finding in `ARCHITECT_CHECK_0.md` §5 | `e210c6f5` (BUILD, architect-artefact landing) |
 
 **What v1.1 changed, in one line:** *"~71M ≈ 37 h"* → **69.10M = 35.99 h** and *"−6M → ~34 h"* →
 **59.30M = 30.89 h**. **The N=50 headline (76.90M / 40.05 h) was correct and is unchanged, and so
@@ -87,6 +94,28 @@ is the decision rule** — its thresholds are criteria, not projections. ⚠️ 
 session:** as published the reduction chain ran **40 → 37 → 34 h against a 32 h budget and never
 reached its own budget**, with *"No other branch. No post-hoc adjustment."* leaving nothing to try;
 corrected, the final rung lands at **30.89 h and fits**.
+
+**What v1.2 changed, in one line:** **§16's tree is re-nested** so the eleven subpackages are drawn
+as children of `whetstone_gate/` (Q-004 — the deciding fact is that tau2-bench installs a top-level
+package named `tau2`, which a sibling layout would collide with); **§16's mingw path is corrected**
+(Q-005); and **§8.6 gains eight constants**, two of which — the **gate-judge 1,500 tokens/call** and
+the **benign-solver 50,000 tokens/episode** targets — were in **neither §8.6 nor `config/`**, which
+§8.6's own sentence calls *a defect, and finding one is a review BLOCKER*. Both are load-bearing in
+**every row of §13.4's arithmetic** and are added to `config/protocol.yaml` in the same amendment.
+**No number §13.4 publishes moves; §13.4 itself is untouched.**
+
+⚠️ **AND A FINDING THAT WAS NOT A TYPO.** Q-005 reported `C:\MinGWin\mingw32-make.exe` as a prose
+typo. At byte level it was a literal **`0x08` BACKSPACE control byte** standing where the `\b` of
+`\bin` belongs, **present since v1.0 (`104fc74`)** — a backspace renders as nothing, so every viewer
+displayed `MinGWin`. **It was the only C0 control byte in any tracked text file** and it is now gone.
+**Neither `check-roles` A3 nor A4 could ever have seen it**: it is not a line ending, and the
+worktree bytes and the blob agreed exactly, so §6a's fingerprint property genuinely held. This is
+`INCIDENTS.md` **INC-10's `Missing` field** — *"nothing checks a tracked document's CONTENT"* —
+arriving a second time, and **OF-01's proposed discriminator would NOT have caught it** (that one
+keys on *"git calls it binary yet it holds no NUL"*; here git correctly calls `CONTEXT.md` text).
+⚠️ **AN `INCIDENTS.md` ENTRY IS OWED FOR THIS.** It is not written here because the concurrent C0
+FIX session owns that file tonight; the full rule-13 entry is in this session's report and in
+`docs/sessions/c0-arch-landing-1.txt`.
 
 ⚠️ **The header's byte-identity claim against `PROJECT_SPEC.md` is SUPERSEDED from v1.1.**
 `CONTEXT.md` has deliberately diverged, **in §13.4 only**. The v1.0 digest is retained, not deleted:
@@ -103,6 +132,11 @@ subsequent 429 into a bill, and this repository would still read *"NONE ATTACHED
 **does not name a billing re-check** `[VERIFIED 2026-08-30]`. C0-COMPLETION did not add one, because
 `PROCESS.md` was outside its scope fence. **Until the architect adds it, the re-confirmation depends
 on somebody reading `PROVENANCE.md` §1.5.**
+
+✅ **CLOSED 2026-08-31 (`e210c6f5`).** `PROCESS.md` §12.1's **C21 row now carries the billing
+re-check** in its done-when: *"no payment method is attached to either provider account,
+RE-CONFIRMED on 4 September and recorded in `PROVENANCE.md` §1.5 with the new date."* The paragraph
+above is kept, not deleted, because it is the record of how long the gap stood and who found it.
 
 ---
 
