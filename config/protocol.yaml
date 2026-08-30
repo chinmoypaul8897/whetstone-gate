@@ -46,6 +46,23 @@ attacker:
   context_summary_is_deterministic: true
   target_tokens_per_episode: 60000
 
+# ── The gate judge (arms 2 / 2S / 3) ──────────────────────────────────────────
+gate_judge:
+  # [merchant-policy, author-chosen] CONTEXT.md §13.3's secondary target: ≤ 1.5K tokens
+  # per judge call, up to 20 calls per episode → ≤ 30K/episode. It is a column in EVERY
+  # row of §13.4's arithmetic, and gate-judge volume SCALES with N and with T-FP.
+  # ⚠️ ADDED 2026-08-31. Until then this number existed in NEITHER §8.6 NOR this file,
+  # which §8.6's own sentence calls a defect and a review BLOCKER. See Q-013's second
+  # ruling and docs/reviews/ARCHITECT_CHECK_0.md §5.
+  target_tokens_per_call: 1500
+
+# ── The benign solver (§12.3, the false-positive side) ────────────────────────
+benign_solver:
+  # [merchant-policy, author-chosen] CONTEXT.md §13.3's secondary target: ≤ 50K tokens
+  # per benign-solver episode. It is a column in EVERY row of §13.4's arithmetic.
+  # ⚠️ ADDED 2026-08-31, for the same reason as gate_judge above.
+  target_tokens_per_episode: 50000
+
 # ── The world ─────────────────────────────────────────────────────────────────
 world:
   # [merchant-policy, author-chosen] — the PRNG is REIMPLEMENTED in Python, not carried
