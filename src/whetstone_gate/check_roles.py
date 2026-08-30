@@ -43,6 +43,8 @@ from __future__ import annotations
 import ast
 import re
 import subprocess
+import traceback
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -1049,10 +1051,23 @@ def check_config_sentinels(root: Path) -> list[Result]:
 
     outstanding = list(sweep.outstanding)
     operator_owed = [s for s in outstanding if s[2] == "TODO_OPERATOR"]
+    # ⚠️ OF-06. A BLANK is not a declared sentinel and must not be reported as one: a
+    # sentinel is a declaration with an owner, a blank is an omission with nobody's name on
+    # it. Reporting them together under "undetermined values are DECLARED" would relabel a
+    # defect as a plan — which is the shape of every finding in this review.
+    blanks = [s for s in outstanding if cfg.is_blank_marker(s[2])]
+    declared = [s for s in outstanding if not cfg.is_blank_marker(s[2])]
     detail = (
         "no undetermined values remain"
-        if not outstanding
-        else "; ".join(f"{name}:{path} = {sentinel}" for name, path, sentinel in outstanding)
+        if not declared
+        else "; ".join(f"{name}:{path} = {sentinel}" for name, path, sentinel in declared)
+    ) + (
+        f" ⚠️ AND {len(blanks)} BLANK value(s), which are NOT declared and are a hard-rule-9 "
+        f"defect — written down and never supplied, invisible to the TODO_ mechanism, and "
+        f"returned as None by a loader that had no way to see them (OPEN_FINDINGS OF-06): "
+        + "; ".join(f"{name}:{path} = {marker}" for name, path, marker in blanks)
+        if blanks
+        else ""
     )
     # ⚠️ F1 now reports WHAT ACTUALLY LOADED. It used to be the hardcoded string
     # "protocol.yaml and lanes.yaml parse" — a conclusion, naming a file it had never
@@ -1068,8 +1083,8 @@ def check_config_sentinels(root: Path) -> list[Result]:
         ),
         Result(
             "F2 undetermined values are DECLARED, not defaulted",
-            True,
-            f"{len(outstanding)} explicit TODO_ sentinel(s) across {len(sweep.loaded)} "
+            not blanks,
+            f"{len(declared)} explicit TODO_ sentinel(s) across {len(sweep.loaded)} "
             f"parsed file(s); the loader RAISES on each rather than substituting a value "
             f"(hard rule 9). {detail}",
         ),
@@ -1097,22 +1112,98 @@ def check_config_sentinels(root: Path) -> list[Result]:
 # --------------------------------------------------------------------------------------
 
 
+def check_examined_root(root: Path) -> list[Result]:
+    """⚠️ `OPEN_FINDINGS.md` **OF-09** — *which* repository did this run actually look at?
+
+    ``cfg.repo_root()`` is ``Path(__file__).resolve().parents[2]``, correct only for an
+    **editable src-layout install**. Two live consequences, both reproduced by the review:
+
+      * ``pip install .`` (non-editable — what someone not told about ``-e`` will type)
+        resolves it to ``…/.venv/Lib``. `check-roles` then printed
+        **``PASS F1 config/ loads``** over **zero** config files.
+      * One venv, two checkouts: run from inside clone B with clone A's venv active, it
+        reports on **clone A**. It printed a full green report while the reviewer stood in a
+        clone with a deliberately corrupted ``.gitattributes``. **It fooled the reviewer for
+        one experiment**, which is the strongest available evidence that it will fool
+        somebody else.
+
+    For a tool whose entire output is *"this repository is sound"*, not naming the
+    repository is a reporting defect on its own — and passing vacuously over a directory
+    that is not a repository is worse than that.
+    """
+    has_git = (root / ".git").exists()
+    has_config = (root / "config").is_dir()
+    missing = [
+        name for name, present in ((".git", has_git), ("config/", has_config)) if not present
+    ]
+    return [
+        Result(
+            "R1 the examined root IS this repository",
+            not missing,
+            f"{root} holds .git and config/"
+            if not missing
+            else (
+                f"{root} holds no {' and no '.join(missing)}. THIS IS NOT THE REPOSITORY — "
+                f"every check below would report on it anyway, and a green report over the "
+                f"wrong directory is worse than a red one. The root is resolved from "
+                f"src/whetstone_gate/config.py's own location (parents[2]), which is correct "
+                f"ONLY for an editable src-layout install: `pip install -e \".[dev]\"`. "
+                f"See OPEN_FINDINGS.md OF-09"
+            ),
+        )
+    ]
+
+
 def run(root: Path | None = None) -> int:
     """Run every check. Returns a process exit code."""
     root = root or cfg.repo_root()
-    groups = [
-        ("A/B/C — the freeze prerequisite and secrets", check_gitattributes(root) + check_secrets(root)),
-        ("D — the gate/scorer moat", check_gate_scorer_isolation(root)),
-        ("E — session identity (PROCESS.md §7a)", check_session_tokens(root)),
-        ("F — config/ completeness (hard rule 9)", check_config_sentinels(root)),
+
+    say("check-roles — the repository's structural invariants\n")
+    # ⚠️ OF-09: NAME THE ROOT. A tool that reports "this repository is sound" must say which.
+    say(f"  ROOT EXAMINED: {root}")
+    say(f"  CONFIG DIR   : {cfg.config_dir()}")
+    say()
+
+    # ⚠️ OF-10: the groups are built LAZILY, one at a time, each inside its own try. They
+    # used to be built in one eager list expression with
+    # `check_gitattributes(root) + check_secrets(root)` as a SINGLE element — so a
+    # `.gitattributes` carrying a non-UTF-8 byte made `read_text` raise and took **the secret
+    # scan** down with it, along with D, E and F: a bare traceback, exit 1, and ZERO check
+    # output. Fail-closed on the exit code, no information in the report. A and B/C are also
+    # separated here so that neither can silence the other at all.
+    groups: list[tuple[str, str, Callable[[Path], list[Result]]]] = [
+        ("R", "the root this run examined (OF-09)", check_examined_root),
+        ("A", "the freeze prerequisite (PROCESS.md §6a)", check_gitattributes),
+        ("B/C", "secrets", check_secrets),
+        ("D", "the gate/scorer moat", check_gate_scorer_isolation),
+        ("E", "session identity (PROCESS.md §7a)", check_session_tokens),
+        ("F", "config/ completeness (hard rule 9)", check_config_sentinels),
     ]
 
     failures = 0
     not_applicable = 0
-    say("check-roles — the repository's structural invariants\n")
-    for title, results in groups:
-        say(f"  {title}")
+    total = 0
+    for letter, title, build in groups:
+        say(f"  {letter} — {title}")
+        try:
+            results = build(root)
+        except Exception as exc:  # noqa: BLE001 — a raising group must not silence the rest
+            where = ""
+            frames = traceback.extract_tb(exc.__traceback__)
+            if frames:
+                where = f", raised at {Path(frames[-1].filename).name}:{frames[-1].lineno}"
+            results = [
+                Result(
+                    f"{letter}! this check GROUP raised and did not run",
+                    False,
+                    f"{type(exc).__name__}: {exc}{where}. The other groups below still ran — "
+                    f"OPEN_FINDINGS OF-10: one group's failure must not silence another, and "
+                    f"a `.gitattributes` problem must never be able to suppress the secret "
+                    f"scan",
+                )
+            ]
         for r in results:
+            total += 1
             say(f"    [{r.symbol}] {r.check}")
             say(f"           {r.detail}")
             if r.ok is False:
@@ -1121,7 +1212,7 @@ def run(root: Path | None = None) -> int:
                 not_applicable += 1
         say()
 
-    total = sum(len(rs) for _, rs in groups)
+    say(f"  ROOT EXAMINED: {root}")
     say(f"  {total - failures - not_applicable} passed, {failures} failed, {not_applicable} n/a")
     if failures:
         say("\n  FAIL — a structural invariant is broken. This is not a style issue.")

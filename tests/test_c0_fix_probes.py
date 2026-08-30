@@ -769,7 +769,11 @@ def test_a4_still_says_it_asserts_nothing_on_binary_files(tmp_path):
 # verdict. Closing one and claiming both is this chunk's own failure mode repeated.
 # =======================================================================================
 
-_A5 = check_roles.A5_CHECK
+#: A5's check name, written out rather than read from the module, for two reasons: a probe
+#: must fail INDIVIDUALLY against a tree with no A5 (a module-level attribute read would
+#: break collection and take every other probe in this file with it), and the name itself is
+#: worth pinning — `check-roles`' output is what a reviewer reads.
+_A5 = "A5 no control byte in text; no NUL-free binary"
 
 
 def test_a5_branch_T_fires_on_a_control_byte_in_a_text_file(tmp_path):
@@ -782,6 +786,11 @@ def test_a5_branch_T_fires_on_a_control_byte_in_a_text_file(tmp_path):
     every display tool showed a *plausible wrong path* rather than a corrupted one, and A1
     through A4 all pass over it because it is not a CR and it round-trips unchanged.
     """
+    assert check_roles.A5_CHECK == _A5, (
+        f"A5's check name changed to {check_roles.A5_CHECK!r}. That name is what a reviewer "
+        f"reads in `make check-roles` output; renaming it is a reporting change, not a "
+        f"refactor."
+    )
     repo = _init(tmp_path / "r")
     # The exact shape: a Windows path whose `\b` was eaten as a backspace escape.
     (repo / "spec.md").write_bytes(b"the shim lives at C:" + bytes([92]) + b"MinGW" + bytes([8]) + b"in\n")
@@ -1023,3 +1032,177 @@ def test_every_A_check_is_still_emitted_when_gitattributes_is_missing(tmp_path):
     ):
         assert by_name[name].ok is None, f"{name} must be n/a, not absent and not a pass"
         assert "not evaluated" in by_name[name].detail, by_name[name].detail
+
+
+# =======================================================================================
+# OF-06 — the loader returned YAML null, empty and whitespace-only values SILENTLY
+# =======================================================================================
+
+
+@pytest.mark.parametrize(
+    "written, marker",
+    [
+        ("probe:\n  void_threshold_breach_rate:\n", "BLANK_NULL"),
+        ("probe:\n  void_threshold_breach_rate: null\n", "BLANK_NULL"),
+        ("probe:\n  void_threshold_breach_rate: ~\n", "BLANK_NULL"),
+        ('probe:\n  void_threshold_breach_rate: ""\n', "BLANK_EMPTY_STRING"),
+        ('probe:\n  void_threshold_breach_rate: "   "\n', "BLANK_WHITESPACE"),
+    ],
+)
+def test_a_blank_value_is_a_refusal_and_is_counted(tmp_path, monkeypatch, written, marker):
+    """`OPEN_FINDINGS.md` **OF-06**, on the exact key `config.py`'s docstring names.
+
+    *"The void threshold is the single number that decides whether the whole run is
+    publishable. If a missing threshold silently read as 0.0, every run would pass the void
+    check and the project's central control would be inert — and nothing would have
+    raised."* A ``TODO_`` sentinel is caught. A key left **blank** was not: ``require()``
+    returned ``None``, ``outstanding_sentinels()`` counted nothing, F2 reported *"no
+    undetermined values remain"* and `make selftest` passed over it. Found by an independent
+    re-implementation written from the spec text alone (`REVIEW_C0.md` §7).
+    """
+    _config_fixture(tmp_path, monkeypatch, {"protocol.yaml": written, "lanes.yaml": _MINIMAL_LANES})
+
+    with pytest.raises(cfg.BlankValue) as excinfo:
+        cfg.load("protocol").require("probe.void_threshold_breach_rate")
+    assert "written down and never supplied" in str(excinfo.value)
+
+    swept = dict(
+        (path, m) for name, path, m in cfg.outstanding_sentinels() if name == "protocol"
+    )
+    assert swept.get("probe.void_threshold_breach_rate") == marker, (
+        f"the sweep did not COUNT the blank; it reported {swept}"
+    )
+
+    f2 = _results(check_roles.check_config_sentinels(tmp_path))[
+        "F2 undetermined values are DECLARED, not defaulted"
+    ]
+    assert f2.ok is False, (
+        "F2 reported 'undetermined values are DECLARED' over a value that was written down "
+        f"and never supplied. A blank is not a declaration. detail: {f2.detail}"
+    )
+    assert "BLANK" in f2.detail and "OF-06" in f2.detail, f2.detail
+
+
+@pytest.mark.parametrize("supplied", ["0", "false", "[]", "0.0"])
+def test_zero_false_and_empty_list_are_SUPPLIED_values_and_must_pass(
+    tmp_path, monkeypatch, supplied
+):
+    """⚠️ The classic way hard rule 9 is got wrong, guarded in the same breath.
+
+    A truthiness test would treat ``0``, ``False`` and ``[]`` as missing, and a
+    ``per_action_cap_paise: 0`` would then silently become a refusal — a config value the
+    author really chose, rejected by the mechanism meant to protect it. The independent
+    re-implementation and this loader **agree** on all three, and `REVIEW_C0.md` §7 says so
+    explicitly: *"That is correct and I would not change it."* OF-06's fix must not break it.
+    """
+    _config_fixture(
+        tmp_path, monkeypatch, {"protocol.yaml": f"money:\n  per_action_cap_paise: {supplied}\n"}
+    )
+    value = cfg.load("protocol").require("money.per_action_cap_paise")
+    assert value in (0, False, [], 0.0), value
+    assert list(cfg.load("protocol").sentinels()) == [], (
+        "a supplied falsy value was counted as undetermined"
+    )
+
+
+def test_the_null_is_a_value_exemption_is_exactly_two_entries_and_covers_tpd():
+    """⚠️ Pinned, for the same reason ``TRIPWIRE_SELF_EXCLUSION`` is pinned at one file.
+
+    `config/lanes.yaml`'s ``tpd: null`` means *"no such limit exists"* — a documented,
+    separately tested fact about Google's free tier, **explicitly excluded from OF-06 by the
+    review** — not an omission. The exemption that keeps it out of the blank sweep is the
+    natural place for OF-06's fix to be quietly widened until it covers the omission too.
+    """
+    assert cfg.NULL_IS_A_VALUE == frozenset({("lanes", "tpd"), ("lanes", "reserved_from")}), (
+        f"the null exemption holds {sorted(cfg.NULL_IS_A_VALUE)}. Widening it is a decision "
+        f"about what counts as a supplied value, and it belongs in a review, not a diff."
+    )
+    # And the exemption really is doing its job on the file it was written for.
+    lanes = cfg.load("lanes")
+    tpds = {lane["name"]: lane["tpd"] for lane in lanes.require("lanes")}
+    assert None in tpds.values(), "no lane states `tpd: null`, so this proves nothing"
+    assert [p for p, _ in lanes.sentinels() if ".tpd" in p] == [], (
+        "`tpd: null` is being reported as a blank. It is a documented 'no such limit "
+        "exists', and REVIEW_C0.md F-09 excludes it from OF-06 by name."
+    )
+
+
+# =======================================================================================
+# OF-09 — repo_root() reported on the wrong directory and no target named the one it used
+# OF-10 — one raising check group destroyed the entire report, INCLUDING THE SECRET SCAN
+# =======================================================================================
+
+
+def test_check_roles_FAILS_rather_than_passing_vacuously_on_a_non_repository(tmp_path, capsys):
+    """`OPEN_FINDINGS.md` **OF-09**. *"It fooled the reviewer for one experiment."*
+
+    ``repo_root()`` is ``Path(__file__).resolve().parents[2]``, correct only for an editable
+    src-layout install. Under ``pip install .`` it resolves to ``…/.venv/Lib``, and
+    `check-roles` printed **`PASS F1 config/ loads — protocol.yaml and lanes.yaml parse`**
+    over **zero** config files. With one venv and two checkouts it reports on the venv's
+    checkout — it printed a full green report while the reviewer stood in a clone with a
+    deliberately corrupted `.gitattributes`.
+    """
+    empty = tmp_path / "not-a-repo"
+    empty.mkdir()
+
+    rc = check_roles.run(empty)
+    printed = capsys.readouterr().out
+
+    assert rc != 0, "check-roles exited 0 over a directory that is not this repository"
+    assert str(empty) in printed, (
+        "check-roles did not NAME the root it examined. For a tool whose entire output is "
+        "'this repository is sound', not naming the repository is a reporting defect."
+    )
+    assert "R1 the examined root IS this repository" in printed
+    assert "THIS IS NOT THE REPOSITORY" in printed
+
+
+def test_every_target_prints_the_root_it_examined(repo_root, capsys):
+    """The other half of OF-09: naming the root even when everything passes."""
+    check_roles.run(repo_root)
+    printed = capsys.readouterr().out
+    assert printed.count("ROOT EXAMINED") >= 2, (
+        "the examined root must be printed at the TOP and at the BOTTOM: a reader who "
+        f"scrolls to the verdict must see which directory it is about. output: {printed[:400]}"
+    )
+    assert str(repo_root) in printed
+    assert str(cfg.config_dir()) in printed
+
+
+def test_one_raising_group_cannot_silence_the_secret_scan(tmp_path, capsys, monkeypatch):
+    """`OPEN_FINDINGS.md` **OF-10**, reproduced and then fixed.
+
+    ``run()`` built all four groups in one eager list expression, and
+    ``check_gitattributes(root) + check_secrets(root)`` was a **single element** of it. So a
+    ``.gitattributes`` carrying a non-UTF-8 byte made ``read_text`` raise and took the
+    **secret scan** down with it, along with D, E and F: a bare traceback, exit 1, and **no
+    check output at all**. Fail-closed on the exit code; zero information in the report.
+    ``_git()``'s ``RuntimeError`` had the same blast radius.
+    """
+    repo = _init(tmp_path / "r")
+    (repo / ".env.example").write_bytes(b"GROQ_API_KEY=\n")
+    (repo / "config").mkdir()
+    (repo / "config" / "protocol.yaml").write_text(_MINIMAL_PROTOCOL, encoding="utf-8")
+    (repo / "config" / "lanes.yaml").write_text(_MINIMAL_LANES, encoding="utf-8")
+    monkeypatch.setenv("WHETSTONE_CONFIG_DIR", str(repo / "config"))
+    _commit(repo)
+    # A non-UTF-8 byte: `read_text(encoding="utf-8")` raises UnicodeDecodeError.
+    (repo / ".gitattributes").write_bytes(b"* text=auto eol=lf\n" + bytes([0xFF, 0xFE]))
+
+    rc = check_roles.run(repo)
+    printed = capsys.readouterr().out
+
+    assert rc != 0, "a group that raised must still fail the run"
+    assert "this check GROUP raised and did not run" in printed, (
+        f"the group that raised is not named in the report: {printed[:600]}"
+    )
+    assert "UnicodeDecodeError" in printed, printed[:600]
+    # ⚠️ THE POINT: the secret scan still ran, and so did D, E and F.
+    assert "C1 no secret-shaped string in any tracked file" in printed, (
+        "a .gitattributes problem silenced the SECRET SCAN. That is OF-10, and it is the "
+        f"reason the finding is not cosmetic. output: {printed[:800]}"
+    )
+    assert "B1 no .env tracked" in printed
+    assert "E1 no commit carries an UNISSUED token" in printed
+    assert "F1 config/ loads" in printed

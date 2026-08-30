@@ -63,13 +63,71 @@ class UndeterminedValue(ConfigError):
     """
 
 
+class BlankValue(ConfigError):
+    """A required key was **written down but never supplied**.
+
+    ⚠️ `OPEN_FINDINGS.md` **OF-06**, found by an independent re-implementation written from
+    the spec text alone. ``require()`` used to return ``None`` for ``key:``, ``null`` and
+    ``~``, and ``''`` for a blank string — and ``outstanding_sentinels()`` counted none of
+    them, so every sentinel report said *"no undetermined values remain"*.
+
+    **The failure scenario, word for word from `config.py`'s own docstring, arriving through
+    the input the mechanism could not see:** a hand-edit leaves
+    ``probe.void_threshold_breach_rate:`` with nothing after the colon. Every report is
+    clean; the void threshold is ``None``; the run proceeds; and the void comparison either
+    raises after the freeze on a run day, or — under an ``if threshold:`` form — reads as
+    absent and **every run clears the void check**.
+
+    A blank is **not** a ``TODO_`` sentinel. A sentinel is a declaration with an owner; a
+    blank is an omission with nobody's name on it, and this class says so.
+    """
+
+
 # --------------------------------------------------------------------------------------
 
 #: A value beginning with this prefix is declared-but-undetermined. Reading it raises.
 SENTINEL_PREFIX = "TODO_"
 
+#: A value the sweep found BLANK carries a marker beginning with this. It is deliberately
+#: distinct from ``TODO_``: a blank was never declared, so reporting it under the heading
+#: *"undetermined values are DECLARED, not defaulted"* would mislabel a defect as a plan.
+BLANK_PREFIX = "BLANK_"
+
+#: ⚠️ **WHERE A YAML ``null`` IS A DETERMINED VALUE, matched on the LEAF KEY.**
+#: Pinned by ``tests/test_c0_fix_probes.py`` at exactly these two entries, the same pattern
+#: as ``TRIPWIRE_SELF_EXCLUSION`` and for the same reason: an exemption list is where a
+#: check dies quietly. Widening it must require editing an assertion a review will see.
+#:
+#:   * ``lanes:*.tpd`` — Google's free tier shows **no daily token cap at all**, only
+#:     requests/day and tokens/minute. ``null`` means *"no such limit exists"*, which is not
+#:     the same as *"unknown"* and is not a default. `config/lanes.yaml`'s own header says
+#:     so, and ``test_every_lane_states_all_four_limits_explicitly`` correctly tests key
+#:     PRESENCE rather than truthiness. `REVIEW_C0.md` F-09 excludes it by name.
+#:   * ``lanes:*.reserved_from`` — ``null`` means *"this lane carries no reservation"*, which
+#:     is what ``test_reserved_lanes_are_marked_so_no_build_session_spends_on_them`` reads.
+#:     ⚠️ Recorded as a **Class B** decision by the C0 FIX session: `lanes.yaml`'s header
+#:     documents `tpd` and not this one, and the alternative — counting four determined
+#:     values as defects — would leave `make check-roles` permanently red for a reason that
+#:     is not a defect, which is how a check earns its way onto the ignore list.
+NULL_IS_A_VALUE: frozenset[tuple[str, str]] = frozenset(
+    {("lanes", "tpd"), ("lanes", "reserved_from")}
+)
+
 #: Who resolves each sentinel. Keeps the failure message actionable.
 _SENTINEL_OWNERS = {
+    "BLANK_NULL": (
+        "NOBODY — and that is the defect. A YAML null is not a declaration; it is a key "
+        "written down and never supplied. Hard rule 9: supply the value, or write an "
+        "explicit TODO_ sentinel naming who owes it. See OPEN_FINDINGS.md OF-06"
+    ),
+    "BLANK_EMPTY_STRING": (
+        "NOBODY — an empty string is an omission with nobody's name on it. Supply the "
+        "value or declare it with a TODO_ sentinel. See OPEN_FINDINGS.md OF-06"
+    ),
+    "BLANK_WHITESPACE": (
+        "NOBODY — a whitespace-only value reads as present to every truthiness test and "
+        "means nothing. Supply the value or declare it. See OPEN_FINDINGS.md OF-06"
+    ),
     "TODO_OPERATOR": (
         "the OPERATOR — capture the exact Google API model id strings "
         "(models/gemma-…, models/gemini-…) from the dashboard. "
@@ -173,6 +231,19 @@ class Config:
                 )
             node = node[segment]
 
+        # ⚠️ OF-06. A value that is null, empty or whitespace-only was WRITTEN DOWN AND NEVER
+        # SUPPLIED, and used to come back as `None` or `''` with nothing raised. It is a
+        # refusal now, except where a null is a determined value by design (NULL_IS_A_VALUE).
+        if blank_marker(node) and (self.name, dotted.split(".")[-1]) not in NULL_IS_A_VALUE:
+            raise BlankValue(
+                f"{self.path.name}: '{dotted}' is BLANK ({node!r}) — written down and never "
+                f"supplied. Hard rule 9: a missing required value is a hard refusal, never a "
+                f"silent fallback, and a blank is not a {SENTINEL_PREFIX}… sentinel: a "
+                f"sentinel is a declaration with an owner, a blank is an omission with "
+                f"nobody's name on it. Supply the value, or declare it. "
+                f"See OPEN_FINDINGS.md OF-06."
+            )
+
         if is_sentinel(node):
             owner = _SENTINEL_OWNERS.get(node, "an unrecorded owner — this is itself a defect")
             raise UndeterminedValue(
@@ -195,8 +266,13 @@ class Config:
         return True
 
     def sentinels(self) -> Iterator[tuple[str, str]]:
-        """Yield ``(dotted_path, sentinel)`` for every undetermined value in this file."""
-        yield from _walk_sentinels(self.data, prefix="")
+        """Yield ``(dotted_path, marker)`` for every undetermined value in this file.
+
+        The marker is a ``TODO_`` sentinel — *declared* undetermined, with an owner — or a
+        ``BLANK_`` marker, which is an omission with nobody's name on it (OF-06). Both are
+        undetermined; only one of them is a plan.
+        """
+        yield from _walk_sentinels(self.data, prefix="", config_name=self.name)
 
 
 def is_sentinel(value: Any) -> bool:
@@ -204,18 +280,47 @@ def is_sentinel(value: Any) -> bool:
     return isinstance(value, str) and value.startswith(SENTINEL_PREFIX)
 
 
-def _walk_sentinels(node: Any, prefix: str) -> Iterator[tuple[str, str]]:
+def is_blank_marker(value: Any) -> bool:
+    """True if ``value`` is a ``BLANK_`` marker emitted by the sweep (not a config value)."""
+    return isinstance(value, str) and value.startswith(BLANK_PREFIX)
+
+
+def blank_marker(value: Any) -> str | None:
+    """Classify a **written down but never supplied** value, or ``None`` if it is supplied.
+
+    ⚠️ ``0``, ``False`` and ``[]`` are **supplied values and must pass**. That is the classic
+    way hard rule 9 is got wrong: a truthiness test would treat all three as missing, and a
+    ``per_action_cap_paise: 0`` would then silently become a refusal. This asks *"was
+    anything written after the colon"*, never *"is it truthy"*.
+    """
+    if value is None:
+        return "BLANK_NULL"
+    if isinstance(value, str) and not value:
+        return "BLANK_EMPTY_STRING"
+    if isinstance(value, str) and not value.strip():
+        return "BLANK_WHITESPACE"
+    return None
+
+
+def _walk_sentinels(node: Any, prefix: str, config_name: str) -> Iterator[tuple[str, str]]:
     if is_sentinel(node):
         yield (prefix, node)
     elif isinstance(node, dict):
         for key, child in node.items():
-            yield from _walk_sentinels(child, f"{prefix}.{key}" if prefix else str(key))
+            yield from _walk_sentinels(
+                child, f"{prefix}.{key}" if prefix else str(key), config_name
+            )
     elif isinstance(node, list):
         for index, child in enumerate(node):
             # Name the list item when it has a name, so an operator reading
             # "lanes[gemma-26b].api_model_id" knows which dashboard row to open.
             label = child["name"] if isinstance(child, dict) and "name" in child else index
-            yield from _walk_sentinels(child, f"{prefix}[{label}]")
+            yield from _walk_sentinels(child, f"{prefix}[{label}]", config_name)
+    else:
+        marker = blank_marker(node)
+        # OF-06: a blank IS counted, unless a null is a determined value here by design.
+        if marker and (config_name, prefix.rpartition(".")[2]) not in NULL_IS_A_VALUE:
+            yield (prefix, marker)
 
 
 def load(name: str) -> Config:
