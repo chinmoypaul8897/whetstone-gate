@@ -222,8 +222,14 @@ someone has to watch is a budget that gets exceeded at 03:00 on the second sweep
    fall into. The rule is belt-and-braces on top of a structural stop, not the stop itself.
 2. ⚠️ **C21 must RE-CONFIRM this before submission**, because the property is about *account state on
    the day*, not about anything in this repository. A card attached on 3 September would silently
-   convert every subsequent 429 into a bill, and nothing in the repo would change to show it. It is
-   therefore a C21 checklist item, and it is listed as one.
+   convert every subsequent 429 into a bill, and **nothing in the repo would change to show it** —
+   this attestation would still read "NONE ATTACHED" and would still be dated 2026-08-30. It is the
+   only claim in this file that can go stale without any file changing.
+   ⚠️ **AND IT IS NOT CURRENTLY A C21 DONE-WHEN.** `[VERIFIED HERE, 2026-08-30]` `PROCESS.md`
+   §12.1's C21 row names the submission pack, the git-history secret scan and the visibility flip,
+   and **does not name a billing re-check**. This session did not add it, because `PROCESS.md` is
+   outside its scope fence. **It is recorded here and flagged to the architect as owed.** Until it
+   is in C21's done-when, the re-confirmation depends on somebody reading this paragraph.
 
 **The claim this guarantees, stated exactly:** *"the total monetary cost of the published run was
 ₹0"*, and it is a **safety property**, not a boast — a 429 is a stop, not a bill. `RESULTS.md`

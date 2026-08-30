@@ -57,6 +57,15 @@ These are not chunks — they execute in the **operator's terminal**, never insi
 | **RUN-4** | 2 Sep 08:00 → | **Sweep day two** — M-BEN, T-FP, AD-CMP, CaMeL, ladder window 3 | inside C18's review | todo |
 | **SUBMIT** | 4 Sep by 18:00 IST | 🚩 Operator action. **Gated on `REVIEW_21` = PASS** | — | todo |
 
+⚠️ **OWED TO THE ARCHITECT — a C21 done-when that does not exist yet.** `PROVENANCE.md` §1.5's
+no-payment-method attestation is dated **2026-08-30** and is the **only claim in the frozen set that
+can go stale without any file changing**: a card attached on 3 September would convert every
+subsequent 429 into a bill, and this repository would still read *"NONE ATTACHED"*. `PROCESS.md`
+§12.1's C21 row names the submission pack, the history secret scan and the visibility flip — and
+**does not name a billing re-check** `[VERIFIED 2026-08-30]`. C0-COMPLETION did not add one, because
+`PROCESS.md` was outside its scope fence. **Until the architect adds it, the re-confirmation depends
+on somebody reading `PROVENANCE.md` §1.5.**
+
 ---
 
 ## Tags
