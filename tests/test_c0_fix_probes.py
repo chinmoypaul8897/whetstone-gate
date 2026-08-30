@@ -1294,3 +1294,60 @@ def test_all_eight_of_the_31_august_constants_are_in_the_registry_and_in_config(
             f"config/protocol.yaml:{dotted} is not {value!r}. §8.6 and config/ must agree — "
             f"config/ is a frozen pre-registration artefact and §8.6 is the law."
         )
+
+
+def test_the_summary_cap_row_fires_on_its_own_name_and_not_on_http_400():
+    """⚠️ THE `400` ROW IS CONTEXTUAL BY ARCHITECT RULING, 2026-08-31 — and this is the probe
+    that makes the ruling checkable rather than asserted.
+
+    **The history matters, because it is the reason this is a correction and not a
+    weakening.** The row was ``STRICT`` because *the architect's own prompt said so*. This
+    session (``c9521aac``) recorded that as a concern in the row's ``note`` and **left the
+    mode alone**, which is what a build session does with an instruction it disagrees with —
+    it flags, it does not soften. The architect then ruled the instruction wrong.
+
+    **Why it was wrong.** ``400`` is also **HTTP 400 Bad Request**, and this project's entire
+    domain is Razorpay's documented 400 errors: ``RAZORPAY_SEMANTICS.md`` carries dozens of
+    them and C4's world must return them. A ``STRICT`` scan would fire constantly on
+    legitimate code **with no legitimate remedy** — an HTTP status cannot be read from
+    ``config/``, and ``spec_constants`` offers no escape comment by design. That is exactly
+    the condition its own docstring names as the way a tripwire dies.
+
+    ⚠️ **This is not hard rule 6.** The scan is not loosened for a value it should catch; it
+    is aimed at the defect that actually exists — a summary cap hardcoded under a name that
+    means the summary cap. Both halves are asserted here, because a row that stopped firing
+    on its own constant would be the weakening, and only the second assertion would notice.
+    """
+    from whetstone_gate.spec_constants import BY_KEY, ScanMode  # noqa: PLC0415
+
+    import test_tripwire_registry as reg  # noqa: PLC0415  (tests/ is on sys.path)
+
+    row = BY_KEY["attacker_context_summary_max_tokens"]
+    assert row.mode is ScanMode.CONTEXTUAL, (
+        "the summary-cap row is not CONTEXTUAL. Ruled 2026-08-31: STRICT on `400` fires on "
+        "every HTTP 400 in a project whose oracle is a catalogue of Razorpay 400s, and a "
+        "tripwire that fires on correct code with no remedy is switched off within a day."
+    )
+    assert row.name_patterns, "a CONTEXTUAL row with no name patterns scans for nothing"
+
+    # It STILL FIRES on the thing it exists to catch.
+    guilty = reg._strip_comments_and_docstrings("context_summary_max_tokens = 400\n")
+    assert reg._contextual_hits(row, guilty), (
+        "the summary-cap row no longer fires on `context_summary_max_tokens = 400`. That "
+        "would not be a re-aim, it would be a hard-rule-6 weakening."
+    )
+
+    # And it does NOT fire on the HTTP status that made STRICT unworkable.
+    innocent = reg._strip_comments_and_docstrings("HTTP_BAD_REQUEST = 400\n")
+    assert not reg._contextual_hits(row, innocent), (
+        "the summary-cap row fired on `HTTP_BAD_REQUEST = 400` — the exact false positive "
+        "the ruling exists to remove, and one with no legitimate remedy."
+    )
+
+    # ⚠️ And no OTHER row picks the same hit up, which is what would make the fix cosmetic.
+    for constant in reg.SPEC_CONSTANTS:
+        if constant.mode is ScanMode.STRICT:
+            assert not reg._strict_hits(constant, innocent), (
+                f"{constant.key} still scans STRICT for a bare 400, so moving this one row "
+                f"changed nothing."
+            )
