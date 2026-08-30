@@ -48,10 +48,62 @@ Defined in full in `PROCESS.md` §5.2. Each is authored before its consuming chu
 
 ## Status
 
-**Empty. No goldens have been authored yet.**
+**One of nine authored. Golden 7 landed 2026-08-31. Eight are still owed.**
 
-C0 is a structural chunk: `PROCESS.md` §12.1 gives it a `code` review and no golden, and its
-done-when is structural rather than numeric. **C0 must not invent one** — a golden authored by a
-build session is exactly the circularity this directory exists to prevent.
+| # | File | State | Authored |
+|---|---|---|---|
+| **7** | `world_seed_2001.json` | ✅ **authored** | **2026-08-31**, by the **architect**, before `src/whetstone_gate/world/` exists |
+| 1 · 2 · 3 · 4 · 5 · 6 · 8 · 9 | — | ⏳ **owed** | each before its consuming chunk is built |
 
-Golden **7** is the next one owed, before C2 is built.
+### Golden 7 — `world_seed_2001.json`
+
+**SHA-256 `649e54ca446e8308f5fcd69ebba56eda5faea8d58246be7277cdb8b42227dd2b`** · **4,879 bytes**.
+
+It carries the **eleven** raw `mulberry32(2001)` outputs as 32-bit unsigned integers, the **first
+six** as exact `u` values to **10 significant figures**, and the complete **12-payment** record for
+seed 2001 — every `id`, `amount_paise`, `status`, `amount_captured_paise`, `amount_refunded_paise`,
+`currency`, `created_at` and `notes` — with the **8 captured / 3 authorized-uncaptured / 1 probe**
+split and `pay_CANARYRECON` carrying the `CONTEXT.md` §10.1 fields exactly.
+
+**Derived by the architect independently of any project code**, and cross-checked against two
+separate `mulberry32` formulations — one unsigned-masked, one mirroring JavaScript's signed `int32`
+and `Math.imul` — which agree on every bit. The algorithm it pins is `CONTEXT.md` **§8.6a**, authored
+in the same amendment because §8.6 alone **did not determine a world** and this golden could not have
+been derived from it. `QUESTIONS.md` **Q-019** records that ruling.
+
+⚠️ **C2 IS UNBLOCKED TO BE BUILT AND TO BE REVIEWED — IT IS NOT UNBLOCKED TO BE TAGGED.** Q-019 (iii)
+is explicit: *no chunk whose numbers derive from this algorithm may be tagged `cN-pass` until the
+operator has confirmed the ruling*, which is Class A and lands before `prereg-v1` precisely so it
+stays reversible.
+
+⚠️ **The session that PLACED this file computed no value in it, and may not.** It copied the
+architect's file byte for byte and verified the digest and the byte count above. That is
+`PROCESS.md` §5.2 applied to the one artefact where a single wrong character is undetectable by any
+test — **because it is the test**. A golden checked by a reimplementation has stopped being
+independent, so no `mulberry32` and no amount formula was written anywhere to "confirm" it.
+
+### What this section said before, kept rather than deleted
+
+> **Empty. No goldens have been authored yet.**
+>
+> C0 is a structural chunk: `PROCESS.md` §12.1 gives it a `code` review and no golden, and its
+> done-when is structural rather than numeric. **C0 must not invent one** — a golden authored by a
+> build session is exactly the circularity this directory exists to prevent.
+>
+> Golden **7** is the next one owed, before C2 is built.
+
+That stood from C0 until 2026-08-31. It is kept because *"this directory was empty, and here is when
+and by whom it stopped being empty"* is a claim a reviewer can check, and a Status section that
+silently rewrites itself into looking complete is not.
+
+---
+
+## The one `full` chunk with no golden, and why that is not a violation
+
+`PROCESS.md` §5.2 assigns the nine goldens to C2, C4, C7, C8, C9, C10, C11 and C18. **C1 is a `full`
+chunk and is assigned none**, which reads against hard rule 3's *"a `full` chunk with no golden may
+not be built."* `QUESTIONS.md` **Q-016** rules it: **C1's golden is Razorpay's own documentation.**
+C1 computes nothing — it transcribes a third party's published text, so its expected values are
+external **by construction**, which is the strongest form of what rule 3 protects rather than an
+exception to it. The enforcement is that C1's **review** independently re-fetches every URL in
+`RAZORPAY_SEMANTICS.md` and diffs the quotes character by character.
