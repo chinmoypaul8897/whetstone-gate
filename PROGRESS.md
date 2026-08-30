@@ -57,8 +57,7 @@ chunk's job that needs the operator's key.
    incident.**
 3. ⚠️ **The screenshots broke the build, and the break was real — INC-09.** They are the
    repository's first binary files. `check-roles` **A3** scanned every tracked file's raw
-   bytes for `
-`, and a PNG's deflate stream carries those bytes as data, so `make
+   bytes for `\r\n`, and a PNG's deflate stream carries those bytes as data, so `make
    check-roles` and `make test` went red on a sound repository. **`.gitattributes` was
    innocent** and is unchanged — `git ls-files --eol` says `i/-text w/-text` and
    `git hash-object` with and without `--no-filters` agree, so `* text=auto` already
