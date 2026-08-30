@@ -10,7 +10,16 @@ mutants · `code` = persona 2 only, ≥4 mutants · `submission` = persona 3 + p
 **No chunk is `PASS` without `docs/reviews/ARCHITECT_CHECK_<N>.md`.** An unrecorded gate is not a
 gate.
 
-*Last updated: 2026-08-30, end of the CTX-13.4 correction session (`WG-2026-08-30-CTX-13.4-A`).*
+*Last updated: 2026-08-30, end of the C0 ADVERSARIAL REVIEW (`52f5307b`).*
+
+⚠️ **C0 IS `FAILED`. NO `c0-pass` TAG EXISTS AND THE TAG CHAIN HAS NOT STARTED.** Four BLOCKERs, all
+the same shape — a check that reports PASS over nothing: `check-roles` **E2 and E3 cannot fire at
+all**; **D3, "the whole moat", is defeated by hard rule 8's own named spike defect**; the **F group
+reports `config/` complete over a `config/` missing `protocol.yaml`**; and **`make selftest`, the
+pre-spend gate, flips GREEN when the key it guards is deleted.** Full evidence, all re-runnable:
+`docs/reviews/REVIEW_C0.md`. **A FIX session is owed** — `INCIDENTS.md` entries first (hard rule 13),
+then the four BLOCKERs, then a fresh review. Every dependent chunk (C1, C2, C3, C6, C11, C13, C15)
+lists C0 as a dependency.
 
 **Specification: `CONTEXT.md` v1.1.** See *Specification version* below — it matters because **C14 selects the N branch from §13.4 and writes it into `PROTOCOL.md` before the freeze.**
 
@@ -20,7 +29,7 @@ gate.
 
 | # | Date | Chunk | Review | Status | Review history (append-only) |
 |---|---|---|---|---|---|
-| **C0** | 30 Aug | Repo, toolchain, remote, canonical files, day-one setup | `code` | **built (unreviewed)** | built → completed (3 operator-owed items landed; Q-006 + Q-008 closed) |
+| **C0** | 30 Aug | Repo, toolchain, remote, canonical files, day-one setup | `code` | ⚠️ **FAILED** | built → completed (3 operator-owed items landed; Q-006 + Q-008 closed) → **REVIEW_C0_1 = FAIL** (`52f5307b`, 4 BLOCKERs; no tag) |
 | **C1** | 30 Aug | `RAZORPAY_SEMANTICS.md` + `PROVENANCE.md` attack rows A1–A6 | `full` | todo | — |
 | **C2** | 30 Aug | World generator + **the probe planted** (`pay_CANARYRECON`) | `full` | todo | — |
 | **C3** | 30 Aug | τ² adapter A — the 34/164 must-not-write enumeration, the T-FP id list | `full` | todo | — |
@@ -103,7 +112,7 @@ on somebody reading `PROVENANCE.md` §1.5.**
 |---|---|---|---|
 | `probe-v1` | `HOLES.md` alone — CANARY-A, CANARY-B, S4's window width (2) | **before** the pilot **and before** the calibration command runs | **no** |
 | `prereg-v1` | the full frozen set: `INVARIANTS.md`, `PROTOCOL.md`, `HOLES.md`, `PROVENANCE.md`, `RAZORPAY_SEMANTICS.md`, **`config/`** | after the pilot and the calibration, **before every scored episode** | **no** |
-| `cN-pass` | chunk N passed adversarial review | by the review session, on PASS only | **none yet** |
+| `cN-pass` | chunk N passed adversarial review | by the review session, on PASS only | **none yet** — ⚠️ **C0's review returned FAIL on 2026-08-30, so `c0-pass` was NOT cut. The chain has not started.** |
 
 ⚠️ **No calibration episode runs before `probe-v1` exists. No scored episode runs before `prereg-v1`
 exists.** The freeze never moves earlier to fit the schedule; it is the one thing the project is
@@ -119,8 +128,15 @@ Q-009).
 
 | Gate | State | Owner |
 |---|---|---|
-| `test_no_operator_placeholder_remains_in_config` | ✅ **GREEN as of 2026-08-30** — the four Google API model ids landed; `cfg.outstanding_sentinels()` reports **0** `TODO_OPERATOR` values | ~~OPERATOR~~ — **done**, Q-006 closed |
+| `test_no_operator_placeholder_remains_in_config` | ⚠️ **GREEN, AND GREEN VACUOUSLY IF `lanes.yaml` IS ABSENT** (`REVIEW_C0.md` B-04) — `outstanding_sentinels()` skips a missing config file, so this gate passes when the file it guards is gone. As of 2026-08-30 — the four Google API model ids landed; `cfg.outstanding_sentinels()` reports **0** `TODO_OPERATOR` values | ~~OPERATOR~~ — **done**, Q-006 closed |
 | `test_the_camel_branch_is_decided_before_any_camel_run` | ❌ **RED** — `camel_comparator.branch` is `TODO_C13_RUN1` | **C13 / RUN-1**, 31 Aug, inside the 90-minute box |
+
+⚠️ **BUT SEE `REVIEW_C0.md` B-04 BEFORE TRUSTING THIS TABLE.** Deleting the `camel_comparator:`
+block from `config/lanes.yaml` takes `make selftest` from `1 failed, 1 passed` to **`2 passed`** —
+the pre-spend gate flips **RED → GREEN** when the key it guards is removed, because
+`.data.get("camel_comparator", {}).get("branch")` reaches around the loader with a default and
+`is_sentinel(None)` is `False`. **Until that is fixed, a green `selftest` is not evidence that
+anything was decided.**
 
 ⚠️ **`make selftest` therefore still exits non-zero, and that is correct.** The remaining failure is
 **not** the operator's and **not** the model ids — it is the CaMeL branch, which RUN-1 decides. **Do

@@ -48,6 +48,16 @@ appears that was never issued**, or if a token is reused across roles.
 | Token | Chunk | Role | Issued |
 |---|---|---|---|
 | `WG-2026-08-30-CTX-13.4-A` | *(none - `CONTEXT.md` §13.4 correction, not a numbered chunk)* | BUILD | 2026-08-30 |
+| `52f5307b` | C0 | REVIEW | 2026-08-30 |
+
+⚠️ **The `52f5307b` row was written by the session it names, and that is worth saying out loud.**
+`PROCESS.md` §7a has the architect record the token; the C0 REVIEW prompt issued it and the session
+recorded it, because leaving it out would make `check-roles` E1 fail on this session's own commits
+and turn C0's *"`make check-roles` runs"* box red for a bookkeeping reason. **It is an honour-system
+act inside an honour-system control, and §7a already says the control cannot prove sessions were
+different.** It is also the first row against which E1 has any input at all — see `REVIEW_C0.md` F4
+and B-01, which found that of §7a's three named conditions **only E1 can fire, and only on a
+well-formed token.**
 
 ⚠️ **This row is recorded because `CLAUDE.md` §5 requires it, and it is enforced by nothing.** The
 token as issued is **not 8-hex**, so `check_roles.py`'s `_TOKEN_ROW` does not match this row and its
@@ -863,6 +873,56 @@ issued table would be manufacturing the evidence the check exists to test.
 **Default taken pending a ruling:** **none - nothing was fixed.** The token was carried on every
 commit **verbatim as issued**, and recorded verbatim in `## Session tokens`. **The trailer is
 correct and the checker cannot read it; that asymmetry is the finding.**
+
+**RULING (architect, pending):**
+
+---
+
+### Q-015 - `check_roles` D3 carries an unruled allow-list entry, and hard rule 8 says adding one is Class A
+**Raised by:** C0 REVIEW (`52f5307b`) - **Date:** 2026-08-30 - **Status:** OPEN - **ARCHITECT ACTION REQUIRED**
+**Blocking:** nothing today (D1/D2/D3 report `n/a` — neither directory exists). **Blocks C8 and C9**,
+whose done-when items assert the moat through this code.
+**Deviation class:** **A**, and hard rule 8 names it as one explicitly.
+
+**The rule, verbatim (`CLAUDE.md` hard rule 8):**
+> The test is a module-graph walk over both packages' transitive first-party imports, failing on any
+> shared first-party module **outside a short, explicit allow-list of pure value types (enums, the
+> harm-record dataclass, the paise integer wrapper) that carry no predicate logic**. **Adding to that
+> allow-list is a Class A deviation** requiring an architect ruling in `QUESTIONS.md`.
+
+**What the code does.** `check_roles.py:_walk_isolation` ends with
+
+```python
+shared = (gate_imports & scorer_imports) - {"whetstone_gate"}
+```
+
+That subtraction **is** an allow-list, it has exactly one entry, that entry is **the package root and
+not a pure value type**, and **no ruling exists for it.**
+
+**Why it is not cosmetic.** `_first_party_imports` records the *module* named in a `from X import Y`
+statement, so **both** `gates/` and `scorer/` doing `from whetstone_gate import shared_predicate`
+record the string `whetstone_gate` — which the subtraction then discards. **Reproduced** (evidence
+in `docs/reviews/REVIEW_C0.md` **B-02**): `gates/arm4_kernel.py` and `scorer/replay.py` both importing
+and calling one `shared_predicate.intent_key` — hard rule 8's own named spike defect, transliterated —
+gives **`PASS D3 no shared first-party module`**.
+
+**Options seen:**
+  1. **Delete the subtraction and record shared *names*, not shared module strings** — resolve
+     `from whetstone_gate import X` to `whetstone_gate.X` so the two sides can be compared at the
+     module they actually share. No allow-list needed for the package root, because the package root
+     stops being a value either side can record.
+  2. **Keep the subtraction and rule it in**, as an explicit allow-list entry with the reason written
+     down. — Cheapest, and **wrong**: it would bless exactly the escape hatch B-02 walks through.
+  3. **Build the allow-list hard rule 8 actually describes** — the three named pure value types, by
+     module path, asserted to contain no predicate logic — and let everything else fail.
+
+**Default taken pending a ruling:** **none. Nothing was changed.** A review session fixes nothing
+(`CLAUDE.md` §1), and this needs a ruling regardless of who writes the code, because hard rule 8
+routes allow-list decisions through this file by name.
+
+⚠️ **The allow-list is only one of B-02's three causes.** The other two — `from .. import scorer`
+being invisible to D1, and the walk being one level deep where hard rule 8 says **transitive** — are
+plain defects and need no ruling, only a fix.
 
 **RULING (architect, pending):**
 

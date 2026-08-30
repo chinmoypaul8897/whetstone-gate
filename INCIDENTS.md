@@ -433,3 +433,86 @@ guardrail is now solid; there is no content guardrail and this entry does not pr
 defect whose first occurrence we had already written up, found in our own work, one hour later.*
 
 ---
+
+## INC-11 — a mutation run scored 18/18 "killed", including a mutant that changed nothing, and the number was worthless
+
+**Date:** 2026-08-30 (C0 REVIEW `52f5307b`, **after** the first build commit `ee3cf93`)
+**Event:** The review's first mutation run over `check_roles.py`, `config.py` and
+`spec_constants.py` reported **every single mutant KILLED — 18 of 18** — and included among them a
+deliberately **semantics-preserving control mutant** that must have survived.
+**Action:** Because the control was killed, the run was discarded rather than reported. The cause
+was located in one command: `tests/test_repo_invariants.py::test_the_object_store_and_the_working_tree_agree`
+compares every tracked file's working-tree bytes against `git show HEAD:`, so **any** uncommitted
+edit turns the suite red — a mutant only has to *exist on disk* to be "killed". The harness was
+rebuilt to **commit** each mutant before testing it, which is the state a real defect actually lives
+in, and to `git reset --hard` between mutants with the source verified byte-identical afterwards. On
+the rebuilt harness the true score was **6 killed, 12 survived, control correctly survived.**
+**Expectation:** A mutation score measures the *test suite's* ability to detect a behaviour change.
+It must be insensitive to whether the working tree is dirty, and a control mutant that changes no
+behaviour must survive.
+**Missing:** Nothing in the repository states that `make test` is only meaningful on a clean tree, and
+nothing separates "your files are being corrupted" from "you have unsaved work" at the suite level.
+`check-roles` **A4 already draws that line correctly** — `test_a4_does_not_fire_merely_because_the_tree_is_dirty`
+exists precisely to keep A4 asking the round-trip question rather than diffing against `HEAD` — and the
+unit suite then re-introduced, in a second test, the exact behaviour A4 was written to avoid.
+**Missed:** `PROGRESS.md`'s CTX-13.4 entry says it plainly: *"`make test` was transiently RED
+mid-session … it fires on ANY uncommitted edit to a tracked file … it means `make test` is only
+meaningful once work is committed."* That sentence was in this repository, had been read by this
+session as part of its read order, and was not connected to the mutation harness until the control
+mutant forced it. **A second signal was in the first run's own output**: 18/18 is not a plausible
+mutation score for any real suite, and the number should have been disbelieved on its face.
+**Diagnosis:** The oracle was not the assertions under test but the tree's cleanliness, so the harness
+measured "was a file edited" and reported it as "was a defect detected." A control mutant is the only
+thing that can distinguish the two, and it is the only reason this was caught.
+**Fix:** No repository source changed — a review session fixes nothing. The corrected harness and its
+result are recorded in `docs/reviews/REVIEW_C0.md` F-05, the underlying suite defect is
+`OPEN_FINDINGS.md` **OF-07**, and the twelve real survivors are closed to **17/19** by the kept probes
+in **`tests/test_c0_review_probes.py`**, committed in this review's own commit.
+**Systemic guardrail:** **Partial.** *What works from now on:* every mutation run in this project
+must carry a semantics-preserving control mutant, and a run whose control is killed is void. That
+convention is written into the probe file's own docstring and into the review, where the next
+mutation-testing session will read it. *What is NOT prevented:* nothing enforces the convention, and
+the suite defect that caused it (OF-07) is open — a fix session that reruns mutants against an
+uncommitted tree will get 100% again.
+*Why it earns an entry: the discarded number was not merely wrong, it was wrong in the flattering
+direction.* Reported unexamined, it would have said **"the C0 test suite kills every mutant"** in a
+review whose actual finding is that the suite kills a third of them. **The only thing standing between
+this document and that sentence was including a mutant that was supposed to survive.**
+
+---
+
+## INC-12 — the INC-06 quoting defect, third occurrence, in a third tool, caught this time by a parser
+
+**Date:** 2026-08-30 (C0 REVIEW `52f5307b`, **after** the first build commit `ee3cf93`)
+**Event:** Writing `tests/test_c0_review_probes.py` through a shell heredoc, `b"hello\n"` inside a
+Python string literal reached disk as `b"hello` + a **real newline** + `")`, and pytest refused to
+collect the file: `SyntaxError: unterminated string literal (detected at line 181)`. Four occurrences
+in two inserted functions. A first attempt at the same insertion had already failed for the same
+reason a few minutes earlier, in a different file.
+**Action:** Abandoned the heredoc for that content. The two damaged regions were repaired with the
+editor tool, which has no shell layer above it. Verified afterwards: zero CR bytes, `git hash-object`
+equals `git hash-object --no-filters`, and 20 of 20 probes pass.
+**Expectation:** Text written to a file should arrive as the characters that were typed.
+**Missing:** Nothing checks that a *newly authored* file is syntactically what its author meant before
+it is committed — the same gap INC-10 names for prose. Here the Python parser happened to be that
+check, which is luck of the file type: the identical corruption in a `.md` file would have been silent.
+**Missed:** **INC-06 and INC-10 both name this exact mechanism** — literal text passed through three
+quoting layers and interpreted at the last one — and INC-10's own `Missed` field records that INC-06
+had *just been read* when it recurred. This session read both entries, in its own read order, and then
+used the same path anyway. **Three occurrences, three sessions, three different tools; the entry that
+warns about it has never yet prevented it.**
+**Diagnosis:** Backslash escapes intended as literal source text were consumed by the Python layer of
+a tool-call → shell-heredoc → Python-string stack. The file-writing tools have no such stack and were
+available throughout.
+**Fix:** No repository source defect to fix; the damage was in an uncommitted file and never reached a
+commit. The repaired file is committed in this review's own commit, and its correctness is asserted by
+the 20 probes it contains.
+**Systemic guardrail:** **None — accepted, because** the honest remedy is a habit, not a mechanism:
+*author files with the editor/write tools; reserve heredocs for content with no backslashes.* A
+mechanism would have to police how a session writes files, which nothing in this process can do.
+*Recorded despite being slight, and despite costing about two minutes, for the reason INC-08 gives:
+leaving out a real defect to make the list look weightier is the same dishonesty as inventing one. Its
+value is not its size — it is that it makes the recurrence count three, which is what turns "a session
+made a mistake" into "this tool path is unsafe and the warning does not work."*
+
+---

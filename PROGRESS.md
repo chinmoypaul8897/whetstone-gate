@@ -6,6 +6,108 @@ not a record; this file is.
 
 ---
 
+## C0 — REVIEW — attempt 1 — 2026-08-30
+
+**SESSION-TOKEN:** `52f5307b` — 8 hex, `PROCESS.md` §7a's shape, carried as the `Session-Token:`
+trailer on this session's commit and recorded in `QUESTIONS.md` `## Session tokens`. ⚠️ **The row was
+written by the session it names**, because omitting it would make E1 fail on my own commit and turn
+C0's *"`make check-roles` runs"* box red for a bookkeeping reason. That is an honour-system act inside
+an honour-system control and the row says so.
+
+**Verdict: FAIL. Four BLOCKERs. No `c0-pass` tag was cut. Nothing was fixed.**
+
+**Token spend: NONE.** Zero provider calls. The only network operations were `git clone` /
+`git ls-remote` against this project's own remote and one anonymous HTTP request to the repository URL
+to establish that it returns 404, i.e. is private.
+
+### The finding, in one sentence
+
+**C0's deliverable is a set of checks, and four of them report PASS over nothing.** `check-roles`
+**E2 and E3 cannot fire at all**; **D3 — the file's own docstring calls it "the whole moat" — is
+defeated by hard rule 8's own named spike defect**; the **F group reports `config/` complete over a
+`config/` that has lost `protocol.yaml`, while printing that `protocol.yaml` parsed**; and
+**`make selftest`, the pre-spend gate, flips RED → GREEN when the key it guards is deleted.**
+
+### What was verified and holds
+
+- **All three baselines reproduce exactly** from a clone of the *remote* into a fresh directory with
+  `core.autocrlf=false` and a new venv: **41/1/2**, **14/0/3**, **1 failed 1 passed 42 deselected**.
+- **`make test` does not need `tau2-bench`** — the clean venv does not have it and the suite is green,
+  which disproves the "it only passes because tau2 is ambient" hypothesis outright.
+- **The line-ending property re-derives independently.** 40 tracked files, **0** skipped, **0**
+  mismatches between working-tree bytes and `git show HEAD:`. Both PNGs are `i/-text w/-text` with
+  identical filtered and unfiltered blob ids. `.gitattributes` is in the root commit.
+- **The provenance chain verifies from two directions.** `git show 310488d:CONTEXT.md | tail -n +35 |
+  sha256sum` → `10f6746c…`, and `sha256(PROJECT_SPEC.md)` **at source** is the same digest.
+- **§13.4 is internally consistent to the stated precision** — every cell of the component table
+  recomputed from the block table and the four feasibility bullets; 76.90M/40.05 h, 69.10M/35.99 h,
+  59.30M/30.89 h all check out, and the corrected chain terminates inside 32 h as the ruling claims.
+- **Secrets, spend and leak: clean.** No `.env` tracked; an independent `git log -p --all` scan
+  against 8 key shapes returns zero hits; `evals/` does not exist. Of the **17** files in the research
+  directory, exactly **two** came across — `PROCESS.md` byte-identical, `PROJECT_SPEC.md` as
+  `CONTEXT.md` — and the 5.5% / 3.2% line overlap from the two changelogs is **100% explained** by
+  those two files quoting themselves. Zero lines unaccounted for; zero in any `docs/sessions/`
+  transcript.
+
+### The number that matters most
+
+**Mutation testing: 6 of 19 mutants killed before the probes.** Twelve behaviour-changing mutations —
+including *`check-roles` no longer detecting a tracked `.env` at all* and *the secret scanner reduced
+to 1 of its 8 patterns* — left `make test` at exactly `41 passed, 1 skipped, 2 deselected` and
+`make check-roles` at exit 0. The cause is uniform and is the whole review: **the suite asserts that
+each check passes on this repository, which is a state in which every check passes trivially.** Only
+three tests in the entire suite build a fixture that should make a check FAIL, and all three are
+INC-09's CRLF work.
+
+**20 kept probes added** (`tests/test_c0_review_probes.py`) take that to **17 of 19**. The two left are
+**M15**, deliberately — a probe there would leave a green test standing over the moat BLOCKER — and
+**M20**, which is an equivalent mutant.
+
+### The four reserved rulings
+
+- **F1 (early return):** real, MEDIUM, **not** a false PASS. It loses information, not the verdict —
+  but `INCIDENTS.md` INC-07 diagnosed exactly this shape, fixed it in `check_secrets`, named
+  `check_gitattributes` as the survivor and accepted it. **I do not accept it**, and its larger form
+  (F-13) *does* cross checks: an exception in `check_gitattributes` silences the secret scan.
+- **F2 (Q-012 / A4 vacuity):** **sufficient. No revert. The screenshot box stands.** I re-derived the
+  property myself rather than taking the test's word: rule 6 forbids weakening an assertion, not
+  withdrawing a false one, and every failure the narrowing removed was a false positive *with respect
+  to the property actually asserted*. The withdrawal is carried in A4's own printed output, which is
+  the one place a future reader cannot skip.
+- **F3 (OF-01, lone CR):** confirmed, **stays OPEN**, re-scoped. New fact: **§6a's fingerprint property
+  is not violated by a lone CR** — worktree bytes and blob are identical — so A3/A4 are not failing at
+  their own job; the gap is the *content* property INC-10's `Missing` field already names. The
+  discriminator is sound, is **not** circular (it compares git's verdict against an independent signal),
+  and is now a kept probe in `make test` — but `check-roles` still cannot report it.
+- **F4 (Q-014, malformed token):** **it must FAIL, not be silent. MEDIUM, due before C1 is reviewed.**
+  The project's own doctrine is *"rules fail closed"*; E4 currently prints a **false statement** about
+  four commits with the wrong cause attached; and the architect's 8-hex ruling is precisely what makes
+  failing closed safe. Cost: four lines and a second, permissive pattern feeding a new `E5`.
+
+### What a later session needs and would otherwise re-derive
+
+1. **`repo_root()` will fool you.** It is `Path(__file__).resolve().parents[2]`, so with one venv and
+   two checkouts, `check-roles` reports on the **venv's** checkout, silently. **It fooled me for one
+   experiment** — I corrupted `.gitattributes` in one clone and got a full green report from the other.
+   No target prints the root it used. That is **OF-09**.
+2. **`make test` is red for the whole middle of any session** (OF-07), which is what produced
+   **INC-11**: a mutation run scoring 18/18 including a control mutant that should have survived. If
+   you mutation-test this repository, **commit the mutant first and always include a control.**
+3. **INC-12 is the third occurrence of INC-06's quoting defect**, this time in a review session's own
+   tooling, caught by a Python parser rather than by any check. Author files with the write/edit tools;
+   the heredoc path has now failed three times in three sessions.
+
+### Scope discipline
+
+**No source file was modified. No fix was made. No tag was created.** What was added: the review
+(`docs/reviews/REVIEW_C0.md`), 20 kept probes, the independent re-implementation
+(`docs/reviews/independent/c0_config_loader.py`, written from the spec text alone and importing nothing
+from the project), thirteen ledger rows in `OPEN_FINDINGS.md` (OF-02…OF-14 plus an OF-01 status
+update), **Q-015** (hard rule 8 routes allow-list decisions through `QUESTIONS.md` by name), and
+**INC-11** / **INC-12**.
+
+---
+
 ## CTX-13.4 — BUILD — attempt 1 — 2026-08-30
 
 **SESSION-TOKEN:** `WG-2026-08-30-CTX-13.4-A` — **the first token this project has issued.**
