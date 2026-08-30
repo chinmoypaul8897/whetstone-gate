@@ -589,18 +589,73 @@ instead of being quietly done.
      it red on a false positive trains everyone to ignore it. Rejected.
   4. **Split the check so nothing is lost.** — Taken. See below.
 
-**Default taken — option 4, constructed so that NOTHING is weakened:**
+⚠️ **CORRECTION, 2026-08-30, BEFORE ANY REVIEW SAW THIS — the first justification written for
+this change was FALSE, and it was the load-bearing sentence.**
+
+`1be73e4`'s commit message, the source comment and the first draft of this entry all claimed:
+*"On every file it covers, A4 is strictly stronger than A3 ever was … A binary file is not skipped
+here; it is checked harder."* **That is not true.** An adversarial re-check of this session's own
+work established it, and the session reproduced it independently before accepting it:
+
+- On `-text` content **git applies no conversion at all**, so `git hash-object` and
+  `git hash-object --no-filters` return the same id **by construction**. **A4 cannot fail on a
+  binary file.** Four adversarial binary shapes were tried — `NUL` + CRLF×100, CRLF×100 + `NUL`,
+  CRLF×5000 + `NUL` + CRLF×10, and all 256 byte values ×4 — and **none** could make A4 fire.
+- **A concrete counterexample to "nothing is weakened" exists**, and it is recorded rather than
+  argued away: `operator_note.txt` = `b"header\r\n" + b"\x00" + b"value=1\r\nvalue=2\r\n"` — plain
+  ASCII, CRLF endings, one NUL byte. git calls it `i/-text w/-text`. **Old A3 FAILED on it; new A3
+  and A4 both PASS.** By the plain reading, that is a narrowing.
+
+**The honest statement is therefore:** *A4 is strictly stronger than old A3 on **text** files, and
+**vacuous** on **binary** files — and binary files are exactly the set whose treatment changed.*
+
+**WHAT ACTUALLY JUSTIFIES THE CHANGE is a different and narrower argument, and it does hold:
+every failure the narrowing removed was a FALSE POSITIVE with respect to the property being
+asserted.** `PROCESS.md` §6a's property is *"a reviewer who clones this repository gets the
+committed bytes"*. On `operator_note.txt` that property is satisfied: `sha256` of the working tree,
+of `git show HEAD:<path>`, and of the file **in a fresh `git clone`** are all
+`af501c80b02c74e93c194e88981482b171df4a1e405556d26805c8cd912e9a5d`. **No true positive was lost.**
+
+That argument is now **asserted rather than argued**:
+`tests/test_repo_invariants.py::test_every_failure_the_narrowing_removed_was_a_false_positive`
+builds that exact file, asserts git really does classify it `-text` (so the test cannot pass by
+exercising the wrong branch), **clones the repository**, and asserts the clone reproduces the bytes.
+**If that test ever fails, the narrowing did lose a true positive and this entry's default must be
+reverted.**
+
+The source comment, the A4 result line and this entry are corrected. `1be73e4`'s commit message
+cannot be — history is never rewritten — so the correction lives here, in the code, in the check's
+own printed output, and in `INCIDENTS.md` INC-09.
+
+**Default taken — option 4. The construction, and what it does and does not buy:**
   * **A3 keeps its CRLF assertion, unchanged**, over every file **git itself** classifies as text
     (`git ls-files --eol`, whose `-text` token *is* git's answer to "do I convert this?"). The check
     does not reimplement git's heuristic — a second copy of the predicate under test is exactly hard
     rule 8's spike defect, where `gate.js` and `invariants.js` shared `world.js:intentKey`.
-  * **A4 is ADDED**, asserting the *underlying* property directly — `worktree bytes == stored blob
-    bytes` — over **every** tracked file, text and binary alike. On every file it covers, **A4 is
-    strictly stronger than A3 ever was**: it catches any divergence, not only the CRLF-shaped kind.
-    A binary file is therefore **not skipped; it is checked harder.**
-  * `A4` also reports *"could not verify"* as a **failure**, never as a pass.
-  * The count of binary files skipped by A3 is **printed** in A3's own detail line, so the narrowing
-    is visible in the output rather than silent (hard rule 11's spirit).
+  * **A4 is ADDED**, asserting the *underlying* property directly — would git's filter chain rewrite
+    these bytes? — over **every** tracked file. ⚠️ **It is a real assertion on TEXT files and
+    VACUOUS on binary ones**, per the correction above, and **A4's own printed detail now says so**
+    rather than leaving a reader to assume otherwise.
+  * `A4` reports *"could not verify"* as a **failure**, never as a pass.
+  * The count of binary files A3 skips is **printed** in A3's own detail line, so the narrowing is
+    visible in the output rather than silent (hard rule 11's spirit).
+  * ⚠️ **The denominator is reconciled out loud**, after a second adversarial finding: the loop
+    skips any tracked path with no regular file behind it (deleted-but-not-staged, a submodule
+    gitlink), and the first version of these messages said *"never silently dropped"* and *"all N
+    tracked file(s)"* over a total that quietly excluded them. Demonstrated with 3 tracked files,
+    one deleted: the output read *"all 2 tracked file(s)"*. **That is exactly hard rule 11's
+    shape, in language this session introduced.** Both lines now print
+    `<text> + <binary> + <non-regular> = <tracked>`, and A4 **fails** if any path was skipped.
+
+**⚠️ ONE GAP FOUND AND DELIBERATELY NOT CLOSED — see `docs/reviews/OPEN_FINDINGS.md` OF-01.**
+A **single stray CR** makes git classify an otherwise-textual file `-text`, so it lands in the
+binary bucket and **neither A3 nor A4 fires on it**. Reproduced: a markdown file with one lone CR
+eating a sentence is reported `i/-text w/-text`, contains no CRLF pair, and passes both checks.
+**This is NOT a regression** — old A3 searched for CRLF *pairs* and missed a lone CR too — but it is
+**precisely INC-06's and INC-10's defect class**, and INC-10 was caught only because that CR
+happened to be followed by LF. Closing it needs a **new** check (the workable discriminator is
+*"git calls this binary, yet it contains no NUL byte"*), which is new scope and belongs to C0's
+review. **Recorded, not fixed, and named as a limitation rather than left for someone to discover.**
 
 **⚠️ The narrowing is PROVEN meaningful rather than asserted**, per hard rule 6's *"it fails on the
 old code"* standard. `tests/test_repo_invariants.py::
@@ -620,6 +675,74 @@ discovered while executing Task 3, which Task 3 pre-authorised a fix and an inci
 exact class. It was fixed because C0-COMPLETION's own done-when requires *both* the screenshots
 recorded *and* `make test` green, and those are jointly unsatisfiable otherwise. **If the architect
 rules this out of scope, the revert is one commit and the box goes back to FAIL-pending.**
+
+**RULING (architect, pending):**
+
+---
+
+### Q-013 - CONTEXT.md 13.4's N=30 and T-FP fallback figures do not reproduce, and the stated chain never reaches its own 32 h budget
+**Raised by:** C0-COMPLETION BUILD - **Date:** 2026-08-30 - **Status:** OPEN - **ARCHITECT ACTION REQUIRED**
+**Blocking:** nothing today. ⚠️ **Blocks C14**, which selects the N branch by this rule and writes
+the selected branch into `PROTOCOL.md` **before the freeze**. It must be ruled before `prereg-v1`.
+**Deviation class:** **A** - it changes reported numbers in `CONTEXT.md`, and those numbers feed a
+**pre-registered decision rule**. Hard rule 1: this session **STOPPED** on it. **`CONTEXT.md` was
+NOT edited.** Hard rule 4: `CONTEXT.md` outranks the plan, the code, the tests and this session.
+
+**How it was found.** Not by looking for it. Q-011 required verifying that 13.4's arithmetic is
+caching-free; re-deriving the figures to check that also re-derived the fallbacks.
+
+**The N=50 headline reproduces EXACTLY. The two fallbacks do not.** Recomputed from 13.4's own
+stated inputs and its own stated method - nothing here is invented:
+
+| Branch | 13.4 states | Recomputed by 13.4's own method | Delta |
+|---|---|---|---|
+| **N=50, T-FP 40** | **76.9M** tokens, **approx 40 h** | **76.90M**, **40.05 h** | ✅ **exact** |
+| N=30, T-FP 40 | *"drops the total to ~71M tokens ≈ 37 h"* | **69.10M**, **35.99 h** | −1.9M, −1.0 h |
+| N=30, T-FP 20 | *"(−6M tokens → ~34 h)"* | **59.30M**, **30.89 h** | −5.8M, −3.1 h |
+
+**The mechanism, in one line: both fallbacks subtract the ATTACKER's share and forget the GATE
+JUDGE's.** 13.4's own gate-judge bullet counts the per-arm share as
+*"50 M-ADV + 34 T-NEG + 16 AD-CMP + 30 M-BEN + 40 T-FP per arm"* - and **the 50 is N** and **the 40
+is T-FP**. Both shrink with the branch, and neither reduction is carried through:
+- N=30 removes 100 M-ADV attacker episodes (−6.0M) **and** 20 judged episodes per arm × 3 arms
+  (−1.8M). 13.4 subtracts only the 6.0M: 76.9 − 6.0 = 70.9 ≈ *"~71M"*.
+- Cutting T-FP 40→20 removes 100 benign-solver episodes (−5.0M), 100 tau2 user-simulator episodes
+  (−3.0M) **and** 20 judged episodes per arm × 3 (−1.8M) = **−9.8M**, not the stated *"−6M"*.
+
+⚠️ **WHY THIS IS NOT COSMETIC, AND IT IS THE PART THAT MATTERS.** Under **13.4's own published
+numbers the pre-declared reduction chain never reaches its own budget**: N=50 → 40 h, N=30 → 37 h,
+T-FP cut → **34 h — still above the ~32 h available**, and the rule says *"No other branch. No
+post-hoc adjustment."* **As written, the decision rule terminates in an infeasible state with
+nothing left to try.** Under the corrected arithmetic it terminates **feasibly**: 40.05 h → 35.99 h
+→ **30.89 h, which fits**. So the error is not decoration on a sound plan; the corrected numbers are
+what make the plan's own escape hatch work.
+
+**Direction of the error, stated because it bears on good faith:** **both slips are CONSERVATIVE.**
+They make the budget look *tighter* than it is, never looser. Nothing here flatters the project, and
+the N=50 branch still does **not** fit on either arithmetic (40.05 h vs ~32 h), so **the branch
+decision at the top of the rule is unchanged.** What changes is the two fallback figures and whether
+the chain has an end.
+
+**Options seen:**
+  1. **Correct `CONTEXT.md` 13.4 now.** - Fixes the numbers before the freeze, which is the only
+     time it can be done without amending a pre-registration. But `CONTEXT.md` is **the law** and is
+     outside this session's scope fence; a build session silently editing the specification's
+     arithmetic is exactly the move this project exists to make impossible.
+  2. **Record it, change nothing, let C14 discover it.** - Safe today, worst on the day. C14 selects
+     the branch from these numbers under time pressure on 31 August.
+  3. **Record it now as a Class A stop, with the recomputation, and let the ARCHITECT rule before
+     `prereg-v1`.** - Taken.
+
+**Default taken:** **option 3. `CONTEXT.md` is untouched.** The recomputation is written out above
+so the architect can check it rather than take it on trust, and it is reproducible from 13.4's own
+inputs in a few lines. **The N=50 branch decision does not move on either arithmetic**, so nothing
+is blocked today.
+
+⚠️ **What this session did NOT verify:** whether 13.4's *intent* was to hold the gate-judge volume
+fixed across branches - e.g. if the gate judge were meant to run the full M-ADV set regardless of N.
+Nothing in 13.4 says so, and its per-arm formula reads as scaling, but **the architect owns that
+question, not this session.** If the intent was fixed volume, the stated figures may be right and
+the per-arm formula is what needs the note instead.
 
 **RULING (architect, pending):**
 

@@ -320,15 +320,48 @@ files that were coming, and in the same session shipped a check that would fail 
 filter chain is a no-op on this path"*, and the proxy is valid only for content git treats as text.
 Because it read raw bytes rather than asking git, it had no way to tell a line ending from a byte
 that happens to equal one.
-**Fix:** **`1be73e4`**. A3 keeps its CRLF assertion **unchanged** over every file
+**Fix:** **`1be73e4`**, corrected by **`b0a4855`** — see the correction block below, which is
+part of this entry and not an afterthought. A3 keeps its CRLF assertion **unchanged** over every file
 `git ls-files --eol` classifies as text — the classification comes from **git**, not from a
 reimplementation of git's NUL-byte heuristic, because a second copy of the predicate under test is
-exactly hard rule 8's spike defect. **A4** is added, asking the property directly of every tracked
-file, text and binary alike: would `git hash-object` and `git hash-object --no-filters` disagree,
-i.e. would the filter chain rewrite these bytes? A4 is **strictly stronger than A3 ever was on every
-file it covers** — it catches any divergence, not only the CRLF-shaped kind — so a binary file is
-not skipped here, it is checked harder. A3 also now **prints the count of binary files it skipped**,
-so the narrowing is visible in the output rather than silent.
+exactly hard rule 8's spike defect. **A4** is added, asking the property directly: would
+`git hash-object` and `git hash-object --no-filters` disagree, i.e. would the filter chain rewrite
+these bytes? A3 also **prints the count of binary files it skipped**, so the narrowing is visible in
+the output rather than silent.
+
+⚠️ **CORRECTION, same day, before any review saw this — the first version of this Fix field, of
+`1be73e4`'s commit message and of the source comment all claimed A4 was *"strictly stronger than A3
+ever was on every file it covers"* and that *"a binary file is not skipped here, it is checked
+harder."* THAT WAS FALSE, and it was the load-bearing sentence of the hard-rule-6 defence.** On
+`-text` content git applies no conversion, so `git hash-object` and `--no-filters` are equal **by
+construction**: **A4 cannot fail on a binary file.** Four adversarial binary shapes were tried and
+none could make it fire. A concrete counterexample to *"nothing is weakened"* exists and is recorded
+rather than argued away — a plain-ASCII CRLF file carrying one NUL byte, on which **old A3 failed
+and new A3 and A4 both pass**.
+**What actually justifies the change is narrower and it does hold: every failure the narrowing
+removed was a FALSE POSITIVE.** That file's bytes are identical in the working tree, in
+`git show HEAD:`, and **in a fresh `git clone`** — `af501c80b02c…9a5d` — so §6a's property was never
+violated and **no true positive was lost**. That argument is now **asserted, not argued**, by
+`test_every_failure_the_narrowing_removed_was_a_false_positive`, which clones the fixture repository
+and compares bytes; if it ever fails, `QUESTIONS.md` Q-012's default must be reverted.
+*The correction is recorded here, in the source comment, in A4's own printed output and in Q-012.
+`1be73e4`'s commit message cannot be corrected — history is never rewritten — which is exactly why
+the correction has to live in four places that can be.*
+
+⚠️ **A SECOND DEFECT IN THE SAME FIX, also corrected in `b0a4855`, and it is a hard rule 11
+violation in language this session introduced.** The loop skips any tracked path with no regular
+file behind it, and the new messages said *"never silently dropped"* and *"all N tracked file(s)"*
+over a denominator that quietly excluded exactly those. Demonstrated with three tracked files, one
+deleted-but-not-staged: the output read *"all 2 tracked file(s)"* while asserting completeness. Both
+lines now print `<text> + <binary> + <non-regular> = <tracked>` and **A4 fails if any path was
+skipped.**
+
+⚠️ **A GAP FOUND AND DELIBERATELY LEFT OPEN — `docs/reviews/OPEN_FINDINGS.md` OF-01.** A **single
+stray CR** makes git classify an otherwise-textual file `-text`, so it falls into the binary bucket
+and **neither A3 nor A4 fires on it.** Not a regression — old A3 searched for CRLF *pairs* and missed
+a lone CR too — but **this is INC-06's and INC-10's exact defect class, and INC-10 was caught only
+because that CR happened to be followed by LF.** Closing it needs a new check and is new scope, so it
+is **recorded as a limitation rather than fixed by the session that found it.**
 **Systemic guardrail:** Partial, and stated as partial.
 **What is now impossible:** this specific false positive, and its silent inverse. A4 asks the real
 question over the whole tree, so a future binary file cannot produce it, and
