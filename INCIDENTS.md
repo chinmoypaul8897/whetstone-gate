@@ -556,7 +556,8 @@ worktree-versus-blob equality, **both of which a lone 0x08 satisfies perfectly**
 it is committed and checked out unchanged.
 **Fix:** The byte is already gone, removed in **`63da93a`** (`CONTEXT.md` v1.2, Q-005's correction).
 That SHA is correct whatever number this entry lands at.
-**Systemic guardrail:** **`check-roles` A5**, built by this session — branch T asserts that no file
+**Systemic guardrail:** **`check-roles` A5**, built by this session in **`4a34c04`** — branch T
+asserts that no file
 git classifies as **text** carries a byte in `0x00`–`0x08`, `0x0B`, `0x0C`, `0x0E`–`0x1F` (TAB, LF and
 CR excluded; A3 owns CR). ⚠️ **State honestly what A5 does NOT catch: an escape sequence that
 resolves to a PRINTABLE character, or to a TAB, is invisible to it.** A5 is a **control-byte** check,
@@ -622,9 +623,12 @@ into one, D3's comparison could discard the commonest import string in the proje
 could skip a missing pre-registration artefact, and **every one of them still printed `clean`**. The
 defect is uniform and it is in none of the three predicates: it is that the suite's oracle was *"the
 check passes here"*, which is satisfied perfectly by a check that cannot fail anywhere.
-**Fix:** B-01 in **`FIXSHA-B01`**; B-02 in **`FIXSHA-B02`**; B-03 in **`FIXSHA-B03`**. Each carries its
-kept probe in the same commit, and each probe was run against the pre-fix code and observed to fail
-before the fix landed.
+**Fix:** **B-01 in `0067b19`** (which also lands Q-014 (i)–(iv), because both rebuild
+`check_session_tokens` and splitting them would produce a commit that does not run); **B-02 in
+`947a995`**; **B-03 in `440f6c4`**. Each carries its kept probes in the same commit, and every probe
+was run against the pre-fix source in a throwaway tree and **observed to fail there** before the fix
+landed — 46 of this session's 52 probes fail against `864c621`, and the 6 that pass there are
+regression guards by design, not defect probes.
 **Systemic guardrail:** **Partial, and the limit is stated.** *What works from now on:* every check
 this session touched now has a probe that fires it at input built to break it, and those probes live
 in `tests/test_c0_fix_probes.py` beside the review's own — the suite's ratio of *fires-on-failure*
@@ -671,9 +675,12 @@ refusal path the loader exposes, and `is_sentinel(None)` is `False` — so **abs
 in the single test whose job is to be red until a decision exists. The mechanism is not that the
 loader was wrong but that the gate did not use it, and nothing in the repository could tell the
 difference.
-**Fix:** **`FIXSHA-B04`**, with two kept probes: deleting the `camel_comparator:` block makes the gate
-fail, and deleting `config/lanes.yaml` entirely makes the operator-placeholder gate fail. **Both
-passed before this fix**, which is what made them worth writing.
+**Fix:** **`e726eb7`**, with four kept probes. Re-run against clean clones of `864c621` and of
+`8ed108e`, exactly as `REVIEW_C0.md` §4 ran it: with the `camel_comparator:` block deleted,
+`make selftest` gives **`2 passed`** on the old tree and **`1 failed, 1 passed`** on the new; with
+`config/lanes.yaml` removed entirely, `test_no_operator_placeholder_remains_in_config` gives
+**`1 passed`** on the old tree and **`1 failed`** on the new. **Both passed before this fix**, which
+is what made them worth writing.
 **Systemic guardrail:** **Partial.** *What works from now on:* the two operator-gate predicates are
 helpers that a test can call against a fixture directory, so *"this gate can go red"* is now asserted
 rather than assumed, and `WHETSTONE_CONFIG_DIR` makes that assertion cheap for every future gate.
@@ -723,8 +730,8 @@ The habit INC-12 accepted as its only guardrail — *"author files with the edit
 precisely the guardrail that failed, which is what a habit does when the task looks too small to
 deserve one.
 **Fix:** No repository source defect: the damage was uncommitted and is repaired in the same commit
-that lands B-04, **`FIXSHA-B04`**. The repaired file's correctness is asserted by the 23 probes it
-contains and by A3/A4 returning to PASS.
+that lands B-04, **`e726eb7`**. The repaired file's correctness is asserted by the probes it carries
+and by A3/A4 returning to PASS.
 **Systemic guardrail:** **None new — accepted, because the mechanism already exists and it worked.**
 `check-roles` **A3 and A4 caught this inside two minutes, before any commit**, which is the whole
 reason `.gitattributes` was a first-commit deliverable (`PROCESS.md` §6a). *What is NOT prevented:*
