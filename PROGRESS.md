@@ -6,6 +6,143 @@ not a record; this file is.
 
 ---
 
+## ARCH — world-generation specification + golden 7 + the owed questions — BUILD — attempt 1 — 2026-08-31
+
+**SESSION-TOKEN:** `0811c64a` — issued by the architect in this session's prompt. ⚠️ **Recorded in
+`QUESTIONS.md` `## Session tokens` BY THIS SESSION**, because no earlier session wrote the row and
+`check-roles` **E1 fails on a token that is not in that table** — it did, `FORGED/UNISSUED` on this
+session's own first two commits, which is E1 working rather than being satisfied retroactively. That
+is stated in the table rather than left tidy: **what is not claimed is that a different session
+vouched for this one.** It is also **the first row whose chunk cell is `ARCH`**, which only became
+parseable when the C0 FIX session landed Q-014 (iii).
+
+**Role:** BUILD, chunk cell **ARCH**. Specification, config, one **architect-authored** fixture and
+question-log entries. ⚠️ **NO LOGIC WAS BUILT AND NO VALUE WAS COMPUTED.**
+
+**Token spend: NONE.** Zero provider model calls. No network operation was needed or made.
+
+### The finding this session exists to answer
+
+**`CONTEXT.md` §8.6 did not determine a world.** Its *"world generation"* row gives the PRNG, the
+payment count, the amount range, the 8/3/1 split and the merchant balance **and nothing else** — no
+draw order, no exact log-uniform formula, no id format, no non-amount field, no status-assignment
+rule. `PROCESS.md` §5.2's **golden 7** requires *"the complete 12-payment record for seed 2001"*,
+which **is not derivable from that text**. So the golden that gates C2 could not be authored, and
+C2's done-when would have fallen back to *"two runs of one seed are byte-identical"* — **a check any
+deterministic function passes, including a wrong one.**
+
+### What landed — seven commits
+
+| # | Commit | What |
+|---|---|---|
+| 1 | `cb96c9a` | **`CONTEXT.md` v1.3 + §8.6a**, the algorithm stated exactly, and the v1.3 change-log row |
+| 2 | `65c8354` | §8.6's **nine** new constants rows + the matching `config/protocol.yaml` `world:` keys |
+| 3 | `09ada4c` | `SESSION-TOKEN 0811c64a` recorded in `QUESTIONS.md` |
+| 4 | `345f921` | the **nine registry rows** + the ruled `400` correction *(unreviewed)* |
+| 5 | `d9c32d8` | **golden 7** — `tests/goldens/world_seed_2001.json` — and the goldens README |
+| 6 | `ebd16ec` | the **two false attributions** corrected (§2, §6) + §9.2's pointer to Q-017 |
+| 7 | `64a16fe` | **Q-016 / Q-017 / Q-018 placed verbatim**, and **Q-019 recorded** |
+
+**§8.6a fixes:** the `mulberry32` step (logical `>>>`, every product mod 2^32); **`u` as the exact
+rational `raw / 2^32`, never the JavaScript float division**; the amount in `decimal.Decimal` at
+`prec=50`; **exactly eleven draws per seed, the probe consuming none**; positional status assignment;
+`pay_` + the first 14 hex of `sha256("whetstone-gate:<seed>:<index>")`; `created_at` from a **fixed**
+epoch so the world **contains no clock read**; the six-template notes pool assigned by `index mod 6`;
+and the `fetch_payments` return order.
+
+### The two decisions inside it that are load-bearing, and are recorded as such (Q-019)
+
+1. ⚠️ **`decimal.Decimal`, NOT binary floating point — and this is correctness, not preference.**
+   `math.exp`/`math.log` call the platform libm, which may differ by **one ULP** across platforms,
+   and near ₹1,50,000 one ULP **flips the rounded paise integer**. Hard rule 10 and §5.1 both **claim
+   and test** a byte-identical world, so **the spec as written would have shipped a world
+   reproducible only on the machine that generated the golden** — passing its own test here and
+   **failing on a reviewer's**. `Decimal.ln()`/`Decimal.exp()` are required to be *correctly rounded*
+   and are therefore platform-identical.
+2. ⚠️ **The notes pool carries a DELIBERATE DECOY at index 4.** The attacker's own tradecraft
+   paragraph says *"**some** describe exceptions to normal limits"* — **plural**. If
+   `pay_CANARYRECON` were the only annotated payment, that paragraph would stop being tradecraft and
+   become a **signpost**: CANARY-A would measure whether the model can **read**, not whether the
+   attacker is **competent**, and the void threshold would calibrate against an inflated number.
+   *"standard limits apply"* is the discriminator against *"exempt from transaction limits"*.
+   **Finding the door is a discrimination task.**
+
+### Golden 7 — copied, never computed
+
+`tests/goldens/world_seed_2001.json` · SHA-256
+`649e54ca446e8308f5fcd69ebba56eda5faea8d58246be7277cdb8b42227dd2b` · **4,879 bytes** — both **as
+observed**, both equal to the expected values.
+
+⚠️ **`tests/goldens/` is read-only to a build session (hard rule 3), and this session computed no
+value in that file.** It was the vehicle for an architect-authored golden that §5.2 requires
+committed before C2's prompt is issued. **Copied byte for byte, never transcribed**, and verified
+four ways: `sha256` matched, size matched, `cmp` against the source reported IDENTICAL, and
+`git hash-object` equalled `git hash-object --no-filters` (`afb546d43d022eff1bbff0e686eef95be70bcf2e`
+both ways). `check-roles` **A5 passes** on it. **No `mulberry32` and no amount formula was
+implemented anywhere to "confirm" it** — a golden verified by a reimplementation has stopped being
+independent. Copy rather than retype because **INC-06, INC-10, INC-12, INC-13 and INC-16 are five
+occurrences in this project of literal text mangled between a tool call and a file**, and a golden is
+the one artefact where a single wrong character is undetectable by any test **because it is the
+test**. The same reasoning governed Q-016/017/018, which were **extracted byte-for-byte** from
+`docs/sessions/c1-build-1.txt` and verified afterwards to still be exact substrings of `QUESTIONS.md`.
+
+### Two false attributions, corrected at source
+
+- **§2's `create_refund` row said of its five parameters *"none is a key"*. That is FALSE.** Razorpay
+  documents `receipt` **as** an idempotency key. ⚠️ **The fourth false claim about third-party
+  behaviour to reach this specification**; `INCIDENTS.md` **INC-05** is the entry that made the class
+  a rule, and that rule is what caught this one. The finding is **sharpened, not weakened**: the
+  header is *structurally unsendable*, `receipt` is merely *optional and unpopulated by default*.
+- **§6 credited *"will settle the maximum amount possible and ignore amount parameter"* to two doc
+  pages. It is on neither** — it is `settlements.go:231-232`, which **§2's own table cites
+  correctly**. One specification, one string, two attributions.
+- ⚠️ **§9.2's definition of S2 was NOT touched.** A fact about a third party was corrected; an
+  invariant was not. Whether S2 should recognise a repeated `receipt` is **Q-017 — OPEN, and the
+  operator's.** §9.2 gained only a one-line pointer saying so.
+
+### Counts
+
+| | BEFORE | AFTER |
+|---|---|---|
+| `python -m whetstone_gate.tasks test` | **116 passed, 1 skipped, 2 deselected** | **117 passed, 1 skipped, 2 deselected** |
+| `check-roles` | **17 passed, 0 failed, 4 n/a, exit 0** | **17 passed, 0 failed, 4 n/a, exit 0** |
+
+**+1 test, and it is the one sanctioned probe.** ⚠️ **It fails against the pre-fix source and passes
+against the new**, demonstrated in a throwaway clone at `09ada4c` — hard rule 6's *"provably
+meaningful"* bar. The registry's `400` row moved **STRICT → CONTEXTUAL** by architect ruling; **no
+existing assertion pinned the mode, so none was changed to get green**, and the distinction between a
+ruled re-aim and a weakening is made visible by the probe asserting **both** halves — it still fires
+on `context_summary_max_tokens = 400` and no longer fires on `HTTP_BAD_REQUEST = 400`.
+
+### What broke while doing it
+
+⚠️ **A FALSE PASS, caught and not shipped, and an `INCIDENTS.md` entry is OWED for it.** The first
+attempt to prove the new probe fails against the pre-fix source **reported `1 passed`** — the
+opposite of the truth. Cause: the throwaway clone was checked out at the old SHA, but the venv's
+**editable install resolved `whetstone_gate` to the live repository**, so the probe read the *new*
+registry while appearing to test the *old* one. Re-run with `PYTHONPATH` pointing at the clone's
+`src/` — and with `whetstone_gate.__file__` printed to prove which tree was loaded — it **failed**,
+correctly. **This is the C0 review's own "a check that reports PASS over nothing" class, arriving in
+the verification procedure rather than in the code**, and it will bite the C0 re-review, which must
+re-run 46 probes against pre-fix source. `INCIDENTS.md` is not this session's file; the full rule-13
+entry is in this session's report and in `docs/sessions/arch-worldgen-1.txt`, **declared OWED to the
+architect.**
+
+### What is owed, and what may not happen
+
+🚩 **Q-019 is Class A and carries the operator's own three conditions.** The derivation is published
+(§8.6a plus the entry); **the ruling is explicitly re-opened for the operator's review before
+`prereg-v1`** — it does not pass silently into the frozen set because it was written overnight; and
+⚠️ **no chunk whose numbers derive from this algorithm may be tagged `cN-pass` until the operator has
+confirmed it. C2 is unblocked to be BUILT and REVIEWED. It is not unblocked to be TAGGED.**
+**No tag was cut. Nothing is self-certified — a fresh adversarial review follows.**
+
+⚠️ **`config/` is a pre-registration artefact and editing it was legal ONLY because `prereg-v1` does
+not exist.** From that tag it is frozen and a defect in it is published as a limitation, never
+edited away.
+
+---
+
 ## C0 — the four BLOCKERs — FIX — attempt 1 — 2026-08-31
 
 **SESSION-TOKEN:** `c9521aac` — issued by the architect in the C0 fix prompt and recorded in
