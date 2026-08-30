@@ -1,0 +1,470 @@
+CONTEXT.md CORRECTION REPORT
+WHETSTONE GATE - CONTEXT.md 13.4, the Q-013 correction
+BUILD session, attempt 1, 2026-08-30. SESSION-TOKEN WG-2026-08-30-CTX-13.4-A.
+Committed before this block was printed (CLAUDE.md section 6.1). The pushed SHA
+named in item 8 is the commit that carries this very file, so it is stated in
+the printed report rather than inside it.
+
+ASCII only, deliberately. INC-08: this repository's typographic prose renders as
+"?" in the operator's Git Bash window, and the lines that matter most were among
+the casualties. So: "13.4" not the section sign, "tau-2" not the Greek, "->" not
+the arrow, "<=" not the inequality.
+
+================================================================================
+0. HEADLINE - READ THIS FIRST
+================================================================================
+The correction is done and every done-when box is PASS.
+
+I recomputed all three branches MYSELF, from 13.4's own components, before
+writing anything. ALL THREE MATCHED THE ARCHITECT'S FIGURES EXACTLY - the
+totals to the hundredth of a million tokens and the lane-times to two decimal
+places. Nothing was taken on trust, which is what the prompt asked for and the
+reason it asked.
+
+THREE THINGS THAT ARE NOT "TASK DONE", IN DESCENDING ORDER OF HOW MUCH THEY
+SHOULD WORRY YOU:
+
+  1. THE SESSION TOKEN YOU ISSUED IS INVISIBLE TO YOUR OWN ENFORCEMENT CODE.
+     WG-2026-08-30-CTX-13.4-A is not the 8-hex shape PROCESS.md 7a specifies
+     and check_roles.py:536-539 enforces. The trailer is on both commits,
+     verbatim, and check-roles CANNOT SEE IT. E4 lists these commits under
+     "carry no trailer". E1 - the check that catches a forged token - is
+     SILENT on it, not passing. Raised as Q-014, NOT fixed. Item 10.
+
+  2. make test IS ONLY MEANINGFUL ON A COMMITTED TREE, and nothing says so.
+     test_the_object_store_and_the_working_tree_agree compares the working tree
+     against HEAD:, so it goes RED on ANY uncommitted edit to a tracked file.
+     It went red mid-session on my own two files and green again on commit.
+     Not a defect and not mine to change - but a session that runs make test
+     before committing will read its own correct work as a failure. Item 6.
+
+  3. I EDITED CONTEXT.md BEFORE I WROTE THE RULING INTO QUESTIONS.md.
+     Hard rule 5 says rulings are recorded "before anything else is touched".
+     In the working tree, I did it the other way round. The permanent record is
+     the commit order, and I committed the ruling (ec3064d) BEFORE the change
+     it authorises (d67550e) deliberately for that reason. Disclosed rather
+     than smoothed over. Item 10.
+
+================================================================================
+1. MY INDEPENDENT RECOMPUTATION OF ALL THREE BRANCHES, WITH COMPONENTS
+================================================================================
+Derived from 13.4's own four feasibility bullets and its block table. Nothing
+below is copied from the prompt; the prompt's figures were compared against
+these AFTER they were produced.
+
+COMPONENT RULES, as 13.4 states them:
+  attacker episodes  = 30 CAL + 10 pilot-ref-half + 5*N M-ADV + 170 T-NEG
+                       + 80 AD-CMP + 10 ladder          @ 60,000 tokens/episode
+  benign-solver eps  = 150 M-BEN + 5*T-FP               @ 50,000 tokens/episode
+  gate judge         = 3 arms x (N + 34 + 16 + 30 + T-FP) episodes
+                       x 20 calls x 1,500 tokens
+  tau-2 user sim     = (170 T-NEG + 5*T-FP) episodes x 20 turns x 1,500 tokens
+  lane-time          = total / 1,920,000 tokens per hour
+                       (the two Gemma lanes, combined 32K TPM)
+
+BRANCH N=50, T-FP=40
+  attacker        550 ep x 60K              =  33.00M
+  benign solver   350 ep x 50K              =  17.50M
+  gate judge      3 x 170 = 510 ep x 30K    =  15.30M
+  tau-2 user sim  370 ep x 30K              =  11.10M
+  TOTAL                                        76.90M
+  LANE-TIME       76,900,000 / 1,920,000    =  40.0521 h  -> 40.05 h
+
+BRANCH N=30, T-FP=40
+  attacker        450 ep x 60K              =  27.00M
+  benign solver   350 ep x 50K              =  17.50M
+  gate judge      3 x 150 = 450 ep x 30K    =  13.50M
+  tau-2 user sim  370 ep x 30K              =  11.10M
+  TOTAL                                        69.10M
+  LANE-TIME       69,100,000 / 1,920,000    =  35.9896 h  -> 35.99 h
+
+BRANCH N=30, T-FP=20
+  attacker        450 ep x 60K              =  27.00M
+  benign solver   250 ep x 50K              =  12.50M
+  gate judge      3 x 130 = 390 ep x 30K    =  11.70M
+  tau-2 user sim  270 ep x 30K              =   8.10M
+  TOTAL                                        59.30M
+  LANE-TIME       59,300,000 / 1,920,000    =  30.8854 h  -> 30.89 h
+
+THE TWO REDUCTIONS, CHECKED SEPARATELY AS WELL AS IN TOTAL:
+  N=50 -> N=30   removes 100 M-ADV attacker episodes (550->450, -6.00M)
+                 AND 20 judged episodes per arm x 3 arms (510->450, -1.80M)
+                 = -7.80M.  76.90 - 7.80 = 69.10.  CONFIRMS the finding: the
+                 published "-6M" carried only the attacker's half.
+  T-FP 40 -> 20  removes 100 benign-solver episodes (350->250, -5.00M),
+                 100 tau-2 user-sim episodes (370->270, -3.00M)
+                 AND 20 judged episodes per arm x 3 arms (450->390, -1.80M)
+                 = -9.80M.  69.10 - 9.80 = 59.30.  CONFIRMS the finding: the
+                 published "-6M" was short by 3.80M, missing BOTH the judge
+                 and the user simulator.
+
+================================================================================
+2. DID MY FIGURES MATCH THE ARCHITECT'S
+================================================================================
+YES. EXACTLY. Every one of the twelve component figures, all three totals, and
+all three lane-times. There is no divergence to report and no discrepancy to
+escalate.
+
+  branch          architect said        I computed           match
+  N=50, T-FP 40   76.90M / 40.05 h      76.90M / 40.05 h     yes
+  N=30, T-FP 40   69.10M / 35.99 h      69.10M / 35.99 h     yes
+  N=30, T-FP 20   59.30M / 30.89 h      59.30M / 30.89 h     yes
+
+The order matters and I state it plainly: the components were derived from
+13.4 first, the totals computed, and only then compared. Had any figure
+differed I was instructed to STOP and not write it. None did.
+
+I also re-ran the check AFTER writing, against the strings actually present in
+the file, so the numbers in CONTEXT.md are the numbers I verified and not a
+transcription of them. All present.
+
+================================================================================
+3. BEFORE / AFTER TEXT OF EACH CORRECTED FIGURE
+================================================================================
+Both live inside 13.4's "Google-side total" bullet.
+
+FIGURE 1 - the N=30 fallback.
+  BEFORE:
+    "... so the N=30 decision rule is **load-bearing, not slack**: N=30 removes
+     100 M-ADV episodes and drops the total to ~71M tokens = 37 h, ..."
+  AFTER:
+    "... so the N=30 decision rule is **load-bearing, not slack**: N=30 removes
+     100 M-ADV attacker episodes **and 20 judged episodes per arm**, dropping
+     the total to **69.10M tokens = 35.99 h**, ..."
+
+FIGURE 2 - the T-FP fallback.
+  BEFORE:
+    "... is **cutting T-FP from 40 to 20 tau-2 tasks** (-6M tokens -> ~34 h)."
+  AFTER:
+    "... is **cutting T-FP from 40 to 20 tau-2 tasks** (**-9.80M -> 59.30M
+     tokens = 30.89 h**). `[CORRECTED v1.1 - Q-013]` - both fallback figures
+     are broken out by component in the table immediately below the list, which
+     is where they come from and how they are checked."
+
+THE N=50 HEADLINE IS UNTOUCHED. Its prose still reads "76.9M tokens" and
+"= 40 hours of Gemma lane time" because both are correct as published; the
+component table supplies the precise 76.90M / 40.05 h beside them.
+
+THE COMPONENT BREAKDOWN ADDED - the prompt's task 1, and the thing whose absence
+let the error survive. A three-row table now sits directly after the feasibility
+list, one row per branch, one column per component, plus totals and lane-time,
+preceded by the statement that the gate-judge per-arm count is
+"N M-ADV + 34 T-NEG + 16 AD-CMP + 30 M-BEN + T-FP T-FP" and so shrinks with N
+AND with T-FP, and that the user-simulator count is "170 T-NEG + 5 x T-FP" and
+so shrinks with T-FP too. Every episode delta between branches is spelled out
+underneath it. A reader can now reconstruct every total instead of trusting it.
+
+THE CONSEQUENCE SENTENCE ADDED - the prompt's task 2, verbatim as written into
+the file:
+
+  "WHY THE CORRECTION MATTERS - it is the reason it was made, not decoration on
+   a sound plan. As previously published the reduction chain ran 40 h -> 37 h
+   -> 34 h against a 32 h budget and therefore never reached its own budget,
+   with the rule's "No other branch. No post-hoc adjustment." leaving nothing
+   left to try - the decision rule terminated in an infeasible state;
+   corrected, the final rung lands at 30.89 h and fits."
+
+It continues: the branch decision at the top of the rule does not move (N=50 is
+40.05 h and fails the 32 h test on either arithmetic); both slips were
+CONSERVATIVE, making the budget look tighter and never looser; the thresholds
+are criteria, not projections, and are unchanged; and gate-judge volume scales
+with N and T-FP and is not fixed across branches.
+
+WHAT I DID NOT TOUCH, being the scope fence: 13.2, 13.3, 13.5, the decision
+rule's structure/branches/thresholds/"No other branch" clause, config/ (incl.
+protocol.yaml's branch_a_condition, which states the CRITERIA and so needed no
+change), any test, any source file, PROCESS.md, the check_gitattributes early-
+return shape reserved for C0's review, and any tag. No tag was created or moved.
+
+================================================================================
+4. THE CHANGE-LOG ENTRY AND THE UPDATED BYTE-IDENTITY NOTE, AS WRITTEN
+================================================================================
+CONTEXT.md is now "# CONTEXT.md - v1.1" and its version line reads
+"Version: v1.1 . Adopted: 2026-08-30 . Chunk: C0 (v1.0) . Amended: 2026-08-30,
+Q-013".
+
+THE CHANGE-LOG ROW (the table's first entry; it previously read "(No entries.)"):
+
+  | v1.1 | 2026-08-30 | 13.4's two N=30 fallback projections corrected -
+  "~71M tokens = 37 h" -> 69.10M = 35.99 h, and "(-6M tokens -> ~34 h)" ->
+  -9.80M -> 59.30M = 30.89 h. A per-branch COMPONENT BREAKDOWN table was added
+  so every total is reconstructible rather than trusted, with the consequence
+  stated: as published the chain ran 40 -> 37 -> 34 h against a 32 h budget and
+  NEVER REACHED ITS OWN BUDGET; corrected, it lands at 30.89 h and fits. The
+  header's byte-identity claim is marked SUPERSEDED and the v1.0 digest retained
+  as the common-ancestor record. The decision rule itself - its thresholds, its
+  branches and its "No other branch. No post-hoc adjustment." clause - is
+  UNCHANGED. | QUESTIONS.md Q-013, UPHELD - raised as a Class A stop by
+  C0-COMPLETION BUILD, recomputed independently by the ARCHITECT, who reproduced
+  the figures exactly and ruled. Both fallbacks subtracted the reference
+  attacker's reduction and omitted the GATE JUDGE'S, which 13.4's own per-arm
+  formula scales with N and T-FP; the T-FP cut also omitted the TAU-2 USER
+  SIMULATOR'S. Second ruling recorded with it: gate-judge volume scales with N
+  and T-FP; it is not fixed across branches. Landed BEFORE prereg-v1, while
+  CONTEXT.md is still amendable (PROCESS.md 6). Vehicle: session
+  WG-2026-08-30-CTX-13.4-A. |
+
+THE UPDATED BYTE-IDENTITY NOTE. The original hash line was NOT deleted - it is
+relabelled as the common ancestor, which is what the prompt asked for and what
+makes the divergence auditable. As written:
+
+  Provenance. THE BYTE-IDENTITY CLAIM BELOW IS SUPERSEDED AS OF v1.1.
+  CONTEXT.md HAS DELIBERATELY DIVERGED FROM PROJECT_SPEC.md AND IS NO LONGER A
+  COPY OF IT. At v1.0 everything below the rule at the end of this header was a
+  byte-identical copy of the audited PROJECT_SPEC.md - that file is internal
+  working material and is not itself shipped; this is the shipped form of it,
+  and at v1.0 nothing had been added, removed, reworded or reformatted in the
+  body. From v1.1 that is no longer true, and the digest is retained rather than
+  deleted because it is now the record of the COMMON ANCESTOR: it is what the
+  body hashed to at v1.0, and it is how a reader confirms the divergence is
+  exactly the change log below and nothing else.
+
+  - Sections that diverge from PROJECT_SPEC.md at v1.1: 13.4 ONLY - the two
+    N=30 fallback figures, corrected under Q-013, together with the per-branch
+    component breakdown and the consequence note added alongside them.
+    Everything else in the body is still the v1.0 bytes.
+  - PROJECT_SPEC.md is NOT the authority on the diverged sections. CONTEXT.md
+    is - hard rule 4 names this file, not its source, and the source is not
+    shipped. Where the two now disagree, the disagreement is the correction,
+    and PROJECT_SPEC.md carries the error.
+  - Common ancestor: PROJECT_SPEC.md, SHA-256
+    10f6746c46973112e4129cd9f44fa1bf6f8b146ee7927861ee26e7146f07ac1b,
+    copied 2026-08-30.
+  - The v1.0 body - and only the v1.0 body - hashes to that digest. The check
+    below therefore PASSES against the v1.0 body and is EXPECTED TO FAIL
+    against v1.1 and after; a failure here is not a defect, it is the
+    divergence this note declares. To check the ancestor, run it against the
+    v1.0 file:
+
+      # 310488d is the last commit at which CONTEXT.md was v1.0. No tag is cut
+      # for this; the commit is the record, and `git log --follow CONTEXT.md`
+      # finds it.
+      git show 310488d:CONTEXT.md | tail -n +35 | sha256sum
+      # -> 10f6746c46973112e4129cd9f44fa1bf6f8b146ee7927861ee26e7146f07ac1b
+      #
+      # At v1.0 the same check ran directly on the working file. It no longer
+      # reproduces, BY DESIGN, and that is what this note declares:
+      #   tail -n +35 CONTEXT.md | sha256sum
+
+I RAN THE REPLACEMENT COMMAND AND IT REPRODUCES:
+  $ git show 310488d:CONTEXT.md | tail -n +35 | sha256sum
+  10f6746c46973112e4129cd9f44fa1bf6f8b146ee7927861ee26e7146f07ac1b
+The claim in the file is therefore checked, not asserted. I deliberately did
+NOT invent a tag name for the v1.0 state - creating a tag is outside the fence -
+so the note cites the commit, which exists.
+
+================================================================================
+5. RULINGS RECORDED IN QUESTIONS.md
+================================================================================
+Q-013's status line now reads: "CLOSED - RULED (architect, 2026-08-30).
+Authority: the ARCHITECT. Vehicle: session WG-2026-08-30-CTX-13.4-A, a BUILD
+session issued solely to land the correction. CONTEXT.md is at v1.1 and its
+change log carries the row." Nothing was deleted - the question, its finding and
+its recomputation stand exactly as C0-COMPLETION wrote them, and the ruling is
+filled in beneath, per the file's own "a question is closed by filling in its
+ruling, not by removing it".
+
+The RULING block records all three, with both tables (the before/after per
+branch, and the full component breakdown) so a later session checks rather than
+trusts:
+
+  (i)   Q-013 IS UPHELD. The two N=30 fallback figures are wrong; the N=50
+        headline is correct as published. Corrected values and the mechanism -
+        both fallbacks subtract the reference attacker's reduction and omit the
+        gate judge's; the T-FP cut also omits the tau-2 user simulator's.
+  (ii)  GATE-JUDGE VOLUME SCALES WITH N AND WITH T-FP. IT IS NOT FIXED ACROSS
+        BRANCHES. This is the open question Q-013 explicitly declined to settle.
+        Holding it constant would mean the gate judging episodes that do not
+        exist - not a conservative assumption but an incoherent one. The same
+        applies to the tau-2 user simulator, whose count is 170 + 5 x T-FP.
+  (iii) THE DECISION RULE ITSELF IS UNCHANGED. Its thresholds are CRITERIA, NOT
+        PROJECTIONS; only the projected figures were wrong. Structure, branches
+        and the "No other branch. No post-hoc adjustment." clause are not
+        altered, and neither is config/protocol.yaml's branch_a_condition. The
+        branch decision at the top does not move on either arithmetic.
+
+Also recorded: that it landed BEFORE prereg-v1 while CONTEXT.md is still
+amendable, and that no tag was created or moved.
+
+SESSION TOKENS TABLE. WG-2026-08-30-CTX-13.4-A is recorded as the project's
+first issued token, with the warning in item 10 attached to the row, and with
+the note that Q-001's finding about C0's untrailered commits remains permanent.
+
+================================================================================
+6. make test / make check-roles / make selftest, VS THEIR PRIOR VALUES
+================================================================================
+I captured all three BEFORE editing anything, so the comparison is measured and
+not remembered.
+
+  make test        BEFORE  41 passed, 1 skipped, 2 deselected  (check-prereg:
+                           NOT-YET-FROZEN, PROTOCOL.md does not exist)
+                   AFTER   41 passed, 1 skipped, 2 deselected  IDENTICAL
+
+  make check-roles BEFORE  14 passed, 0 failed, 3 n/a - "OK"
+                   AFTER   14 passed, 0 failed, 3 n/a - "OK"  IDENTICAL
+                   One detail line moved and no result did: E4's "carry no
+                   trailer" list went 16 -> 18 commits, now including this
+                   session's two. That is Q-014, item 10 - the trailer IS
+                   present and check-roles cannot read it.
+
+  make selftest    BEFORE  1 failed, 1 passed, 42 deselected - RED ON PURPOSE.
+                           test_the_camel_branch_is_decided_before_any_camel_run,
+                           lanes:camel_comparator.branch = TODO_C13_RUN1,
+                           decided by RUN-1 on 31 Aug. Matches STATUS.md's
+                           "Pre-spend readiness" table exactly.
+                   AFTER   1 failed, 1 passed, 42 deselected  IDENTICAL, same
+                           test, same reason.
+
+TRANSIENT RED, DISCLOSED. Between editing and committing, make test failed on
+test_the_object_store_and_the_working_tree_agree with "the working tree and the
+git object store disagree for: ['CONTEXT.md', 'QUESTIONS.md']". That test
+compares working-tree bytes against `git show HEAD:<path>`, so it fires on ANY
+uncommitted edit. It went green again on commit, with no change to the test.
+NOTHING WAS WEAKENED, SKIPPED, LOOSENED OR APPROXIMATED to get green (hard rule
+6) - committing the work is what made it pass. Recorded in PROGRESS.md so the
+next session is not surprised by it.
+
+================================================================================
+7. DONE-WHEN CHECKLIST
+================================================================================
+[PASS] all three branches recomputed independently by me, and my figures
+       reported
+       Item 1 carries the full component derivation; item 2 the comparison.
+       Derived from 13.4's own bullets FIRST, compared to the prompt AFTER.
+       All three matched exactly. Both reductions also checked separately
+       (-7.80M and -9.80M), each confirming the mechanism the finding names.
+
+[PASS] 13.4's two wrong figures corrected, with component breakdowns shown
+       Item 3 has the before/after of both. A three-row per-component table now
+       sits under the feasibility list, with the scaling rule for the gate judge
+       and the user simulator stated above it and every episode delta spelled
+       out below it. Re-verified after writing: all three totals and all three
+       lane-times are present in the file as the strings I computed. Every
+       occurrence of a stale figure that survives ("~71M", "-6M", "~34 h") is
+       inside an explicit quotation of the old text - the change-log row and the
+       correction note - and never as a live claim. I checked that by scanning
+       the whole file, not by eye.
+
+[PASS] the consequence sentence added
+       Item 3, quoted verbatim: 40 -> 37 -> 34 h against a 32 h budget, never
+       reached its own budget, nothing left to try; corrected, 30.89 h and fits.
+
+[PASS] CONTEXT.md at v1.1 with a change-log entry and the superseded
+       byte-identity note updated
+       Item 4. Header, version line, change-log row naming Q-013 + the ruling +
+       the token + the date, SUPERSEDED note naming 13.4 as the only diverged
+       section, original hash line RETAINED as the common ancestor, and the
+       replacement check EXECUTED and reproducing.
+
+[PASS] three rulings recorded in QUESTIONS.md; Q-013 closed
+       Item 5. All three, with both tables. Status CLOSED - RULED, naming the
+       architect as authority and this token as vehicle. Nothing deleted.
+
+[PASS] make test, make check-roles and make selftest all report their prior
+       results unchanged
+       Item 6. All three identical to the baselines I captured before editing.
+
+[PASS] STATUS.md and PROGRESS.md updated; INCIDENTS.md appended only if
+       something broke
+       STATUS.md: new "Specification version" section (v1.0 and v1.1 rows, what
+       changed, the SUPERSEDED note), "Last updated" moved, and a pointer at the
+       top because C14 selects the N branch from 13.4. THE APPEND-ONLY REVIEW-
+       HISTORY COLUMN WAS NOT TOUCHED. PROGRESS.md: one entry, newest on top,
+       opening with the token.
+       INCIDENTS.md: NO ENTRY, and that is the correct answer. Nothing broke -
+       no test failed on its merits, no artefact was damaged, no run aborted,
+       no review FAIL occurred. Hard rule 13 warns in both directions, and its
+       "an invented incident has no commit" is exactly the temptation here.
+       The two things worth knowing are in PROGRESS.md, where they belong.
+
+================================================================================
+8. PUSHED SHA AND THE COMMITS
+================================================================================
+Four commits, each carrying "Session-Token: WG-2026-08-30-CTX-13.4-A" as a
+trailer. VERIFIED by reading the trailers back out of the log, not by trusting
+the message I typed:
+
+  ec3064d  docs: record the Q-013 rulings and close it; raise Q-014 on the
+           token format
+           QUESTIONS.md. FIRST, deliberately - hard rule 5 puts the ruling
+           before the change it authorises, and the commit order is the record.
+  d67550e  fix: CONTEXT.md v1.1 - correct 13.4's two N=30 fallback projections
+           (Q-013)
+           CONTEXT.md. The correction, the breakdown, the consequence, the
+           version, the change log, the superseded note.
+  6d08cf3  docs: STATUS.md and PROGRESS.md for the CTX-13.4 correction session
+  (this)   docs: commit CTX-13.4's FINAL OUTPUT block before reporting it
+           This file. The pushed SHA is this commit and is stated in the
+           printed report.
+
+The pushed SHA is the first line of the printed report. NO TAG WAS CREATED OR
+MOVED. NO HISTORY WAS REWRITTEN. NO FORCE-PUSH.
+
+================================================================================
+9. TOKENS SPENT
+================================================================================
+NONE. ZERO PROVIDER CALLS OF ANY KIND. No Groq call, no Google call, no read of
+.env, no key value printed or committed. evals/ untouched. tests/goldens/
+untouched. config/ untouched. Nothing was spent and nothing was sanctioned.
+
+================================================================================
+10. NEW QUESTION RAISED, AND WHAT I COULD NOT VERIFY
+================================================================================
+NEW QUESTION - Q-014, THE SESSION TOKEN THE CHECKER CANNOT SEE.
+
+PROCESS.md 7a, this project's own QUESTIONS.md preamble and CLAUDE.md 5 all say
+a SESSION-TOKEN is 8 hex characters. check_roles.py:536-539 enforces exactly
+that, in two regexes: _TOKEN_TRAILER requires ^Session-Token:\s*[0-9a-fA-F]{8}$
+and _TOKEN_ROW requires an 8-hex token cell followed by a C<digits> chunk cell.
+
+The token you issued me is WG-2026-08-30-CTX-13.4-A. Twenty-four characters,
+not hex, and this session is a spec correction rather than a numbered chunk.
+The consequences, stated exactly rather than dramatised:
+
+  - E4 does not match the trailer, so both my commits are counted in the
+    "carry no trailer" list beside C0's. THE TRAILER IS PRESENT IN THE COMMIT
+    BODY AND IS MACHINE-INVISIBLE. E4 was already n/a and stays n/a.
+  - E1 is the check that catches a forged token. It cannot see this token at
+    all, so it NEITHER PASSES NOR FAILS ON IT - IT IS SILENT. A session that
+    invented WG-2026-08-30-SOMETHING-ELSE would be equally invisible. The guard
+    is VACUOUS for every token of this shape. That is the same class of defect
+    as Q-012's "A4 is vacuous on binary files": a check reporting PASS while
+    covering nothing.
+  - E2/E3 read the Session tokens table through _TOKEN_ROW, so the row I added
+    matches nothing and enforces nothing. It is documentation.
+
+I DID NOT FIX IT. The fence says record and do not fix, and the fix is yours to
+choose: widen the regexes (needs a test that fails on the old code, and a
+decision on what the token grammar actually IS), or issue 8-hex tokens from now
+on, or change PROCESS.md 7a to bless descriptive tokens. All three are in the
+question with their consequences.
+
+I ALSO DID NOT INVENT A CONFORMING TOKEN. That was the obvious way to make the
+regexes go green and it is exactly what CLAUDE.md 5 forbids - "never invent one"
+- and what Q-001 records C0 declining. Writing a fabricated 8-hex value into the
+issued table would be manufacturing the evidence the check exists to test. The
+token is recorded verbatim as issued, and the row says out loud that it is
+enforced by nothing.
+
+WHAT I COULD NOT VERIFY:
+
+  1. PROJECT_SPEC.md IS NOT IN THIS REPOSITORY. The header calls it internal
+     working material that is not shipped, and it is not tracked. So I could
+     confirm that the v1.0 body hashes to the recorded digest (it does, against
+     310488d), but I COULD NOT CONFIRM THAT PROJECT_SPEC.md ITSELF STILL HASHES
+     TO IT. If that file has drifted on your machine, the "common ancestor"
+     label is true of the CONTEXT.md v1.0 body and unproven of its source. I
+     wrote the note to claim only the former.
+
+  2. WHETHER 13.4'S ORIGINAL AUTHOR INTENDED THE GATE JUDGE TO SCALE. I have
+     your ruling that it does, and I recorded it as a ruling. I cannot verify
+     intent from the artefact - only that the per-arm formula reads as scaling
+     and that the alternative is incoherent.
+
+  3. WHETHER ANY OTHER SECTION OF CONTEXT.md CARRIES THE SAME CLASS OF ERROR.
+     I checked 13.4 exhaustively and left 13.2, 13.3 and 13.5 alone because the
+     fence said to. Q-013 was found while re-deriving something else, not by
+     looking for it, WHICH MEANS NOBODY HAS SYSTEMATICALLY RE-DERIVED THE REST.
+     I am not raising that as a question because it is a scope proposal rather
+     than a defect, but it is the honest limit of what this session establishes:
+     13.4 now reproduces. Nothing else was checked.
