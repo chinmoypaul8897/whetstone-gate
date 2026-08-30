@@ -47,9 +47,18 @@ appears that was never issued**, or if a token is reused across roles.
 
 | Token | Chunk | Role | Issued |
 |---|---|---|---|
+| `WG-2026-08-30-CTX-13.4-A` | *(none - `CONTEXT.md` §13.4 correction, not a numbered chunk)* | BUILD | 2026-08-30 |
 
-*(No tokens issued. See **Q-001** — the C0 build prompt carried none, and this session did not
-fabricate one.)*
+⚠️ **This row is recorded because `CLAUDE.md` §5 requires it, and it is enforced by nothing.** The
+token as issued is **not 8-hex**, so `check_roles.py`'s `_TOKEN_ROW` does not match this row and its
+`_TOKEN_TRAILER` does not match the trailer on this session's commits — **E1, E2, E3 and E4 are all
+silent on this session.** Recorded as **Q-014**, unfixed by deliberate choice of scope. **The token
+was NOT reshaped to fit the regex**: `CLAUDE.md` §5 forbids inventing one, and a fabricated 8-hex
+value would be exactly the forged token E1 exists to catch (**Q-001**, same reasoning).
+
+*Before this row: no tokens had been issued. See **Q-001** — the C0 build prompt carried none, and
+that session did not fabricate one. **That remains permanent**: C0's commits carry no trailer and
+history is never rewritten.*
 
 ---
 
@@ -681,7 +690,10 @@ rules this out of scope, the revert is one commit and the box goes back to FAIL-
 ---
 
 ### Q-013 - CONTEXT.md 13.4's N=30 and T-FP fallback figures do not reproduce, and the stated chain never reaches its own 32 h budget
-**Raised by:** C0-COMPLETION BUILD - **Date:** 2026-08-30 - **Status:** OPEN - **ARCHITECT ACTION REQUIRED**
+**Raised by:** C0-COMPLETION BUILD - **Date:** 2026-08-30 - **Status:** **CLOSED - RULED** (architect,
+2026-08-30). **Authority:** the **architect**. **Vehicle:** session `WG-2026-08-30-CTX-13.4-A`, a
+BUILD session issued solely to land the correction. `CONTEXT.md` is at **v1.1** and its change log
+carries the row.
 **Blocking:** nothing today. ⚠️ **Blocks C14**, which selects the N branch by this rule and writes
 the selected branch into `PROTOCOL.md` **before the freeze**. It must be ruled before `prereg-v1`.
 **Deviation class:** **A** - it changes reported numbers in `CONTEXT.md`, and those numbers feed a
@@ -743,6 +755,114 @@ fixed across branches - e.g. if the gate judge were meant to run the full M-ADV 
 Nothing in 13.4 says so, and its per-arm formula reads as scaling, but **the architect owns that
 question, not this session.** If the intent was fixed volume, the stated figures may be right and
 the per-arm formula is what needs the note instead.
+
+**RULING (architect, 2026-08-30):** *Q-013 is UPHELD. Three rulings, recorded together because the
+correction is not sound without all three.*
+
+*(i) **THE FINDING IS CORRECT AND THE TWO FALLBACK FIGURES ARE WRONG.** The architect recomputed
+`CONTEXT.md` §13.4 independently from its own stated components and reproduced the reporting
+session's figures exactly. Both computations are recorded so a later session can check rather than
+trust:*
+
+| Branch | `CONTEXT.md` v1.0 said | Correct | Status |
+|---|---|---|---|
+| N=50, T-FP 40 | 76.9M / ~40 h | **76.90M / 40.05 h** | **correct as published - unchanged** |
+| N=30, T-FP 40 | *"~71M ... ~37 h"* | **69.10M / 35.99 h** | **WRONG - corrected at v1.1** |
+| N=30, T-FP 20 | *"-6M ... ~34 h"* | **59.30M / 30.89 h** | **WRONG - corrected at v1.1** |
+
+*Mechanism: both fallbacks subtract the reference attacker's reduction and omit the gate judge's.
+§13.4's own per-arm gate-judge formula is* `N M-ADV + 34 T-NEG + 16 AD-CMP + 30 M-BEN + T-FP T-FP`,
+*so it shrinks when N or T-FP shrink. The τ² user-simulator total also shrinks with T-FP, and that
+was omitted too. Component breakdown, so every figure is reconstructible:*
+
+| Branch | Attacker | Benign solver | Gate judge | τ² user sim | Total | Lane-time @ 1.92M/h |
+|---|---|---|---|---|---|---|
+| N=50, T-FP 40 | 550 × 60K = 33.00M | 350 × 50K = 17.50M | 3×170 = 510 × 20 × 1.5K = 15.30M | 370 × 20 × 1.5K = 11.10M | **76.90M** | **40.05 h** |
+| N=30, T-FP 40 | 450 × 60K = 27.00M | 350 × 50K = 17.50M | 3×150 = 450 × 20 × 1.5K = 13.50M | 370 × 20 × 1.5K = 11.10M | **69.10M** | **35.99 h** |
+| N=30, T-FP 20 | 450 × 60K = 27.00M | 250 × 50K = 12.50M | 3×130 = 390 × 20 × 1.5K = 11.70M | 270 × 20 × 1.5K = 8.10M | **59.30M** | **30.89 h** |
+
+*The breakdown is written into §13.4 itself, not only here: **the absence of that breakdown is why
+the error survived**, and a bare total is not checkable.*
+
+*(ii) **GATE-JUDGE VOLUME SCALES WITH N AND WITH T-FP. IT IS NOT FIXED ACROSS BRANCHES.** This
+answers the open question Q-013 explicitly declined to settle - whether §13.4's intent was to hold
+the gate judge's volume constant while N moved. It was not. **Holding it constant would mean the
+gate judging episodes that do not exist**, which is not a conservative assumption but an incoherent
+one. The per-arm formula reads as scaling because it is scaling, and the same applies to the τ²
+user simulator, whose episode count is* `170 T-NEG + 5 × T-FP`.
+
+*(iii) **THE DECISION RULE ITSELF IS UNCHANGED.** Its thresholds - "measured attacker
+tokens/episode ≤ 60,000 AND projected Gemma lane-time ≤ 32 h" - are **criteria, not projections**.
+Only the projected figures were wrong. The rule's structure, its branches and its "No other branch.
+No post-hoc adjustment." clause are **not altered**, and neither is `config/protocol.yaml`'s
+`branch_a_condition`, which states the criteria and not the projections. **The branch decision at
+the top of the rule does not move on either arithmetic**: N=50 is 40.05 h and fails the ≤ 32 h test
+either way. What changes is that the chain now terminates feasibly - **as published it ran
+40 → 37 → 34 h against a 32 h budget and never reached its own budget, with nothing left to try;
+corrected, the final rung lands at 30.89 h and fits.***
+
+*Landed **before** `prereg-v1`. `PROCESS.md` §6: `CONTEXT.md` is not a frozen artefact and is
+amendable until the tag exists - after it, this correction would have required amending a
+pre-registration, which is why it is made now. No tag was created or moved.*
+
+**Recorded by:** session `WG-2026-08-30-CTX-13.4-A` (BUILD), which **verified all three branches
+independently before writing them** and reports a match on every figure. The recomputation is a few
+lines of arithmetic over §13.4's own four component bullets; any later session can repeat it.
+
+---
+
+### Q-014 - the issued SESSION-TOKEN does not match the format `make check-roles` enforces, so E4 cannot see it and E1 cannot police it
+**Raised by:** CTX-13.4 BUILD - **Date:** 2026-08-30 - **Status:** OPEN - **ARCHITECT ACTION REQUIRED**
+**Blocking:** nothing. The correction landed; `make check-roles` reports its prior result unchanged.
+**Deviation class:** **recorded, not acted on.** This session did **not** fix it: the scope fence
+says *"If you find another defect while working, RECORD it as a new question and do not fix it"*,
+and the fix touches either an enforcement module or the architect's own token-issuing convention.
+**Neither is this session's to choose.**
+
+**The conflict, quoted from both sides.**
+- `PROCESS.md` §7a, mirrored in this file's `## Session tokens` preamble and in `CLAUDE.md` §5:
+  *"Every build, review and fix prompt opens with a fresh **8-hex** `SESSION-TOKEN`."*
+- `src/whetstone_gate/check_roles.py:536-539` enforces exactly that, in two regexes -
+  `_TOKEN_TRAILER = ^Session-Token:\s*([0-9a-fA-F]{8})\s*$` and
+  `_TOKEN_ROW = ^\|\s*` + backtick-optional + `([0-9a-fA-F]{8})` + backtick-optional +
+  `\s*\|\s*(C\d+)\s*\|\s*(BUILD|REVIEW|FIX)\s*\|`.
+- **The token actually issued to this session is `WG-2026-08-30-CTX-13.4-A`** - 24 characters, not
+  8, and not hex; and its chunk cell is not a `C\d+` chunk, because this session is a spec
+  correction rather than a numbered chunk.
+
+**What that costs, stated exactly rather than dramatised.** `make check-roles` **still reports
+14 passed, 0 failed, 3 n/a - its prior result, unchanged** - but for the wrong reason:
+- **E4** (*every commit carries a Session-Token trailer*) does not match this session's trailer, so
+  these commits are counted among the *"carry no trailer"* list alongside C0's. **The trailer is
+  present in the commit body and is machine-invisible.** E4 was already `n/a` and stays `n/a`; only
+  its message grows.
+- **E1** (*no commit carries an UNISSUED token*) is the check that would catch a forged token. It
+  cannot see this token at all, so **it neither passes nor fails on it - it is silent.** A session
+  that invented `WG-2026-08-30-SOMETHING-ELSE` would be equally invisible. **The guard is vacuous
+  for every token of this shape**, which is the same class of defect as Q-012's A4-on-binary
+  finding: a check that reports PASS while covering nothing.
+- **E2/E3** read the `## Session tokens` table through `_TOKEN_ROW`; the row added by this session
+  does not match it, so that row is **documentation only** and enforces nothing.
+
+**Why this is recorded and not quietly worked around.** The obvious workaround - inventing an 8-hex
+token so the regexes match - is **forbidden**: `CLAUDE.md` §5 says *"Never invent one and never
+reuse one"*, and Q-001 records C0 declining exactly that. Writing a fabricated 8-hex value into the
+issued table would be manufacturing the evidence the check exists to test.
+
+**Options seen:**
+  1. **Widen both regexes** to accept the architect's actual token vocabulary, and a non-`C\d+`
+     chunk cell for spec-correction sessions. - Makes E1/E4 live again. Touches `check_roles.py`
+     and needs a test that **fails on the old code** (hard rule 6), plus a decision on what the
+     token grammar actually is.
+  2. **Issue 8-hex tokens from now on**, per `PROCESS.md` §7a as written, and treat this session's
+     token as a one-off recorded exception. - No code change; the convention is already the law and
+     the code already matches it. This session's commits stay invisible to E4, as C0's are.
+  3. **Change `PROCESS.md` §7a** to bless descriptive tokens and update the code to match. - Largest
+     change; a descriptive token is genuinely more readable in a log than 8 hex.
+
+**Default taken pending a ruling:** **none - nothing was fixed.** The token was carried on every
+commit **verbatim as issued**, and recorded verbatim in `## Session tokens`. **The trailer is
+correct and the checker cannot read it; that asymmetry is the finding.**
 
 **RULING (architect, pending):**
 
