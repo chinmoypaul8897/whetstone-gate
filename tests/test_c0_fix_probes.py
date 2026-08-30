@@ -1206,3 +1206,91 @@ def test_one_raising_group_cannot_silence_the_secret_scan(tmp_path, capsys, monk
     assert "B1 no .env tracked" in printed
     assert "E1 no commit carries an UNISSUED token" in printed
     assert "F1 config/ loads" in printed
+
+
+# =======================================================================================
+# THE §8.6 → REGISTRY DIRECTION — the check that reported PASS over nothing at all.
+#
+# `test_registry_covers_every_config_constant`'s docstring claimed BOTH directions and
+# implemented one. It never iterated §8.6, so a constant added to the spec that the registry
+# never learned about was exactly the constant the tripwire could not catch. That is the
+# mechanism by which EIGHT rows went missing, found by the architect on 2026-08-31 and by no
+# session and no review — TWO of them in neither §8.6 nor config/ at all, which §8.6's own
+# sentence calls a review BLOCKER, and both load-bearing in every row of §13.4.
+# ARCHITECT_CHECK_0.md §5.
+# =======================================================================================
+
+
+def test_the_s86_parser_fires_on_a_row_the_registry_has_never_heard_of():
+    """A synthetic §8.6 carrying one unknown row must be REPORTED, not silently skipped.
+
+    ⚠️ The check is fired at a table, not at the repository, precisely because on the
+    repository it passes — which is what the four BLOCKERs were all about. Against the
+    registry as it stood before this session, **any of the eight real rows** would produce
+    this failure; the synthetic row makes the probe independent of whether they are still
+    missing.
+    """
+    from whetstone_gate.spec_constants import SPEC_CONSTANTS  # noqa: PLC0415
+
+    import test_tripwire_registry as reg  # noqa: PLC0415  (tests/ is on sys.path)
+
+    synthetic = (
+        "## 8.6 THE AUTHORED ARTEFACTS\n"
+        "\n"
+        "| Constant | Value | Used by |\n"
+        "|---|---|---|\n"
+        "| **turn budget** | **20** | all arms |\n"
+        "| a constant nobody transcribed [ADDED 31 Aug] | 4242 | §13.4 |\n"
+        "\n"
+        "# 9. THE INVARIANTS\n"
+    )
+    rows = reg.parse_s86_rows(synthetic)
+    assert rows == [
+        "**turn budget**",
+        "a constant nobody transcribed [ADDED 31 Aug]",
+    ], rows
+
+    in_spec = {reg.normalise_spec_row(r) for r in rows}
+    in_registry = {reg.normalise_spec_row(c.spec_row) for c in SPEC_CONSTANTS}
+    assert "turn budget" in in_registry, "the parser and the registry do not agree at all"
+    assert in_spec - in_registry == {"a constant nobody transcribed"}, (
+        "a §8.6 row absent from the registry was not reported. That is the direction that "
+        "was never checked, and it is why eight constants went missing."
+    )
+
+
+def test_all_eight_of_the_31_august_constants_are_in_the_registry_and_in_config():
+    """The eight rows §8.6 gained on 2026-08-31, named one by one.
+
+    Six were in `config/` but in neither §8.6 nor the registry. **Two — the gate-judge
+    1,500-token per-call target and the benign-solver 50,000-token per-episode target — were
+    in NEITHER**, which §8.6's own sentence calls *"a defect, and finding one is a review
+    BLOCKER"*, while being a column in **every row of §13.4's arithmetic**. Naming them here
+    means a future edit that drops one fails with the constant's name, not with a count.
+    """
+    from whetstone_gate.spec_constants import BY_KEY  # noqa: PLC0415
+
+    expected = {
+        "attacker_context_window_turns_verbatim": ("attacker.context_window_turns_verbatim", 6),
+        "attacker_context_summary_max_tokens": ("attacker.context_summary_max_tokens", 400),
+        "attacker_target_tokens_per_episode": ("attacker.target_tokens_per_episode", 60000),
+        "gate_judge_target_tokens_per_call": ("gate_judge.target_tokens_per_call", 1500),
+        "benign_solver_target_tokens_per_episode": (
+            "benign_solver.target_tokens_per_episode",
+            50000,
+        ),
+        "confidence_level": ("statistics.confidence_level", 0.95),
+        "rule_of_three_min_n": ("statistics.rule_of_three_min_n", 30),
+        "money_rounding": ("money.rounding", "ROUND_HALF_UP"),
+    }
+    protocol = cfg.load("protocol")
+    for key, (dotted, value) in expected.items():
+        assert key in BY_KEY, (
+            f"{key} is not in the tripwire registry, so nothing scans for it. "
+            f"CONTEXT.md §8.6 carries it as of 2026-08-31."
+        )
+        assert BY_KEY[key].config_path == f"protocol.yaml:{dotted}", BY_KEY[key].config_path
+        assert protocol.require(dotted) == value, (
+            f"config/protocol.yaml:{dotted} is not {value!r}. §8.6 and config/ must agree — "
+            f"config/ is a frozen pre-registration artefact and §8.6 is the law."
+        )

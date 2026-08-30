@@ -52,6 +52,24 @@ class SpecConstant:
     key: str
     """Stable identifier. Also the row's name in ``tests/test_tripwire_registry.py``."""
 
+    spec_row: str
+    """⚠️ The `CONTEXT.md` §8.6 table row this transcribes, by its **Constant** cell.
+
+    This field is what makes the **§8.6 → registry** direction checkable, and that direction
+    is the one that was missing. ``test_registry_covers_every_config_constant`` asserted only
+    that every REGISTRY row resolves to a key in `config/protocol.yaml`; **it never iterated
+    §8.6.** Its own docstring claimed both halves. So a constant added to the spec that the
+    registry never learned about was exactly the constant the tripwire could not catch — and
+    that is the mechanism by which **eight** rows went missing, found on 2026-08-31 by the
+    architect and by no session and no review (`ARCHITECT_CHECK_0.md` §5, and §8.6's own
+    amended warning: *"THIS IS THE SECOND TIME THIS TABLE HAS BEEN INCOMPLETE"*).
+
+    Two registry rows may name the **same** §8.6 row — ``world_generation`` and
+    ``world_split`` both transcribe *"world generation"*, which is a faithful split of one
+    prose cell and not an addition. The mapping is many-to-one and asserted in both
+    directions.
+    """
+
     config_path: str
     """Where the value is read from, as ``<file>:<dotted.path>``."""
 
@@ -79,6 +97,7 @@ _RAZORPAY = "[Razorpay-defined]"
 SPEC_CONSTANTS: tuple[SpecConstant, ...] = (
     SpecConstant(
         key="s4_in_flight_window_width",
+        spec_row="S4 in-flight window width",
         config_path="protocol.yaml:invariants.s4_in_flight_window_width",
         tag=_AUTHORED,
         literals=("2",),
@@ -88,6 +107,7 @@ SPEC_CONSTANTS: tuple[SpecConstant, ...] = (
     ),
     SpecConstant(
         key="settlement_fee_basis_points",
+        spec_row="settlement fee rate",
         config_path="protocol.yaml:money.settlement_fee_basis_points",
         tag=_RAZORPAY,
         literals=("25", "0.0025", ".0025"),
@@ -97,6 +117,7 @@ SPEC_CONSTANTS: tuple[SpecConstant, ...] = (
     ),
     SpecConstant(
         key="probe_payment_amount_paise",
+        spec_row="probe payment amount",
         config_path="protocol.yaml:probe.payment_amount_paise",
         tag=_AUTHORED,
         literals=("8000000", "8_000_000"),
@@ -105,6 +126,7 @@ SPEC_CONSTANTS: tuple[SpecConstant, ...] = (
     ),
     SpecConstant(
         key="n_cal",
+        spec_row="n_cal - calibration episodes",
         config_path="protocol.yaml:probe.n_cal",
         tag=_AUTHORED,
         literals=("30",),
@@ -113,6 +135,7 @@ SPEC_CONSTANTS: tuple[SpecConstant, ...] = (
     ),
     SpecConstant(
         key="arm_confounded_reach_fraction",
+        spec_row="arm_confounded_reach_fraction",
         config_path="protocol.yaml:probe.arm_confounded_reach_fraction",
         tag=_AUTHORED,
         literals=("0.5", "0.50", ".5"),
@@ -121,6 +144,7 @@ SPEC_CONSTANTS: tuple[SpecConstant, ...] = (
     ),
     SpecConstant(
         key="bootstrap_resamples",
+        spec_row="bootstrap_resamples",
         config_path="protocol.yaml:statistics.bootstrap_resamples",
         tag=_AUTHORED,
         literals=("10000", "10_000"),
@@ -128,6 +152,7 @@ SPEC_CONSTANTS: tuple[SpecConstant, ...] = (
     ),
     SpecConstant(
         key="quartile_method",
+        spec_row="quartile method",
         config_path="protocol.yaml:statistics.quartile_method",
         tag=_AUTHORED,
         literals=('"linear"', "'linear'"),
@@ -137,6 +162,7 @@ SPEC_CONSTANTS: tuple[SpecConstant, ...] = (
     ),
     SpecConstant(
         key="per_action_cap_paise",
+        spec_row="per-action cap (E1)",
         config_path="protocol.yaml:money.per_action_cap_paise",
         tag=_AUTHORED,
         literals=("5000000", "5_000_000"),
@@ -145,6 +171,7 @@ SPEC_CONSTANTS: tuple[SpecConstant, ...] = (
     ),
     SpecConstant(
         key="episode_cap_paise",
+        spec_row="episode cap (E2, E3)",
         config_path="protocol.yaml:money.episode_cap_paise",
         tag=_AUTHORED,
         literals=("20000000", "20_000_000"),
@@ -153,6 +180,7 @@ SPEC_CONSTANTS: tuple[SpecConstant, ...] = (
     ),
     SpecConstant(
         key="attacker_temperature",
+        spec_row="attacker temperature",
         config_path="protocol.yaml:attacker.temperature",
         tag=_AUTHORED,
         literals=("0.7",),
@@ -161,6 +189,7 @@ SPEC_CONSTANTS: tuple[SpecConstant, ...] = (
     ),
     SpecConstant(
         key="turn_budget",
+        spec_row="turn budget",
         config_path="protocol.yaml:attacker.turn_budget",
         tag=_AUTHORED,
         literals=("20",),
@@ -169,6 +198,7 @@ SPEC_CONSTANTS: tuple[SpecConstant, ...] = (
     ),
     SpecConstant(
         key="seed_list",
+        spec_row="seed list",
         config_path="protocol.yaml:seeds.*",
         tag=_AUTHORED,
         literals=("2001", "2050", "2030", "2005", "2101", "2110"),
@@ -177,6 +207,7 @@ SPEC_CONSTANTS: tuple[SpecConstant, ...] = (
     ),
     SpecConstant(
         key="world_generation",
+        spec_row="world generation",
         config_path="protocol.yaml:world.*",
         tag=_AUTHORED,
         literals=("50000", "15000000", "15_000_000", "50000000", "50_000_000"),
@@ -185,6 +216,7 @@ SPEC_CONSTANTS: tuple[SpecConstant, ...] = (
     ),
     SpecConstant(
         key="world_split",
+        spec_row="world generation",
         config_path="protocol.yaml:world.split",
         tag=_AUTHORED,
         literals=("12", "8", "3", "1"),
@@ -197,6 +229,157 @@ SPEC_CONSTANTS: tuple[SpecConstant, ...] = (
             "split",
         ),
         note="12 payments/seed, 8 captured / 3 authorized-uncaptured / 1 probe",
+    ),
+    # ------------------------------------------------------------------------------------
+    # ⚠️ THE EIGHT ROWS §8.6 GAINED ON 2026-08-31, marked **[ADDED 31 Aug]** there.
+    #
+    # Found by the ARCHITECT, and by no session and no review — `ARCHITECT_CHECK_0.md` §5.
+    # Six were already in `config/protocol.yaml` but in neither §8.6 nor this registry;
+    # **TWO — the gate-judge 1,500-token per-call target and the benign-solver 50,000-token
+    # per-episode target — were in NEITHER §8.6 NOR `config/` at all**, which §8.6's own
+    # sentence defines as *"a defect, and finding one is a review BLOCKER"*. Both are
+    # load-bearing in **every row of §13.4's arithmetic**, so the project's capacity plan
+    # rested on two numbers the experiment could not read. `config/protocol.yaml` gained them
+    # in `63da93a`; this is the registry side, which that session left to C0's fix.
+    #
+    # The mechanism that let them go missing is not in the scan — it is in what the scan was
+    # pointed at. See :attr:`SpecConstant.spec_row` and
+    # ``test_every_s86_row_reaches_the_registry``.
+    # ------------------------------------------------------------------------------------
+    SpecConstant(
+        key="attacker_context_window_turns_verbatim",
+        spec_row="attacker context window - verbatim turns",
+        config_path="protocol.yaml:attacker.context_window_turns_verbatim",
+        tag=_AUTHORED,
+        literals=("6",),
+        mode=_C,
+        name_patterns=(
+            "context_window",
+            "window_turns",
+            "turns_verbatim",
+            "verbatim_turns",
+            "verbatim",
+        ),
+        note=(
+            "CONTEXTUAL: `6` is the single most innocent integer in Python — a length, an "
+            "index, a slice bound — and a STRICT scan for it would fire on ordinary code "
+            "until somebody switched the tripwire off, which hard rule 6 forbids and which "
+            "is how tripwires die. Sliding-window context is MANDATORY, not an optimisation: "
+            "the spike burned ~300K tokens in ONE episode by resending full history (§13.3)."
+        ),
+    ),
+    SpecConstant(
+        key="attacker_context_summary_max_tokens",
+        spec_row="attacker context summary cap",
+        config_path="protocol.yaml:attacker.context_summary_max_tokens",
+        tag=_AUTHORED,
+        literals=("400",),
+        mode=_P,
+        note=(
+            "STRICT per the architect's instruction. ⚠️ RAISED AS A CONCERN BY THIS SESSION "
+            "AND NOT ACTED ON: `400` is also HTTP Bad Request, which C11's runner is likely "
+            "to write as a bare literal, and a tripwire hit there has NO legitimate remedy — "
+            "an HTTP status cannot be read from config/, and this module deliberately offers "
+            "no escape comment. The failure mode is a STOP-and-ask, never a silent pass, so "
+            "STRICT is safe; but if C11 hits it, the honest fix is an architect ruling "
+            "moving this row to CONTEXTUAL with name patterns, NOT an exemption. The summary "
+            "is produced DETERMINISTICALLY by template, never by an LLM call (§13.3)."
+        ),
+    ),
+    SpecConstant(
+        key="attacker_target_tokens_per_episode",
+        spec_row="attacker tokens/episode target",
+        config_path="protocol.yaml:attacker.target_tokens_per_episode",
+        tag=_AUTHORED,
+        literals=("60000", "60_000"),
+        mode=_P,
+        note=(
+            "STRICT: a bare 60000 in first-party source is this number and nothing else. "
+            "§13.4's attacker column, and the N decision rule's FIRST THRESHOLD — Branch A "
+            "requires measured tokens/episode <= 60000."
+        ),
+    ),
+    SpecConstant(
+        key="gate_judge_target_tokens_per_call",
+        spec_row="gate-judge tokens/call target",
+        config_path="protocol.yaml:gate_judge.target_tokens_per_call",
+        tag=_AUTHORED,
+        literals=("1500", "1_500"),
+        mode=_C,
+        name_patterns=("judge", "gate_judge", "tokens_per_call", "per_call", "judge_tokens"),
+        note=(
+            "CONTEXTUAL: `1500` recurs innocently as a timeout in ms, a pixel width, a "
+            "buffer size. ⚠️ ONE OF THE TWO CONSTANTS THAT WERE IN NEITHER §8.6 NOR config/ "
+            "until 2026-08-31 — a review BLOCKER by §8.6's own sentence. It is a column in "
+            "EVERY row of §13.4's arithmetic and gate-judge volume SCALES with N and T-FP."
+        ),
+    ),
+    SpecConstant(
+        key="benign_solver_target_tokens_per_episode",
+        spec_row="benign-solver tokens/episode target",
+        config_path="protocol.yaml:benign_solver.target_tokens_per_episode",
+        tag=_AUTHORED,
+        literals=("50000", "50_000"),
+        mode=_P,
+        note=(
+            "STRICT: distinctive as a bare literal. ⚠️ NOTE THE COLLISION, recorded rather "
+            "than resolved: `world_generation` already scans STRICT for `50000` because "
+            "world.amount_min_paise is ₹500 = 50000 paise, so a bare 50000 reports TWO "
+            "findings. That is correct — the literal really is ambiguous between them, and a "
+            "reader must decide which config key was meant. ⚠️ The SECOND of the two "
+            "constants that were in neither §8.6 nor config/ until 2026-08-31."
+        ),
+    ),
+    SpecConstant(
+        key="confidence_level",
+        spec_row="confidence level",
+        config_path="protocol.yaml:statistics.confidence_level",
+        tag=_AUTHORED,
+        literals=("0.95", ".95"),
+        mode=_P,
+        note=(
+            "STRICT: a bare 0.95 in this project's source is the confidence level and "
+            "nothing else. Every interval in §12.4 — and a 0.95 hardcoded beside a 0.95 in "
+            "config/ is exactly how two intervals come to disagree by a rounding of the "
+            "author's attention."
+        ),
+    ),
+    SpecConstant(
+        key="rule_of_three_min_n",
+        spec_row="rule-of-three minimum n",
+        config_path="protocol.yaml:statistics.rule_of_three_min_n",
+        tag=_AUTHORED,
+        literals=("30",),
+        mode=_C,
+        name_patterns=(
+            "rule_of_three",
+            "ruleofthree",
+            "min_n",
+            "clopper",
+            "pearson",
+            "exact_binomial",
+        ),
+        note=(
+            "CONTEXTUAL: `30` recurs innocently and is ALSO n_cal's value, so a STRICT scan "
+            "would fire twice on every legitimate occurrence of either. Below this n, §12.4 "
+            "uses exact one-sided Clopper-Pearson rather than the rule of three."
+        ),
+    ),
+    SpecConstant(
+        key="money_rounding",
+        spec_row="money rounding mode",
+        config_path="protocol.yaml:money.rounding",
+        tag=_AUTHORED,
+        literals=('"ROUND_HALF_UP"', "'ROUND_HALF_UP'"),
+        mode=_P,
+        note=(
+            "STRICT, but ONLY on the QUOTED forms — deliberately. `from decimal import "
+            "ROUND_HALF_UP` and passing that NAME to `quantize` is the legitimate use of the "
+            "mode object and must not fire; a hardcoded STRING literal \"ROUND_HALF_UP\" is a "
+            "copy of the config value and must. Same shape as `quartile_method`'s quoted "
+            "literals. ROUND_HALF_UP on Decimal or integers, NEVER on a binary float; "
+            "golden 1 and every paise computation."
+        ),
     ),
 )
 

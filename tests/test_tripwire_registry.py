@@ -102,12 +102,96 @@ def test_no_spec_value_is_hardcoded_in_implementation_source(implementation_sour
     )
 
 
-def test_registry_covers_every_config_constant():
-    """Every §8.6 row is in the registry, and every registry row points at a real config key.
+def normalise_spec_row(label: str) -> str:
+    """Reduce a §8.6 **Constant** cell (or a registry ``spec_row``) to a comparable key.
 
-    This is the check that stops the tripwire silently losing coverage. `CONTEXT.md` §8.6:
-    *"Any constant that is not in this table and not in `config/` is a defect, and finding
-    one is a review BLOCKER."*
+    The table is prose in markdown: some cells are bold, some carry backticks, some carry an
+    ``[ADDED 30 Aug]`` / ``[ADDED 31 Aug]`` marker, and the 30-August rows use an em dash
+    where the 31-August rows use a hyphen. None of that is the constant's identity.
+    """
+    text = re.sub(r"\[ADDED[^\]]*\]", " ", label)
+    text = text.replace("*", " ").replace("`", " ")
+    text = re.sub(r"[‐-―−]", "-", text)  # any dash variant → ASCII hyphen
+    return re.sub(r"\s+", " ", text).strip().lower()
+
+
+def parse_s86_rows(context_md: str) -> list[str]:
+    """Return the **Constant** cell of every row of `CONTEXT.md` §8.6's constants table.
+
+    ⚠️ Parsed rather than transcribed, deliberately. A transcription would be one more copy
+    of the table that can drift from it — which is the entire defect this closes.
+    """
+    lines = context_md.splitlines()
+    start = next(i for i, line in enumerate(lines) if line.startswith("## 8.6 "))
+    end = next(
+        (i for i in range(start + 1, len(lines)) if lines[i].startswith("#")), len(lines)
+    )
+    section = lines[start:end]
+    header = next(
+        i for i, line in enumerate(section) if line.strip().startswith("| Constant ")
+    )
+    rows: list[str] = []
+    for line in section[header + 2 :]:  # skip the header and the |---|---|---| separator
+        if not line.strip().startswith("|"):
+            break
+        rows.append(line.strip().strip("|").split("|")[0].strip())
+    return rows
+
+
+def test_every_s86_row_reaches_the_registry(repo_root):
+    """⚠️ **THE DIRECTION THAT WAS NEVER CHECKED, AND THE MECHANISM BY WHICH EIGHT ROWS WENT
+    MISSING.**
+
+    ``test_registry_covers_every_config_constant``'s docstring claimed *"Every §8.6 row is in
+    the registry, **and** every registry row points at a real config key."* **Only the second
+    half was implemented.** It iterated ``SPEC_CONSTANTS`` and never ``§8.6``, so it could
+    only ever find a registry row pointing at a missing config key — never a spec row the
+    registry had never heard of. **A constant added to the spec that the tripwire never
+    learns about is exactly the constant it cannot catch: the gap is not in the scan, it is
+    in what the scan is pointed at.**
+
+    On 2026-08-31 the architect found **eight** such constants, and **two of them were in
+    neither §8.6 nor `config/` at all** — which §8.6's own next sentence calls *a defect, and
+    finding one is a review BLOCKER* — while being load-bearing in **every row of §13.4's
+    arithmetic**. §8.6's amended warning is blunt about the record: *"THIS IS THE SECOND TIME
+    THIS TABLE HAS BEEN INCOMPLETE."* `ARCHITECT_CHECK_0.md` §5.
+
+    Both directions are asserted here, so neither list can grow a row the other has not seen.
+    """
+    rows = parse_s86_rows((repo_root / "CONTEXT.md").read_text(encoding="utf-8"))
+    assert len(rows) >= 21, (
+        f"§8.6's constants table parsed to {len(rows)} rows, which is fewer than the 21 it "
+        f"held on 2026-08-31. Either the table shrank or this parser stopped seeing it — "
+        f"and a parser that silently reads nothing is the same class of defect as the check "
+        f"it replaces."
+    )
+
+    in_spec = {normalise_spec_row(r) for r in rows}
+    in_registry = {normalise_spec_row(c.spec_row) for c in SPEC_CONSTANTS}
+
+    missing = sorted(in_spec - in_registry)
+    assert not missing, (
+        "CONTEXT.md §8.6 carries constants the tripwire's registry has never heard of, so "
+        f"the tripwire does not scan for them and reports green anyway: {missing}. §8.6: "
+        "'Any constant that is not in this table and not in config/ is a defect, and "
+        "finding one is a review BLOCKER.' Add a SpecConstant row naming this spec_row."
+    )
+
+    phantom = sorted(in_registry - in_spec)
+    assert not phantom, (
+        f"the registry names §8.6 rows that do not exist in CONTEXT.md: {phantom}. Either a "
+        "row was renamed in the spec and not here, or this registry has invented a constant "
+        "the specification does not carry — and the registry is a TRANSCRIPTION of that "
+        "table, nothing else."
+    )
+
+
+def test_registry_covers_every_config_constant():
+    """And the other direction: every registry row points at a real config key.
+
+    This is the half that was implemented. It is what killed mutant M16 (renaming a row key).
+    The §8.6 → registry half is :func:`test_every_s86_row_reaches_the_registry`, added by the
+    C0 FIX session because it did not exist.
     """
     protocol = cfg.load("protocol")
 
