@@ -1,0 +1,671 @@
+C0 REVIEW REPORT
+================================================================================
+SESSION-TOKEN: 52f5307b   role REVIEW   chunk C0   attempt 1   2026-08-30
+ASCII only, per INCIDENTS.md INC-08.
+Committed to docs/sessions/c0-review-1.txt BEFORE being printed (CLAUDE.md 6.1).
+The pushed SHA is the commit carrying this file and is stated in the printed
+report, the same convention C0 used at 5a68f5c and C0-COMPLETION at 310488d.
+================================================================================
+
+1. VERDICT
+--------------------------------------------------------------------------------
+>>> FAIL. <<<  No c0-pass tag was cut. Nothing was fixed.
+
+What drove it: C0's deliverable IS a set of checks, and FOUR of them report PASS
+over nothing. PROCESS.md 5.4 - "the review gate must go red on purpose" - is the
+governing line, and a check that cannot go red is not a check.
+
+  B-01  check-roles E2 and E3 are STRUCTURALLY UNABLE TO FAIL. Two of the three
+        conditions PROCESS.md 7a says make check-roles fails on cannot fire.
+  B-02  check-roles D3 - the file's own docstring calls it "the whole moat" - is
+        DEFEATED BY HARD RULE 8'S OWN NAMED SPIKE DEFECT. 1 of 4 attack forms
+        detected.
+  B-03  The F group reports config/ COMPLETE over a config/ that has lost
+        protocol.yaml, a PRE-REGISTRATION ARTEFACT, while printing that
+        protocol.yaml parsed. Exit 0, "OK - no structural invariant is broken."
+  B-04  make selftest - THE PRE-SPEND GATE - flips RED to GREEN when the key it
+        guards is deleted from config/lanes.yaml.
+
+Every one reproduced from a fresh clone of the remote. Commands in section 4.
+
+WHAT THIS VERDICT IS NOT. The three baselines reproduce exactly. The line-ending
+property re-derives independently. The provenance chain verifies at source. The
+secret and leak discipline is clean. 13.4's corrected arithmetic is internally
+consistent to the last decimal. The two build sessions' self-reporting was, as
+far as I could check it, honest - including against themselves. None of that is
+what is being failed. What is being failed is that the checks were written
+against a repository in which they all pass, and almost none was ever fired at
+input that should break it.
+
+
+2. CLEAN-CLONE REPRODUCTION - the three commands vs the reported baselines
+--------------------------------------------------------------------------------
+Cloned from the REMOTE into a fresh directory, core.autocrlf=false, new Python
+3.12.2 venv, pip install -e ".[dev]". Nothing of mine added before these ran.
+
+  command                                    reported          reproduced
+  ----------------------------------------   ---------------   ---------------
+  tasks test        41 passed 1 skip 2 desel  41 / 1 / 2   ->   41 / 1 / 2  exit 0  OK
+  tasks check-roles 14 passed 0 fail 3 n/a    14 / 0 / 3   ->   14 / 0 / 3  exit 0  OK
+  tasks selftest    1 failed 1 passed 42 des  1/1/42       ->   1/1/42      exit 1  OK
+
+ALL THREE MATCH EXACTLY.
+
+AND THE SPECIFIC SUSPICION IS DISPROVED: make test does NOT depend on an ambient
+tau2-bench. The clean venv does not have tau2-bench installed and the suite is
+green anyway. Nothing under tests/ imports it. (tau2-bench IS present in the
+operator's tree at the pinned SHA a2c0247, git status --porcelain empty,
+requires-python ">=3.12,<3.14" at line 10 - all verified here.)
+
+Also verified first-hand:
+  python --version                 -> 3.12.2
+  make shim                        -> ~/bin/make.exe, GNU Make 3.82.90, runs a recipe
+  remote, anonymous HTTP           -> 404, i.e. PRIVATE
+  PROVENANCE.md 1                  -> carries the URL and the PRIVATE row
+  evals/                           -> does not exist; nothing under it tracked
+  .gitattributes                   -> added in ee3cf93 == the root commit
+
+
+3. THE CLEAN-CLONE-FROM-BARE CLAIM - is CONTEXT.md 20's first box true today?
+--------------------------------------------------------------------------------
+EXACTLY WHAT A STRANGER MUST RUN, IN ORDER:
+
+  git clone https://github.com/chinmoypaul8897/whetstone-gate && cd whetstone-gate
+  py -3.12 -m venv .venv && . .venv/Scripts/activate      # 3.12 REQUIRED
+  pip install -e ".[dev]"                                  # the [dev] is load-bearing
+  python -m whetstone_gate.tasks test                      # or make test
+  # and only if tau2-bench is wanted (nothing in tests/ needs it today):
+  mkdir -p vendor/tau2-bench && cd vendor/tau2-bench
+  git init -q && git remote add origin https://github.com/sierra-research/tau2-bench.git
+  git fetch -q --depth 1 origin a2c024725189473d2d7cea3a5cfdbcc67478e41f
+  git checkout -q --detach FETCH_HEAD && cd ../.. && pip install -e vendor/tau2-bench
+
+>>> THE BOX IS NOT TRUE TODAY. Three reasons, one of them C0's. <<<
+
+(1) OF-14, and it is C0's. `pip install -e .` - the obvious command - leaves
+    make test BROKEN, and nothing in the repository says [dev] is required.
+    REPRODUCED FROM A BARE CLONE:
+        $ pip install -e .
+        $ python -m whetstone_gate.tasks test
+        ...python.exe: No module named pytest          exit 1
+    There is NO README.md in this repository, so the requirement is written
+    nowhere at all, and tasks.py does not diagnose it - the user gets pytest's
+    raw one-line ModuleNotFoundError from the target whose whole purpose is to
+    be "the one command". CONTEXT.md 20 splits the box: C19 owns the clean-clone
+    TEST, C0 owns "THE COMMAND EXISTS". The command as it stands does not run
+    after the natural install.
+
+(2) `pip install -e vendor/tau2-bench` - a literal C0 done-when box - CANNOT be
+    run from a bare clone. vendor/*/ is git-ignored under Q-010. The fetch
+    commands ARE in vendor/MANIFEST.md 2 and they work, so this is documented,
+    not missing - but Q-010 is an UNRULED CLASS A item that was nevertheless
+    IMPLEMENTED (OF-08), and the box is satisfiable only after a step the box
+    does not mention.
+
+(3) pyproject.toml declares readme = "README.md" against a file that does not
+    exist. Both `pip install -e .` and `pip install .` tolerate it silently.
+    LOW (OF-13); C19 creates the README.
+
+MISSING FROM vendor/MANIFEST.md: nothing. Its section 2 is correct and complete
+and I ran it mentally against the operator's checkout, which is at the pinned SHA
+and clean.
+
+
+4. FINDINGS, numbered and severity-ranked
+--------------------------------------------------------------------------------
+Full text, with every command, in docs/reviews/REVIEW_C0.md.
+
+>>> B-01  BLOCKER  check-roles E2 and E3 are structurally unable to fail
+    PROCESS.md 7a / CLAUDE.md 5: "make check-roles fails if a chunk's build and
+    review commits share a token, if a token appears that was never issued, or if
+    a token is reused across roles."
+    check_session_tokens builds `issued: dict[token -> (chunk, role)]`. A token in
+    TWO rows keeps only the LAST. So every token belongs to exactly one bucket:
+      - shared_build_review intersects the BUILD bucket with the REVIEW bucket;
+        for a duplicated token one of them is ALWAYS empty. E2 can never fire.
+      - reused_across_roles counts buckets containing the token; always exactly 1,
+        so "> 1" is never true. E3 can never fire.
+    EVIDENCE (clean clone). Add to QUESTIONS.md ## Session tokens the two
+    violations the rule names:
+        | `deadbeef` | C0 | BUILD  | 2026-08-30 |
+        | `deadbeef` | C0 | REVIEW | 2026-08-30 |     <- E2's exact condition
+        | `cafebabe` | C1 | BUILD  | 2026-08-30 |
+        | `cafebabe` | C2 | FIX    | 2026-08-30 |     <- E3's exact condition
+    then run check_roles.check_session_tokens(Path('.')):
+        rows parsed by _TOKEN_ROW: [('deadbeef','C0','BUILD'),
+          ('deadbeef','C0','REVIEW'),('cafebabe','C1','BUILD'),('cafebabe','C2','FIX')]
+        PASS E2 no token shared by a chunk's BUILD and REVIEW | clean
+        PASS E3 no token reused across roles                  | clean
+    THE ROWS PARSE. THE VIOLATIONS ARE PRESENT. BOTH CHECKS SAY CLEAN.
+    Why BLOCKER: 7a is candid that session identity is "an honour system WITH AN
+    ARTEFACT" whose claim is "here is the check, run it." The check IS the
+    artefact, two thirds of it is inert, and C19 is scheduled to tell a panelist
+    it exists.
+
+>>> B-02  BLOCKER  the moat check is defeated by hard rule 8's own named defect
+    Four attack forms built under src/whetstone_gate/{gates,scorer}/:
+      1. both `from whetstone_gate.shared_predicate import intent_key`  FAIL D3  correct
+      2. both `from whetstone_gate import shared_predicate`             PASS     WRONG
+      3. gates/ does `from .. import scorer`                            PASS     WRONG
+      4. each imports its own helper; both helpers import the shared
+         predicate (ONE HOP)                                            PASS     WRONG
+    Form 2 IS the spike defect (gate.js and invariants.js both calling
+    world.js:intentKey) transliterated into Python, and it is the most natural way
+    to write it in a src/whetstone_gate/ layout.
+    THREE CAUSES:
+      (a) `shared = (gate_imports & scorer_imports) - {"whetstone_gate"}`. For
+          `from whetstone_gate import X` the regex captures the MODULE, not the
+          imported name, so both sides record "whetstone_gate" and the
+          subtraction discards it. That subtraction IS an allow-list; its one
+          entry is the package root, not a pure value type; NO RULING EXISTS.
+          Hard rule 8: "Adding to that allow-list is a Class A deviation
+          requiring an architect ruling in QUESTIONS.md."  -> raised as Q-015.
+      (b) `module.lstrip(".").split(".")[0]` is "" for `from .. import scorer`,
+          which is not in package_roots, so the import is not recorded at all.
+      (c) THE WALK IS ONE LEVEL DEEP. Hard rule 8 says TRANSITIVE.
+    Mitigating and stated for fairness: D1/D2/D3 are n/a today (neither directory
+    exists) and the binding tests are C8's and C9's. That is exactly why it must
+    be fixed NOW - check_roles.py's docstring calls D "the whole moat",
+    test_gates_and_scorer_share_no_first_party_module delegates to it, and a
+    C8/C9 reviewer will see a green D3 and conclude the moat holds.
+
+>>> B-03  BLOCKER  the F group reports config/ complete over a missing protocol.yaml
+    EVIDENCE: git rm config/protocol.yaml && git commit, then check-roles:
+        [PASS] F1 config/ loads
+               protocol.yaml and lanes.yaml parse        <- IT DOES NOT EXIST
+        [PASS] F2 undetermined values are DECLARED, not defaulted
+               1 explicit TODO_ sentinel(s)              <- IT WAS 6
+        [PASS] F3 OPERATOR-owed values   none outstanding
+        14 passed, 0 failed, 3 n/a
+        OK - no structural invariant is broken.          <- EXIT 0
+    Five sentinels vanish from the count, among them
+    probe.void_threshold_breach_rate, which config.py's OWN docstring calls "the
+    single number that decides whether the whole run is publishable". config/ is
+    a PRE-REGISTRATION ARTEFACT (CLAUDE.md hard rule 9).
+    CAUSES: outstanding_sentinels()'s blanket `if not path.is_file(): continue`,
+    written for ladder.yaml, silently excuses protocol.yaml and lanes.yaml too;
+    and F1's detail is a HARDCODED STRING naming a file it never opened.
+    REACHABLE WITH NO DELETION AT ALL: install non-editably (pip install .) and
+    repo_root() resolves to .venv/Lib. Then F1/F2/F3 all PASS over ZERO config
+    files, and check-prereg - which hard rule 9 puts inside BOTH make test and
+    make eval - prints "config/ holds 0 file(s):" and EXITS 0.
+
+>>> B-04  BLOCKER  the pre-spend gate flips GREEN when the key it guards is deleted
+    Delete the camel_comparator: block from config/lanes.yaml:
+        as shipped                    1 failed, 1 passed, 42 deselected   RED
+        camel_comparator: removed     2 passed, 42 deselected             GREEN
+    The gate declares the CaMeL branch DECIDED when the key does not exist.
+    Mechanism, one line in tests/test_lanes_operator_placeholders.py:
+        branch = cfg.load("lanes").data.get("camel_comparator", {}).get("branch")
+        assert not cfg.is_sentinel(branch)
+    It reaches AROUND the loader to .data and uses dict.get with a default - the
+    exact accessor config.py's docstring says "does not exist and must not be
+    added", so that hard rule 9's refusal could not be got round by accident. It
+    was got round on purpose, in the test that guards spending. is_sentinel(None)
+    is False, so ABSENCE READS AS DETERMINED.
+    AND THE OTHER HALF: remove config/lanes.yaml entirely and
+    test_no_operator_placeholder_remains_in_config STILL PASSES, because
+    outstanding_sentinels() skips missing files (B-03's cause).
+
+--- MEDIUM ---------------------------------------------------------------------
+ OF-02  12 of 19 mutants survive both entry points. See section 6.
+ OF-03  check_gitattributes' early return removes A2/A3/A4 from the report with
+        no n/a. INC-07 diagnosed this shape, fixed it in check_secrets, named
+        this function as the survivor, and accepted it. I do not accept it.
+ OF-04  Q-014's remaining half: a PRESENT but MALFORMED Session-Token trailer is
+        treated as ABSENT, and E4 then prints a FALSE STATEMENT naming 9663247,
+        6d08cf3, d67550e and ec3064d as carrying no trailer when all four carry
+        one, with Q-001's cause attached. Ruling in section 5.
+ OF-05  B1 inspects only the repository root. A tracked config/secrets/.env
+        reports "PASS B1 no .env tracked - none tracked" (reproduced). Bounded by
+        .gitignore and by C1, which DOES catch it if the value matches one of the
+        eight enumerated shapes (verified). B1's claim is broader than its check.
+ OF-06  The loader returns YAML null / empty / whitespace silently. See section 7.
+ OF-07  make test is RED for any uncommitted edit to any tracked file. Unusable
+        while writing code; creates pressure to COMMIT IN ORDER TO GO GREEN in a
+        project whose commits are its audit trail; and useless as a mutation
+        oracle - it produced INC-11.
+ OF-08  Q-010's Class A default was not merely recorded but IMPLEMENTED before a
+        ruling (.gitignore gained vendor/*/ in ee098a4). Needs a ruling before
+        C19. Q-001's and Q-003's defaults are by contrast ACCEPTED.
+ OF-09  repo_root() silently reports on the WRONG directory and no target names
+        the one it used. IT FOOLED ME FOR ONE EXPERIMENT - I corrupted
+        .gitattributes in one clone and got a full green report from another.
+ OF-10  Any exception in any check destroys the WHOLE check-roles report. run()
+        builds all four groups eagerly and check_gitattributes + check_secrets is
+        one element, so a .gitattributes problem SILENCES THE SECRET SCAN.
+        Reproduced with a non-UTF-8 byte in .gitattributes: bare traceback, no
+        check output at all, exit 1.
+ OF-14  pip install -e . leaves make test broken and nothing says [dev]. Sec. 3.
+ OF-01  UNCHANGED at MEDIUM, status updated. See section 5, F3.
+
+--- LOW ------------------------------------------------------------------------
+ OF-11  _first_party_imports misses `import a, b` (one capture group) and
+        importlib.import_module(...). Two more holes in B-02's net.
+ OF-12  The tripwire is evaded by arithmetic decomposition (500 * 10000) and
+        Indian digit grouping (50_00_000). Inherent; simply not stated anywhere.
+ OF-13  pyproject.toml names a readme that does not exist.
+
+--- INFO -----------------------------------------------------------------------
+ F-17   STATUS.md says "No chunk is PASS without docs/reviews/ARCHITECT_CHECK_
+        <N>.md." No such file exists and only the ARCHITECT writes one. Confirm a
+        review PASS is understood as necessary-but-not-sufficient, or the rule
+        will be quietly ignored the first time a chunk passes.
+ F-18   `tail -n +35 CONTEXT.md` was calibrated to v1.0's 34-line header; v1.1's
+        header runs to line 61, so the superseded command now cuts INSIDE the
+        header. It fails as the note says it will, but for a second reason the
+        note does not give. The replacement command is the operative one and it
+        verifies (section 9).
+
+
+5. F1 THROUGH F4 - my ruling on each
+--------------------------------------------------------------------------------
+F1  THE EARLY-RETURN SHAPE.  RULING: real, MEDIUM, NOT a false PASS.
+    Reproduced: with .gitattributes deleted, check_gitattributes returns ONE
+    result and A2/A3/A4 do not run and are not reported.
+      - A1 cannot be shadowed: the early return IS A1 failing.
+      - A3 and A4 CAN be shadowed, but never into a green report - the branch is
+        entered only when A1 fails, so check-roles always exits 1 there. What is
+        lost is INFORMATION: `total` is computed from the results returned, so
+        the summary silently prints three fewer checks with nothing marking them
+        not-run. The module's own contract is "n/a is never silently a pass";
+        here they report NOTHING, which is weaker than n/a.
+      - C0-COMPLETION DID grow the blast radius, as the prompt suspects, but only
+        for A4 and only inside the already-failing branch. No new failure mode.
+      - THE LARGER FORM IS OF-10 AND IT DOES CROSS CHECKS: an exception in
+        check_gitattributes suppresses check_secrets entirely.
+    INC-07 diagnosed this exactly ("a check's absence and a check's pass became
+    indistinguishable to any caller"), fixed check_secrets, named this function
+    as the survivor, and wrote "Systemic guardrail: none - accepted, because" a
+    fixed key set "needs a meta-test enumerating the expected keys, which is a
+    second list to keep in sync." I DO NOT ACCEPT THAT: emitting A2/A3/A4 as
+    Result(..., None, "not evaluated - .gitattributes is missing") costs four
+    lines, needs no second list, and restores the module's own stated contract.
+
+F2  IS Q-012'S REPLACEMENT JUSTIFICATION SUFFICIENT?  RULING: YES. NO REVERT.
+    THE SCREENSHOT BOX STANDS.
+    I judged it rather than accepting it, and I RE-DERIVED the property myself:
+    across all 40 tracked files in a fresh clone with autocrlf=false, working-tree
+    bytes equal `git show HEAD:` bytes; both PNGs are i/-text w/-text with
+    identical filtered and unfiltered blob ids. Git applies NO conversion to
+    -text content, so 6a's property holds there unconditionally.
+    Sufficient for three reasons:
+      1. HARD RULE 6 FORBIDS WEAKENING AN ASSERTION TO GET GREEN. IT DOES NOT
+         REQUIRE KEEPING A FALSE ONE. Old A3 asserted "no \r\n bytes anywhere",
+         which is not 6a's property and is not true of any binary file. Every
+         failure removed was a false positive WITH RESPECT TO THE PROPERTY
+         ACTUALLY BEING ASSERTED, and that is the correct test for a rule-6
+         question.
+      2. The evidence is of the strongest available kind. The pinning test does
+         not argue: it builds the adversarial file, asserts git really classifies
+         it -text so it cannot pass on the wrong branch, CLONES THE REPOSITORY,
+         and compares bytes. If it ever fails the default is revertible and the
+         test says so.
+      3. The overclaim was withdrawn IN THE ARTEFACTS A READER ACTUALLY READS -
+         including A4's OWN PRINTED OUTPUT ("On the N binary file(s) this holds BY
+         CONSTRUCTION and so asserts nothing"). Putting it in the runtime output
+         is the one place a future reader cannot skip.
+    ONE RIDER: A4's honesty depends on that printed sentence. If a later chunk
+    trims the detail strings, A4 silently becomes an assertion over 38 files
+    wearing a label that says 40.
+
+F3  OF-01, THE LONE CR.  RULING: CONFIRMED. STAYS OPEN. RE-SCOPED. PROBE ADDED.
+    Reproduced exactly: a file whose only defect is one lone CR reports
+    i/-text w/-text, holds no CRLF pair, and PASSES BOTH A3 AND A4.
+    THE FACT OF-01 DOES NOT STATE, AND IT CHANGES HOW IT MUST BE FIXED: the
+    working-tree bytes and the committed blob are IDENTICAL
+    (b'line one\rline two\nline three\n' on both sides). So PROCESS.md 6a's
+    FINGERPRINT property is NOT violated by a lone CR - git converts nothing on
+    -text content and a fresh clone reproduces the bytes. A3 and A4 are not
+    failing at their own job. The gap is a DIFFERENT property, and INC-10's own
+    Missing field already names it: "nothing checks a tracked document's CONTENT,
+    only its line endings ... neither can say 'and it has eaten a sentence.'"
+    WHAT I DID: verified the proposed discriminator is sound and
+    false-positive-free here (both PNGs carry NULs in IHDR; the lone-CR file does
+    not); ANSWERED THE ANTI-CIRCULARITY OBJECTION that kept it out of check_roles
+    - it is NOT a second copy of git's heuristic, it compares git's verdict
+    against an INDEPENDENT signal, which is the OPPOSITE of hard rule 8's
+    circularity; and added it as a KEPT PROBE
+    (test_no_tracked_file_is_binary_without_a_nul_byte).
+    WHAT I DID NOT DO: fix it. A review session fixes nothing, and make
+    check-roles - not make test - is what C0's done-when names.
+    REVISED STATUS: reproduced, detected by make test, still invisible to
+    check-roles. SEVERITY UNCHANGED AT MEDIUM. The fix session adds it as A5 in
+    check_gitattributes with the mutation test the original row correctly says it
+    needs.
+
+F4  Q-014, THE MALFORMED TRAILER.  RULING: A PRESENT-BUT-MALFORMED Session-Token
+    TRAILER MUST BE A FAILURE, NOT AN ABSENCE. SEVERITY: MEDIUM, DUE BEFORE C1
+    IS REVIEWED.
+    The architect's format ruling (8 random hex; regex NOT widened) is not
+    reopened. Four reasons for failing closed:
+      1. THE PROJECT'S OWN DOCTRINE. CONTEXT.md 14 closes on Prabu Ram's formula,
+         quoted with its source: "judging fails open and rules fail closed."
+         This is a rule. It fails open.
+      2. IT DOES NOT MERELY STAY SILENT - IT PRINTS SOMETHING FALSE. E4 names
+         9663247, 6d08cf3, d67550e and ec3064d among "commit(s) carry no trailer"
+         when all four carry one, and offers Q-001's cause for them. A check that
+         MISREPORTS is worse than one that says nothing, because its output is
+         what a reader trusts. This is why I rank it above a cosmetic gap.
+      3. THE ARCHITECT'S RULING IS WHAT MAKES FAILING SAFE. With 8-hex mandated
+         from now on, a non-conforming trailer is a STRICTLY ABNORMAL condition -
+         either a prompt issued a malformed token or somebody typed one by hand,
+         and both should stop the build. Before the ruling, failing closed would
+         have blocked legitimate work; after it, it cannot.
+      4. THE COST IS FOUR LINES. A second permissive pattern
+         ^Session-Token:\s*(\S.*?)\s*$ run when the strict one does not match,
+         feeding a new E5 "malformed Session-Token trailer" that FAILS and names
+         the SHAs. `untrailered` then means what it says.
+    WHY MEDIUM AND NOT BLOCKER: no forged token exists today, and E1 DOES work on
+    well-formed input - verified, a commit carrying Session-Token: deadbeef with
+    no matching row makes E1 FAIL and turns the suite red. BUT IT COMPOUNDS B-01:
+    E2 and E3 cannot fire, and E1 cannot see a malformed token. OF PROCESS.md
+    7a's THREE NAMED CONDITIONS, EXACTLY ONE WORKS, ON EXACTLY ONE SHAPE OF INPUT.
+
+
+6. MUTATION TESTING
+--------------------------------------------------------------------------------
+METHOD, stated so its own weakness is visible. Each mutant applied to a clean
+clone, COMMITTED (so the dirty-tree test was satisfied - the state a real defect
+lives in), both entry points run, then git reset --hard with the source verified
+byte-identical. A SEMANTICS-PRESERVING CONTROL MUTANT was included, and it is the
+only reason the result is trustworthy - see INC-11.
+
+19 mutants + 1 control.  BEFORE MY PROBES: 6 KILLED, 12 SURVIVED.
+
+  SURVIVED (every one leaving make test at exactly 41/1/2 and check-roles exit 0)
+    M4   load: accept a non-mapping YAML
+    M5   _walk_sentinels: stop recursing into lists
+    M6   require: non-dict traversal returns None instead of refusing
+    M7   A2: added[-1] -> added[0]
+    M9   A4: drop unverifiable/not_regular from the verdict
+    M10  _eol_classification: read git's i/ side instead of w/
+    M11  E1: INVERT the forged-token predicate
+    M12  E: widen _TOKEN_TRAILER to any hex length
+    M13  B1: STOP DETECTING A TRACKED .env AT ALL
+    M15  D3: hard-wire shared = set()
+    M17  C1: SCAN ONLY THE FIRST OF THE 8 SECRET PATTERNS
+    M20  A2: substitute a fake root commit
+  KILLED
+    M1 M2 M3 M14 M16 M19
+  CONTROL M18 survived, correctly.
+
+M17 survives because test_the_secret_scanner_actually_fires exercises the REGEXES
+via re.search and never the SCANNER; the scanner can stop using them and the test
+cannot tell. M13 leaves a tracked .env entirely undetected.
+
+ROOT CAUSE, uniform across all twelve: tests/test_repo_invariants.py asserts
+result.ok is True against the repository under review - a state in which every
+check passes trivially. Only THREE tests in the whole suite build a fixture that
+should make a check FAIL, and all three are INC-09's CRLF work.
+
+PROBES ADDED - tests/test_c0_review_probes.py, 20 tests, ALL PASSING:
+    test_b1_fires_on_a_tracked_env_file                          kills M13
+    test_c1_fires_through_check_secrets_for_every_pattern (x8)   kills M17
+    test_e1_fires_on_a_commit_carrying_an_unissued_token         kills M11
+    test_the_token_trailer_matches_exactly_eight_hex...          kills M12
+    test_a2_fires_when_gitattributes_is_not_in_the_first_commit  (late-add case)
+    test_a2_reads_the_EARLIEST_add_not_the_latest                kills M7
+    test_a4_fires_when_a_tracked_path_has_no_regular_file        kills M9
+    test_eol_classification_reports_the_working_tree_side        kills M10
+    test_no_tracked_file_is_binary_without_a_nul_byte            OF-01 (F3)
+    test_load_refuses_a_yaml_that_is_not_a_mapping               kills M4
+    test_require_refuses_when_the_path_traverses_a_non_mapping   kills M6
+    test_sentinels_are_found_inside_lists                        kills M5
+    test_protocol_yaml_holds_no_null_and_no_empty_string         OF-06
+
+AFTER THE PROBES: 17 OF 19 KILLED. The two remaining:
+  M15 (D3) - DELIBERATELY NOT CLOSED. A probe could only assert D3 fires on the
+      one form it already catches, which would leave a green test standing over
+      B-02. B-02 needs a FIX, not a probe.
+  M20 - AN EQUIVALENT MUTANT. git rev-list --max-parents=0 HEAD cannot return
+      empty while HEAD resolves, and if HEAD does not resolve _git raises first.
+      The fallback is unreachable; survival is correct.
+
+SUITE AFTER THE PROBES: 61 passed, 1 skipped, 2 deselected.
+
+
+7. MY INDEPENDENT RE-IMPLEMENTATION
+--------------------------------------------------------------------------------
+Written from CLAUDE.md hard rule 9, PROCESS.md 4.9 / 5.1 and PROCESS.md 12.1's C7
+row ALONE, importing nothing from the project. Committed at
+docs/reviews/independent/c0_config_loader.py with its six rules stated up front,
+BEFORE the diff was run.
+
+  input                        MINE          THEIRS            agree
+  --------------------------   -----------   ---------------   -----
+  determined int               5000000       5000000            yes
+  absent key                   REFUSE        MissingRequired    yes
+  TODO_C14_CALIBRATION         REFUSE        Undetermined       yes
+  0                            return 0      return 0           yes
+  false                        return False  return False       yes
+  []                           return []     return []          yes
+  `key:` (YAML null)           REFUSE        return None        NO
+  `null`                       REFUSE        return None        NO
+  `~`                          REFUSE        return None        NO
+  `""`                         REFUSE        return ''          NO
+  `"   "`                      REFUSE        return '   '       NO
+  todo_C14_CALIBRATION (lower) REFUSE        return the string  NO
+
+WHERE IT AGREES, and this is worth saying because it is the CLASSIC way rule 9 is
+got wrong: both return 0, False and []. A truthiness test would treat all three as
+missing, and per_action_cap_paise: 0 would silently become a refusal. Theirs walks
+the key path and tests is_sentinel, never truthiness. THAT IS CORRECT AND I WOULD
+NOT CHANGE IT.
+
+WHERE IT DIVERGES: four classes, all of the form "written down but never
+supplied". Scenario (OF-06): a hand-edit leaves probe.void_threshold_breach_rate:
+blank. require() returns None; outstanding_sentinels() counts nothing; check-roles
+F2 says "no undetermined values remain"; make selftest passes. That is, word for
+word, the scenario config.py's OWN docstring says the mechanism exists to prevent,
+arriving through the input the mechanism cannot see.
+lanes.yaml's `tpd: null` is explicitly NOT part of this - it means "no such limit
+exists", it is documented in the file header, and the lane test correctly checks
+key PRESENCE rather than truthiness. The finding is that the loader cannot
+distinguish that from an omission, and hard rule 9 covers both.
+
+A SEVENTH DIVERGENCE sits in the sweep rather than the accessor: my outstanding()
+REFUSES when a required config file is missing, because a sweep that skips a file
+it cannot open reports a smaller number than the truth. Theirs `continue`s. That
+is B-03's cause.
+
+The lowercase-sentinel divergence is the weakest of mine and I record it as a
+preference, not a defect.
+
+
+8. CLASS-B (AND DEFAULTED CLASS-A) DECISIONS, JUDGED
+--------------------------------------------------------------------------------
+  Q-002  Date line beyond rule 13's field list      B   ACCEPT. Rule 13 fixes the
+         fields an entry must contain, not the fields it may not. The date is what
+         makes "at least two entries dated after the first build commit"
+         checkable at all, and it IS checked.
+  Q-009  two tiers (test deselects operator_gate;   B   ACCEPT. The two done-when
+         selftest runs it)                              boxes genuinely contradict;
+         the split is the only resolution satisfying both; and nothing is hidden -
+         task_test PRINTS what it deselected and why. Right shape. BUT SEE B-04:
+         the gate the split created is itself vacuous. That is a defect in the
+         gate, not in the split.
+  Q-012  A3 narrowed to git-classified text; A4     B   ACCEPT. Full reasoning at
+         added                                          F2. I re-derived it rather
+         than taking it.
+  two-mode tripwire (STRICT / CONTEXTUAL)           B   ACCEPT. A single strict
+         mode over 2/20/25/30 would fire constantly and the first response would
+         be to weaken it, which rule 6 forbids and which is how tripwires die.
+         test_registry_covers_every_config_constant keeps it honest and it KILLED
+         a mutant (M16).
+  TRIPWIRE_SELF_EXCLUSION pinned at one entry       B   ACCEPT. The exclusion is
+         unavoidable and the test is the right guard against it becoming an amnesty.
+  Q-001  no trailer on C0's commits; nothing        A   ACCEPT (defaulted). The
+         fabricated                                     alternatives were to forge
+         a credential in the audit trail of a project whose thesis is that
+         self-certified evidence is worthless, or to deliver nothing. The chosen
+         option is the reversible one and the gap is permanent and visible.
+  Q-003  evals/ committed; only transient ignored   A   ACCEPT (defaulted).
+         CONTEXT.md 16 and PROCESS.md 9/6b all require the outputs committed; the
+         default is the conservative direction and is trivially reversible.
+  Q-010  vendored trees pinned, not committed       A   >>> OF-08. NEEDS A RULING
+         BEFORE C19. <<< The measurement is sound and I agree with the conclusion.
+         The objection is procedural: it was not merely recorded but IMPLEMENTED -
+         .gitignore gained vendor/*/ in ee098a4 - so a Class A deviation that
+         "changes what a reviewer receives" is in force, unruled.
+  Q-004  package layout ambiguity                   A   CORRECT, and correctly NOT
+         defaulted. check_roles checks BOTH candidate layouts and needs no edit
+         when the ruling lands. This is how a Class A stop should look.
+  Q-014  malformed token recorded, not fixed        -   CORRECT to record; the fix
+         is now DUE. See F4.
+
+
+9. SECRET / SPEND / LEAK CHECKS
+--------------------------------------------------------------------------------
+SECRETS - CLEAN.
+  - No .env tracked (only .env.example, carrying GROQ_API_KEY= and
+    GOOGLE_API_KEY= as bare NAMES with no values). No .env file exists at all.
+  - MY OWN independent history scan - git log -p --all against 8 key patterns,
+    plus api_key = "..." and Authorization: Bearer ... shapes across all tracked
+    files - returned ZERO HITS. (C21 still owns the committed scan; this is an
+    early look, not a substitute.)
+  - No key value in any docs/sessions/ transcript, any report, or any log.
+
+SPEND - ZERO, AND STRUCTURALLY SO.
+  - evals/ DOES NOT EXIST and nothing under it is tracked, which is the only
+    checkable form the "zero provider calls" claim can take before C14.
+  - Nothing in src/ or tests/ imports an HTTP client or an SDK, or reads
+    GROQ_API_KEY / GOOGLE_API_KEY.
+  - THIS REVIEW SPENT ZERO TOKENS AND MADE ZERO PROVIDER CALLS. The only network
+    operations were git clone / git ls-remote against this project's own remote,
+    and ONE anonymous HTTP request to the repository URL to establish that it
+    returns 404, i.e. is private.
+
+LEAK - CLEAN. The research directory holds 17 files. I hashed every one against
+every tracked file and measured verbatim long-line overlap for each:
+  byte-identical to a tracked file : PROCESS.md ONLY (cc1587e7b4c4, matching its
+                                     commit message exactly)
+  PROJECT_SPEC.md sha256           : 10f6746c... - EXACTLY the common-ancestor
+                                     digest CONTEXT.md's header records, verified
+                                     AT SOURCE and not only through git history
+  long-line overlap, other 15      : PROCESS_AUDIT.md 5.5%, SPEC_CHANGELOG.md
+                                     3.2%, EVERY OTHER FILE 0.0%
+  those overlapping lines          : 100% EXPLAINED by PROCESS.md / CONTEXT.md
+                                     themselves - the two changelogs quote the
+                                     documents they describe. ZERO lines
+                                     unaccounted for.
+  docs/sessions/*.txt              : ZERO lines from any unsanctioned file
+EXACTLY THE TWO SANCTIONED FILES CAME ACROSS. NOTHING ELSE, UNDER ANY NAME.
+
+PROVENANCE CHAIN - VERIFIED.
+  $ git show 310488d:CONTEXT.md | tail -n +35 | sha256sum
+  10f6746c46973112e4129cd9f44fa1bf6f8b146ee7927861ee26e7146f07ac1b   MATCHES
+  $ tail -n +35 CONTEXT.md | sha256sum
+  892b033a...                                    correctly does NOT reproduce
+
+13.4's THREE BRANCH TOTALS ARE INTERNALLY CONSISTENT - every cell recomputed from
+the block table and the four feasibility bullets:
+  N=50 T-FP40  550ep=33.00M + 350ep=17.50M + 510ep=15.30M + 370ep=11.10M
+               = 76.90M / 1.92 = 40.05 h   OK
+  N=30 T-FP40  450ep=27.00M + 350ep=17.50M + 450ep=13.50M + 370ep=11.10M
+               = 69.10M / 1.92 = 35.99 h   OK
+  N=30 T-FP20  450ep=27.00M + 250ep=12.50M + 390ep=11.70M + 270ep= 8.10M
+               = 59.30M / 1.92 = 30.89 h   OK
+Every episode count reconciles: attacker 30+10+5N+170+80+10; judge per arm
+N+34+16+30+T-FP; user sim 170 + 5*T-FP. Requests 11000+7000+10200+7400 = 35600.
+The corrected chain 40.05 -> 35.99 -> 30.89 terminates inside the 32 h budget as
+the ruling claims.
+
+LINE-ENDING PROPERTY - RE-DERIVED INDEPENDENTLY IN THE LINUX-SIMULATING CLONE.
+  denominator: 40 tracked files.  skipped: 0.  mismatches: 0.
+  both PNGs: git ls-files --eol -> i/-text w/-text attr/text=auto eol=lf;
+  git check-attr -a -> text: auto, eol: lf; git hash-object == --no-filters.
+  .gitattributes needed no image rule and correctly has none.
+
+
+10. PUSHED SHA, AND WHETHER I TAGGED
+--------------------------------------------------------------------------------
+Three commits, each carrying the trailer Session-Token: 52f5307b.
+  5ac79db  test: the 20 kept probes  (unreviewed)
+  9c5481b  docs: REVIEW_C0 = FAIL, the re-implementation, and every ledger
+  (this)   docs: this FINAL OUTPUT block, committed before it is printed
+The pushed SHA is stated as the first line of the printed report.
+
+AFTER THE COMMITS, VERIFIED: `make test` 61 passed 1 skipped 2 deselected exit 0;
+`make check-roles` 14 passed 0 failed 3 n/a exit 0. AND E1 NOW HAS REAL INPUT FOR
+THE FIRST TIME - these commits carry a parseable 8-hex trailer and its row exists,
+so E1's PASS is an assertion rather than a vacuum. E2, E3 and E4 are unchanged and
+remain as B-01 and F4 describe them.
+
+>>> NO TAG WAS CREATED. c0-pass DOES NOT EXIST. The tag chain has not started. <<<
+On FAIL the prompt is explicit: commit the review, update the ledgers, DO NOT TAG,
+do not fix. I created no tag of any kind and moved none.
+
+NOTHING WAS FIXED. No file under src/ or config/ was modified. What was ADDED:
+docs/reviews/REVIEW_C0.md; tests/test_c0_review_probes.py (20 probes);
+docs/reviews/independent/c0_config_loader.py; OF-02..OF-14 plus an OF-01 status
+update; QUESTIONS.md Q-015 and the 52f5307b token row; INCIDENTS.md INC-11 and
+INC-12; STATUS.md and PROGRESS.md.
+
+ONE THING THE OPERATOR SHOULD KNOW ABOUT THE TOKEN ROW: I wrote my own row into
+QUESTIONS.md ## Session tokens. PROCESS.md 7a has the ARCHITECT record it. I
+recorded it because omitting it would make E1 fail on my own commit and turn C0's
+"make check-roles runs" box red for a bookkeeping reason. It is an honour-system
+act inside an honour-system control, the row says so in the file, and it is also
+the first row against which E1 has any input at all.
+
+
+11. WHAT I COULD NOT VERIFY
+--------------------------------------------------------------------------------
+  1. What the two dashboard PNGs DEPICT. A session cannot read an image.
+     PROVENANCE.md already labels the content OPERATOR-ATTESTED. I verified them
+     only as FILES.
+  2. That no payment method is attached to either provider account.
+     Operator-attested. PROVENANCE.md 1.5 correctly records that NO done-when
+     re-checks it before the public flip, and STATUS.md carries the flag.
+  3. That the sessions were actually different. Nothing can prove this - 7a says
+     so plainly. What I CAN say is that the mechanism 7a offers instead is today
+     two-thirds inert (B-01).
+  4. Whether `pip install -e vendor/tau2-bench` completes FROM SCRATCH. I
+     verified the operator's checkout is at the pinned SHA, clean, and declares
+     >=3.12,<3.14. I did not re-run the install - 74 dependencies, outside a
+     review's remit.
+  5. The remote's privacy AS GITHUB RECORDS IT. I established that an anonymous
+     client gets 404, which is consistent with private (and with deleted, which
+     git ls-remote rules out). I did not query the GitHub API.
+  6. Anything about C1-C21. Out of range.
+
+
+12. WHAT I WOULD LOOK AT NEXT WITH ANOTHER HOUR
+--------------------------------------------------------------------------------
+  1. FIRE EVERY REMAINING check_roles BRANCH AT A FAILING FIXTURE AND COUNT THE
+     ONES THAT HAVE NEVER EXECUTED. I fired seventeen; the pattern was so uniform
+     that the right next step is a coverage run restricted to the FAILURE
+     branches. My guess is that a third of the module has never executed.
+  2. _eol_classification's PARSER AGAINST HOSTILE PATHS - a literal tab in a
+     path, a quoted/escaped path (core.quotepath), a non-ASCII filename. It
+     partitions on the first tab, which is right, and nothing tests it.
+  3. config/protocol.yaml LINE BY LINE AGAINST CONTEXT.md 8.6. I checked the
+     REGISTRY covers the table; I did NOT check every VALUE in the YAML equals the
+     spec's. That is the one place a wrong number would propagate silently into
+     everything, and C14 FREEZES it.
+  4. WHETHER check-prereg CAN EVER FAIL. Today it returns 0 on every path,
+     including "config/ holds 0 file(s)". Hard rule 9 puts it inside make test AND
+     make eval; C14 gives it a manifest. Somebody should write down NOW what its
+     FAIL looks like, because a check that has only ever returned 0 is the class
+     of object this entire review has been about.
+  5. THE .gitignore's evals/ RULES AGAINST Q-003's DEFAULT, before RUN-3 writes
+     the first episode and discovers that something it needed was ignored.
+
+
+13. THE ONE THING TO ACT ON FIRST
+--------------------------------------------------------------------------------
+A FIX SESSION IS OWED. Under hard rule 13 it writes its INCIDENTS.md entries
+BEFORE it changes a line, then closes B-01, B-02, B-03 and B-04 and nothing else.
+Then a FRESH review re-runs section 4's evidence.
+
+TWO RULINGS ARE OWED BY THE ARCHITECT AND BOTH BLOCK LATER WORK:
+  Q-015  the D3 allow-list. Hard rule 8 routes allow-list decisions through
+         QUESTIONS.md BY NAME, and the entry currently in the code was never
+         ruled. Blocks C8 and C9.
+  Q-010  (OF-08) the vendored-tree Class A default, already implemented.
+         Needed before C19's clean-clone test.
+
+AND THE PRACTICAL ONE: C0 is FAILED, and C1, C2, C3, C6, C11, C13 and C15 all
+list C0 as a dependency. The fix cycle is what PROCESS.md 12.0 budgeted an hour a
+day for. This is the first of the five it planned for.
