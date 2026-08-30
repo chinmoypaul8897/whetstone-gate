@@ -36,7 +36,7 @@ credential. **`docs/reviews/ARCHITECT_CHECK_0.md` now exists** and **UPHOLDS C0'
 | # | Date | Chunk | Review | Status | Review history (append-only) |
 |---|---|---|---|---|---|
 | **C0** | 30 Aug | Repo, toolchain, remote, canonical files, day-one setup | `code` | ⚠️ **FAILED** | built → completed (3 operator-owed items landed; Q-006 + Q-008 closed) → **REVIEW_C0_1 = FAIL** (`52f5307b`, 4 BLOCKERs; no tag) → **ARCHITECT_CHECK_0 committed** (`e210c6f5`, 31 Aug — **FAIL UPHELD**; B-01…B-04 each re-confirmed from source; §13.4 recomputed = MATCH; **no `c0-pass`**) → **fix owed** (`c9521aac`) |
-| **C1** | 30 Aug | `RAZORPAY_SEMANTICS.md` + `PROVENANCE.md` attack rows A1–A6 | `full` | todo | — |
+| **C1** | 30 Aug | `RAZORPAY_SEMANTICS.md` + `PROVENANCE.md` attack rows A1–A6 | `full` | **built (unreviewed)** | built (`20cd5b79`, 31 Aug — **71 rows, 0 `[UNFETCHED]`**; 10 pages + 2 pinned source trees fetched first-hand, each page fetched twice and byte-identical; **0 Razorpay pages changed since 2026-08-30**; **6 findings raised against this project's own records**, F-06 HIGH; **Q-016 / Q-017 / Q-018 owed**; **no `INCIDENTS.md` entry owed**) → **review owed** |
 | **C2** | 30 Aug | World generator + **the probe planted** (`pay_CANARYRECON`) | `full` | todo | — |
 | **C3** | 30 Aug | τ² adapter A — the 34/164 must-not-write enumeration, the T-FP id list | `full` | todo | — |
 | **C4** | 30 Aug | World semantics, the five-tool surface, the typed harm record, the spend-free self-test | `full` | todo | — |

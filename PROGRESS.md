@@ -6,6 +6,114 @@ not a record; this file is.
 
 ---
 
+## C1 — RAZORPAY_SEMANTICS.md + PROVENANCE.md A1–A6 — BUILD — attempt 1 — 2026-08-31
+
+**SESSION-TOKEN:** `20cd5b79` — issued by the architect in the C1 build prompt and recorded in
+`QUESTIONS.md` `## Session tokens` by the `e210c6f5` session **before this session ran**, which is
+the shape `PROCESS.md` §7a intended. Carried as the `Session-Token:` trailer on every commit below.
+
+**Role:** BUILD — **documentation only**. No source file, no test file and no golden was touched.
+Ran concurrently with the **C0 FIX** session (`c9521aac`), which owns `src/`, `tests/` and
+`INCIDENTS.md` tonight (concurrent pair **P-01**).
+
+**Token spend: NONE.** Zero provider model calls — no Groq call, no Google call, nothing consuming a
+lane's quota. **27 HTTP GETs to public third-party documentation**, plus 5 against two pinned public
+source trees. Fetching a public docs page is not a provider model call and consumes no lane quota
+(ruled 2026-08-31, `PROCESS.md` §11a); `PROCESS.md` §9 *requires* those fetches, because this chunk
+is nothing but third-party claims.
+
+### What landed
+
+1. **`RAZORPAY_SEMANTICS.md` — new, 71 rows**, each with a verbatim quote, a URL and a **UTC fetch
+   timestamp**. **0 rows marked `[UNFETCHED]`.** Partitioned `MUST-FIRE` 40 / `MUST-HOLD` 13 /
+   `RECORDED` 18 — and 40 + 13 + 18 = 71 exactly.
+2. **`PROVENANCE.md` §2.4** — one row per attack A1–A6 with the *rejected-by-Razorpay* column and
+   every constant tagged; the inversion carried in `CONTEXT.md` §6's own words; **A5 marked entirely
+   `[merchant-policy, author-chosen]`** in the table, in its own headed subsection, and at RS-20.
+   §2.2 and §3.2 gained **append-only landing notes**; no existing row was rewritten.
+
+### Every quote was fetched, and every quote was then checked back against the bytes
+
+**All 10 pages returned HTTP 200 and were fetched twice, six minutes apart, byte-identical both
+times** — so the review's re-fetch diff is a real test, not a coin toss. SHA-256 of every page is in
+§1. **`refunds.go:73-75` was verified first-hand at the pinned SHA and has NOT drifted**;
+`grep -rni "idempot"` over the whole 94-file archive returns **0 hits**; the SDK's `extraHeaders`
+slot is `resources/payment.go:44`. **All five instant-settlement bounds were found.** Three carry a
+published figure (settlement balance; **₹5 Cr**; **₹2 L** outside banking hours); **two — the daily
+withdrawable limit and the max attempts/day — are documented WITHOUT one, and this session invented
+neither.**
+
+### The finding that came out of checking my own file
+
+The file's premise is *"a `>` block is a verbatim quote."* A mechanical check — strip the `>`, grep
+the remainder against the fetched bytes — found **17 lines that were this session's own commentary
+sitting inside quote blocks**. They were **rewritten, not excused**: RS-12(iv)'s greps became a
+table, RS-22's warning became plainly-labelled commentary beside the quote it qualifies, and RS-49 —
+the one quote whose source is HTML and therefore not a contiguous run of bytes — became a table of
+five individually-verbatim text nodes with the joining declared. **The check now reports 299 of 299
+matched, 0 unmatched, and it is written into the file so the review can re-run it.**
+This is **INC-13's** lesson generalised: a `>` block that reads as Razorpay's text but is the
+author's is the same failure as a `0x08` that renders as nothing.
+
+### Six findings — all against this project's own records, none against Razorpay
+
+⚠️ **No Razorpay page's text has changed since 2026-08-30.** Every string `CONTEXT.md` §6 and §9.2
+attribute to a Razorpay page was found on that page, verbatim. **Zero divergences.** The findings are
+of a different kind, listed as F-01…F-06 in `RAZORPAY_SEMANTICS.md` §9:
+
+- **F-06 (HIGH)** — Razorpay documents `receipt` as *"treated as an idempotency key"*, and `receipt`
+  **is** one of `create_refund`'s five parameters. The S2 finding **survives** — both mechanisms are
+  opt-in and only the header is *structurally* unreachable — but the claim is narrower than *"the
+  tool sends no idempotency key."* **Class A; recorded and NOT defaulted past. `Q-017` owed.**
+- **F-01 (MEDIUM)** — `CONTEXT.md` §6 attributes *"will settle the maximum amount possible and ignore
+  amount parameter"* to two docs pages. **It is on neither.** It is the MCP server's own tool
+  description, which `CONTEXT.md` §2 cites correctly. One string, two attributions, one spec.
+- **F-05 (MEDIUM)** — ~40% of the documented errors are account-configuration errors no world can
+  reach, so C4's *"every documented Razorpay error fires"* is unsatisfiable once the file is
+  complete. The `MUST-FIRE` / `RECORDED` split gives it a denominator. **`Q-018` owed.**
+- **F-02 (MEDIUM)** — the ₹2 L bound is conditioned on *"banking hours"*, which **no page defines**.
+- **F-03 (LOW)** — three different published instant-settlement minimums (₹1 / ₹2,000 / ₹100), plus
+  ₹2 in the MCP tool. A floor; the attack pushes up. No reported number depends on it.
+- **F-04 (LOW)** — `PROVENANCE.md` §2.2's *"₹500 ex-tax on ₹2,00,000"* is 500 **paise** on 200,000
+  **paise** in the source. **The rate is identical (0.25%) and golden 1's four vectors are
+  unaffected**; the units in that descriptive sentence are off by 100×.
+
+### One addition that changes how C4 must build the world
+
+**RS-26 — refunds are paid out of the merchant balance**, the same balance
+`create_instant_settlement` sweeps: *"Refunds are paid out from the merchant balance, not directly
+from the original payment."* **This couples A4 to A2 and A3.** A world modelling two independent
+pools lets an attacker drain the balance *and* refund out of it, **counting the same rupees twice** —
+which is `INCIDENTS.md` INC-03's failure with a fresh mechanism. The world's ₹5,00,000 opening
+balance is *smaller* than the 12-payment captured total, so this fires in ordinary play, not only
+under attack. **28 such additions are recorded (RS-26…RS-53).**
+
+### Verification
+
+| | Before (dirty tree) | After (committed) |
+|---|---|---|
+| `python -m whetstone_gate.tasks test` | **1 failed, 79 passed, 1 skipped, 2 deselected** | **80 passed, 1 skipped, 2 deselected** |
+| `python -m whetstone_gate.tasks check-roles` | **15 passed, 0 failed, 4 n/a** | **15 passed, 0 failed, 4 n/a** |
+
+⚠️ **The suite count MOVED from the 61 this session's prompt predicted to 79.** The concurrent C0 FIX
+session added `tests/test_c0_fix_probes.py` and its C0 BLOCKER fixes. **Said, not investigated and
+not touched**, exactly as the prompt directs. The single failure before commit is **OF-07** — it
+named `PROVENANCE.md` (mine, uncommitted) alongside three files of the concurrent session — and it
+went green on commit. **It was not weakened and it was not touched.**
+
+### Owed to the architect
+
+**`Q-016`** (the ruling that C1's golden is Razorpay's own documentation), **`Q-017`** (F-06, Class
+A), **`Q-018`** (F-05) — full text in this session's `FINAL OUTPUT` block and in
+`docs/sessions/c1-build-1.txt`. `QUESTIONS.md` was outside this session's fence.
+**No `INCIDENTS.md` entry is owed.** Nothing broke: the 17 quote-block lines were found by a check
+this session wrote and were fixed before the first commit, so there is no `Event`, no violated
+`Expectation` and no ignored `Missed` signal — and rule 13's own closing note warns against
+dramatising an entry that reads well. The reasoning is stated so a reviewer can overturn it on the
+reasoning rather than on the conclusion (the `Q-011` precedent).
+
+---
+
 ## C0 — ARCHITECT-ARTEFACT LANDING — BUILD — attempt 1 — 2026-08-31
 
 **SESSION-TOKEN:** `e210c6f5` — 8 hex, `PROCESS.md` §7a's shape, generated by the **architect** with
