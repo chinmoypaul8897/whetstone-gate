@@ -7,13 +7,34 @@
 # pool (CONTEXT.md §13.3). Independent token buckets for RPM, TPM and RPD are refilled
 # on their own clocks, and a call is admitted only when ALL THREE permit it.
 #
-# ⚠️ THE `api_model_id` FIELDS FOR THE SIX GOOGLE LANES ARE `TODO_OPERATOR`.
+# ✅ THE `api_model_id` FIELDS FOR THE FOUR GOOGLE LANES WERE OPERATOR-OWED PLACEHOLDERS;
+# THEY ARE NOW THE REAL IDs, captured by the OPERATOR from the live models endpoint on
+# 2026-08-30.
 # CONTEXT.md §13.3.2: "The Google model names above are the builder's dashboard labels,
 # not API id strings … Building against a dashboard label rather than an id would be a
 # defect; this is the one place the spec cannot supply the string first-hand."
 # `tests/test_lanes_operator_placeholders.py` FAILS while any placeholder remains, and
-# `make selftest` runs it, so no token can be spent against a guessed id.
-# See QUESTIONS.md Q-006. The exact ids go into PROTOCOL.md at `prereg-v1`.
+# `make selftest` runs it, so no token could be spent against a guessed id. That gate is
+# now green. See QUESTIONS.md Q-006 (CLOSED). The exact ids go into PROTOCOL.md at
+# `prereg-v1`.
+#
+# ⚠️ **FOUR, not six.** This block previously said SIX, and PROVENANCE.md §2.3 said "the
+# six Google API model ids". Both were wrong: `config/lanes.yaml` defines exactly FOUR
+# Google lanes, and the operator gate reported exactly four placeholders. The count is
+# corrected here rather than carried into a frozen artefact. (The CaMeL comparator's
+# `model_string` is a fifth Google model string, but it is NOT a lane and was never an
+# operator-owed placeholder; it is decided by RUN-1 under `TODO_C13_RUN1`.)
+#
+# ⚠️ **NO PROMPT CACHING ON EITHER GEMMA LANE.** The endpoint's
+# `supportedGenerationMethods` for `models/gemma-4-26b-a4b-it` and `models/gemma-4-31b-it`
+# are `generateContent` and `countTokens` ONLY — **no `createCachedContent`**. Both Flash
+# Lite lanes do support it. The Gemma lanes are the reference attacker AND the gate judge
+# (§13.3.2), i.e. almost all of the sweep's volume, so caching is unavailable exactly where
+# the volume is. **§13.4's feasibility arithmetic is computed on RAW throughput and takes no
+# caching discount anywhere** (CONTEXT.md contains zero occurrences of "cach"), so no stated
+# assumption is violated — but caching is therefore **NOT an available lever** for closing
+# the §13.4 lane-hour gap. Anyone reaching for it later under schedule pressure must be told
+# no. See QUESTIONS.md Q-011.
 #
 # Limits: read from the operator's own dashboards on 2026-08-30 and recorded in
 # PROVENANCE.md §1 with that date. The CONTEXT.md §13.7 fourth-clause comparison against
@@ -34,46 +55,81 @@ lanes:
   - name: gemma-26b
     provider: google
     dashboard_label: "Gemma 4 26B"
-    api_model_id: TODO_OPERATOR        # expected form: models/gemma-…
+    api_model_id: "models/gemma-4-26b-a4b-it"
+    api_display_name: "Gemma 4 26B A4B IT"     # as returned by the models endpoint, 2026-08-30
     role: "attacker: REFERENCE (all volume work — M-ADV, T-NEG, AD-CMP, CAL, its ladder cell) AND gate judge for arms 2/2S/3"
     rpm: 30
     tpm: 16000
     rpd: 14400
     tpd: null
     reserved_from: "2026-08-31"        # PROCESS.md §8 LANE RESERVATION — no build session may spend here
+    # Capabilities as returned by the live models endpoint on 2026-08-30. OPERATOR-ATTESTED:
+    # no session called the endpoint, and none may.
+    capability:
+      input_token_limit: 262144
+      output_token_limit: 32768
+      supported_generation_methods: ["generateContent", "countTokens"]
+      supports_context_caching: false   # ⚠️ NO createCachedContent — see Q-011
 
   - name: gemma-31b
     provider: google
     dashboard_label: "Gemma 4 31B"
-    api_model_id: TODO_OPERATOR        # expected form: models/gemma-…
+    api_model_id: "models/gemma-4-31b-it"
+    api_display_name: "Gemma 4 31B IT"         # as returned by the models endpoint, 2026-08-30
     role: "reference-attacker overflow; gate-judge overflow; benign-solver spill when Flash-Lite RPD is exhausted"
     rpm: 30
     tpm: 16000
     rpd: 14400
     tpd: null
     reserved_from: "2026-08-31"
+    capability:
+      input_token_limit: 262144
+      output_token_limit: 32768
+      supported_generation_methods: ["generateContent", "countTokens"]
+      supports_context_caching: false   # ⚠️ NO createCachedContent — see Q-011
 
   - name: flash-lite-3.1
     provider: google
     dashboard_label: "Gemini 3.1 Flash Lite"
-    api_model_id: TODO_OPERATOR        # expected form: models/gemini-…
+    api_model_id: "models/gemini-3.1-flash-lite"
+    api_display_name: "Gemini 3.1 Flash Lite"  # as returned by the models endpoint, 2026-08-30
     role: "benign solver (primary), spilling to Gemma when RPD is exhausted"
     rpm: 15
     tpm: 250000
     rpd: 500
     tpd: null
     reserved_from: null
+    # ⚠️ THE STABLE BUILD, NOT THE PREVIEW. The endpoint ALSO returns
+    # `models/gemini-3.1-flash-lite-preview` (displayName "Gemini 3.1 Flash Lite Preview",
+    # version 3.1-flash-lite-preview-03-2026), which is a SEPARATE, EARLIER build. The
+    # dashboard limits table lists "Gemini 3.1 Flash Lite" at 500 RPD, and that is the
+    # STABLE model, version 3.1-flash-lite-05-2026 — the `rpd: 500` above is ITS number.
+    # Architect-ruled 2026-08-30; do not re-derive. See PROVENANCE.md §1.2 and Q-006.
+    not_this_id: "models/gemini-3.1-flash-lite-preview"
+    capability:
+      input_token_limit: 1048576
+      output_token_limit: 65536
+      supported_generation_methods:
+        ["generateContent", "countTokens", "createCachedContent", "batchGenerateContent"]
+      supports_context_caching: true    # available here, but this lane is RPD-bound — see Q-011
 
   - name: flash-lite-3.5
     provider: google
     dashboard_label: "Gemini 3.5 Flash Lite"
-    api_model_id: TODO_OPERATOR        # expected form: models/gemini-…
+    api_model_id: "models/gemini-3.5-flash-lite"
+    api_display_name: "Gemini 3.5 Flash Lite"  # as returned by the models endpoint, 2026-08-30
     role: "tau2 USER SIMULATOR — tau2 is dual-control; every turn is one agent call PLUS one user-simulator call, which DOUBLES tau2's request count"
     rpm: 15
     tpm: 250000
     rpd: 500
     tpd: null
     reserved_from: null
+    capability:
+      input_token_limit: 1048576
+      output_token_limit: 65536
+      supported_generation_methods:
+        ["generateContent", "countTokens", "createCachedContent", "batchGenerateContent"]
+      supports_context_caching: true    # available here, but this lane is RPD-bound — see Q-011
 
   # ── GROQ ────────────────────────────────────────────────────────────────────
   # Groq lanes carry EXACT api ids already — no placeholder needed.
