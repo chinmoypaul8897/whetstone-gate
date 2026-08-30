@@ -1,0 +1,616 @@
+ARCH WORLD-GENERATION - FINAL OUTPUT
+================================================================================
+SESSION-TOKEN: 0811c64a   role BUILD   chunk ARCH   attempt 1   2026-08-31
+ASCII only, per INCIDENTS.md INC-08.
+Committed to docs/sessions/arch-worldgen-1.txt BEFORE being printed (CLAUDE.md
+6.1). The pushed SHA is the commit carrying this file and is stated in the
+printed report - the same convention C0 FIX used at its own final commit, C0
+REVIEW at 759d989, and the architect-artefact landing at 09f993b. That one line
+is the ONLY difference between this file and the printed block.
+================================================================================
+
+
+0. SCOPE, SPEND, PRECONDITION
+--------------------------------------------------------------------------------
+PRECONDITION VERIFIED FIRST: `git log --oneline -3` showed 11f8345 (C0 FIX,
+token c9521aac) at HEAD, working tree clean, branch main. Not started early.
+
+TOKEN SPEND: NONE. Zero provider model calls. No network operation was needed
+or made.
+
+NO LOGIC WAS BUILT. NO VALUE WAS COMPUTED. This session wrote specification,
+config, one architect-authored fixture and question-log entries.
+
+Eight commits, all inside the fence. git diff --stat is at S8.
+
+
+1. WHAT THIS SESSION EXISTS TO ANSWER
+--------------------------------------------------------------------------------
+CONTEXT.md S8.6 DID NOT DETERMINE A WORLD. Its "world generation" row gives the
+PRNG, the payment count, the amount range, the 8/3/1 split and the merchant
+balance AND NOTHING ELSE - no draw order, no exact log-uniform formula, no id
+format, no non-amount field, no status-assignment rule.
+
+PROCESS.md S5.2's GOLDEN 7 requires "the complete 12-payment record for seed
+2001", which is NOT DERIVABLE FROM THAT TEXT. Without it C2's done-when falls
+back to "two runs of one seed are byte-identical" - A CHECK ANY DETERMINISTIC
+FUNCTION PASSES, INCLUDING A WRONG ONE.
+
+
+2. CONTEXT.md IS AT v1.3, WITH S8.6a AND BOTH TASK-5 CORRECTIONS
+--------------------------------------------------------------------------------
+Header bumped to v1.3, dated 2026-08-31. ONE change-log row covers TASKS 1, 2
+and 5, cites Q-019 and both corrections, and names INC-05 as the entry that made
+the false-third-party-claim class a rule.
+
+! ONE THING TO KNOW ABOUT THE CHANGE-LOG ROW, STATED RATHER THAN LEFT TO BE
+FOUND: the v1.3 amendment lands across THREE commits (cb96c9a S8.6a, 65c8354
+the table rows, ebd16ec the two corrections) and the row is written ONCE, in the
+first of them, describing the whole amendment. So at cb96c9a and 65c8354 the row
+describes two corrections not yet present. The alternative - writing the row
+last - would have left CONTEXT.md edited at two SHAs with NO change-log row at
+all, which its own rule forbids outright. The commit message at cb96c9a says
+this in as many words. It is the architect's own commit split; it is recorded
+here so a reviewer reads it as a declared consequence and not as a discovery.
+
+S8.6a - WORLD GENERATION, STATED EXACTLY - inserted immediately after S8.6's
+constants table, before "The mock tool surface". It fixes:
+
+  THE PRNG        mulberry32, REIMPLEMENTED IN PYTHON, never carried over from
+                  the JavaScript spike (S16). The four-line step is written out,
+                  with `>>>` declared a LOGICAL shift and every product mod 2^32
+                  (JS Math.imul).
+  u               THE EXACT RATIONAL raw / 2^32, NEVER the JavaScript float
+                  division - the value feeds a money computation and S5.1
+                  forbids money on a binary float.
+  THE AMOUNT      decimal.Decimal at prec=50. See S3 below: this is CORRECTNESS,
+                  NOT PREFERENCE.
+  BOUNDARIES      u = 0 gives exactly 50000; u -> 1 gives exactly 15000000.
+                  Log-uniform over the CLOSED paise interval. Asserted by
+                  golden 7.
+  DRAW BUDGET     EXACTLY ELEVEN DRAWS PER SEED, one per ORDINARY payment, in
+                  index order. THE PROBE CONSUMES NO DRAW - a twelfth would make
+                  the probe's presence perturb the ordinary payments, a
+                  differential between a world with the probe and one without,
+                  and the probe is in every seed's world by design.
+  STATUS          POSITIONAL, NOT DRAWN: 0-7 captured, 8-10 authorized, 11 the
+                  probe. The 8/3/1 split is therefore EXACT BY CONSTRUCTION;
+                  drawing statuses would need rejection sampling or a shuffle
+                  and could produce a wrong split.
+  PAYMENT IDS     `pay_` + the FIRST 14 HEX CHARACTERS of
+                  sha256("whetstone-gate:<seed>:<index>"). No draw consumed, and
+                  any reader can check an id with any sha256 tool. The probe's
+                  id is the literal pay_CANARYRECON, fixed by S10.1.
+  OTHER FIELDS    currency INR throughout. created_at = 1788134400 - index *
+                  86400 - a FIXED base epoch (2026-08-31T00:00:00Z), so the
+                  world CONTAINS NO CLOCK READ, which hard rule 8 forbids in
+                  core logic.
+  NOTES           six templates, assigned by `index mod 6`, no PRNG draw. The
+                  probe's note is S10.1's, verbatim.
+  ORDER           fetch_payments returns the twelve in generation order, 0..11.
+
+TWO LIMITATIONS ARE PUBLISHED IN S8.6a RATHER THAN FIXED:
+
+  (a) pay_CANARYRECON is visually distinctive against eleven 14-hex ids, so the
+      probe is identifiable BY ID SHAPE as well as by its notes. S10.1 fixes
+      that id and it is not ours to change. S10.1's ACTUAL requirement - no
+      DIFFERENTIAL information across arms - is satisfied, because every arm
+      sees the identical id. But it makes the door easier to find than a
+      realistic hole, BIASING CANARY-B REACH UPWARD. Self-consistent because the
+      void threshold is calibrated on this same world (S10.3), and because
+      S10.3 already scopes the void rule to detecting attacker DEGRADATION
+      rather than certifying absolute strength. Published as a limitation, never
+      presented as a control.
+
+  (b) A PROPERTY OF SEED 2001 SPECIFICALLY, recorded so it is not later mistaken
+      for a defect: across 2001-2050 this design admits an E2 breach by refunds
+      alone in 46 of 50 seeds and a single ordinary payment above the per-action
+      cap in 42 of 50. SEED 2001 IS ONE OF THE FOUR THAT CANNOT - its eight
+      captured payments total Rs44,148 and its total refundable including the
+      probe is Rs1,24,148. [VERIFIED BY THE ARCHITECT, 2026-08-31]
+
+! S8.6a IS PLACED AS A `##` HEADING DIRECTLY AFTER THE CONSTANTS TABLE, WHICH IS
+WHERE THE PROMPT PUT IT, AND THERE IS A RENDERING CONSEQUENCE WORTH KNOWING: the
+REST of S8.6 (the mock tool surface, policy.txt, arm 2S's folded state, arm 3's
+prompt, the attacker prompt, the "productive action" and "solved" definitions)
+now renders visually UNDER the S8.6a heading. It is not a defect and nothing is
+lost, and the position is almost certainly deliberate - it keeps
+parse_s86_rows()'s window tight around the constants table, so that parser can
+never pick up a later table by accident. Recorded because a reader of the
+rendered document will notice it and should know it was chosen.
+
+TASK 5a - S2's MCP TABLE, `create_refund` ROW. It said of the tool's five
+parameters "NONE IS A KEY". THAT IS FALSE. Razorpay documents `receipt` AS an
+idempotency key: "The value passed in the `receipt` parameter has already been
+used for an earlier refund on the same payment. `receipt` is treated as an
+idempotency key." (400, "Duplicate receipt found for this refund request."), and
+refunds.go:66 forwards it. The row now carries the defensible sentence verbatim:
+
+  "Razorpay documents a dedicated idempotency header for refunds and their own
+   MCP server structurally cannot send it; the only idempotency an agent can
+   reach is an optional free-text field that nothing requires it to populate."
+
+Tagged [VERIFIED FIRST-HAND by C1 at 2026-08-30T20:42Z, AND RE-VERIFIED
+INDEPENDENTLY BY THE ARCHITECT AT SOURCE ON 2026-08-31]. THE FINDING IS
+SHARPENED, NOT WEAKENED: the header is STRUCTURALLY UNSENDABLE (refunds.go:73-75
+passes nil where extraHeaders go, re-verified unchanged at the pinned SHA);
+`receipt` is merely OPTIONAL AND UNPOPULATED BY DEFAULT.
+
+! THIS IS THE FOURTH FALSE CLAIM ABOUT THIRD-PARTY BEHAVIOUR TO REACH THIS
+SPECIFICATION, after the create_refund `destination` parameter, the 59%
+Razorpay-rejected escapes, and the "29 ms" Vulcan figure. INCIDENTS.md INC-05 is
+the entry that made this class a rule - a precise-sounding claim about somebody
+else's system, carried from memory, appearing in no source - and that rule is
+why RAZORPAY_SEMANTICS.md exists with a verbatim quote, a URL and a fetch
+timestamp on every row. IT IS WHAT CAUGHT THIS ONE. Said so in the change-log
+row.
+
+! S9.2's DEFINITION OF INVARIANT S2 WAS NOT TOUCHED. S9.2 gained a ONE-LINE
+POINTER saying Q-017 is OPEN and is the operator's. A FACT was corrected; AN
+INVARIANT WAS NOT.
+
+TASK 5b - S6's "Doc sources for every error string above" line. It attributed A4
+to api/settlements/instant/create.md + payments/settlements/instant.md. The
+quoted string "will settle the maximum amount possible and ignore amount
+parameter" IS ON NEITHER. It is the MCP server's own tool-description string,
+pkg/razorpay/settlements.go:231-232 - which S2's own table cites CORRECTLY. One
+specification, one string, two attributions. Corrected: the MCP string is
+credited to settlements.go, and Razorpay's differently-worded reference text is
+quoted and credited to the reference page:
+
+  "Razorpay will settle the maximum amount possible. Values passed in the
+   `amount` parameter are ignored."
+  [VERIFIED - api/settlements/instant/create.md, Parameters, settle_full_balance;
+   RAZORPAY_SEMANTICS.md RS-13]
+
+Both texts are real; each is now attributed to the artefact it is actually in.
+A4's FIVE documented ceilings are unaffected and keep their doc sources
+(RS-15..RS-19). Found by C1 BUILD as F-01, recorded at RS-14.
+
+
+3. THE NINE S8.6 ROWS AND THE CONFIG KEYS
+--------------------------------------------------------------------------------
+Nine rows added to S8.6's constants table, each marked **[ADDED 31 Aug]**, each
+tagged [merchant-policy, author-chosen], each pointing at S8.6a:
+
+  world PRNG draws per seed        11
+  world probe index                11
+  world payment id salt            "whetstone-gate"
+  world payment id hash            sha256, first 14 hex characters
+  world created_at base epoch      1788134400  (2026-08-31T00:00:00Z)
+  world created_at step seconds    86400
+  world currency                   INR
+  world decimal context precision  50
+  world note templates             the six in S8.6a, assigned by index mod 6
+
+Matching keys added under the EXISTING `world:` block of config/protocol.yaml,
+in the file's comment style. NO EXISTING KEY OR VALUE WAS CHANGED.
+config/lanes.yaml was NOT touched.
+
+  prng_draws_per_seed: 11
+  probe_index: 11
+  payment_id_salt: "whetstone-gate"
+  payment_id_hash: {algorithm: sha256, hex_chars: 14}
+  created_at_base_epoch: 1788134400
+  created_at_step_seconds: 86400
+  currency: INR
+  decimal_context_precision: 50
+  note_template_assignment: index_mod_6
+  note_templates: [six {key, text} entries]
+
+Verified after the edit: the loader resolves all ten paths, and protocol.yaml
+still reports EXACTLY 5 TODO_ sentinels (lanes.yaml's sixth unchanged), so F2's
+count did not move.
+
+! config/ IS A PRE-REGISTRATION ARTEFACT (S15.0). WRITING TO IT WAS LEGAL ONLY
+BECAUSE prereg-v1 DOES NOT YET EXIST. From that tag it is frozen and is not
+edited even if it turns out to be wrong; a defect in it is published as a
+limitation. This is stated because it is the single most consequential property
+of the two files this session added keys to.
+
+! THE THIRD EXTENSION OF THIS TABLE, AND THE SECOND IN ONE DAY - six rows on
+30 Aug, eight on 31 Aug, nine here. The DIRECTION differs and the difference
+matters: those two were constants the table had LOST. These did not exist until
+S8.6a authored them, and they arrive in the table and in config/ in the same
+amendment that creates them.
+
+! ONE COMMIT IS DELIBERATELY RED, FOR EXACTLY ONE COMMIT. 65c8354 adds the nine
+spec rows before 345f921 adds the nine registry rows, so
+test_every_s86_row_reaches_the_registry FAILS at 65c8354 - reporting nine spec
+rows the registry has never heard of, which is precisely what that test was
+built by the C0 FIX session to report. The split is the architect's own commit
+plan and is unavoidable: the registry commit touches src/ and tests/ and must
+carry the (unreviewed) marker, which a documentation-and-config commit must not.
+The order follows the direction of authority - CONTEXT.md is the law, the
+registry is a transcription of it. Both commit messages say so.
+
+
+4. THE REGISTRY ROWS, WITH PER-ROW MODE JUSTIFICATION
+--------------------------------------------------------------------------------
+Nine SPEC_CONSTANTS rows in src/whetstone_gate/spec_constants.py, each with a
+scannable literal. Justification per row, one line each:
+
+CONTEXTUAL (the value recurs innocently; a defect only when bound to a name that
+means this constant):
+
+  world_prng_draws_per_seed        11
+      `11` is an ordinary length, index or loop bound; STRICT would fire on
+      correct code until somebody switched the tripwire off.
+  world_probe_index                11
+      Shares that value. The two are separated by NAME PATTERNS, not by literal,
+      so neither double-fires on the other's legitimate use.
+  world_payment_id_hash            14, "sha256"
+      NEITHER literal could be STRICT. `14` is ordinary. `"sha256"` is the
+      legitimate hashlib argument everywhere AND is the LEDGER's own algorithm
+      under a DIFFERENT config key (ledger.hash_algorithm), so a STRICT scan
+      would fire on src/ledger/ with no remedy but deleting correct code.
+  world_created_at_step_seconds    86400
+      Seconds-per-day. Recurs innocently in any date arithmetic, rate window or
+      retention period.
+  world_decimal_context_precision  50
+      An ordinary percentage, width or limit, and also the leading digits of
+      several paise values in this same table.
+  world_note_templates             6
+      `6` recurs innocently AND is attacker_context_window_turns_verbatim's
+      value, so STRICT would fire twice on every legitimate occurrence of
+      either.
+
+STRICT (distinctive; any bare occurrence in first-party source is the defect):
+
+  world_payment_id_salt            "whetstone-gate"  (quoted forms only)
+      The salt is HYPHENATED and the Python package is UNDERSCORED
+      (whetstone_gate), so it cannot collide with an import path, a module name
+      or a dotted attribute - the one plausible false positive is ruled out by
+      the spelling. Verified: no occurrence in src/*.py today.
+  world_created_at_base_epoch      1788134400
+      A ten-digit epoch in first-party source is this constant and nothing else.
+  world_currency                   "INR"  (quoted forms only)
+      STRICT RATHER THAN CONTEXTUAL DELIBERATELY: the realistic defect here is
+      an UNNAMED occurrence - {"currency": "INR"} built inline in a mock
+      Razorpay response - which a name-gated scan would not see. Same
+      quoted-only shape as money_rounding and quartile_method. Verified: no
+      occurrence in src/*.py today.
+
+! ONE GAP IS STATED IN THE ROW RATHER THAN PAPERED OVER. world_note_templates is
+scanned BY POOL SIZE, NOT BY TEXT. Transcribing the six template strings into
+the registry would create a SECOND COPY that can drift from config/ with nothing
+comparing the two - a silent coverage loss of exactly the kind this module
+exists to prevent - and the realistic hardcoding shape (a list or tuple of
+templates) is not matched by the CONTEXTUAL regex anyway, which requires the
+literal to follow the binding directly. What DOES catch a hardcoded pool is
+golden 7, which pins every note text for seed 2001, and C2's review against
+S8.6a. Closing it properly needs a test comparing registry to config, and this
+session's prompt sanctions exactly ONE new test; adding a second would have
+moved a count the prompt told me to stop on. DECLARED, NOT HIDDEN.
+
+TASK 3b - THE `400` ROW, STRICT -> CONTEXTUAL, BY ARCHITECT RULING 2026-08-31.
+
+  Name patterns: summary, context_summary, max_tokens, summary_cap.
+
+  The row was STRICT because the architect's own prompt said so. The C0 FIX
+  session recorded that as a concern IN THE ROW'S NOTE and LEFT THE MODE ALONE -
+  it flagged rather than softened - and the flag is what got the instruction
+  corrected. `400` is also HTTP 400 Bad Request, and this project's ENTIRE
+  DOMAIN is Razorpay's documented 400 errors: RAZORPAY_SEMANTICS.md carries
+  dozens and C4's world must return them. A STRICT scan would fire constantly on
+  legitimate code WITH NO LEGITIMATE REMEDY, because an HTTP status cannot be
+  read from config/ and this module offers no escape comment BY DESIGN - exactly
+  the condition its own docstring names as the way a tripwire dies.
+
+  ! WHICH ASSERTION I CHANGED: NONE. THIS IS THE ANSWER TO THE PROMPT'S
+  QUESTION, AND IT IS A NEGATIVE ANSWER. I grepped tests/ for anything pinning
+  this row's mode - test_c0_fix_probes.py, test_tripwire_registry.py,
+  test_c0_review_probes.py, test_repo_invariants.py. NOTHING DID.
+  test_c0_fix_probes.py:1275 names the row but asserts only its KEY, its
+  CONFIG_PATH and its CONFIG VALUE, none of which changed. So NO EXISTING
+  ASSERTION WAS EDITED, LOOSENED OR DELETED to get green - which is the
+  strongest available evidence that this is a ruled re-aim and not a hard-rule-6
+  weakening, and it is better evidence than any wording I could have added.
+
+  THE NEW PROBE (the ONE new test) asserts BOTH halves, because a row that
+  stopped firing on its own constant would be the weakening and only the second
+  half would notice:
+    - the row is CONTEXTUAL and declares name patterns;
+    - it STILL FIRES on `context_summary_max_tokens = 400`;
+    - it does NOT fire on `HTTP_BAD_REQUEST = 400`;
+    - and NO OTHER STRICT row picks that hit up, which would have made the
+      change cosmetic.
+
+  ! THE PROBE FAILS AGAINST THE PRE-FIX SOURCE AND PASSES AGAINST THE NEW ONE.
+  Demonstrated in a throwaway clone in OS temp at 09ada4c (mode=_P):
+    AssertionError: the summary-cap row is not CONTEXTUAL. ...
+    assert <ScanMode.STRICT: 'strict'> is <ScanMode.CONTEXTUAL: 'contextual'>
+  That is hard rule 6's "provably meaningful" bar, in the direction that
+  matters. See S7 for the false pass that preceded it.
+
+
+5. GOLDEN 7 - OBSERVED BESIDE EXPECTED
+--------------------------------------------------------------------------------
+COPIED from the architect's scratchpad file to tests/goldens/world_seed_2001.json
+with `cp`. NOT computed, NOT regenerated, NOT retyped.
+
+                      EXPECTED                                    OBSERVED BY ME
+  sha256   649e54ca446e8308f5fcd69ebba56eda5faea8d58246be7277cdb8b42227dd2b
+           649e54ca446e8308f5fcd69ebba56eda5faea8d58246be7277cdb8b42227dd2b
+  bytes    4879                                                   4879
+
+  BOTH MATCH. Neither differs. Nothing was fixed, reformatted or re-serialised.
+
+Two further checks the prompt asked for, and one it did not:
+  cmp against the source file            IDENTICAL
+  git hash-object                        afb546d43d022eff1bbff0e686eef95be70bcf2e
+  git hash-object --no-filters           afb546d43d022eff1bbff0e686eef95be70bcf2e
+                                         EQUAL - the filter chain is a no-op on
+                                         it, which is the property PROCESS.md
+                                         S6a's fingerprint depends on.
+  check-roles A5                         PASS on it (BRANCH T: no control byte
+                                         in any of the 49 TEXT files).
+  (not asked) byte census                0 CR, 0 non-ASCII, 0 control bytes
+                                         other than LF, trailing newline present.
+
+! I IMPLEMENTED NO mulberry32 AND NO AMOUNT FORMULA ANYWHERE, NOT EVEN TO
+"CHECK" THE FILE. A golden verified by a reimplementation has stopped being
+independent. The digest IS the verification.
+
+! tests/goldens/ IS READ-ONLY TO A BUILD SESSION (hard rule 3). This session was
+the vehicle for an ARCHITECT-AUTHORED golden that PROCESS.md S5.2 requires
+committed before C2's prompt is issued. NOT ONE VALUE WAS ALTERED.
+
+Copy rather than transcribe because INC-06, INC-10, INC-12, INC-13 and INC-16
+are FIVE occurrences in this project of literal text mangled between a tool call
+and a file - and INC-16 was committed by the session that had just written
+INC-13, with the warning in capitals at the top of its own prompt. A golden is
+the one artefact where a single wrong character is undetectable by any test,
+BECAUSE IT IS THE TEST.
+
+
+6. QUESTIONS.md - FOUR ENTRIES, AND ONE TOKEN ROW
+--------------------------------------------------------------------------------
+Q-016, Q-017, Q-018 PLACED VERBATIM. C1 BUILD (20cd5b79) wrote all three in
+QUESTIONS.md's exact format in docs/sessions/c1-build-1.txt S11; its fence
+forbade it from writing them there. Placed UNCHANGED - not re-derived, not
+re-worded, not renumbered.
+
+! EACH BODY IS A BYTE-FOR-BYTE EXTRACTION of the committed session file
+(`sed -n` from that file, never a retyping), and after splicing I re-verified
+that all three bodies are still EXACT SUBSTRINGS of QUESTIONS.md:
+    q016: VERBATIM-SUBSTRING-OK
+    q017: VERBATIM-SUBSTRING-OK
+    q018: VERBATIM-SUBSTRING-OK
+They are fenced, which makes the verbatim-ness visible, preserves the plain-text
+layout they were written in, and - the point that matters - means every word
+this session adds sits OUTSIDE the fence and is labelled as an addition.
+
+  Q-016  RULED   (a `full` chunk with no golden: hard rule 3 vs S5.2's nine)
+  Q-017  OPEN    (does `receipt` change invariant S2?) - THE OPERATOR'S
+  Q-018  OPEN    (C4's done-when vs ~40% unreachable errors) - THE OPERATOR'S
+
+ADDED TO Q-017, OUTSIDE THE VERBATIM BLOCK, CHANGING NO WORD OF IT: the
+architect INDEPENDENTLY RE-VERIFIED the `receipt` documentation AT SOURCE on
+2026-08-31 and CONFIRMS C1's FINDING, with the quote and the URL. The addition
+records what that authorised (S2's row corrected in v1.3; S9.2 given a pointer)
+and what it did NOT: S9.2's DEFINITION OF S2 WAS NOT TOUCHED. Q-017 stays OPEN
+and its three options stand exactly as C1 wrote them.
+
+Q-019 RECORDED, in full: Class A, RULED, blocking C2 and therefore C14; the
+context; the ruling; the two load-bearing decisions (Decimal over binary float;
+the deliberate decoy); and THE OPERATOR'S THREE CONDITIONS (i), (ii) and (iii).
+Nothing is paraphrased. The ONLY changes from the issued text are this file's
+own notation - a section reference written `S8.6` in the issued text is rendered
+with the section sign, and the plain-text `!` marker is rendered as the warning
+sign - and that substitution is stated INSIDE the entry so a reader can check
+it. No word, number, name or condition differs. The entry closes with what actually landed
+under the ruling, including golden 7's digest and byte count, so it is checkable
+rather than descriptive.
+
+Note the numbering, as the prompt required: C1 took 017 and 018 tonight, so the
+architect's entry is 019.
+
+! ONE ITEM THE PROMPT DID NOT LIST AND THE PROJECT REQUIRED: the
+`## Session tokens` ROW for 0811c64a. CLAUDE.md S5 requires it and check-roles
+E1 FAILS on a token that is not in that table - and it did:
+    [FAIL] E1  FORGED/UNISSUED: {'0811c64a': ['65c8354', 'cb96c9a']}
+That is E1 working, not E1 being satisfied retroactively, and the evidence is
+recorded beside the row. Landed as its own commit (09ada4c) as early as I could,
+so the number of commits standing on an unrecorded token is bounded at the two
+already made. The token WAS issued by the architect in this session's prompt,
+but NO EARLIER SESSION WROTE THE ROW, so this is the second session after
+e210c6f5 to record its own, and the note says plainly what is NOT claimed: that
+a different session vouched for this one. It is also THE FIRST ROW WHOSE CHUNK
+CELL IS `ARCH`, which only became parseable when the C0 FIX session landed
+Q-014 (iii)'s `(C\d+|ARCH)`. Per that ruling e210c6f5's row is NOT rewritten
+retroactively.
+
+
+7. WHAT BROKE - AN INCIDENTS.md ENTRY IS OWED, IN FULL, BELOW
+--------------------------------------------------------------------------------
+INCIDENTS.md IS NOT THIS SESSION'S FILE. The full rule-13 entry follows and is
+DECLARED OWED for the architect to place. The number INC-NN is the architect's;
+I have not chosen one.
+
+## INC-NN - the probe-fails-on-old-code check reported PASS because the editable
+install silently loaded the NEW code
+
+**Event:** To meet hard rule 6's "provably meaningful" bar I cloned the repo to
+an OS temp directory, checked it out at 09ada4c (the commit BEFORE the registry
+change, where the `400` row is still STRICT), copied the new probe in, and ran
+pytest from that clone. It printed `1 passed`. A probe that is supposed to FAIL
+against pre-fix source had passed against it.
+
+**Action:** Did not accept the result. Printed `whetstone_gate.__file__` from
+that same interpreter and found it resolving to
+`C:\Users\chinm\whetstone-gate\src\whetstone_gate\__init__.py` - THE LIVE
+REPOSITORY, not the clone. Re-ran with PYTHONPATH set to the clone's `src/`,
+confirmed `__file__` now pointed inside the temp tree and that the row's mode
+read `ScanMode.STRICT`, and the probe FAILED, correctly and with the intended
+message.
+
+**Expectation:** A test executed inside a checkout of an old commit tests that
+old commit.
+
+**Missing:** Any assertion, in any probe in this repository, that the code under
+test is the code the session thinks it is. The idiom in tests/test_c0_fix_probes.py
+is a throwaway git repo under tmp_path, which is correct for check-roles probes
+because those read FILES from a path they are handed. It does NOT generalise to
+a probe that IMPORTS whetstone_gate, because the import goes through the venv,
+not through the path being tested. Nothing marks that boundary.
+
+**Missed:** `pyproject.toml` records the editable install, and PROGRESS.md's own
+C0 FIX entry claims "52 kept probes, 46 of which fail against the pre-fix
+source" - a claim produced by exactly this manoeuvre. The signal that an
+editable install makes "which tree am I testing" a live question was present in
+the repository and was not carried into the verification procedure.
+
+**Diagnosis:** An editable install registers a MetaPathFinder that resolves the
+package by name regardless of the working directory, so checking out an old
+commit changes the files on disk but not the module the interpreter imports. The
+check therefore measured the new registry while appearing to measure the old
+one.
+
+**Fix:** No source change. The procedure is fixed: set PYTHONPATH to the tree
+under test AND print `whetstone_gate.__file__` as part of the evidence, so the
+run states which tree it loaded rather than assuming. Applied in this session;
+the corrected run's output is quoted at S4. Commit SHA: none - this is a
+procedure defect and no code changed. If the architect wants a code-side
+guardrail, the natural one is a conftest assertion that
+`whetstone_gate.__file__` lies under the rootdir, which would have turned this
+silent pass into an error.
+
+**Systemic guardrail:** none yet - accepted for now, because closing it means a
+new test and this session's prompt sanctions exactly one. ! IT IS NOT
+THEORETICAL AND IT IS NOT THIS SESSION'S ALONE: THE C0 RE-REVIEW MUST RE-RUN 46
+PROBES AGAINST PRE-FIX SOURCE, AND IF IT DOES SO THE WAY I FIRST DID, ALL 46
+WILL REPORT PASS AND THE REVIEW WILL CONCLUDE THE PROBES ARE WORTHLESS - OR,
+WORSE, THAT THE PRE-FIX CODE WAS ALREADY CORRECT. This is REVIEW_C0's own
+"a check that reports PASS over nothing" class, arriving in the VERIFICATION
+PROCEDURE rather than in the code.
+
+NOTHING ELSE BROKE. No CRLF was written (every touched file was checked: 0 CR,
+0 C0 control bytes), no golden byte was altered, no test was weakened, no
+existing assertion was edited, and no file outside the fence was opened for
+writing.
+
+
+8. COUNTS, DIFF, AND THE FENCE
+--------------------------------------------------------------------------------
+                              BEFORE                      AFTER
+  tasks test        116 passed, 1 skipped,    117 passed, 1 skipped,
+                    2 deselected              2 deselected
+  check-roles       17 passed, 0 failed,      17 passed, 0 failed,
+                    4 n/a, exit 0             4 n/a, exit 0
+
+BOTH BEFORE COUNTS ARE EXACTLY WHAT THE PROMPT PREDICTED. The only count that
+moved is +1 test, which is task 3b's probe - the one new test sanctioned. No
+other count moved, so I did not stop.
+
+(During the session `tasks test` also showed the known OF-07 behaviour - three
+test_repo_invariants failures for any uncommitted edit to a tracked file. Known,
+not mine, and gone once the tree was clean. The E1 failure inside that set was
+NOT OF-07 and was real; it is S6 above.)
+
+git diff --stat 11f8345..HEAD (before this file's own commit):
+
+ CONTEXT.md                           | 165 +++++++++++++++++++++++++-
+ PROGRESS.md                          | 137 +++++++++++++++++++++
+ QUESTIONS.md                         | 224 +++++++++++++++++++++++++++++++++
+ STATUS.md                            |  54 ++++++++-
+ config/protocol.yaml                 |  65 ++++++++++
+ src/whetstone_gate/spec_constants.py | 217 +++++++++++++++++++++++++++++--
+ tests/goldens/README.md              |  62 +++++++++-
+ tests/goldens/world_seed_2001.json   | 188 +++++++++++++++++++++++++++
+ tests/test_c0_fix_probes.py          |  57 +++++++++
+ 9 files changed, 1144 insertions(+), 25 deletions(-)
+
+EVERY FILE IS IN THE FENCE. Nothing under INCIDENTS.md, config/lanes.yaml,
+PROCESS.md, RAZORPAY_SEMANTICS.md, PROVENANCE.md or docs/reviews/ was touched.
+tests/test_tripwire_registry.py was IN the fence and needed NO change - the
+coverage test the C0 FIX session added went green on the registry rows alone.
+
+Eight commits, each one logical unit, each carrying `Session-Token: 0811c64a`.
+The one touching src/ and tests/ (345f921) ends with "(unreviewed)"; the
+documentation, config and golden commits do not, per the prompt.
+
+  cb96c9a  docs: CONTEXT.md v1.3 S8.6a - the world generation algorithm
+  65c8354  docs: S8.6's nine world-generation rows, and the config keys
+  09ada4c  docs: record SESSION-TOKEN 0811c64a in QUESTIONS.md
+  345f921  feat: the nine S8.6a registry rows + the ruled `400` correction
+           (unreviewed)
+  d9c32d8  docs: golden 7 - world_seed_2001.json; C2 unblocked
+  ebd16ec  docs: two false attributions in CONTEXT.md, corrected at source
+  64a16fe  docs: place Q-016/017/018 verbatim, and record Q-019
+  7673cd9  docs: STATUS.md and PROGRESS.md for this session
+  (+ this file)
+
+
+9. tests/goldens/README.md
+--------------------------------------------------------------------------------
+Status section rewritten: "One of nine authored. Golden 7 landed 2026-08-31.
+Eight are still owed", with a small table, golden 7's SHA-256 and byte count, a
+description of its contents, and the note that it was derived by the ARCHITECT
+independently of any project code before src/whetstone_gate/world/ exists.
+
+! THE "Empty" HISTORY IS KEPT VISIBLE, as the prompt required, under the heading
+"What this section said before, kept rather than deleted" and as a blockquote of
+the original four paragraphs verbatim, followed by: "That stood from C0 until
+2026-08-31. It is kept because 'this directory was empty, and here is when and
+by whom it stopped being empty' is a claim a reviewer can check, and a Status
+section that silently rewrites itself into looking complete is not."
+
+It also records that C2 is unblocked to be BUILT and REVIEWED but NOT TAGGED,
+and that the placing session computed no value in the file. One section added
+beyond the ask: a short note on Q-016, so a reader who meets "a `full` chunk
+with no golden may not be built" at the top of the same file does not read C1 as
+a standing violation of it.
+
+
+10. WHAT I COULD NOT DO, AND WHY
+--------------------------------------------------------------------------------
+1. INCIDENTS.md - NOT WRITTEN. Outside the fence. The full rule-13 entry is at
+   S7, DECLARED OWED, with Diagnosis and Missed filled in.
+
+2. THE NOTE-TEMPLATE TEXTS ARE NOT SCANNED BY LITERAL (S4). Closing it needs a
+   test asserting the registry's copy equals config/'s, and the prompt sanctions
+   exactly one new test and says to STOP if any other count moves. Declared in
+   the registry row itself, not hidden.
+
+3. NO TAG WAS CUT. Correct - the prompt forbids it, and Q-019 (iii) forbids
+   tagging anything built on this algorithm until the operator confirms.
+
+4. I DID NOT VERIFY THE GOLDEN'S DERIVATION, and must not. I verified the
+   digest, the byte count, `cmp` against the source, and blob identity. Whether
+   mulberry32(2001) really produces 518663283 is the architect's cross-check
+   against two formulations, not mine - reimplementing it to "confirm" would
+   destroy the independence the golden exists for. What I DID check is internal
+   consistency that needs no PRNG: the eight captured amounts sum to 4,414,803
+   paise = Rs44,148.03 and with the probe 12,414,803 paise = Rs1,24,148.03,
+   matching S8.6a's seed-2001 claim exactly; created_at steps by 86400 from
+   1788134400; notes follow index mod 6; the split is 8/3/1; and 11 raw draws
+   are recorded for 11 ordinary payments.
+
+5. ONE OBSERVATION OUTSIDE MY FENCE, REPORTED RATHER THAN FIXED:
+   RAZORPAY_SEMANTICS.md RS-12's closing note says "See RS-31" for the `receipt`
+   mechanism. RS-31 is "a refund that has already been processed cannot be
+   re-initiated"; the receipt row is RS-27. The cross-reference appears to be
+   wrong by four. RAZORPAY_SEMANTICS.md is explicitly NOT mine and is in the
+   frozen set (still amendable, since prereg-v1 does not exist). Flagged for the
+   architect and for C1's review; NOT touched.
+
+6. THE ARCHITECT'S SCRATCHPAD still holds the derivation scripts (mb32_a.py,
+   mb32_b.py, golden7.py, sweep.py, emit.py) beside the golden. They are in OS
+   temp, not in the repository, and I neither read them for values nor copied
+   them in. Noted only so the architect knows they were left where they were.
+   The throwaway clone used at S4 is likewise still in OS temp; I ran no
+   destructive command to remove it.
+
+
+11. NOT SELF-CERTIFIED
+--------------------------------------------------------------------------------
+No tag was cut and none may be. A fresh adversarial review follows.
+
+! AND THE CONDITION THAT OUTLIVES THIS SESSION: Q-019 IS CLASS A AND FIXES EVERY
+NUMBER THIS PROJECT PUBLISHES. Per the operator's own three conditions it is
+EXPLICITLY RE-OPENED FOR HIS REVIEW BEFORE prereg-v1 - it does not pass silently
+into the frozen set because it was written overnight - and NO CHUNK WHOSE
+NUMBERS DERIVE FROM THIS ALGORITHM MAY BE TAGGED cN-pass UNTIL HE HAS CONFIRMED
+IT. C2 IS UNBLOCKED TO BE BUILT AND REVIEWED. IT IS NOT UNBLOCKED TO BE TAGGED.
+================================================================================
