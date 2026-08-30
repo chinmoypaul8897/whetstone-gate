@@ -18,6 +18,10 @@ own, because they are facts about the repository rather than about any module:
      bug. That is not a result; it is a definition.
   E. Session-token discipline (`PROCESS.md` §7a): no commit carries a token that was never
      issued, and no token is reused across roles or shared by a chunk's build and review.
+     **E5 additionally FAILS on a trailer that is PRESENT but MALFORMED** — Q-014 (i):
+     *"judging fails open and rules fail closed"* (`CONTEXT.md` §14). Silence there used to
+     be indistinguishable from absence, and E4 printed a false statement about four commits
+     that do carry a trailer.
   F. Outstanding ``TODO_`` sentinels in ``config/`` are reported, so "somebody still owes
      this project a value" is a printed number rather than something to remember.
 
@@ -533,27 +537,96 @@ def _walk_isolation(
 # E. session tokens
 # --------------------------------------------------------------------------------------
 
+#: The STRICT matcher. `PROCESS.md` §7a specifies 8 random hex, and the architect's Q-014
+#: ruling declined to widen it — *"`_TOKEN_TRAILER` IS NOT WIDENED. That stands and is not
+#: reopened."* ``tests/test_c0_review_probes.py`` pins it.
 _TOKEN_TRAILER = re.compile(r"^Session-Token:\s*([0-9a-fA-F]{8})\s*$", re.MULTILINE)
+
+#: The PERMISSIVE matcher, applied **only where the strict one did not match** — Q-014 (i)'s
+#: named mechanism. It exists to distinguish *"this commit carries no trailer"* from
+#: *"this commit carries a trailer nobody can read"*, which E4 used to conflate while
+#: printing a false statement about four commits that do carry one.
+_TOKEN_TRAILER_ANY = re.compile(r"^Session-Token:\s*(\S.*?)\s*$", re.MULTILINE)
+
+#: ⚠️ Q-014 (iii): the CHUNK group is widened to ``(C\d+|ARCH)`` **and no further**. ``ARCH``
+#: denotes an architect-artefact session that is not a numbered chunk — a spec correction,
+#: an artefact landing — which previously could not have a parseable row at all, so E1
+#: FAILED on that session's own commits. **THE TOKEN GROUP IS NOT TOUCHED:** Q-014's
+#: protection is of the token format, so a forged token cannot hide behind a loose pattern.
 _TOKEN_ROW = re.compile(
-    r"^\|\s*`?([0-9a-fA-F]{8})`?\s*\|\s*(C\d+)\s*\|\s*(BUILD|REVIEW|FIX)\s*\|", re.MULTILINE
+    r"^\|\s*`?([0-9a-fA-F]{8})`?\s*\|\s*(C\d+|ARCH)\s*\|\s*(BUILD|REVIEW|FIX)\s*\|",
+    re.MULTILINE,
 )
+
+#: ⚠️ **THE E5 EXCEPTION LIST — EXPLICIT, DATED, NAMED, AND PINNED AT EXACTLY FOUR ENTRIES.**
+#:
+#: Q-014 (iv) forbids reshaping `WG-2026-08-30-CTX-13.4-A`: *"Rewriting it into a conforming
+#: 8-hex value would manufacture the evidence the check exists to test, which is the same act
+#: Q-001 correctly refused."* So E5 would be **permanently red** on these four commits, and a
+#: permanently red check is one people learn to ignore — Q-009's own argument, turned on this
+#: check.
+#:
+#: The remedy is the same shape as ``TRIPWIRE_SELF_EXCLUSION``, which is pinned at one entry
+#: for the same reason: an exception list is the natural place for a check to die quietly.
+#: ``tests/test_c0_fix_probes.py`` asserts this dict has **exactly four** keys and that they
+#: are **exactly these four commits**, so widening it requires editing an assertion a review
+#: will see. **E5 FAILS on any NEW malformed trailer, on any commit, from now on.**
+E5_EXCEPTIONS: dict[str, str] = {
+    "966324740c4d9de40e407a356bcf24d3d76af65d": (
+        "the four CTX-13.4 commits, 2026-08-30: the token ISSUED to that session was "
+        "`WG-2026-08-30-CTX-13.4-A`, which is not 8 hex. Q-014 (iv) records it as a "
+        "ONE-OFF exception and forbids reshaping it"
+    ),
+    "6d08cf3ff75189db5e9f49fdc6f59a20466b26d4": "same session, same issued token (Q-014 (iv))",
+    "d67550e46282af4f513810c1cc812ed91dfeac90": "same session, same issued token (Q-014 (iv))",
+    "ec3064dc74c999dec0bc5277e1ca96705b907547": "same session, same issued token (Q-014 (iv))",
+}
+
+
+def _issued_tokens(questions: Path) -> dict[str, set[tuple[str, str]]]:
+    """Parse `QUESTIONS.md`'s ``## Session tokens`` table into ``{token: {(chunk, role)}}``.
+
+    ⚠️ **ONE TOKEN MAY HOLD MANY ``(chunk, role)`` PAIRS, AND THAT IS THE WHOLE POINT.**
+    The first version of this built ``issued[token] = (chunk, role)`` — keyed by TOKEN — so
+    a token appearing in two rows kept only the **last** one. Every token then landed in
+    exactly one bucket, which made **E3's count always 1** and **E2's BUILD∩REVIEW always
+    empty**: two of `PROCESS.md` §7a's three named conditions were *structurally unable to
+    fire*, and both printed ``clean`` over input that contains the violation verbatim.
+    See `REVIEW_C0.md` **B-01**, `ARCHITECT_CHECK_0.md` §3 and `INCIDENTS.md` **INC-14**.
+
+    A row repeated byte-for-byte is not reuse, so the value is a **set**: the same
+    ``(chunk, role)`` twice collapses, two different ones do not.
+    """
+    issued: dict[str, set[tuple[str, str]]] = {}
+    if not questions.is_file():
+        return issued
+    for token, chunk, role in _TOKEN_ROW.findall(questions.read_text(encoding="utf-8")):
+        issued.setdefault(token.lower(), set()).add((chunk, role.upper()))
+    return issued
 
 
 def check_session_tokens(root: Path) -> list[Result]:
     questions = root / "QUESTIONS.md"
-    issued: dict[str, tuple[str, str]] = {}
-    if questions.is_file():
-        for token, chunk, role in _TOKEN_ROW.findall(questions.read_text(encoding="utf-8")):
-            issued[token.lower()] = (chunk, role.upper())
+    issued = _issued_tokens(questions)
+    rows = sum(len(pairs) for pairs in issued.values())
 
     log = _git("log", "--format=%H%x1f%B%x1e", root=root)
     used: dict[str, list[str]] = {}
     untrailered: list[str] = []
+    malformed: list[tuple[str, str]] = []
     for record in filter(None, (r.strip() for r in log.split("\x1e"))):
         sha, _, body = record.partition("\x1f")
-        tokens = [t.lower() for t in _TOKEN_TRAILER.findall(body)]
-        if not tokens:
-            untrailered.append(sha[:7])
+        strict = _TOKEN_TRAILER.findall(body)
+        # ⚠️ Q-014 (i): the PERMISSIVE pattern is applied ONLY where the strict one did not
+        # match, and a trailer it catches that the strict one did not is MALFORMED — not
+        # absent. `_TOKEN_TRAILER` is the authority for "well formed"; there is deliberately
+        # no second copy of the 8-hex predicate here to drift away from it.
+        for value in _TOKEN_TRAILER_ANY.findall(body):
+            if value not in strict:
+                malformed.append((sha, value))
+        tokens = [t.lower() for t in strict]
+        if not tokens and not any(s == sha for s, _ in malformed):
+            untrailered.append(sha)
         for token in tokens:
             used.setdefault(token, []).append(sha[:7])
 
@@ -564,30 +637,34 @@ def check_session_tokens(root: Path) -> list[Result]:
         Result(
             "E1 no commit carries an UNISSUED token",
             not unissued,
-            "clean"
+            f"clean — {rows} issued row(s) covering {len(issued)} token(s) parsed from "
+            f"QUESTIONS.md; {len(used)} token(s) appear in the log"
             if not unissued
             else f"FORGED/UNISSUED: {unissued} — not present in QUESTIONS.md ## Session tokens",
         )
     )
 
     by_chunk_role: dict[tuple[str, str], set[str]] = {}
-    for token, (chunk, role) in issued.items():
-        by_chunk_role.setdefault((chunk, role), set()).add(token)
-    reused_across_roles = [
-        token
-        for token in issued
-        if sum(1 for (c, r), toks in by_chunk_role.items() if token in toks) > 1
-    ]
-    shared_build_review = [
+    for token, pairs in issued.items():
+        for pair in pairs:
+            by_chunk_role.setdefault(pair, set()).add(token)
+
+    shared_build_review = sorted(
         chunk
         for chunk in {c for c, _ in by_chunk_role}
         if by_chunk_role.get((chunk, "BUILD"), set()) & by_chunk_role.get((chunk, "REVIEW"), set())
-    ]
+    )
+    # §7a's preamble is "never reused", so ANY second (chunk, role) pairing is reuse. A
+    # token under two ROLES is the case §7a names; a token under two CHUNKS in the same
+    # role is reuse too, and reporting it here is stricter than the clause, never looser.
+    reused = sorted(
+        (token, sorted(pairs)) for token, pairs in issued.items() if len(pairs) > 1
+    )
     out.append(
         Result(
             "E2 no token shared by a chunk's BUILD and REVIEW",
             not shared_build_review,
-            "clean"
+            f"clean — {rows} issued row(s) checked"
             if not shared_build_review
             else f"SHARED on {shared_build_review} — build and review are never the same session",
         )
@@ -595,8 +672,11 @@ def check_session_tokens(root: Path) -> list[Result]:
     out.append(
         Result(
             "E3 no token reused across roles",
-            not reused_across_roles,
-            "clean" if not reused_across_roles else f"REUSED: {reused_across_roles}",
+            not reused,
+            f"clean — no token holds more than one (chunk, role) pair across {rows} row(s)"
+            if not reused
+            else "REUSED: "
+            + "; ".join(f"{token} appears as {pairs}" for token, pairs in reused),
         )
     )
 
@@ -605,15 +685,54 @@ def check_session_tokens(root: Path) -> list[Result]:
             Result(
                 "E4 every commit carries a Session-Token trailer",
                 None,
-                f"{len(untrailered)} commit(s) carry no trailer: {untrailered[:6]}. "
+                f"{len(untrailered)} commit(s) carry no trailer: "
+                f"{[s[:7] for s in untrailered[:6]]}. "
                 "The C0 build prompt issued no SESSION-TOKEN and this session did not "
                 "fabricate one — a fabricated token would be exactly the 'token that was "
-                "never issued' that E1 exists to catch. See QUESTIONS.md Q-001",
+                "never issued' that E1 exists to catch. See QUESTIONS.md Q-001. "
+                "⚠️ This list holds ONLY commits with no trailer at all: a trailer that is "
+                "present but malformed is E5's, not this list's (Q-014 (i))",
             )
         )
     else:
         out.append(Result("E4 every commit carries a Session-Token trailer", True, "clean"))
+
+    out.append(_malformed_trailer_result(malformed))
     return out
+
+
+def _malformed_trailer_result(malformed: list[tuple[str, str]]) -> Result:
+    """E5 — `QUESTIONS.md` **Q-014 (i)**: a PRESENT but MALFORMED trailer must FAIL.
+
+    *"Judging fails open and rules fail closed"* (`CONTEXT.md` §14, Prabu Ram, quoted with
+    its source). This is a rule and it used to fail open — worse, it printed a **false
+    statement**, naming four commits that *do* carry a trailer among *"commit(s) carry no
+    trailer"* and attributing them to Q-001, which is a different session's different
+    cause. The architect's 8-hex mandate is exactly what makes failing closed safe: after
+    it, a non-conforming trailer is a strictly abnormal condition.
+    """
+    unexcepted = [(sha, value) for sha, value in malformed if sha not in E5_EXCEPTIONS]
+    excepted = sorted({sha for sha, _ in malformed if sha in E5_EXCEPTIONS})
+    if unexcepted:
+        return Result(
+            "E5 malformed Session-Token trailer",
+            False,
+            "MALFORMED and NOT on the dated exception list: "
+            + "; ".join(f"{sha[:7]} carries {value!r}" for sha, value in unexcepted[:6])
+            + f". PROCESS.md §7a specifies 8 random hex and Q-014 declined to widen "
+            f"_TOKEN_TRAILER. Either a prompt issued a malformed token or somebody typed "
+            f"one by hand; both stop the build. The exception list holds exactly "
+            f"{len(E5_EXCEPTIONS)} SHAs and is not extended without an architect ruling",
+        )
+    return Result(
+        "E5 malformed Session-Token trailer",
+        True,
+        f"no NEW malformed trailer. {len(excepted)} commit(s) carry the ONE-OFF exception "
+        f"recorded in Q-014 (iv): {[s[:7] for s in excepted]} — "
+        + (next(iter(E5_EXCEPTIONS.values())) if E5_EXCEPTIONS else "")
+        + f". The list is pinned at {len(E5_EXCEPTIONS)} entries by "
+        f"tests/test_c0_fix_probes.py so it cannot grow into an amnesty",
+    )
 
 
 # --------------------------------------------------------------------------------------
