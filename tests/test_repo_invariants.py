@@ -85,12 +85,19 @@ def test_the_crlf_check_still_fires_on_text_and_no_longer_lies_about_binary(tmp_
     sp.run(["git", "add", "-A"], cwd=tmp_path, check=True, capture_output=True)
     sp.run(["git", "commit", "-qm", "fixture"], cwd=tmp_path, check=True, capture_output=True)
 
+    # Exactly two offenders exist, so the detail's [:5] truncation cannot be what hides the
+    # binary file. Asserted, not assumed — otherwise a >5-offender detail would let this
+    # test pass against the OLD code and the proof would be worthless.
     results = _results(check_roles.check_gitattributes(tmp_path))
     a3 = results["A3 no CRLF in any tracked file"]
 
     assert a3.ok is False, (
         "A3 passed on a text file that genuinely carries CRLF — the assertion has been "
         f"gutted, which is hard rule 6's forbidden move. detail: {a3.detail}"
+    )
+    assert "more)" not in a3.detail, (
+        "the detail is truncated, so 'binary_with_crlf.bin not in detail' would prove "
+        f"nothing. detail: {a3.detail}"
     )
     assert "text_with_crlf.md" in a3.detail, (
         f"A3 no longer names the real CRLF offender. detail: {a3.detail}"
@@ -100,8 +107,12 @@ def test_the_crlf_check_still_fires_on_text_and_no_longer_lies_about_binary(tmp_
         f"INC-09 unfixed. detail: {a3.detail}"
     )
 
-    # And A4 — the assertion that REPLACED the proxy — catches the real defect on the text
-    # file (git would rewrite it on checkin) and leaves the binary file alone.
+    # And A4 catches the real defect on the text file (git would rewrite it on checkin).
+    #
+    # ⚠️ A4 does NOT "check the binary file harder" — that claim was made and is FALSE.
+    # On `-text` content git converts nothing, so A4's two hashes are equal BY
+    # CONSTRUCTION and A4 cannot fail there. What justifies the narrowing is that the
+    # removed failures were false positives, which the next test asserts directly.
     a4 = results["A4 working tree and object store hold identical bytes"]
     assert a4.ok is False, (
         f"A4 passed on a file git would rewrite on checkin. detail: {a4.detail}"
@@ -110,6 +121,72 @@ def test_the_crlf_check_still_fires_on_text_and_no_longer_lies_about_binary(tmp_
     assert "binary_with_crlf.bin" not in a4.detail, (
         f"A4 claims git rewrites a binary file, which it does not: {a4.detail}"
     )
+
+
+def test_every_failure_the_narrowing_removed_was_a_false_positive(tmp_path):
+    """⚠️ The REAL hard-rule-6 defence for INC-09's narrowing, asserted rather than argued.
+
+    The first justification written for it — *"a binary file is not skipped; it is checked
+    harder"* — **was false**, and it was the load-bearing sentence. A4 cannot fail on
+    `-text` content, because git applies no conversion there and its two hashes are equal
+    by construction.
+
+    What actually justifies the change is narrower and checkable: **every failure the
+    narrowing removed was a false positive with respect to the property being asserted.**
+    `PROCESS.md` §6a's property is *"a reviewer who clones this gets the committed bytes"*,
+    and this test asserts exactly that, end to end, on the adversarial case — a file that
+    LOOKS textual (plain ASCII, CRLF endings) but that git calls binary because of a single
+    NUL byte. Old A3 failed on it. It round-trips perfectly.
+
+    If this ever fails, the narrowing really did lose a true positive and Q-012's default
+    must be reverted.
+    """
+    import hashlib
+    import subprocess as sp
+
+    origin = tmp_path / "origin"
+    origin.mkdir()
+    for cmd in (
+        ["git", "init", "-q"],
+        ["git", "config", "user.email", "fixture@example.invalid"],
+        ["git", "config", "user.name", "fixture"],
+    ):
+        sp.run(cmd, cwd=origin, check=True, capture_output=True)
+
+    (origin / ".gitattributes").write_bytes(b"* text=auto eol=lf\n")
+    # Plain ASCII, CRLF-terminated, ONE NUL byte. git calls the whole file `-text`.
+    payload = b"header\r\n" + b"\x00" + b"value=1\r\nvalue=2\r\n"
+    (origin / "operator_note.txt").write_bytes(payload)
+    sp.run(["git", "add", "-A"], cwd=origin, check=True, capture_output=True)
+    sp.run(["git", "commit", "-qm", "fixture"], cwd=origin, check=True, capture_output=True)
+
+    eol = sp.run(
+        ["git", "ls-files", "--eol", "operator_note.txt"],
+        cwd=origin, check=True, capture_output=True, text=True,
+    ).stdout
+    assert "w/-text" in eol, (
+        f"the fixture is not exercising the binary branch at all; git says: {eol!r}"
+    )
+
+    # The property, end to end: a FRESH CLONE reproduces the committed bytes exactly.
+    clone = tmp_path / "clone"
+    sp.run(
+        ["git", "clone", "-q", str(origin), str(clone)], check=True, capture_output=True
+    )
+    cloned = (clone / "operator_note.txt").read_bytes()
+
+    assert cloned == payload, (
+        "a fresh clone did NOT reproduce the working-tree bytes for a file git calls "
+        "binary. The narrowing in INC-09 would then have removed a TRUE positive, and "
+        "Q-012's default must be reverted. "
+        f"origin sha256={hashlib.sha256(payload).hexdigest()} "
+        f"clone sha256={hashlib.sha256(cloned).hexdigest()}"
+    )
+
+    # And the check agrees: no CRLF complaint, no rewrite predicted.
+    results = _results(check_roles.check_gitattributes(origin))
+    assert results["A3 no CRLF in any tracked file"].ok is True
+    assert results["A4 working tree and object store hold identical bytes"].ok is True
 
 
 def test_a4_does_not_fire_merely_because_the_tree_is_dirty(tmp_path):
@@ -137,6 +214,12 @@ def test_a4_does_not_fire_merely_because_the_tree_is_dirty(tmp_path):
 
     # Now dirty the tree — an ordinary uncommitted edit, still LF.
     (tmp_path / "clean.md").write_bytes(b"committed\nand then edited\n")
+
+    # Assert the tree really IS dirty, or this test passes vacuously and proves nothing.
+    dirty = sp.run(
+        ["git", "status", "--porcelain"], cwd=tmp_path, check=True, capture_output=True, text=True
+    ).stdout
+    assert "clean.md" in dirty, f"the fixture is not dirty, so this proves nothing: {dirty!r}"
 
     results = _results(check_roles.check_gitattributes(tmp_path))
     assert results["A3 no CRLF in any tracked file"].ok is True

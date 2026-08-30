@@ -213,23 +213,54 @@ def check_gitattributes(root: Path) -> list[Result]:
     # reading it as one reports the repository broken when it is sound.
     # See INCIDENTS.md INC-09 and QUESTIONS.md Q-012.
     #
-    # The property is therefore asserted TWICE, and nothing here is narrower than what this
-    # check asserted before:
+    # The property is therefore asserted TWICE:
     #   A3 keeps the CRLF assertion, UNCHANGED, over every file GIT says is text;
-    #   A4 asserts the UNDERLYING property directly — worktree bytes == stored bytes —
-    #      over EVERY tracked file, text and binary alike. On every file it covers, A4 is
-    #      strictly stronger than A3 ever was: it catches any divergence, not only the
-    #      CRLF-shaped kind. A binary file is not skipped here; it is checked harder.
+    #   A4 asserts the UNDERLYING property directly — would git's filter chain rewrite
+    #      these bytes? — over EVERY tracked file.
+    #
+    # ⚠️ CORRECTION, 2026-08-30, from an adversarial re-check of this very comment. An
+    # earlier version of it claimed *"on every file it covers A4 is strictly stronger than
+    # A3 ever was … a binary file is not skipped here; it is checked harder."* **THAT WAS
+    # FALSE, and it was the load-bearing sentence of the hard-rule-6 defence.** On `-text`
+    # content git applies no conversion, so `git hash-object` and `--no-filters` are equal
+    # BY CONSTRUCTION: **A4 cannot fail on a binary file.** Four adversarial binary shapes
+    # were tried and none could make it fire. The honest statement is:
+    #
+    #     A4 is strictly STRONGER than old A3 on TEXT files.
+    #     On BINARY files A4 is VACUOUS — and binary files are exactly the set whose
+    #     treatment changed.
+    #
+    # **What still makes this not a rule-6 weakening is a different argument, and it is the
+    # one that actually holds:** every failure removed was a FALSE POSITIVE. git applies no
+    # conversion to `-text` content, so the §6a property — a fresh clone reproduces the
+    # committed bytes — holds there unconditionally. Verified end-to-end: a text-shaped file
+    # with CRLF endings and one NUL byte, on which old A3 failed, hashes identically in the
+    # working tree, in `git show HEAD:`, and in a **fresh `git clone`**. No true positive was
+    # lost. See QUESTIONS.md Q-012 and INCIDENTS.md INC-09.
+    #
+    # ⚠️ KNOWN GAP, NOT CLOSED HERE (OPEN_FINDINGS OF-01): a single stray CR makes git
+    # classify an otherwise-textual file `-text`, so neither A3 nor A4 fires on it. That is
+    # NOT a regression — old A3 searched for CRLF pairs and missed a lone CR too — but it is
+    # precisely INC-06's and INC-10's defect class. Closing it needs a new check and belongs
+    # to C0's review, not to this session's fence.
     classification = _eol_classification(root)
     crlf_in_text: list[str] = []
     divergent: list[str] = []
     unverifiable: list[str] = []
+    not_regular: list[str] = []
     text_checked = 0
     binary_checked = 0
+    tracked = _tracked_files(root)
 
-    for rel in _tracked_files(root):
+    for rel in tracked:
         p = root / rel
         if not p.is_file():
+            # ⚠️ Hard rule 11 applies to a CHECK's denominator too. A tracked path with no
+            # regular file behind it — deleted-but-not-staged, a submodule gitlink — is
+            # skipped, and it is therefore COUNTED AND NAMED. The earlier wording said
+            # "never silently dropped" and "all N tracked file(s)" over a denominator that
+            # quietly excluded these, which is the exact shape rule 11 forbids.
+            not_regular.append(rel)
             continue
         try:
             worktree = p.read_bytes()
@@ -250,40 +281,67 @@ def check_gitattributes(root: Path) -> list[Result]:
         elif not round_trips:
             divergent.append(rel)
 
+    # The denominator, reconciled out loud. len(tracked) is the only honest total.
+    skipped = (
+        f"; {len(not_regular)} tracked path(s) have no regular file behind them and were "
+        f"checked by NEITHER: {not_regular[:5]}"
+        if not_regular
+        else ""
+    )
+    reconciliation = (
+        f"{text_checked} text + {binary_checked} binary + {len(not_regular)} non-regular "
+        f"= {len(tracked)} tracked"
+    )
+
     out.append(
         Result(
             "A3 no CRLF in any tracked file",
             not crlf_in_text,
-            f"{text_checked} tracked file(s) that git classifies as TEXT are LF in the "
-            f"working tree; {binary_checked} binary file(s) hold no line endings to "
-            f"normalise and are covered by A4 instead — counted here, never silently "
-            f"dropped"
+            f"{text_checked} file(s) git classifies as TEXT carry no CRLF in the working "
+            f"tree. {binary_checked} file(s) git classifies as BINARY (`-text`) are NOT "
+            f"scanned for CRLF, because git applies no end-of-line conversion to them and "
+            f"a CR-LF pair there is data, not a line ending{skipped}. {reconciliation}"
             if not crlf_in_text
-            else f"CRLF found in {len(crlf_in_text)} TEXT file(s): {crlf_in_text[:5]}",
+            else (
+                f"CRLF found in {len(crlf_in_text)} TEXT file(s): "
+                f"{sorted(crlf_in_text)[:5]}"
+                + (f" (+{len(crlf_in_text) - 5} more)" if len(crlf_in_text) > 5 else "")
+            ),
         )
     )
     out.append(
         Result(
             "A4 working tree and object store hold identical bytes",
-            not (divergent or unverifiable),
+            not (divergent or unverifiable or not_regular),
             f"git's filter chain is a no-op on all {text_checked + binary_checked} tracked "
-            f"file(s) ({binary_checked} binary), so `git show <ref>:<path>` and the "
-            f"checked-out bytes agree on every OS — the property PROCESS.md §6a's "
-            f"fingerprint depends on"
-            if not (divergent or unverifiable)
+            f"file(s) checked, so `git show <ref>:<path>` and the checked-out bytes agree "
+            f"on every OS — the property PROCESS.md §6a's fingerprint depends on. "
+            f"⚠️ On the {binary_checked} binary file(s) this holds BY CONSTRUCTION and so "
+            f"asserts nothing: git converts nothing there, and A4 cannot fail on `-text` "
+            f"content. It is a real assertion on the {text_checked} text file(s) only. "
+            f"{reconciliation}"
+            if not (divergent or unverifiable or not_regular)
             else (
                 (
                     f"git would REWRITE {len(divergent)} file(s) on checkin: "
-                    f"{divergent[:5]}. "
+                    f"{sorted(divergent)[:5]}. "
                     if divergent
                     else ""
                 )
                 + (
-                    f"COULD NOT VERIFY {len(unverifiable)} file(s): {unverifiable[:5]} — "
-                    f"'could not verify' is reported as a failure, never as a pass"
+                    f"COULD NOT VERIFY {len(unverifiable)} file(s): "
+                    f"{sorted(unverifiable)[:5]} — 'could not verify' is reported as a "
+                    f"failure, never as a pass. "
                     if unverifiable
                     else ""
                 )
+                + (
+                    f"{len(not_regular)} tracked path(s) have no regular file behind them "
+                    f"and were checked by nothing: {not_regular[:5]}. "
+                    if not_regular
+                    else ""
+                )
+                + reconciliation
             ),
         )
     )
