@@ -1,0 +1,237 @@
+"""THE ONE CONFIG LOADER.
+
+`CLAUDE.md` hard rule 9, verbatim:
+
+    **CONFIG, NOT CONSTANTS.** Every spec-specified value lives in `config/`, loaded
+    through one loader, with **no default for a required value** — a missing value is a
+    hard refusal, never a silent fallback.
+
+This module is that one loader, and it is deliberately austere:
+
+  * There is **no** ``get(key, default=...)``. It does not exist and must not be added.
+    A caller that wants to tolerate absence must ask :meth:`Config.has` and say so out
+    loud. You cannot get a silent fallback out of this API by accident, because the API
+    has no place to put one.
+
+  * A value that is **not yet determined** — the calibrated void threshold, the pilot's
+    N branch, the Google API model ids, the AgentDojo/CaMeL SHAs — is written into the
+    YAML as an explicit ``TODO_`` sentinel, and reading it raises
+    :class:`UndeterminedValue`. "Not decided yet" is therefore a loud, typed failure at
+    the point of use, not a zero that quietly propagates into a published number.
+
+  * ``config/`` is a **pre-registration artefact** (`CONTEXT.md` §15.0). Every file under
+    it is listed in `PROTOCOL.md` with the SHA-256 of its **git blob**, and
+    ``make check-prereg`` recomputes them inside both ``make eval`` and ``make test``.
+
+Why the sentinel mechanism earns its keep: the void threshold is the single number that
+decides whether the whole run is publishable. If a missing threshold silently read as
+``0.0``, every run would pass the void check and the project's central control would be
+inert — and nothing would have raised.
+"""
+
+from __future__ import annotations
+
+import os
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Iterator
+
+import yaml
+
+# --------------------------------------------------------------------------------------
+# Errors. All of them are hard refusals; none of them has a "carry on with a default" path.
+# --------------------------------------------------------------------------------------
+
+
+class ConfigError(RuntimeError):
+    """Base: something about `config/` is wrong and the caller must stop."""
+
+
+class ConfigFileMissing(ConfigError):
+    """A named config file does not exist."""
+
+
+class MissingRequiredValue(ConfigError):
+    """A required key is absent. Hard rule 9: this is a refusal, never a default."""
+
+
+class UndeterminedValue(ConfigError):
+    """A required key holds a ``TODO_`` sentinel: the value is not decided yet.
+
+    The message names *who* decides it, so the failure is actionable rather than merely
+    loud.
+    """
+
+
+# --------------------------------------------------------------------------------------
+
+#: A value beginning with this prefix is declared-but-undetermined. Reading it raises.
+SENTINEL_PREFIX = "TODO_"
+
+#: Who resolves each sentinel. Keeps the failure message actionable.
+_SENTINEL_OWNERS = {
+    "TODO_OPERATOR": (
+        "the OPERATOR — capture the exact Google API model id strings "
+        "(models/gemma-…, models/gemini-…) from the dashboard. "
+        "CONTEXT.md §13.3.2; QUESTIONS.md Q-006"
+    ),
+    "TODO_C14_CALIBRATION": (
+        "C14 — the arm-1 calibration sets it to the 95% Wilson LOWER bound rounded DOWN "
+        "to 5 pp, after `probe-v1` is cut, and it is SINGLE-SHOT (CLAUDE.md §3)"
+    ),
+    "TODO_C14_PILOT": (
+        "C14 — the pilot's MEASURED tokens/episode selects the N branch by the "
+        "CONTEXT.md §13.4 rule. Never by preference, never by schedule pressure"
+    ),
+    "TODO_C13_C16": "C13 / C16 — pin at the SHA actually vendored",
+    "TODO_C13_RUN1": (
+        "C13 / RUN-1 — the 90-minute timeboxed CaMeL branch test on 31 Aug decides "
+        "Branch A (live) or Branch B (citation). Branch B is published as a result"
+    ),
+}
+
+#: The config files this project reads. There are no others.
+KNOWN_CONFIGS = ("protocol", "lanes", "ladder")
+
+
+def config_dir() -> Path:
+    """Return the repository's ``config/`` directory.
+
+    Honours ``WHETSTONE_CONFIG_DIR`` so a test can point at a fixture directory without
+    monkey-patching the loader. **It supplies no default value for anything** — it only
+    says *where* to read, never *what* to read.
+    """
+    override = os.environ.get("WHETSTONE_CONFIG_DIR")
+    if override:
+        return Path(override)
+    return repo_root() / "config"
+
+
+def repo_root() -> Path:
+    """Return the repository root, resolved from this file's location.
+
+    ``src/whetstone_gate/config.py`` → up three parents. Deliberately not derived from
+    the current working directory, so ``make`` and a bare ``python -m`` agree.
+    """
+    return Path(__file__).resolve().parents[2]
+
+
+@dataclass(frozen=True)
+class Config:
+    """One parsed config file.
+
+    Access is through :meth:`require` alone. There is no defaulting accessor by design.
+    """
+
+    name: str
+    path: Path
+    data: dict
+
+    # -- the only read path ------------------------------------------------------------
+
+    def require(self, dotted: str) -> Any:
+        """Return the value at ``dotted`` (e.g. ``"money.per_action_cap_paise"``).
+
+        Raises :class:`MissingRequiredValue` if any segment is absent, and
+        :class:`UndeterminedValue` if the value is a ``TODO_`` sentinel. **It never
+        returns a default, because it has none to return.**
+        """
+        node: Any = self.data
+        walked: list[str] = []
+        for segment in dotted.split("."):
+            walked.append(segment)
+            if not isinstance(node, dict) or segment not in node:
+                raise MissingRequiredValue(
+                    f"{self.path.name}: required value '{dotted}' is missing "
+                    f"(stopped at '{'.'.join(walked)}'). "
+                    f"Hard rule 9: a missing required value is a hard refusal, never a "
+                    f"silent fallback. Add it to {self.path}, or — if it is not yet "
+                    f"decided — write an explicit {SENTINEL_PREFIX}… sentinel."
+                )
+            node = node[segment]
+
+        if is_sentinel(node):
+            owner = _SENTINEL_OWNERS.get(node, "an unrecorded owner — this is itself a defect")
+            raise UndeterminedValue(
+                f"{self.path.name}: '{dotted}' is not determined yet (sentinel {node!r}). "
+                f"Resolved by: {owner}. "
+                f"Hard rule 9 forbids substituting a value here."
+            )
+        return node
+
+    def has(self, dotted: str) -> bool:
+        """True if ``dotted`` resolves to a real, determined value.
+
+        The explicit way to tolerate absence. A caller that uses this is *saying so*,
+        which is the whole point.
+        """
+        try:
+            self.require(dotted)
+        except ConfigError:
+            return False
+        return True
+
+    def sentinels(self) -> Iterator[tuple[str, str]]:
+        """Yield ``(dotted_path, sentinel)`` for every undetermined value in this file."""
+        yield from _walk_sentinels(self.data, prefix="")
+
+
+def is_sentinel(value: Any) -> bool:
+    """True if ``value`` is a declared-but-undetermined ``TODO_`` marker."""
+    return isinstance(value, str) and value.startswith(SENTINEL_PREFIX)
+
+
+def _walk_sentinels(node: Any, prefix: str) -> Iterator[tuple[str, str]]:
+    if is_sentinel(node):
+        yield (prefix, node)
+    elif isinstance(node, dict):
+        for key, child in node.items():
+            yield from _walk_sentinels(child, f"{prefix}.{key}" if prefix else str(key))
+    elif isinstance(node, list):
+        for index, child in enumerate(node):
+            # Name the list item when it has a name, so an operator reading
+            # "lanes[gemma-26b].api_model_id" knows which dashboard row to open.
+            label = child["name"] if isinstance(child, dict) and "name" in child else index
+            yield from _walk_sentinels(child, f"{prefix}[{label}]")
+
+
+def load(name: str) -> Config:
+    """Load ``config/<name>.yaml``.
+
+    Not cached: these files are tiny, and a cache would let a stale read outlive an edit
+    during a long run. Determinism matters more here than microseconds.
+    """
+    if name not in KNOWN_CONFIGS:
+        raise ConfigError(
+            f"unknown config {name!r}; this project reads exactly {KNOWN_CONFIGS}. "
+            f"Adding one is a Class A deviation and needs an architect ruling."
+        )
+    path = config_dir() / f"{name}.yaml"
+    if not path.is_file():
+        raise ConfigFileMissing(
+            f"{path} does not exist. config/ is a pre-registration artefact "
+            f"(CONTEXT.md §15.0); it is not optional and has no fallback."
+        )
+    with path.open("r", encoding="utf-8") as handle:
+        data = yaml.safe_load(handle)
+    if not isinstance(data, dict):
+        raise ConfigError(f"{path} did not parse to a mapping (got {type(data).__name__}).")
+    return Config(name=name, path=path, data=data)
+
+
+def outstanding_sentinels() -> list[tuple[str, str, str]]:
+    """Return ``(config_name, dotted_path, sentinel)`` for every undetermined value.
+
+    Used by ``check-roles`` and by the operator-gate test, so that "somebody still owes
+    this project a value" is a number the repository can print rather than a thing
+    somebody has to remember.
+    """
+    found: list[tuple[str, str, str]] = []
+    for name in KNOWN_CONFIGS:
+        path = config_dir() / f"{name}.yaml"
+        if not path.is_file():
+            continue  # ladder.yaml does not exist until C15. Absence is not a sentinel.
+        cfg = load(name)
+        for dotted, sentinel in cfg.sentinels():
+            found.append((name, dotted, sentinel))
+    return found

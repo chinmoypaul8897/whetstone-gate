@@ -1,0 +1,164 @@
+# config/lanes.yaml — the nine model+provider lanes and their rate limits
+#
+# ⚠️ A PRE-REGISTRATION ARTEFACT (CONTEXT.md §15.0). Frozen at `prereg-v1`.
+#
+# ⚠️ CONCURRENCY HERE MEANS LANES, NOT THREADS. One in-flight episode per
+# model+provider lane. The runner schedules episodes onto lanes, never onto a thread
+# pool (CONTEXT.md §13.3). Independent token buckets for RPM, TPM and RPD are refilled
+# on their own clocks, and a call is admitted only when ALL THREE permit it.
+#
+# ⚠️ THE `api_model_id` FIELDS FOR THE SIX GOOGLE LANES ARE `TODO_OPERATOR`.
+# CONTEXT.md §13.3.2: "The Google model names above are the builder's dashboard labels,
+# not API id strings … Building against a dashboard label rather than an id would be a
+# defect; this is the one place the spec cannot supply the string first-hand."
+# `tests/test_lanes_operator_placeholders.py` FAILS while any placeholder remains, and
+# `make selftest` runs it, so no token can be spent against a guessed id.
+# See QUESTIONS.md Q-006. The exact ids go into PROTOCOL.md at `prereg-v1`.
+#
+# Limits: read from the operator's own dashboards on 2026-08-30 and recorded in
+# PROVENANCE.md §1 with that date. The CONTEXT.md §13.7 fourth-clause comparison against
+# §13.2 was executed in C0: NO LIMIT DIFFERS, so no INCIDENTS.md entry is forced and the
+# §13.4 feasibility arithmetic is not invalidated. See PROVENANCE.md §1.3.
+#
+# NOTE ON `tpd: null` — Google's free tier shows NO daily token cap, only requests/day
+# and tokens/minute. `null` means "no such limit exists", which is NOT the same as
+# "unknown" and is NOT a default. Every lane states it explicitly.
+
+schema_version: 1
+limits_read_on: "2026-08-30"
+limits_source: "operator dashboards; recorded in PROVENANCE.md §1; operator-attested, not session-verified"
+
+lanes:
+
+  # ── GOOGLE ──────────────────────────────────────────────────────────────────
+  - name: gemma-26b
+    provider: google
+    dashboard_label: "Gemma 4 26B"
+    api_model_id: TODO_OPERATOR        # expected form: models/gemma-…
+    role: "attacker: REFERENCE (all volume work — M-ADV, T-NEG, AD-CMP, CAL, its ladder cell) AND gate judge for arms 2/2S/3"
+    rpm: 30
+    tpm: 16000
+    rpd: 14400
+    tpd: null
+    reserved_from: "2026-08-31"        # PROCESS.md §8 LANE RESERVATION — no build session may spend here
+
+  - name: gemma-31b
+    provider: google
+    dashboard_label: "Gemma 4 31B"
+    api_model_id: TODO_OPERATOR        # expected form: models/gemma-…
+    role: "reference-attacker overflow; gate-judge overflow; benign-solver spill when Flash-Lite RPD is exhausted"
+    rpm: 30
+    tpm: 16000
+    rpd: 14400
+    tpd: null
+    reserved_from: "2026-08-31"
+
+  - name: flash-lite-3.1
+    provider: google
+    dashboard_label: "Gemini 3.1 Flash Lite"
+    api_model_id: TODO_OPERATOR        # expected form: models/gemini-…
+    role: "benign solver (primary), spilling to Gemma when RPD is exhausted"
+    rpm: 15
+    tpm: 250000
+    rpd: 500
+    tpd: null
+    reserved_from: null
+
+  - name: flash-lite-3.5
+    provider: google
+    dashboard_label: "Gemini 3.5 Flash Lite"
+    api_model_id: TODO_OPERATOR        # expected form: models/gemini-…
+    role: "tau2 USER SIMULATOR — tau2 is dual-control; every turn is one agent call PLUS one user-simulator call, which DOUBLES tau2's request count"
+    rpm: 15
+    tpm: 250000
+    rpd: 500
+    tpd: null
+    reserved_from: null
+
+  # ── GROQ ────────────────────────────────────────────────────────────────────
+  # Groq lanes carry EXACT api ids already — no placeholder needed.
+  - name: qwen-27b
+    provider: groq
+    dashboard_label: "qwen/qwen3.8-27b"
+    api_model_id: "qwen/qwen3.8-27b"
+    role: "attacker: ladder L2 (mid). The only Groq lane with volume (2M TPD ≈ 33 ep/day); hosts the pilot's L2 share"
+    rpm: 30
+    tpm: 8000
+    rpd: 1000
+    tpd: 2000000
+    reserved_from: "2026-08-31"        # ladder windows
+
+  - name: gpt-oss-20b
+    provider: groq
+    dashboard_label: "openai/gpt-oss-20b"
+    api_model_id: "openai/gpt-oss-20b"
+    role: "attacker: ladder L1 (weak). Bottom of a same-family capability ladder"
+    rpm: 30
+    tpm: 8000
+    rpd: 1000
+    tpd: 200000
+    reserved_from: "2026-08-31"
+
+  - name: gpt-oss-120b
+    provider: groq
+    dashboard_label: "openai/gpt-oss-120b"
+    api_model_id: "openai/gpt-oss-120b"
+    role: "attacker: ladder L3 (strong). Top of the same family as L1. SCARCE — used precisely, never in bulk (~3 ep/day)"
+    rpm: 30
+    tpm: 8000
+    rpd: 1000
+    tpd: 200000
+    reserved_from: "2026-08-31"
+
+  - name: compound
+    provider: groq
+    dashboard_label: "groq/compound"
+    api_model_id: "groq/compound"
+    role: "UNASSIGNED. Explicitly DROPPED as a ladder point (PROCESS.md §12.2): an agentic SYSTEM with built-in tooling, not a raw model, and the ladder's x-axis is measured model competence"
+    rpm: 30
+    tpm: 70000
+    rpd: 250
+    tpd: null
+    reserved_from: null
+
+  - name: compound-mini
+    provider: groq
+    dashboard_label: "groq/compound-mini"
+    api_model_id: "groq/compound-mini"
+    role: "UNASSIGNED. Dropped as a ladder point for the same reason as `compound`"
+    rpm: 30
+    tpm: 70000
+    rpd: 250
+    tpd: null
+    reserved_from: null
+
+# ── The CaMeL comparator lane (CONTEXT.md §8.5.1) ──────────────────────────────
+# CaMeL has NO base_url override, so Google is its only reachable free provider. The
+# branch decision is made by RUN-1 (the 90-minute timeboxed test on 31 Aug) and recorded
+# in PROTOCOL.md: Branch A runs it live; Branch B ships the comparator as a CITATION of
+# Tables 5–7 of arXiv 2503.18813v2 with the one-line reason verbatim.
+# ⚠️ Branch B is published as a RESULT, not hidden as a failure.
+camel_comparator:
+  model_string: "google:gemini-2.0-flash-lite-001"
+  branch: TODO_C13_RUN1
+  branch_a_condition: "the model id is still served AND the run completes inside the 90-minute box"
+  branch_b_action: "ship as a citation of Tables 5–7 of arXiv 2503.18813v2 with the CONTEXT.md §8.5.1 reason verbatim"
+
+# ── Models present on the dashboards that CONTEXT.md §13.2 does NOT list ──────
+# Recorded for honesty (QUESTIONS.md Q-007) and deliberately NOT given a lane: adding an
+# unassigned lane to a frozen pre-registration artefact would be a Class A change.
+# An ADDITION is not a DIFFERENCE, so §13.7's fourth clause did not fire on any of them.
+unassigned_observed_2026_08_30:
+  groq:
+    - { label: "openai/gpt-oss-safeguard-20b", rpm: 30, rpd: 1000, tpm: 8000, tpd: 200000 }
+    - { label: "qwen/qwen3.6-27b", rpm: 30, rpd: 1000, tpm: 8000, tpd: 200000 }
+    - { label: "meta-llama/llama-prompt-guard-2-22m", rpm: 30, rpd: 14400, tpm: 15000, tpd: 500000, note: "prompt-injection CLASSIFIER, not a chat model" }
+    - { label: "meta-llama/llama-prompt-guard-2-86m", rpm: 30, rpd: 14400, tpm: 15000, tpd: 500000, note: "prompt-injection CLASSIFIER, not a chat model" }
+  google:
+    - { label: "Gemini 2.5 Flash Lite", rpm: 10, tpm: 250000, rpd: 20, note: "⚠️ NOT a substitute for a 3.x Flash Lite — 20 RPD against their 500" }
+    - { label: "Gemini 2.5 Flash", rpm: 5, tpm: 250000, rpd: 20 }
+    - { label: "Gemini 3 Flash", rpm: 5, tpm: 250000, rpd: 20, note: "covered by §13.2's 'Gemini 3.x Flash (full)' row; 20 RPD — do not rely on it" }
+    - { label: "Gemini 3.5 Flash", rpm: 5, tpm: 250000, rpd: 20, note: "covered by §13.2's 'Gemini 3.x Flash (full)' row" }
+    - { label: "Gemini 3.6 Flash", rpm: 5, tpm: 250000, rpd: 20, note: "covered by §13.2's 'Gemini 3.x Flash (full)' row" }
+    - { label: "Gemini 3.7 Flash", rpm: 5, tpm: 250000, rpd: 20, note: "covered by §13.2's 'Gemini 3.x Flash (full)' row" }
+    - { label: "allam-2-7b (Groq)", rpm: 30, rpd: 7000, tpm: 6000, tpd: 500000, note: "listed in §13.2; unassigned reserve" }

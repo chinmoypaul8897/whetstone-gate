@@ -40,18 +40,19 @@ htmlcov/
 .nox/
 coverage.xml
 
-# ── vendor/ BUILD ARTEFACTS ONLY ──────────────────────────────────────────────
-# The pinned third-party SOURCE trees are part of the repository (CONTEXT.md §16:
-# "vendor/  # pinned third-party checkouts (tau2-bench, agentdojo, CaMeL) + manifest").
-# C13's done-when requires a diff against the vendored SHA to be reproducible, so
-# only build output and nested VCS metadata are ignored here.
-vendor/**/build/
-vendor/**/dist/
-vendor/**/.git/
-vendor/**/*.egg-info/
-vendor/**/__pycache__/
-vendor/**/.pytest_cache/
-vendor/**/.venv/
+# ── vendor/ ───────────────────────────────────────────────────────────────────
+# ⚠️ THE VENDORED SOURCE TREES ARE NOT COMMITTED. See QUESTIONS.md Q-010 and
+# vendor/MANIFEST.md, which pins every SHA and gives the exact commands to reproduce
+# each checkout byte for byte.
+#
+# MEASURED, 2026-08-30: tau2-bench at the pinned SHA is 793.2 MB across 1,564 tracked
+# files, of which ~450 MB is data/tau2/results/ — OTHER PEOPLE'S published model runs,
+# which this project never reads. Committing it would put a ~0.8 GB clone between a
+# judge and CONTEXT.md §20's "git clone -> one command -> it runs", and §1's headline
+# claim is that a reviewer can re-run every number AT ZERO COST on the free tier.
+# What ships instead is the MANIFEST plus C13's committed empty-diff proof.
+vendor/*/
+!vendor/MANIFEST.md
 
 # ── evals/ TRANSIENT ARTEFACTS ONLY ───────────────────────────────────────────
 # ⚠️ evals/ CONTENT IS COMMITTED EVIDENCE, NOT IGNORED OUTPUT. See QUESTIONS.md Q-003.

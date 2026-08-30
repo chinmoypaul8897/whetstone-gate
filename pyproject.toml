@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "whetstone-gate"
+version = "0.1.0"
+description = "A policy gate for agentic payments, attacked by a policy-blind adversary on an externally-authored answer key, under a pre-registered and externally-witnessed protocol."
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [{ name = "Chinmoy Paul" }]
+
+# ⚠️ 3.12 is REQUIRED, not preferred. tau2-bench at the pinned SHA
+# a2c024725189473d2d7cea3a5cfdbcc67478e41f declares requires-python = ">=3.12,<3.14"
+# in its own pyproject.toml (verified in the vendored checkout, 2026-08-30), and
+# CONTEXT.md §21.4 forbids ever dropping tau2-bench. 3.11 makes the project's spine
+# uninstallable. See CONTEXT.md §16.
+requires-python = ">=3.12,<3.14"
+
+dependencies = [
+  "pyyaml>=6.0",   # the one config loader
+  "numpy>=1.26",   # the statistics module (C10); quartile method is percentile(method="linear")
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.urls]
+Repository = "https://github.com/chinmoypaul8897/whetstone-gate"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# `make test` runs the unit suite. `make selftest` runs the operator/pre-spend gates,
+# which are SUPPOSED to be red until the operator supplies what only the operator has.
+# Nothing is hidden: `tasks test` prints how many operator_gate tests it deselected and why.
+markers = [
+  "operator_gate: a pre-spend readiness gate that fails until an OPERATOR action lands (see QUESTIONS.md Q-006, Q-009). Run by `make selftest`, deselected by `make test`.",
+]
