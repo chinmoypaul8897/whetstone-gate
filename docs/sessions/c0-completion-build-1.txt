@@ -1,0 +1,691 @@
+CHUNK C0-COMPLETION REPORT
+WHETSTONE GATE - the three operator-owed items from C0
+BUILD session, attempt 1, 2026-08-30. Committed before this block was printed
+(PROCESS.md section 3). The pushed SHA named in item 9 is the commit that carries
+this very file, so it is stated in the printed report rather than inside it.
+
+ASCII only, deliberately. INC-08: this repository's typographic prose renders as
+"?" in the operator's Git Bash window, and the lines that matter most were among
+the casualties.
+
+================================================================================
+0. HEADLINE - READ THIS FIRST
+================================================================================
+All four tasks are done. Q-006 and Q-008 are closed. `make test` and
+`make check-roles` are GREEN. `make selftest` is STILL RED, correctly, for a
+reason that is NOT the model ids - item 1.
+
+FOUR THINGS THAT ARE NOT "TASK DONE", IN DESCENDING ORDER OF HOW MUCH THEY
+SHOULD WORRY YOU:
+
+ (1) >>> Q-013, CLASS A, NEEDS AN ARCHITECT RULING BEFORE prereg-v1. <<<
+     CONTEXT.md 13.4's N=50 headline reproduces EXACTLY. Its two FALLBACK
+     figures DO NOT - both forget the gate judge's share. And the consequence is
+     not cosmetic: UNDER 13.4'S OWN PUBLISHED NUMBERS THE PRE-DECLARED REDUCTION
+     CHAIN NEVER REACHES ITS OWN 32 h BUDGET (40 h -> 37 h -> 34 h, and the rule
+     says "No other branch. No post-hoc adjustment."). Corrected, it does
+     (40.05 -> 35.99 -> 30.89 h). CONTEXT.md WAS NOT EDITED. Item 3b.
+
+ (2) I OVERCLAIMED IN A HARD-RULE-6 DEFENCE, AND AN ADVERSARIAL RE-CHECK CAUGHT
+     IT. Commit 1be73e4 argued its change was not a weakening because "a binary
+     file is not skipped here; it is checked harder." THAT SENTENCE IS FALSE.
+     A4 CANNOT FAIL on a binary file. Corrected in b0a4855; the real - and
+     narrower - justification is now asserted by a test. Item 7.
+
+ (3) INC-09 - landing the screenshots turned `make check-roles` and `make test`
+     RED. The repository was sound; the check was wrong. A3 scanned every
+     tracked file's raw bytes for CR-LF and a PNG's deflate stream carries those
+     bytes as DATA.
+
+ (4) INC-10 - the commit that RECORDED INC-09 wrote a real control byte into
+     PROGRESS.md and ate a sentence. Second occurrence of a defect this repo had
+     already written up as INC-06, same tool, same file class, three commits
+     after committing an incident that cites INC-06 as its own missed signal.
+     The guardrail added ONE COMMIT EARLIER caught it within one command.
+
+Plus one smaller correction, 09532df: PROVENANCE.md 1.5 as first written claimed
+the C21 billing re-check "is a C21 checklist item, and it is listed as one."
+IT IS NOT. Item 11(a).
+
+SESSION-TOKEN: NONE ISSUED. This prompt carried no SESSION-TOKEN line and this
+session did not fabricate one, exactly as the prompt directed and exactly as C0
+did. Recorded under QUESTIONS.md Q-001. Every commit here is permanently
+untrailered; check-roles E4 reports that as n/a naming Q-001, never as a pass.
+
+================================================================================
+1. THE FOUR IDs AS WRITTEN, AND `make selftest` BEFORE AND AFTER
+================================================================================
+Written into config/lanes.yaml, verbatim as supplied:
+
+  lane gemma-26b       -> models/gemma-4-26b-a4b-it     "Gemma 4 26B A4B IT"
+  lane gemma-31b       -> models/gemma-4-31b-it         "Gemma 4 31B IT"
+  lane flash-lite-3.1  -> models/gemini-3.1-flash-lite  "Gemini 3.1 Flash Lite"
+  lane flash-lite-3.5  -> models/gemini-3.5-flash-lite  "Gemini 3.5 Flash Lite"
+
+Each lane also carries the capability facts the endpoint returned, under a
+`capability:` mapping: input_token_limit, output_token_limit,
+supported_generation_methods, and a derived supports_context_caching flag.
+
+  gemma-26b / gemma-31b        in 262144   out 32768
+                               [generateContent, countTokens]
+  flash-lite-3.1 / -3.5        in 1048576  out 65536
+                               [generateContent, countTokens,
+                                createCachedContent, batchGenerateContent]
+
+PREVIEW-VS-STABLE: recorded, not re-derived. Lane flash-lite-3.1 carries a
+`not_this_id: models/gemini-3.1-flash-lite-preview` field plus the reasoning, so
+the distinction survives in the artefact the RUNNER reads, not only in prose.
+Full ruling in PROVENANCE.md 1.2.1 and in Q-006's closure.
+
+`make selftest`
+---------------
+BEFORE (exit 2):  2 failed, 39 deselected
+     FAILED test_no_operator_placeholder_remains_in_config
+            -> "OPERATOR ACTION REQUIRED - 4 value(s) ..."
+     FAILED test_the_camel_branch_is_decided_before_any_camel_run
+
+AFTER  (exit 2):  1 failed, 1 passed, 41 deselected
+     PASSED test_no_operator_placeholder_remains_in_config
+     FAILED test_the_camel_branch_is_decided_before_any_camel_run
+
+>>> IT STILL FAILS, FOR A DIFFERENT REASON, AND THIS IS NOT PAPERED OVER. <<<
+The remaining failure is camel_comparator.branch = TODO_C13_RUN1. That is
+decided by RUN-1 on 31 August inside its 90-minute box. It is C13's, not the
+operator's, and it is CORRECT for the pre-spend gate to be red while it stands -
+no token may be spent while a declared value is undetermined.
+
+Because "make selftest is red" could be misread as "the ids are still missing",
+STATUS.md now carries a "what make selftest is still waiting on" table naming
+both gates and their owners. Remaining TODO_ sentinels in config/: six, ZERO of
+them operator-owed (C14 calibration x1, C14 pilot x2, C13/C16 x2, C13/RUN-1 x1).
+
+Verified: cfg.outstanding_sentinels() reports 0 TODO_OPERATOR values, and
+`grep -rn TODO_OPERATOR config/` exits 1 with no matches - the token does not
+appear in config/ even as prose, so "zero remain" is checkable either way.
+
+================================================================================
+2. `make test` AND `make check-roles`
+================================================================================
+Final run, on a CLEAN tree, after every commit:
+
+  make test         exit 0   41 passed, 1 skipped, 2 deselected
+                             (baseline was 38 passed; +3 new tests)
+  make check-roles  exit 0   14 passed, 0 failed, 3 n/a
+                             (baseline was 12 passed, 0 failed, 4 n/a)
+
+Two deltas in check-roles, both expected:
+  * A4 is NEW and passes (item 7).
+  * F3 "OPERATOR-owed values" moved from n/a to PASS - there are now none.
+
+BOTH COMMANDS WENT RED IN THE MIDDLE OF THIS SESSION AND WERE MADE GREEN BY
+FIXING DEFECTS, NEVER BY RELAXING A CHECK. See INC-09, INC-10, Q-012.
+
+A3 and A4 now reconcile their own denominator out loud, after an adversarial
+finding that the first wording did not (item 7):
+  A3: "36 file(s) git classifies as TEXT carry no CRLF ... 2 file(s) git
+       classifies as BINARY (`-text`) are NOT scanned for CRLF, because git
+       applies no end-of-line conversion to them and a CR-LF pair there is data,
+       not a line ending. 36 text + 2 binary + 0 non-regular = 38 tracked"
+  A4: "... On the 2 binary file(s) this holds BY CONSTRUCTION and so asserts
+       nothing: git converts nothing there, and A4 cannot fail on `-text`
+       content. It is a real assertion on the 36 text file(s) only."
+
+================================================================================
+3a. THE CACHING FINDING - WHAT I VERIFIED, AND THE RULE-13 CALL
+================================================================================
+THE FACT. Neither Gemma model lists createCachedContent; both Flash Lite models
+do. Per CONTEXT.md 13.3.2 the Gemma lanes are the REFERENCE ATTACKER *and* the
+GATE JUDGE, so prompt caching is unavailable on exactly the lanes carrying the
+sweep, and available only on the two 500-RPD lanes.
+
+WHAT I VERIFIED MYSELF RATHER THAN TAKING ON TRUST (the prompt asked for this):
+
+  (a) `grep -ic cach CONTEXT.md` -> 0. Confirmed at byte level on the raw file.
+      The specification never mentions caching, so it cannot have assumed a
+      discount from it.
+
+  (b) 13.4's four stated arithmetic identities, re-derived:
+        32,000 x 60   = 1,920,000/h   MATCHES "combined 32K TPM = 1.92M tokens/h"
+        76.9M / 1.92M = 40.05 h       MATCHES "approx 40 hours"
+        71M   / 1.92M = 36.98 h       MATCHES its stated "~37 h"
+        65M   / 1.92M = 33.85 h       MATCHES its stated "~34 h"
+      All four hold, on RAW throughput, with no caching discount anywhere.
+      NO STATED ASSUMPTION IS VIOLATED.
+      >>> BUT TWO OF THOSE INPUT TOTALS ARE THEMSELVES WRONG - SEE 3b. <<<
+
+  (c) The volume claim. 13.4's own bullets: reference-attacker 33.0M +
+      gate-judge 15.3M = 48.3M of the 76.9M Google-side total lands on Gemma
+      DIRECTLY (62.8%), before the spill 13.4 describes.
+
+THE FORWARD CONSEQUENCE - the reason the entry exists:
+CACHING IS NOT AN AVAILABLE LEVER for closing the 13.4 lane-hour gap. When
+somebody on 1 September says "just cache the attacker's system prompt and it
+will fit" - the answer is NO, the Gemma lanes do not offer it. The only
+pre-declared reductions remain 13.4's own: N=50 -> N=30, then T-FP 40 -> 20.
+N is not a degradation rung (PROCESS.md 14).
+
+ONE THING I ADD THAT THE PROMPT DID NOT: caching is a weak lever on the Flash
+Lite lanes too. Those are bound by 500 RPD EACH - by REQUESTS - and caching
+reduces TOKENS. 13.4 says their 1,000 combined daily requests are precisely why
+the benign-solver and user-simulator work spills to Gemma. Caching does not move
+a request-bound constraint; createCachedContent is itself a request.
+
+MY RULE-13 JUDGEMENT: QUESTIONS ENTRY, NOT AN INCIDENT. I concur with the
+architect, and here is the reasoning from rule 13's own text rather than from
+deference, so a reviewer can overturn it on the reasoning:
+
+  Rule 13: "An entry with an empty Diagnosis or Missed is not an entry."
+  No Event                 - no failure unfolded.
+  No violated Expectation  - 13.4 assumed no caching and still assumes none.
+  No Diagnosis             - a diagnosis is a CAUSAL MECHANISM for an effect,
+                             and no effect occurred.
+  No Missed                - no signal was present and ignored. The endpoint was
+                             read for the first time today and the fact was
+                             recorded within the hour.
+
+Writing it as an incident would require INVENTING a Diagnosis and a Missed to
+fill mandatory fields - exactly the failure mode rule 13's own closing note
+warns about: "the pressure runs both ways - to under-report a failure that costs
+a fix session, and to DRAMATISE one that reads well."
+
+Recorded in: QUESTIONS.md Q-011, PROVENANCE.md 1.2.1, and as a machine-readable
+`supports_context_caching:` field on all four Google lanes in config/lanes.yaml.
+
+================================================================================
+3b. >>> Q-013 - CLASS A. CONTEXT.md 13.4's FALLBACK FIGURES DO NOT REPRODUCE <<<
+================================================================================
+FOUND WHILE VERIFYING (b) ABOVE. Not looked for. CONTEXT.md WAS NOT EDITED -
+hard rule 1 says stop; hard rule 4 says CONTEXT.md outranks this session.
+
+Recomputed from 13.4's OWN stated inputs by 13.4's OWN stated method:
+
+  Branch          13.4 states          Recomputed             Delta
+  N=50, T-FP 40   76.9M / approx 40 h  76.90M / 40.05 h       EXACT MATCH
+  N=30, T-FP 40   "~71M ... ~37 h"     69.10M / 35.99 h       -1.9M, -1.0 h
+  N=30, T-FP 20   "-6M ... ~34 h"      59.30M / 30.89 h       -5.8M, -3.1 h
+
+THE MECHANISM, IN ONE LINE: both fallbacks subtract the ATTACKER's share and
+forget the GATE JUDGE's. 13.4's own gate-judge bullet counts the per-arm share
+as "50 M-ADV + 34 T-NEG + 16 AD-CMP + 30 M-BEN + 40 T-FP per arm" - the 50 IS N
+and the 40 IS T-FP. Both shrink with the branch; neither reduction is carried
+through.
+  - N=30 removes 100 M-ADV attacker episodes (-6.0M) AND 20 judged episodes per
+    arm x 3 arms (-1.8M). 13.4 subtracts only the 6.0M: 76.9 - 6.0 = 70.9 ~ 71M.
+  - T-FP 40->20 removes 100 benign episodes (-5.0M), 100 user-sim episodes
+    (-3.0M) AND 20 judged episodes per arm x 3 (-1.8M) = -9.8M, not "-6M".
+
+>>> WHY THIS IS NOT COSMETIC. Under 13.4's OWN published numbers the
+pre-declared reduction chain NEVER REACHES ITS OWN BUDGET: 40 h, then 37 h, then
+34 h, against ~32 h available - and the rule states "No other branch. No
+post-hoc adjustment." AS WRITTEN IT TERMINATES IN AN INFEASIBLE STATE WITH
+NOTHING LEFT TO TRY. Under the corrected arithmetic it terminates FEASIBLY at
+30.89 h. The error is not decoration on a sound plan; the corrected numbers are
+what make the plan's own escape hatch work. <<<
+
+DIRECTION OF THE ERROR, stated because it bears on good faith: BOTH SLIPS ARE
+CONSERVATIVE. They make the budget look TIGHTER than it is, never looser.
+Nothing here flatters the project. The N=50 branch still does NOT fit on either
+arithmetic (40.05 h vs ~32 h), so THE BRANCH DECISION AT THE TOP OF THE RULE IS
+UNCHANGED. What changes is the two fallback figures and whether the chain ends.
+
+WHAT I DID NOT VERIFY, and the architect owns it: whether 13.4 INTENDED the
+gate-judge volume to be fixed across branches. Nothing in 13.4 says so and its
+per-arm formula reads as scaling - but if fixed volume was the intent, the
+stated figures may be right and the per-arm formula is what needs the note.
+
+BLOCKS C14, which selects the branch by this rule and writes it into PROTOCOL.md
+BEFORE the freeze. Needs a ruling before prereg-v1. Nothing is blocked today.
+
+================================================================================
+4. SCREENSHOT VERIFICATION - PATHS, SIZES, DIGESTS, EOL
+================================================================================
+Both exist, both non-empty, both valid PNGs. Committed in b72ce97.
+
+  docs/evidence/limits/groq-2026-08-30.png
+      138,103 bytes   1918 x 901   8-bit RGBA, non-interlaced
+      sha256 9fab79450fcfc4c4a2e181a3b4b1e4225bccbf53d312213741cbb573fa374f19
+
+  docs/evidence/limits/gemini-2026-08-30.png
+      127,384 bytes   1911 x 870   8-bit RGBA, non-interlaced
+      sha256 73b4dc71004a5e558ff74168da042f632b51dcf089d3de257351de18df955ec6
+
+STRUCTURAL VALIDITY - checked, not assumed. Both carry the 8-byte PNG signature
+89 50 4E 47 0D 0A 1A 0A; both open with IHDR and end with IEND; EVERY chunk's
+CRC-32 recomputes correctly (8 chunks Groq, 7 Gemini); and in both the chunk
+walk terminates EXACTLY at end-of-file, consuming all 138,103 / 127,384 bytes.
+
+WHAT I DID NOT VERIFY: what the images DEPICT. A session cannot read a
+dashboard. The CONTENT stays operator-attested exactly as PROVENANCE.md 1.2
+already said. These make the operator's figures auditable BY A HUMAN REVIEWER;
+they do not convert them into session-verified facts, and nothing claims they do.
+
+EOL CHECK - the prompt asked specifically. ANSWER: THEY ARE NOT BEING TREATED AS
+TEXT, so the prompt's conditional DID NOT FIRE and `.gitattributes` was NOT
+modified. It is still exactly 19 bytes, `* text=auto eol=lf\n`, added in the root
+commit ee3cf93 and in no commit since.
+
+  git check-attr text eol   -> text: auto, eol: lf   (attributes ARE set)
+  git ls-files --eol        -> i/-text w/-text attr/text=auto eol=lf, BOTH files.
+                              `-text` is git's own token for "binary; apply no
+                              conversion". text=auto detects on NUL bytes, which
+                              a PNG has in IHDR.
+  git hash-object vs
+      --no-filters          -> IDENTICAL blob id for both. Filter path is a
+                              no-op; nothing is being rewritten.
+  sha256(worktree) vs
+      sha256(git show HEAD:) -> IDENTICAL, both files, after the real commit.
+  git log --numstat b72ce97 -> "-  -", git's own binary marker.
+
+`.gitattributes` needed no image rule and none was added. Adding one would ALSO
+have broken check-roles A1, which requires that file to contain exactly
+`* text=auto eol=lf`, and PROCESS.md 6a makes it fixable only in the first
+commit.
+
+BUT COMMITTING THEM DID BREAK SOMETHING ELSE - ITEM 7 (INC-09).
+
+================================================================================
+5. PROVENANCE.md 1.5 AS WRITTEN
+================================================================================
+Heading: "1.5 No payment method attached - OPERATOR-ATTESTED 2026-08-30
+(closes the other half of Q-008)"
+
+  Groq (Groq Console -> billing)
+      Payment method attached? NONE ATTACHED
+      Verified by: OPERATOR-ATTESTED - the operator opened the billing page and
+                   read it
+      Date: 2026-08-30
+      Evidence: operator attestation, recorded here. No session can hold this: a
+                session has no browser and no provider credentials it is
+                permitted to use, and CLAUDE.md section 4 forbids it from
+                reading a key value at all.
+
+  Google AI Studio / Google Cloud (billing)
+      Payment method attached? NONE ATTACHED
+      Verified by: OPERATOR-ATTESTED - the operator opened the billing pages and
+                   read them
+      Date: 2026-08-30
+      Evidence: operator attestation, recorded here. Same limitation as above.
+
+Then, because it is a SAFETY PROPERTY and not paperwork:
+
+  "With no card on file, exceeding a free-tier limit returns HTTP 429 and the
+   runner stops. IT CANNOT BILL. That is what makes CONTEXT.md's zero-cost claim
+   STRUCTURAL rather than a promise: the guarantee is enforced by the provider
+   refusing the call, not by anyone remembering to watch a meter. A budget
+   somebody has to watch is a budget that gets exceeded at 03:00 on the second
+   sweep day."
+
+And two consequences:
+  1. PROCESS.md section 8's session rule reads differently in this light. With no
+     card, a 429 is the ONLY thing that can happen at the ceiling - there is no
+     silent overage path for a session to fall into. "STOP and report, never
+     retry into another lane" is belt-and-braces on top of a structural stop.
+  2. C21 MUST RE-CONFIRM IT, because this is the only claim in the frozen set
+     that can go stale WITHOUT ANY FILE CHANGING - and, per the correction in
+     item 11(a), IT IS NOT CURRENTLY A C21 DONE-WHEN.
+
+================================================================================
+6. QUESTIONS CLOSED, AND THE THREE RAISED
+================================================================================
+CLOSED
+  Q-006  the Google API model id strings. Closed by the operator's capture. The
+         closure records the four ids, the capability facts, the
+         preview-vs-stable ruling, and the fact that selftest is still red for
+         the CaMeL branch. PLUS two corrections to Q-006's OWN TEXT, recorded
+         rather than silently applied, with the original left standing:
+           - it says "the six Google api_model_id values". THERE ARE FOUR. The
+             same "six" appeared in config/lanes.yaml's header and
+             PROVENANCE.md 2.3. All three corrected.
+           - it names the gate as tests/test_lanes_no_placeholders.py. The file
+             is tests/test_lanes_operator_placeholders.py and never had the
+             other name.
+  Q-008  both halves. Screenshots (with what was and was NOT verified stated
+         separately) and the no-payment-method attestation.
+
+RAISED
+  Q-011  the caching finding, with the independent verification and the rule-13
+         judgement written out. Item 3a.
+  Q-012  the A3 narrowing. Class B, with all four options seen - AND with the
+         correction at item 7 written into it in full, including the concrete
+         counterexample that refutes the original justification.
+  Q-013  >>> CLASS A, ARCHITECT ACTION REQUIRED <<< CONTEXT.md 13.4's fallback
+         arithmetic. Item 3b.
+
+ALSO OPENED: docs/reviews/OPEN_FINDINGS.md OF-01 (MEDIUM) - the lone-CR gap,
+item 7.
+
+================================================================================
+7. INCIDENTS.md ENTRIES ADDED, AND THE CORRECTION TO ONE OF THEM
+================================================================================
+Two entries. Both after the first build commit ee3cf93. Hard rule 13 requires at
+least two such entries; there are now FIVE (INC-06 through INC-10).
+
+INC-09 - the CRLF invariant read a PNG's payload bytes as line endings, and the
+         repository's own evidence turned it red.
+         Fix: 1be73e4, CORRECTED by b0a4855.
+
+  Committing the screenshots turned `make check-roles` and `make test` RED on a
+  repository that was SOUND. A3 scanned every tracked file's raw bytes for
+  CR-LF; the Groq image carries 2 such pairs and the Gemini image 3, as deflate
+  DATA.
+
+  MISSED (two signals, both already inside this repository):
+   1. INC-06 is the SAME CLASS, recorded earlier the same day, three commits
+      back - and its fix WAS A3. Nothing in writing that fix asked whether a
+      tracked file might ever not be text.
+   2. Sharper: INC-06's OTHER fix,
+      test_the_object_store_and_the_working_tree_agree, asks the property
+      DIRECTLY and would never have false-positived on a PNG. The correct
+      formulation was already in the repository, IN THE SAME COMMIT, next to the
+      wrong one. And Q-008 - written by C0 in that same session - names the
+      exact paths of the two PNGs that were coming. C0 recorded the paths of the
+      files that would break its own check, and shipped the check anyway.
+
+  DIAGNOSIS: A3 asserted a PROXY (absence of CR-LF bytes) where the property is
+  "git's filter chain is a no-op on this path", and the proxy is valid only for
+  text. Reading raw bytes rather than asking git, it could not tell a line
+  ending from a byte that happens to equal one.
+
+  >>> AND THEN I OVERCLAIMED THE FIX. THIS IS THE PART TO READ. <<<
+  1be73e4's commit message, its source comment and Q-012's first draft all said:
+  "On every file it covers, A4 is strictly stronger than A3 ever was ... A binary
+  file is not skipped here; it is checked harder."  THAT IS FALSE, and it was
+  the LOAD-BEARING sentence of the hard-rule-6 defence.
+
+  An adversarial re-check of my own change found it; I reproduced it before
+  accepting it. On -text content git applies NO conversion, so `git hash-object`
+  and `--no-filters` are equal BY CONSTRUCTION: A4 CANNOT FAIL ON A BINARY FILE.
+  Four adversarial shapes were tried - NUL+CRLF*100, CRLF*100+NUL,
+  CRLF*5000+NUL+CRLF*10, all 256 byte values *4 - and NONE could make it fire.
+
+  AND A CONCRETE COUNTEREXAMPLE TO "nothing is weakened" EXISTS, recorded rather
+  than argued away:
+      operator_note.txt = b"header\r\n" + b"\x00" + b"value=1\r\nvalue=2\r\n"
+      plain ASCII, CRLF endings, one NUL byte -> git says i/-text w/-text
+      OLD A3: FAIL.   NEW A3: PASS.   NEW A4: PASS.
+  By the plain reading, that is a narrowing.
+
+  THE HONEST STATEMENT: A4 is strictly stronger than old A3 on TEXT files, and
+  VACUOUS on BINARY files - and binary files are exactly the set whose treatment
+  changed.
+
+  WHAT ACTUALLY JUSTIFIES THE CHANGE is narrower and DOES hold: every failure the
+  narrowing removed was a FALSE POSITIVE. PROCESS.md 6a's property is "a reviewer
+  who clones this gets the committed bytes", and on that file it holds - sha256
+  of the working tree, of `git show HEAD:`, and OF A FRESH `git clone` are all
+  af501c80b02c74e93c194e88981482b171df4a1e405556d26805c8cd912e9a5d. NO TRUE
+  POSITIVE WAS LOST.
+  That is now ASSERTED, NOT ARGUED:
+  test_every_failure_the_narrowing_removed_was_a_false_positive builds that
+  exact file, asserts git really classifies it -text (so it cannot pass by
+  exercising the wrong branch), CLONES the repository, and compares bytes. If it
+  ever fails, Q-012's default must be reverted.
+
+  SECOND DEFECT IN THE SAME FIX - a hard rule 11 violation in language I
+  introduced. The loop skips tracked paths with no regular file behind them,
+  while the new messages asserted "never silently dropped" and "all N tracked
+  file(s)". Demonstrated with 3 tracked files, one deleted-but-not-staged: the
+  output read "all 2 tracked file(s)". Both lines now print
+  <text> + <binary> + <non-regular> = <tracked>, and A4 FAILS if any path was
+  skipped.
+
+  AND THE ORIGINAL rule-6 PROOF STILL STANDS, for what it does cover: run
+  against the pre-fix module loaded out of the git object store,
+       OLD: "CRLF found in 2 file(s):
+             ['binary_with_crlf.bin', 'text_with_crlf.md']"
+       NEW: "CRLF found in 1 TEXT file(s): ['text_with_crlf.md']"
+            A4: "git would REWRITE 1 file(s) on checkin: ['text_with_crlf.md']"
+  The new test's third assertion FAILS against the old code. Two soft weaknesses
+  the re-check named are also closed: the test now asserts the detail is not
+  truncated (or "not in detail" would prove nothing), and the dirty-tree test now
+  asserts the tree is actually dirty.
+
+  GAP FOUND AND DELIBERATELY NOT CLOSED - OPEN_FINDINGS.md OF-01, MEDIUM:
+  a LONE CR (not followed by LF) makes git classify an otherwise-textual file
+  -text, so it lands in the binary bucket and NEITHER A3 NOR A4 FIRES ON IT.
+  Reproduced. NOT a regression - old A3 searched for CRLF pairs and missed a lone
+  CR too - BUT IT IS INC-06'S AND INC-10'S EXACT CLASS, and INC-10 was caught
+  only because that CR happened to be followed by LF. Under a lone CR the
+  repository would have gone green over corrupted prose. Proposed discriminator,
+  recorded but NOT applied: "git calls this binary, yet it contains no NUL byte"
+  - narrow, and it passes both PNGs, which carry NULs in IHDR. It needs a new
+  check and a mutation test, i.e. new scope, so it belongs to C0's review.
+
+INC-10 - the same Python-write defect INC-06 names, three commits after writing
+         INC-06, this time corrupting CONTENT and not only line endings.
+         Fix: a47bc62
+
+  The commit that recorded INC-09 emitted "warning: in the working copy of
+  'PROGRESS.md', CRLF will be replaced by LF". The next `make check-roles` failed
+  BOTH new checks. One CR byte in 13,299.
+
+  Locating the byte rather than reflexively normalising is what exposed the
+  second and worse half: THE CONTENT WAS WRONG, not merely its line endings. The
+  literal text meant to DESCRIBE INC-09's own defect had been emitted as a real
+  CR and LF, splitting the sentence. Git had already normalised the CR away on
+  checkin, so the committed blob read "...raw bytes for `" and then, on the next
+  line, "`, and a PNG's deflate stream...". NORMALISING THE WORKING TREE WOULD
+  HAVE HIDDEN THE CORRUPTION INSTEAD OF REVEALING IT.
+
+  MISSED: INCIDENTS.md INC-06 names this exact cause, in this exact file class,
+  by this exact tool, and this session HAD JUST FINISHED READING IT. INC-06's own
+  Missed field reads: "each was written or rewritten by an in-session Python
+  script rather than by an editor tool or a shell heredoc." This session then
+  wrote PROGRESS.md with an in-session Python script - three commits after
+  committing INC-09, which cites INC-06 as ITS missed signal. The git warning was
+  read as a known nuisance rather than as the recurrence of a documented defect.
+
+  DIAGNOSIS: the two-character sequences intended as LITERAL TEXT passed through
+  three quoting layers - tool call, shell heredoc, Python string literal - and
+  were interpreted at the last one, emitting real control bytes into a document.
+  The first repair attempt failed for the SAME REASON AT THE SAME LAYER, which is
+  what identified the mechanism.
+
+  MISSING: nothing checks a tracked document's CONTENT, only its line endings.
+  A3 and A4 both fired correctly and immediately, but both say "there is a CR
+  here"; neither can say "and it has eaten a sentence." The content damage was
+  found by choosing to look at the byte, not by any check.
+
+  SYSTEMIC GUARDRAIL, split honestly:
+    WORKED - the guardrail added ONE COMMIT EARLIER for INC-09 caught this within
+      a SINGLE COMMAND, before it reached a second file. A3 fired on PROGRESS.md
+      as a TEXT file, which is the live demonstration that INC-09's narrowing did
+      not gut it, and A4 fired independently on the round-trip question.
+    NOT PREVENTED - nothing stops a session writing a tracked file through a
+      stacked-quoting path, and NOTHING AT ALL checks that a document says what
+      its author meant. The line-ending guardrail is now solid; there is no
+      content guardrail and the entry does not pretend otherwise. And per OF-01,
+      had that CR NOT been followed by LF, nothing would have caught it at all.
+
+================================================================================
+8. DONE-WHEN CHECKLIST
+================================================================================
+[PASS] config/lanes.yaml holds the four real ids; zero TODO_OPERATOR remain
+       cfg.outstanding_sentinels() reports 0 TODO_OPERATOR values, and
+       `grep -rn TODO_OPERATOR config/` exits 1 - not even in prose.
+
+[PASS] `make selftest` result reported, whatever it is
+       Before: exit 2, 2 failed. After: exit 2, 1 failed 1 passed. The
+       placeholder gate now PASSES; the remaining failure is TODO_C13_RUN1
+       (C13/RUN-1, 31 Aug), reported as a different reason. Item 1.
+
+[PASS] `make test` still green, and `make check-roles` still passes
+       make test exit 0: 41 passed, 1 skipped, 2 deselected.
+       make check-roles exit 0: 14 passed, 0 failed, 3 n/a.
+       Both on a CLEAN tree after every commit. Both went RED mid-session and
+       were made green by FIXING DEFECTS, never by relaxing a check.
+
+[PASS] the preview-vs-stable ruling is written into PROVENANCE.md
+       PROVENANCE.md 1.2.1, in full, with the reason the stable id is correct.
+       Also in Q-006's closure and as `not_this_id:` in lanes.yaml.
+
+[PASS] the caching finding is in QUESTIONS.md and PROVENANCE.md, with the
+       rule-13 judgement stated
+       Q-011 and PROVENANCE.md 1.2.1. Judgement: QUESTIONS entry, not an
+       incident, reasoned from rule 13's own text. Item 3a.
+
+[PASS] both screenshots verified, digested, recorded, and their EOL handling
+       checked
+       Item 4. Sizes, sha256, dimensions, full chunk-CRC validation, and four
+       independent EOL checks. `.gitattributes` NOT modified - the prompt's
+       conditional did not fire.
+
+[PASS] PROVENANCE.md 1.5 completed and labelled OPERATOR-ATTESTED
+       Item 5, with the item-11(a) correction applied.
+
+[PASS] Q-006 and Q-008 marked closed in QUESTIONS.md with what closed them
+       Item 6, including two corrections to Q-006's own text.
+
+[PASS] STATUS.md and PROGRESS.md updated; INCIDENTS.md appended if anything broke
+       STATUS.md: C0's review-history column APPENDED (never overwritten), a
+       "what make selftest is still waiting on" table, and the C21 flag.
+       PROGRESS.md: one entry, newest on top, opening with the absent token.
+       INCIDENTS.md: INC-09 (with its correction) and INC-10.
+
+SCOPE FENCE - verified explicitly, not assumed:
+  UNTOUCHED: .gitattributes, .gitignore, CLAUDE.md, CONTEXT.md, PROCESS.md,
+  Makefile, pyproject.toml, config/protocol.yaml, config.py, tasks.py,
+  spec_constants.py, _console.py, conftest.py, test_config_loader.py,
+  test_tripwire_registry.py, test_lanes_operator_placeholders.py,
+  tests/goldens/, evals/. No tag exists or was moved. No .env read or tracked.
+  NO PROJECT LOGIC: no world, ledger, scorer, gates, attacker or adapters.
+  CONTEXT.md IS UNTOUCHED DESPITE Q-013 - that is the point of Q-013.
+  AND: the check_gitattributes EARLY-RETURN SHAPE that C0's own report names as
+  a candidate defect is UNTOUCHED and remains for C0's review, as the fence
+  required. Confirmed by diffing: no diff line mentions its result key.
+
+================================================================================
+9. PUSHED SHA
+================================================================================
+Stated as the first line of the printed report. It is the commit that carries
+this file. The nine commits before it, in order:
+
+  1be73e4  fix: check-roles A3 read binary payload bytes as line endings; add A4
+  457c5d3  feat: the four Google API model ids, captured by the operator
+  b72ce97  docs: the two operator dashboard screenshots, dated 2026-08-30
+  7f50e02  docs: close Q-006 and Q-008, raise Q-011 and Q-012, record INC-09
+  a47bc62  fix: PROGRESS.md carried a real CR that ate a sentence (INC-06 again)
+  8d1009c  docs: INCIDENTS.md INC-10, with its Fix SHA a47bc62
+  09532df  docs: correct an unsupported claim - the C21 billing re-check is NOT
+           a done-when
+  b0a4855  fix: A4 is VACUOUS on binary files - the rule-6 defence was
+           overclaimed
+  c21b57d  docs: correct INC-09 and Q-012, raise Q-013, open OF-01
+
+Every commit touching source or tests ends "(unreviewed)": 1be73e4, 457c5d3,
+b0a4855. No commit carries a Session-Token trailer; none was issued and none was
+fabricated (Q-001).
+
+================================================================================
+10. TOKENS SPENT
+================================================================================
+NONE. ZERO. Not one call to any Groq or Google model, or to any other provider.
+
+The chunk needed none. Writing a model id into a config file is not a call, and
+validating an id against the live endpoint is a later chunk's job that needs the
+operator's key - CLAUDE.md section 4 forbids this session from using one.
+evals/usage/ was not read because nothing was spent and there was nothing to
+read; the directory does not exist yet (it arrives with C11).
+
+No .env file was read, printed, echoed or committed. No key value was accessed.
+
+================================================================================
+11. NEEDS OPERATOR / NEEDS ARCHITECT
+================================================================================
+NOTHING IS OWED BY THE OPERATOR. All three items landed.
+
+(a) CORRECTION - MY OWN CLAIM WAS WRONG, fixed in 09532df.
+    PROVENANCE.md 1.5 as I first wrote it said the C21 re-confirmation of "no
+    payment method attached" "is a C21 checklist item, AND IT IS LISTED AS ONE."
+    IT IS NOT. PROCESS.md 12.1's C21 row names the submission pack, the
+    git-history secret scan and the visibility flip, and names NO billing
+    re-check. I wrote an unverified claim into the honesty ledger, in the very
+    paragraph arguing that this property can go stale invisibly - which is
+    exactly where such a claim does damage.
+    >>> ARCHITECT: PROCESS.md 12.1's C21 done-when needs a billing re-check. <<<
+
+(b) >>> ARCHITECT: Q-013 IS CLASS A AND NEEDS A RULING BEFORE prereg-v1. <<<
+    CONTEXT.md 13.4's two fallback figures do not reproduce, and as published the
+    reduction chain never reaches its own 32 h budget. CONTEXT.md was NOT edited.
+    It blocks C14, which selects the branch by that rule before the freeze.
+    Item 3b has the full recomputation so it can be checked, not trusted.
+
+(c) Q-012 SPECIFICALLY WANTS A RULING, and it now wants one more than it did.
+    This session changed a structural invariant, argued it was not a rule-6
+    weakening, WAS WRONG ABOUT WHY, and corrected itself. The replacement
+    justification - every removed failure was a false positive, proven by cloning
+    - is narrower and is pinned to a test. A reviewer should decide whether that
+    is sufficient. If not, the revert is one commit and the screenshot box goes
+    back to FAIL-pending.
+
+(d) OF-01 (MEDIUM, OPEN) needs a decision: close the lone-CR gap, or accept it
+    with a reason. C19's done-when requires this file empty or every item
+    explicitly accepted.
+
+(e) RULINGS PENDING, none blocking today: Q-001 (the missing session token - now
+    across TWO sessions and, once this file is committed, ALL FIFTEEN commits in
+    the repository, none of which carries a trailer; counted, not estimated:
+    `git log --format=%B | grep -c '^Session-Token:'` returns 0), Q-011, Q-012,
+    Q-013, and the seven still-open questions C0 raised.
+
+(f) C13 / RUN-1 owes camel_comparator.branch. `make selftest` stays red until it
+    lands, correctly.
+
+(g) C0's REVIEW still owes the check_gitattributes early-return shape, left
+    untouched on purpose. NOTE FOR THE REVIEWER: this session added A4 to that
+    same function, so the early-return now shadows A4 as well as A3 - the
+    defect's blast radius grew by one check, and that is this session's doing.
+
+================================================================================
+12. ANYTHING I COULD NOT VERIFY
+================================================================================
+Stated plainly, because the whole project turns on not claiming more than was
+checked.
+
+1. THAT THE FOUR MODEL IDs ARE REAL AND SERVED. I did not call the endpoint and
+   must not. OPERATOR-ATTESTED. A wrong id fails at the first API call of the
+   sweep, AFTER the freeze, on a day with no slack.
+
+2. THAT THE PREVIEW/STABLE DISTINCTION IS AS DESCRIBED. Recorded as an architect
+   ruling and treated as binding per hard rule 5. I could not observe the
+   endpoint, the two version strings, or the dashboard row.
+
+3. WHAT THE SCREENSHOTS DEPICT. Verified as FILES only. I cannot read an image.
+   The day-one limit figures in PROVENANCE.md 1.1 and 1.2 remain
+   OPERATOR-ATTESTED; the screenshots make them auditable by a HUMAN, and that is
+   all they do.
+
+4. THE BILLING STATE OF EITHER ACCOUNT. Cannot and must not. OPERATOR-ATTESTED.
+
+5. THE CAPABILITY FACTS. Also operator-attested. NOTE THE ASYMMETRY: Q-011's
+   conclusion rests on an operator-attested ABSENCE of createCachedContent, but
+   its LOAD-BEARING half - that 13.4 assumes no caching and is therefore
+   unaffected - I verified MYSELF against CONTEXT.md and its own arithmetic. The
+   "no assumption is violated" finding stands on my own checking; only "caching
+   is unavailable" depends on the attestation.
+
+6. WHETHER CONTEXT.md 13.4 INTENDED the gate-judge volume to be fixed across N
+   branches. Q-013 assumes it scales, because 13.4's own per-arm formula names N
+   and T-FP as terms. If fixed volume was intended, the published figures may be
+   right and the formula is what needs the note. THE ARCHITECT OWNS THIS.
+
+7. THAT INC-09'S FIX IS COMPLETE RATHER THAN SUFFICIENT. I now know it is NOT
+   complete: OF-01 is an open, reproduced gap in the same function, and A4 is
+   vacuous on binary files. What I DID prove is that no true positive was lost.
+   I did not enumerate every remaining case - symlinks, submodule gitlinks,
+   empty files (which count as TEXT, harmlessly, though git's own split is
+   two-way and mine prints three buckets).
+
+8. THAT NO OTHER CHECK IN THE REPOSITORY MAKES A3'S MISTAKE. I fixed the one that
+   fired and re-checked the one I wrote. I did not audit the rest of
+   check_roles.py for other proxies standing in for properties. That is C0's
+   review.
+
+9. ANY OF THE ABOVE BEYOND WHAT ONE ADVERSARIAL RE-CHECK FOUND. That re-check
+   found a false claim in my own rule-6 defence, a rule-11 denominator defect,
+   two vacuous-passing tests and two arithmetic errors in the specification -
+   ALL AFTER I HAD ALREADY WRITTEN THE REPORT SAYING THE WORK WAS DONE. The
+   honest inference is not "and now it is clean"; it is that a second reviewer
+   would probably find more. DO NOT TREAT THIS SESSION AS SELF-CERTIFIED.
+
+END OF REPORT.
