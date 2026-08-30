@@ -703,3 +703,54 @@ def test_the_operator_placeholder_gate_still_fires_on_a_real_placeholder(tmp_pat
     assert gate.camel_branch_problem() is None, (
         "a DECIDED branch must satisfy the gate, or `make selftest` can never go green"
     )
+
+
+# =======================================================================================
+# Q-012's RIDER (REVIEW_C0.md F2, closing paragraph) — A4's honesty sentence, PINNED.
+#
+#   "A4's honesty depends on that printed sentence. If a later chunk trims the detail
+#    strings, A4 silently becomes an assertion over 38 files wearing a label that says 40.
+#    Worth a note in the fix session."
+#
+# A note is not a check. This is the check.
+# =======================================================================================
+
+
+def test_a4_still_says_it_asserts_nothing_on_binary_files(tmp_path):
+    """⚠️ A4 is **VACUOUS on binary content**, and the only place that is said is its output.
+
+    The first justification written for INC-09's narrowing — *"a binary file is not skipped
+    here; it is checked harder"* — **was false, and it was the load-bearing sentence of the
+    hard-rule-6 defence.** On ``-text`` content git applies no conversion, so A4's two
+    hashes are equal BY CONSTRUCTION and **A4 cannot fail there.** `b0a4855` withdrew the
+    overclaim in the one place a future reader cannot skip: A4's own printed detail.
+
+    So the honesty of this check now rests on a **string**. Trim it and A4 becomes an
+    assertion over N text files wearing a label that says N + B. This probe fails if that
+    sentence goes, which is the only way a note in a review survives contact with a later
+    chunk. See QUESTIONS.md Q-012 and INCIDENTS.md INC-09.
+    """
+    repo = _init(tmp_path / "r")
+    (repo / "note.md").write_bytes(b"plain text\n")
+    # A PNG-shaped binary: the NUL is what makes git say `-text`, and the CRLF bytes are
+    # payload. It carries a NUL in its first 8000 bytes, so A5 branch B is satisfied too.
+    (repo / "shot.png").write_bytes(
+        b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x01\x00payload\r\n"
+    )
+    _commit(repo)
+
+    a4 = _results(check_roles.check_gitattributes(repo))[
+        "A4 working tree and object store hold identical bytes"
+    ]
+    assert a4.ok is True, f"the fixture must be a PASSING A4 for this to test anything: {a4.detail}"
+    assert "1 binary file(s) this holds BY CONSTRUCTION" in a4.detail, (
+        "A4 no longer says that it asserts NOTHING on binary content. That sentence is the "
+        "whole of Q-012's honesty: without it A4 is an assertion over the text files "
+        f"wearing a label that counts every tracked file. detail: {a4.detail}"
+    )
+    assert "asserts nothing" in a4.detail and "cannot fail on" in a4.detail, a4.detail
+    # Two text files: `.gitattributes` and `note.md`. One binary: `shot.png`.
+    assert "It is a real assertion on the 2 text file(s) only" in a4.detail, (
+        "A4 must state the size of the set it REALLY asserts over, not only the size of the "
+        f"set it walked. detail: {a4.detail}"
+    )
