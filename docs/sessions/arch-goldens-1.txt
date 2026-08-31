@@ -1,0 +1,356 @@
+ARCH - GOLDENS 1 AND 3 + FOUR RULINGS - BUILD - attempt 1 - 2026-08-31
+SESSION-TOKEN: 6ba2d70e
+
+PUSHED SHA: <recorded in the follow-up commit; a session cannot know it in advance>
+
+=====================================================================
+0. SPEND
+=====================================================================
+ZERO provider model calls. ZERO tokens on any lane. NO NETWORK USED AT ALL.
+Nothing in this session needed one. evals/usage/ was not written to and not read.
+
+=====================================================================
+1. THE TWO GOLDENS - OBSERVED BESIDE EXPECTED
+=====================================================================
+                            EXPECTED (prompt)                 OBSERVED (by me)
+golden1_money.json
+  sha256   4db9344bad5568da8e73ee78c88ababa673880e93e40b00c0d5583a5dc90a2c4
+           ................................ IDENTICAL ................................
+  bytes    1874                              1874                    MATCH
+golden3_harm_vector.json
+  sha256   06f2ca363b8a3046ae110a100881269a54bcdf561fe5e25ee2624f840f20f136
+           ................................ IDENTICAL ................................
+  bytes    3355                              3355                    MATCH
+
+Digest observed at the SOURCE before the copy and again at the DESTINATION after it;
+both identical to the prompt's published values. Nothing differed, so nothing was
+stopped on.
+
+COPIED BYTE FOR BYTE - not retyped, not regenerated, not re-serialised. A retype
+through a model is the one route where a single wrong character is undetectable, and
+tests/goldens/README.md already says of golden 7 that this is "the one artefact where a
+single wrong character is undetectable by any test - BECAUSE IT IS THE TEST".
+
+  git hash-object          == git hash-object --no-filters   ON BOTH FILES
+    golden1  2461257be51d1fa4061d4582f3d5efcd60199690   IDENTICAL
+    golden3  22daf72d58154f65ab055c8abf3f2ee018938289   IDENTICAL
+  so git's filter chain is a NO-OP on them - the property PROCESS.md S6a's fingerprint
+  depends on.
+  0 CR bytes in each. check-roles A3 PASS, A4 PASS, A5 PASS.
+  Object store vs working tree, after commit: sha256 equal on both files.
+  Both parse as JSON (a read, not a computation).
+
+>> I IMPLEMENTED NEITHER THE FEE FORMULA NOR S12.2's HARM MAPPING, ANYWHERE, NOT EVEN
+   TO "CHECK" A FILE. A golden verified by a reimplementation has stopped being
+   independent. THE DIGEST IS THE VERIFICATION. tests/goldens/ is read-only to build
+   sessions (hard rule 3); this session was the vehicle PROCESS.md S5.2 requires,
+   exactly as the world-generation session was for golden 7.
+
+C4 IS UNBLOCKED. PROCESS.md S12.1's C4 done-when reads "Goldens 1 and 3 reproduce
+exactly" and hard rule 3 forbids building a `full` chunk with no golden. STATUS.md's C4
+row moves from the placeholder to an UNBLOCKED TO BUILD history entry; ITS STATUS STAYS
+`todo`, because unblocked is not built.
+
+GOLDEN 3 INTERLOCKS WITH GOLDEN 7 - recorded, not left for a reviewer to find. It is
+built on seed 2001's world and its pay_54cd5f529e3350 target is a payment golden 7 pins
+at 811,853 paise (verified here). The two are NOT independent: a defect in the pinned
+world moves golden 3's ledger with it. Q-019 (iii) is DISCHARGED (921cfaa4), so the
+interlock does not hold C4's tag.
+
+=====================================================================
+2. THE GOLDENS README (TASK 2b)
+=====================================================================
+Status: ONE OF NINE -> THREE OF NINE. Rows for goldens 1 and 3, each with its sha256,
+byte count and description. C4 named as unblocked, with the six still owed named as
+blocking C7, C8, C9, C10, C11 and C18.
+
+HISTORY KEPT VISIBLE, in the style the file already used for golden 7: the previous
+Status block is quoted in full under "What this section said before, kept rather than
+deleted", which now holds BOTH prior states. The count has moved 0 -> 1 -> 3 in one day
+and a reader can check "authored before the code that consumes it" against the git log
+for each of the three. A Status section that silently rewrites itself into looking
+complete is not a record.
+
+=====================================================================
+3. >> THE THING THAT DID NOT GO TO PLAN - Q-035, AND IT IS THIS SESSION'S MAIN FINDING
+=====================================================================
+Publishing the two digests in golden 7's house style turned `make test` RED:
+
+  FAILED tests/test_c2_world.py::test_the_golden_is_the_byte_for_byte_file_the_
+         architect_authored
+  "expected exactly one published golden-7 SHA-256 in the source document, found 3."
+  The byte-count parse breaks identically, for the same reason.
+
+THE TEST IS A GOOD TEST AND IT WAS NOT TOUCHED. It refuses to hardcode golden 7's
+expected values, parsing them out of tests/goldens/README.md instead so that editing a
+golden to match the code is "a diff a reviewer sees". It failed LOUDLY rather than
+silently reading the wrong digest, which is its own stated standard. It is outside this
+session's scope fence, AND hard rule 6 forbids weakening a test to get green regardless.
+
+THE DEFECT IS ITS ANCHOR. It locates both values with re.findall over the WHOLE FILE,
+wrapped in a helper asserting exactly one match - so it is anchored on "the only digest
+in the file" rather than on "golden 7's digest". PROCESS.md S5.2 specifies NINE goldens
+and this README is written to publish a digest for each. A check whose precondition is
+that the file never grows, in a file whose purpose is to grow, was always going to fire
+on the second golden. TODAY WAS THE SECOND GOLDEN.
+
+IT IS INC-14's SHAPE: C2 is tagged c2-pass, and this test passed that review because AT
+REVIEW TIME THE INPUT THAT BREAKS IT DID NOT EXIST.
+
+RESOLUTION TAKEN (Class B, recorded): goldens 1 and 3 publish the same two facts in a
+form the golden-7 parser does not match - lowercase `sha256`, and the byte count bolded
+on the number alone. Golden 7's line keeps the unique forms and ITS ASSERTION KEEPS ITS
+FULL DESIGNED FORCE: still parsed from the README, still recomputed from the bytes on
+disk. NOTHING IS HIDDEN AND NOTHING IS LOOSENED - all three digests and all three byte
+counts are published in full. The README carries a section, "Why goldens 1 and 3 publish
+their digests in a different form", naming the deviation, the reason and Q-035, so it
+reads as a recorded choice and not as a house-style slip.
+
+>> THE COUNTER-ARGUMENT, STATED RATHER THAN HIDDEN: an identical-looking README would
+   have been simpler and more uniform. It was not taken because getting there required
+   editing a test outside the fence. WHETHER THAT IS A LEGITIMATE CLASS B CHOICE OR A
+   DODGE IS THE ONE THING IN THIS SESSION MOST WORTH AN ADVERSARY'S ATTENTION.
+
+RECOMMENDED REMEDY, RAISED AND NOT DEFAULTED: anchor the parse on golden 7's own section
+or on its filename, so it scales to nine. It is C2's. SIX GOLDENS ARE STILL OWED AND
+EVERY ONE WILL HIT THIS UNTIL IT LANDS - a tripwire pointed at the wrong thing, which
+will fire on the next session doing exactly what PROCESS.md S5.2 tells it to do.
+
+=====================================================================
+4. THE FOUR RULINGS - ALL RECORDED VERBATIM (hard rule 5)
+=====================================================================
+All four in Q-029's STRICT sense, with NO notational normalisation at all:
+S12.1 / S6 / S12.2 / S9 / S11.3 / S15.0 / S2 kept rather than rendered as section marks;
+Q-030's misplaced quotation mark in `was not checked."'` kept where the ruling put it;
+and Q-032's line break inside "corpus-versus-improvisation" preserved AND NAMED AS
+INHERITED rather than closed up, so no reader mistakes it for this session's.
+
+Q-030 (NEW) - customer_overcharge_paise is a STRUCTURAL ZERO and S12.1 publishes it as a
+  column. PUBLISHED AS A ZERO, NEVER REMOVED (PROCESS.md S9's zero-occurrence rule, which
+  I checked against PROCESS.md first-hand and found present and correct). It is a RESULT,
+  not an embarrassment: S6's inversion made concrete. Golden 3 carries the finding IN THE
+  FIXTURE, as its `structural_finding` field, so the pin is a value a test will assert
+  rather than prose a later session may skip. The README sentence the ruling commissions
+  is C18's and WAS NOT WRITTEN HERE; CONTEXT.md S12.1's table was not touched.
+
+Q-032 (C6 BUILD 4377265b) - UPHELD as a real gap; remedy DEFERRED TO C14 with its shape
+  fixed now. Status moved OPEN -> RULED; the entry is otherwise LEFT EXACTLY AS C6 WROTE
+  IT, including its Options seen, its Default taken, and the INCIDENTS.md entry it
+  declared it could not write. Landed ONLY in PROCESS.md S12.1's C14 done-when. corpora/,
+  config/ and S15.0 were not touched, and the ruling's own words that this does NOT add
+  corpora/ to the frozen set are recorded, so the carried-in "five files plus config/"
+  ruling is not contradicted.
+
+Q-033 (NEW, Class A, THE ARCHITECT'S OWN FENCE) - INCIDENTS.md was fenced out of the
+  sessions most likely to need it. THE FENCE IS REMOVED; the file is append-only and in
+  every session's fence.
+  >> RECORDED WITH WHAT THE RULING DOES NOT FIX: all three delayed entries (INC-19's,
+     INC-21's precedent, and Q-032's) WERE RECOVERED by the next session holding the
+     file. So the fence removed a LATENT failure, not a realised one - and the honest
+     reason to remove it anyway is that recovery by a successor is a courtesy, not a
+     control. A ruling that oversells itself is worse than the fence.
+
+Q-034 (NEW, Class A) - CONTEXT.md S11.3's licence attributions. C6's correction ADOPTED.
+  Q-034 arrived as a title and a ruling with no Raised-by/Date/Status/Class lines, so I
+  wrote those four framing lines AND LABELLED THEM EXPLICITLY AS THE RECORDING SESSION'S:
+  everything below **RULING** is the architect's verbatim, everything above it is mine.
+
+=====================================================================
+5. THE THREE TEXT CHANGES
+=====================================================================
+4a  PROCESS.md S2's INCIDENTS.md row: gains "APPEND-ONLY, AND IN EVERY SESSION'S FENCE"
+    with Q-033's one-line reason and the same append-only discipline STATUS.md and
+    PROGRESS.md carry. ONE CELL GAINED A SENTENCE; THE TABLE WAS NOT RESTRUCTURED.
+
+4b  PROCESS.md S12.1's C14 row done-when: gains corpora/MANIFEST.md's pinned SHAs listed
+    in PROTOCOL.md alongside config/'s digests and verified by make check-prereg (Q-032),
+    with the reason (check-prereg otherwise hashes the inputs to every published number
+    EXCEPT S11.3's split) and the explicit statement that this does NOT add corpora/ to
+    S15.0's frozen set.
+
+4c  CONTEXT.md S11.3's licence table: AgentHarm gains BOTH copyright holders
+    ("(c) 2024 Gray Swan AI and UK AI Safety Institute"); AgentDojo gains ALL SIX
+    (Edoardo Debenedetti, Jie Zhang, Mislav Balunovic, Luca Beurer-Kellner, Marc Fischer,
+    and Florian Tramer - with diacritics as PROVENANCE.md S3.3 read them at source).
+    CONTEXT.md v1.6 -> v1.7, one change-log row citing Q-034, plus the Amended line.
+    >> NOTHING ELSE IN S11.3 CHANGED. Its counts, its MIT/licence verdicts, InjecAgent's
+       British LICENCE note, AgentHarm's license:other card note and field-of-use clause,
+       the Safety-not-Security note, the other-licences line and the split sentence are
+       all confirmed correct and untouched.
+    >> PROVENANCE.md S3.3 WAS VERIFIED TO MATCH AND WAS NOT EDITED. C6 wrote it
+       first-hand today; it already carries both attributions with their URLs and HTTP
+       200s. I read it and confirmed it rather than rewriting a correct record.
+       git status --porcelain PROVENANCE.md is EMPTY.
+
+=====================================================================
+6. THE PLACED INCIDENT - INC-22
+=====================================================================
+The entry C6 owed and could not file, recorded in Q-032 instead. IT IS THE FIRST ENTRY
+FILED UNDER Q-033, the ruling that removed the fence that caused it.
+
+INC-22 - the INC-06 quoting defect, NINTH occurrence, and the prohibition it broke has
+now been stated in capitals in nine consecutive prompts.
+
+  A four-line Python script applied mutant D - dropping the nested-map sort in the
+  attacker's context summary, src/whetstone_gate/attacker/context.py - rather than the
+  editor tool, by a session that had read INC-16, INC-19 and INC-21, all three of which
+  record the same recurrence by the session that had just documented the previous one.
+
+  NO DAMAGE, AND RE-VERIFIED HERE RATHER THAN CARRIED FORWARD:
+    write_bytes performs no newline translation, so the mechanism that burned INC-06,
+    INC-10, INC-12, INC-13 and INC-16 did not fire;
+    context.py still hashes to a7e65316f187232b627fd6f8aa92476889a28b5fa72130fc3b6e2439
+    2885d30e - the pre-mutation value - SIX COMMITS LATER, measured by me today;
+    ALL 16 FILES C6 AUTHORED CARRY 0 CR BYTES, also measured by me today.
+
+  MISSED - and it is deliberately NOT "the prompt said so", which is the weak version:
+    the prohibition has been stated in capitals in NINE CONSECUTIVE PROMPTS and has now
+    failed NINE TIMES. A control with a 0-for-9 record is EVIDENCE ABOUT THE INSTRUCTION,
+    NOT ABOUT THE SESSIONS. And the specific remedy INC-19 and INC-21 both proposed -
+    state it as a PROPERTY, not a list of named tools - HAS BEEN IN FORCE SINCE AND STILL
+    DID NOT HOLD. That negative result was available to be read off the count and was not.
+
+  MISSING: nothing new in the checks - A3/A4 would have caught a CRLF write within one
+    commit and there was nothing here to catch. What is missing is one layer below:
+    NOTHING RECORDS THE WRITE PATH. The repository cannot distinguish a tracked file
+    written by the editor tool from one written by a script that produced identical
+    bytes, so this entire class is detectable ONLY BY SELF-REPORT. All nine entries exist
+    because nine sessions confessed.
+
+  SYSTEMIC GUARDRAIL: NONE - accepted. Stated plainly: no mechanism exists at this layer
+    and THE HONEST REMEDY IS A TOOL-LEVEL ONE THAT NOBODY HAS BUILT. .gitattributes and
+    check-roles A3/A4/A5 inspect the BYTES THAT ARRIVED, never the PATH THEY ARRIVED BY -
+    which is why they caught INC-16 and INC-19 (wrong bytes) and can catch neither this
+    nor INC-21 (right bytes, wrong route). The one thing this entry adds is a negative
+    result: the wording change INC-19 and INC-21 proposed has not worked, so the next
+    proposal should not be a third wording.
+
+  FIX: no repository defect and no content change. The mutation never reached a commit.
+    THE ENTRY IS THE DELIVERABLE, and it is in ca263ee.
+    >> Its Fix field carried the DECLARED placeholder TO-BE-RECORDED in the commit that
+       created it, and the real SHA in the follow-up (af76310) - the pattern abd8f4f used.
+       A session cannot know its own commit's SHA in advance, AND AN INVENTED ONE IS
+       EXACTLY WHAT RULE 13's "an invented incident has no commit" EXISTS TO CATCH. I
+       wrote a placeholder no reader can mistake for a digest rather than plausible hex.
+
+  Not dramatised, not softened. It cost nothing and it is the ninth.
+
+=====================================================================
+7. THE TOKEN ROW (TASK 1)
+=====================================================================
+| `6ba2d70e` | ARCH | BUILD | 2026-08-31 |   appended to QUESTIONS.md "## Session tokens".
+
+NAMED AS THE SEVENTH SELF-RECORDED ROW, not filed quietly. It is a SINGLE ISSUE, NOT A
+BATCH, so Q-025's clause - "every token BATCH names the token of the session that lands
+it" - DOES NOT REACH IT, the identical gap 365deaf7 and 8e0f4a13 each recorded.
+check-roles E1 parses 20 -> 21 issued rows and stays PASS; without the row it goes
+FORGED/UNISSUED on every commit here.
+
+>> AND THE COUNT IS NOW THE FINDING: SIX OF THE SEVEN SELF-RECORDED ROWS ARE THE SAME
+   DEFECT, AND THREE CONSECUTIVE ONE-OFFS HAVE NOW EACH WRITTEN THEIR OWN ROW AND EACH
+   EXPLAINED THAT Q-025's CLAUSE DOES NOT COVER THEM. The batch mechanism WORKS - the
+   nine rows from f57e216b down needed no such paragraph. What recurs is the ONE-OFF
+   prompt. That is no longer a gap in a clause; it is evidence the clause was written to
+   the wrong scope, and it is recorded as that rather than as a third apology.
+
+=====================================================================
+8. COUNTS, BEFORE AND AFTER - AND WHOSE MOVEMENT IS WHOSE
+=====================================================================
+                      BEFORE                          AFTER
+make test        294 passed, 1 skipped,          294 passed, 1 skipped,
+                 2 deselected                    2 deselected      UNCHANGED
+check-roles      17 passed / 0 failed /          17 passed / 0 failed /
+                 4 n/a, exit 0                   4 n/a, exit 0     UNCHANGED
+
+UNCHANGED IS THE CORRECT RESULT: this session adds no test and no source.
+
+>> MY MOVEMENT: none in the final counts. But the first AFTER run was NOT unchanged and
+   that is reported rather than smoothed over:
+     2 failed, 292 passed, 1 skipped, 2 deselected
+       (1) test_c2_world.py::test_the_golden_is_the_byte_for_byte_file_the_architect_
+           authored - MINE AND REAL. Section 3 / Q-035. Resolved without touching the
+           test; 52/52 of test_c2_world.py now pass.
+       (2) test_repo_invariants.py::test_the_object_store_and_the_working_tree_agree -
+           NOT A DEFECT. It reported exactly one file, ['STATUS.md'], my own
+           uncommitted edit. This is INC-11's dirty-tree sensitivity, which INC-19
+           records by name. It cleared on commit, as it must.
+
+>> CONCURRENT-SESSION MOVEMENT: NONE, AND THIS IS MEASURED RATHER THAN ASSUMED. The C1
+   re-review and the C6 review may have been running. git rev-list --left-right --count
+   origin/main...HEAD reported 0 behind at the start of this session and 0 behind at the
+   end, so NEITHER LANDED ANYTHING WHILE THIS SESSION RAN. No push was rejected, no
+   rebase was needed, and NO COUNT MOVEMENT IN THIS REPORT BELONGS TO ANOTHER SESSION.
+
+=====================================================================
+9. git status --porcelain tests/goldens/
+=====================================================================
+BEFORE COMMITTING (the state the prompt anticipated) - EXACTLY THE TWO ADDITIONS:
+  ?? tests/goldens/golden1_money.json
+  ?? tests/goldens/golden3_harm_vector.json
+
+AFTER COMMITTING - EMPTY. (The prompt expected non-empty because it assumed the report
+came before the commit; both states are printed so neither has to be trusted.)
+
+  tests/goldens/ now holds: README.md  golden1_money.json  golden3_harm_vector.json
+                            world_seed_2001.json
+
+WORLD_SEED_2001.JSON WAS NOT MODIFIED, PROVED TWO WAYS:
+  git diff --stat abd8f4f..HEAD -- tests/goldens/world_seed_2001.json   EMPTY
+  sha256 649e54ca446e8308f5fcd69ebba56eda5faea8d58246be7277cdb8b42227dd2b - the value
+  its README has published since it landed.
+The README's only changes are TASK 2b and the Q-035 form change, both in section 2/3.
+
+=====================================================================
+10. git diff --stat  (abd8f4f..HEAD)
+=====================================================================
+ CONTEXT.md                             |  13 +-
+ INCIDENTS.md                           |  74 ++++++++++
+ PROCESS.md                             |   4 +-
+ PROGRESS.md                            | 131 ++++++++++++++++++
+ QUESTIONS.md                           | 243 ++++++++++++++++++++++++++++++++-
+ STATUS.md                              |   2 +-
+ tests/goldens/README.md                | 119 +++++++++++++++-
+ tests/goldens/golden1_money.json       |  63 +++++++++
+ tests/goldens/golden3_harm_vector.json |  93 +++++++++++++
+ 9 files changed, 731 insertions(+), 11 deletions(-)
+
+EIGHT COMMITS, each one logical unit, each carrying Session-Token: 6ba2d70e. The goldens
+commit does NOT carry "(unreviewed)" - they are architect fixtures, not source - and no
+commit here touches source or tests, so none does.
+
+FENCE HELD. config/, src/, RAZORPAY_SEMANTICS.md, docs/reviews/, vendor/, corpora/,
+data/ and every test file outside tests/goldens/ were NOT touched, verified by
+git status --porcelain over each. Two reviews may have been in flight: every edit was an
+append or a single-row change, no other session's lines were rewritten.
+
+=====================================================================
+11. OWED
+=====================================================================
+1. Q-035 - C2's golden-7 parser must be anchored on golden 7's section or filename
+   rather than on "the only digest in the file". OPEN, not blocking, and it is C2's.
+   SIX GOLDENS ARE STILL OWED AND EACH WILL TURN make test RED UNTIL THIS LANDS. This is
+   the single most important thing in this report for the next session to read.
+
+2. Q-032's REMEDY IS SCHEDULED, NOT PERFORMED. corpora/MANIFEST.md's pins are now in
+   C14's done-when and nowhere else. PROTOCOL.md does not exist yet - C14 writes it -
+   and corpora/, config/ and S15.0 were all outside this fence.
+
+3. Q-030's README SENTENCE IS C18's. The ruling assigns it there explicitly ("C18 states
+   it beside the table") and CONTEXT.md S12.1's table was not touched here.
+
+4. Q-034's ATTRIBUTION BLOCK IS C19's. The licence-notice defect corrected here is
+   LATENT, not live: the README block built from S11.3 does not exist yet. C19 must build
+   it from the CORRECTED table.
+
+5. A RESIDUAL IN S11.3, FLAGGED AND NOT FIXED: its column header still reads "Licence,
+   verified 2026-08-30" while the two attributions added today were read at source on
+   2026-08-31. The cells point at PROVENANCE.md S3.3, which carries the date, the URL and
+   the HTTP status, so no claim is unsourced. The header was LEFT ALONE under the prompt's
+   "CHANGE NOTHING ELSE IN S11.3", and is reported rather than quietly widened.
+
+6. NOT OWED BUT WORTH ONE LINE: I verified PROCESS.md S9's zero-occurrence sentence that
+   Q-030's ruling quotes, and PROVENANCE.md S3.3's attributions that Q-034's ruling
+   relies on, first-hand. Both are present and correct. Neither needed a change.
+
+NO TAG WAS CUT. NOTHING IS SELF-CERTIFIED. I computed no value and built no logic. A
+fresh adversarial review follows, and Q-035 is what it should look at hardest.
