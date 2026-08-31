@@ -66,7 +66,10 @@ which are unchanged.
 
 ### Golden 1 — `golden1_money.json`
 
-**SHA-256 `4db9344bad5568da8e73ee78c88ababa673880e93e40b00c0d5583a5dc90a2c4`** · **1,874 bytes**.
+**sha256** `4db9344bad5568da8e73ee78c88ababa673880e93e40b00c0d5583a5dc90a2c4` · **1,874** bytes.
+*(On why this line is not styled like golden 7's below, see **"Why goldens 1 and 3 publish their
+digests in a different form"** at the foot of this section — it is a recorded deviation, not a
+house-style slip.)*
 
 **One line:** the money arithmetic C4 must reproduce — the `ROUND_HALF_UP` mode with Razorpay's two
 discriminating cases (`0.885 → 0.89`, `2.065 → 2.07`, each carrying the `ROUND_HALF_EVEN` answer
@@ -88,7 +91,7 @@ cases and one fee vector**, which is what makes this fixture a test rather than 
 
 ### Golden 3 — `golden3_harm_vector.json`
 
-**SHA-256 `06f2ca363b8a3046ae110a100881269a54bcdf561fe5e25ee2624f840f20f136`** · **3,355 bytes**.
+**sha256** `06f2ca363b8a3046ae110a100881269a54bcdf561fe5e25ee2624f840f20f136` · **3,355** bytes.
 
 **One line:** the harm vector on one worked **five-entry** episode — every one of the four components
 computed by hand per entry and per episode, carrying the `create_instant_settlement` sweep that moves
@@ -117,6 +120,41 @@ formula was not implemented anywhere, and neither was the §12.2 harm mapping, n
 file.** A golden verified by a reimplementation has stopped being independent — the digest and the
 byte count above **are** the verification, recorded as observed after the copy, and the copy was
 byte-for-byte rather than a retype.
+
+### Why goldens 1 and 3 publish their digests in a different form
+
+⚠️ **A RECORDED DEVIATION (hard rule 2, Class B), AND THE REASON IS A REAL DEFECT IN A COMMITTED
+TEST — `QUESTIONS.md` Q-035.** Golden 7's line below publishes its digest as a **bolded `SHA-256`
+label followed by a code span**, and its size as a **bolded `N bytes`**. Goldens 1 and 3 deliberately
+use neither shape — lowercase `sha256`, and the byte count bolded on the number alone — and the
+difference is not cosmetic.
+
+`tests/test_c2_world.py::test_the_golden_is_the_byte_for_byte_file_the_architect_authored` — C2's, and
+a good test — parses golden 7's expected digest and byte count **out of this README** rather than
+hardcoding them, so that editing the golden to match the code also requires editing a published
+digest, *"which is a diff a reviewer sees."* **That intent is exactly right.** But it locates them by
+`re.findall` over the whole file, wrapped in a helper that **asserts exactly one match** — one
+pattern for the `SHA-256` label plus a 64-hex code span, one for a bolded `[\d,]+ bytes` — so it is
+anchored on *"the only digest in the file"* rather than on *"golden 7's digest"*.
+
+**This directory is specified to grow to nine goldens, each publishing a digest.** So that parser was
+going to break on the second one, by construction — and it did, on the first occasion a second golden
+was added: three matches where it requires one, on **both** patterns. **The test was right to fail
+rather than silently read the wrong one**; its own message says a parser that *"reads an unintended
+second occurrence … is the same class of defect as the check it replaces."*
+
+**What was done, and what was deliberately not done.** `tests/test_c2_world.py` is **outside this
+session's scope fence and was not touched** — and hard rule 6 forbids weakening a test to get green
+in any case. Instead these two entries publish the same two facts in a form the golden-7 parser does
+not match, so **golden 7's published digest stays the unique anchor and its assertion keeps working
+exactly as designed** — still parsed from this file, still recomputed from the bytes on disk.
+**Nothing is hidden and nothing is loosened: all three digests and all three byte counts are here, in
+full, and any reader or future parser can find all three.**
+
+**The real remedy is C2's and is raised, not taken:** anchor the parse on golden 7's own section, or
+on its filename, so the check scales to nine. Until then **every golden added to this file must
+either use the distinct form or break C2's test** — which is why this paragraph exists rather than a
+quiet re-styling.
 
 ### Golden 7 — `world_seed_2001.json`
 

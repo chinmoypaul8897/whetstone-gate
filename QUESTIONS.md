@@ -2886,6 +2886,65 @@ silently.
 
 ---
 
+### Q-035 — C2's golden-7 check anchors on *"the only digest in the file"*, in a directory specified to hold nine
+**Raised by:** ARCH BUILD (`6ba2d70e`) · **Date:** 2026-08-31 · **Status:** **OPEN — not blocking**
+**Blocking:** nothing. `make test` is green and every count is at its baseline. **Relevant to every
+future golden**, which is why it is raised the moment it fired rather than left for the ninth.
+**Deviation class:** **B — taken and recorded.** The README-form change below is an implementation
+choice inside this session's fence. The underlying defect is in a test file outside it, and **no
+option here was defaulted**: the remedy is named and left to the chunk that owns the test.
+
+**What happened, in the order it happened.** Placing goldens 1 and 3 (`PROCESS.md` §5.2) and giving
+each its digest and byte count in `tests/goldens/README.md` — TASK 2b, in the house style golden 7
+already used — turned `make test` **RED**:
+`tests/test_c2_world.py::test_the_golden_is_the_byte_for_byte_file_the_architect_authored`, with
+*"expected exactly one published golden-7 SHA-256 in the source document, found 3."* The byte-count
+parse breaks identically, for the same reason.
+
+**The test is a good test and its intent is exactly right.** It refuses to hardcode golden 7's
+expected values, parsing them from this README instead so that *"editing the golden to match the code
+now requires editing the README's published digest too, which is a diff a reviewer sees"* — and it
+**failed loudly rather than silently reading the wrong digest**, which is its own stated standard:
+*"a parser that silently reads nothing … or reads an unintended second occurrence … is the same class
+of defect as the check it replaces."*
+
+⚠️ **THE DEFECT IS THE ANCHOR, AND IT WAS ALWAYS GOING TO FIRE ON THE SECOND GOLDEN.** The values are
+located by `re.findall` over the whole file inside a helper asserting **exactly one** match — so the
+check is anchored on *"the only digest in the file"* rather than on *"golden 7's digest"*.
+`PROCESS.md` §5.2 specifies **nine** goldens and this README is written to carry a published digest
+for each. **A check whose precondition is that the file never grows, in a file whose purpose is to
+grow, is a latent failure with a known trigger date** — and today was it, on golden number two.
+⚠️ **AND IT IS INC-14's SHAPE:** C2 is tagged `c2-pass`, and this test passed that review because **at
+review time the input that breaks it did not exist.** It was never fired at a two-golden README, so
+its green said nothing about the case it now meets.
+
+**Options seen:**
+  1. **Generalise the parse** — anchor on golden 7's own section heading or on `world_seed_2001.json`,
+     so it scales to nine. ⚠️ **The right fix, and NOT taken here**: `tests/test_c2_world.py` is
+     **outside this session's scope fence**, and hard rule 6 forbids touching a test to get green
+     regardless. It is C2's.
+  2. **Weaken or skip the assertion.** — Rejected outright. Hard rule 6.
+  3. **Publish goldens 1 and 3's digests in a form the golden-7 parser does not match, and say so
+     where a reader will see it.** — ⚠️ **TAKEN.** Golden 7's line keeps the unique
+     `SHA-256`-plus-code-span and bolded-`N bytes` forms and **its assertion keeps working exactly as
+     designed** — still parsed from the README, still recomputed from the bytes on disk. Goldens 1
+     and 3 use lowercase `sha256` and bold the number alone. **Nothing is hidden and nothing is
+     loosened: all three digests and all three byte counts are published in full.** The README
+     carries a section — *"Why goldens 1 and 3 publish their digests in a different form"* — stating
+     the deviation, the reason and this question's number, **so it reads as a recorded choice and not
+     as a house-style slip.**
+  4. **Do nothing and leave `make test` red.** — Rejected: TASK 2b is completable in full without it,
+     and leaving the suite red for the next session is a worse handover than a recorded deviation.
+
+**Recommendation:** option 1, owned by whoever next holds `tests/test_c2_world.py`. ⚠️ **Until it
+lands, every golden added to this README must either use the distinct form or turn C2's test red** —
+and there are **six** still owed. That is a tripwire pointed at the wrong thing: it will fire on the
+next session doing exactly what `PROCESS.md` §5.2 tells it to do, and that session will have to
+rediscover this entry to know why. **This is the reason it is raised loudly now rather than noted in
+a report.**
+
+---
+
 ## Rulings carried in from before the repository existed
 
 These were made by the architect in `PROJECT_SPEC.md` before C0 and are **already binding**. They
