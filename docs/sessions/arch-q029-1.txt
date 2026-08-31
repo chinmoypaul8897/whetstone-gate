@@ -3,11 +3,13 @@ ARCH -- Q-029 CLOSURE -- BUILD -- attempt 1 -- SESSION-TOKEN 8e0f4a13 -- 2026-08
 FINAL OUTPUT. Committed to docs/sessions/arch-q029-1.txt BEFORE being printed.
 ================================================================================
 
-PUSHED SHA: <recorded by the immediately following commit, which is this session's
-             head; see "GIT" below. This file is committed before it is printed, so
-             it cannot contain its own hash, and a guessed one would be the exact
-             defect hard rule 13's Fix-with-SHA field exists to detect. Same
-             handling as c1-fix-1.txt.>
+PUSHED SHA: e0f11ca  (this block, committed and pushed)
+            The head at the moment this session ends is the follow-up commit that
+            writes this line, because a file cannot contain its own hash. Both are
+            on origin/main. A guessed SHA here would be the exact defect hard rule
+            13's Fix-with-SHA field exists to make detectable, so the placeholder
+            was carried through the push rather than filled in by prediction. Same
+            handling as c1-fix-1.txt.
 
 VERDICT: Q-029 is RULED and closed. A4's five documented bounds now map to SIX
 configured values and ALL SIX ARE PRESENT. One finding is recorded and is NOT
