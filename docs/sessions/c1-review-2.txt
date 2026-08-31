@@ -3,14 +3,15 @@ C1 -- ADVERSARIAL RE-REVIEW -- attempt 2 -- SESSION-TOKEN df238be6 -- 2026-08-31
 FINAL OUTPUT. Committed to docs/sessions/c1-review-2.txt BEFORE being printed.
 ================================================================================
 
-PUSHED SHA: <recorded by the follow-up commit>
-            A file cannot contain its own hash, so this block is committed with
-            the placeholder and the head at the moment this session ends is the
+PUSHED SHA: a775823  (this block, committed and pushed)
+            A file cannot contain its own hash, so this block was committed with
+            a placeholder and the head at the moment this session ends is the
             follow-up commit that fills it in. Both are on origin/main. A guessed
             SHA here would be the exact defect hard rule 13's Fix-with-SHA field
-            exists to make detectable, so the placeholder is carried through the
+            exists to make detectable, so the placeholder was carried through the
             push rather than filled in by prediction. Same handling as
             c1-fix-1.txt and arch-q029-1.txt.
+            TAG: c1-pass, cut on the follow-up commit so it covers this line too.
 
 VERDICT: PASS. ZERO BLOCKERS. `c1-pass` IS CUT.
          Eight new findings, ALL MEDIUM OR LOW, OF-39..OF-46.
