@@ -2590,6 +2590,120 @@ and the shape of the remedy is left open on purpose (an owner-less `TODO_UNRULED
 
 ---
 
+### Q-031 — C6 is a `full` chunk with no golden, and its token figure cannot be measured without a provider call
+**Raised by:** architect · **Date:** 2026-08-31 · **Status:** **RULED**
+**Blocking:** nothing — C6 was built under the two rulings below.
+**Deviation class:** n/a — architect rulings, not a session deviation.
+**Context:** two separate problems, ruled together because both are C6's done-when.
+- Hard rule 3 says a `full` chunk with no golden may not be built; `PROCESS.md` §5.2's
+  nine goldens assign **none** to C6.
+- C6's done-when says *"measured tokens/episode is recorded and compared against the
+  ≤ 60,000 target"*, and `PROCESS.md` §8 reserves the attacker lanes for the sweep from
+  31 August: **no build session may spend on them.**
+
+**RULING (architect, 2026-08-31), part 1 — NO GOLDEN, AND THAT IS THE RULING.** C6's
+done-when is **entirely structural and determinism-based rather than numeric**: the four
+"never sees" assertions, the summary's byte-identity for identical state, the
+one-call-per-turn count, the corpus/improvisation field. There is no expected *value* for a
+golden to hold. This is Q-016's reasoning (C1) and Q-020's (C3) applied to C6.
+**ENFORCEMENT in place of a golden: C6's REVIEW must INDEPENDENTLY RE-DERIVE the four
+"never sees" assertions and the summary's determinism BY ITS OWN METHOD.** A divergence is
+a finding.
+
+**RULING (architect, 2026-08-31), part 2 — C6 PRODUCES AN ESTIMATE, LABELLED ONE
+EVERYWHERE.** A true measurement requires a provider call and this session may not make
+one. C6 assembles the full 20-turn context against a **mocked** model and counts by a
+**declared** method, naming the method and its expected error. **THE PILOT MEASURES THE
+REAL FIGURE AND IT SELECTS THE N BRANCH** (`CONTEXT.md` §13.3: *"The pilot MUST measure the
+actual figure and it selects the N branch"*); **C14 owns that.** An estimate presented as a
+measurement is `INCIDENTS.md` **INC-05**'s class, and the N branch decides the size of the
+whole run.
+
+**BUILD SESSION'S NOTE (`4377265b`), added because the enforcement is only executable if
+the method is on the record.** The estimator is a **character-count approximation**,
+``ceil(chars / 3)`` plus a per-message framing allowance, and **its parameters are
+implementation choices recorded as Class B — they are NOT §8.6 rows and were NOT added to
+`config/`**, because §8.6 fixes no estimation method and the figure is superseded by C14's
+measurement before any scored episode runs.
+
+⚠️ **THE CALIBRATION WAS RUN TWICE AND THE FIRST RUN WAS WRONG IN THE UNSAFE DIRECTION.
+Recorded because the number that survived is only trustworthy if the one that did not is
+visible.** Against a toy fixture with short tool results the assembled context ran **4.11
+characters per BPE token** and the conventional divisor of 4 over-estimated by **+2.9%** —
+the safe direction, and the session nearly stopped there. Re-run against the **real
+seed-2001 world payload** the same estimator ran **−25.4%, LOW**: `fetch_payments` returns
+JSON, JSON tokenises far denser than prose (**2.97** chars/token), so a divisor of 4
+**under**-estimates every context a real episode assembles. **Low is the unsafe direction
+for precisely this number**, because §13.4's Branch A is *"measured tokens/episode ≤
+60,000"*. The divisor is therefore **3**, chosen against the realistic fixture rather than
+the flattering one: measured error **−0.9%** worst case, **+11.9%** realistic.
+
+⚠️ **AND THE ESTIMATE IS NOT COMFORTABLY UNDER THE TARGET — IT DEPENDS ON A BEHAVIOUR
+NOBODY HAS MEASURED YET, AND THAT IS THE FINDING C14 NEEDS.** Both figures below are
+ESTIMATES over a full 20-turn episode against seed 2001's real world:
+
+| Attacker behaviour | ESTIMATE | vs the 60,000 target |
+|---|---|---|
+| **Realistic** — reads the payment list twice, then acts; actions return short results | **~25,200** | **WITHIN**, with room |
+| **Worst case** — the full 12-payment list comes back on **every** turn | **~126,600** | ⚠️ **OVER, by ~2.1×** |
+
+**The spread is the whole message: the figure is governed by how often the attacker
+re-reads `fetch_payments`, not by the window.** The window is doing its job either way —
+per-turn context reaches a **steady state** after 6 turns and stops growing, which
+``test_the_windowed_context_stops_growing_which_is_what_the_window_is_FOR`` asserts. **C6
+does not select a branch and does not propose amending the target**; it records that
+Branch A's threshold is reachable in one regime and not in the other, so the pilot's
+measurement is load-bearing rather than a formality.
+
+---
+
+### Q-032 — the attacker corpora are pinned in a file the freeze does not cover
+**Raised by:** C6 BUILD (`4377265b`) · **Date:** 2026-08-31 · **Status:** **OPEN — not blocking**
+**Blocking:** nothing. C6 built under Q-010's ruled pattern and the pins are verified on
+every load. **Relevant to C14** (the freeze) **and C18** (which publishes the split).
+**Deviation class:** none taken — this is a question, not a change.
+
+**Context.** `CONTEXT.md` §11.3's corpus/improvisation split is a **published number**, and
+what it is computed over is the corpus. The corpora are pinned in `corpora/MANIFEST.md` and
+`corpora/seed_index.json`, and `src/whetstone_gate/attacker/corpus.py` verifies each file's
+SHA-256 before parsing it — so a drifted payload stops the run.
+
+**But neither file is in the frozen set.** `CONTEXT.md` §15.0's frozen set is exactly five
+files plus `config/`, and the vendored packages' pins live in
+`config/protocol.yaml:vendor.*` precisely so `make check-prereg` hashes them at
+`prereg-v1`. **The corpus pins have no such key.** So the inputs to a published number sit
+outside the freeze, while the inputs to every other published number sit inside it.
+
+**Options seen:**
+  1. **Add `corpora.*` pin keys to `config/protocol.yaml`**, matching `vendor.*`. Closes the
+     gap exactly. But `config/` is a pre-registration artefact and the C6 card permits
+     touching it **only if a constant it needs is genuinely absent** — and C6 needed none,
+     because the manifest and the hash check are sufficient to *build*.
+  2. **Add `corpora/` to the frozen set** in `CONTEXT.md` §15.0. A spec change, architect's.
+  3. **Leave it, and publish the split with the pins cited from `corpora/MANIFEST.md`.**
+     Honest, and weaker than every other number this project publishes.
+
+**Default taken:** ⚠️ **none — work stopped on this item**, per Q-010's ruling that retires
+*"default taken pending a ruling"* for Class A. C6 did not touch `config/` and did not
+amend §15.0. The pins are recorded, verified first-hand, and hash-checked on every load;
+**what is missing is only that `make check-prereg` does not see them.**
+
+⚠️ **AND THIS SESSION OWES AN `INCIDENTS.md` ENTRY IT CANNOT WRITE.** During the mutation
+testing that proves the four blindness guards fire, this session applied one mutant
+(**D**, the summary's sort order) with a **four-line Python script** rather than the editor
+tool. **That is the INC-06 class, and its own prompt forbids it in capitals** — the same
+recurrence INC-16, INC-19 and INC-21 each record, by a session that had read all four.
+**No damage: `write_bytes` performs no newline translation, the file was restored from a
+pre-mutation copy and its SHA-256 verified equal (`a7e65316…85d30e`), and every file this
+session authored carries 0 CR bytes.** The entry is nonetheless owed, because INC-21's own
+note says the under-reporting pressure is strongest exactly when *"it reads badly and cost
+nothing"*. **`INCIDENTS.md` is named under NOT in this session's scope fence**, so it is
+recorded here instead — which is the same shape as Q-029's finding that the `TODO_`
+sentinel mechanism is unreachable from inside a fence, one layer up: **the file that
+records process failures is the file a fenced session most often may not write to.**
+
+---
+
 ## Rulings carried in from before the repository existed
 
 These were made by the architect in `PROJECT_SPEC.md` before C0 and are **already binding**. They
