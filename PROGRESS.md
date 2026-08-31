@@ -6,6 +6,176 @@ not a record; this file is.
 
 ---
 
+## ARCH — the rulings, the token batch, and two defect closures — BUILD — attempt 1 — 2026-08-31
+
+**SESSION-TOKEN:** `921cfaa4` — issued by the architect in this session's prompt. ⚠️ **Its row was
+written by this session, and that makes it the FOURTH self-recorded row in a table this session's own
+headline change exists to stop needing.** The prompt asserted the row was already present; it was not
+(`grep -c 921cfaa4 QUESTIONS.md` → **0** on first read, before any edit). See **Q-025**, and the batch
+note in `QUESTIONS.md` where it is labelled rather than left looking tidy.
+
+**Role:** BUILD, chunk cell **ARCH**. **No logic built. No tag cut. Not self-certified.**
+
+**Token spend: NONE.** **Zero provider model calls.** No network operation was needed or made.
+
+**Preconditions, verified rather than assumed.** `git log --oneline -3` showed **`ae8b14f`** (C2,
+`f0c50283`) at HEAD; `git status --porcelain` **empty**. The prompt's *"NO OTHER SESSION IS RUNNING"*
+was checked against the log rather than taken on trust — **precisely because that sentence was wrong
+the last time it was written** (Q-024's third architect error): the last commit landed **28 minutes**
+earlier, and nothing arrived during the session.
+
+### 1. The token batch — and the defect inside it
+
+`check-roles` **E1 has fired correctly three times** on one friction (`0811c64a`, `da356dbb`,
+`debc97ae`): every session needs `QUESTIONS.md` for its own token row and so **collides there with
+every other session**, and a session recording its own token is backwards — `PROCESS.md` §7a puts it
+on the **architect**, and `REVIEW_C0.md` named self-recording as the honour-system weak point.
+
+**Nine tokens are now recorded before the sessions that will use them exist.** `f57e216b` (C0 REVIEW),
+`a0cc0212` (C1 REVIEW), `a66c389d` (C3 REVIEW), `94116fe2` (C2 REVIEW), `7904e0a2` (C4), `4377265b`
+(C6), `ac7a0cf7` (C7), `5bd2f44a` (C8), `e1911a9f` (C9). **E1 parses 8 → 18 issued rows and stays
+PASS.** An issued-but-unused row is harmless because **E1 checks commits → issued and never the
+reverse**, so an unused row stands visible rather than being pruned to match what happened.
+
+⚠️ **E2 AND E3 GET REAL INPUT FOR THE FIRST TIME.** C0 now holds BUILD + FIX + REVIEW and C1 holds
+BUILD + REVIEW — exactly the shapes they police — and **before the C0 FIX session's B-01 repair they
+could not have fired on them at all** (`REVIEW_C0.md` F4/B-01: of §7a's three named conditions, only
+E1 could fire). **This is the first moment the build-vs-review separation is machine-checkable rather
+than asserted.**
+
+🚩 **AND THE BATCH OMITTED THIS SESSION'S OWN TOKEN — Q-025, a fourth architect error, found by the
+verification the prompt itself demanded** (*"verify each is present and say so"*). **A token batch
+that omits the batching session's own token reproduces exactly the defect it closes**: the batch is
+not self-applying, because the session that lands one is itself a session and needs a row some
+*earlier* batch had to contain. **Q-021's ruling — landed in this same session — already says the
+batch *"is not enforced either, and that is said rather than implied."* This is the first instance of
+that, within minutes.** Remedy, one clause: *every batch names the token of the session that lands
+it.* **Options 2 and 3 were available and rejected for a stated reason:** C3's red was correct
+*because C3's fence forbade the file*; this session's fence **names** it, so accepting a red here
+would be accepting a broken `check-roles` for a reason that does not apply.
+
+### 2. The six rulings — verbatim, and nothing deleted
+
+**Q-017, Q-018, Q-019, Q-021, Q-022, Q-023**, recorded **verbatim** (hard rule 5). Each `Status` flips
+to `RULED` **quoting the exact line it replaced**, and C2's and C3's `<pending>` placeholder lines are
+**left standing rather than overwritten**, because they are an earlier session's text. The only lines
+this session removed from `QUESTIONS.md` are the five status lines, each reproduced verbatim in its
+replacement — checkable with `git diff`.
+
+**Q-017 is the one that moves a number-bearing definition.** UPHELD: **S2 moves to `receipt`.** The
+deciding argument is not that `receipt` is nicer — it is that **the header definition cannot be
+implemented honestly**. `refunds.go:73-75` passes `nil` where `extraHeaders` go, so no refund on
+Razorpay's own MCP surface can carry `X-Refund-Idempotency`, and **S2 as defined could never fire**;
+making it fire would require our mock `create_refund` to accept a parameter the real server does not
+have — **INC-02 in mirror image**, the error that collapsed ₹2,004 crore to ₹22.4 L, pointed the other
+way. **The header finding is sharpened into a published claim, not lost.**
+
+**Q-018:** C1's option 1, with **40 / 13 / 18** — **checked, not transcribed**, against
+`RAZORPAY_SEMANTICS.md` §10's census, which states `40 + 13 + 18 = 71` against 71 contiguous rows.
+**Q-019:** the **operator's confirmation** appended beneath the ruling **changing no word of it** —
+condition (ii) satisfied, **(iii) discharged**, so C2 and its dependents are taggable on a review
+PASS. **Q-021:** the architect's error; C3 was right. **Q-022** and **Q-023:** upheld, C2's handling
+endorsed in both. **Q-024** placed as a new entry for the concurrent-review amendment — and while
+placing it, `QUESTIONS.md`'s `## Concurrent pairs` preamble was found **still carrying the struck
+clause** *"REVIEW sessions remain strictly serial"*, because `debc97ae` amended `PROCESS.md` §1 and
+not this file's mirror. **The two canonical files disagreed for a day on the one rule every session
+consults before writing its own pair row.** Corrected in `PROCESS.md`'s own manner: **struck, not
+deleted.**
+
+### 3. Q-022's remedy — the open door is now inside the frozen set
+
+`config/protocol.yaml` gains **`probe.notes`**; §8.6's table gains the **probe note** row; the
+registry gains a **STRICT** `probe_note` row on the quoted forms; and `world/spec.py`'s
+`PROBE_NOTE_KEY` / `PROBE_NOTE_TEXT` **literals are deleted** in favour of a read through the loader —
+**exactly the remedy C2 wrote.**
+
+**The text was copied from §10.1, not retyped from the prompt**, and asserted character-identical:
+**51 ASCII bytes**, SHA-256 `d3a87f639e49fa490ae473a676929ff3520bc794d3ef38070c6aef1e3e4c7fb5`, equal
+to §8.6a's copy, to the deleted source literal and to golden 7's.
+
+⚠️ **THE NAMES WERE KEPT, AND THAT WAS FORCED BY THE FENCE RATHER THAN CHOSEN.** `world/__init__.py`
+re-exports both, and `tests/test_c2_world.py` asserts on them three times — **both files are outside
+this session's fence**, and the prompt says a C2 test failing means *my* change is wrong. They resolve
+**lazily, via PEP 562 `__getattr__`**, because `whetstone_gate.config.load` is deliberately uncached
+(*"a cache would let a stale read outlive an edit during a long run"*) and a module-level eager read
+would be exactly that cache frozen at import. **C2's tests pass unchanged; no test was edited.**
+
+⚠️ **§8.6's warning gained a THIRD paragraph, which the prompt did not ask for.** The existing one says
+*"THIS IS THE SECOND TIME THIS TABLE HAS BEEN INCOMPLETE"*, and this is the **third** — six rows 30
+Aug, eight 31 Aug, and this. Leaving it would have left a **false count in the file that is law**.
+
+### 4. `CONTEXT.md` v1.4, and an overclaim of the architect's own
+
+**§9.2's S2 shows BOTH redefinitions, because they failed for different reasons** — amount-equality
+was **wrong** (INC-04, 8/8 seeds, preserved verbatim), the header was **unimplementable**. **`S2-amt`
+is unchanged.** The bullet also carries the caveat that **S2 may print a zero** — a policy-blind
+attacker has no reason to populate `receipt` either — **and that a zero is a result**, because §12.1
+prints it as a number and an invariant that cannot fire says something true about an opt-in guard.
+
+**§8.6a's ULP sentence is corrected.** *"Near ₹1,50,000 one ULP flips the rounded paise integer"*
+**overstated its own margin by about five orders of magnitude.** Re-derived by this session over all
+**660** draws (50 scored + 10 pilot): closest approach **0.0011866860605438627855977872 paise** at
+**seed 2046, draw index 3, raw `4167386882`**, **≈ 4.2 × 10⁵ ULPs**, and the float path reproduces
+**all 660** integer paise here (**0 mismatches**). ⚠️ **An overclaim in a document whose subject is
+overclaims, written by the architect — the class INC-05 made a rule.** **The decision to require
+`Decimal` STANDS, for a stronger reason:** byte-identity is *claimed and tested*, correctly-rounded
+`Decimal` makes it **provable**, and a float margin argument would need **recomputing whenever the
+seed list changes** — which §13.4's N rule may do.
+
+**One new test file**, `tests/test_arch_ulp_margin.py`, per Q-023's ruling: it **re-derives** the 660
+draws rather than quoting them, and its failure messages read *"this is a finding, not a failure of
+the world: report it, do not relax the assertion."* **Verified non-vacuous** — a synthetic amount
+1e-10 from a boundary yields **0.036 ULPs** and fails the assertion.
+
+⚠️ **DECLARED DEVIATION, Class B.** `config/protocol.yaml`'s `decimal_context_precision` comment
+repeated the withdrawn sentence verbatim. Correcting it changes **no key and no value** —
+`yaml.safe_load` of the working tree and of HEAD compare **equal** — and that file is inside this
+session's fence; but TASK 3a said *"change no other key or value"* and Q-023 named §8.6a alone, so it
+is recorded rather than slipped in. **Leaving it would have put a withdrawn justification inside the
+artefact that gets hashed at `prereg-v1`** — the exact two-files-one-corrected shape this session
+raises against the architect as Q-026, aimed at itself.
+
+⚠️ **A SECOND, SMALLER DEVIATION, Class C:** the v1.4 change-log row was inserted with a Python
+heredoc before the prompt's *"write files with your editor/write tools"* instruction was applied to it.
+The bytes were verified afterwards — **0 CRLF, diff localised at 94 insertions / 28 deletions, not a
+whole-file rewrite** — and every other edit in this session used the editor tools.
+
+### 5. What was found and NOT fixed
+
+**Q-025** — the token batch, above. **Q-026** — **`CONTEXT.md` §2 line 176 still carries
+*"`create_refund` sends no idempotency key"***, the exact sentence Q-017's ruling calls **false**,
+inside the block headed *"written so a payments engineer cannot puncture it."* **v1.3 corrected §2's
+table row and not the prose fourteen lines below it**, so the specification now states **both** forms
+of the claim, and a reader meets the false one first. **§2 is outside this session's task fence and
+outside Q-017's own enumerated consequence list** (§9.2, `INVARIANTS.md`, C4, C8, golden 2), so it is
+**raised, not edited — Q-022's handling, applied by the session that recorded the ruling endorsing
+it.** Remedy supplied, one sentence.
+
+**And one thing owed:** C1 raised **Q-017 as the OPERATOR'S** to rule, and the ruling as issued is
+signed `(architect, 2026-08-31)` **with no operator-approval line**, unlike Q-024's *"APPROVED BY THE
+OPERATOR"*. The ruling is recorded verbatim and **not** annotated inside its own text; the flag sits
+at the head of the entry.
+
+### 6. Counts
+
+| | before | after |
+|---|---|---|
+| `make test` | 208 passed, 1 skipped, 2 deselected | **210 passed, 1 skipped, 2 deselected** |
+| `make check-roles` | 17 passed, 0 failed, 4 n/a, exit 0 | **17 passed, 0 failed, 4 n/a, exit 0** |
+| E1 issued rows parsed | 8 | **18** |
+
+**+2 tests, both in `tests/test_arch_ulp_margin.py`, this session's only new test file.** **No other
+count moved**, and `check-roles` is unchanged because E1/E2/E3 were already PASS — the batch changes
+what they are checking **against**, not whether they pass. `git status --porcelain tests/goldens/`
+**EMPTY**; no golden was edited, added or regenerated.
+
+**No `INCIDENTS.md` entry is owed.** Nothing broke during this session: no test was weakened, no
+assertion loosened, no red was reached. The two defects found are **specification and process
+defects raised as questions** (Q-025, Q-026), not incidents of this session's own making — and
+`INCIDENTS.md` is outside this session's fence in any case.
+
+---
+
 ## C2 — the world generator, with the probe planted — BUILD — attempt 1 — 2026-08-31
 
 **SESSION-TOKEN:** `f0c50283` — issued by the architect in this session's prompt, and recorded in
