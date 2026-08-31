@@ -99,17 +99,24 @@ file. **Every one of the eight is one edit, and all are legal only while `prereg
 `make check-roles` **17 passed / 0 failed / 4 n/a, exit 0.** C1's own selection: **green at every base
 SHA** (65 → 77 passed).
 
-⚠️ **`make test` IS RED, AND THE RED BELONGS TO THE CONCURRENT GOLDENS SESSION.**
-`tests/test_c2_world.py::test_the_golden_is_the_byte_for_byte_file_the_architect_authored` fails with
-*"expected exactly one published golden-7 SHA-256 …, found 3"*: it parses `tests/goldens/README.md`
-for `` SHA-256 `<64 hex>` `` and demands exactly one, and `5559b72` placed goldens 1 and 3 there.
-**Measured at HEAD as `1 failed, 293 passed`** — note that the entry directly below this one reports
-`294 passed` as *unchanged*, which is the same 294 tests with one of them now failing. **Not C1's and
-not this review's to fix**; `tests/goldens/` is read-only to a review and `test_c2_world.py` is C2's.
-Flagged loudly because the session that caused it may not know. ⚠️ **It also forced a methodological
-choice:** INC-11 is precisely the entry about a mutation baseline taken from an already-red tree, so
-this review scored against a **C1 selection green at each base SHA** and says so in the mutants file
-rather than quietly scoring against a red one.
+⚠️ **`make test` WAS RED DURING THIS REVIEW, THE RED BELONGED TO THE CONCURRENT GOLDENS SESSION, AND
+IT IS NOW CLOSED — BY THAT SESSION, NOT BY THIS ONE.** Written in the order it happened, because the
+first half of this paragraph was true when it was drafted and the second half corrects it.
+`tests/test_c2_world.py::test_the_golden_is_the_byte_for_byte_file_the_architect_authored` failed
+with *"expected exactly one published golden-7 SHA-256 …, found 3"*: it parses
+`tests/goldens/README.md` for `` SHA-256 `<64 hex>` `` with an exactly-one matcher, and `5559b72`
+placed goldens 1 and 3 there. **Measured at `af76310`, this review's mutation base, as `1 failed,
+293 passed`.** ⚠️ **The concurrent session found it independently in its own baseline, fixed it in
+`165f1e6`** — publishing the two new digests in a form that parser does not match — **and raised
+`Q-035`**, naming the real remedy and leaving it to the chunk that owns the test. **This review did
+not find it first and does not claim to.** **At the SHA this review passes, `make test` is GREEN:
+306 passed, 1 skipped, 2 deselected.**
+
+⚠️ **The methodological consequence survives the correction, which is why it is still recorded.**
+INC-11 is precisely the entry about a mutation baseline taken from an already-red tree — *"every
+mutant scoring 'killed' by a red that was already red"* — so this review scored against a **C1
+selection green at each base SHA** and said so in the mutants file rather than quietly scoring
+against a red one. That decision was right when it was made and is unaffected by the later fix.
 
 ### ⚠️ This session's own blemish, reported because it reads badly and cost nothing
 

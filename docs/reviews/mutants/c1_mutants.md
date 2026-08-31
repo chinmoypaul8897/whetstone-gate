@@ -37,13 +37,18 @@ subprocess that had lost `PYTHONPATH`, tested the **live** repository, and repor
 passing — *"nothing in the output looked wrong."* It fooled attempt 1's harness once and the C1 FIX
 session's once.
 
-⚠️ **INC-11, and the baseline this run refused to take.** `make test` at HEAD is **RED**, and the
-red belongs to the **concurrent architect goldens session**, not to C1:
+⚠️ **INC-11, and the baseline this run refused to take.** `make test` at the base SHA `af76310` was
+**RED**, and the red belonged to the **concurrent architect goldens session**, not to C1:
 `tests/test_c2_world.py::test_the_golden_is_the_byte_for_byte_file_the_architect_authored` parses
-`tests/goldens/README.md` for `` SHA-256 `<64 hex>` `` and demands **exactly one**; that README now
-carries **three**, because goldens 1 and 3 were placed in `5559b72`. INC-11 is precisely the entry
+`tests/goldens/README.md` for `` SHA-256 `<64 hex>` `` and demands **exactly one**; that README
+carried **three**, because goldens 1 and 3 were placed in `5559b72`. INC-11 is precisely the entry
 about a baseline taken from an already-red tree — *"every mutant scoring 'killed' by a red that was
 already red."* So this run scores against a **selection that is green at the base SHA** and says so:
+
+*(⚠️ **That red is now CLOSED, and not by this review** — the concurrent session found it in its own
+baseline, fixed it in `165f1e6` and raised `Q-035`. `make test` at the SHA C1 passes on is **306
+passed, 1 skipped, 2 deselected**. The scoping decision below is left exactly as it was taken,
+because it was right when it was taken and a run's method is not rewritten by later news.)*
 
 ```
 tests/test_c1_semantics_check.py   tests/test_c1_fix_probes.py

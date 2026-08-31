@@ -39,7 +39,7 @@ the repository. **Eight new findings, all MEDIUM or LOW**, are recorded and go t
 | **₹5 Cr, re-derived from first principles** | **5,000,000,000 paise.** All **nine** money keys obey `paise = rupees × 100` without exception |
 | **`tests/test_c1_review_probes.py` byte-identity** | ⚠️ **IDENTICAL.** Blob `3a3af44d…` at `4cfddc0` and at HEAD. **No reviewer's probe in this project has ever been edited by a later session** |
 | Mutation run, 18 mutants + a control | **11/18 → 16/18** killed; **the control survived both runs** |
-| `make check-roles` | **17 passed, 0 failed, 4 n/a**, exit 0 |
+| `make test` / `make check-roles` at the passing SHA | **306 passed, 1 skipped, 2 deselected** · **17 / 0 / 4, exit 0** |
 
 **The FAIL at attempt 1 was correct, it produced the six A4 constants, and the work it forced is
 good.** This verdict is not a softening of it.
@@ -496,20 +496,35 @@ the tags are guarded; the prose is not.**
 
 ---
 
-## INFO-1 · `make test` is RED at review time, and the red is the CONCURRENT session's
+## INFO-1 · `make test` was RED **during** this review, and the red was the CONCURRENT session's — **it is green now, and the correction is theirs**
 
-`tests/test_c2_world.py::test_the_golden_is_the_byte_for_byte_file_the_architect_authored` fails:
-`expected exactly one published golden-7 SHA-256 …, found 3`. It parses `tests/goldens/README.md` for
-`` SHA-256 `<64 hex>` `` and demands **exactly one**; that README gained goldens 1 and 3 in `5559b72`,
-the architect goldens session's own commit, ~40 minutes into this review.
+⚠️ **Stated in the order it happened, because the first half of this entry was written while it was
+still true and the second half is a correction to it.**
 
-**Not C1's, and not this review's to fix** — `tests/goldens/` is read-only to me and `test_c2_world.py`
-is C2's. **Flagged prominently because the session that caused it may not know**, and because a red
-`make test` is exactly the state INC-11 says a mutation baseline must never be taken from. This
-review's mutation run therefore scored against a **C1 selection that is green at each base SHA**, and
-says so in `c1_mutants.md` §1. **Full suite before this review's probes: `1 failed, 293 passed,
-1 skipped, 2 deselected` — the one failure being that test.** `make check-roles`: **17 / 0 / 4,
-exit 0.**
+**During the review**, `tests/test_c2_world.py::test_the_golden_is_the_byte_for_byte_file_the_architect_authored`
+failed: `expected exactly one published golden-7 SHA-256 …, found 3`. It parses
+`tests/goldens/README.md` for `` SHA-256 `<64 hex>` `` with an exactly-one matcher, and that README
+gained goldens 1 and 3 in `5559b72`, the architect goldens session's own commit, ~40 minutes into
+this review. Measured at `af76310` — the SHA this review took as its mutation base —
+`make test` reported **`1 failed, 293 passed, 1 skipped, 2 deselected`**.
+
+⚠️ **It is CLOSED, and this review did not close it and cannot take credit for finding it.** The
+concurrent session **found it independently, in its own baseline**, fixed it in **`165f1e6`** by
+publishing the two new digests in a form that parser does not match, and **raised `Q-035`** — *"C2's
+golden-7 check anchors on 'the only digest in the file', in a directory specified to hold nine"* —
+naming the real remedy and leaving it to the chunk that owns the test. That is the right handling and
+it is better than the one this entry was about to recommend.
+
+**At the SHA this review PASSES, `make test` is GREEN: `306 passed, 1 skipped, 2 deselected`**, and
+`make check-roles` is **17 / 0 / 4, exit 0**.
+
+⚠️ **The methodological point survives the correction and is why the entry stays.** A red full suite
+is exactly the state INC-11 says a mutation baseline must never be taken from — *"every mutant
+scoring 'killed' by a red that was already red"* — so this review's mutation run scored against a
+**C1 selection green at each base SHA** and said so in `c1_mutants.md` §1 rather than quietly scoring
+against a red tree. That decision was correct when it was made and is unaffected by the later fix.
+**`Q-035` is the concurrent session's, is OPEN and non-blocking, and this review neither adopts nor
+re-raises it.**
 
 ## INFO-2 · the A4 check order (§2.3), owed to C4
 
@@ -620,7 +635,8 @@ today: `c0-pass`, `c2-pass`, `c3-pass`, and now `c1-pass`.
    or keep accepting the gap in writing. ⚠️ **This review changes the calculus**: with `test_p1_…`
    pinning the quote sequence, vendoring now buys *"these bytes are Razorpay's"* rather than
    *"these bytes have not changed"*, which is a smaller marginal gain than it was yesterday.
-5. **INFO-1** — the goldens session's own, and it does not know yet.
+5. ~~**INFO-1** — the goldens session's own.~~ **Already done by that session, in `165f1e6`, with
+   `Q-035` raised.** Nothing owed.
 6. **INFO-3** — an `INCIDENTS.md` entry is **OWED** for this session's stray `s4.md`.
 
 ---
