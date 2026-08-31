@@ -27,10 +27,15 @@ from whetstone_gate.spec_constants import BY_KEY, ScanMode
 
 # ── The five A4 constants Q-028 landed — INC-18, and REVIEW_C1_1's BLOCKER F-R4 ───────
 #
-# ⚠️ `max_per_settlement_paise` is DELIBERATELY ABSENT from this list. Q-029 is OPEN and
-# the value is a declared STOP, so a probe asserting it exists would be asserting the
-# opposite of what this session decided. `test_the_stopped_sixth_value_is_still_stopped`
-# below covers it from the other side.
+# ⚠️ `max_per_settlement_paise` STAYS OUT OF THIS DICT, AND THE REASON CHANGED ON
+# 2026-08-31. It was out because Q-029 was OPEN and the value was a declared STOP. Q-029 is
+# now RULED and the key EXISTS, carrying 5,000,000,000 paise - but it is
+# `[Razorpay-defined]`, and `test_the_two_razorpay_defined_a4_figures_are_tagged_razorpay...`
+# below partitions this dict on exactly ONE Razorpay-tagged key, so adding a second here
+# would turn that probe red. Editing that probe is outside the ARCH (`8e0f4a13`) fence,
+# which permitted ONE existing test to be flipped and no other.
+# `test_the_stopped_sixth_value_is_ruled_and_landed` below covers the key in full - loader
+# resolution, the ruled status, and the value re-derived rather than transcribed.
 A4_KEYS = {
     "a4_daily_withdrawable_limit_paise": (
         "world.instant_settlement.daily_withdrawable_limit_paise",
@@ -131,20 +136,30 @@ def test_the_imps_cap_agrees_with_the_rupee_figure_razorpay_publishes():
     )
 
 
-def test_the_stopped_sixth_value_is_still_stopped_and_still_declared(repo_root):
-    """⚠️ **Q-029 is OPEN, and this probe fails the moment somebody quietly closes it.**
+def test_the_stopped_sixth_value_is_ruled_and_landed(repo_root):
+    """⚠️ **FLIPPED 2026-08-31 BY ARCH BUILD (`8e0f4a13`) ON A RULING, NOT WEAKENED.**
 
-    ₹5 Cr resolves to three different paise figures across three sources and no two agree
-    (correct 5,000,000,000; RS-16's committed Notes 50,000,000,000; the fix prompt's
-    500,000,000,000). Hard rule 1 and this session's own prompt both say STOP rather than
-    reconcile.
+    **This probe used to assert the opposite**, and its previous form is preserved in
+    `docs/sessions/arch-q029-1.txt` rather than only in `git log`. It was
+    ``test_the_stopped_sixth_value_is_still_stopped_and_still_declared``, and it failed
+    if `max_per_settlement_paise` appeared while `QUESTIONS.md` **Q-029** was still
+    ``**Status:** **OPEN**``, or if the absence stopped being *declared*. **Q-029 is now
+    RULED** (architect, 2026-08-31, Class A), so the state it guarded no longer exists and
+    the probe asserts the ruled state instead.
 
-    **Two directions, and the second is the one that matters.** If the key appears, a
-    session has taken a Class A decision Q-029 reserves for the architect. If the key
-    appears *and* Q-029 has been marked RULED, that is legitimate — so this probe fails
-    only on the key existing while the question is still OPEN, and it fails loudly if the
-    STOP stops being *declared*, because an undeclared absence is exactly the shape of the
-    BLOCKER this whole session exists to close.
+    ⚠️ **HARD RULE 6 IS WHY THIS DOCSTRING IS THIS LONG.** *"NEVER WEAKEN A TEST … If a
+    ruling legitimately changes behaviour, the test flips citing the ruling — and the flip
+    must be provably meaningful (it fails on the old code)."* **It does, on all four
+    assertions at once**: against the pre-ruling tree the key is absent, so ``require``
+    raises before any assertion is reached, and the RULED check fails on Q-029's own status
+    line. **This is a reversal, not a loosening** — the old probe made one assertion in each
+    branch, this one makes four and every one of them is stricter than "the key is absent".
+
+    **The four, and the last is the one Q-029 exists for.** The key resolves through the
+    **loader** (not just present in the YAML text); it carries **5,000,000,000**; Q-029 is
+    **RULED** and not merely edited; and the value equals the **derivation recomputed here**
+    rather than a transcribed constant — ``5 * 10**7 * 100`` — so a future edit that changes
+    the figure has to change arithmetic, not a copy of itself.
     """
     protocol = cfg.load("protocol")
     questions = (repo_root / "QUESTIONS.md").read_text(encoding="utf-8")
@@ -153,24 +168,29 @@ def test_the_stopped_sixth_value_is_still_stopped_and_still_declared(repo_root):
         r"### Q-029 —.*?\n(.*?)\n(?=### Q-|\n## )", questions, re.S
     )
     assert entry is not None, "Q-029 has been deleted from QUESTIONS.md"
-    still_open = "**Status:** **OPEN**" in entry.group(1)
+    assert "**Status:** **RULED**" in entry.group(1), (
+        "QUESTIONS.md Q-029 is no longer marked RULED, but config/ carries the value it "
+        "ruled. Either the question was re-opened without the key being withdrawn, or the "
+        "entry was edited. Rs 5 Cr is Class A: it resolved to three different paise "
+        "figures and no two agreed, and only an architect ruling closes that."
+    )
 
-    if protocol.has("world.instant_settlement.max_per_settlement_paise"):
-        assert not still_open, (
-            "config/ now carries max_per_settlement_paise while QUESTIONS.md Q-029 is "
-            "still OPEN. That value is Class A: Rs 5 Cr resolves to three different paise "
-            "figures and no two agree. A session that wrote it took a decision the "
-            "architect reserved."
-        )
-    else:
-        assert "Q-029" in (repo_root / "RAZORPAY_SEMANTICS.md").read_text(
-            encoding="utf-8"
-        ), (
-            "the value is absent from config/ and RAZORPAY_SEMANTICS.md no longer names "
-            "Q-029. An UNDECLARED absence is precisely REVIEW_C1_1's BLOCKER F-R4: a "
-            "constant that is in neither CONTEXT.md §8.6 nor config/, with nothing saying "
-            "so. Hard rule 11 - print it as a number, never as a silence."
-        )
+    value = protocol.require("world.instant_settlement.max_per_settlement_paise")
+
+    # ⚠️ Derived, never transcribed. 1 crore = 10^7, so Rs 5 Cr = 50,000,000 rupees, and
+    # paise = rupees * 100 - the convention every other money key in protocol.yaml obeys,
+    # with RS-17's Rs 2,00,000 -> 20,000,000 as the control. The two figures this is NOT:
+    # 50,000,000,000 (10x, RS-16's Notes line until 2026-08-31) and 500,000,000,000 (100x,
+    # the C1 FIX prompt).
+    rupees_in_five_crore = 5 * 10**7
+    assert value == rupees_in_five_crore * 100, (
+        f"world.instant_settlement.max_per_settlement_paise is {value}, and Rs 5 Cr is "
+        f"{rupees_in_five_crore * 100} paise. If this is 50000000000 or 500000000000, it "
+        f"is the 10x or the 100x figure Q-029 ruled against - both are named in that entry, "
+        f"in config/, in RAZORPAY_SEMANTICS.md RS-16 and in PROVENANCE.md S2.4 precisely so "
+        f"neither is written back. Changing it is a Class A deviation needing a ruling."
+    )
+    assert value == 5000000000
 
 
 def test_every_config_pointer_in_the_oracle_resolves_to_a_real_key(repo_root):
