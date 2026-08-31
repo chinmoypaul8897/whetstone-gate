@@ -68,6 +68,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `e1911a9f` | C9 | BUILD | 2026-08-31 |
 | `365deaf7` | C1 | FIX | 2026-08-31 |
 | `8e0f4a13` | ARCH | BUILD | 2026-08-31 |
+| `6ba2d70e` | ARCH | BUILD | 2026-08-31 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -99,6 +100,25 @@ is recorded before the session that carries it runs, whether it is issued in a b
 it was not applied to this one.** Recorded so the table does not hide how its rows arrived, which is
 exactly what `PROCESS.md` §7a's honour-system caveat warns about. **Sixth of six, and the count is
 the point: five of the six are the same defect.**
+
+⚠️ **AND `6ba2d70e` IS THE SEVENTH SELF-RECORDED ROW. THE COUNT IS NOW SIX OF SEVEN ON THE SAME
+DEFECT, AND IT IS NAMED HERE RATHER THAN FILED QUIETLY.** This session's prompt — goldens 1 and 3
+plus four rulings, chunk cell **ARCH**, 2026-08-31 — opened with `6ba2d70e`, **was not part of the
+`f57e216b` batch**, and put `QUESTIONS.md` inside its fence with TASK 1 instructing it to append the
+row. Its own words: *"Your token `6ba2d70e` is NOT in the batch."* **It is a single issue, not a
+batch, so Q-025's remedy does not reach it** — that clause reads *"every token batch names the token
+of the session that lands it"*, and **a batch clause cannot cover an issue that is not a batch**,
+which is the identical gap the `365deaf7` and `8e0f4a13` paragraphs above each record. Without the
+row, `check_roles.py` **E1 fails on every commit this session makes** (`FORGED/UNISSUED`), so the
+choice is the same one those two faced: a self-recorded row, or a red `make check-roles`.
+⚠️ **THE BROADER REMEDY THAT WOULD REACH IT WAS RULED IN Q-025 AND HAS NOW FAILED TO BE APPLIED THREE
+TIMES RUNNING** — *a token is recorded before the session that carries it runs, whether it is issued
+in a batch or alone.* The batch mechanism works: the nine rows from `f57e216b` down were recorded
+before their sessions existed and **not one of them needed a paragraph like this one.** What keeps
+recurring is the **one-off** prompt issued outside a batch, and three consecutive one-offs have now
+each written their own row and each explained that Q-025's clause does not cover them.
+**That is no longer a gap in a clause; it is evidence that the clause was written to the wrong
+scope** — and it is recorded here as such rather than as a third apology.
 
 ## ⚠️ THE TOKEN BATCH, 2026-08-31 — and this is what ends the collision class
 
