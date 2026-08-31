@@ -1,7 +1,9 @@
 ARCH - GOLDENS 1 AND 3 + FOUR RULINGS - BUILD - attempt 1 - 2026-08-31
 SESSION-TOKEN: 6ba2d70e
 
-PUSHED SHA: <recorded in the follow-up commit; a session cannot know it in advance>
+PUSHED SHA: f53f844a36a9b7a201dca2b3d525eb5bd6c6e0fa
+            (the commit that carried this block; this line was written by the follow-up
+            commit, since a session cannot know its own commit's SHA in advance)
 
 =====================================================================
 0. SPEND
