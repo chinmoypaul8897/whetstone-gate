@@ -1,0 +1,684 @@
+C1 REVIEW REPORT
+================================================================================
+SESSION-TOKEN: a0cc0212   role REVIEW   chunk C1   attempt 1   2026-08-31
+Review type: full - personas 1 (evaluation integrity) AND 2 (code).
+ASCII only, per INCIDENTS.md INC-08.
+Committed to docs/sessions/c1-review-1.txt BEFORE being printed (CLAUDE.md 6.1).
+The pushed SHA is the commit carrying this file and is stated in the printed
+report, the same convention C0 REVIEW used.
+Ran concurrently with C0's re-review (f57e216b) as pair P-02. Disjoint chunk.
+TOKEN SPEND: NONE. ZERO provider model calls; zero lane quota consumed.
+  40 HTTP GETs to public documentation, raw.githubusercontent.com and
+  codeload.github.com - permitted and REQUIRED by PROCESS.md S11a (ruled
+  2026-08-31). This review is impossible without them.
+================================================================================
+
+1. VERDICT
+--------------------------------------------------------------------------------
+>>> FAIL. <<<  No c1-pass tag was cut. Nothing was fixed.
+
+ONE BLOCKER. It is NOT in a quote, a digest, a URL or a count - every single one
+of those verifies, and most of them verify perfectly. Section 2 states what
+passed, at length, because the evidence runs overwhelmingly the other way and a
+FAIL that buries that would be dishonest.
+
+  F-R4  BLOCKER. Two of A4's five bounds are documented by Razorpay WITHOUT a
+        figure - the per-merchant DAILY WITHDRAWABLE LIMIT and the MAX
+        ATTEMPTS/DAY. C1 established this correctly, first-hand, and INVENTED
+        NEITHER, which is right. It then wrote THREE TIMES - RS-18, RS-19, and
+        PROVENANCE.md S2.4's A4 cell - that their author-chosen values "live in
+        config/".
+
+        THEY DO NOT. git grep over every tracked file returns only prose naming
+        the bounds. There is no key in config/protocol.yaml, no row in
+        CONTEXT.md S8.6's constants table, and no entry in
+        src/whetstone_gate/spec_constants.py. The banking-hours window for the
+        Rs 2 L bound is a third such constant and is in none of them either.
+
+        CONTEXT.md S8.6 and config/protocol.yaml's header each carry the same
+        sentence, verbatim:
+          "Any constant that is not in this table and not in config/ is a
+           defect, and finding one is a review BLOCKER."
+
+        THREE REASONS IT IS A BLOCKER AND NOT A MEDIUM, EACH SUFFICIENT ALONE:
+
+        (1) The rule is unconditional and is stated in two files. It does not
+            say "unless another chunk will add it later".
+
+        (2) IT MAKES C4'S DONE-WHEN UNSATISFIABLE - THROUGH THE RULING C1
+            ITSELF OBTAINED. Q-018's ruling, now in PROCESS.md S12.1's C4 row,
+            reads "every RAZORPAY_SEMANTICS.md row marked MUST-FIRE fires in
+            the mock world". RS-18 and RS-19 are BOTH MUST-FIRE. To fire
+            "Amount that can be settled for the day is exhausted" the world
+            needs a daily limit; to fire "No more attempts left for today" it
+            needs an attempt count. C4's only routes are to invent two
+            constants outside the frozen set - which S8.6 forbids - or to fail
+            its done-when. Q-018 was raised to give C4 a SATISFIABLE
+            denominator. This is that same problem one level down, and C1 is
+            the chunk that would have seen it.
+
+        (3) IT IS THE FOURTH OCCURRENCE. S8.6's own text: "SIX ROWS ADDED 30
+            AUGUST, EIGHT ADDED 31 AUGUST, AND THIS ONE... THE THIRD OCCURRENCE
+            IS WHERE A PATTERN STOPS BEING BAD LUCK" and "EACH TIME IT WAS
+            FOUND BY SOMEBODY TRIPPING OVER A MISSING CONSTANT, NEVER BY A
+            CHECK." This one was found the same way, by a fourth session.
+
+        WHAT IS C1'S, STATED NO MORE BROADLY THAN IT IS. C1 COULD NOT write to
+        config/ or CONTEXT.md - both outside its fence - and IS NOT FAULTED FOR
+        NOT FIXING IT. Refusing to write into a pre-registration artefact from
+        outside is the behaviour Q-022's ruling explicitly ENDORSES. What is
+        C1's: the escalation route was open and C1 USED IT THREE TIMES (Q-016,
+        Q-017, Q-018, each written out in docs/sessions/c1-build-1.txt S11 in
+        QUESTIONS.md format for the architect to place) - a FOURTH WAS NOT
+        WRITTEN; and three artefacts assert a location that is empty, one of
+        them in a table under the column heading "Every constant, tagged" whose
+        own preamble promises "This table asserts nothing that file does not
+        source".
+
+        REMEDY, the architect's, before prereg-v1: three rows into S8.6, three
+        keys into config/protocol.yaml, three rows into spec_constants.py.
+        Legal ONLY while prereg-v1 does not exist - the same window and the same
+        argument as Q-022's. The VALUES are a Class A choice (they set how hard
+        A4's ceiling binds, and A4 is one of the three attacks that survive
+        contact with the real API). This review picks none of them.
+
+DO NOT READ THIS FAIL AS DOUBT ABOUT THE ARTEFACT'S CONTENT. It is the strongest
+artefact this project has produced. See section 2.
+
+--------------------------------------------------------------------------------
+1b. THE OTHER FINDINGS (all -> docs/reviews/OPEN_FINDINGS.md OF-15..OF-21)
+--------------------------------------------------------------------------------
+  F-R5  HIGH. RAZORPAY_SEMANTICS.md S0 publishes a "re-runnable check" of its
+        own blockquote-is-verbatim rule, reports "299 of 299", and cites
+        INCIDENTS.md INC-13 ("nothing checked a tracked document's content") as
+        the reason it "mattered enough to fix rather than to note".
+        THERE IS NO IMPLEMENTATION. Not in tests/, not in src/, not a Makefile
+        target, not a script. The fix was performed and NOT KEPT, which is
+        INC-13's own lesson landing on the document that cites it. Measured by
+        12 mutants: 4 caught by NOTHING, 2 only by a manual re-fetch, 3 only by
+        that uncommitted check. Section 5. -> OF-15
+  F-R6  HIGH. S0's check, AS SPECIFIED, matches each quoted line against ANY
+        source in S1, never against the source THE ROW ITSELF CITES. Measured:
+        "* code: 400" occurs 8x in normal-refunds-idempotent.md, so a documented
+        409 rewritten to 400 matches trivially; and RS-23's solution string
+        occurs 1x in create-normal.md and 0x in capture.md, the page RS-22
+        cites, so a remediation lifted from the wrong page passes. It also
+        passes VACUOUSLY over an emptied quote ("" is a substring of every
+        source). And its stripping rule says "the three-field labels" while
+        listing FOUR - the two readings give 0 vs 3 unmatched. -> OF-16
+  F-R2  MEDIUM. S0 publishes "299 of 299". The file as committed carries 301
+        non-empty quoted lines. The VERDICT reproduces exactly (this review
+        re-ran it: 301 of 301 matched, 0 unmatched); the DENOMINATOR does not,
+        and never did - RAZORPAY_SEMANTICS.md has exactly one commit, 55f1f2c,
+        and the count there is already 301. Likely mechanism, offered as a
+        diagnosis to test rather than a claim: S6 holds exactly 2 quoted lines,
+        and 301 - 2 = 299, i.e. the check did not cover S6. -> OF-17
+  F-R1  MEDIUM. RS-12's Notes says "See RS-31". RS-31 is "a refund that has
+        already been processed cannot be re-initiated", whose OWN Notes say
+        "Do NOT read this as a duplicate-refund guard". The row meant is RS-27.
+        Every other citation in the project is right - S7's table, S9's F-06,
+        PROVENANCE.md S2.4, CONTEXT.md S2 and S9.2 all say RS-27. The one wrong
+        pointer is in RS-12, the row Q-017's Class A ruling turns on, and it is
+        the pointer a reader follows to reach the qualification. -> OF-18
+  F-R3  LOW. RS-70 names TWO things: a RECORDED table row (the three 500s) and
+        the heading "### RS-70 (note)". RS-16 and RS-65..RS-68 all say "see
+        RS-70" and land ambiguously. The PARTITION IS NOT AFFECTED - the note
+        carries no World label and the counts recompute to 71. -> OF-19
+  F-R7  LOW. S10's opening sentence says "Total: 14 items. All 14 resolve"
+        directly above a table numbered 1 to 18 and a counts row of 18. The 18
+        is right. -> OF-20
+  F-R8  LOW. PROVENANCE.md S2.4's A4 cell says "only three carry a published
+        figure (balance; Rs 5 Cr; Rs 2 L)". Razorpay publishes NO figure for the
+        settlement balance - it is live merchant state. The OPERATIVE half is
+        correct: exactly two bounds need an author-chosen value and the cell
+        names exactly those two. -> OF-21
+  F-R9  INFO, for C4, not against C1. RS-17 is MUST-FIRE and its predicate is
+        "outside banking hours". Hard rule 8 forbids a clock in core logic, and
+        Q-018's own reasoning lists a WALL CLOCK among the grounds for RECORDED
+        (it is why RS-59 is RECORDED). RS-17 is correctly MUST-FIRE PROVIDED C4
+        models banking hours as SEEDED WORLD STATE, never now().
+  F-R10 INFO. Check 2g's consistency sweep DID find a surviving stale sentence,
+        CONTEXT.md line 178, inside the block headed "the sharper one, written
+        so a payments engineer cannot puncture it":
+          "...and `create_refund` sends no idempotency key - so a retry is a
+           second refund."
+        CONTEXT.md S9.2 line 966 calls that exact form "false"; PROVENANCE.md
+        line 384 says "do not write" it. IT IS ALREADY QUESTIONS.md Q-026, OPEN,
+        raised by ARCH BUILD 921cfaa4 with a one-sentence remedy drafted.
+        CONFIRMED INDEPENDENTLY HERE, RECORDED AS OPEN, AND NOT COUNTED AGAINST
+        C1. Two further occurrences Q-026 does not name - CONTEXT.md S6's and
+        PROVENANCE.md S2.4's A3 *Mechanism* cells, both "no idempotency key is
+        sent" - are judged DEFENSIBLE: they describe what the attacker does in
+        this attack, not what the tool CAN do, and PROVENANCE's cell carries the
+        pointer to `receipt` in the same row. Named so a later session does not
+        "fix" them into inaccuracy.
+
+--------------------------------------------------------------------------------
+2. WHAT PASSED - measured, and stated before anything else was concluded
+--------------------------------------------------------------------------------
+  All 10 quoted pages re-fetched, digests recompared ... 10/10 BYTE-IDENTICAL
+  Both pinned source trees re-read ................... 94 files; refunds.go
+                                                       digest identical RAW and
+                                                       FROM THE ARCHIVE
+  Both claimed-404 URLs .............................. 404 / 404, 135098-byte
+                                                       shell each
+  All 6 discovery URLs ............................... 200 / 200 / 200 x6
+  Every Errors entry on S1,S2,S3,S4 present verbatim . 79 OF 79. ZERO MISSING.
+  Partition recount, from the document ............... 40 + 13 + 18 = 71, EXACT
+  S0's check re-implemented and re-run ............... 301 OF 301 MATCHED,
+                                                       UNMATCHED 0
+  Every A1-A6 error string in CONTEXT.md S6 .......... resolves to a row,
+                                                       verbatim, FOUND BLIND
+                                                       FIRST
+  All five instant-settlement bounds ................. present; 3 figures
+                                                       published, 2 NOT, and NO
+                                                       FIGURE INVENTED
+  A5 marked entirely author-chosen ................... CONTEXT.md S6, RS-20,
+                                                       PROVENANCE.md S2.4, and
+                                                       its own subsection
+  All 7 grep claims in RS-12(iv)/CONTEXT.md S2 ....... ALL EXACT (see 2b)
+  Razorpay pages changed since 2026-08-30 ............ 0 - NO DRIFT, either way
+  PARAPHRASES FOUND .................................. 0
+
+  Razorpay's own typos survive intact in C1's transcription, which is the
+  discriminator between a transcription and a paraphrase:
+    "at least 10 character long"      SINGULAR "character", no s   (RS-05)
+    "less than 2 Lacs"                Razorpay's spelling          (RS-17)
+    "the authorised amount ."         SPACE before the full stop, and British
+                                      "authorised" against the error title's
+                                      American "authorized"        (RS-01)
+    "greater than amount captured"    NO article before "amount"   (RS-03)
+    "less than ."  /  "at least ."    Razorpay's own TRUNCATED fields (RS-28)
+
+2b. THE GREP CLAIMS, RE-RUN OVER THE 94-FILE ARCHIVE AT THE PINNED SHA
+       grep -rni "idempot"       claimed 0   measured 0   OK
+       grep -rn  "X-Refund"      claimed 0   measured 0   OK
+       grep -rni "audit"         claimed 0   measured 0   OK
+       mcpgo.Max(                claimed 9   measured 9   OK
+       mcpgo.Max(100)            claimed 6   measured 6   OK
+       mcpgo.Min(                claimed 35  measured 35  OK
+       Middleware                claimed 0   measured 0   OK
+
+--------------------------------------------------------------------------------
+3. PHASE 1 - THE BLIND ORACLE, AND ITS COVERAGE
+--------------------------------------------------------------------------------
+PROCESS.md S10 template 2's committed reimplementation is SUBSTITUTED for this
+chunk by Q-016's ruling, because C1 computes nothing. In its place:
+
+  docs/reviews/independent/c1_oracle.md - 26 rows, IO-01..IO-26, rebuilt from
+  Razorpay's documentation and source WITHOUT opening RAZORPAY_SEMANTICS.md,
+  PROVENANCE.md, PROGRESS.md, INCIDENTS.md, docs/sessions/c1-build-1.txt or the
+  diff.  COMMITTED AT f069486 BEFORE PHASE 2 BEGAN.
+
+Read in Phase 1: CLAUDE.md, both personas, PROCESS.md S12.1's C1 row, and
+CONTEXT.md S2 / S6 in full / S9.2 / S11.3 / S15.2. Nothing else.
+
+COVERAGE, stated as what it does and does NOT reach:
+  COVERED - every A1-A6 error string S6 names (IO-01..IO-07, IO-13..IO-18,
+            IO-22); the X-Refund-Idempotency documentation including the 10-char
+            minimum in BOTH its forms and BOTH of the page's TWO DISTINCT 409s
+            (IO-08..IO-12); all five instant-settlement bounds each with an
+            explicit "does Razorpay publish a figure?" verdict (IO-14..IO-18);
+            the capture-concurrency entry as three fields with its remediation
+            intact (IO-20) AND its near-duplicate on the refunds page (IO-21);
+            source-refunds-only (IO-22); and the pinned-SHA source verification
+            (IO-23..IO-26).
+  NOT COVERED - S7, S8, S9 and S10 were NOT mined blind, so RS-44..RS-53 rest on
+            C1's transcription plus this review's digest match, not on an
+            independent second reading. A row this oracle lacks is NOT-COVERED,
+            NEVER "wrong". The RECORDED table RS-54..RS-71 was not rebuilt
+            independently, but every one of the 18 was assessed for whether its
+            exclusion is honest (section 6).
+  DELIBERATELY NOT BUILT - the MUST-FIRE/MUST-HOLD/RECORDED labels. A label is a
+            decision about OUR world, not a fact about Razorpay's docs.
+            Inventing one blind would MANUFACTURE a disagreement rather than
+            test one.
+
+THE NEGATIVE CONTROL, RUN BEFORE ANY QUOTE WAS RECORDED, because a 200 from a
+single-page app proves nothing:
+  .../api/payments/this-page-does-not-exist-a0cc0212.md   404   135098 bytes
+  .../api/refunds/nonexistent-zzz.md                      404   135098 bytes
+  .../totally/bogus/path.md                               404   135098 bytes
+  .../api/settlements/instant/create.txt                  404   135098 bytes
+  (the last is the RIGHT page with the WRONG extension - the tightest control)
+So a 200 carrying markdown on this host IS evidence of a page. C1 ran the same
+control on two different URLs and reached the same conclusion independently.
+
+--------------------------------------------------------------------------------
+4. THE DIFF, ROW BY ROW  (full text: docs/reviews/independent/c1_oracle_diff.txt)
+--------------------------------------------------------------------------------
+  IO-01 <-> RS-01  A1 amount equality ............ IDENTICAL (space-before-stop
+                                                   and authorised/authorized
+                                                   both preserved by both)
+  IO-02 <-> RS-02  A1 amount_due ................. IDENTICAL
+  IO-03 <-> RS-03  A2 refund > captured .......... IDENTICAL (no article - the
+                                                   likeliest real slip; neither
+                                                   session inserted "the")
+  IO-04 <-> RS-04  A2 fully refunded ............. IDENTICAL
+  IO-05 <-> RS-21  A6 must be captured ........... IDENTICAL
+  IO-06 <-> RS-13  settle_full_balance, doc ...... IDENTICAL (double space
+                                                   preserved); C1 quotes the
+                                                   whole block, review the one
+                                                   bullet - CHOICE OF EXTRACT
+  IO-07 <-> RS-14  settle_full_balance, MCP ...... IDENTICAL. *** THE MOST
+                                                   IMPORTANT AGREEMENT: both
+                                                   sessions independently
+                                                   grepped the doc pages for
+                                                   "ignore amount parameter",
+                                                   got ZERO hits, and located it
+                                                   at settlements.go:231-232.
+                                                   CONTEXT.md S6's A4
+                                                   attribution correction is
+                                                   confirmed by a second BLIND
+                                                   reading. ***
+  IO-08 <-> RS-05  header + 10 chars (prose) ..... IDENTICAL ("10 character
+                                                   long" singular preserved by
+                                                   both, and both refuse to
+                                                   merge it with RS-07's plural)
+  IO-09 <-> RS-06  the 409 (prose) ............... IDENTICAL; C1 additionally
+                                                   quotes the curl header line -
+                                                   verified present; C1's
+                                                   extract is the richer one
+  IO-10 <-> RS-07  10 chars (error) .............. IDENTICAL
+  IO-11 <-> RS-09  same key IN FLIGHT -> 409 ..... IDENTICAL; both correctly
+                                                   identify THIS row, not RS-10,
+                                                   as S6's "409 on
+                                                   same-key-in-flight"
+  IO-12 <-> RS-10  same key, different body ...... IDENTICAL; both independently
+                                                   kept the page's TWO 409s
+                                                   separate
+  IO-13 <-> RS-27  receipt IS an idempotency key . IDENTICAL. Review additionally
+                                                   records the COUNTERWEIGHT
+                                                   from the SAME page (receipt's
+                                                   request-Parameters entry says
+                                                   only "for your internal
+                                                   reference"). NOT a builder
+                                                   error - RS-27's conclusion is
+                                                   right and that second half is
+                                                   its evidence.
+  IO-14 <-> RS-15  bound 1, balance .............. quote IDENTICAL;
+                                                   >>> DIVERGENT (project-state)
+                                                   -> F-R8, LOW
+  IO-15 <-> RS-16  bound 2, Rs 5 Cr .............. IDENTICAL; both corroborate
+                                                   on S5's table AND prose;
+                                                   FIGURE PUBLISHED
+  IO-16 <-> RS-17  bound 3, Rs 2 L ............... IDENTICAL ("2 Lacs"
+                                                   preserved); FIGURE PUBLISHED;
+                                                   BOTH independently raised the
+                                                   undefined "banking hours"
+                                                   (C1 as F-02, review as F-R9)
+  IO-17 <-> RS-18  bound 4, daily limit .......... quote IDENTICAL; BOTH: NO
+                                                   FIGURE, NONE INVENTED;
+                                                   >>> DIVERGENT (project-state)
+                                                   -> F-R4, BLOCKER
+  IO-18 <-> RS-19  bound 5, attempts/day ......... quote IDENTICAL; BOTH: NO
+                                                   FIGURE, NONE INVENTED;
+                                                   >>> DIVERGENT (project-state)
+                                                   -> F-R4, BLOCKER
+                                                   (C1 adds a sharp reading the
+                                                   review missed: it is an
+                                                   ATTEMPT counter, so REJECTED
+                                                   requests increment it too,
+                                                   which matters for A5. Credit
+                                                   to C1.)
+  IO-19 <-> RS-36/F-03  the 3-way minimum ........ AGREEMENT, reached
+                                                   independently: Rs 1, Rs 2000,
+                                                   Rs 100 published, plus the
+                                                   MCP's FOURTH value Min(200) =
+                                                   Rs 2. Neither reconciled
+                                                   them; both recorded the
+                                                   disagreement as Razorpay's.
+  IO-20 <-> RS-22  capture concurrency, 3 fields . IDENTICAL, remediation INTACT
+  IO-21 <-> RS-23  the refunds-page near-duplicate IDENTICAL. *** THE TRAP BOTH
+                                                   AVOIDED: same title, different
+                                                   description AND solution, on
+                                                   two pages. Both carry them as
+                                                   TWO rows, each credited to
+                                                   the page it is actually on.
+                                                   Measured: RS-23's solution
+                                                   occurs 1x in create-normal.md
+                                                   and 0x in capture.md. ***
+  IO-22 <-> RS-25  source refunds only ........... IDENTICAL (bold preserved)
+  IO-23 <-> RS-12(i)(ii)  nil into extraHeaders .. IDENTICAL
+  IO-24 <-> RS-12(iii)    five parameters ........ FACTS IDENTICAL; see 4b
+  IO-25 <-> RS-27         refunds.go:66 forwards . IDENTICAL
+  IO-26 <-> (CONTEXT.md S2) the go.mod pins ...... IDENTICAL
+
+  TALLY: 26 rows built. 26 IDENTICAL on Razorpay's text.
+         BUILDER ERRORS ............................ 0
+         PAGE CHANGED (drift, with both dates) ..... 0
+         CHOICE OF EXTRACT (both correct) .......... 4  (IO-06, 08, 09, 13)
+         PROJECT-STATE (not about Razorpay) ........ 3  (IO-14 -> F-R8;
+                                                        IO-17+IO-18 -> F-R4)
+         ==> THE ONLY DIVERGENCES ARE ABOUT THIS REPOSITORY.
+
+4b. NAMED, DELIBERATELY NOT FILED AS A FINDING
+    RS-12(iii)'s heading still reads "create_refund has five parameters and none
+    of them is a key" - the exact form CONTEXT.md v1.3 declared FALSE as the
+    FOURTH false third-party claim to reach this specification. NOT raised as a
+    finding: within RS-12's frame, which is about the HEADER, it is defensible;
+    RS-12's own Notes qualifies it in the next paragraph; and RS-27 states the
+    correction in full. It is named here because it is ONE CLAUSE from being the
+    fifth, and because F-R1's misaimed pointer is what a reader must follow to
+    reach the qualification. FIXING F-R1 FIXES MOST OF THIS.
+
+--------------------------------------------------------------------------------
+5. EVERY URL RE-FETCHED - DIGEST THEN AND NOW
+--------------------------------------------------------------------------------
+Then = C1, 2026-08-30T20:42Z-20:47Z.  Now = this review, 2026-08-31T05:30Z-05:39Z.
+
+ #   page (base razorpay.com/docs/build/llm-docs/)  bytes then/now   digest
+ --- --------------------------------------------- ---------------- ------------
+ S1  api/payments/capture.md                        15396 / 15396   ddbca672...
+     then ddbca6729688f6049ac24672495607f68bafcc1a94dce7b1189622b4236ed1d9
+     now  IDENTICAL                                                    MATCH
+ S2  api/refunds/create-normal.md                   14596 / 14596
+     then 517e32acd22591ebd23447d6752bd95002ce9d4eb53af60877486443bb356569
+     now  IDENTICAL                                                    MATCH
+ S3  api/refunds/normal-refunds-idempotent.md       10846 / 10846
+     then 95fa561c8aad6f0cda405ddff88c36ba140bcb7a6b5680f9b8fc8b79c2070a9b
+     now  IDENTICAL                                                    MATCH
+ S4  api/settlements/instant/create.md              18159 / 18159
+     then 95776ebd485afe612bdfb756cbdaff8ee7732dfeed9bab25935acf92dd98cccd
+     now  IDENTICAL                                                    MATCH
+ S5  payments/settlements/instant.md                 5788 /  5788
+     then 4d2a05585157bf0c3e4034f126c30d62c0db7b66a012c87460952c105d9d4d08
+     now  IDENTICAL                                                    MATCH
+ S6  payments/refunds.md                             4834 /  4834
+     then 65f32df23cdb3c982b56bf4b8f483d1cd6b3a6f1e9083f6f93de5ef72478c19e
+     now  IDENTICAL                                                    MATCH
+ S7  api/payments/fetch-all-payments.md             10123 / 10123
+     then 9e7f6d97f0f978738bba89638c43faea5f4fe60a632f1f24c2d343f02772bf93
+     now  IDENTICAL                                                    MATCH
+ S8  api/payments/fetch-with-id.md                  12613 / 12613
+     then 38f972475767fd0a43348c985c0ea591f6016cb535277141b115b53bd205790c
+     now  IDENTICAL                                                    MATCH
+ S9  payments/settlements/faqs.md                   20378 / 20378
+     then 4ccfaa94a9da0dfd56672fa0aa9879b6e29328f8e743519120f880a923b80de5
+     now  IDENTICAL                                                    MATCH
+ S10 razorpay.com/capital/instant-settlements/     109181 / 109181
+     then (no digest recorded by C1 - HTML marketing page)
+     now  e3c4ef75ff937774da11284a34b9a535cde227d3175a0e70c20ee2ccfd77f481
+          BYTE COUNT MATCHES EXACTLY                                   MATCH
+ S11 razorpay-mcp-server @ 7950d51d118ca164c32b7cf0cfaa14f34f24849f
+     archive 167215 bytes, extracted = 94 FILES (C1 claimed 94)        MATCH
+     refunds.go d483495c0e29331a3414cdc393968f780b0cf20b27207528f7f4557e56d3f26f
+     IDENTICAL whether fetched raw OR read out of the archive - C1's claim
+     verified both ways                                                MATCH
+ S12 razorpay-go @ v1.4.0 resources/payment.go       7793 /  7793
+     now  0279e086093da15a0af7e61551fdd2f278a7a70dab539b0a471301969b589b58
+                                                                       MATCH
+
+ C1's two claimed-404 URLs, re-checked:
+     .../llm-docs/llms.txt                        404, 135098 bytes    MATCH
+     .../llm-docs/api/payments/fetch-all.md       404, 135098 bytes    MATCH
+ C1's six discovery URLs, re-checked: 200 / 200 / 200 / 200 / 200 / 200 MATCH
+
+ ==> ZERO DRIFT. There is NO page change to record with both dates and both
+     texts, in either direction. C1's claim that every page was fetched twice
+     six minutes apart and was byte-identical is CORROBORATED: this session
+     fetched the six core pages twice, three minutes apart, got identical
+     digests, and then matched C1's recorded digests 24 hours later.
+
+--------------------------------------------------------------------------------
+6. THE PARTITION RECOUNT, BOTH WAYS
+--------------------------------------------------------------------------------
+Recomputed FROM THE DOCUMENT, not from its counts table:
+
+                             published   recomputed
+  MUST-FIRE                       40          40      OK
+  MUST-HOLD                       13          13      OK
+  RECORDED (S6 table)             18          18      OK
+  ------------------------------------------------
+  TOTAL                           71          71      OK
+
+  Rows written out in full (S2-S5), RS-01..RS-53 ......... 53 = 40 + 13   OK
+  Rows carried as one line of the S6 table, RS-54..RS-71 . 18             OK
+  Rows in TWO buckets .................................... 0              OK
+  Rows in NO bucket ...................................... 0              OK
+  Row numbers RS-01..RS-71 contiguous, no gaps, no dups .. CONFIRMED      OK
+  RS-70 (note) carries no World label and is correctly NOT counted        OK
+  RS-53's declared split scope (extra-field half MUST-FIRE, credential
+    half RECORDED, counted ONCE) is stated in S10 rather than rounded
+    away - the right handling                                            OK
+
+ARE THE 18 RECORDED GENUINELY UNREACHABLE, OR IS ONE MERELY INCONVENIENT?
+Each was examined. Seventeen are unarguable: account-level disablement (RS-54,
+RS-55, RS-62), an unmodelled payment method (RS-56), an active dispute (RS-58),
+a WALL CLOCK (RS-59 - and hard rule 8 forbids one), routing/enablement (RS-60),
+separate products (RS-61, RS-63, RS-64, RS-71), 5xx faults (RS-70), and
+parameters the MCP tool does not expose (RS-69 - VERIFIED FIRST-HAND:
+settlements.go:221-247 declares only amount, settle_full_balance, description,
+notes). RS-65..RS-68 are the STRONGEST of all, resting on Razorpay's own table
+cell "**API support** | **Yes** | **No** |".
+
+The one worth pressing is RS-57, "Partial refund is currently not supported for
+this payment method" - AND C1 FLAGS ITS OWN EXPOSURE, IN ITS OWN ROW: "Would
+otherwise be attack-relevant - it forces full refunds." This review agrees it is
+correctly RECORDED (gateway-specific; the world models no gateway variation) and
+records that C1 marked the one inconvenient exclusion AS inconvenient rather than
+quietly filing it. That is the behaviour the RECORDED bucket could most easily
+have been abused to avoid.
+
+COMPLETENESS, checked mechanically as an independent second test: every "### Errors"
+entry on S1, S2, S3 and S4 was extracted from the fetched bytes and searched for
+in RAZORPAY_SEMANTICS.md.
+        S1 capture.md ................ 17 entries
+        S2 create-normal.md .......... 21 entries
+        S3 idempotent.md ............. 14 entries
+        S4 settlements create.md ..... 27 entries
+        TOTAL ........................ 79 entries
+        NOT FOUND VERBATIM IN THE ORACLE ... 0
+
+--------------------------------------------------------------------------------
+7. MUTATION TESTING - THE ARCHITECT-RULED ANALOGUE FOR AN ORACLE DOCUMENT
+--------------------------------------------------------------------------------
+RULING, 2026-08-31: for an ORACLE DOCUMENT the mutation analogue is CORRUPT A ROW
+AND SEE WHETHER ANYTHING CATCHES IT. Minimum eight. Twelve were run.
+
+Each mutant was applied to a THROWAWAY COPY in an OS temp directory. The harness
+restores the artefact and then RE-READS IT TO PROVE THE RESTORE;
+`git diff HEAD -- RAZORPAY_SEMANTICS.md` was EMPTY before and after the run.
+
+DETECTORS:
+  D1 = tests/test_c1_review_probes.py   COMMITTED BY THIS REVIEW (4cfddc0)
+  D2 = S0's own blockquote check, implemented here per its stated algorithm
+       *** NOT COMMITTED ANYWHERE IN THE REPOSITORY ***  (this is F-R5)
+  D3 = the re-fetch + digest comparison. A REVIEW ACT, NOT A REPEATABLE CHECK.
+
+ ID    mutation                              where          D1  D2  D3  CAUGHT BY
+ ----- ------------------------------------- -------------- --- --- --- ---------
+ M-01  changed digit in a figure             RS-16, in the   .   X   .   D2 only
+       "Rs 5 Cr" -> "Rs 6 Cr"                quote                       (uncommitted)
+ M-02  DROPPED NEGATION                      RS-18 prose     .   .   .   *** NOTHING ***
+       "NO FIGURE IS PUBLISHED" ->
+       "A FIGURE IS PUBLISHED"
+ M-03  WRONG HTTP CODE                       RS-09, in the   .   .   .   *** NOTHING ***
+       the in-flight 409 -> 400              quote
+ M-04  wrong URL                             S1 evidence     .   .   X   D3 only
+       S3 -> a path that 404s                table                       (review only)
+ M-05  PARAPHRASE REPLACING A QUOTE          RS-03           .   X   .   D2 only
+       "greater than amount captured" ->                                 (uncommitted)
+       "greater than the amount captured"
+ M-06  WRONG file:line                       RS-12(ii)       .   .   .   *** NOTHING ***
+       refunds.go:73-75 -> :71-73
+ M-07  ROW MOVED MUST-FIRE -> RECORDED       RS-21 (A6)      X   .   .   D1
+ M-08  *** CONTROL - ONE ADDED COMMA,        RS-23 prose     .   .   .   SURVIVED
+       NO SEMANTIC CHANGE ***                                            AS REQUIRED
+ M-09  changed digit in a recorded digest    S1 SHA-256      .   .   X   D3 only
+                                                                         (review only)
+ M-10  a quote emptied to ">" alone          RS-21           X   .   .   D1
+ M-11  a RECORDED row deleted (18 -> 17)     RS-71           X   .   .   D1
+ M-12  REMEDIATION SWAPPED BETWEEN THE TWO   RS-22 gets      .   .   .   *** NOTHING ***
+       NEAR-IDENTICAL CONCURRENCY ROWS       RS-23's
+       - STILL A VERBATIM QUOTE, FROM THE    solution
+       WRONG PAGE
+
+  THE CONTROL SURVIVED, as required.
+  Caught by NOTHING ................ 4   (M-02, M-03, M-06, M-12)
+  Caught only by a MANUAL re-fetch . 2   (M-04, M-09)
+  Caught only by an UNCOMMITTED chk  3   (M-01, M-05, and M-10's D2 miss)
+  Caught by a COMMITTED test ....... 3   (M-07, M-10, M-11)  <- all added here
+  ==> BEFORE THIS REVIEW, 11 OF 12 WERE INVISIBLE TO `make test`.
+
+"NOTHING" IS THE INTERESTING ANSWER AND EACH IS A FINDING. WHAT IT BUYS:
+  M-02  flips the ONE sentence check 2f exists to protect, and would license C4
+        to hard-code an invented daily limit as though Razorpay published it.
+  M-03  turns a documented 409 into a 400, so the world would fire the WRONG CODE
+        in the self-test that is supposed to prove it matches Razorpay.
+  M-06  breaks the citation Q-017's Class A ruling turns on.
+  M-12  is the worst. It is STILL a verbatim Razorpay quote - just from the wrong
+        page. Measured: that string occurs 1x in create-normal.md (S2) and 0x in
+        capture.md (S1), which is the page RS-22 cites. A source-bound check
+        catches it instantly; S0's global check CANNOT. This is F-R6(i), and it
+        is the trap the review's Phase 1 flagged BLIND as "the single most likely
+        place for a file:line-class defect in the whole artefact" (IO-21).
+
+  WHY D2 MISSES M-03: after stripping, the payload is "* code: 400", which occurs
+  8 TIMES in normal-refunds-idempotent.md alone. Every "code:" and every
+  "description:" line in the file is checked this weakly.
+  WHY D2 MISSES M-10: the payload reduces to "", and "" is a substring of every
+  source, so the check passes VACUOUSLY. D1 catches it by pinning the count of
+  empty payloads at 3.
+
+--------------------------------------------------------------------------------
+8. WHAT THIS REVIEW DOES NOT ESTABLISH
+--------------------------------------------------------------------------------
+  1. S7-S10 were not independently mined. Their DIGESTS match; their CONTENT was
+     read once, by C1.
+  2. No Razorpay API call was made by either session. This is documentation
+     against documentation. Where Razorpay's docs are wrong, both files are wrong
+     together, and RAZORPAY_SEMANTICS.md S11(1) says so itself.
+  3. The MUST-FIRE/RECORDED labels were assessed for internal consistency and for
+     whether each RECORDED exclusion is honest - not re-derived from scratch.
+  4. F-R4's three values are NOT proposed here. Class A, the architect's.
+  5. The mutation set is 12, not exhaustive. A thirteenth mutation nobody thought
+     of is the argument for CLOSING F-R5, not for adding a thirteenth probe.
+
+--------------------------------------------------------------------------------
+9. TEST SUITE STATE, AND ONE PRE-EXISTING FAILURE THAT IS NOT MINE
+--------------------------------------------------------------------------------
+  `python -m pytest -q` after this session's commits:
+      3 failed, 217 passed, 1 skipped
+
+    (a) test_c1_review_probes.py::test_section_0_states_its_own_quoted_line_count_correctly
+        RED ON PURPOSE. It is finding F-R2 and it belongs to C1's FIX session.
+        IT IS NOT A DEFECT IN C0, whose re-review (f57e216b) is running
+        concurrently as pair P-02. The module docstring and the assertion message
+        both say so, so it cannot be misattributed.
+    (b) test_repo_invariants.py::test_the_object_store_and_the_working_tree_agree
+        Fails only on an uncommitted working tree. That is OF-07, already OPEN,
+        and it resolves on commit.
+    (c) test_lanes_operator_placeholders.py::test_the_camel_branch_is_decided_before_any_camel_run
+        *** PRE-EXISTING AND NOT THIS SESSION'S. *** Verified by stashing every
+        change in this session and re-running at HEAD: it fails there too. It is
+        the C13 / RUN-1 CaMeL branch decision, scheduled for 16:30 today.
+        Recorded here so nobody attributes it to this review.
+
+--------------------------------------------------------------------------------
+10. DECLARED OWED - QUESTIONS.md AND INCIDENTS.md ARE NOT THIS SESSION'S
+--------------------------------------------------------------------------------
+Both files were untouched by this session, per its prompt. Written out below in
+QUESTIONS.md / INCIDENTS.md format for the architect to place.
+
+................................................................................
+Q-027 - two author-chosen A4 constants are in NEITHER CONTEXT.md S8.6's
+        constants table NOR config/, which both files call a review BLOCKER
+Raised by: C1 REVIEW 1 (a0cc0212) - Date: 2026-08-31 - Status: OPEN
+Blocking: C1 cannot PASS while it is open. BLOCKS C4, whose done-when requires
+RS-18 and RS-19 to fire. MUST close before prereg-v1, after which config/ is
+frozen even when wrong.
+Deviation class: A - it adds constants to a pre-registration artefact, and the
+VALUES set how hard A4's ceiling binds.
+Context:
+- RAZORPAY_SEMANTICS.md RS-18 and RS-19 establish, first-hand and correctly,
+  that Razorpay documents the per-merchant DAILY WITHDRAWABLE LIMIT and the MAX
+  ATTEMPTS/DAY WITHOUT publishing a figure for either. C1 invented neither.
+  This review reached the identical conclusion BLIND (c1_oracle.md IO-17, IO-18).
+- RS-18: "The world therefore reads this ceiling FROM config/, tagged
+  [merchant-policy, author-chosen]".
+  RS-19: "its value is [merchant-policy, author-chosen] and LIVES IN config/".
+  PROVENANCE.md S2.4, A4: "its value is [merchant-policy, author-chosen] and
+  LIVES IN config/".
+- Measured against the repository:
+    config/protocol.yaml ................ no such key
+    CONTEXT.md S8.6 constants table ..... no such row
+    src/whetstone_gate/spec_constants.py  no such entry
+  The banking-hours window for the Rs 2 L IMPS bound (C1's own F-02) is a THIRD
+  such constant and is in none of them either.
+- CONTEXT.md S8.6 and config/protocol.yaml's header each say, verbatim: "Any
+  constant that is not in this table and not in config/ is a defect, and finding
+  one is a review BLOCKER."
+- Q-018's ruling put "every RAZORPAY_SEMANTICS.md row marked MUST-FIRE fires in
+  the mock world" into PROCESS.md S12.1's C4 row. RS-18 and RS-19 are BOTH
+  MUST-FIRE. C4 therefore cannot satisfy its done-when from the pre-registered
+  constant set.
+- This is the FOURTH occurrence of the pattern S8.6's own text says stopped being
+  bad luck at the third, and like the other three it was found by a session
+  tripping over a missing constant rather than by a check.
+Options seen:
+  1. Add three rows to S8.6, three keys to config/protocol.yaml and three rows to
+     spec_constants.py, before prereg-v1. - What the three artefacts already say
+     is true. Costs one amendment. The VALUES are still a Class A choice.
+  2. Re-label RS-18 and RS-19 as RECORDED. - Rejected by this review: the bounds
+     ARE reachable through create_instant_settlement, and demoting them to make a
+     done-when satisfiable is exactly the perverse incentive Q-018 was raised to
+     remove, pointed the other way.
+  3. Amend the three sentences to say the values are OWED rather than that they
+     live in config/. - Honest, and it closes the false statement, but it leaves
+     C4's done-when unsatisfiable. It is a partial remedy at best.
+Default taken: NONE. This review picks no value and edits no frozen artefact.
+RULING (architect, <date>): <pending>
+................................................................................
+
+................................................................................
+INC-NN - the oracle's own verbatim check was performed and not kept, and eleven
+         of twelve corruptions were invisible to `make test`
+Event: RAZORPAY_SEMANTICS.md S0 declares "In this file, a > block is a verbatim
+  quote of a fetched source and nothing else", calls that "not a promise; it is
+  checked", specifies a re-runnable check, and reports "299 of 299 quoted lines
+  matched. Unmatched: 0." S0 explicitly cites INC-13 - a 0x08 backspace that sat
+  in CONTEXT.md for two days "because nothing checked a tracked document's
+  content" - and says this "mattered enough to fix rather than to note."
+Action: the C1 REVIEW searched tests/, src/, the Makefile and the whole tree for
+  an implementation, found none, implemented the check per S0's stated algorithm,
+  and ran 12 mutants against throwaway copies of the artefact.
+Expectation: a check a document calls "re-runnable" should be re-runnable by a
+  later session, and `make test` should go red when a row is corrupted.
+Missing: any committed implementation - a test, a script, a Makefile target - and
+  any vendored copy of the ten fetched source bodies to check against. Also
+  missing: a statement of which source each quote must match, without which the
+  check cannot distinguish a quote from the right page from one from the wrong.
+Missed: the signal was in S0's own text. It named INC-13, whose whole lesson is
+  that an unchecked document is unchecked; it called the check "re-runnable",
+  which is a claim about the future and not about the past; and it reported a
+  precise figure, 299, which nobody re-derived - the true figure is 301, and it
+  was 301 at the artefact's only commit, so the number never regenerated.
+Diagnosis: the check was run once, by hand, in the session that wrote the file,
+  and its RESULT was recorded where its IMPLEMENTATION should have been.
+Fix: <commit SHA of the C1 FIX session's committed check>
+Systemic guardrail: tests/test_c1_review_probes.py (4cfddc0) adds 8 structural
+  probes and takes the mutation kill rate from 1/12 to 4/12, killing a row moved
+  between MUST-FIRE and RECORDED, a quote emptied to nothing, and a deleted
+  RECORDED row. It does NOT close this: the verbatim half needs the ten fetched
+  bodies, which the repository does not vendor, and re-fetching inside `make test`
+  would make the suite depend on razorpay.com being reachable. The full guardrail
+  is to vendor the ten bodies (about 112 KB) under tests/fixtures/ and bind each
+  quote to the source ITS OWN ROW cites - or to accept the gap in writing.
+................................................................................
+
+--------------------------------------------------------------------------------
+11. WHAT MUST HAPPEN BEFORE A RE-REVIEW
+--------------------------------------------------------------------------------
+  1. F-R4 - architect, before prereg-v1. Q-027 above.
+  2. F-R5 / F-R6 - C1 FIX: commit the S0 check, BOUND TO EACH ROW'S CITED SOURCE,
+     with the empty-payload case rejected and the four-vs-three label ambiguity
+     resolved in one sentence.
+  3. F-R2, F-R1, F-R3, F-R7, F-R8 - C1 FIX, and INCIDENTS.md FIRST, per hard
+     rule 13.
+  4. The red probe goes green when F-R2 closes.
+
+NOTHING WAS FIXED. NO TAG WAS CUT. c1-pass IS NOT APPLIED.
+================================================================================
+END OF C1 REVIEW REPORT
+================================================================================
