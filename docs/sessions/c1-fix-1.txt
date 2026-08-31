@@ -3,10 +3,12 @@ C1 -- FIX SESSION -- attempt 1 -- SESSION-TOKEN 365deaf7 -- 2026-08-31
 FINAL OUTPUT. Committed to docs/sessions/c1-fix-1.txt BEFORE being printed.
 ================================================================================
 
-PUSHED SHA: <recorded by the immediately following commit, which is this session's
-             head; see "GIT" below. This file is committed before it is printed,
-             so it cannot contain its own hash, and a guessed one would be the
-             exact defect hard rule 13's Fix-with-SHA field exists to detect.>
+PUSHED SHA: a068278  (this block, committed and pushed)
+            The head at the moment this session ends is the follow-up commit that
+            writes this line, because a file cannot contain its own hash. Both are
+            on origin/main. A guessed SHA here would be the exact defect hard rule
+            13's Fix-with-SHA field exists to make detectable, so the placeholder
+            was carried through the push rather than filled in by prediction.
 
 VERDICT OF THIS SESSION: the BLOCKER is closed, both specification corrections
 landed, TASK 6 is DONE IN FULL, and ONE ITEM IS A DECLARED STOP (Q-029, Class A,
