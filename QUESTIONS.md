@@ -238,14 +238,27 @@ history is never rewritten.*
 
 `PROCESS.md` §1. Up to **two BUILD sessions** may be in flight at once, if and only if their SCOPE
 FENCEs are disjoint and neither imports the other. **The architect records the pair here BEFORE
-issuing either prompt.** **REVIEW sessions remain strictly serial**, and a chunk's review may not
-begin before the architect has recomputed that chunk's build report and committed its
-`ARCHITECT_CHECK`.
+issuing either prompt.** ~~**REVIEW sessions remain strictly serial**~~ — **AMENDED 2026-08-31, see
+below**, and a chunk's review may not begin before the architect has recomputed that chunk's build
+report and committed its `ARCHITECT_CHECK`.
+
+⚠️ **AMENDED 2026-08-31 (`Q-024`), MIRRORING `PROCESS.md` §1 — AND THE CLAUSE IS STRUCK, NOT
+DELETED**, for the reason `PROCESS.md` gives in its own words: *"a rule that changed under schedule
+pressure must be visible as a change."* **UP TO TWO REVIEW SESSIONS MAY BE IN FLIGHT AT ONCE, IF AND
+ONLY IF their chunks are DISJOINT AND NEITHER DEPENDS ON THE OTHER.** A chunk and its dependency are
+never reviewed in parallel. The pair is recorded here **BEFORE either prompt is issued**, exactly as
+a build pair is. **Nothing in any review is weakened** — different fresh session, two sealed phases,
+blind Phase 1, committed reimplementation, eight mutants, unchanged PASS conditions. `PROCESS.md` §1
+is the authoritative statement; this is its mirror.
+
+⚠️ **THIS PREAMBLE STILL READ *"REVIEW sessions remain strictly serial"* UNTIL SESSION `921cfaa4`
+CORRECTED IT**, because `debc97ae` amended `PROCESS.md` §1 and did not amend the mirror here. **The
+two canonical files disagreed for the length of a day**, on the one rule every session consults
+before writing its own pair row. It is recorded rather than quietly fixed: `Q-024`.
 
 | Pair | Chunks | Fences (disjoint) | Recorded | Issued |
 |---|---|---|---|---|
 | P-01 | C0-FIX (`c9521aac`) + C1 BUILD (`20cd5b79`) | C0-FIX: `src/whetstone_gate/{check_roles,config,spec_constants}.py`, `tests/` · C1: `RAZORPAY_SEMANTICS.md`, `PROVENANCE.md` | 2026-08-31 | 2026-08-31 |
-
 *(Before P-01: no concurrent pairs. C0 ran alone.)*
 
 ⚠️ **ARCHITECT RULING — the rule is EXTENDED, and that is recorded rather than assumed.**
@@ -1980,6 +1993,172 @@ closest approach itself; the numbers in §8.6a and in the ruling are checked aga
 computation rather than transcribed. ⚠️ **C2's own measurement test in `tests/test_c2_world.py`
 remains untouched** — it is outside this session's fence, and two independent tests measuring the
 same quantity by different routes is a property worth having, not a duplication to collapse.
+
+---
+
+### Q-024 — REVIEW sessions were strictly serial, and that rule was the binding constraint on the freeze
+**Raised by:** architect · **Date:** 2026-08-31 · **Status:** RULED
+**Blocking:** nothing now. It was blocking C14.
+**Deviation class:** A — a process amendment.
+**Context:** `PROCESS.md` S1 read "REVIEW sessions remain strictly serial." Twelve `full` reviews
+stood between 31 August and C14, at a MEASURED ~75 minutes each — about 15 hours, putting the
+freeze past midnight.
+**RULING (architect, 2026-08-31, APPROVED BY THE OPERATOR):** *Up to TWO review sessions may be in
+flight at once, IF AND ONLY IF their chunks are disjoint and neither depends on the other. A chunk
+and its dependency are never reviewed in parallel. The pair is recorded under `## Concurrent
+pairs` BEFORE either prompt is issued. Landed in `PROCESS.md` S1 by session `debc97ae`.*
+*⚠️ NOTHING IN ANY REVIEW IS WEAKENED. Each is still a different fresh session, still two sealed
+phases, still blind in Phase 1, still requires its committed reimplementation and its eight
+mutants. PASS conditions, persona coverage and mutant counts are untouched. THIS IS NOT A
+PRECEDENT FOR CUTTING REVIEW RIGOUR: this project's own C0 FAIL is the evidence the gate works and
+is worth more than the hours it cost. The S14 ladder was examined first and CANNOT relieve this
+path — rungs 1, 3, 4 and 5 all cut chunks that are not on it.*
+*⚠️ AND A THIRD ARCHITECT ERROR IS RECORDED HERE, FOUND BY C2 AND NOT BY THE ARCHITECT. C2's
+prompt asserted "No other session is running" while the ARCHITECT_CHECK_1 session (`debc97ae`) was
+issued concurrently, and NO `## Concurrent pairs` ROW WAS RECORDED FOR THE PAIR, which S1 requires
+BEFORE either prompt is issued. C2 refused to add the row retrospectively from inside one half of
+the pair — "recording one afterwards would be manufacturing the evidence the control exists to
+produce" — WHICH IS EXACTLY RIGHT and is the better judgement. The row is NOT added now, for the
+same reason; the violation is recorded instead. Alongside the `400` STRICT error and Q-021's
+fence error, that is three architect errors on 31 August, all found by sessions.*
+
+**Recorded by:** session `921cfaa4`, 2026-08-31, **verbatim** (hard rule 5), as a new entry at the
+architect's instruction. **The number is Q-024 and not Q-022 or Q-023 because C2 BUILD
+(`f0c50283`) took those two**, which is checkable above.
+
+⚠️ **THE AMENDMENT IS ALREADY IN FORCE IN `PROCESS.md` §1 AND THIS SESSION DID NOT PUT IT THERE.**
+`PROCESS.md` is under this session's `NOT` fence. Session `debc97ae` landed it, and it is visible in
+that file as a **struck** clause rather than a deleted one — *"struck rather than deleted, because a
+rule that changed under schedule pressure must be visible as a change"* — with its reasoning, its
+accepted risks and its explicit list of what is **not** changed. **This entry is the `QUESTIONS.md`
+record of a ruling that was applied before it was written down**, which is the wrong order and is
+said rather than smoothed: hard rule 5 puts the ruling in this file *before anything else is
+touched*.
+
+⚠️ **A FOURTH ARCHITECT ERROR BELONGS BESIDE THE THIRD, AND IT WAS FOUND THE SAME WAY.** The ruling
+above counts three errors on 31 August. **This session's own prompt carries a fourth:** it asserted
+that `921cfaa4` was already in `## Session tokens` and it was not, so the token batch that closes
+Q-021's collision class **omitted the batching session's own token** (**Q-025**). Like the other
+three, it was found by a session and not by the architect, and like the third it was found by the
+verification step the prompt itself demanded — *"verify each is present and say so."* **The
+instruction to check is what caught the error in the instruction.**
+
+⚠️ **AND THE `## Concurrent pairs` PREAMBLE STILL CARRIED THE STRUCK SENTENCE.** That section opened
+with *"**REVIEW sessions remain strictly serial**"* — the exact clause this ruling amends — because
+`debc97ae` amended `PROCESS.md` §1 and this file's mirror of it was not updated. **A frozen-artefact
+rule is not at stake** (`QUESTIONS.md` is neither frozen nor law), but `CLAUDE.md` §1's *"if the
+card, the spec and the logs disagree → STOP"* is exactly this shape, and the disagreement would have
+been read by every session that opens this file for its own pair row. It is corrected in this
+session, **by amendment in `PROCESS.md`'s own manner — struck, not deleted** — under this ruling.
+
+---
+
+### Q-025 — the token batch that ends the collision class omitted the batching session's own token
+**Raised by:** ARCH BUILD (`921cfaa4`) · **Date:** 2026-08-31 · **Status:** **OPEN**
+**Blocking:** nothing. The row was added and `check-roles` is green; what is open is the process
+question, not the value.
+**Deviation class:** ⚠️ **A on the defect; B on this session's response** — set out below so the
+review judges rather than inherits my judgement. This is **Q-022's shape deliberately reused**,
+because the architect endorsed that handling in this same session's rulings.
+
+**Context:**
+- This session's prompt, TASK 1, verbatim: *"`debc97ae`, `da356dbb`, `f0c50283` and `921cfaa4` are
+  already there — do NOT duplicate them; verify each is present and say so."*
+- **Three of the four were present. `921cfaa4` was not.** `grep -c 921cfaa4 QUESTIONS.md` returned
+  **0** on this session's first read, before any edit. The nine rows the prompt supplied are
+  `f57e216b`, `a0cc0212`, `a66c389d`, `94116fe2`, `7904e0a2`, `4377265b`, `ac7a0cf7`, `5bd2f44a`,
+  `e1911a9f` — **none of them this session's.**
+- `CLAUDE.md` §5 requires the trailer `Session-Token: 921cfaa4` on every commit this session makes,
+  and `check_roles.py` **E1 FAILS on a token that is not in `## Session tokens`.** Without the row,
+  E1 goes red on every commit here — **the identical red Q-021 records for C3**, and the third
+  consecutive chunk to hit it after `da356dbb` and `debc97ae`.
+
+⚠️ **WHY THIS IS NOT BOOKKEEPING.** TASK 1's own note says the batch means *"from here a session
+CARRIES its trailer and NEVER WRITES ITS ROW"*, and Q-021's ruling calls the batch **the structural
+fix** for an honour-system weakness `REVIEW_C0.md` named. **The batch is not self-applying.** The
+session that lands a batch is itself a session; its row must have been in a *previous* batch, and on
+the first batch there is no previous one. **So the mechanism has a base case it does not cover, and
+the base case is the session that installs it.** Left unstated, the table would read as though the
+self-recording problem ended here — and the fourth self-recorded row would be sitting in it.
+
+**Options seen:**
+  1. **Add the row, name it as a fourth self-recording, raise the gap.** — What this session did.
+     Closes E1, crosses **no** fence (`QUESTIONS.md` is in this session's scope, unlike C3's), and
+     costs only the honesty of the label.
+  2. **Omit the row, carry the trailer, report the RED.** — Q-021 option 3, and the *right* answer
+     for C3, whose fence forbade option 1. **Here the fence does not**, so choosing the red would be
+     accepting a broken `make check-roles` for a reason that does not apply.
+  3. **Strip the trailer.** — Forbidden. The token was issued; omitting it defeats E4, and history
+     is never rewritten.
+  4. **Stop and ask.** — The architect's intent is not in doubt: the prompt's first line issues
+     `921cfaa4` and TASK 1 asserts its row should exist. Stopping would cost the session for a
+     value nobody disputes.
+
+**Default taken:** **option 1**, and per **Q-010** a Class A item may not be defaulted past, so this
+entry says which reading it takes. **The DEFECT is Class A** — a control's first application omits
+its own author, and `E1`'s status depends on it. **The RESPONSE is Class B**: it changes no meaning,
+no behaviour and no reported number; the token is fixed by the prompt's own first line, and the row
+is a location for an unambiguous value inside a directory this session may write.
+
+**REMEDY, for the architect, one clause: every token batch names the token of the session that
+lands it.** That is the base case, and it costs one row. **A stronger version, if it is wanted:**
+`check_roles` could assert that the token on `HEAD`'s trailer appears in the table — but that is
+what E1 already does, and it cannot distinguish *"the architect forgot"* from *"the session forged
+it"*. **The batch clause is the fix; the check is not.**
+
+**RULING (architect, <date>):** <pending>
+
+---
+
+### Q-026 — `CONTEXT.md` §2 still carries the exact sentence Q-017's ruling calls false
+**Raised by:** ARCH BUILD (`921cfaa4`) · **Date:** 2026-08-31 · **Status:** **OPEN**
+**Blocking:** nothing today. **It blocks C19**, which publishes the claim, and it should close
+before `prereg-v1` for the same reason every other third-party claim did.
+**Deviation class:** **A** — it is a false claim about a third party's system in the file that is
+law, which is the class `INC-05` made a rule.
+
+**Context:**
+- **Q-017's ruling, landed in this session, verbatim:** *"The loose version — "create_refund sends
+  no idempotency key" — does not [survive a payments engineer], and was false."*
+- **`CONTEXT.md` §2, line 176, verbatim**, inside a block whose own heading is *"And the sharper
+  one, written so a payments engineer cannot puncture it"*:
+  > *"Razorpay's API caps each refund at the amount captured on that payment, and caps the
+  > cumulative refunds on a payment at the same figure. Nothing caps **how many** refunds an agent
+  > may issue, nothing caps the **total across payments**, and `create_refund` sends no idempotency
+  > key — so a retry is a second refund."*
+- `RAZORPAY_SEMANTICS.md` **RS-27** already carries the defensible form: *"`create_refund` sends no
+  idempotency key **unless the caller chooses to**, and the header cannot be chosen at all."*
+
+⚠️ **WHY IT SURVIVED THE 31 AUGUST CORRECTION.** `CONTEXT.md` v1.3 corrected §2's `create_refund`
+**table row** (line 161), which now carries the sharpened sentence in full. **The prose block four
+lines further down was not touched**, so the specification now states both the corrected and the
+false form of the same claim, **fourteen lines apart**, and the false one is the one presented as
+the version *"a payments engineer cannot puncture."* **`git grep` finds it in one command;** a
+panelist reading §2 top to bottom meets the false sentence first.
+
+**Options seen:**
+  1. **Amend line 176 to RS-27's form.** — One sentence, before `prereg-v1`, and it makes §2
+     internally consistent. The architect's: §2 is outside this session's task fence.
+  2. **Leave it and let C19 publish the sharpened version only.** — Rejected as a remedy: the false
+     sentence stays in the file that outranks the code, and `CLAUDE.md` hard rule 4 means a later
+     session reading §2 is entitled to rely on it.
+  3. **Do nothing.** — This is the fourth false third-party claim to reach this specification
+     (v1.3's change log counts three: the `destination` parameter, the 59% figure, the *"29 ms"*
+     Vulcan figure). Doing nothing is what makes it the fifth.
+
+**Default taken:** **none for the file; the finding is recorded and §2 is NOT edited.** This session's
+fence names §9.2 and §8.6a and says *"DO NOT TOUCH §6, §8.6a's other clauses, §10.1, **or any other
+section**"*, and Q-017's ruling **enumerates its own consequences** — §9.2, `INVARIANTS.md`, C4, C8,
+golden 2 — **and §2 is not among them.** Editing law outside both the fence and the ruling's
+enumerated scope is the move this project's rules exist to prevent, so it is raised instead. **This
+is Q-022's handling, applied by the session that recorded the ruling endorsing it.**
+
+**REMEDY, one sentence, for the architect:** replace *"and `create_refund` sends no idempotency key
+— so a retry is a second refund"* with RS-27's tested form — *"and the only idempotency
+`create_refund` can send is an optional `receipt` that nothing requires it to populate — so a retry
+is a second refund"* — or strike the clause and let the table row carry the claim alone.
+
+**RULING (architect, <date>):** <pending>
 
 ---
 
