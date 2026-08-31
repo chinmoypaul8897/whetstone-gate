@@ -462,34 +462,56 @@ def test_no_reviewer_probe_file_has_ever_been_edited_by_a_later_session(repo_roo
     and its blob is ``3a3af44d…`` at that commit **and** at HEAD.
 
     The claim was true. This probe makes it stay true, for every reviewer probe file in the
-    project rather than for the one that happened to be checked — each must have exactly one
-    commit, because a reviewer's probe is the reviewer's, permanently.
+    project rather than for the one that happened to be checked.
 
-    ⚠️ **A legitimate reason to touch one exists** — `OF-19` records that renaming
-    ``### RS-70 (note)`` would raise ``ValueError`` inside C1's reviewer's own partition
-    probe. When that happens the edit is made by *a review session*, deliberately, and this
-    assertion is updated citing it. What it forbids is a **fix** session doing it quietly.
+    ⚠️ **THE INVARIANT IS ONE AUTHOR, NOT ONE COMMIT — and this probe was WRONG the first way
+    round.** It first asserted *exactly one commit per file*, and it went red inside this very
+    session, on this very file, the moment a second commit refined ``P3``. A review that
+    amends its own probe before it is finished has done nothing wrong; a **later** session
+    touching it is the whole offence. So the assertion is over the ``Session-Token`` trailer:
+    every commit that touches a reviewer's probe file must carry the token of the session that
+    authored it. That is the same identity `make check-roles` polices, applied to the one
+    class of file hard rule 6 names.
+
+    The mistake is left recorded here rather than tidied away, because a probe whose first
+    form was wrong is exactly the kind of thing this project's reports are supposed to say out
+    loud.
+
+    ⚠️ **A legitimate reason for a later session to touch one exists** — `OF-19` records that
+    renaming ``### RS-70 (note)`` would raise ``ValueError`` inside C1's reviewer's own
+    partition probe. When that happens the edit is made by *a review session*, deliberately,
+    and this assertion is updated citing it. What it forbids is a **fix** session doing it
+    quietly to get green.
     """
     probes = sorted(repo_root.glob("tests/test_c*_review*_probes.py"))
     assert len(probes) >= 5, f"only {len(probes)} reviewer probe files found: {probes}"
 
-    multi = {}
+    offenders = {}
     for path in probes:
         rel = path.relative_to(repo_root).as_posix()
         out = subprocess.run(
-            ["git", "log", "--format=%h %s", "--", rel],
+            ["git", "log", "--format=%h%x00%s%x00%b%x01", "--", rel],
             cwd=repo_root,
             capture_output=True,
             text=True,
             encoding="utf-8",
             errors="replace",
         )
-        commits = [ln for ln in out.stdout.split("\n") if ln.strip()]
-        if len(commits) > 1:
-            multi[rel] = commits
+        tokens = {}
+        for entry in out.stdout.split("\x01"):
+            if not entry.strip():
+                continue
+            sha, subject, body = (entry.strip().split("\x00") + ["", ""])[:3]
+            found = re.search(r"^Session-Token:\s*([0-9a-f]{8})\s*$", body, re.M)
+            tokens.setdefault(found.group(1) if found else "(none)", []).append(
+                f"{sha} {subject[:60]}"
+            )
+        if len(tokens) > 1:
+            offenders[rel] = tokens
 
-    assert not multi, (
-        "a reviewer's probe file has been touched more than once. A fix session editing a "
-        "reviewer's probe to get green is hard rule 6's central case:\n  "
-        + "\n  ".join(f"{k}: {v}" for k, v in multi.items())
+    assert not offenders, (
+        "a reviewer's probe file has been touched by MORE THAN ONE SESSION. A later session "
+        "editing a reviewer's probe to get green is hard rule 6's central case, and the "
+        "Session-Token trailer is what distinguishes it from the review refining its own "
+        "work:\n  " + "\n  ".join(f"{k}: {v}" for k, v in offenders.items())
     )
