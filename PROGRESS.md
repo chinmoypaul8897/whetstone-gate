@@ -6,6 +6,128 @@ not a record; this file is.
 
 ---
 
+## C2 — the world generator and the planted probe — **REVIEW** — attempt 1 — 2026-08-31
+
+**SESSION-TOKEN:** `94116fe2` — issued in the architect's batch and already present in
+`QUESTIONS.md`. This session wrote **no** token row, and wrote nothing to `QUESTIONS.md`
+or `INCIDENTS.md`; both are fenced out and everything owed to them is in the report.
+
+**Role:** REVIEW, chunk **C2**, type `full` (personas 1 and 2), two sealed phases, a
+committed reimplementation, minimum eight mutants plus a control. **Not the session that
+built C2** — that was `f0c50283`, with the Q-022 remedy landing in `921cfaa4`.
+
+**Verdict: PASS. `c2-pass` cut.** Q-019 (iii) is discharged by the operator's confirmation
+of 2026-08-31, and `docs/reviews/ARCHITECT_CHECK_1.md` exists as `PROCESS.md` §11 requires.
+
+### Phase 1 (BLIND), committed at `d1634d2` before any build file was opened
+
+`docs/reviews/independent/c2_reimpl.py` was written from `CONTEXT.md` §8.6a's text alone and
+**imports nothing from `src/`, nothing from `config/` and nothing from `tests/`** — a
+reimplementation that read its constants from `config/` would be checking the build against
+itself. This is the **third** independent `mulberry32` in the project, and Q-019 makes a
+three-way disagreement the most valuable finding available to this review.
+
+**There is none.** All eleven raw draws, all six `u` renderings character for character, the
+merchant balance, and all twelve payment records field for field and **positionally**.
+Golden 7's digest `649e54ca446e8308f5fcd69ebba56eda5faea8d58246be7277cdb8b42227dd2b` and
+**4,879 bytes**, observed by this session, match Q-019 and `tests/goldens/README.md`.
+
+⚠️ **Reproducing a golden shows two implementations agree; it does not show the formula is
+right, because two faithful transcriptions of a wrong formula also agree.** So the two
+closed-form vectors were checked against an oracle with no transcendental function in it:
+`u=1/2` ⟹ `math.isqrt(750000000000·10⁶⁰)`, `u=1/4` ⟹ an integer 4th root. **Identical to all
+36 significant figures both times.**
+
+⚠️ **One consequence was recorded blind, before any result was seen, so the standard could not
+be said to have been invented afterwards:** no reachable input is an exact `.5` tie (a
+`prec=50` `exp()` leaves 42–44 fractional digits), so `ROUND_HALF_UP → ROUND_HALF_EVEN` moves
+no value this world can produce and only a structural check can kill it. **C2 already kills it
+structurally**, through golden 1's discriminating cases applied to the mode resolved from
+`config/`. That was the right answer and it was already there.
+
+### Phase 2 (SIGHTED)
+
+**31 vectors, TOTAL DIVERGENCES: 0** — 16 raw-draw and 15 whole-seed, plus 1,200 further raw
+draws (200 on each of six seeds, because a generator agreeing on eleven and diverging on the
+twelfth would still be wrong). **21 of the 31 appear nowhere under `tests/`**, including seed
+**2046** — Q-023's own witness, whose only occurrence in the tree is inside an unrelated SHA.
+
+**The probe and P7, re-verified independently across all 60 seeds**, with the tag and the note
+**parsed from `CONTEXT.md`** rather than transcribed: the probe is present with §10.1's fields
+in all 60, and clause **P7's match-count histogram is `{1: 60}`** — exactly one payment, and it
+is the probe, in every seed. Two would exempt a payment the design does not intend; **zero
+would shut the door and make arm 4 VOID BY CONSTRUCTION while every test still passed.**
+
+**The four non-uses were each fired at its own breaking fixture** — `math`, `time`, `random`,
+and **`openai` planted in `whetstone_gate/config.py`, outside the world package but inside its
+first-party closure**, which is the firing that proves the transitive walk really leaves
+`world/`. **C2's honest scope was checked rather than trusted:** the no-clock claim covers the
+package's own modules and says why a broader claim would be *false*, and that is verified at
+source — `yaml/representer.py` does import `datetime`.
+
+**Q-023 re-derived, and the specification carries no second overclaim.** All four published
+figures reproduce: the closest approach `0.0011866860605438627855977872` paise is
+character-identical, at seed 2046 draw index 3 raw `4167386882`; **4.22 × 10⁵** ULPs relative
+to the amount, as §8.6a's own words define it; and a float implementation differs on **0 of
+660**.
+
+### Mutation: 13 mutants + 4 non-use firings + a control
+
+**10 killed, 1 proven equivalent, 2 survived, and the semantics-preserving CONTROL SURVIVED —
+the run is VALID.** Run in a throwaway clone with `PYTHONPATH` set and `whetstone_gate.__file__`
+printed on all eighteen runs (INC-17), every mutant **committed** before it ran (INC-11), and
+**no mutant commit in `main`'s history**. Baseline `1 failed, 226 passed, 1 skipped, 2
+deselected`; the one red is C1's own probe over C1's open BLOCKER, identical on every row and
+therefore excluded from every "killed by" column.
+
+**Two kills are the hard kind.** **M4** takes §8.6a's forbidden twelfth draw and *discards* it,
+leaving every amount byte-identical, and dies only on the test that counts calls at the
+generator instead of trusting the record. **M10** drops the working precision from 50 digits to
+28, **moves none of the 660 amounts**, and dies on `test_u_is_exact_and_the_division_loses_nothing`.
+A suite that kills two mutations moving no money is not passing by coincidence.
+
+🚩 **Two survived, both of the class this review was told to hunt — "a forbidden construct that
+changes no value on this input", the class C2 BUILD itself opened with `ast.Div`. Reported as
+findings rather than dropped**, which is what C3's review did with its M11 and was right to do.
+
+### Findings — ZERO BLOCKERs
+
+* **OF-32 / F-1 (MEDIUM)** — `exp(context=context)` → `exp()` is byte-for-byte the baseline yet
+  **moves 14 of the 660 published amounts** under `Context(prec=8, ROUND_FLOOR)`. The guard
+  exercises **seed 2001 alone**, whose largest ordinary amount is 1,648,691; below 10,000,000 a
+  `prec=8` truncation still leaves a fractional digit, so **seed 2001 cannot exhibit the
+  failure**. The docstring's claim is about the package; the check was about one seed.
+* **OF-33 / F-2 (MEDIUM)** — `index % 6` hardcodes a §8.6 row that the tripwire's CONTEXTUAL
+  scan cannot see, a gap `spec_constants.py`'s own registry note already states.
+* **OF-34 / F-3 (MEDIUM)** — `import whetstone_gate.world` makes **two `cfg.load` calls at
+  import time**, defeating `spec.py`'s own *"a module-level eager read would be exactly that
+  stale cache, frozen at import"*, falsifying *"the only I/O in the package is
+  `load_world_spec`"*, and turning a `config/` defect into an import-time crash.
+* **OF-35, OF-36, OF-37, OF-38 (LOW)** — a docstring stale on two discharged rulings; §8.6a's
+  four libm figures bound to no computation; the decoy setting a *floor* on CANARY-A's
+  difficulty rather than its ceiling (for C10/C14/C18, not C2); and a `>= 50` floor where the
+  property is `== 60`.
+* **Three kept probes added**, each verified **red on its mutant and green on the world as
+  written** — the must-fire / must-not-cry-wolf pair this project requires. They are review
+  tests, not fixes: **this session changed no file under `src/` or `config/`.**
+
+### ⚠️ This review tripped INC-11 itself, and says so
+
+Phase 1's commit `d1634d2` produced `c2_reimpl_expected.json` through a **Windows shell
+redirect**, leaving CRLF in the working tree against LF in the object store. That turned **two**
+repo invariants red — `A3 no CRLF in any tracked file` and
+`test_the_object_store_and_the_working_tree_agree`, the latter being INC-11's own test — and a
+mutation baseline taken from that state would have been **VOID for a reason having nothing to do
+with C2**. Caught at the baseline, fixed in `6db060f` by taking the shell out of the path. It is
+the **seventh** occurrence of an instruction this project has already paid for six times,
+reached by a new route. **OWED to `INCIDENTS.md`**, which this session may not write.
+
+**Suite as a stranger runs it:** `2 failed, 230 passed, 1 skipped`. Both reds are pre-existing
+and neither is C2's — C1's open BLOCKER, and the `operator_gate` CaMeL-branch test that
+`make test` deselects and RUN-1 closes. `git status --porcelain tests/goldens/` is **empty**.
+
+---
+
 ## C3 — τ² adapter A: the 34/164 enumeration and the T-FP id list — **REVIEW** — attempt 1 — 2026-08-31
 
 **SESSION-TOKEN:** `a66c389d` — issued in the architect's batch and already present in
