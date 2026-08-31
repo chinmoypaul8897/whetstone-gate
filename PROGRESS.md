@@ -6,6 +6,171 @@ not a record; this file is.
 
 ---
 
+## C3 — τ² adapter A: the enumeration and the pre-registered task selections — BUILD — attempt 1 — 2026-08-31
+
+**SESSION-TOKEN:** `da356dbb` — issued by the architect in this session's prompt.
+⚠️ **NOT recorded in `QUESTIONS.md` `## Session tokens` by this session, and that is deliberate.**
+C3's scope fence names `QUESTIONS.md` under **NOT**. `check-roles` **E1 therefore FAILS** on this
+session's three commits — which is E1 **working**, exactly as it did for `0811c64a`. The row is
+**OWED to the architect** and is one line. See *What is owed* below; nothing was weakened to hide it.
+
+**Role:** BUILD, chunk **C3**. Review type `full`. **Not tagged. Not self-certified.**
+
+**Token spend: NONE.** **Zero provider model calls.** No Groq, no Google, no network operation of any
+kind was needed or made. This chunk reads local files from a vendored checkout and enumerates them.
+
+### Why this chunk ran first
+
+`CONTEXT.md` §21.4 names the τ² adapter **the project's #1 time risk** — *"the step most likely to
+eat a day"* — and `PROCESS.md` §12.1 schedules it **first**; revision 1's plan scheduled it **tenth,
+behind a chunk that depends on it**. Everything external about this submission rests on τ²-bench: it
+is the **only** source of tasks, gold behaviour and a grader this project did not author, and
+`PROCESS.md` §14 puts it on the **never-cut** list. If it could not be driven, the central claim was
+gone. **It can be driven, and the specification's numbers are right.**
+
+### The result — all six of §11.1's sub-counts reproduced, none assumed
+
+| | `CONTEXT.md` §11.1 claims | Reproduced at the pinned SHA |
+|---|---|---|
+| must-not-write, total | **34 of 164** | **34 of 164** ✅ |
+| airline | **24 of 50** (7 empty, 17 read-only) | **24 of 50** (7, 17) ✅ |
+| retail | **10 of 114** (2 empty, 8 read-only) | **10 of 114** (2, 8) ✅ |
+| write tasks | **130** | **130** = 26 airline + 104 retail ✅ |
+| `reward_basis`, airline | all **50** `[DB, COMMUNICATE]` | **50** ✅ |
+| `reward_basis`, retail | **112** `[DB, NL_ASSERTION]`, **2** `[DB]` | **112 / 2** ✅ |
+| telecom | **2,253** `[ENV_ASSERTION]` + **32** `[ENV_ASSERTION, ACTION]` of **2,285** | **2,253 / 32 / 2,285**, `DB` in **none** ✅ |
+
+Partitions, printed as `PROCESS.md` §9 requires: `7 + 17 + 26 = 50`, `2 + 8 + 104 = 114`,
+`34 + 130 = 164`. **Nothing needed adjusting.** ⚠️ **§11.1's *"The spec's 34/164 figure is exactly
+right"* is now a checked statement rather than a checked-once one** — the test re-derives it on every
+run and **parses the expected values back out of `CONTEXT.md` itself**, so neither side is
+transcribed into a test file where a third copy could drift from both.
+
+### Three things that were verified rather than trusted
+
+1. **Write tools come from τ²'s own decorator, and the parser was cross-checked against τ².** The
+   enumeration reads `@is_tool(ToolType.WRITE)` out of τ²-bench's source with `ast` — *a hand-list of
+   tool names would be an answer key we authored.* ⚠️ **The set that parser returns was checked
+   against the set τ²'s own metaclass builds at import time** (the `__tool_type__` attribute
+   `is_tool` sets): **identical on all 14 airline and all 16 retail decorated tools, with zero
+   `mutates_state` overrides in either domain.** Airline WRITE = 6, retail WRITE = 7.
+2. **Telecom's exclusion is asserted as its REASON, not its conclusion.** §11.1 withdrew an unsourced
+   *"unsound"* claim and replaced it with a structural one. The test re-derives that no telecom
+   `reward_basis` carries `DB` at all — so there is **no DB-hash write signal to score** and telecom
+   **cannot host the control**, which is a different and checkable statement.
+3. **Both source lines §11.1 cites are still exactly there.**
+   `evaluator_nl_assertions.py:121` is `assistant_message = generate(` with
+   `model=DEFAULT_LLM_NL_ASSERTIONS,` on 122, and `config.py:24` is
+   `DEFAULT_LLM_NL_ASSERTIONS = "gpt-4.1-2025-04-14"`. **No drift.** *This project has shipped four
+   false claims about third-party code; a stale line number would be the fifth, and it is cheap to
+   check.*
+
+### The sort ruling, and why it is load-bearing rather than a formality
+
+§13.4 pre-registers T-FP as *"the first 40 write-task ids after sorting"* and **does not say which
+sort**. Ruled by the architect: **task ids as strings, bytewise ascending, within each domain, first
+20 of each.** ⚠️ **The two readings select different tasks in BOTH domains**, and a test asserts that
+difference so the ruling is shown to matter instead of assumed to:
+
+| | first | last | what a numeric sort would have done |
+|---|---|---|---|
+| airline | `"11"` | `"37"` | started at `"7"`; `"7"` and `"8"` are excluded bytewise |
+| retail | `"0"` | `"15"` | `"100"`…`"109"` sort **ahead of** `"11"` bytewise |
+
+**Left to "whatever sort the language defaults to", a pre-registered sample would have been decided
+by an implementation detail after the fact** — the opposite of pre-registration.
+
+### The db_reward non-use, stated at the precision the claim actually supports
+
+The test walks **`db_reward`'s own transitive imports** — `tau2.evaluator.evaluator_env`, 24
+first-party modules — and finds **no text-generation client**: `litellm` unreachable,
+`tau2.utils.llm_utils` unreachable, `evaluator_nl_assertions` unreachable. *A walk over τ²-bench as a
+whole would fail correctly and prove nothing about what we call.* Three things keep that honest:
+
+- **the same walk is pointed at `evaluator_nl_assertions` and MUST find `litellm` and
+  `tau2.utils.llm_utils`** — a walk that finds nothing anywhere is a walk with a broken regex;
+- ⚠️ **`vendor/tau2-bench/src/tau2/__init__.py` DOES import the framework's model clients**, so
+  **importing any `tau2.*` module loads `litellm` into the process** (measured ~22 s). That is a
+  property of package initialisation, not of the reward path — and it is **asserted in a test rather
+  than left out**, because *"no model client is ever loaded in our process"* would be **false**. It
+  is also why this adapter imports **no** τ² module and reads τ²'s **files** instead;
+- ⚠️ **one provider SDK name IS reachable from the db_reward path and this session says so first:**
+  `elevenlabs`, a **speech**-synthesis SDK, imported by `tau2.data_model.voice` for a pydantic type,
+  inside `try: … except ImportError`, not installed here, never called on the reward path. **Not a
+  text-generation client and it does not touch the claim** — but a reviewer would find it, so a test
+  names it, pins where it enters, and asserts it is still guarded. **It is not swallowed by a
+  denylist that happens not to mention it.**
+
+### What landed — three commits
+
+| # | Commit | What |
+|---|---|---|
+| 1 | `7fb09d4` | the **34 must-not-write ids** and the **40 T-FP ids** pre-registered in `config/protocol.yaml` |
+| 2 | `39516dd` | `src/whetstone_gate/tau2/` — the enumeration *(unreviewed)* |
+| 3 | `5032cb6` | `tests/test_c3_tau2_enumeration.py` — 39 tests *(unreviewed)* |
+
+⚠️ **`config/` is a pre-registration artefact and editing it was legal ONLY because `prereg-v1` does
+not exist.** No existing key or value was changed; `vendor.tau2_bench_sha` was **verified**, not
+rewritten. Every id is **quoted** — τ² task ids are strings, and unquoted YAML would turn `"0"` into
+`0`, matching no task at all. ⚠️ The ids were **hand-written and then machine-verified against the
+derived enumeration**, and that verification is a **committed test**, not a one-off — because
+`INC-06`, `INC-10`, `INC-12`, `INC-13` and `INC-16` are **five occurrences** in this project of
+literal text mangled between a tool call and a file.
+
+⚠️ **Class B deviation, recorded rather than silently taken:** the prompt asks for the 34 *"each with
+its domain"*; both lists are committed as **domain-keyed mappings** rather than flat `{id, domain}`
+records. Identical information, and the domain cannot be separated from an id.
+
+### Counts
+
+| | BEFORE | AFTER |
+|---|---|---|
+| `python -m whetstone_gate.tasks test` | **117 passed, 1 skipped, 2 deselected** | ⚠️ **154 passed, 2 failed**, 1 skipped, 2 deselected |
+| `check-roles` | **17 passed, 0 failed, 4 n/a, exit 0** | ⚠️ **16 passed, 1 failed, 4 n/a, exit 1** |
+
+**+39 tests, all this chunk's, all passing.** The **two** failures and the **one** `check-roles`
+failure are **the same single cause**: `da356dbb` is not in `QUESTIONS.md`'s token table, which is
+outside this chunk's fence. `test_no_commit_carries_a_forged_or_reused_session_token` fails, and
+`test_check_roles_exits_zero` fails **as a consequence of it**. ⚠️ **Nothing was weakened, skipped or
+loosened** (hard rule 6), and no test was touched to make this go away.
+
+### What broke while doing it
+
+**Nothing in this chunk's own work.** Every count reproduced on the first derivation, the
+hand-written config ids matched the derived ones on the first check, and no test was flipped.
+⚠️ **`INCIDENTS.md` INC-17 was PLACED, and it is not this session's finding** — it was found by the
+ARCH world-generation session (`0811c64a`) and **independently reproduced by the architect**: a probe
+run inside a clone of an *old* commit imported `whetstone_gate` from **the live repository**, because
+an editable install resolves the package **by name** regardless of the working directory. It printed
+`1 passed` where the truth was a failure. ⚠️ **Its live consequence is carried in the entry: the C0
+re-review must re-run 46 probes against pre-fix source, and done naively ALL 46 WILL REPORT PASS.**
+
+### What is owed
+
+🚩 **Q-021 — OWED, and it is why the suite is red.** `CLAUDE.md` §5 requires the `Session-Token`
+trailer on every commit **and** requires the token to be recorded in `QUESTIONS.md`; C3's fence names
+`QUESTIONS.md` under **NOT**. This session carried the trailer and **did not reach outside the
+fence** — the precedent being C1 BUILD, which wrote Q-016/017/018 into its report *"rather than
+reaching outside the fence"*, and was right to. **Remedy: one row —**
+`| `da356dbb` | C3 | BUILD | 2026-08-31 |`.
+🚩 **Q-020 — RULED by the architect, OWED to `QUESTIONS.md`.** C3 is a `full` chunk with **no
+golden**, and that is a ruling, not an omission: **C3's golden is τ²-bench itself at the pinned SHA**
+— expected values read from an unmodified third-party checkout are external **by construction**,
+which is the strongest form of what hard rule 3 protects. Q-016's reasoning, applied to C3. Its
+enforcement is that **C3's review must independently re-derive the 34/164 split, the six sub-counts,
+the `reward_basis` census and the 40 T-FP ids from the same SHA, by its own method, and diff.**
+🚩 **A `conftest.py` guardrail is NAMED AS OWED** by INC-17 — an assertion that
+`whetstone_gate.__file__` lies under the pytest rootdir. `tests/conftest.py` is an existing test file
+and outside this fence, so it is **named, not built**.
+
+Both full texts are in `docs/sessions/c3-build-1.txt`, in `QUESTIONS.md`'s exact format.
+
+**`vendor/tau2-bench` verified at `a2c024725189473d2d7cea3a5cfdbcc67478e41f` with an EMPTY porcelain
+BEFORE and AFTER.** It was never edited, patched or installed over. **No tag was cut. Nothing is
+self-certified — a fresh adversarial review follows.**
+
+---
+
 ## ARCH — world-generation specification + golden 7 + the owed questions — BUILD — attempt 1 — 2026-08-31
 
 **SESSION-TOKEN:** `0811c64a` — issued by the architect in this session's prompt. ⚠️ **Recorded in

@@ -10,10 +10,36 @@ mutants · `code` = persona 2 only, ≥4 mutants · `submission` = persona 3 + p
 **No chunk is `PASS` without `docs/reviews/ARCHITECT_CHECK_<N>.md`.** An unrecorded gate is not a
 gate.
 
-*Last updated: 2026-08-31, end of the **ARCH WORLD-GENERATION** session (`0811c64a`) — specification,
-config, one architect-authored golden and four question-log entries; **no logic**. Before it: the
-**C0 FIX** session (`c9521aac`), which ran concurrently with the **C1 BUILD** session (`20cd5b79`) as
-pair **P-01**, and before them the ARCHITECT-ARTEFACT LANDING session (`e210c6f5`).*
+*Last updated: 2026-08-31, end of the **C3 BUILD** session (`da356dbb`) — the τ² adapter's
+enumeration and the pre-registered task selections; **the project's first chunk with real logic**.
+Before it: the **ARCH WORLD-GENERATION** session (`0811c64a`), then the **C0 FIX** session
+(`c9521aac`), which ran concurrently with the **C1 BUILD** session (`20cd5b79`) as pair **P-01**, and
+before them the ARCHITECT-ARTEFACT LANDING session (`e210c6f5`).*
+
+⚠️ **UPDATE, 2026-08-31, C3 BUILD (`da356dbb`): τ²-BENCH CAN BE DRIVEN, AND ALL SIX OF §11.1's
+SUB-COUNTS REPRODUCE FROM THE PINNED SHA. `make test` IS RED FOR ONE REASON, AND IT IS NOT A DEFECT
+IN THIS CHUNK.**
+`CONTEXT.md` §21.4 calls the τ² adapter **the project's #1 time risk** — *"the step most likely to
+eat a day"* — and it is retired: **34 of 164** (24 of 50 airline: 7 empty, 17 read-only; 10 of 114
+retail: 2 empty, 8 read-only), **130** write (26 + 104), the `reward_basis` census, and telecom's
+**structural** exclusion (**2,253 + 32 of 2,285, `DB` in none**) all reproduce from the unmodified
+checkout. `vendor/tau2-bench` was verified at `a2c0247…e41f` with an **empty** porcelain **before and
+after**. The **40 T-FP ids** and the **34 must-not-write ids** are pre-registered in
+`config/protocol.yaml`.
+🚩 **RED, AND OWED TO THE ARCHITECT — ONE LINE CLOSES IT.** `check-roles` **E1 FAILS**:
+`FORGED/UNISSUED: {'da356dbb': [...]} - not present in QUESTIONS.md ## Session tokens`. **E1 is
+working, not broken** — it is the same firing recorded for `0811c64a`. **C3's scope fence names
+`QUESTIONS.md` under NOT**, so this session could not add its own row and **did not reach outside
+the fence to do it** (the precedent this project praises is C1 BUILD doing exactly that). The remedy
+is **one row** in `QUESTIONS.md` `## Session tokens`:
+`| `da356dbb` | C3 | BUILD | 2026-08-31 |`. Until it lands, `make test` reports **2 failed, 154
+passed** and `check-roles` exits 1. ⚠️ **Nothing was weakened to get green** (hard rule 6), and the
+two failures are `test_no_commit_carries_a_forged_or_reused_session_token` and
+`test_check_roles_exits_zero` — the second is a consequence of the first. Raised as **Q-021**,
+**OWED**, in `docs/sessions/c3-build-1.txt`. **Q-020** (C3's missing golden, RULED by the architect)
+is owed to the same file.
+⚠️ **`INCIDENTS.md` INC-17 is placed**, and it carries a live instruction: **the C0 re-review must
+re-run 46 probes against pre-fix source, and done naively ALL 46 WILL REPORT PASS.**
 
 ⚠️ **UPDATE, 2026-08-31, ARCH WORLD-GENERATION (`0811c64a`): `CONTEXT.md` IS v1.3, GOLDEN 7 EXISTS,
 AND C2 IS UNBLOCKED — TO BE BUILT AND REVIEWED, NOT TO BE TAGGED.**
@@ -71,7 +97,7 @@ credential. **`docs/reviews/ARCHITECT_CHECK_0.md` now exists** and **UPHOLDS C0'
 | **C0** | 30 Aug | Repo, toolchain, remote, canonical files, day-one setup | `code` | ⚠️ **fixed (unreviewed)** | built → completed (3 operator-owed items landed; Q-006 + Q-008 closed) → **REVIEW_C0_1 = FAIL** (`52f5307b`, 4 BLOCKERs; no tag) → **ARCHITECT_CHECK_0 committed** (`e210c6f5`, 31 Aug — **FAIL UPHELD**; B-01…B-04 each re-confirmed from source; §13.4 recomputed = MATCH; **no `c0-pass`**) → **fix owed** (`c9521aac`) → **FIXED, UNREVIEWED** (`c9521aac`, 31 Aug — all four BLOCKERs closed with the review's own §4 evidence re-run old-beside-new: **B-01** E2/E3 go `PASS/PASS` → `FAIL/FAIL` on §7a's two named violations; **B-02** attack forms 2, 3 and 4 go `PASS` → `FAIL` (form 1 already failed); **B-03** `config/` minus `protocol.yaml` goes `14 passed, 0 failed, exit 0` → `14 passed, 1 failed, exit 1`; **B-04** `make selftest` with `camel_comparator:` deleted goes `2 passed` (GREEN) → `1 failed, 1 passed` (RED), and with `lanes.yaml` deleted the operator gate goes `1 passed` → `1 failed`. Plus **A5** (2 branches, closes **OF-01** and is **INC-13**'s guardrail), **E5** + a 4-SHA exception list (Q-014, BLOCKER), the **empty** `MOAT_ALLOW_LIST` (Q-015), the **§8.6 → registry** direction with the **8** missing constants, and **OF-03/04/06/10 CLOSED** · **OF-02/09/11 updated, still OPEN**. **INC-13, INC-14, INC-15** written *before* any code changed; **INC-16** written when `check-roles` A3 caught this session writing CRLF. `make test` **61 → 116 passed**; `check-roles` **14/0/3 → 17 passed, 0 failed, 4 n/a, exit 0**; `make selftest` **still RED**, correctly. **52 kept probes, 46 of which fail against the pre-fix source.** ⚠️ **NO `c0-pass` TAG. Nothing is self-certified — a fresh review re-runs the evidence**) → **re-review owed** |
 | **C1** | 30 Aug | `RAZORPAY_SEMANTICS.md` + `PROVENANCE.md` attack rows A1–A6 | `full` | **built (unreviewed)** | built (`20cd5b79`, 31 Aug — **71 rows, 0 `[UNFETCHED]`**; 10 pages + 2 pinned source trees fetched first-hand, each page fetched twice and byte-identical; **0 Razorpay pages changed since 2026-08-30**; **6 findings raised against this project's own records**, F-06 HIGH; **Q-016 / Q-017 / Q-018 owed**; **no `INCIDENTS.md` entry owed**) → **review owed** |
 | **C2** | 30 Aug | World generator + **the probe planted** (`pay_CANARYRECON`) | `full` | todo | ⚠️ **UNBLOCKED TO BUILD, 31 Aug** (`0811c64a`) — its golden and its specification both now exist, and neither did before. `CONTEXT.md` **§8.6a** states the generation algorithm exactly (mulberry32 step; `u` as the exact rational `raw/2^32`; the amount in `decimal.Decimal` at `prec=50`; **eleven** draws, the probe consuming none; positional status; sha256 ids; `created_at`; the six-template notes pool with its **deliberate decoy**; return order), and **`tests/goldens/world_seed_2001.json`** is committed — SHA-256 `649e54ca…dd2b`, 4,879 bytes, **architect-derived independently of any project code**, cross-checked against two `mulberry32` formulations. Ruling: **Q-019**. 🚩 **NOT UNBLOCKED TO BE TAGGED — Q-019 (iii): no chunk whose numbers derive from this algorithm may be tagged `cN-pass` until the OPERATOR has confirmed the ruling.** Build on it, review against it, **do not tag**. ⚠️ Two limitations are published with it, not hidden: `pay_CANARYRECON`'s **id shape** biases CANARY-B reach **upward** (§10.1 fixes that id), and **seed 2001 is one of only four in 2001–2050 that cannot breach E2 by refunds alone** — recorded so it is not later read as a defect. C0 remains a dependency and is still `fixed (unreviewed)` |
-| **C3** | 30 Aug | τ² adapter A — the 34/164 must-not-write enumeration, the T-FP id list | `full` | todo | — |
+| **C3** | 30 Aug | τ² adapter A — the 34/164 must-not-write enumeration, the T-FP id list | `full` | **built (unreviewed)** | built (`da356dbb`, 31 Aug — **ALL SIX OF `CONTEXT.md` §11.1's SUB-COUNTS REPRODUCE FROM THE PINNED SHA**, which was the chunk's whole question: **34 of 164** = 24 of 50 airline (7 empty, 17 read-only) + 10 of 114 retail (2 empty, 8 read-only); write **130** = 26 + 104; partitions 7+17+26=50, 2+8+104=114, 34+130=164. `reward_basis` census reproduces (50 airline `[DB, COMMUNICATE]`; retail 112 `[DB, NL_ASSERTION]` + 2 `[DB]`), and so does telecom's structural exclusion — **2,253 `[ENV_ASSERTION]` + 32 `[ENV_ASSERTION, ACTION]` of 2,285, `DB` in none**. Write tools read from τ²'s own `@is_tool(ToolType.WRITE)` decorator, **cross-checked against τ²'s own `__tool_type__` metadata — identical on all 14 airline / 16 retail tools, zero `mutates_state` overrides**. T-FP's 40 ids committed to `config/protocol.yaml` under the architect's **bytewise string sort** ruling, and the ruling is shown to be load-bearing: a numeric sort selects a **different** sample in **both** domains. `evaluator_nl_assertions.py:121` and `config.py:24` **both verified at source**. **`make test` 117 → 154 passed (+39 tests) and is RED for ONE reason that is not a defect in this chunk — see the ⚠️ block above.** ⚠️ **NO TAG.** Q-020 and Q-021 **declared OWED**; `INCIDENTS.md` **INC-17 placed**) → **review owed** |
 | **C4** | 30 Aug | World semantics, the five-tool surface, the typed harm record, the spend-free self-test | `full` | todo | — |
 | **C5** | 30 Aug | τ² adapter B — `HalfDuplexAgent` + the Gemini 3.5 Flash Lite user simulator | `full` | todo | — |
 | **C6** | 30 Aug | Attacker loop — policy-blind, sliding-window context | `full` | todo | — |
