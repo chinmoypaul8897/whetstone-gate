@@ -6,6 +6,137 @@ not a record; this file is.
 
 ---
 
+## ARCH — goldens 1 and 3, four rulings, one owed incident — **BUILD** — attempt 1 — 2026-08-31
+
+**SESSION-TOKEN:** `6ba2d70e` — ⚠️ **NOT in the `f57e216b` batch, so this session recorded its own
+row, and it is the SEVENTH to do so.** Q-025's remedy reads *"every token **batch** names the token
+of the session that lands it"*, and this was a single ARCH issue, not a batch — the identical gap
+`365deaf7` and `8e0f4a13` each recorded. **Three consecutive one-offs have now each written their own
+row and each explained that the clause does not cover them; six of the seven self-recorded rows are
+this same defect.** The batch mechanism itself works — the nine rows from `f57e216b` down needed no
+such paragraph. **The clause was scoped to the case that does not recur.** Named in `QUESTIONS.md`
+rather than filed quietly; without it `check-roles` **E1** goes `FORGED/UNISSUED` on every commit
+here. E1 parses **20 → 21** issued rows and stays **PASS**.
+
+**Zero provider model calls. Zero tokens spent on any lane. No network was used at all** — nothing
+in this session needed one.
+
+**Counts.** `make test` **294 passed, 1 skipped, 2 deselected — UNCHANGED**, as it should be: this
+session adds no test. `check-roles` **17 passed / 0 failed / 4 n/a, exit 0 — UNCHANGED.** ⚠️ **It was
+not unchanged on the first run, and that is the substantive event of this session — see Q-035
+below.** No movement is attributable to a concurrent session: the remote had not advanced when this
+session started or finished (`git rev-list --left-right --count origin/main...HEAD` → `0 <n>`), so
+the C1 re-review and the C6 review had landed nothing while it ran.
+
+**TASK 2 — goldens 1 and 3 placed, and NOTHING was computed.** `golden1_money.json` **sha256
+`4db9344b…90a2c4`, 1,874 bytes**; `golden3_harm_vector.json` **sha256 `06f2ca36…20f136`, 3,355
+bytes** — **both exactly the values the prompt published**, verified as observed after the copy.
+Copied **byte for byte, not retyped and not regenerated**: a retype through a model is precisely the
+route where a single wrong character is undetectable, and `tests/goldens/README.md` already says of
+golden 7 that this is *"the one artefact where a single wrong character is undetectable by any test —
+**because it is the test**."* `git hash-object` equals `git hash-object --no-filters` on both, so
+git's filter chain is a no-op on them (§6a's fingerprint property); **0 CR bytes**; `check-roles`
+**A3, A4 and A5 all PASS**; and the object store and the working tree were confirmed to hold
+identical bytes after the commit. ⚠️ **NEITHER THE FEE FORMULA NOR §12.2's HARM MAPPING WAS
+IMPLEMENTED ANYWHERE, not even to "check" a file** — a golden verified by a reimplementation has
+stopped being independent, so **the digest IS the verification**. This session was the vehicle
+`PROCESS.md` §5.2 requires, exactly as the world-generation session was for golden 7.
+
+**C4 IS UNBLOCKED, AND ITS ROW SAYS SO WITHOUT SAYING MORE.** `PROCESS.md` §12.1's C4 done-when reads
+*"Goldens 1 and 3 reproduce exactly"* and hard rule 3 forbids building a `full` chunk with no golden,
+so this was the clause holding it. `STATUS.md`'s C4 row moves from `—` to an **UNBLOCKED TO BUILD**
+history entry; **its status stays `todo`, because unblocked is not built.** ⚠️ **Golden 3 INTERLOCKS
+with golden 7 and this is recorded rather than left for a reviewer to notice**: it is built on seed
+2001's world and its `pay_54cd5f529e3350` target is a payment golden 7 pins at **811,853** paise —
+verified here — so the two are **not independent**, and a defect in the pinned world moves golden 3's
+ledger with it. Q-019 (iii) is **discharged** (`921cfaa4`), so the interlock does not hold C4's tag.
+
+⚠️ **TASK 2b DID NOT GO TO PLAN, AND THIS IS THE ENTRY'S MAIN FINDING — `QUESTIONS.md` Q-035.**
+Publishing the two digests in golden 7's house style turned `make test` **RED**:
+`tests/test_c2_world.py::test_the_golden_is_the_byte_for_byte_file_the_architect_authored` parses
+golden 7's expected digest **and** byte count out of this README with a matcher that asserts
+**exactly one** of each, and found **three**. **The test is a good test, it failed loudly rather than
+reading the wrong digest, and it was NOT touched** — it is outside this session's fence, and hard
+rule 6 forbids weakening a test to get green in any case. **The defect is its anchor:** it locates
+the values by scanning the whole file, so it is anchored on *"the only digest in the file"* — in a
+directory `PROCESS.md` §5.2 specifies to hold **nine**, each publishing a digest. **It was always
+going to fire on the second golden, and today was the second golden.** It is **INC-14's shape**: C2 is
+tagged `c2-pass` because at review time the input that breaks this test did not exist. **Resolution
+taken:** goldens 1 and 3 publish the same facts in a form the golden-7 parser does not match, so
+golden 7's assertion keeps its full designed force; **all three digests and byte counts remain
+published in full**, and the README carries a section naming the deviation, its reason and Q-035, so
+it reads as a recorded choice and not a re-styling. **Six goldens are still owed and every one will
+hit this until the parse is generalised** — which is C2's, and is recommended, not defaulted.
+
+**TASK 3 — four rulings recorded verbatim** (hard rule 5), all four in **Q-029's strict sense with no
+notational normalisation at all**: `S12.1`/`S6`/`S12.2`/`S9`/`S11.3`/`S15.0`/`S2` kept rather than
+rendered as section marks, Q-030's misplaced quotation mark kept where the ruling put it, and
+Q-032's line break inside *"corpus-versus-improvisation"* preserved and **named as inherited rather
+than closed up**, so no reader mistakes it for this session's.
+**Q-030** (new) — `customer_overcharge_paise` is a **structural zero** and is published as one, never
+removed. Golden 3 carries the finding **in the fixture itself**, as its `structural_finding` field,
+so the pin is a value a test will assert rather than prose a later session may skip. The README
+sentence the ruling commissions is **C18's** and was not written here.
+**Q-032** (C6's) — **UPHELD**, remedy **deferred to C14** with its shape fixed. Status moved
+`OPEN → RULED`; the entry is otherwise **left exactly as C6 wrote it**, options and all.
+**Q-033** (new, Class A, **the architect's own fence**) — `INCIDENTS.md` was fenced out of the
+sessions most likely to need it; the fence is **removed** and the file is append-only and in every
+session's fence. ⚠️ **Recorded with what the ruling does NOT fix:** all three delayed entries were
+recovered by the next session holding the file, so it removed a **latent** failure rather than
+repairing a realised one — and the reason to remove it anyway is that recovery by a successor is a
+courtesy, not a control.
+**Q-034** (new, Class A) — C6's licence-notice correction **adopted**. Its header and framing lines
+are **labelled as this session's**; everything below `**RULING**` is the architect's verbatim.
+
+**TASK 4 — three text changes, and one file deliberately NOT edited.** `PROCESS.md` §2's
+`INCIDENTS.md` row gains **APPEND-ONLY, AND IN EVERY SESSION'S FENCE** with Q-033's one-line reason —
+**one cell gained a sentence; the table was not restructured.** `PROCESS.md` §12.1's **C14** row
+done-when gains `corpora/MANIFEST.md`'s pins in `PROTOCOL.md`, verified by `make check-prereg`, and
+states explicitly that this does **not** add `corpora/` to §15.0's frozen set. `CONTEXT.md` §11.3's
+licence table gains AgentHarm's **two** holders and AgentDojo's **six**, at **v1.7** with one
+change-log row citing Q-034 — ⚠️ **and nothing else in §11.3 changed**: its counts, its MIT verdicts,
+InjecAgent's British-`LICENCE` note, the field-of-use clause and the **Safety-not-Security** note are
+all confirmed correct and untouched. ⚠️ **`PROVENANCE.md` §3.3 was VERIFIED TO MATCH AND WAS NOT
+EDITED** — C6 wrote it first-hand today and it already carries both attributions with their URLs and
+HTTP statuses; `git status --porcelain PROVENANCE.md` is **empty**. *(One residual, flagged not
+fixed: §11.3's column header still reads "verified 2026-08-30" while the two added attributions were
+read at source on 2026-08-31. The cells point at `PROVENANCE.md` §3.3, which carries the date and the
+URL, and the header was left alone under the prompt's "change nothing else in §11.3".)*
+
+**TASK 5 — the owed incident is placed, as `INC-22`.** C6 declared it in Q-032 because it could not
+write `INCIDENTS.md`; **this is the first entry filed under Q-033, which removed that fence.** The
+**ninth** occurrence of INC-06's class: a four-line Python script applied mutant D rather than the
+editor tool, by a session that had read INC-16, INC-19 and INC-21. **No damage, and re-verified here
+rather than carried forward** — `context.py` still hashes to the pre-mutation
+`a7e65316…85d30e` six commits later, and **all 16 files C6 authored carry 0 CR bytes**, both measured
+first-hand. ⚠️ **Its `Missed` field is deliberately not "the prompt said so"**: the prohibition has
+been stated in capitals in nine consecutive prompts and has failed nine times, which is **evidence
+about the instruction, not about the sessions** — and the specific remedy INC-19 and INC-21 both
+proposed (state it as a **property**, not a list of tools) has been in force since and **still did not
+hold**, which is a negative result this entry records rather than proposing a third wording. Its
+`Systemic guardrail` says plainly that **none exists** and that the honest remedy is **tool-level and
+nobody has built it** — `.gitattributes` and A3/A4/A5 inspect the bytes that arrived, never the path
+they arrived by. ⚠️ **Its `Fix` field carried the declared placeholder `TO-BE-RECORDED` in the commit
+that created it and the real SHA in the follow-up**, because a session cannot know its own commit's
+SHA in advance and **an invented one is exactly what rule 13's *"an invented incident has no commit"*
+exists to catch.** Not dramatised, not softened: it cost nothing and it is the ninth.
+
+**FENCE.** `config/`, `src/`, `RAZORPAY_SEMANTICS.md`, `docs/reviews/`, `vendor/`, `corpora/`,
+`data/` and every test file outside `tests/goldens/` were **not touched**, verified by
+`git status --porcelain` over each. `git status --porcelain tests/goldens/` shows **exactly the two
+additions and no modification to `world_seed_2001.json`**. Two reviews may have been running; every
+edit here was an append or a single-row change, no other session's lines were rewritten, and no
+rebase was needed.
+
+🚩 **NO TAG WAS CUT. Nothing is self-certified.** This session computed nothing and built no logic; a
+fresh adversarial review follows, and the one thing most worth an adversary's attention is **Q-035** —
+whether publishing two digests in a distinct form to keep a committed test's anchor unique is a
+legitimate Class B choice or a dodge. **The counter-argument is available and is not hidden:** an
+identical-looking README would have been simpler, and the reason it was not taken is that it required
+editing a test outside the fence to get green.
+
+---
+
 ## C6 — the attacker loop — **BUILD** — attempt 1 — 2026-08-31
 
 **SESSION-TOKEN:** `4377265b` — **issued in the `f57e216b` batch and already recorded** in
