@@ -1,0 +1,437 @@
+================================================================================
+ARCH -- Q-029 CLOSURE -- BUILD -- attempt 1 -- SESSION-TOKEN 8e0f4a13 -- 2026-08-31
+FINAL OUTPUT. Committed to docs/sessions/arch-q029-1.txt BEFORE being printed.
+================================================================================
+
+PUSHED SHA: <recorded by the immediately following commit, which is this session's
+             head; see "GIT" below. This file is committed before it is printed, so
+             it cannot contain its own hash, and a guessed one would be the exact
+             defect hard rule 13's Fix-with-SHA field exists to detect. Same
+             handling as c1-fix-1.txt.>
+
+VERDICT: Q-029 is RULED and closed. A4's five documented bounds now map to SIX
+configured values and ALL SIX ARE PRESENT. One finding is recorded and is NOT
+closed -- it is OWED. No tag cut. Do not self-certify: a fresh adversarial review
+follows.
+
+TOKEN SPEND: ZERO provider model calls. ZERO network requests of any kind. Every
+figure is derived arithmetic over a quote already committed and already re-fetched
+byte-identical by C1's reviewer on 2026-08-31.
+
+--------------------------------------------------------------------------------
+1. THE RULING, AND WHAT IT SETTLES
+--------------------------------------------------------------------------------
+
+Q-029 -- RULED (architect, 2026-08-31), Class A. Status flipped from OPEN. Recorded
+VERBATIM in QUESTIONS.md under hard rule 5.
+
+  THE VALUE IS 5,000,000,000 PAISE.
+  1 crore = 10^7, so Rs 5 Cr = 50,000,000 rupees, x 100 = 5,000,000,000 paise.
+
+THE RULING UPHOLDS THE SESSION THAT STOPPED. C1 FIX (365deaf7) was told to verify
+both Razorpay figures against RS-16/RS-17 and to STOP rather than reconcile if one
+disagreed. One did. It stopped. The ruling says it "is CORRECT and it was right to
+stop", and the architect re-derived the value independently.
+
+BOTH OTHER FIGURES WERE WRONG AND BOTH ARE RECORDED AGAINST THEIR AUTHORS:
+  500,000,000,000  100x  THE ARCHITECT'S OWN PROMPT. Named in the ruling as the
+                         FIFTH ARCHITECT ERROR OF 2026-08-31.
+  50,000,000,000    10x  RS-16's own committed Notes line, at 55f1f2c.
+The FIX session's diagnosis of the extra zero -- the "Rs 50 Crores" Smart
+Settlements cell one column right in the table RS-16 quotes -- is recorded as a
+DIAGNOSIS TO TEST, not as a finding, and is left standing at exactly that weight.
+
+VERBATIM IN THE STRICT SENSE, AND MORE STRICTLY THAN Q-028's. Q-028's closing note
+declares two notational substitutions its house style invites (S<n> -> Sn as a
+section mark, Rs -> the rupee sign). NONE WAS APPLIED HERE. The recorded ruling
+keeps "Rs", keeps "10^7", keeps "x" for multiplication, keeps "->", and keeps the
+issued text's own article/noun disagreement -- "The defect is a **author-written
+annotation**". A transcription that silently tidies grammar has been READ FOR SENSE
+rather than COPIED, and a reader then has no way to tell which other word was
+tidied. No word, number, name, condition or character differs.
+
+--------------------------------------------------------------------------------
+2. THE SEPARATE FINDING -- RECORDED AS OWED, NOT CLOSED
+--------------------------------------------------------------------------------
+
+THE TODO_ SENTINEL MECHANISM IS UNUSABLE FROM INSIDE A SCOPE FENCE.
+
+Recorded inside Q-029 as a FINDING and explicitly NOT as a ruling. Declaring a new
+sentinel requires BOTH an owner row in src/whetstone_gate/config.py (the
+SENTINEL_PREFIX owner map) AND an entry in tests/test_config_loader.py's closed
+sentinel set -- test_protocol_sentinels_are_exactly_the_undecided_ones asserts
+EXACT equality, so an undeclared sentinel turns that test red. Both files are
+outside a fix session's fence.
+
+So the mechanism this project built for hard rule 9's "a value not yet determined"
+CANNOT BE REACHED BY THE SESSIONS MOST LIKELY TO NEED IT -- a build or fix session
+that discovers mid-chunk that a value is undetermined -- and what it falls back to
+is an ABSENT KEY PLUS PROSE, which is the shape of F-R4, the BLOCKER that failed
+C1. THE ARCHITECT ACCEPTS THIS AS A REAL PROCESS DEFECT.
+
+IT IS NOT CLOSED HERE, AND THE REASON IS THAT IT REPRODUCES ON THIS SESSION:
+config.py and test_config_loader.py are outside THIS fence too. It is named as
+OWED, belonging to a chunk that owns those files, and the shape of the remedy is
+deliberately left open (an owner-less TODO_UNRULED prefix, a QUESTIONS.md-derived
+owner, or a fenced escape hatch are all candidates; none is ruled).
+
+The previous session's handling is recorded as CORRECT regardless: absent-and-loud
+beats present-and-wrong, and it declared the absence in four places.
+
+--------------------------------------------------------------------------------
+3. THE CONFIG KEY, WITH ITS DERIVATION
+--------------------------------------------------------------------------------
+
+config/protocol.yaml, under world.instant_settlement:, beside the five already
+there. No other key or value in the file is touched.
+
+    max_per_settlement_paise: 5000000000   # Rs 5 Cr  [Razorpay-defined]
+
+Commented in the file's style, tagged [Razorpay-defined], with the derivation on
+one line so the next reader neither re-derives it nor repeats either error:
+
+    1 crore = 10^7, so Rs 5 Cr = 50,000,000 rupees = 5,000,000,000 paise.
+
+BOTH WRONG FIGURES ARE NAMED IN THE COMMENT rather than forgotten -- 50,000,000,000
+as 10x and what RS-16 carried until today, 500,000,000,000 as 100x and what the C1
+FIX prompt supplied -- so a reader arriving holding either is told which it is.
+The comment also carries: that Razorpay's quoted text was correct throughout and is
+untouched; that the convention is paise = rupees * 100 without exception across
+every other money key in the file; that RS-17's Rs 2,00,000 -> 20,000,000 is the
+control; that the ceiling DOES NOT BIND under Q-028's values and that this is
+precisely why it had to be carried rather than left, a bound that never binds being
+UNFALSIFIABLE FROM INSIDE THE RUN; and that C4 READS this ceiling, never knows it.
+
+The 21-line comment block that declared the absence is replaced by this key and its
+comment. The STOP itself is not erased -- it is preserved in full in Q-029, in
+RS-16, in PROVENANCE.md S2.4 and in CONTEXT.md S8.6.
+
+--------------------------------------------------------------------------------
+4. THE S8.6 ROW, AND THE SIX-OF-SIX STATEMENT
+--------------------------------------------------------------------------------
+
+CONTEXT.md S8.6's constants table gains ONE row, marked [ADDED 31 Aug], tagged
+[Razorpay-defined]:
+
+  | **A4 max per settlement** **[ADDED 31 Aug]** | **5,000,000,000 paise** (Rs 5 Cr)
+    ... | config/protocol.yaml:world.instant_settlement.max_per_settlement_paise;
+    src/whetstone_gate/world/ (RS-16, MUST-FIRE); Q-029 -- **[Razorpay-defined]** |
+
+CONTEXT.md is bumped to v1.6 with one change-log row and one Amended line.
+
+THE SIX-OF-SIX STATEMENT IS PUT WHERE A READER WILL SEE IT -- in FOUR places, not
+one: S8.6's warning paragraph (rewritten from "ONE OF A4's FIVE BOUNDS IS STILL
+MISSING FROM BOTH" to "A4's FIVE DOCUMENTED BOUNDS NOW MAP TO SIX CONFIGURED VALUES,
+AND ALL SIX ARE PRESENT"), RAZORPAY_SEMANTICS.md RS-17's trailing paragraph,
+PROVENANCE.md S2.4, and config/protocol.yaml itself.
+
+AND THE FIVE-OF-SIX STATE IS KEPT VISIBLE IN EVERY ONE OF THEM, because that is the
+point. Hard rule 11's shape applies to a set of BOUNDS as much as to a set of
+episodes; the previous session PRINTED the gap AS A NUMBER rather than leaving it as
+a silence; and the set was five-of-six for EXACTLY ONE COMMIT. So each of those
+paragraphs now says "six of six" explicitly instead of quietly no longer mentioning
+it. A COUNT THAT VANISHES IS WORSE THAN ONE THAT CLOSES.
+
+--------------------------------------------------------------------------------
+5. THE REGISTRY ROW
+--------------------------------------------------------------------------------
+
+src/whetstone_gate/spec_constants.py gains one SpecConstant:
+
+    key         a4_max_per_settlement_paise
+    spec_row    A4 max per settlement
+    config_path protocol.yaml:world.instant_settlement.max_per_settlement_paise
+    tag         [Razorpay-defined]      (the SECOND in the A4 block; the tags are
+                                         mixed inside one config block and a wrong
+                                         one is a PROVENANCE.md defect)
+    literals    ("5000000000", "5_000_000_000")
+    mode        STRICT
+
+STRICT IS THE EASY CALL: 5000000000 is a TEN-DIGIT paise integer and does not occur
+innocently in ordinary Python, so a bare literal anywhere in first-party source is a
+defect on its face and needs no name to gate it. Same shape as
+a4_daily_withdrawable_limit_paise.
+
+IT CANNOT COLLIDE WITH THE SHORTER MONEY LITERALS -- 50000000 (merchant balance) or
+30000000 (daily limit) -- and that was checked rather than assumed: the scan anchors
+every literal with (?<![\w.]) ... (?![\w.]), so a shorter figure cannot match inside
+a longer one.
+
+The block comment above the A4 group, which read "BOUND 2 OF 5 ... HAS NO ROW HERE,
+and its absence is a DECLARED STOP", now records that it is here and that the set is
+six of six, keeping the one-commit history.
+
+COVERAGE TEST, BOTH DIRECTIONS, CONFIRMED PASSING:
+  test_every_s86_row_reaches_the_registry     S8.6 -> registry AND registry -> S8.6
+                                              (it asserts `missing` and `phantom`
+                                              are both empty)
+  test_registry_covers_every_config_constant  registry -> config/
+Both green. The row's spec_row normalises to "a4 max per settlement" on both sides.
+
+--------------------------------------------------------------------------------
+6. RS-16's ANNOTATION, AND THE ">"-LINE VERIFICATION
+--------------------------------------------------------------------------------
+
+RS-16's Notes line read:
+    "Exact figure found: Rs 5 Cr = 50,000,000,000 paise."   -- WRONG BY 10x
+It now reads:
+    "Exact figure found: Rs 5 Cr = 5,000,000,000 paise"
+and points at config/protocol.yaml : world.instant_settlement.max_per_settlement_
+paise = 5000000000, its S8.6 row, its registry row and its [Razorpay-defined] tag.
+
+THE CORRECTION IS KEPT VISIBLE, WHICH IS THIS FILE'S DISCIPLINE. A line directly
+beneath states that the line read 50,000,000,000 until 2026-08-31 and that it was
+wrong by 10x. The FIX session's derivation table is UPDATED, NOT PRUNED: it gains a
+VERDICT column and now names ALL THREE figures with their authors --
+
+  5,000,000,000    1x    RULED CORRECT -- the value in config/, S8.6 and the registry
+  50,000,000,000   10x   WRONG, corrected 2026-08-31; the author is THIS FILE
+  500,000,000,000  100x  WRONG, never written anywhere; the author is THE
+                         ARCHITECT'S OWN PROMPT, recorded against it
+
+"Why it is not fixed here" is replaced by "How it was fixed, and by whom" -- the
+STOP, the ruling that upheld it, and the session that landed it -- with the stop
+preserved rather than erased. RS-17's trailing paragraph, which asserted the sixth
+value was a declared STOP and not in config/, now states six of six.
+
+>-LINE SEQUENCE, VERIFIED MECHANICALLY BEFORE AND AFTER, NOT ASSERTED:
+
+  before (be378ce, this session's starting commit)  316 lines beginning with ">"
+  after  (HEAD)                                     316 lines beginning with ">"
+  diff                                              EMPTY
+  SHA-256 of the extracted sequence, both:          13d8a33c90aee25a1ce79b2e54011c67
+                                                    7412e28f748a2716e32663345ccf9b50
+
+IDENTICAL IN CONTENT AND IN ORDER. NOT ONE CHARACTER OF ANY VERBATIM RAZORPAY QUOTE
+IS ALTERED. That is the ruling's own reason the fix is safe: the defect was an
+author-written annotation, never a quote.
+
+ONE SELF-CAUGHT ERROR ON THE WAY, REPORTED BECAUSE IT WAS CAUGHT BEFORE PUBLICATION
+AND NOT AFTER: the first verification sentence written into QUESTIONS.md cited a
+SHA-256 of `grep -n` OUTPUT. Line numbers shift whenever anything above them moves,
+so that hash WOULD HAVE REPORTED A DIFFERENCE THAT IS NOT ONE -- a check that cries
+wolf on its own formatting. It is corrected in the same session to the hash of the
+extracted LINES, and the distinction is written into the sentence.
+
+--------------------------------------------------------------------------------
+7. PROVENANCE.md S2.4 -- BOUND 2
+--------------------------------------------------------------------------------
+
+BEFORE:
+  | 2 -- Rs 5 Cr per settlement | NONE -- a DECLARED STOP | UNDETERMINED |
+    [Razorpay-defined] | RS-16 |
+
+AFTER:
+  | 2 -- Rs 5 Cr per settlement |
+    world.instant_settlement.max_per_settlement_paise | 5,000,000,000 paise
+    (Rs 5 Cr) | [Razorpay-defined] -- a published figure. 1 crore = 10^7, so
+    Rs 5 Cr = 50,000,000 rupees = 5,000,000,000 paise. This cell read "NONE -- a
+    DECLARED STOP" / "UNDETERMINED" for one commit ... the two rejected figures --
+    50,000,000,000 (10x) and 500,000,000,000 (100x) -- are named at RS-16 rather
+    than deleted | RS-16 |
+
+The paragraph beneath the table, which read "BOUND 2 IS OPEN AND IS PRINTED AS A
+NUMBER RATHER THAN LEFT AS A SILENCE ... FIVE LANDED; ONE IS OPEN", now reads "BOUND
+2 IS CLOSED, AND THE SET IS SIX OF SIX", and keeps the five-of-six history and the
+reason it was printed. The sentence "Every row above also carries a CONTEXT.md S8.6
+row and a spec_constants.py registry row" is now true of bound 2 as well, which it
+was not before.
+
+--------------------------------------------------------------------------------
+8. THE STOP TEST -- BEFORE AND AFTER
+--------------------------------------------------------------------------------
+
+THIS IS THE ONLY EXISTING TEST EDITED. No other test in this file or any other file
+was touched.
+
+BEFORE -- tests/test_c1_fix_probes.py
+
+  def test_the_stopped_sixth_value_is_still_stopped_and_still_declared(repo_root):
+      """Q-029 is OPEN, and this probe fails the moment somebody quietly closes it.
+      ... fails only on the key existing while the question is still OPEN, and it
+      fails loudly if the STOP stops being *declared* ..."""
+      protocol = cfg.load("protocol")
+      questions = (repo_root / "QUESTIONS.md").read_text(encoding="utf-8")
+      entry = re.search(r"### Q-029 -.*?\n(.*?)\n(?=### Q-|\n## )", questions, re.S)
+      assert entry is not None, "Q-029 has been deleted from QUESTIONS.md"
+      still_open = "**Status:** **OPEN**" in entry.group(1)
+      if protocol.has("world.instant_settlement.max_per_settlement_paise"):
+          assert not still_open, (...)
+      else:
+          assert "Q-029" in (repo_root / "RAZORPAY_SEMANTICS.md").read_text(...), (...)
+
+AFTER -- tests/test_c1_fix_probes.py
+
+  def test_the_stopped_sixth_value_is_ruled_and_landed(repo_root):
+      """FLIPPED 2026-08-31 BY ARCH BUILD (8e0f4a13) ON A RULING, NOT WEAKENED.
+      ... the flip must be provably meaningful (it fails on the old code) ..."""
+      protocol = cfg.load("protocol")
+      questions = (repo_root / "QUESTIONS.md").read_text(encoding="utf-8")
+      entry = re.search(r"### Q-029 -.*?\n(.*?)\n(?=### Q-|\n## )", questions, re.S)
+      assert entry is not None, "Q-029 has been deleted from QUESTIONS.md"
+      assert "**Status:** **RULED**" in entry.group(1), (...)
+      value = protocol.require(
+          "world.instant_settlement.max_per_settlement_paise")
+      rupees_in_five_crore = 5 * 10**7
+      assert value == rupees_in_five_crore * 100, (...)
+      assert value == 5000000000
+
+IT IS A RULED REVERSAL, NOT A WEAKENING, AND THE DISTINCTION IS SHOWN RATHER THAN
+CLAIMED. Hard rule 6: "If a ruling legitimately changes behaviour, the test flips
+citing the ruling -- and the flip must be PROVABLY meaningful (it fails on the old
+code)." IT WAS RUN RED TWICE, in throwaway clones in an OS temp directory, with
+PYTHONPATH set and whetstone_gate.__file__ AND config.repo_root() PRINTED FROM
+INSIDE THE RUN -- INC-17's discipline, because a probe that silently imports the
+LIVE package reports the opposite of the truth:
+
+  be378ce (pre-session: Q-029 OPEN, key absent)
+      MODULE : ...\scratchpad\prefix-tree\src\whetstone_gate\__init__.py
+      ROOT   : ...\scratchpad\prefix-tree
+      RED on the RULED assertion.  1 failed, 21 passed.
+
+  97a5981 (Q-029 RULED, key not yet written)
+      MODULE : ...\scratchpad\ruled-nokey\src\whetstone_gate\__init__.py
+      ROOT   : ...\scratchpad\ruled-nokey
+      RED on the loader, with MissingRequiredValue -- hard rule 9's "a missing
+      required value is a hard refusal, never a silent fallback", firing exactly as
+      designed.  1 failed, 21 passed.
+
+BOTH HALVES FAIL INDEPENDENTLY. The new probe makes FOUR assertions where the old
+made one per branch, and every one is stricter than "the key is absent": the key
+resolves THROUGH THE LOADER (not merely present in the YAML text); Q-029 is marked
+RULED; the value is 5,000,000,000; and the value equals the DERIVATION RECOMPUTED IN
+THE TEST -- 5 * 10**7 * 100 -- rather than a transcribed constant, so a future edit
+that changes the figure must change arithmetic, not a copy of itself. Nothing was
+deleted, skipped, loosened or approximated.
+
+The A4_KEYS comment above it was updated because its STATED REASON changed: the key
+stays out of that dict now because it is the SECOND [Razorpay-defined] key and
+test_the_two_razorpay_defined_a4_figures_are_tagged_razorpay_and_the_rest_are_not
+partitions the dict on exactly ONE Razorpay-tagged key. Adding it there would turn
+that probe red, and editing that probe is outside this fence.
+
+--------------------------------------------------------------------------------
+9. COUNTS, AND THE GOLDENS CHECK
+--------------------------------------------------------------------------------
+
+                              BEFORE                    AFTER
+  make test                   0 failed, 259 passed,     0 failed, 259 passed,
+                              1 skipped, 2 deselected   1 skipped, 2 deselected
+  make check-roles            17 / 0 / 4, exit 0        17 / 0 / 4, exit 0
+
+The passed count is UNCHANGED because the flipped probe replaces its predecessor
+1:1. Both BEFORE figures match this session's prompt exactly. No other test went
+red.
+
+  git status --porcelain tests/goldens/
+  (EMPTY -- printed, and empty)
+
+ONE INTERMEDIATE RED, NAMED, BECAUSE A REPORT THAT ONLY SHOWS THE GREEN RUN IS NOT A
+REPORT: tests/test_repo_invariants.py::test_the_object_store_and_the_working_tree_
+agree fired once, while three edited files were still uncommitted. It compares
+sha256(working tree) against sha256(git show HEAD:<path>) for every tracked file, SO
+IT FIRES ON ANY UNCOMMITTED EDIT BY DESIGN -- a clean-tree invariant, not a
+regression. Green on the next commit and green at HEAD.
+
+--------------------------------------------------------------------------------
+10. GIT
+--------------------------------------------------------------------------------
+
+Six commits, atomic, each carrying Session-Token: 8e0f4a13. Those touching src/ or
+tests/ end with "(unreviewed)". NO TAG CUT.
+
+  97a5981  docs: Q-029 RULED verbatim, the token row, and the TODO_ sentinel
+           finding recorded as OWED
+  5e20abe  feat: Q-029's key lands in all three places - config/, S8.6, the
+           registry (unreviewed)
+  d9d93d2  test: flip the Q-029 stop probe on the ruling - a reversal, not a
+           weakening (unreviewed)
+  32dfb7f  docs: RS-16's annotation corrected to 5,000,000,000 paise, and
+           PROVENANCE S2.4's bound 2
+  1994ef5  docs: STATUS and PROGRESS - Q-029 closed, six of six, and this session's
+           own blemish
+  (this)   docs: ARCH Q-029 FINAL OUTPUT, committed verbatim before it is printed
+  (+1)     docs: record the pushed SHA in this block
+
+git diff --stat be378ce..HEAD (before the two docs/sessions commits):
+
+  CONTEXT.md                           |  49 +++++++-----
+  PROGRESS.md                          | 123 ++++++++++++++++++++++++++++
+  PROVENANCE.md                        |  32 +++++----
+  QUESTIONS.md                         | 119 ++++++++++++++++++++++++--
+  RAZORPAY_SEMANTICS.md                |  86 +++++++++++++--------
+  STATUS.md                            |   2 +-
+  config/protocol.yaml                 |  50 ++++++++-----
+  src/whetstone_gate/spec_constants.py |  51 +++++++++++--
+  tests/test_c1_fix_probes.py          |  92 ++++++++++++++--------
+  9 files changed, 475 insertions(+), 129 deletions(-)
+
+EVERY FILE TOUCHED IS INSIDE THE FENCE. Nothing under PROCESS.md, INCIDENTS.md,
+config/lanes.yaml, any other module under src/, any other test file, docs/reviews/,
+tests/goldens/ or vendor/ was opened for writing.
+
+--------------------------------------------------------------------------------
+11. WHAT I COULD NOT DO, AND WHY
+--------------------------------------------------------------------------------
+
+(a) THE TODO_ SENTINEL FINDING IS NOT CLOSED -- BY INSTRUCTION, AND BECAUSE IT
+    REPRODUCES HERE. The prompt says it is named as owed rather than closed. It
+    would require editing src/whetstone_gate/config.py and
+    tests/test_config_loader.py, both outside this fence, WHICH IS THE DEFECT
+    ITSELF. Recorded in Q-029 and in CONTEXT.md S8.6; owed to a chunk that owns
+    those files.
+
+(b) NO INCIDENTS.md ENTRY WAS WRITTEN, AND ONE MAY BE OWED. INCIDENTS.md is
+    explicitly on this prompt's NOT list. Two things this session would otherwise
+    have written up are recorded in PROGRESS.md instead, and are flagged here so the
+    architect can decide whether either is an entry:
+      - the stray "@" commit-message blemish in (c) below;
+      - the >-line hash that was first taken over `grep -n` output.
+    Neither broke a published number and both were caught inside the session.
+
+(c) ONE BLEMISH IN THIS SESSION'S OWN GIT HISTORY, REPORTED RATHER THAN REWRITTEN.
+    Commit 97a5981 carries a stray "@" as its SUBJECT LINE and another as its last
+    line: the message was passed through the Bash tool using PowerShell here-string
+    syntax (@'...'@), which bash does not parse, so both "@" characters became part
+    of the message. The trailer survived intact and check-roles E5 is GREEN
+    (17/0/4, exit 0). IT WAS NOT AMENDED: CLAUDE.md S5 says no history rewrite,
+    ever, and the markers this project leaves in history are permanent on purpose.
+    Every later commit used a message FILE written with the editor tool.
+    THIS IS ADJACENT TO INC-06's CLASS WITHOUT BEING AN INSTANCE OF IT -- nothing
+    was written to a project file by a shell mechanism; a commit message was
+    mangled -- and it is said plainly rather than filed quietly, because "adjacent"
+    is exactly the judgement a session grades itself on. Every project file in this
+    session was written with the editor/write tools: no heredocs, no Python
+    scripts, no shell redirects.
+
+(d) THE SIXTH KEY IS NOT ADDED TO test_c1_fix_probes.py's A4_KEYS DICT. Doing so
+    would turn test_the_two_razorpay_defined_a4_figures_are_tagged_razorpay_and_
+    the_rest_are_not red, because that probe partitions the dict on exactly ONE
+    Razorpay-tagged key, and editing a SECOND existing test is outside a fence that
+    permitted one flip. The key is covered in full by the flipped probe instead --
+    loader resolution, ruled status, and the value re-derived. The comment in the
+    file states this so the omission cannot be read as an oversight.
+
+(e) Q-028's ANNOTATION WAS CORRECTED, WHICH IS BEYOND THE LITERAL TASK LIST AND IS
+    FLAGGED FOR REVIEW. Its clause "It is written as an explicit TODO_ sentinel the
+    loader refuses" IS FALSE -- no sentinel was ever written; the key was absent --
+    and it directly contradicts the finding this session was told to record. It is
+    STRUCK AND NAMED, not deleted, inside QUESTIONS.md, which is inside the fence.
+    Judged worth doing because a false claim about this repository's state, sitting
+    in the entry that closes the BLOCKER about false claims about this repository's
+    state, is F-R4's exact class. If the architect disagrees, it is one contiguous
+    edit to revert.
+
+NOTHING ELSE WAS BLOCKED. Every task in the prompt is done in full.
+
+--------------------------------------------------------------------------------
+12. DO NOT SELF-CERTIFY
+--------------------------------------------------------------------------------
+
+NO TAG IS CUT AND NONE MAY BE. This is a BUILD session; only a REVIEW session tags,
+and only on a PASS. C1's re-review is still owed and C1 remains fixed (unreviewed).
+Q-029's ruling and this session's work have not been adversarially reviewed by
+anyone. The one number a reviewer should re-derive first is the one this whole
+session turns on: 1 crore = 10^7; Rs 5 Cr = 50,000,000 rupees; x 100 =
+5,000,000,000 paise.
+================================================================================
