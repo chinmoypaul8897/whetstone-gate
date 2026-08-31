@@ -6,6 +6,109 @@ not a record; this file is.
 
 ---
 
+## C3 — τ² adapter A: the 34/164 enumeration and the T-FP id list — **REVIEW** — attempt 1 — 2026-08-31
+
+**SESSION-TOKEN:** `a66c389d` — issued in the architect's batch and already present in
+`QUESTIONS.md`. This session wrote **no** token row.
+
+**Role:** REVIEW, chunk **C3**, type `full` (personas 1 and 2), minimum eight mutants plus a control.
+**I fixed nothing, and I built nothing.** ✅ **`c3-pass` CUT.**
+
+**Token spend: NONE. ZERO provider model calls; zero lane quota consumed.** No network operation at
+all — the vendored checkout is local, and the only `git clone` was of this repository onto itself
+into an OS temp directory.
+
+**Concurrency.** C2's review may have been in flight as pair **P-03**. Disjoint chunk. I wrote only
+`docs/reviews/REVIEW_C3_1.md`, `docs/reviews/independent/c3_enumeration.{md,py}`,
+`docs/reviews/independent/c3_enumeration_diff.txt`, `docs/reviews/mutants/c3_mutants.md`,
+`tests/test_c3_review_probes.py`, `docs/reviews/OPEN_FINDINGS.md` (appended), `STATUS.md`
+(appended — and the three earlier "Last updated" paragraphs left verbatim), this file and
+`docs/sessions/`. **`QUESTIONS.md` and `INCIDENTS.md` were not touched.**
+
+### VERDICT: **PASS** — zero BLOCKERs; one MEDIUM, five LOW, three INFO
+
+### Phase 1 was really blind, and that is the whole value of it
+
+`docs/reviews/independent/c3_enumeration.md` was **committed at `e89f63c` before
+`src/whetstone_gate/tau2/`, `tests/test_c3_tau2_enumeration.py`, `docs/sessions/c3-build-1.txt` or
+`config/protocol.yaml`'s `selections:` block had been opened**, and before any diff was read. Method
+deliberately unlike C3's: an `ast` decorator walk **plus** the runtime `__tool_type__` /
+`__mutates_state__` cross-check C3 declined to commit, over raw JSON rather than Sierra's pydantic
+models, censusing all three domains.
+
+**It diverges on nothing.** Not one count, not one id, in either direction — airline 50 / 24 (7+17)
+/ 26, retail 114 / 10 (2+8) / 104, **34 of 164**, write **130**, both partitions compared **id for
+id**, the `reward_basis` census for airline, retail *and* telecom, and the **40 T-FP ids as an
+ordered list** against both the derivation and `config/protocol.yaml`. Full diff:
+`docs/reviews/independent/c3_enumeration_diff.txt`.
+
+Two blind observations turned out to matter. I flagged that a **flat** 40-id list would collapse to
+**37 distinct strings** (airline and retail both contain `11`, `14`, `15`) — C3 had already keyed the
+lists by domain. And I recorded, before reading anything, that `requestor` is absent from all 692
+reference actions; that became **OF-30**.
+
+### The sort choice, and why the ruling was not a formality
+
+I wrote my rule down before reading C3's: **bytewise on the `str` id, per domain**, because
+`Task.id` *is* `str` and `int(id)` **raises on all 2,285 telecom ids**, so a numeric rule is not even
+total over τ²'s id space. Same rule C3 implements. And the ruling was **needed**, measured rather
+than asserted: airline 4 of 20 ids differ, retail **14 of 20 replaced**. Two competent readers of
+§13.4's unqualified *"after sorting"* would have shared 6 of 20 retail tasks. §13.4 as worded was
+under-specified — a finding on the **specification**, not on C3, which found it and raised it.
+`prereg-v1` does not exist, so closing it now is pre-freeze, not post-hoc selection.
+
+### The checks that could most easily have been decorative, fired red by hand
+
+* **The db_reward walk.** Pointed at `evaluator_nl_assertions` it finds **`litellm`** — by my own
+  independent walk *and* by mutant M8. I also checked its one way of lying: it silently `continue`s
+  on an unresolvable `tau2.*` name, so I re-ran it recording those — **126 unresolved, all 126
+  `from <module> import <symbol>`, ZERO real modules dropped** — and confirmed `ast.walk` still
+  catches a **deferred** `import litellm`. Both are now kept probes.
+* **The no-reimplementation scan.** Fires on its synthetic fixture, the stripper is proved not to
+  have eaten the file, **and** (mutant M9) it fires on a real `hashlib.sha256(...).hexdigest()`
+  grader planted inside `enumerate.py` itself.
+* **The unknown-tool refusal.** It really refuses rather than defaulting a task into the 34 — M7
+  killed. And **M2**, which collapses empty into read-only and leaves the headline **34 unchanged**,
+  is still killed: the proof that the *sub-counts*, not just the total, are checked.
+* **Third-party claims re-verified at source**, because four false ones have reached this spec:
+  `evaluator_nl_assertions.py:121`, `config.py:24`, `docs/evaluation.md:122-126`, and
+  `EvaluationCriteria.reward_basis`'s `default_factory`. All four hold.
+
+### Mutation — and the survivor is reported, not dropped
+
+**11 mutants, 10 killed, the semantics-preserving CONTROL SURVIVED** (baseline `215 passed, 1
+skipped, 2 deselected`). Run in a **throwaway clone pinned at one commit**, because P-03 could
+otherwise have moved the baseline — the exact trap that voided a complete C0 pass. `PYTHONPATH` set
+and **`whetstone_gate.__file__` printed on all 13 runs** (INC-17); every mutant **committed** before
+it ran (INC-11). `vendor/` is git-ignored, so the pinned checkout was copied in read-only and every
+copied file SHA-256-verified byte-identical first; **the real `vendor/tau2-bench` was never written
+to.**
+
+🚩 **M11 SURVIVED.** Turning `tool_types`'s *"cannot read this decorator"* `raise` into a silent skip
+leaves the suite byte-for-byte the baseline, because its only test's fixture contains no readable
+tool, so an unrelated refusal fires and a bare `pytest.raises` cannot tell them apart. **Equivalent
+at the pin**, the pin separately enforced, **no published number affected** — MEDIUM, not BLOCKER,
+and the reasoning is written out in full so the architect can overrule it. **OF-26.**
+
+### What I left behind, and what I did not
+
+Four kept probes (`tests/test_c3_review_probes.py`, all green): the decorator keyword/attribute
+shapes are asserted absent at the pin, closing **OF-28** from the other side; the import walk drops
+no real module; `ast.walk` sees a deferred import; and the reference actions' real key set is pinned
+with the 142/550 counts, closing **OF-30** from the other side. **I did not fix the parser, the
+`pytest.raises`, `report()`'s exit code or the banners** — a reviewer fixes nothing.
+
+**OF-08 was re-checked and deliberately not re-raised against C3.** `make test`'s clean-clone
+failures do land in C3's file, but the cause is **Q-010**'s unruled Class A default putting
+`vendor/` outside the repository. Filing it here would move the finding to the wrong owner.
+
+**Nothing is OWED to `QUESTIONS.md` or `INCIDENTS.md`.** No ambiguity blocked me, no ruling was
+issued to me, and nothing broke that meets rule 13's bar: no measurement was voided, no artefact
+mangled, no evidence discarded. Saying so explicitly, because "nothing to report" and "I did not
+look" are indistinguishable otherwise.
+
+---
+
 ## C0 — repo, checks, loader, tripwire, Makefile targets — **REVIEW** — attempt 2 — 2026-08-31
 
 **SESSION-TOKEN:** `f57e216b` — issued in the architect's batch and **already present in

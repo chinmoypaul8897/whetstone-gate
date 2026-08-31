@@ -188,3 +188,35 @@ INC-17, reproduced independently by this session first. Full OLD-beside-NEW evid
   inside `tests/test_c3_tau2_enumeration.py`, which needs the `vendor/tau2-bench` tree Q-010's
   unruled Class A default put outside the repository. The breakage is **C3's, not C0's**, and it is
   precisely what attempt 1 predicted when it raised OF-08. See `REVIEW_C0_2.md` **I-01**.
+
+---
+
+## APPENDED BY `REVIEW_C3_1` (`a66c389d`), 2026-08-31 — C3 **PASSES**, six rows opened
+
+C3 passed with **zero BLOCKERs**: every count in `CONTEXT.md` §11.1 and every one of the 40
+pre-registered T-FP ids re-derived independently with **zero divergence**, ten of eleven mutants
+killed, the control surviving. These are what the review could not close. **No row below changes a
+number C3 publishes**; each is a guard, a comment or a record that is weaker than it reads.
+
+| ID | Chunk | Severity | Finding | Spec citation | Raised by | Status | Closed by (SHA) |
+|---|---|---|---|---|---|---|---|
+| **OF-26** | C3 | **MEDIUM** | **Mutant M11 survives the whole suite.** Turning `tool_types`'s *"this parser cannot read this decorator"* `raise` into a silent skip leaves `215 passed, 1 skipped, 2 deselected` — the baseline exactly. Its only test (`test_a_tool_whose_decorator_cannot_be_read_is_a_refusal_not_a_silent_read_tool`) uses a fixture whose **sole** decorated `def` is the unreadable one, so under the mutation the unrelated *"no decorated tools were found at all"* refusal fires instead and a bare `pytest.raises` cannot tell them apart. **Equivalent at the pin** (all 30 airline+retail decorators are plain `@is_tool(ToolType.MEMBER)`) and the pin is separately enforced, so no published number is affected — but this is the guard on the **externally-authored competence control**. Fix is one line: `match="cannot read"`, or a readable tool in the fixture. | `PROCESS.md` §5.4; `CONTEXT.md` §11.1(b); hard rule 3 | `REVIEW_C3_1.md` F-1 | **OPEN** | |
+| **OF-27** | C3 | LOW | `enumerate.py:625, 686-690` — `report()` prints `MATCH`/`DIFFERS` per domain for the committed pre-registration and then `return 0` **unconditionally**, so an operator checking its exit status sees success over a drift. Mitigated: `report()` is wired into neither `tasks.py` nor the `Makefile`, and `test_the_committed_selections_still_match_the_pinned_checkout` enforces the equality inside `make test` (proven by mutants M4, M5, M6, M10). | `PROCESS.md` §9 | `REVIEW_C3_1.md` F-2 | **OPEN** | |
+| **OF-28** | C3 | LOW | `enumerate.py:275-287` — `tool_types` takes the type from `decorator.args[0]` and treats *no positional argument* as `ToolType.READ`, so **`@is_tool(tool_type=ToolType.WRITE)` is silently read as READ** and its tasks would land inside the 34; `getattr(decorator.func, "id", None)` likewise skips an attribute-qualified callee. Both contradict the docstring's *"…is a refusal, not a silently-dropped tool."* Latent, not live: neither shape occurs at the pin. **Guarded from the other side by this review** — `tests/test_c3_review_probes.py::test_no_pinned_domain_toolkit_uses_the_keyword_form_of_the_tool_decorator` now goes red if a bump introduces one. The parser is still C3's to widen. | `CONTEXT.md` §11.1; hard rule 11 | `REVIEW_C3_1.md` F-3 | **OPEN** | |
+| **OF-29** | C3 | LOW | `enumerate.py:152, 251-253` — the *"THE SHELL … filesystem lives here and nowhere else"* / *"PURE — from here down, every function takes its data as an argument"* banners are **false for eight functions below the second one** (`enumerate_tau2`, `telecom_reward_basis_census`, `telecom_reward_basis_includes_db`, `tfp_quota`, `committed_must_not_write_ids`, `committed_tfp_ids`, `_committed_ids`, `report`); `cfg.load` is uncached, so `tfp_quota()` opens `config/protocol.yaml` on every call. Hard rule 8's **substance is honoured** — all real computation is pure — so LOW; but **C5 depends on C3** and could call `tfp_quota()` from episode logic trusting that banner. | hard rule 8 | `REVIEW_C3_1.md` F-4 | **OPEN** | |
+| **OF-30** | C3 | LOW | `docs/sessions/c3-build-1.txt:97-98` reports *"142 airline and 550 assistant actions, 0 user"*. The counts and the conclusion are right, but **no airline or retail reference action carries a `requestor` key at all** (key union: `action_id, arguments, compare_args, info, name`); they are `"assistant"` only via `Action.requestor`'s pydantic default, which this project never loads. **No code or test computes that census** — `action_names()` never reads `requestor`. So *"0 user"* is true because the field is absent, not because it was surveyed. Made checkable by this review: `tests/test_c3_review_probes.py::test_no_reference_action_carries_a_requestor_field_at_all` pins the real shape and goes red if a bump ships a user-requested action — which would put a **user-side write inside the 34**. | `CONTEXT.md` §11.1(b); persona 1, third-party claims | `REVIEW_C3_1.md` F-5 | **OPEN** | |
+| **OF-31** | C3 | LOW | `tests/test_c3_tau2_enumeration.py:562` — `test_the_two_source_lines_the_specification_cites_are_still_there` asserts `config_lines[23].startswith("DEFAULT_LLM_NL_ASSERTIONS = ")`, pinning the constant's **name** but not the **value** §11.1 quotes (`"gpt-4.1-2025-04-14"`). τ² could bump the judge model and the test would stay green while the specification's quotation went stale. One `==` from closed. | `CONTEXT.md` §11.1; persona 1, third-party claims | `REVIEW_C3_1.md` F-6 | **OPEN** | |
+
+**Three INFO items are recorded in `REVIEW_C3_1.md` and deliberately NOT given rows here** (the file
+says `INFO` belongs in the review, not this table): the bytewise T-FP sample being the *tail* of
+retail's id space — 14 of 20 from ids `100–113` — which C18 should state in one sentence beside the
+false-positive number; `test_every_committed_id_is_a_string`'s assertion being unable to be false
+(the behaviour is protected and does go red, via the exception `_committed_ids` raises); and
+`reward_basis()`'s deliberately-unsorted fallback, which is what lets its own test detect the
+fallback being reached and should carry a comment saying so before someone "fixes" it.
+
+⚠️ **OF-08 was re-checked and is NOT re-raised against C3.** `make test`'s clean-clone failures do
+land in `tests/test_c3_tau2_enumeration.py`, but the cause is **Q-010**'s unruled Class A default
+putting `vendor/tau2-bench` outside the repository (`.gitignore`: `vendor/*/`). The remedy is an
+architect ruling plus `vendor/MANIFEST.md`'s fetch commands in the README, which C19's done-when
+already carries. Filing it against C3 would move the finding to the wrong owner.

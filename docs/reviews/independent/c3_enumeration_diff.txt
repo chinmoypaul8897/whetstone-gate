@@ -1,0 +1,96 @@
+C3 REVIEW 1 (a66c389d) — PHASE 2a — MY BLIND DERIVATION DIFFED AGAINST C3's
+================================================================================
+
+Left column  : docs/reviews/independent/c3_enumeration.md §8, committed BLIND at e89f63c
+               before any C3 file was opened. Method: ast decorator scan + a runtime
+               __tool_type__ cross-check, raw json, not Sierra's pydantic models.
+Right column : whetstone_gate.tau2.enumerate at HEAD, plus the ids as committed to
+               config/protocol.yaml's `selections:` block.
+
+vendor/tau2-bench  HEAD      = a2c024725189473d2d7cea3a5cfdbcc67478e41f
+vendor/tau2-bench  porcelain = (empty)
+whetstone_gate.__file__      = C:\Users\chinm\whetstone-gate\src\whetstone_gate\__init__.py
+
+THE SIX SUB-COUNTS CONTEXT.md §11.1 CLAIMS — derived a fourth time
+--------------------------------------------------------------------------------
+FIELD                          BLIND(mine)   C3/derived    VERDICT
+airline.total                  50            50            AGREE
+airline.empty                  7             7             AGREE
+airline.read_only              17            17            AGREE
+airline.must_not_write         24            24            AGREE
+airline.write                  26            26            AGREE
+retail.total                   114           114           AGREE
+retail.empty                   2             2             AGREE
+retail.read_only               8             8             AGREE
+retail.must_not_write          10            10            AGREE
+retail.write                   104           104           AGREE
+COMBINED.must_not_write        34            34            AGREE
+COMBINED.total                 164           164           AGREE
+COMBINED.write                 130           130           AGREE
+
+BOTH PARTITIONS, ID BY ID — not just the cardinalities
+--------------------------------------------------------------------------------
+airline empty ids            AGREE   (mine 7 / theirs 7)    only-mine=[] only-theirs=[]
+airline read-only ids        AGREE   (mine 17 / theirs 17)  only-mine=[] only-theirs=[]
+retail empty ids             AGREE   (mine 2 / theirs 2)    only-mine=[] only-theirs=[]
+retail read-only ids         AGREE   (mine 8 / theirs 8)    only-mine=[] only-theirs=[]
+
+7 + 17 + 26 = 50 ; 2 + 8 + 104 = 114 ; 34 + 130 = 164. Every partition sums.
+
+THE T-FP SELECTION — compared AS AN ORDERED LIST, not as a set
+--------------------------------------------------------------------------------
+T-FP airline  derived == mine, IN ORDER           : True
+T-FP retail   derived == mine, IN ORDER           : True
+config/protocol.yaml tfp airline == mine, IN ORDER: True
+config/protocol.yaml tfp retail  == mine, IN ORDER: True
+config/protocol.yaml must-not-write airline == mine (as sets): True
+config/protocol.yaml must-not-write retail  == mine (as sets): True
+
+  airline: 11 12 14 15 16 17 18 19 20 21 22 23 24 25 29 30 32 33 35 37
+  retail : 0 1 100 101 102 103 104 105 106 107 108 109 11 110 111 112 113 13 14 15
+
+THE reward_basis CENSUS — all three domains
+--------------------------------------------------------------------------------
+airline : {('COMMUNICATE','DB'): 50}                                    AGREE (50)
+retail  : {('DB','NL_ASSERTION'): 112, ('DB',): 2}                      AGREE (112 + 2)
+telecom : {('ENV_ASSERTION',): 2253, ('ACTION','ENV_ASSERTION'): 32}    AGREE (2253 + 32)
+telecom, any basis carrying DB                    : False               AGREE
+
+  (Key ORDER differs cosmetically and nothing else: C3 sorts each basis, my blind pass
+  kept file order, so C3 prints ('COMMUNICATE','DB') where I printed ('DB','COMMUNICATE').
+  Same multiset, same counts, compared as such.)
+
+THE WRITE-TOOL SETS — from the decorator, both by ast AND by runtime __tool_type__
+--------------------------------------------------------------------------------
+airline (6) : book_reservation, cancel_reservation, send_certificate,
+              update_reservation_baggages, update_reservation_flights,
+              update_reservation_passengers                             AGREE
+retail  (7) : cancel_pending_order, exchange_delivered_order_items,
+              modify_pending_order_address, modify_pending_order_items,
+              modify_pending_order_payment, modify_user_address,
+              return_delivered_order_items                              AGREE
+
+  My blind pass ALSO ran the runtime cross-check C3 declined to commit as a test
+  (importing AirlineTools/RetailTools and reading __tool_type__ / __mutates_state__):
+      [airline] ast==runtime tool set : True   ast==runtime WRITE set : True
+      [retail ] ast==runtime tool set : True   ast==runtime WRITE set : True
+      mutates_state=True set == WRITE set, in both domains, zero overrides.
+  So C3's §12(d) claim is independently confirmed, and the fast path is sound AT THE PIN.
+
+THE SORT RULE
+--------------------------------------------------------------------------------
+Mine, recorded blind : bytewise ascending on the str id, per domain, first 20 of each.
+C3's, as committed   : identical, and named in config/protocol.yaml and in
+                       enumerate.py's docstring as the architect's 2026-08-31 ruling.
+                                                                        AGREE
+
+WAS THE RULING NEEDED?  YES — measured, not assumed:
+  airline  bytewise vs numeric: 4 ids differ (only-bytewise 35,37; only-numeric 7,8)
+  retail   bytewise vs numeric: 28 ids differ — 14 of the 20 are replaced
+  Two competent readers of §13.4's unqualified "after sorting" share only 6 of 20
+  retail tasks. `prereg-v1` does not exist, so closing it now is pre-freeze, not
+  post-hoc selection.
+
+DIVERGENCES
+--------------------------------------------------------------------------------
+NONE. Not one count, not one id, not one census cell, in either direction.
