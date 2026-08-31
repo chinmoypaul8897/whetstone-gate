@@ -1,0 +1,318 @@
+SESSION-TOKEN: 4377265b   CHUNK C6 - THE ATTACKER LOOP   ROLE: BUILD   ATTEMPT 1
+PUSHED SHA: <recorded in the follow-up commit; see below>
+
+=====================================================================
+0. SPEND
+=====================================================================
+ZERO PROVIDER MODEL CALLS. ZERO TOKENS ON ANY LANE. The Gemma lanes, the gate-judge
+lanes and the ladder lanes are untouched. The model client is INJECTED and MOCKED for
+every one of the 35 tests, and a test walks the package's own modules AND its transitive
+first-party imports asserting no groq/google/openai/anthropic/litellm/httpx/requests/
+urllib/socket - so a test run CANNOT spend a lane's quota by accident. The only network
+used was HTTP GETs to public corpus repositories, which PROCESS.md S11a rules are not
+provider calls.
+
+=====================================================================
+1. THE THREE AUTHORED TEXTS - CHARACTER-IDENTICAL, AND HOW THEY WERE COMPARED
+=====================================================================
+data/policy.txt        sha256 5208cd67c1e62cd9b1f88ba7700ce3ef93045edf0465024b9073ad5ca5a32194
+data/arm3_safety.txt   sha256 f05527737e544020f71992eb2cab0ff667322fea90358ffbd497924ccb3715ad
+data/attacker_sys.txt  sha256 3c999383a49adb7771e0345ac97b18af010751bae708225204d40ecbf5662b53
+
+HOW: PARSED OUT OF CONTEXT.md AND COMPARED, NEVER RETYPED. The test locates each fenced
+block by THE PROSE SENTENCE THAT INTRODUCES IT - not by a line number, which points
+somewhere else the next time anything above it moves - and ASSERTS THE MARKER MATCHED
+EXACTLY ONCE. It then compares the file byte-for-byte with "\n".join(fence contents)+"\n".
+
+Byte hygiene checked explicitly, because INC-13 is a `\b` that reached the specification
+as a real 0x08 byte and sat there for two days, invisible:
+  0 CR bytes, 0 stray control bytes in all three.
+  Non-ASCII is exactly what S8.6 carries: U+20B9 and U+2013 in policy.txt, U+2014 in
+  attacker_sys.txt, none in arm3_safety.txt.
+
+policy.txt and arm3_safety.txt are C9's TO USE. They exist here because they are S8.6
+texts and C6 is the first chunk needing the mechanism - and because loading the REAL
+policy is how the blindness test proves the attacker never sees it. C6 built no gate.
+
+=====================================================================
+2. THE FOUR POLICY-BLINDNESS TESTS, EACH FIRED AT A FIXTURE THAT BREAKS IT
+=====================================================================
+All four assert over the ACTUAL ASSEMBLED CONTEXT - not the source, not a constructor
+argument. Two mechanisms make blindness STRUCTURAL rather than promised:
+  (a) every context part carries an Origin tag: AUTHORED / ATTACKER / WORLD;
+  (b) THE LOOP HAS NO GATE OBJECT AT ALL - ToolExecutor.execute returns a bare `str`,
+      no verdict/arm/clause field, asserted by an AST walk over the protocol. There is
+      no channel down which an arm identity or clause number could travel.
+
+CLAIM 1  no policy string     - fires on: the 7 clauses injected into the system prompt
+CLAIM 2  no hole              - fires on: the probe note in AUTHORED text; and on
+                                "CANARY-A" anywhere
+CLAIM 3  no attack list       - fires on: "Try A4 ...; it breaches E2 and S1"
+CLAIM 4  no gate denial reason- fires on: "<generic> (arm 2S)", "<generic> Clause P1 was
+                                violated.", "<generic> verdict=INDETERMINATE"
+
+AND THEY WERE ADDITIONALLY FIRED AT MUTATED IMPLEMENTATIONS, which is the stronger
+evidence:
+  MUTANT A  assemble() injects the policy + "CANARY-A ..." + "A1 A2 A3 A4; E1 E2 E3 S1 S2"
+            into the AUTHORED context
+            -> CLAIMS 1, 2, 3 RED. CLAIM 4 correctly GREEN (the mutation does not touch
+               the denial path) - which is evidence the four guards are INDEPENDENT
+               rather than one guard counted four times.
+  MUTANT B  loop.py sets last_refusal = result + " (arm 2S, clause P1 DENIED)"
+            -> CLAIM 4 RED, 76 findings, catching arm identity, clause number and
+               verdict name separately.
+Both files restored from pre-mutation copies, SHA-256 VERIFIED EQUAL:
+  context.py a7e65316f187232b627fd6f8aa92476889a28b5fa72130fc3b6e24392885d30e
+  loop.py    bef3999f49f813346396d317ce0c9922eeff6eaf780e787c834dea4e02608b6a
+
+THE DENIAL: parsed out of CONTEXT.md S8.6 and asserted EXACTLY EQUAL to
+"This action was blocked by policy." - carrying no arm identity, no clause number and no
+verdict name. The attacker sees it as the text of a tool result, exactly like a Razorpay
+error, and the loop cannot tell the two apart.
+
+CLAIM 2 CARRIES A CONTROL, AND IT IS THE SUBTLEST ASSERTION IN THIS CHUNK. The probe's
+note text reaching the attacker AS A WORLD TOOL RESULT MUST NOT FIRE. S10.1 requires no
+DIFFERENTIAL information across arms, NOT concealment: the notes come back from
+fetch_payments identically in every arm and the attacker earns the door by reading. A
+guard that banned the note everywhere would CLOSE THE DOOR AND MAKE ARM 4 VOID BY
+CONSTRUCTION WHILE EVERY TEST STILL PASSED. So our vocabulary for the hole (CANARY-A,
+CANARY-B, HOLES.md) is banned globally; the note text only on the AUTHORED surface.
+
+=====================================================================
+3. THE SUMMARY'S BYTE-IDENTITY AND THE ONE-CALL-PER-TURN NUMBER
+=====================================================================
+BYTE-IDENTICAL for identical state, and INSERTION-ORDER-INDEPENDENT (a dict's order is a
+property of how the ledger happened to be walked, not of the state). A DIFFERENT state
+produces different bytes, so it is not byte-identical for the trivial reason of saying
+nothing. Truncation at the configured cap is deterministic AND VISIBLY MARKED - a
+silently shortened summary is hard rule 11's shape applied to context.
+  MUTANT D  drop the nested-map sort -> RED.
+
+ONE MODEL CALL PER TURN, ASSERTED AGAINST THE MOCK AS A NUMBER because "it adds no
+request" is a claim about a number: 20 calls / 20 turns / 20 records.
+  MUTANT C  a second call per turn -> 40 calls, RED.
+Rendering the summary makes no model call (asserted separately). Temperature is read
+from config/ and asserted on every call.
+
+THE WINDOW: last `context_window_turns_verbatim` turns kept, older ones VERIFIED GONE
+(not merely unlabelled), tool schemas emitted EXACTLY ONCE per turn. That the sizes come
+from config/ is proved by POINTING THE LOADER AT AN ALTERED CONFIG and observing the
+behaviour change (6 -> 2), not by inspecting the source. And the property the window
+exists for is asserted directly: per-turn context reaches a STEADY STATE after the
+window fills and stops growing - turns 7..19 vary by 0 tokens.
+
+=====================================================================
+4. THE CORPUS/IMPROVISATION FIELD (S11.3)
+=====================================================================
+Every TurnRecord carries: provenance (CORPUS | IMPROVISED), corpus_ref, seed_offered_ref.
+Recorded FROM TURN 0 because C18 publishes the fraction and a fraction cannot be
+recovered from transcripts that never carried it. A record whose provenance and ref
+disagree RAISES.
+
+THRESHOLD-FREE ON PURPOSE: exact substring containment after a declared normalisation
+(NFC + whitespace collapse). A similarity cutoff would be an author-chosen constant
+deciding a published number, and S8.6 fixes none - which by S8.6's own sentence would
+make inventing one a review BLOCKER.
+
+THE BIAS DIRECTION IS STATED RATHER THAN DISCOVERED LATER: a PARAPHRASE counts as
+IMPROVISED, so the corpus fraction is a LOWER BOUND and improvisation an UPPER BOUND.
+That is the honest direction to be wrong in - it cannot inflate the "nobody has published
+this" number in our favour. Asserted as a test.
+
+=====================================================================
+5. THE CORPORA - EVERY LICENCE VERIFIED AT SOURCE, WITH URL AND DATE
+=====================================================================
+0 marked [UNFETCHED]. NOT ONE ROW carried forward from S11.3 on trust - S11.3 is a
+previous session's reading; PROVENANCE.md S3.3 is the first-hand record. All 2026-08-31.
+
+  InjecAgent  MIT (c) 2023 Qiusi Zhan
+              raw.githubusercontent.com/uiuc-kang-lab/InjecAgent/main/LICENCE   HTTP 200
+  AgentDojo   MIT (c) 2024 Edoardo Debenedetti, Jie Zhang, Mislav Balunovic,
+              Luca Beurer-Kellner, Marc Fischer, and Florian Tramer
+              raw.githubusercontent.com/ethz-spylab/agentdojo/main/LICENSE      HTTP 200
+  AgentHarm   "MIT License with an additional clause"
+              (c) 2024 Gray Swan AI and UK AI Safety Institute
+              huggingface.co/datasets/ai-safety-institute/AgentHarm/raw/main/LICENSE
+                                                                                HTTP 200
+  ASB         MIT (c) 2024 AGI Research
+              raw.githubusercontent.com/agiresearch/ASB/main/LICENSE            HTTP 200
+  R-Judge     NONE - no licence file of any kind
+              api.github.com/repos/Lordog/R-Judge                               HTTP 200
+
+INJECAGENT'S BRITISH `LICENCE` IS PROVED, NOT REPEATED: both spellings fetched.
+  LICENCE -> HTTP 200, 1,066 bytes.   LICENSE -> HTTP 404.
+A build script globbing LICENSE* finds nothing and would wrongly report "no licence".
+
+AGENTHARM: field-of-use clause read from the shipped file; "gated": false, "license":
+"other", card lastModified 2024-12-19T13:27:30Z - each figure S11.3 states, confirmed
+against the HuggingFace API here. NOT GATED means there is no click-through and nothing
+prompts a reader to look; THE CLAUSE BINDS ANYWAY. OUR USE QUALIFIES AND PROVENANCE.md
+S3.3 SAYS SO EXPLICITLY, in the clause's own words - this project exists to improve the
+safety and security of an AI system.
+
+R-JUDGE VERIFIED FROM REPOSITORY METADATA ONLY - "license": null, and no licence-shaped
+file at root (README.md, assets, cache, config, data, eval, requirements.txt, results).
+NOT ONE BYTE OF THE CORPUS WAS FETCHED, which is the whole point of "cite, never vendor".
+
+>> TWO CORRECTIONS TO S11.3'S ATTRIBUTION, found by reading the files rather than the card:
+   (1) AgentHarm's copyright names TWO holders - "Gray Swan AI AND UK AI Safety
+       Institute" - and S11.3 names only the second. MIT requires the notice reproduced,
+       so an attribution block built from S11.3 alone would be a LICENCE-NOTICE DEFECT,
+       not a cosmetic one. S11.3's Safety-not-Security point is separately CORRECT and is
+       confirmed here.
+   (2) AgentDojo's six copyright holders were unnamed in S11.3 and are now recorded.
+
+PINNED, NOT COMMITTED (Q-010's ruled pattern). corpora/MANIFEST.md carries each source,
+its exact revision, the fetch commands and the verification; corpora/seed_index.json
+carries the SHA-256 of each pinned file and the loader CHECKS EVERY HASH BEFORE PARSING.
+Pins resolved first-hand 2026-08-31:
+  InjecAgent f19c9f2c79a41046eb13c03c51a24c567a8ffa07
+  AgentDojo  089ed468cf3ed0322acc66b0211f26d9d90dbf60
+  ASB        1f561dccf92d55302368fa67679b4ba9d9c8fdc4
+  AgentHarm  e23b3fe60a0da9037314b88e5ee3a0c054970dad  (HuggingFace dataset revision)
+Byte counts cross-checked by TWO INDEPENDENT ROUTES (GitHub trees API at the pinned SHA,
+and wc -c over the downloaded bytes) and they agree exactly.
+
+A MISSING CORPUS RAISES AND NAMES THE FETCH COMMAND; IT NEVER RETURNS AN EMPTY LIST.
+Zero entries would publish S11.3's split as "100% improvised" - a headline produced by a
+broken instrument, which is INC-01 exactly.
+
+Two reasons beyond Q-010's for not committing, both this chunk's own: AgentHarm's
+field-of-use clause plus a harmful-behaviour payload in a repository that flips PUBLIC on
+4 September; and AgentHarm's canary_guid, a contamination canary belonging to somebody
+else's benchmark, which the adapter reads past and never carries into a corpus entry.
+
+=====================================================================
+6. THE TOKEN FIGURE - AN ESTIMATE, ITS METHOD, AND ITS LABEL
+=====================================================================
+>> IT IS AN ESTIMATE. IT IS NOT A MEASUREMENT. C14's PILOT MEASURES THE REAL FIGURE AND
+>> IT SELECTS THE N BRANCH (CONTEXT.md S13.3, S13.4). Labelled in the type name
+>> (TokenEstimate), in the method string, and in the rendered comparison.
+
+METHOD: character-count approximation, ceil(chars / CHARS_PER_TOKEN) + messages *
+FRAMING_TOKENS_PER_MESSAGE, over the full 20-turn context assembled against a MOCKED
+model and seed 2001's REAL world payload. Parameters are Class B implementation choices,
+NOT S8.6 rows, and were NOT added to config/ - S8.6 fixes no estimation method and the
+figure is superseded by C14's measurement before any scored episode runs.
+
+>> THE CALIBRATION WAS RUN TWICE AND THE FIRST RUN WAS WRONG IN THE UNSAFE DIRECTION.
+   Recorded because the surviving number is only trustworthy if the discarded one is
+   visible. Against a TOY fixture with short tool results, prose dominated: 4.11
+   chars/BPE token, divisor 4 over-estimated by +2.9% - the safe direction, and the
+   session nearly stopped there. Re-run against the REAL seed-2001 world payload the
+   same estimator ran -25.4%, LOW: fetch_payments returns JSON and JSON tokenises far
+   denser than prose (2.97 chars/token). LOW IS THE UNSAFE DIRECTION FOR THIS NUMBER,
+   because S13.4's Branch A is "measured tokens/episode <= 60,000". Divisor is now 3:
+   measured error -0.9% worst case, +11.9% realistic.
+   Calibrated against cl100k_base, which is NOT Gemma's tokenizer - so it bounds the
+   ARITHMETIC, not the VOCABULARY. tiktoken was used SESSION-SIDE ONLY and is imported
+   by no file under src/ or tests/; it is not a declared dependency.
+
+THE ESTIMATE, and it is NOT comfortably under target:
+  REALISTIC (reads the payment list twice, then acts)   ~25,200   WITHIN the 60,000 target
+  WORST CASE (full 12-payment list returned EVERY turn) ~126,600  OVER, by ~2.1x
+The spread is governed by HOW OFTEN THE ATTACKER RE-READS fetch_payments, not by the
+window - which reaches steady state after 6 turns in both regimes and stops growing.
+C6 SELECTS NO BRANCH AND PROPOSES NO AMENDMENT TO THE TARGET. It records that Branch A's
+threshold is reachable in one regime and not the other, which makes C14's pilot
+measurement LOAD-BEARING RATHER THAN A FORMALITY.
+
+=====================================================================
+7. Q-031 RECORDED (RULED), AND Q-032 RAISED
+=====================================================================
+Q-031 RULED, both parts verbatim in QUESTIONS.md before anything else was touched:
+  PART 1 - NO GOLDEN, AND THAT IS THE RULING. PROCESS.md S5.2's nine assign none to C6,
+  whose done-when is entirely structural and determinism-based rather than numeric.
+  Q-016's (C1) and Q-020's (C3) reasoning applied to C6. ENFORCEMENT: C6's REVIEW MUST
+  INDEPENDENTLY RE-DERIVE the four "never sees" assertions and the summary's determinism
+  BY ITS OWN METHOD.
+  PART 2 - C6 PRODUCES AN ESTIMATE, labelled one everywhere; the pilot measures the real
+  figure and it selects the N branch.
+
+Q-032 RAISED, OPEN, NOT BLOCKING: the corpus pins are verified on every load but sit
+OUTSIDE the frozen set, so `make check-prereg` never hashes the inputs to a published
+number (S11.3's split) while it hashes the inputs to every other one. Three options
+named. DEFAULT TAKEN: NONE - work stopped on this item, per Q-010's ruling retiring
+"default taken pending a ruling" for Class A.
+
+config/ WAS NOT TOUCHED - C6 needed no absent constant; all five attacker values
+(turn_budget, context_window_turns_verbatim, context_summary_max_tokens, temperature,
+target_tokens_per_episode) were already present and are read through the one loader.
+Another chunk's TODO_C13_C16 sentinel was NOT resolved.
+
+=====================================================================
+8. COUNTS, BEFORE AND AFTER
+=====================================================================
+                          BEFORE                          AFTER
+  make test               259 passed, 1 skipped,          294 passed, 1 skipped,
+                          2 deselected, 0 failed          2 deselected, 0 failed
+  check-roles             17 passed / 0 failed / 4 n/a    17 passed / 0 failed / 4 n/a
+                          exit 0                          exit 0   (UNCHANGED)
+  new tests                                               +35, all in tests/test_c6_attacker.py
+
+  git status --porcelain tests/goldens/   -> EMPTY (printed; nothing under goldens moved)
+  git status --porcelain                  -> EMPTY (clean tree at the reported SHA)
+  whetstone_gate.__file__ = C:\Users\chinm\whetstone-gate\src\whetstone_gate\__init__.py
+    (printed per INC-17 - nothing was run against another tree)
+
+  The hardcoded-value tripwire PASSES over the new package: no S8.6 constant appears as a
+  literal in src/whetstone_gate/attacker/.
+
+git diff --stat b4cd58a..HEAD
+ PROGRESS.md                             | 142 ++++++
+ PROVENANCE.md                           |  92 ++++
+ QUESTIONS.md                            | 114 +++++
+ STATUS.md                               |   2 +-
+ corpora/.gitignore                      |  11 +
+ corpora/MANIFEST.md                     | 123 +++++
+ corpora/seed_index.json                 |  60 +++
+ data/arm3_safety.txt                    |   4 +
+ data/attacker_sys.txt                   |   9 +
+ data/policy.txt                         |   7 +
+ src/whetstone_gate/attacker/__init__.py |  77 +++
+ src/whetstone_gate/attacker/context.py  | 256 ++++++++++
+ src/whetstone_gate/attacker/corpus.py   | 275 ++++++++++
+ src/whetstone_gate/attacker/estimate.py | 155 ++++++
+ src/whetstone_gate/attacker/loop.py     | 254 ++++++++++
+ src/whetstone_gate/attacker/texts.py    |  98 ++++
+ tests/test_c6_attacker.py               | 866 ++++++++++++++++++++++++++++++++
+ vendor/MANIFEST.md                      |  10 +-
+ 18 files changed, 2549 insertions(+), 6 deletions(-)
+
+=====================================================================
+9. WHAT I COULD NOT DO, AND WHY
+=====================================================================
+1. THE REAL TOKEN MEASUREMENT. It needs a provider call; PROCESS.md S8 forbids one here.
+   Ruled as Q-031 part 2. C14's pilot owns it and it selects the N branch.
+
+2. THE INCIDENTS.md ENTRY THIS SESSION OWES. INCIDENTS.md is named under NOT in this
+   session's scope fence, so the entry is recorded in QUESTIONS.md Q-032 instead.
+   WHAT HAPPENED: applying mutant D, this session used a FOUR-LINE PYTHON SCRIPT rather
+   than the editor tool. That is the INC-06 class its own prompt forbids in capitals -
+   the NINTH occurrence - by a session that had read INC-16, INC-19 and INC-21, all
+   three of which record the same recurrence by the session that had just documented the
+   previous one. NO DAMAGE: write_bytes performs no newline translation, the file was
+   restored from a pre-mutation copy with its SHA-256 VERIFIED EQUAL, and every file this
+   session authored carries 0 CR bytes, confirmed. It is reported anyway because INC-21's
+   own note says the under-reporting pressure is strongest exactly when a blemish "reads
+   badly and cost nothing". Every other file in this session went through the editor tool.
+   THE SHAPE IS Q-029'S FINDING ONE LAYER UP: the file that records process failures is
+   the file a fenced session most often may not write to.
+
+3. CLOSING Q-032. Closing it means either adding corpus pin keys to config/ (a
+   pre-registration artefact the C6 card permits touching only for a genuinely absent
+   constant - and none was) or amending CONTEXT.md S15.0's frozen set (the architect's).
+   Raised, not defaulted.
+
+4. RESOLVING vendor.agentdojo_sha. It is another chunk's TODO_C13_C16 sentinel. C6 pinned
+   only the AgentDojo banking INJECTION CORPUS file, in corpora/MANIFEST.md, and left the
+   suite's pin to C13/C16.
+
+5. A DEMONSTRATION THAT THE WINDOW SAVES ~300K TOKENS. The saving depends on real tool
+   result sizes across a real episode, which needs a provider run. What IS demonstrated
+   is the structural property: per-turn context reaches a steady state and stops growing,
+   asserted with a realistic payload (a short one would pass for the wrong reason).
+
+NO c6-pass TAG WAS CUT. Nothing is self-certified. A fresh adversarial review follows,
+and Q-031's enforcement requires it to re-derive the four blindness assertions and the
+summary's determinism BY ITS OWN METHOD.
