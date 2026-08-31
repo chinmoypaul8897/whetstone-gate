@@ -1,0 +1,368 @@
+================================================================================
+c1_oracle_diff.txt -- PHASE 2a
+The REVIEW session's BLIND oracle (docs/reviews/independent/c1_oracle.md, IO-01..IO-26,
+committed f069486) diffed CHARACTER BY CHARACTER against RAZORPAY_SEMANTICS.md (55f1f2c).
+
+SESSION-TOKEN: a0cc0212   Date: 2026-08-31
+Method: every ">" block of both files reduced to its payload and compared byte for byte
+        against the SAME fetched source bytes (sha256 recorded in both files' section 1).
+        Zero provider model calls.
+================================================================================
+
+LEGEND
+  IDENTICAL   the two transcriptions are byte-identical, and both match the source bytes
+  DIVERGENT   the two transcriptions differ
+  NOT-COVERED the independent oracle did not build this row (never means "wrong")
+
+Every divergence is judged as one of:
+  (a) BUILDER ERROR      -- C1 transcribed something the source does not say
+  (b) PAGE CHANGED       -- the source moved between C1's fetch and this one
+  (c) CHOICE OF EXTRACT  -- both correct; the two sessions quoted different spans
+  (d) PROJECT-STATE      -- not about Razorpay's text at all; about this repository
+
+================================================================================
+PART 1 -- THE SOURCE BYTES THEMSELVES
+================================================================================
+
+Before any quote can diverge, the bytes must. They did not.
+
+  page                                   C1 sha256 (2026-08-30T20:42Z)  review (2026-08-31T05:30Z)
+  ------------------------------------   -----------------------------  --------------------------
+  api/payments/capture.md                ddbca672...4236ed1d9           IDENTICAL
+  api/refunds/create-normal.md           517e32ac...bb356569            IDENTICAL
+  api/refunds/normal-refunds-idempotent  95fa561c...9c2070a9b           IDENTICAL
+  api/settlements/instant/create.md      95776ebd...92dd98cccd          IDENTICAL
+  payments/settlements/instant.md        4d2a0558...05d9d4d08           IDENTICAL
+  payments/refunds.md                    65f32df2...72478c19e           IDENTICAL
+  api/payments/fetch-all-payments.md     9e7f6d97...02772bf93           IDENTICAL
+  api/payments/fetch-with-id.md          38f97247...53bd205790c         IDENTICAL
+  payments/settlements/faqs.md           4ccfaa94...880a923b80de5       IDENTICAL
+  razorpay.com/capital/instant-settl..   (no digest recorded)           109,181 bytes -- byte
+                                                                        count IDENTICAL
+  mcp-server refunds.go @7950d51d        d483495c...56d3f26f            IDENTICAL (raw AND
+                                                                        from the 94-file archive)
+  razorpay-go v1.4.0 payment.go          (not digested by C1)           7,793 bytes, as stated
+
+  ==> PAGE CHANGED (b): ZERO. There is NO drift to record with both dates, in either
+      direction. Every divergence below is therefore (a), (c) or (d) by elimination --
+      it CANNOT be blamed on the world moving.
+
+================================================================================
+PART 2 -- ROW BY ROW
+================================================================================
+
+--------------------------------------------------------------------------------
+IO-01  <->  RS-01     A1, capture amount equality
+--------------------------------------------------------------------------------
+IDENTICAL. All three fields. Both preserve Razorpay's two byte-level oddities:
+  - "the authorised amount ."   <-- SPACE before the full stop
+  - "authorised" (British) in the description vs "authorized" in the error title
+Both also preserve the blank continuation line inside the description block.
+A paraphraser repairs both. Neither did.
+
+--------------------------------------------------------------------------------
+IO-02  <->  RS-02     A1, the separate amount_due check
+--------------------------------------------------------------------------------
+IDENTICAL. Both treat it as a SECOND, distinct rejection with its own string,
+which is what CONTEXT.md S6's "+ a separate `amount_due` check" requires.
+
+--------------------------------------------------------------------------------
+IO-03  <->  RS-03     A2, refund > captured
+--------------------------------------------------------------------------------
+IDENTICAL. Both carry "greater than amount captured" with NO article before
+"amount". This is the single likeliest place for an unconscious repair, and it is
+mutation M-05 in the review's table. Neither session inserted "the".
+
+--------------------------------------------------------------------------------
+IO-04  <->  RS-04     A2, already fully refunded
+--------------------------------------------------------------------------------
+IDENTICAL.
+
+--------------------------------------------------------------------------------
+IO-05  <->  RS-21     A6, payment must be captured
+--------------------------------------------------------------------------------
+IDENTICAL, all three fields.
+
+--------------------------------------------------------------------------------
+IO-06  <->  RS-13     A4, settle_full_balance -- the API reference wording
+--------------------------------------------------------------------------------
+IDENTICAL in payload.
+CHOICE OF EXTRACT (c), and both are right:
+  - RS-13 quotes the WHOLE parameter block (label, type, both bullets).
+  - IO-06 quotes the `true` bullet alone.
+Both preserve the DOUBLE SPACE in "`true`:  Razorpay". Both note it explicitly.
+CONTEXT.md S6's blockquote is that bullet minus the "`true`:  " label -- a
+legitimate excerpt, confirmed by both sessions.
+
+--------------------------------------------------------------------------------
+IO-07  <->  RS-14     A4, settle_full_balance -- the MCP tool-description wording
+--------------------------------------------------------------------------------
+IDENTICAL.
+*** THE MOST IMPORTANT AGREEMENT IN THIS DIFF. ***
+Both sessions, INDEPENDENTLY, searched the doc pages for
+"ignore amount parameter" and got ZERO hits, and both located the string at
+pkg/razorpay/settlements.go:231-232 -- the same file and the same two lines.
+So CONTEXT.md S6's A4 attribution correction (finding F-01) is confirmed by a
+second, blind reading. The withdrawn attribution to
+api/settlements/instant/create.md + payments/settlements/instant.md was wrong,
+and the correction now in the spec is right.
+
+--------------------------------------------------------------------------------
+IO-08  <->  RS-05     A3, the header and the 10-character minimum (PROSE)
+--------------------------------------------------------------------------------
+IDENTICAL.
+Both preserve Razorpay's typo "at least 10 character long" -- SINGULAR
+"character", no "s". Both explicitly flag that it differs from the Errors-table
+wording (IO-10 / RS-07, "10 characters long") and both refuse to merge them.
+CHOICE OF EXTRACT (c): RS-05 quotes all three prose bullets; IO-08 quotes the
+second alone. Both correct.
+
+--------------------------------------------------------------------------------
+IO-09  <->  RS-06     A3, the 409 (PROSE)
+--------------------------------------------------------------------------------
+IDENTICAL payload.
+CHOICE OF EXTRACT (c): RS-06 additionally quotes the curl header line
+  -H 'X-Refund-Idempotency: 550e8400-e29b-41d4-a716-446655440000' \
+which IO-09 does not. Verified present in the source. C1's extract is the richer
+one and is correct.
+
+--------------------------------------------------------------------------------
+IO-10  <->  RS-07     A3, 10-character minimum (ERROR)
+--------------------------------------------------------------------------------
+IDENTICAL, all three fields.
+
+--------------------------------------------------------------------------------
+IO-11  <->  RS-09     A3, same key still in progress -> 409
+--------------------------------------------------------------------------------
+IDENTICAL. Both correctly identify THIS row -- not RS-10 -- as the
+"409 on same-key-in-flight" that CONTEXT.md S6's A3 row names.
+
+--------------------------------------------------------------------------------
+IO-12  <->  RS-10     A3, same key different body -> 409
+--------------------------------------------------------------------------------
+IDENTICAL.
+Both sessions independently noticed the page carries TWO DISTINCT 409s and both
+kept them as separate rows. An oracle that carried one and called it "the 409"
+would be incomplete; one that merged them would be wrong. Neither did either.
+
+--------------------------------------------------------------------------------
+IO-13  <->  RS-27     `receipt` IS treated as an idempotency key
+--------------------------------------------------------------------------------
+IDENTICAL, all three fields, including the sentence Q-017 turns on:
+  "`receipt` is treated as an idempotency key."
+
+CHOICE OF EXTRACT (c), and it runs in the REVIEW's favour rather than C1's:
+IO-13 additionally records the COUNTERWEIGHT from the same page --
+  `receipt` _optional_
+  : `string` A unique identifier provided by you for your internal reference.
+(L182-183, the request Parameters block). So Razorpay documents `receipt` as an
+idempotency key in exactly ONE Errors-table description, and as "your internal
+reference" in the Parameters block, on the same page, with no cross-reference.
+RS-27 does not quote the Parameters entry, though its own conclusion --
+"an attacker simply omits it, or varies it" -- depends on precisely that fact.
+NOT a builder error; the row's conclusion is right. Recorded because the second
+half is the EVIDENCE for the conclusion and is one line away.
+
+--------------------------------------------------------------------------------
+IO-14  <->  RS-15     A4 bound 1 of 5 -- the unsettled settlement balance
+--------------------------------------------------------------------------------
+Quote: IDENTICAL, all three fields, including Razorpay's note that the same
+condition has three possible response strings.
+
+>>> DIVERGENT (d) -- PROJECT-STATE, not Razorpay's text. See REVIEW_C1_1.md F-R8.
+    IO-14 records: "Figure published: NO -- and none is possible. The bound is
+      the merchant's own live balance."
+    PROVENANCE.md S2.4's A4 cell records: "only three carry a published figure
+      (balance; Rs 5 Cr; Rs 2 L)."
+    Razorpay publishes NO figure for the balance. The imprecision is confined to
+    that parenthetical; the operative conclusion -- that exactly TWO bounds need
+    an author-chosen value, and which two -- is CORRECT in every file.
+    Severity LOW.
+
+--------------------------------------------------------------------------------
+IO-15  <->  RS-16     A4 bound 2 of 5 -- Rs 5 Cr per settlement
+--------------------------------------------------------------------------------
+IDENTICAL. Both carry the S4 error AND both corroborate on S5's comparison table
+row and S5's prose. Both record the figure as PUBLISHED.
+RS-16 adds, correctly, that S5's "Rs 50 Crores" cell is Smart Settlements, which
+has no API support -- so Rs 5 Cr is the ceiling that binds a tool-calling agent.
+Verified independently: S5's table cell reads "**API support** | **Yes** | **No** |".
+
+--------------------------------------------------------------------------------
+IO-16  <->  RS-17     A4 bound 3 of 5 -- Rs 2 lakh outside banking hours (IMPS)
+--------------------------------------------------------------------------------
+IDENTICAL, all three fields. Both preserve Razorpay's "2 Lacs" spelling in the
+error title against "2 lakh" in the description.
+Both record the figure as PUBLISHED (Rs 2,00,000).
+BOTH INDEPENDENTLY RAISED THE SAME PROBLEM: "banking hours" is defined on no page,
+and S5 separately gives Instant Settlement's timings as 24*7 / Holidays: None
+while quoting a DIFFERENT IMPS cap of Rs 5 Lakhs. C1 files it as F-02; the review
+files the clock half as F-R9 (for C4: seed it as world state, never now()).
+No divergence of fact.
+
+--------------------------------------------------------------------------------
+IO-17  <->  RS-18     A4 bound 4 of 5 -- the per-merchant daily withdrawable limit
+--------------------------------------------------------------------------------
+Quote: IDENTICAL. Both carry the S5 prose (2 bullets) AND both S4 errors
+("Amount that can be settled for the day is exhausted..." and "Requested amount
+is greater than available limit."). Both correctly treat those two errors as one
+bound.
+Both record: NO FIGURE PUBLISHED. NEITHER INVENTED ONE.  <-- check 2f, PASS
+Both cite Razorpay's own closing sentence as the reason ("You can check the
+Dashboard for latest updates on the limits").
+
+>>> DIVERGENT (d) -- PROJECT-STATE. See REVIEW_C1_1.md F-R4, BLOCKER.
+    RS-18: "The world therefore reads this ceiling FROM config/, tagged
+            [merchant-policy, author-chosen]".
+    Verified against the repository: there is no such key in config/protocol.yaml,
+    no such row in CONTEXT.md S8.6's constants table, and no such entry in
+    src/whetstone_gate/spec_constants.py.
+    The row is RIGHT about Razorpay and WRONG about this repository.
+
+--------------------------------------------------------------------------------
+IO-18  <->  RS-19     A4 bound 5 of 5 -- max attempts per day
+--------------------------------------------------------------------------------
+Quote: IDENTICAL, all three fields.
+Both record: NO FIGURE PUBLISHED. NEITHER INVENTED ONE.  <-- check 2f, PASS
+RS-19 adds a genuinely sharp observation the independent oracle did not make:
+it is an ATTEMPT counter, so REJECTED requests increment it too -- which matters
+for A5, whose mechanism is many small calls. Verified against the source text:
+"The merchant has exhausted the maximum number of Instant Settlement attempts
+allowed for the day." The reading is supportable. Credit to C1.
+
+>>> DIVERGENT (d) -- PROJECT-STATE, same as IO-17. F-R4.
+    RS-19: "its value is [merchant-policy, author-chosen] and LIVES IN config/".
+    It does not.
+
+--------------------------------------------------------------------------------
+IO-19  <->  RS-36 / F-03   the instant-settlement minimum, and Razorpay's own
+                           disagreement with itself
+--------------------------------------------------------------------------------
+AGREEMENT, reached independently and worth recording as such.
+Both sessions found that Razorpay publishes THREE different instant-settlement
+minima and that the MCP server adds a FOURTH:
+    Rs 1      S4 Errors + the "Settlement amounts of Rs 1 or lower are now
+              supported" parameter note
+    Rs 2,000  S4 Errors, for accounts not in "automatic" mode
+    Rs 100    S5's comparison table (reconcilable only if that cell means PAISE)
+    Rs 2      pkg/razorpay/settlements.go:227, mcpgo.Min(200)
+Neither session reconciled them; both recorded the disagreement as Razorpay's.
+C1 files it as F-03 (LOW, "the attack pushes up, not down"). The review agrees
+with both the finding and the severity.
+
+--------------------------------------------------------------------------------
+IO-20  <->  RS-22     the capture-concurrency error, THREE FIELDS
+--------------------------------------------------------------------------------
+IDENTICAL. error / code / description / solution all present; the remediation
+"Wait a few seconds and retry. Fetch the payment to confirm its current state
+before retrying." is INTACT and untrimmed, exactly as CONTEXT.md S9.2 demands.
+Both sessions independently record that Razorpay documents an ERROR ENTRY and
+NOT a stale-read invariant, and that the inference and the window width of 2 are
+this project's. RS-22 sets that commentary as prose, deliberately not as a quote,
+and declares the choice. Correct handling.
+
+NOTE ON FORM (c): RS-22 prefixes the fields with "**error:** / **code:** /
+**description:** / **solution:**", which the source does not carry. S0 declares
+these as labels this file ADDS and strips them before checking. Legitimate --
+but see F-R6(iii): S0 calls them "the three-field labels" and then lists FOUR,
+and the two readings of that sentence give 0 vs 3 unmatched lines.
+
+--------------------------------------------------------------------------------
+IO-21  <->  RS-23     the SAME error title on the refunds page, worded differently
+--------------------------------------------------------------------------------
+IDENTICAL.
+*** THE TRAP BOTH SESSIONS AVOIDED. ***
+api/payments/capture.md and api/refunds/create-normal.md carry an error with the
+IDENTICAL title and DIFFERENT description and solution. IO-21 flagged this in
+Phase 1, blind, as "the single most likely place for a file:line-class defect in
+the whole artefact". C1 carries them as TWO rows (RS-22, RS-23), credits each to
+the page it is actually on, and notes that RS-23's remediation is the stronger
+("fetch the payment AND ITS EXISTING REFUNDS"). CONTEXT.md S9.2 quotes the
+CAPTURE page's body and credits the CAPTURE page -- correct.
+Verified by measurement: RS-23's solution string occurs 1x in create-normal.md
+and 0x in capture.md. This is mutation M-12, which NOTHING caught.
+
+--------------------------------------------------------------------------------
+IO-22  <->  RS-25     source refunds only
+--------------------------------------------------------------------------------
+IDENTICAL, including the ** markers around "source refunds" that are in the
+source markdown. CONTEXT.md S2's shorter quote stops at the sentence boundary --
+also verbatim.
+
+--------------------------------------------------------------------------------
+IO-23  <->  RS-12(i)(ii)   nil into extraHeaders
+--------------------------------------------------------------------------------
+IDENTICAL, at the pinned SHA 7950d51d118ca164c32b7cf0cfaa14f34f24849f.
+  refunds.go:73-75  -- the three lines, the trailing `nil`
+  payment.go:44     -- the signature, 4th param `extraHeaders map[string]string`
+  payment.go:53     -- `return p.Request.Post(url, data, extraHeaders)`
+Both halves of F-06 verified first-hand by both sessions. Every file:line in
+CONTEXT.md S2 and S9.2 resolves exactly: :73-75, :66, :42-46, payment.go:44.
+This is mutation M-06 (file:line corruption), which NOTHING caught.
+
+--------------------------------------------------------------------------------
+IO-24  <->  RS-12(iii)   create_refund's five parameters
+--------------------------------------------------------------------------------
+FACTS IDENTICAL: payment_id (Required), amount (Required, Min(100), NO Max),
+speed, notes, receipt -- declared at refunds.go:17-47, validated at :62-67.
+No `destination`. No sixth parameter. No header parameter.
+
+>>> NOT FILED AS A FINDING, BUT NAMED. See REVIEW_C1_1.md section 5.
+    RS-12(iii)'s heading reads "...and none of them is a key", which is the exact
+    form CONTEXT.md v1.3 declared FALSE (the fourth false third-party claim to
+    reach the specification). Within RS-12's frame -- which is about the HEADER --
+    it is defensible, RS-12's own Notes qualifies it in the next paragraph, and
+    RS-27 states the correction in full. Not raised as a finding. Named because
+    it is one clause from being the fifth, and because F-R1's misaimed pointer is
+    what a reader must follow to reach the qualification.
+
+--------------------------------------------------------------------------------
+IO-25  <->  RS-27 / RS-12(iii)   refunds.go:66 forwards `receipt`
+--------------------------------------------------------------------------------
+IDENTICAL. Line 66 is ValidateAndAddOptionalString(data, "receipt"), and `data`
+is the 3rd argument at line 75 -- the request BODY, not the headers. The
+asymmetry Q-017 rests on holds at source.
+
+--------------------------------------------------------------------------------
+IO-26  <->  (CONTEXT.md S2)   the go.mod pins
+--------------------------------------------------------------------------------
+IDENTICAL: mcp-go v0.43.2, razorpay-go v1.4.0.
+
+================================================================================
+PART 3 -- WHAT THE INDEPENDENT ORACLE DID NOT COVER
+================================================================================
+Stated so the agreement above is not read as broader than it is.
+
+  RS-26, RS-28..RS-35, RS-37..RS-43   NOT-COVERED as independent transcriptions.
+      (But: a mechanical completeness check in Phase 2 confirmed that ALL 79
+      Errors entries across S1, S2, S3 and S4 appear VERBATIM in
+      RAZORPAY_SEMANTICS.md -- zero missing. So these rows are corroborated in
+      bulk even where they were not rebuilt one by one.)
+  RS-44..RS-49, RS-50..RS-53          NOT-COVERED. These rest on S7, S8, S9 and
+      S10, which the independent oracle did not mine. Their DIGESTS match; their
+      CONTENT was read once, by C1.
+  RS-54..RS-71 (the RECORDED table)   NOT rebuilt independently, but every one
+      was assessed for whether its exclusion is honest (REVIEW_C1_1.md section 3).
+
+================================================================================
+PART 4 -- THE TALLY
+================================================================================
+
+  Rows the independent oracle built .................................. 26
+  IDENTICAL on the Razorpay text .................................... 26
+  BUILDER ERRORS (a) -- C1 transcribed something the source lacks ....  0
+  PAGE CHANGED (b) -- drift to record with both dates ................  0
+  CHOICE OF EXTRACT (c) -- both correct, different spans ............. 4   (IO-06,
+                                                                   IO-08, IO-09, IO-13)
+  PROJECT-STATE (d) -- not about Razorpay's text .................... 3   (IO-14 -> F-R8 LOW;
+                                                                   IO-17 + IO-18 -> F-R4 BLOCKER)
+
+  ==> NO ROW IS A PARAPHRASE.
+  ==> EVERY A1-A6 ERROR STRING IN CONTEXT.md S6 RESOLVES TO A ROW, VERBATIM.
+  ==> ALL FIVE INSTANT-SETTLEMENT BOUNDS PRESENT; THREE FIGURES PUBLISHED, TWO
+      NOT, AND NO FIGURE WAS INVENTED FOR EITHER.
+  ==> THE ONLY DIVERGENCES ARE ABOUT THIS REPOSITORY, NOT ABOUT RAZORPAY.
+
+================================================================================
+END. Phase 1 was sealed at f069486 before any of Part 2 was written.
+================================================================================

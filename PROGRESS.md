@@ -6,6 +6,170 @@ not a record; this file is.
 
 ---
 
+## C1 — `RAZORPAY_SEMANTICS.md` + `PROVENANCE.md` A1–A6 — **REVIEW** — attempt 1 — 2026-08-31
+
+**SESSION-TOKEN:** `a0cc0212` — issued in this session's prompt and, unlike the previous session's,
+**already present in `QUESTIONS.md` when checked** (`grep -c a0cc0212 QUESTIONS.md` → non-zero on
+first read, before any edit). The batch clause Q-025 asked for is working.
+
+**Role:** REVIEW, chunk **C1**, type `full` (personas 1 **and** 2), two sealed phases.
+**I fixed nothing. No tag cut. `c1-pass` NOT applied.**
+
+**Token spend: NONE. ZERO provider model calls; zero lane quota consumed.** 40 HTTP GETs to public
+documentation, `raw.githubusercontent.com` and `codeload.github.com` — permitted and required by
+`PROCESS.md` §11a, ruled 2026-08-31. **This review is impossible without them**, and every byte they
+returned is digested in `docs/reviews/independent/c1_oracle.md` §0.
+
+**Concurrency.** C0's re-review (`f57e216b`) was in flight as pair **P-02**. Its chunk is disjoint.
+This session wrote only `docs/reviews/REVIEW_C1_1.md`, `docs/reviews/independent/`,
+`tests/test_c1_review_probes.py`, `docs/reviews/OPEN_FINDINGS.md` (appended), `STATUS.md`
+(appended), this file and `docs/sessions/`. **`QUESTIONS.md` and `INCIDENTS.md` were not touched**;
+what belongs in them is declared **OWED** in this session's FINAL OUTPUT.
+
+---
+
+# VERDICT: **FAIL** — one BLOCKER
+
+**F-R4.** C1 established, correctly and first-hand, that **two of A4's five bounds — the
+per-merchant daily withdrawable limit and the max attempts/day — are documented by Razorpay
+WITHOUT a figure.** It then wrote, in three places (RS-18, RS-19, `PROVENANCE.md` §2.4's A4 cell),
+that their author-chosen values *"live in `config/`"*. **They do not.** `git grep` over every
+tracked file returns only prose naming the bounds — **no key in `config/protocol.yaml`, no row in
+`CONTEXT.md` §8.6's constants table, no entry in `src/whetstone_gate/spec_constants.py`.** §8.6 and
+`config/protocol.yaml` each carry the same sentence: *"Any constant that is not in this table and
+not in `config/` is a defect, and finding one is a review BLOCKER."*
+
+**Three reasons it is a BLOCKER and not a MEDIUM, each sufficient alone:**
+1. The rule is unconditional and is stated in two files.
+2. ⚠️ **It makes C4's done-when unsatisfiable — through the ruling C1 itself obtained.** Q-018 put
+   *"every `MUST-FIRE` row fires in the mock world"* into `PROCESS.md` §12.1's C4 row. **RS-18 and
+   RS-19 are both `MUST-FIRE`.** C4's only routes are to invent two constants outside the frozen set
+   or to fail its done-when. **Q-018 existed to give C4 a satisfiable denominator; this is the same
+   problem one level down, and C1 is the chunk that would have seen it.**
+3. **It is the fourth occurrence**, in a section whose own text reads *"THE THIRD OCCURRENCE IS
+   WHERE A PATTERN STOPS BEING BAD LUCK"* and *"EACH TIME IT WAS FOUND BY SOMEBODY TRIPPING OVER A
+   MISSING CONSTANT, NEVER BY A CHECK."* This one was found the same way, by a fourth session.
+
+**What is C1's, stated no more broadly than it is.** C1 **could not** write to `config/` or
+`CONTEXT.md` and is not faulted for not fixing it — refusing to write into a pre-registration
+artefact from outside is the behaviour Q-022's ruling **endorses**. What is C1's: the escalation
+route was open and **C1 used it three times** (Q-016, Q-017, Q-018, all written out in
+`docs/sessions/c1-build-1.txt` §11 in `QUESTIONS.md` format) — **a fourth was not written**; and
+three artefacts assert a location that is empty, in a table whose own preamble promises *"This table
+asserts nothing that file does not source."*
+
+---
+
+### 1. ⚠️ What the FAIL is NOT — because the evidence runs overwhelmingly the other way
+
+**This is the strongest artefact this project has produced.** Everything checkable about Razorpay
+checked out, and most of it perfectly:
+
+| Checked | Result |
+|---|---|
+| All **10** quoted pages re-fetched, digests recompared | **10/10 byte-identical.** 9 SHA-256s exact; S10's 109,181-byte count exact |
+| Both pinned trees re-read | `refunds.go` digest identical **raw AND from the archive**; the archive holds **exactly 94 files**, as claimed |
+| Both claimed-404 URLs · all 6 discovery URLs | 404/404 with the 135,098-byte shell · **200 on all six** |
+| **Every `Errors` entry on S1–S4** | **79 of 79 present VERBATIM. Zero missing.** |
+| Partition recount, from the document | **40 + 13 + 18 = 71.** Exact. Every row in **exactly one** bucket; RS-01…RS-71 contiguous |
+| §0's blockquote check, re-implemented, re-run over all 12 sources | **301 of 301 matched. Unmatched: 0** — the verdict reproduces exactly |
+| Paraphrases | **ZERO.** Razorpay's own typos survive: `10 character long` (singular), `2 Lacs`, `authorised amount .` with its space before the full stop |
+| All five instant-settlement bounds | present; **3 figures published, 2 not, and NO figure invented for either** |
+| All 7 `grep` claims in RS-12(iv) / `CONTEXT.md` §2 | `idempot`→0, `X-Refund`→0, `audit`→0, `Max(`→9, `Max(100)`→6, `Min(`→35, `Middleware`→0. **All exact** |
+| Razorpay pages changed since 2026-08-30 | **0.** No drift to record, in either direction |
+
+**And C1 found the fourth false third-party claim in this specification, by reading a source it was
+already citing.** That is the chunk working exactly as designed.
+
+### 2. Phase 1 was BLIND, and was sealed before Phase 2 — `f069486`
+
+`PROCESS.md` §10 template 2's reimplementation is substituted by **Q-016's ruling**, because C1
+computes nothing. In its place: **`docs/reviews/independent/c1_oracle.md`, 26 rows (`IO-01`…`IO-26`)
+rebuilt from Razorpay's documentation and source WITHOUT opening `RAZORPAY_SEMANTICS.md`,
+`PROVENANCE.md`, `PROGRESS.md`, `INCIDENTS.md`, `docs/sessions/c1-build-1.txt` or the diff — and
+committed first.**
+
+⚠️ **Four deliberate 404s were run BEFORE any quote was recorded**, because a `200` from a
+single-page app proves nothing. All four returned a genuine 404 with an identical 135,098-byte body.
+C1 ran the same control on two different URLs and reached the same conclusion independently.
+
+**The diff (`c1_oracle_diff.txt`): 26 of 26 IDENTICAL on Razorpay's text. 0 builder errors.
+0 page changes. 4 differences of extract, both correct. 3 divergences — and all three are about
+THIS REPOSITORY, not about Razorpay.**
+
+The single most valuable agreement: **both sessions independently searched the doc pages for
+*"ignore amount parameter"*, got ZERO hits, and located the string at
+`pkg/razorpay/settlements.go:231-232`.** `CONTEXT.md` §6's A4 attribution correction is confirmed
+by a second blind reading.
+
+### 3. The mutation run — ARCHITECT-RULED analogue, and *"NOTHING"* was the answer four times
+
+⚠️ **RULING, 2026-08-31:** for an oracle document the mutation analogue is *corrupt a row and see
+whether anything catches it.* **12 mutants, each on a throwaway copy in an OS temp directory.** The
+harness restores and then **re-reads to prove the restore**; `git diff HEAD -- RAZORPAY_SEMANTICS.md`
+was empty before and after.
+
+**The control (one added comma) SURVIVED, as required.** Of the other eleven:
+**4 were caught by NOTHING** — a dropped negation in RS-18's *"NO FIGURE IS PUBLISHED"*; a
+documented `409` rewritten to `400`; `refunds.go:73-75` → `:71-73`, the citation Q-017 turns on;
+and RS-22 given RS-23's remediation, **which is still a verbatim Razorpay quote, from the wrong
+page**. **2 more only by a manual re-fetch. 3 more only by a check that is not committed.**
+
+**F-R5 is why.** `RAZORPAY_SEMANTICS.md` §0 publishes a *"re-runnable check"* of its
+blockquote-is-verbatim rule, reports **299 of 299**, and cites **INC-13** (*"nothing checked a
+tracked document's content"*) as the reason it *"mattered enough to fix rather than to note."*
+⚠️ **There is no implementation** — not in `tests/`, not in `src/`, not a `Makefile` target.
+**The fix was performed and not kept, which is INC-13's own lesson landing on the document that
+cites it.**
+
+**F-R6:** the check, *as specified*, matches each quoted line against **any** source rather than
+against **the source the row cites** — measured: `* code: 400` occurs **8×** in one page, and
+RS-23's solution string occurs **1×** in `create-normal.md` and **0×** in `capture.md`, the page
+RS-22 cites. It also passes vacuously over an emptied quote, and its stripping rule says *"the
+three-field labels"* while listing **four** — the two readings give 0 vs 3 unmatched.
+
+**8 kept probes added** (`tests/test_c1_review_probes.py`), kill rate **1/12 → 4/12**. ⚠️ **One is
+RED ON PURPOSE** (`test_section_0_states_its_own_quoted_line_count_correctly`) and its docstring says
+in terms that it is **C1's finding and not C0's**, so the concurrent P-02 session cannot misattribute
+it. **A probe detects; only a fix closes.**
+
+### 4. The other findings
+
+- **F-R2 (MEDIUM)** — §0 publishes *"299 of 299"*; the file carries **301** non-empty quoted lines.
+  ⚠️ **It was never reproducible**: `RAZORPAY_SEMANTICS.md` has one commit and the count there is
+  already 301. Likely mechanism, offered as a diagnosis to test: §6 holds exactly 2 quoted lines and
+  **301 − 2 = 299**, i.e. the check did not cover §6.
+- **F-R1 (MEDIUM)** — RS-12's Notes says *"⚠️ **See RS-31.**"*; **RS-31** explicitly disclaims being
+  a duplicate-refund guard. The row meant is **RS-27**, which every other citation in the project
+  gets right. It is the pointer on the row Q-017 turns on. **No mechanical check can catch a
+  well-formed pointer that is wrong**, and this review's probe says so in its own docstring.
+- **F-R3 / F-R7 / F-R8 (LOW)** — `RS-70` names both a table row and a note; §10 says *"Total: 14"*
+  above a table of 18; `PROVENANCE.md` counts the settlement balance among bounds *"carrying a
+  published figure"*, and Razorpay publishes none for it.
+- **F-R9 (INFO, for C4)** — RS-17 is `MUST-FIRE` and fires *"outside banking hours"*. **Hard rule 8
+  forbids a clock in core logic**, so C4 must model banking hours as **seeded world state**, never
+  `now()`.
+- **F-R10 (INFO)** — check 2g's consistency sweep found a surviving stale sentence at `CONTEXT.md`
+  line 178. ⚠️ **It is already `Q-026`, OPEN, with a remedy drafted.** Confirmed independently,
+  recorded as open, **and not counted against C1.** Two further occurrences (§6's and
+  `PROVENANCE.md`'s A3 *Mechanism* cells) are judged **DEFENSIBLE** — they describe what the
+  attacker does, not what the tool can do — and are named so a later session does not "fix" them
+  into inaccuracy.
+
+### 5. What I owe, and did not write myself
+
+`QUESTIONS.md` and `INCIDENTS.md` are not this session's. **One `QUESTIONS.md` entry (Q-027, F-R4)
+and one `INCIDENTS.md` entry (F-R5) are declared OWED**, written out in full in
+`docs/sessions/c1-review-1.txt` for the architect to place.
+
+⚠️ **On not manufacturing.** Hard rule 13's note cuts both ways. The BLOCKER was tested against its
+strongest counter-argument — *"`config/` was outside C1's fence"* — which is **true and is why the
+remedy is the architect's**; it does not answer the three artefacts asserting a location that is
+empty, nor Q-018's consequence, nor §8.6's unconditional wording. **Everything else in this chunk
+was PASSED, loudly, and the FAIL says so first.**
+
+---
+
 ## ARCH — the rulings, the token batch, and two defect closures — BUILD — attempt 1 — 2026-08-31
 
 **SESSION-TOKEN:** `921cfaa4` — issued by the architect in this session's prompt. ⚠️ **Its row was
