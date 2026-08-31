@@ -67,8 +67,12 @@ appears that was never issued**, or if a token is reused across roles.
 | `5bd2f44a` | C8 | BUILD | 2026-08-31 |
 | `e1911a9f` | C9 | BUILD | 2026-08-31 |
 | `365deaf7` | C1 | FIX | 2026-08-31 |
+| `8e0f4a13` | ARCH | BUILD | 2026-08-31 |
 
-⚠️ **THE ROW ABOVE IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** Q-025's remedy —
+⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
+said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
+so the sentence keeps meaning what it meant. Nothing else in this paragraph is changed.)* Q-025's
+remedy —
 ruled below — is *"every token batch names the token of the session that lands it."* **This is a
 single issue, not a batch**: the architect's C1 FIX prompt opened with `365deaf7`, stated that the
 token *"is NOT yet recorded"*, and placed `QUESTIONS.md` inside this session's fence with TASK 2
@@ -81,6 +85,20 @@ an unlabelled self-recording. **Named as the fifth rather than filed silently**,
 hides how its rows arrived is exactly what §7a's honour-system caveat warns about. **The general
 remedy is broader than Q-025's clause and is recorded in its ruling below: a token is recorded before
 the session that carries it runs, whether it is issued in a batch or alone.**
+
+⚠️ **AND `8e0f4a13` IS THE SIXTH SELF-RECORDED ROW, ON THE SAME GROUND, AND IT IS NAMED HERE RATHER
+THAN FILED QUIETLY.** This session's prompt — Q-029's closure, chunk cell **ARCH**, 2026-08-31 —
+opened with `8e0f4a13`, was **not** part of the `f57e216b` batch, and put `QUESTIONS.md` inside its
+fence with TASK 1 instructing it to append the row. **It is a single issue, not a batch, so Q-025's
+remedy does not reach it**: that clause reads *"every token batch names the token of the session that
+lands it"*, and a batch clause cannot cover an issue that is not a batch — the identical gap the
+`365deaf7` paragraph above records. Without the row, `check_roles.py` **E1 fails on every commit this
+session makes** (`FORGED/UNISSUED`), so the choice is between a self-recorded row and a red
+`make check-roles`. **The broader remedy that does reach it is already ruled below in Q-025 — a token
+is recorded before the session that carries it runs, whether it is issued in a batch or alone — and
+it was not applied to this one.** Recorded so the table does not hide how its rows arrived, which is
+exactly what `PROCESS.md` §7a's honour-system caveat warns about. **Sixth of six, and the count is
+the point: five of the six are the same defect.**
 
 ## ⚠️ THE TOKEN BATCH, 2026-08-31 — and this is what ends the collision class
 
@@ -2382,15 +2400,28 @@ author-chosen one.** Each is tagged individually, because the two tags are mixed
 ⚠️ **ONE OF THE SIX COULD NOT BE WRITTEN AND IS A STOP — see `Q-029` immediately below.** The ₹5 Cr
 per-settlement ceiling's **paise** value does not reconcile across three sources, and this session's
 prompt instructed it to verify both Razorpay figures against RS-16/RS-17 and **STOP rather than
-reconcile**. It is written as an explicit `TODO_` sentinel the loader refuses (hard rule 9's *"no
-default for a required value"*). **The other five are determined and landed.** RS-17's ₹2,00,000 →
+reconcile**. ⚠️ ~~*It is written as an explicit `TODO_` sentinel the loader refuses (hard rule 9's
+"no default for a required value").*~~ **CORRECTED 2026-08-31 by ARCH BUILD (`8e0f4a13`) — THAT
+SENTENCE IS FALSE AND IS STRUCK RATHER THAN DELETED.** No sentinel was ever written: the key was
+**absent**, and the `TODO_` mechanism **could not be used**, because declaring one needs an owner row
+in `src/whetstone_gate/config.py` **and** an entry in `tests/test_config_loader.py`'s closed sentinel
+set, both outside a fix session's fence. Q-029's own entry, `config/protocol.yaml`'s comment block
+and `docs/sessions/c1-fix-1.txt` §4 all say exactly that; **this annotation is the one place that
+said otherwise.** It is a claim about this repository's state that was not true — **`F-R4`'s exact
+class, inside the entry that closes `F-R4`** — so it is struck and named rather than erased, and the
+underlying gap is recorded as an **OWED** finding under Q-029. **The other five are determined and
+landed.** RS-17's ₹2,00,000 →
 `20000000` paise **verifies exactly** against its committed quote.
 
 ---
 
 ### Q-029 — ⚠️ STOP: ₹5 Cr resolves to THREE DIFFERENT paise figures across three sources, and no two agree
-**Raised by:** **C1 FIX (`365deaf7`)** · **Date:** 2026-08-31 · **Status:** **OPEN** ·
-**Class A** — it is a `[Razorpay-defined]` money constant that C4 enforces as a ceiling.
+**Raised by:** **C1 FIX (`365deaf7`)** · **Date:** 2026-08-31 · **Status:** **RULED** (2026-08-31,
+by ARCH BUILD `8e0f4a13`) · **Class A** — it is a `[Razorpay-defined]` money constant that C4
+enforces as a ceiling. ⚠️ **The entry below is left exactly as C1 FIX wrote it, INCLUDING its
+"Options seen" and its recommendation, because a question that edits its own history to match the
+ruling it received is worth less than one that shows both.** What changed is this status line and the
+ruling at the foot.
 **Blocking:** **`world.instant_settlement.max_per_settlement_paise` only.** The other five keys of
 `Q-028`'s block are determined and landed, so **C4 is not blocked on the bounds that bind** — see the
 non-bindingness note below. **It blocks `prereg-v1`**, because `config/` is hashed there and a
@@ -2479,7 +2510,80 @@ binds is never exercised by any test.
 **5,000,000,000** and the correction recorded as an `INCIDENTS.md` entry in its own right — the
 arithmetic is elementary, it is cross-checked five ways above, and RS-17's line is the control.
 
-**RULING (architect, <date>):** <pending>
+**RULING (architect, 2026-08-31):** *The C1 FIX session is CORRECT and it was right to
+stop. The value is **5,000,000,000 paise**, and the architect has re-derived it independently:
+one crore is 10^7, so Rs 5 Cr is 50,000,000 rupees and 5,000,000,000 paise. The convention
+`paise = rupees x 100` holds without exception across every other money key in
+`config/protocol.yaml` — per-action cap, episode cap, probe amount, merchant balance, amount_max —
+and RS-17's own Rs 2,00,000 -> 20,000,000 obeys it, which is the control that proves the defect is
+specific to RS-16's annotation.*
+*BOTH OTHER FIGURES WERE WRONG AND BOTH ARE RECORDED AGAINST THEIR AUTHORS. The architect's
+prompt supplied 500,000,000,000, which is 100x. RS-16's committed Notes carries 50,000,000,000,
+which is 10x, and the FIX session's diagnosis of the likely mechanism — that it is the
+"Rs 50 Crores" cell of the very table RS-16 quotes, one column right, and the cell that same
+paragraph rules out two sentences earlier — is plausible and is recorded as a diagnosis to test
+rather than as a finding.*
+*⚠️ RAZORPAY'S QUOTED TEXT IS UNTOUCHED AND WAS NEVER IN DOUBT. The defect is a
+**author-written annotation**, so correcting it alters no verbatim quote. That distinction is why
+the fix is safe: C1's reviewer re-fetched all ten pages 24 hours later and confirmed every quote
+byte-identical, including Razorpay's own typos.*
+*⚠️ IT DOES NOT BIND AND IT IS STILL CORRECTED. The balance is Rs 5,00,000 and the daily limit
+Rs 3,00,000, three orders of magnitude below the smallest candidate, so no number this project
+publishes moves either way. It is corrected because it is `[Razorpay-defined]`, it is hashed into
+`PROTOCOL.md` at `prereg-v1`, and it is published as a ceiling this world enforces — and a
+published third-party figure wrong by 10x is INC-05's and INC-02's exact class **in the artefact
+built to make that class impossible**, and UNFALSIFIABLE FROM INSIDE THE RUN, because a bound that
+never binds is never exercised. This is the fifth architect error of 2026-08-31.*
+
+**Status: RULED.** Recorded **verbatim** (hard rule 5) by ARCH BUILD (`8e0f4a13`), 2026-08-31.
+⚠️ **AND IT IS VERBATIM IN THE STRICT SENSE, WITH NO NOTATIONAL NORMALISATION AT ALL — UNLIKE
+Q-028's.** Q-028's closing note declares two substitutions this file's own house style would invite
+(`S<n>` → `§<n>`, `Rs` → `₹`). **None was applied here.** The ruling above keeps `Rs`, keeps `10^7`,
+keeps `x` for multiplication, keeps `->`, and keeps *"The defect is a **author-written annotation**"*
+— **the article disagrees with its noun and it is preserved**, because a transcription that silently
+tidies grammar is a transcription that has been read for sense rather than copied, and the reader has
+no way to tell which other word was "tidied". **No word, number, name, condition or character
+differs.**
+
+⚠️ **WHAT THE RULING SETTLES, IN ONE LINE, SO NO LATER SESSION RE-DERIVES IT:**
+`world.instant_settlement.max_per_settlement_paise: 5000000000`. **1 crore = 10⁷ → ₹5 Cr =
+50,000,000 rupees → × 100 = 5,000,000,000 paise.** **Both wrong figures are named in `config/`, in
+§8.6, in RS-16 and in `PROVENANCE.md` §2.4 rather than deleted**, so a reader who arrives holding
+either one is told which it is and why.
+
+**What landed under it, in this session (`8e0f4a13`).** `config/protocol.yaml` gains the sixth and
+last key of `world.instant_settlement`; `CONTEXT.md` §8.6 gains its row, marked **[ADDED 31 Aug]**
+and tagged `[Razorpay-defined]`; `spec_constants.py` gains a **STRICT** registry row; RS-16's Notes
+annotation is corrected **with the wrong figures kept visible in its own derivation table**;
+`PROVENANCE.md` §2.4's bound 2 moves from *"NONE — a DECLARED STOP"* to its key and value. ⚠️ **A4's
+five documented bounds now map to SIX CONFIGURED VALUES AND ALL SIX ARE PRESENT** — hard rule 11's
+shape applied to a set of bounds rather than a set of episodes, and this set was **five of six for
+one commit**, which is the number the previous session printed rather than left silent.
+⚠️ **`RAZORPAY_SEMANTICS.md`'s VERBATIM RAZORPAY QUOTES WERE VERIFIED MECHANICALLY BEFORE AND AFTER
+AND ARE AN IDENTICAL SEQUENCE:** all **316** lines beginning with `>`, unchanged in content and in
+order (SHA-256 of the numbered sequence `69dca877…52648`, before and after). **The defect was an
+author-written annotation and correcting it altered no quote, which is the ruling's own reason the
+fix is safe.**
+
+⚠️ **A SEPARATE FINDING, RECORDED HERE AND NOT CLOSED HERE — THE `TODO_` SENTINEL MECHANISM IS
+UNUSABLE FROM INSIDE A SCOPE FENCE.** This is **a finding, not a ruling**, and it is **OWED**, not
+closed. C1 FIX (`365deaf7`) went to declare `max_per_settlement_paise` as a `TODO_` sentinel — option
+4 above, the mechanism this project built for exactly *"a value that is not yet determined"*, and the
+option it took — and **found it could not**: declaring a new sentinel requires **an owner row in
+`src/whetstone_gate/config.py`** (the `SENTINEL_PREFIX` owner map) **AND an entry in
+`tests/test_config_loader.py`'s closed sentinel set** (`test_protocol_sentinels_are_exactly_the_undecided_ones`
+asserts **exact** equality, so an undeclared sentinel turns that test red), and **both files are
+outside a fix session's fence.** **THE ARCHITECT ACCEPTS THAT AS A REAL PROCESS DEFECT.** So the
+mechanism intended for hard rule 9's *"no default for a required value"* **cannot be reached by the
+sessions most likely to need it** — a build or fix session that discovers mid-chunk that a value is
+undetermined — and what it falls back to is an **absent key plus prose**, which is the shape of
+`F-R4`, the BLOCKER that failed C1. ⚠️ **The previous session's handling was nonetheless correct**:
+absent-and-loud beats present-and-wrong, and it declared the absence in four places.
+**Why it is not closed here:** closing it touches `src/whetstone_gate/config.py` and an existing test
+file, **both outside THIS session's fence too** — the defect reproduces on the session recording it —
+and it belongs to a chunk that owns those files. **It is named as owed rather than filed quietly**,
+and the shape of the remedy is left open on purpose (an owner-less `TODO_UNRULED` prefix, a
+`QUESTIONS.md`-derived owner, or a fenced escape hatch are all candidates and none is ruled here).
 
 ---
 
