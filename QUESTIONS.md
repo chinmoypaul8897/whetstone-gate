@@ -1394,8 +1394,16 @@ reported 299/299 at the time of writing.
 ---
 
 ### Q-017 — Razorpay documents `receipt` as an idempotency key, and unlike `X-Refund-Idempotency` the MCP tool CAN send it. Does invariant S2 change?
-**Raised by:** C1 BUILD (`20cd5b79`) · **Date:** 2026-08-31 · **Status:** **OPEN** —
-⚠️ **and it is the OPERATOR'S ruling, not the architect's.**
+**Raised by:** C1 BUILD (`20cd5b79`) · **Date:** 2026-08-31 · **Status:** **RULED** (2026-08-31) —
+⚠️ **status was `OPEN` until the ruling at the foot of this entry landed; the original line read
+`**Status:** **OPEN** — ⚠️ and it is the OPERATOR'S ruling, not the architect's.`**
+⚠️ **AND THAT QUALIFIER IS NOT DISCHARGED BY THE RULING, WHICH IS SIGNED `(architect,
+2026-08-31)`.** C1 raised Q-017 as the **operator's** to rule; the ruling as issued to session
+`921cfaa4` carries the architect's signature and **no operator-approval line**, unlike **Q-024**
+below (*"APPROVED BY THE OPERATOR"*) and unlike **Q-019**'s three operator conditions. The ruling
+is recorded verbatim as hard rule 5 requires and is **not** annotated inside its own text. **This
+line is the flag: if the operator has not seen it, the confirmation is still owed, and it is owed
+before `prereg-v1` for the same reason Q-019's was.**
 
 ```text
 Q-017 - Razorpay documents `receipt` as an idempotency key, and unlike
@@ -1451,11 +1459,63 @@ carries a one-line pointer to this question so a reader knows it is live.
 ⚠️ **§9.2's DEFINITION OF S2 WAS NOT TOUCHED. A FACT ABOUT A THIRD PARTY WAS CORRECTED; AN INVARIANT
 WAS NOT.** Q-017 remains **OPEN**, and its three options stand exactly as C1 wrote them.
 
+⚠️ **THE SENTENCE ABOVE IS SUPERSEDED BY THE RULING BELOW, WHICH LANDED ON 2026-08-31.** It is left
+standing because it was true when it was written and this file does not rewrite its own history.
+
+**RULING (architect, 2026-08-31):** *UPHELD, AND INVARIANT S2 MOVES TO `receipt`.*
+*THE DECIDING ARGUMENT IS NOT THAT `receipt` IS BETTER — IT IS THAT THE HEADER DEFINITION CANNOT
+BE IMPLEMENTED HONESTLY. `refunds.go:73-75` passes `nil` where the SDK's `extraHeaders` go, so an
+agent on Razorpay's official MCP server CANNOT SEND `X-Refund-Idempotency` AT ALL. In a world
+faithful to that surface no refund ever carries the header, so S2 as defined COULD NEVER FIRE. To
+make it fire, our mock `create_refund` would have to accept a parameter THE REAL SERVER DOES NOT
+HAVE — which is INC-02 in mirror image. INC-02 records a threat model built on a `destination`
+parameter Razorpay does not have, and it collapsed Rs2,004 crore to Rs22.4 L. Giving our mock
+agent a capability the real agent structurally lacks is the same error pointed the other way, and
+it is the criticism this project could least afford.*
+*`receipt` is one of `create_refund`'s five real parameters, is forwarded at `refunds.go:66`, and
+Razorpay documents it AS an idempotency key with its own 400. `[VERIFIED FIRST-HAND by C1 at
+2026-08-30T20:42Z; RE-VERIFIED INDEPENDENTLY BY THE ARCHITECT AT SOURCE on 2026-08-31.]` It is
+reachable, Razorpay-grounded, deterministic and clock-free — all four properties S9.2 demanded;
+the header has three.*
+*⚠️ THE HEADER FINDING IS SHARPENED, NOT LOST. It stops being a scored predicate and becomes a
+published claim: "Razorpay documents a dedicated idempotency header for refunds and their own MCP
+server structurally cannot send it; the only idempotency an agent can reach is an optional
+free-text field that nothing requires it to populate." That survives a payments engineer. The
+loose version — "create_refund sends no idempotency key" — does not, and was false.*
+*⚠️ A CAVEAT ON THE ARCHITECT'S OWN RULING, so a zero is not later misread as a defect: a
+POLICY-BLIND ATTACKER HAS NO REASON TO POPULATE `receipt` EITHER, so S2 may fire rarely or never.
+That is not a hidden gap — S12.1 reports "invariants breached (distinct ids, >=1x)", so an S2
+that never fires PRINTS AS A ZERO. An invariant that cannot fire is itself a finding, and this one
+says something true: Razorpay's duplicate-refund guard is opt-in and nothing makes an agent opt
+in.*
+*S2-amt IS UNCHANGED, and its false-positive delta (INC-04) is now measured against the `receipt`
+predicate. CONSEQUENCES, all before `prereg-v1`: S9.2 amended in this session; `INVARIANTS.md`
+carries the new definition at the freeze; C4 models `receipt` and NOT the header; C8 scores it;
+golden 2 is authored against it.*
+
+**Status: RULED.** Recorded by session `921cfaa4`, 2026-08-31, **verbatim** (hard rule 5). The only
+changes from the architect's issued text are this file's own notation — `S<n>` rendered as `§<n>`
+where it names a `CONTEXT.md` section — and **no word, number, name or condition differs**. What
+landed under it in this session: **`CONTEXT.md` v1.4, §9.2's S2 bullet**. What it binds and has not
+yet landed: `INVARIANTS.md` at the freeze, **C4** (models `receipt`, **not** the header), **C8**
+(scores it), **golden 2** (authored against it), and **C19** (publishes the sharpened claim).
+
+⚠️ **ONE CONSEQUENCE THE RULING DOES NOT NAME, FOUND BY THIS SESSION WHILE LANDING IT, AND NOT
+FIXED HERE:** the ruling calls *"create_refund sends no idempotency key"* **false**, and
+`CONTEXT.md` **§2 carries that exact sentence** — at line 176, inside the block headed *"And the
+sharper one, written so a payments engineer cannot puncture it."* **§2 is not in the ruling's
+enumerated consequence list and is outside this session's task fence**, so it is **raised as
+`Q-026` and left standing**, not edited. Q-017's own §2 correction of 31 August fixed the
+`create_refund` **table row**; the **prose sentence four sections earlier was not touched by it.**
+
 ---
 
 ### Q-018 — C4's done-when says *"every documented Razorpay error fires in the mock world"*, and ~40% of the documented errors are unreachable by construction
-**Raised by:** C1 BUILD (`20cd5b79`) · **Date:** 2026-08-31 · **Status:** **OPEN** —
-⚠️ it scopes another chunk's done-when in `PROCESS.md` §12.1, which is the architect's file.
+**Raised by:** C1 BUILD (`20cd5b79`) · **Date:** 2026-08-31 · **Status:** **RULED** (2026-08-31) —
+⚠️ **status was `OPEN` until the ruling at the foot of this entry landed; the original line read
+`**Status:** **OPEN** — ⚠️ it scopes another chunk's done-when in PROCESS.md §12.1, which is the
+architect's file.`** That remains true of the *file*: the amendment it authorises was landed in
+`PROCESS.md` §12.1 by session `debc97ae`, **not** by C1 and **not** by this session.
 
 ```text
 Q-018 - C4's done-when says "every documented Razorpay error fires in the mock
@@ -1493,6 +1553,28 @@ S0 declares the split as this session's own construction), but it does NOT
 amend C4's done-when, which is PROCESS.md's and outside this fence.
 RULING (architect, <date>): <pending>
 ```
+
+**RULING (architect, 2026-08-31):** *C1's OPTION 1, ADOPTED, and already implemented in
+`PROCESS.md` S12.1's C4 row by session `debc97ae`. C4's done-when reads over the MUST-FIRE set;
+the RECORDED set is listed and excluded WITH ITS REASON. Counts: 40 MUST-FIRE / 13 MUST-HOLD /
+18 RECORDED.*
+*Option 2 — narrowing the oracle to reachable rules — is REJECTED: it would delete first-hand
+documented rules and make the exclusion invisible, rewarding the perverse incentive C1 found.
+As written the done-when became UNSATISFIABLE THE MOMENT THE ORACLE WAS COMPLETE, so the cheapest
+way to satisfy it was to keep the oracle INCOMPLETE. C1 refused that and labelled all 71 rows.
+Option 3 is scope growth for no measurement value, and one excluded rule depends on a WALL CLOCK,
+which hard rule 8 forbids in core logic. The excluded 18 are a PRINTED NUMBER — hard rule 11's
+shape applied to a denominator of documented rules.*
+
+**Status: RULED.** Recorded by session `921cfaa4`, 2026-08-31, **verbatim** (hard rule 5); the only
+notational change is `S12.1` left exactly as the architect wrote it. **This session landed nothing
+under this ruling** — the amendment it records was already in `PROCESS.md` §12.1 before this session
+opened, and `PROCESS.md` is under this session's `NOT` fence.
+
+**The three counts are checkable and this session checked them** rather than transcribing them:
+`RAZORPAY_SEMANTICS.md` §10's census table carries `MUST-FIRE` **40**, `MUST-HOLD` **13**,
+`RECORDED` **18**, and that file's own line states *"`40 + 13 + 18 = 71`, and the partition is
+exact"* against **71** contiguous rows RS-01…RS-71. **They agree with the ruling exactly.**
 
 ---
 
@@ -1544,6 +1626,23 @@ entry in this file. No word, number, name or condition differs.
 `tests/goldens/world_seed_2001.json` — SHA-256
 `649e54ca446e8308f5fcd69ebba56eda5faea8d58246be7277cdb8b42227dd2b`, 4,879 bytes.
 
+**OPERATOR CONFIRMATION (2026-08-31):** *The operator has REVIEWED AND CONFIRMED S8.6a and golden
+7, satisfying condition (ii). Condition (iii) IS THEREBY DISCHARGED: C2 and its dependents MAY be
+tagged `cN-pass` on a review PASS like any other chunk. Conditions (i) and (ii) are recorded as
+met — the derivation was published as S8.6a plus this entry, and it was confirmed BEFORE
+`prereg-v1`, the only window in which it was reversible.*
+
+**Appended by session `921cfaa4`, 2026-08-31, verbatim, beneath the existing ruling and changing no
+word of it** — which is exactly what the architect's instruction for this entry required. **The
+ruling above is untouched; this is an addition.**
+
+⚠️ **WHAT THIS DISCHARGES AND WHAT IT DOES NOT.** It discharges **(iii)**, the tag freeze, for
+**C2 and its dependents** — `c2-pass` becomes cuttable like any other chunk's. **It does not
+pre-authorise a tag: only a REVIEW session tags, and only on a PASS** (`CLAUDE.md` §6, duty 9).
+**This session cuts no tag.** It also does **not** reach **Q-017**, whose own operator confirmation
+is flagged as still owed at the head of that entry, and it does not reach `prereg-v1`, which is
+C14's.
+
 ---
 
 ### Q-020 - C3 is a `full` chunk with no golden
@@ -1588,7 +1687,9 @@ protecting.**
 
 ### Q-021 - C3's prompt requires the Session-Token trailer on every commit, and
              fences the session out of the file where the token must be recorded
-**Raised by:** C3 BUILD (`da356dbb`) * **Date:** 2026-08-31 * **Status:** OPEN
+**Raised by:** C3 BUILD (`da356dbb`) * **Date:** 2026-08-31 * **Status:** **RULED** (2026-08-31)
+*(this line read `**Status:** OPEN` until the ruling at the foot of this entry landed; the body
+between here and that ruling is C3 BUILD's own text and is unchanged)*
 **Blocking:** `make test` and `make check-roles` are RED for this one reason.
 Nothing else in C3 is blocked; the chunk is complete.
 **Deviation class:** A - it changes a reported number (check-roles' pass count
@@ -1641,10 +1742,36 @@ issues a token. The fix is a **habit of the prompt author**, and this project's 
 is the fifth occurrence of a class whose accepted guardrail was also a habit — is the reason that
 sentence is written down instead of assumed.
 
----
+**RULING (architect, 2026-08-31):** *THE ARCHITECT'S ERROR, AND THE SESSION WAS RIGHT. C3's prompt
+required the trailer on every commit and fenced the session out of the file where S7a requires the
+token recorded. Both instructions could not be obeyed. C3 carried the trailer, did NOT cross the
+fence, weakened nothing, and reported the red with its exact remedy. E1 was WORKING.*
+*THE FIX IS STRUCTURAL: the architect now issues tokens in BATCHES, recorded before the sessions
+that use them run (TASK 1). That removes the collision and restores S7a's intent, which
+`REVIEW_C0.md` observed had been inverted every time a session wrote its own row.*
+*⚠️ C2 OBSERVED, CORRECTLY, THAT THIS IS NOT MECHANICAL: nothing checks that a prompt's fence
+contains QUESTIONS.md when that prompt issues a token, and INC-16 is this project's evidence that
+habits are unreliable. The batch mechanism is better than a habit because it removes the need
+rather than relying on remembering — but it is not enforced either, and that is said rather than
+implied.*
+
+**Status: RULED.** Recorded by session `921cfaa4`, 2026-08-31, **verbatim** (hard rule 5). The
+ruling's *"TASK 1"* is this session's own task 1, landed above as **the token batch** in
+`## Session tokens`. **Status was `OPEN`; the original line read `**Status:** OPEN`, and every word
+of the entry above is unchanged.**
+
+⚠️ **AND THE RULING'S LAST PARAGRAPH WAS VINDICATED WITHIN THE SAME SESSION THAT LANDED IT.** *"It
+is not enforced either"* — the batch this ruling names as the structural fix **omitted this
+session's own token, `921cfaa4`**, while the prompt asserted it was already present. E1 would have
+gone red on this session's commits for **the identical reason it went red on C3's**. The row was
+added, the self-recording is named as one in the batch note, and the mechanism's gap is raised as
+**Q-025**. **The batch is still the right fix; it is a fix that does not yet cover its own
+landing.**
 
 ### Q-022 — the probe's note text — the string that IS the open door — is in neither §8.6's constants table nor `config/`
-**Raised by:** C2 BUILD (`f0c50283`) · **Date:** 2026-08-31 · **Status:** **OPEN**
+**Raised by:** C2 BUILD (`f0c50283`) · **Date:** 2026-08-31 · **Status:** **RULED** (2026-08-31)
+*(this line read `**Status:** **OPEN**` until the ruling at the foot of this entry landed; the
+remedy landed with it, in the same session)*
 **Blocking:** nothing in C2 — the **value** is not in doubt, so the world was built. It blocks
 nothing else either, and it is **reversible only until `prereg-v1`**, which is why it is raised now
 rather than noted for later.
@@ -1725,10 +1852,53 @@ deleted and `load_world_spec` reads them like every other value.
 
 **RULING (architect, <date>):** <pending>
 
+**RULING (architect, 2026-08-31):** *UPHELD. IT IS A DEFECT AND IT IS A BLOCKER BY S8.6'S OWN
+SENTENCE, and the remedy lands in this session (TASK 3), before `prereg-v1`, after which `config/`
+is frozen even when wrong.*
+*C2's HANDLING WAS CORRECT AND IS ENDORSED: it named the string in exactly one place with the
+remedy beside it, refused to touch `config/`, and stated the reading under which it should have
+stopped instead rather than grading itself out of the question. Stopping would have cost the
+chunk; the chosen course is reversible in one commit and is visible.*
+*⚠️ THE PATTERN MATTERS MORE THAN THE INSTANCE. S8.6's table has now been found INCOMPLETE THREE
+TIMES — six rows added 30 Aug, eight added 31 Aug, and this. Each time it was found by somebody
+tripping over a missing constant, never by a check. THE THIRD OCCURRENCE IS WHERE A PATTERN STOPS
+BEING BAD LUCK. The probe note is the worst possible instance: clause P7 matches on it, CANARY-A's
+predicate depends on it, and it decides whether the door is open at all — a drifted copy would
+close the door and make arm 4 VOID BY CONSTRUCTION while every test still passed.*
+*C14's done-when therefore gains a THREE-WAY CONSISTENCY CHECK at the freeze, which is the natural
+place because it is when `config/` is hashed: every value in `config/` has a S8.6 row; every S8.6
+row has a `config/` key; every S8.6 row has a registry row. The architect will land that in
+`PROCESS.md`; it is not this session's.*
+
+**Status: RULED.** Recorded by session `921cfaa4`, 2026-08-31, **verbatim** (hard rule 5). ⚠️ **The
+`<pending>` placeholder line above is left in place rather than overwritten**, because it is the
+record of what C2 BUILD wrote when it raised the question and this file does not edit an earlier
+session's text — the ruling follows it rather than replacing it. **Every word of the entry above is
+C2 BUILD's and is unchanged.**
+
+**What landed under this ruling in this session (TASK 3), all four parts:** `config/protocol.yaml`
+gained `probe.notes.reconciliation`; `CONTEXT.md` §8.6's constants table gained the **probe note**
+row marked **[ADDED 31 Aug]**; `src/whetstone_gate/spec_constants.py` gained the `probe_note`
+`SpecConstant` row, **STRICT** on the quoted forms; and `src/whetstone_gate/world/spec.py`'s
+`PROBE_NOTE_KEY` / `PROBE_NOTE_TEXT` were deleted in favour of `protocol.require("probe.notes")`,
+exactly as C2's remedy block specified. **The text was copied from `CONTEXT.md` §10.1, not retyped
+from the ruling**, and this session asserts it character-identical to §10.1's by byte comparison.
+
+⚠️ **THE THREE-WAY CHECK IS THE ARCHITECT'S AND IS NOT IN THIS SESSION'S FENCE**, so it has **not**
+landed. Two of its three directions already exist as tests — `config/` → registry
+(`test_registry_covers_every_config_constant`) and §8.6 → registry
+(`test_every_s86_row_reaches_the_registry`, added by the C0 FIX session). **The third — every
+`config/` value has a §8.6 row — is the one nothing checks, and it is the direction that would have
+caught this defect**, because the probe note's absence was visible from `config/` before it was
+visible from anywhere else. Until C14 lands it, **this class remains open**, and Q-022 is the third
+instance in two days.
+
 ---
 
 ### Q-023 — §8.6a's ULP sentence is not exhibited by the frozen seed set, and this session measured it rather than repeating it
-**Raised by:** C2 BUILD (`f0c50283`) · **Date:** 2026-08-31 · **Status:** **OPEN** — informational.
+**Raised by:** C2 BUILD (`f0c50283`) · **Date:** 2026-08-31 · **Status:** **RULED** (2026-08-31)
+*(this line read `**Status:** **OPEN** — informational.` until the ruling at the foot of this entry
+landed)*
 **Blocking:** **nothing.** The world is built exactly as §8.6a specifies and no change is proposed.
 **Deviation class:** **C** — it proposes no change to behaviour, to a number, or to the ruling. It
 corrects the **margin** claimed by one sentence of the justification, not the decision it justifies.
@@ -1775,6 +1945,41 @@ relax the assertion"*** — so if a future seed list does bring an amount within
 the suite says so instead of the risk becoming real silently.
 
 **RULING (architect, <date>):** <pending>
+
+**RULING (architect, 2026-08-31):** *THE FINDING IS CORRECT AND IT IS AGAINST THE ARCHITECT'S OWN
+TEXT. S8.6a's sentence "near Rs1,50,000 ONE ULP FLIPS THE ROUNDED PAISE INTEGER" OVERSTATES ITS
+OWN MARGIN BY ABOUT FIVE ORDERS OF MAGNITUDE for the frozen seed set: measured over all 660 draws,
+the closest approach to a rounding boundary is ~0.0012 paise, about 4.2e+05 binary64 ULPs, and a
+float implementation reproduces all 660 amounts identically on this machine. THAT IS AN OVERCLAIM
+IN A DOCUMENT WHOSE SUBJECT IS OVERCLAIMS, written by the architect, and INC-05 is the entry that
+made that class a rule.*
+*THE DECISION STANDS AND ITS REASONING IS REPLACED WITH THE SESSION'S, WHICH IS STRONGER THAN THE
+ARCHITECT'S WAS. Hard rule 10 and PROCESS.md S5.1 do not claim the world is PROBABLY
+byte-identical across platforms — they CLAIM AND TEST that it IS. `Decimal.ln()`/`Decimal.exp()`
+are required by the General Decimal Arithmetic specification to be correctly rounded, so the claim
+is PROVABLE. A float world's claim would rest on a margin argument that must be RECOMPUTED EVERY
+TIME THE SEED LIST CHANGES — and S13.4's N decision rule is exactly a thing that may change the
+seed list. Provable beats comfortable, and that is the reason to keep Decimal.*
+*S8.6a's sentence is CORRECTED in this session (TASK 4). The measurement is kept as a committed
+test, whose failure message reads as a finding rather than an instruction to relax the assertion —
+so if a future seed list brings an amount within a ULP of a boundary, the suite says so instead of
+the risk becoming real silently.*
+
+**Status: RULED.** Recorded by session `921cfaa4`, 2026-08-31, **verbatim** (hard rule 5). The
+`<pending>` line above is left standing for the same reason as Q-022's: it is C2 BUILD's text.
+**Every word of the entry above is unchanged.**
+
+**What landed under this ruling in this session (TASK 4b, 4c):** `CONTEXT.md` **v1.4** replaces
+§8.6a's ULP sentence with the measured margin and the *provable-beats-comfortable* reasoning; and
+`tests/test_arch_ulp_margin.py` carries the measurement as **this session's one new test**, with
+the failure message the ruling requires.
+
+⚠️ **THE MEASUREMENT WAS RE-DERIVED BY THIS SESSION AND NOT COPIED FROM THIS ENTRY.** The new test
+recomputes all 660 draws over seeds 2001–2050 and 2101–2110 from the generator and reports the
+closest approach itself; the numbers in §8.6a and in the ruling are checked against that
+computation rather than transcribed. ⚠️ **C2's own measurement test in `tests/test_c2_world.py`
+remains untouched** — it is outside this session's fence, and two independent tests measuring the
+same quantity by different routes is a property worth having, not a duplication to collapse.
 
 ---
 
