@@ -625,12 +625,15 @@ SPEC_CONSTANTS: tuple[SpecConstant, ...] = (
     # C1 itself obtained - RS-18 and RS-19 are both MUST-FIRE, so C4's done-when was
     # UNSATISFIABLE without them. INCIDENTS.md INC-18.
     #
-    # ⚠️ BOUND 2 OF 5 - the Rs 5 Cr per-settlement ceiling - HAS NO ROW HERE, and its
-    # absence is a DECLARED STOP: QUESTIONS.md Q-029, OPEN, Class A. Rs 5 Cr resolves to
-    # three different paise figures across three sources and no two agree. It is absent
-    # from S8.6's table and from config/ for the same reason, so all three directions of
-    # the coverage check stay consistent and the gap is ONE open question rather than a
-    # silent asymmetry between two lists.
+    # ⚠️ BOUND 2 OF 5 - the Rs 5 Cr per-settlement ceiling - IS NOW HERE, and the set is
+    # SIX OF SIX. It was a DECLARED STOP for exactly one commit: QUESTIONS.md Q-029, now
+    # RULED (architect, 2026-08-31, Class A). Rs 5 Cr had resolved to three different
+    # paise figures across three sources and no two agreed; the ruling upholds the C1 FIX
+    # session's refusal to reconcile it and re-derives the value independently. It was
+    # absent from S8.6's table, from config/ and from here AT THE SAME TIME, so all three
+    # directions of the coverage check stayed consistent and the gap was ONE open question
+    # rather than a silent asymmetry between two lists - and it lands in all three the
+    # same way.
     SpecConstant(
         key="a4_daily_withdrawable_limit_paise",
         spec_row="A4 daily withdrawable limit",
@@ -755,6 +758,42 @@ SPEC_CONSTANTS: tuple[SpecConstant, ...] = (
             "A [Razorpay-defined] figure hardcoded in source is the SAME hard-rule-9 defect "
             "as an author-chosen one, which is why C4 reads this ceiling rather than knowing "
             "it."
+        ),
+    ),
+    SpecConstant(
+        key="a4_max_per_settlement_paise",
+        spec_row="A4 max per settlement",
+        config_path="protocol.yaml:world.instant_settlement.max_per_settlement_paise",
+        tag=_RAZORPAY,
+        literals=("5000000000", "5_000_000_000"),
+        mode=_P,
+        note=(
+            "STRICT, and it is the easy call: 5000000000 is a TEN-DIGIT paise integer and does "
+            "not occur innocently in ordinary Python, so a bare literal anywhere in first-party "
+            "source is a defect on its face and needs no name to gate it. Same shape as "
+            "`a4_daily_withdrawable_limit_paise`. ⚠️ IT DOES NOT COLLIDE WITH "
+            "`world_generation`'s 50000000 (the merchant balance) NOR WITH "
+            "`a4_daily_withdrawable_limit_paise`'s 30000000: the scan anchors every literal "
+            "with (?<![\\w.]) ... (?![\\w.]), so a shorter figure cannot match inside a longer "
+            "one. The SECOND [Razorpay-defined] row in this A4 block - the tags are mixed "
+            "inside one config block and getting one wrong is a PROVENANCE.md defect, not a "
+            "formatting one. "
+            "Rs 5 Cr = 5,000,000,000 paise: 1 crore = 10^7, so Rs 5 Cr = 50,000,000 rupees, "
+            "x 100 = 5,000,000,000. ⚠️ THIS ROW WAS A DECLARED STOP FOR ONE COMMIT and the two "
+            "WRONG figures are named here rather than forgotten, because a reader arriving with "
+            "either must be told which it is: 50,000,000,000 is 10x and is what "
+            "RAZORPAY_SEMANTICS.md RS-16's Notes line carried until 2026-08-31; 500,000,000,000 "
+            "is 100x and is what the C1 FIX prompt supplied. NEITHER is this value, and neither "
+            "is scanned for - a wrong figure is not a spec constant. QUESTIONS.md Q-029, RULED. "
+            "⚠️ RAZORPAY'S QUOTED TEXT WAS CORRECT THROUGHOUT AND WAS NEVER TOUCHED; the defect "
+            "was one author-written annotation, which is why correcting it altered no verbatim "
+            "quote. RS-17's Rs 2,00,000 -> 20,000,000 is the control that proved the convention "
+            "was not in doubt. "
+            "⚠️ THE CEILING NEVER BINDS under Q-028's values - the balance is Rs 5,00,000 and "
+            "the daily limit Rs 3,00,000 - AND THAT IS THE REASON THE ROW MATTERS RATHER THAN A "
+            "REASON TO OMIT IT: a bound that never binds is never exercised by any test, so a "
+            "wrong [Razorpay-defined] figure here would be UNFALSIFIABLE FROM INSIDE THE RUN. "
+            "The tripwire is the only thing that would notice it being hardcoded."
         ),
     ),
 )

@@ -225,27 +225,35 @@ world:
     # Notes line states "Rs 2,00,000 = 20,000,000 paise". 200000 * 100 = 20000000.
     # AGREES EXACTLY. Operative only while within_banking_hours is false.
     imps_outside_banking_hours_cap_paise: 20000000
-    # ⚠️ BOUND 2 OF 5 - Rs 5 Cr per settlement, [Razorpay-defined] - IS DELIBERATELY
-    # ABSENT FROM THIS BLOCK, AND ITS ABSENCE IS A DECLARED STOP, NOT AN OVERSIGHT.
-    # QUESTIONS.md Q-029, OPEN, Class A. Rs 5 Cr resolves to THREE DIFFERENT paise
-    # figures across three sources and no two agree: the correct conversion is
-    # 5,000,000,000 (5e7 rupees * 100); RS-16's committed Notes line says
-    # 50,000,000,000 (10x); the C1 FIX prompt supplied 500000000000 (100x).
-    # RAZORPAY'S QUOTED TEXT IS CORRECT AND IS UNTOUCHED - "Rs 5 Cr", "Rs 5 Crores",
-    # re-fetched by C1's reviewer and byte-identical 24 hours later. The defect is
-    # confined to ONE AUTHOR-WRITTEN ANNOTATION. RS-17's line is the control and it
-    # is correct, which is what proves the convention is not in doubt.
-    # The prompt's own instruction was to STOP rather than reconcile, and hard rule
-    # 1 says the same. ⚠️ A `TODO_` SENTINEL - the mechanism this project built for
-    # exactly this - COULD NOT BE USED, and that is a finding recorded in Q-029:
-    # declaring one needs an owner row in src/whetstone_gate/config.py AND an entry
-    # in test_config_loader.py's closed sentinel set, and BOTH are outside a fix
-    # session's scope fence. So the key is absent and LOUD rather than present and
-    # wrong. ⚠️ It does not bind today under Q-028's values - the balance is
-    # Rs 5,00,000 and the daily limit Rs 3,00,000, three orders of magnitude below
-    # the smallest candidate - which is why nothing downstream is blocked, and is
-    # NOT a reason to leave it: a published [Razorpay-defined] figure wrong by 10x
-    # or 100x is INC-05's exact class in the artefact built to prevent INC-05.
+    # [Razorpay-defined] BOUND 2 OF 5 - the per-request hard cap on one instant
+    # settlement. THE DERIVATION, ON ONE LINE, SO THE NEXT READER DOES NOT REDO IT:
+    # 1 crore = 10^7, so Rs 5 Cr = 50,000,000 rupees = 5,000,000,000 paise.
+    # ⚠️ VERIFIED AGAINST RAZORPAY_SEMANTICS.md RS-16's committed quotes, which are
+    # correct and are UNTOUCHED: "Amount requested is more than the max limit for
+    # ondemand settlement." (400) with "(Rs 5 Cr)", the S5 comparison-table row
+    # "Maximum amount per settlement | Rs5 Crores | Rs50 Crores |", and "up to
+    # Rs5 Crores" - two independent pages, re-fetched by C1's reviewer and confirmed
+    # byte-identical 24 hours later. The defect Q-029 stopped on was ONE
+    # AUTHOR-WRITTEN ANNOTATION, never a quote.
+    # ⚠️ TWO WRONG FIGURES ARE NAMED HERE RATHER THAN FORGOTTEN, so a reader who
+    # arrives holding either is told which it is: 50,000,000,000 is 10x and is what
+    # RS-16's Notes line carried until 2026-08-31 (likely the "Rs50 Crores" Smart
+    # Settlements cell one column right, which that same paragraph rules out);
+    # 500,000,000,000 is 100x and is what the C1 FIX prompt supplied. NEITHER is
+    # this value. The convention is paise = rupees * 100, without exception across
+    # every other money key in this file, and RS-17's Rs 2,00,000 -> 20,000,000 is
+    # the control that proves the defect was specific to RS-16's annotation.
+    # ⚠️ IT DOES NOT BIND UNDER Q-028's VALUES AND IT IS STILL CARRIED HERE: the
+    # balance is Rs 5,00,000 and the daily limit Rs 3,00,000, three orders of
+    # magnitude below it, so no number this project publishes moves either way. It
+    # is in config/ because it is hashed into PROTOCOL.md at prereg-v1 and published
+    # as a ceiling this world enforces, and because a bound that never binds is
+    # UNFALSIFIABLE FROM INSIDE THE RUN - a published [Razorpay-defined] figure
+    # wrong by 10x is INC-05's exact class in the artefact built to prevent it.
+    # QUESTIONS.md Q-029, RULED 2026-08-31 (Class A); the STOP that preceded it is
+    # recorded there in full and is not erased. C4 READS this ceiling; it never
+    # knows it.
+    max_per_settlement_paise: 5000000000   # Rs 5 Cr  [Razorpay-defined]
 
 # ── Seeds ─────────────────────────────────────────────────────────────────────
 # The pilot seeds are DISJOINT from the scored set on purpose.
