@@ -93,11 +93,50 @@ checks, not for rulings.
 - **One prompt per chunk, and never two prompts in one message.** Two prompts in one message is how
   steps get skipped.
 - ⚠️ **CONCURRENCY, precisely — revised 2026-08-30, because strict serialisation cannot fit the
-  schedule (§12).** **Up to two BUILD sessions may be in flight at once, if and only if their SCOPE
-  FENCEs are disjoint and neither imports the other.** The architect records the concurrent pair as a
-  ruling in `QUESTIONS.md` under `## Concurrent pairs` **before** issuing either prompt.
-  **REVIEW sessions remain strictly serial**, and a chunk's review may not begin before the architect
-  has recomputed that chunk's build report and committed its `ARCHITECT_CHECK`.
+  schedule (§12); the REVIEW half amended 2026-08-31, see immediately below.** **Up to two BUILD
+  sessions may be in flight at once, if and only if their SCOPE FENCEs are disjoint and neither
+  imports the other.** The architect records the concurrent pair as a ruling in `QUESTIONS.md` under
+  `## Concurrent pairs` **before** issuing either prompt.
+  ~~**REVIEW sessions remain strictly serial**~~ — **AMENDED 2026-08-31, see the next bullet.** What
+  is **not** amended and still binds: **a chunk's review may not begin before the architect has
+  recomputed that chunk's build report and committed its `ARCHITECT_CHECK`.**
+
+- ⚠️ **AMENDMENT, 2026-08-31 — CONCURRENT REVIEWS. Approved by the OPERATOR on 2026-08-31.**
+  The struck clause above read *"REVIEW sessions remain strictly serial."* It is **struck rather than
+  deleted**, because a rule that changed under schedule pressure must be visible as a change.
+  **AMENDED TO:** **UP TO TWO REVIEW SESSIONS MAY BE IN FLIGHT AT ONCE, IF AND ONLY IF their chunks
+  are DISJOINT AND NEITHER DEPENDS ON THE OTHER.** **A chunk and its dependency are never reviewed in
+  parallel** — **C7's and C8's reviews may not pair, because C8 depends on C7; C1's and C3's may, and
+  C2's and C4's may.** The pair is recorded in `QUESTIONS.md` under `## Concurrent pairs` **BEFORE
+  either prompt is issued**, exactly as a build pair is.
+
+  **THE REASONING, WRITTEN DOWN BECAUSE A RULE CHANGED UNDER SCHEDULE PRESSURE MUST SHOW ITS
+  WORKING:** the serial-review rule was **the BINDING CONSTRAINT on the entire critical path to the
+  freeze** — twelve `full` reviews at a **measured ~75 minutes** is **~15 hours**, which put **C14
+  past midnight on 31 August**. **NOTHING IN THE REVIEW ITSELF IS WEAKENED BY PAIRING.** Each review
+  is still a **DIFFERENT FRESH SESSION**, still **two sealed phases**, still **blind in Phase 1**,
+  still requires its **committed reimplementation** and its **eight mutants**, and still **cannot be
+  written by the session that built the chunk**. **The only change is that two are in flight at
+  once.**
+
+  ⚠️ **WHAT IS EXPLICITLY NOT CHANGED, so this amendment cannot be read as a precedent for cutting
+  review rigour:** **PASS conditions**, **persona coverage**, **mutant counts**, the
+  **reimplementation requirement**, the **two sealed phases**, and the rule that **build and review
+  are never the same session**. **This project's own C0 FAIL is the evidence that the gate works, and
+  it is worth more than the hours it cost.**
+
+  **RISKS ACCEPTED, EACH WITH ITS MITIGATION:** journal collisions on `STATUS.md`, `PROGRESS.md` and
+  `docs/reviews/OPEN_FINDINGS.md` are handled by the **append-only + rebase + stop-after-two-
+  rejections** clause, which was **PROVEN on 2026-08-31 when C0-FIX and C1 ran concurrently for 45
+  minutes with zero collisions**; a **FAIL arriving while its pair is mid-flight** is covered by
+  **§11a's twice-failed-chunk rule**; and **the architect's own throughput is the remaining limit, to
+  be reported the moment it binds.**
+
+  ⚠️ **SUPERSESSION, noted rather than back-edited:** **§12.0's item 1** was written on 2026-08-30
+  and still reads *"Reviews stay serial, so the **serial review queue is the binding constraint**"*.
+  **That sentence is the record of the arithmetic as it stood then and is not rewritten here**; from
+  2026-08-31 **this bullet governs**, and the binding constraint is the architect's own throughput,
+  above.
 - Build and review are **never the same session**, and the architect is never the reviewer.
 - Long runs (the sweep, the pilot, the calibration, the CaMeL branch test, the ladder windows)
   execute in the **operator's terminal**, never inside a session that might close mid-run.
