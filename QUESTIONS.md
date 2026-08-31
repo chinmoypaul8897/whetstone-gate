@@ -2610,6 +2610,47 @@ and the shape of the remedy is left open on purpose (an owner-less `TODO_UNRULED
 
 ---
 
+### Q-030 — `customer_overcharge_paise` is a structural zero, and S12.1 publishes it as a column
+**Raised by:** architect · **Date:** 2026-08-31 · **Status:** RULED · **Class:** n/a — a finding
+about the design, not an ambiguity.
+**Context:** S12.2's mapping makes **A1 over-capture the ONLY class that populates
+`customer_overcharge_paise`**. S6 records A1 as **rejected by Razorpay itself** — *"Capture amount
+must be equal to the amount authorized."* — and S12.2 says a record with
+`rejected_by_razorpay == true` **contributes ZERO to all four**. So the component can never be
+non-zero in this world.
+**RULING (architect, 2026-08-31):** *IT IS PUBLISHED AS A ZERO AND IT IS NOT REMOVED. PROCESS.md
+S9: "Zero-occurrence branches are printed as zeros, never omitted. A reader must distinguish 'did
+not happen' from 'was not checked."' Golden 3 pins it so a later session cannot read the zero as
+a defect and quietly "fix" the mapping.*
+*⚠️ AND IT IS A RESULT, NOT AN EMBARRASSMENT — it is S6's inversion made concrete and it belongs in
+the README in one sentence: **the harm component that would look worst, money taken from
+customers, can never accrue, because Razorpay's own API rejects every over-capture.** That is a
+finding about Razorpay's API rather than about our gate, and it is the honest shape of A1/A2/A6:
+the three attacks with an external answer key are exactly the three Razorpay refuses, so every arm
+including the no-gate arm scores near-identically on them.*
+*C18 states it beside the table. `merchant_irrecoverable_outflow_paise` is NOT in the same
+position — A3 (a duplicate carrying no shared receipt) and A5 both populate it and both execute.*
+
+**Status: RULED.** Recorded **verbatim** (hard rule 5) by ARCH BUILD (`6ba2d70e`), 2026-08-31.
+⚠️ **AND IT IS VERBATIM IN Q-029'S STRICT SENSE, WITH NO NOTATIONAL NORMALISATION AT ALL.** Q-029's
+closing note names two substitutions this file's house style would invite and records that **none**
+was applied. None is applied here either: the entry above keeps `S12.1`, `S6`, `S12.2` and `S9`
+rather than `§`, and it keeps the misplaced quotation mark in *`was not checked."'`* exactly where
+the ruling put it. **No word, number, name, condition or character differs.** A transcription that
+silently tidies punctuation is one that has been read for sense rather than copied, and the reader
+has no way to tell which other character was "tidied".
+
+**What this session did under it, and what it deliberately did not.** Golden 3 —
+`golden3_harm_vector.json`, placed by this session — carries the finding **in the fixture itself**,
+as its `structural_finding` field, so the pin the ruling asks for exists as a value a test will
+assert rather than as prose a later session may not read. `PROCESS.md` §9's quoted sentence was
+**checked against `PROCESS.md` first-hand** and is present and correct. ⚠️ **`CONTEXT.md` §12.1's
+table was NOT touched and the README sentence was NOT written**: the ruling assigns the README
+sentence to **C18** *("C18 states it beside the table")*, and this session's fence permits neither —
+so the ruling is recorded and the work it commissions is left to the chunk that owns it.
+
+---
+
 ### Q-031 — C6 is a `full` chunk with no golden, and its token figure cannot be measured without a provider call
 **Raised by:** architect · **Date:** 2026-08-31 · **Status:** **RULED**
 **Blocking:** nothing — C6 was built under the two rulings below.
@@ -2678,7 +2719,12 @@ measurement is load-bearing rather than a formality.
 ---
 
 ### Q-032 — the attacker corpora are pinned in a file the freeze does not cover
-**Raised by:** C6 BUILD (`4377265b`) · **Date:** 2026-08-31 · **Status:** **OPEN — not blocking**
+**Raised by:** C6 BUILD (`4377265b`) · **Date:** 2026-08-31 · **Status:** **RULED** (2026-08-31, by
+ARCH BUILD `6ba2d70e`). ⚠️ **The entry below is left exactly as C6 BUILD wrote it, INCLUDING its
+"Options seen", its "Default taken" and the `INCIDENTS.md` entry it declared it could not write,
+because a question that edits its own history to match the ruling it received is worth less than one
+that shows both.** What changed is this status line and the ruling at the foot. *(Its status line
+previously read `**OPEN — not blocking**`.)*
 **Blocking:** nothing. C6 built under Q-010's ruled pattern and the pins are verified on
 every load. **Relevant to C14** (the freeze) **and C18** (which publishes the split).
 **Deviation class:** none taken — this is a question, not a change.
@@ -2721,6 +2767,122 @@ nothing"*. **`INCIDENTS.md` is named under NOT in this session's scope fence**, 
 recorded here instead — which is the same shape as Q-029's finding that the `TODO_`
 sentinel mechanism is unreachable from inside a fence, one layer up: **the file that
 records process failures is the file a fenced session most often may not write to.**
+
+**RULING (architect, 2026-08-31):** *UPHELD as a real gap, and the remedy is DEFERRED TO C14 with
+its shape fixed now. The corpus pins are verified on every load but sit outside the frozen set, so
+`make check-prereg` hashes the inputs to every published number EXCEPT S11.3's corpus-versus-
+improvisation split. That asymmetry is not defensible in a project whose freeze is its central
+claim.* *REMEDY: `corpora/MANIFEST.md`'s pinned SHAs are listed in `PROTOCOL.md` at `prereg-v1`
+alongside `config/`'s digests, and `make check-prereg` verifies them. This does NOT add
+`corpora/` to S15.0's frozen SET — the manifest is already a tracked file and the pins are already
+verified on load; what changes is that the pins become part of what the pre-registration ASSERTS.
+C14 owns it and it is added to C14's done-when in TASK 4.* *C6 was right to stop rather than touch
+`config/` or S15.0.*
+
+**Status: RULED.** Recorded **verbatim** (hard rule 5) by ARCH BUILD (`6ba2d70e`), 2026-08-31, in
+Q-029's strict sense: `S11.3` and `S15.0` are kept rather than normalised to `§`, and **the line
+break inside *"corpus-versus-improvisation"* is the ruling's own wrap and is preserved rather than
+closed up** — named here so a reader can see it was inherited, not introduced.
+
+⚠️ **WHAT THIS RULING DOES AND DOES NOT MOVE, STATED BECAUSE THE DISTINCTION IS THE WHOLE REMEDY.**
+It moves the pins **into what the pre-registration asserts**; it does **not** move `corpora/` into
+`CONTEXT.md` §15.0's frozen set, which stays exactly five files plus `config/`. So the carried-in
+ruling at the foot of this file — *"the frozen set is exactly five files plus one directory"* — is
+**unchanged and is not contradicted**, and no session should read this entry as amending it.
+
+**What landed under it in this session (`6ba2d70e`):** `PROCESS.md` §12.1's **C14 row done-when**
+gains the clause (TASK 4b). **Nothing else.** `PROTOCOL.md` does not exist yet — C14 writes it — and
+`corpora/`, `config/` and §15.0 were all outside this session's fence and were **not touched**;
+`git status --porcelain` over each is empty. **The remedy is therefore recorded and scheduled, not
+performed**, and C14's done-when is the only place that can now fail if it is forgotten.
+
+⚠️ **AND THE ENTRY C6 COULD NOT WRITE IS NOW WRITTEN.** The paragraph above declaring an owed
+`INCIDENTS.md` entry is discharged by **`INC-22`**, placed by this session under Q-033's ruling —
+which removed the fence that caused it. C6's own framing was adopted as that ruling's ground.
+
+---
+
+### Q-033 — INCIDENTS.md is fenced out of the sessions most likely to need it
+**Raised by:** C1 FIX (`365deaf7`), C6 BUILD (`4377265b`), and Q-029 · **Date:** 2026-08-31 ·
+**Status:** RULED · **Class:** A — it disables a stated process control.
+**Context:** THREE SESSIONS IN ONE DAY reported an incident they were forbidden to file. C6 put it
+best: *"the file that records process failures is the file a fenced session most often may not
+write to."* Q-029 found the same shape in the `TODO_` sentinel mechanism. The fence was the
+ARCHITECT'S, added to stop concurrent sessions colliding on it.
+**RULING (architect, 2026-08-31):** *THE FENCE WAS WRONG AND IS REMOVED. **`INCIDENTS.md` IS
+APPEND-ONLY AND IS IN EVERY SESSION'S FENCE FROM NOW ON**, under the same discipline that has
+carried `STATUS.md` and `PROGRESS.md` through four concurrent sessions today without a single
+collision: append only, never rewrite another session's lines, re-verify your own bytes after any
+rebase, stop after two rejected pushes.* *The collision risk I was avoiding is smaller than the
+harm I caused: hard rule 13 says an entry with an empty field is not an entry, and a session that
+CANNOT WRITE ONE AT ALL is the same defect at full strength. It also pushed the recording into
+`QUESTIONS.md` and into report prose, where rule 13's eight fields do not bind — so the fence was
+degrading the format as well as the coverage.* *This is the sixth architect error of 2026-08-31.
+Landed in `PROCESS.md` S2's INCIDENTS.md row in TASK 4.*
+
+**Status: RULED.** Recorded **verbatim** (hard rule 5) by ARCH BUILD (`6ba2d70e`), 2026-08-31, in
+Q-029's strict sense — `S2` is kept rather than normalised to `§2`, and the ARCHITECT'S apostrophe
+is kept as the ruling capitalised it.
+
+**Landed in this session (`6ba2d70e`):** `PROCESS.md` §2's `INCIDENTS.md` row now carries
+**APPEND-ONLY AND IN EVERY SESSION'S FENCE** with Q-033's one-line reason (TASK 4a). The table was
+not restructured; one cell gained a sentence.
+
+⚠️ **AND THIS SESSION IS THE FIRST TEST OF THE RULING, WHICH IS WHY IT IS WORTH NAMING.** The very
+entry that C6 could not file — the ninth occurrence of INC-06's class — is filed here as **`INC-22`**
+by the first session whose fence contains `INCIDENTS.md` under this ruling. **The count of unfiled
+owed entries goes from one to zero on the same day the fence came down.** ⚠️ **What the ruling does
+NOT fix, stated because a ruling that oversells itself is worse than the fence:** the two entries
+this one names as precedent — INC-19's, declared OWED by C2 REVIEW and written up a session later by
+C1 FIX, and Q-032's, written up a session later here — **were both recovered by the next session
+holding the file.** So the fence has not yet lost this project an incident; it has delayed three and
+degraded the format of one. **The honest claim is that it removed a latent failure, not that it
+repaired a realised one** — and the reason to remove it anyway is hard rule 13's own: recovery by the
+next session is a courtesy, not a control, and it depends on the fenced session having written the
+facts down somewhere a successor happened to read.
+
+---
+
+### Q-034 — `CONTEXT.md` §11.3 names one of AgentHarm's two copyright holders, and none of AgentDojo's six
+**Raised by:** C6 BUILD (`4377265b`), from the shipped LICENSE files rather than the dataset cards ·
+**Date:** 2026-08-31 · **Status:** RULED · **Class:** A — a licence-notice defect in a table the
+README's attribution block is built from.
+⚠️ *This header, and these four framing lines, are **the recording session's** and are not the
+architect's. The prompt supplied Q-034 as a title and a ruling; everything below `**RULING**` is
+verbatim and everything above it is labelled so no reader mistakes one for the other.*
+**Context:** C6 BUILD fetched every attacker-corpus licence at source rather than carrying §11.3
+forward on trust, and `docs/sessions/c6-build-1.txt` §5 records the result: **0 rows marked
+`[UNFETCHED]`**, all five fetched 2026-08-31, each with its URL and an HTTP 200. Two of its findings
+are attribution defects rather than confirmations — AgentHarm's `(c) 2024 Gray Swan AI and UK AI
+Safety Institute`, of which §11.3 names only the second holder, and AgentDojo's six named holders,
+of which §11.3 names none.
+**RULING (architect, 2026-08-31):** *C6's correction is ADOPTED. S11.3 names only the UK AI Safety
+Institute for AgentHarm; the shipped LICENSE names **TWO holders, "Gray Swan AI and UK AI Safety
+Institute"**, and MIT REQUIRES THE NOTICE REPRODUCED — so a README attribution block built from
+S11.3 alone would be a LICENCE-NOTICE DEFECT, not a cosmetic one. AgentDojo's six copyright
+holders were likewise unnamed. Corrected in TASK 4. S11.3's Safety-not-Security point is
+separately CORRECT and is confirmed. ⚠️ This is the FIFTH thing C6 verified at source that S11.3
+had recorded from a previous session's reading — the rule that every third-party claim carries a
+URL and a date exists because of INC-05, and it keeps earning its cost.*
+
+**Status: RULED.** Recorded **verbatim** (hard rule 5) by ARCH BUILD (`6ba2d70e`), 2026-08-31, in
+Q-029's strict sense — `S11.3` is kept rather than normalised to `§11.3`.
+
+**Landed in this session (`6ba2d70e`):** `CONTEXT.md` §11.3's licence table gains AgentHarm's two
+holders and AgentDojo's six; `CONTEXT.md` bumps to **v1.7** with one change-log row citing Q-034
+(TASK 4c). ⚠️ **NOTHING ELSE IN §11.3 WAS TOUCHED** — its counts, its MIT/licence verdicts, its
+InjecAgent British-`LICENCE` note, AgentHarm's field-of-use clause and the Safety-not-Security note
+are all confirmed correct and are unchanged. **`PROVENANCE.md` §3.3 was NOT edited**: C6 wrote it
+first-hand today, it already carries both attributions, and this session **verified that it matches
+and says so** rather than rewriting a correct record.
+
+⚠️ **WHY THIS IS CLASS A AND NOT COSMETIC, IN ONE LINE A LATER SESSION CAN CHECK.** MIT's own text
+requires *"the above copyright notice … shall be included in all copies or substantial portions"*,
+so an attribution block that reproduces **half** a notice has not reproduced it. The defect is
+**latent, not live**: the README's attribution block is **C19's** and does not exist yet, so no
+published artefact currently carries the half-notice. **It is corrected now precisely because the
+table it would have been built from is the one that was wrong**, and C19 would have inherited it
+silently.
 
 ---
 
