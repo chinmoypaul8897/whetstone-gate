@@ -6,6 +6,161 @@ not a record; this file is.
 
 ---
 
+## ARCH — ARCHITECT_CHECK_1 + two `PROCESS.md` amendments — BUILD — attempt 1 — 2026-08-31
+
+**SESSION-TOKEN:** `debc97ae` — issued by the architect in this session's prompt.
+⚠️ **NOT recorded in `QUESTIONS.md` `## Session tokens` by this session, and that is deliberate and
+the architect's own sequencing.** This session's fence names `QUESTIONS.md` under **NOT**, because
+the **concurrent C2 BUILD session (`f0c50283`) owns that file** — its first task was landing the
+token rows and two question entries there, which it did in `b9ba135`. `check-roles` **E1 therefore
+FAILS** on this session's three commits — which is E1 **working**, the third such firing after
+`0811c64a` and `da356dbb` (**Q-021**). The row is **OWED** and is one line. Nothing was weakened to
+hide it.
+
+**Role:** BUILD, chunk **ARCH**. **No tag cut. Nothing self-certified.**
+
+**Token spend: NONE.** **Zero provider model calls.** No Groq, no Google, no network operation of any
+kind was needed or made. **No logic was built and no defect was fixed.** This session wrote one
+architect artefact and two `PROCESS.md` amendments.
+
+### Why this session ran, and what it exists to stop
+
+`PROCESS.md` §11: *"After every build and review report the architect emits a VERIFICATION block —
+the numbers recomputed, the value obtained, the value claimed … **No chunk is tagged `cN-pass`
+without one**."* §1: *"a chunk's review may not begin before the architect has recomputed that
+chunk's build report and committed its `ARCHITECT_CHECK`."*
+
+**`ARCHITECT_CHECK_0` §1 records that C0's review ran BEFORE its check existed** — which §1 forbids —
+and closes that paragraph with *"The next chunk's `ARCHITECT_CHECK` precedes its review."*
+**`ARCHITECT_CHECK_1` is that sentence kept.** It covers the four sessions of 30–31 August and it
+exists **before any of their reviews begins**, so the omission does not repeat.
+
+### Task 1 — `docs/reviews/ARCHITECT_CHECK_1.md`
+
+**TRANSCRIBED, NOT AUTHORED.** This session **verified nothing of its own and added no finding of its
+own** — it has no independent basis for one, and inventing one would make the file worthless. Written
+in `ARCHITECT_CHECK_0`'s shape, and carrying its **vehicle note** convention so the file says on its
+face who verified and who typed. **All four sessions are VERIFIED.**
+
+| § | Session | The architect's finding, in one line |
+|---|---|---|
+| 1 | **C0 FIX** `c9521aac` | at HEAD `11f8345`, clean: test **116 passed**, `check-roles` **17/0/4 exit 0** (now printing `ROOT EXAMINED` — **OF-09's half-closure**), `selftest` **still RED, correctly** (**Q-009 upheld**). **B-01 read in source**: `_issued_tokens` → `dict[str, set[tuple[str, str]]]`, so the impossibility that made E2/E3 unable to fire **is gone**. **Q-015's `MOAT_ALLOW_LIST` created EMPTY.** INC-13…16 present, **zero placeholder `Fix` SHAs**. Fence 11 files, all inside |
+| 2 | **C1** `20cd5b79` | 85,895 bytes, 71 rows. **F-01 confirmed locally.** **F-06 re-verified independently AT SOURCE**, the page re-fetched by the architect — ⚠️ **so `CONTEXT.md` §2's *"none is a key"* WAS FALSE, the FOURTH false third-party claim to reach this specification.** **INC-05 made that class a rule, and `RAZORPAY_SEMANTICS.md` is what caught it** |
+| 3 | **ARCH** `0811c64a` | test **117 passed**, `check-roles` **17/0/4 exit 0**. **Golden 7 measured: `649e54ca…dd2b`, 4879 bytes — IDENTICAL to the architect's own derivation. Not one byte altered in transit.** Fence 10 files, all inside |
+| 4 | **C3** `da356dbb` | ⚠️ **the enumeration RE-DERIVED INDEPENDENTLY** from §11.1's text alone, importing nothing from `whetstone_gate` and without reading C3's code: **34/164 MATCH**, write tools **name for name**, T-FP bytewise **MATCH**, telecom **MATCH**. **Two independent derivations now confirm 34/164; `CONTEXT.md` §21.4's #1 TIME RISK IS RETIRED.** **The sort ruling is PROVED load-bearing by the architect's own output, not asserted** |
+| 5 | — | **INC-17 reproduced** by the architect at 03:45 IST. ⚠️ **Live consequence: the C0 re-review must re-run 46 probes against pre-fix source, and done naively ALL 46 REPORT PASS** |
+| 6 | — | **TWO ARCHITECT ERRORS, recorded against himself**: the **STRICT `400` tripwire row** (the FIX session implemented what it was told **and flagged the consequence** — that flag is what got the instruction corrected), and **C3's fence-vs-trailer contradiction (Q-021)** |
+| 7 | — | what he **could not** verify: the dashboard PNGs, the no-payment-method attestation, and that the sessions were genuinely different (**nothing can — §7a says so**) |
+| 8 | — | **No tag is cut by this file.** C0 stays `FAILED` until its re-review passes; C1, C2, C3 stay `built (unreviewed)` |
+
+### Task 2 — `PROCESS.md` §1, concurrent reviews
+
+**Approved by the OPERATOR on 2026-08-31.** *"REVIEW sessions remain strictly serial"* → **UP TO TWO
+REVIEW SESSIONS IN FLIGHT AT ONCE, IFF their chunks are DISJOINT AND NEITHER DEPENDS ON THE OTHER.**
+**A chunk and its dependency are never reviewed in parallel** — **C7's and C8's may not pair; C1's
+and C3's may, and C2's and C4's may.** The pair is recorded in `QUESTIONS.md` under
+`## Concurrent pairs` **before either prompt is issued**, exactly as a build pair is.
+
+⚠️ **The old clause is STRUCK, not deleted, and the amendment is dated and in the file's own voice
+alongside the existing *"revised 2026-08-30"* note — because a rule that changed under schedule
+pressure must be visible as a change and must show its working.** The working: the serial-review rule
+was **the binding constraint on the entire critical path to the freeze** — **twelve `full` reviews at
+a measured ~75 minutes is ~15 hours**, which put **C14 past midnight on 31 August**.
+
+⚠️ **WHAT IS EXPLICITLY NOT CHANGED, so this cannot be read as a precedent for cutting review
+rigour:** **PASS conditions, persona coverage, mutant counts, the reimplementation requirement, the
+two sealed phases, and the rule that build and review are never the same session.** Each review is
+still a **different fresh session**, still **blind in Phase 1**. **The only change is that two are in
+flight at once.** *"This project's own C0 FAIL is the evidence that the gate works, and it is worth
+more than the hours it cost."*
+
+**RISKS ACCEPTED, EACH WITH ITS MITIGATION:** journal collisions on `STATUS.md`, `PROGRESS.md` and
+`OPEN_FINDINGS.md` → the **append-only + rebase + stop-after-two-rejections** clause, **PROVEN on
+2026-08-31 when C0-FIX and C1 ran concurrently for 45 minutes with zero collisions**; a **FAIL
+arriving while its pair is mid-flight** → **§11a's twice-failed-chunk rule**; and **the architect's
+own throughput**, the remaining limit, to be reported the moment it binds.
+
+⚠️ **Class B judgement, recorded rather than taken silently: `PROCESS.md` §12.0's item 1 still reads
+*"Reviews stay serial, so the serial review queue is the binding constraint."*** It was **NOT
+back-edited** — it is the record of the arithmetic as it stood on 30 August, and rewriting it would
+erase that. **The supersession is noted inside the new §1 bullet instead.**
+
+### Task 3 — `PROCESS.md` §12.1's C4 row, Q-018's ruling implemented
+
+C4's done-when read *"every documented Razorpay error in `RAZORPAY_SEMANTICS.md` fires in the mock
+world"*. **C1 established first-hand that ~18 of the ~50 documented errors are UNREACHABLE BY
+CONSTRUCTION** from any world built on `CONTEXT.md` §8.6 — merchant account configuration, a payment
+method this world does not model, an active dispute, a **WALL CLOCK (which hard rule 8 forbids in
+core logic)**, 5xx faults, or a Razorpay product with no API at all. **So as written the done-when
+becomes UNSATISFIABLE THE MOMENT THE ORACLE IS COMPLETE, and the perverse incentive is to keep the
+oracle INCOMPLETE — the opposite of what C1 exists for.**
+
+**AMENDED per the architect's ruling of 2026-08-31, adopting C1's option 1:** the done-when reads
+over the **`MUST-FIRE`** set; every **`MUST-HOLD`** row holds; and **every `RECORDED` row is listed
+in the self-test's output as documented-but-unreachable WITH ITS REASON, so the excluded set is a
+printed number and not a silence (hard rule 11).** **C1 labelled all 71 rows for exactly this
+purpose; the counts are 40 / 13 / 18.** The superseded wording is **quoted inside the amended row**,
+not deleted.
+
+### What landed — four commits
+
+| # | Commit | What |
+|---|---|---|
+| 1 | `bd2bf4c` | `docs/reviews/ARCHITECT_CHECK_1.md` |
+| 2 | `b5ee2a0` | `PROCESS.md` §1 — the concurrent-reviews amendment |
+| 3 | `8f19312` | `PROCESS.md` §12.1's C4 row — Q-018's ruling |
+| 4 | *(this)* | `STATUS.md` + `PROGRESS.md` |
+
+**Documentation only — no source, no test.** These commits therefore carry **no `(unreviewed)`
+marker**, and every one carries `Session-Token: debc97ae`.
+⚠️ **All files written with the editor/Write tools, never through a shell heredoc or a Python
+script** — **INC-06, INC-10, INC-12, INC-13 and INC-16 are FIVE occurrences in this project of
+literal text mangled between a tool call and a file**, and INC-16 happened to the session that had
+just documented the fourth. Every written file was verified afterwards: **zero CR bytes, zero stray
+C0 control bytes, valid UTF-8, and `git hash-object` == `git hash-object --no-filters`** (so §6a's
+fingerprint property holds). The three amended `STATUS.md` chunk rows were re-counted at **7 pipes /
+6 columns** each.
+
+### Counts
+
+| | BEFORE | AFTER |
+|---|---|---|
+| `python -m whetstone_gate.tasks test` | **156 passed**, 1 skipped, 2 deselected, **0 failed** | ⚠️ **154 passed, 2 failed**, 1 skipped, 2 deselected |
+| `check-roles` | **17 passed, 0 failed, 4 n/a, exit 0** | ⚠️ **16 passed, 1 failed, 4 n/a, exit 1** |
+
+**Total is 156 at both ends. No test was added, removed, weakened, skipped or loosened** (hard rule
+6), and **no source was touched.** ⚠️ **The ONLY movement is this session's own unrecorded token**,
+and it is named as such: `test_no_commit_carries_a_forged_or_reused_session_token` fails, and
+`test_check_roles_exits_zero` fails **as a consequence of it**. **Nothing in the movement is
+attributable to the concurrent C2 session** — C2's `b9ba135` (the token rows, Q-020 and Q-021) landed
+**before** this session's first commit and is in its base, which is **why C3's two failures were
+already cleared at the BEFORE reading**.
+
+### What broke while doing it
+
+**Nothing.** No `INCIDENTS.md` entry is owed by this session, and none was written — `INCIDENTS.md`
+is outside this fence in any case. The E1 failure is **not a defect**: it is **the architect's own
+sequencing**, predicted in this session's prompt, and it is Q-021's shape repeating by design.
+
+### What is owed
+
+🚩 **This session's token row — one line.** `| `debc97ae` | ARCH | BUILD | 2026-08-31 |` in
+`QUESTIONS.md` `## Session tokens`. Until it lands, `check-roles` exits 1.
+🚩 **FOUR RULINGS are owed to `QUESTIONS.md` by the architect** and land in the **next** session, once
+**C2 (`f0c50283`) releases the file**. They are **not this session's** to write.
+🚩 ⚠️ **AND ONE TEMPORARY INCONSISTENCY, STATED RATHER THAN LEFT TO BE FOUND: `PROCESS.md` §12.1's C4
+row now carries Q-018's ruling while `QUESTIONS.md` Q-018 still reads `Status: OPEN`.** The ruling
+text is in the amended row and in `docs/sessions/arch-check-1.txt`. **Hard rule 5 says a ruling is
+recorded in `QUESTIONS.md` before anything else is touched; this session could not, and says so
+rather than reaching outside its fence** — the precedent being C1 BUILD and C3 BUILD, which did the
+same and were right to.
+**Nothing is blocked by any of it: Q-019 (ii) gates TAGGING, which happens at a review PASS.**
+
+**No tag was cut. Nothing is self-certified.** A fresh adversarial review follows — and, now that
+`ARCHITECT_CHECK_1` exists, **C0's re-review and C1's and C3's reviews may begin.**
+
+---
+
 ## C3 — τ² adapter A: the enumeration and the pre-registered task selections — BUILD — attempt 1 — 2026-08-31
 
 **SESSION-TOKEN:** `da356dbb` — issued by the architect in this session's prompt.
