@@ -236,3 +236,44 @@ selections:
   tfp_stratification: { airline: 20, retail: 20 }
   tau2_must_not_write_task_count: 34
   tau2_write_task_count: 130
+
+  # ── THE PRE-REGISTERED tau2 TASK SELECTIONS [ADDED 2026-08-31 by C3] ────────
+  # CONTEXT.md §15.2 requires PROTOCOL.md to carry "the pre-registered task
+  # selections", and config/ is what the experiment actually reads, so this is
+  # their home. Both lists are DERIVED from the vendored checkout at
+  # vendor.tau2_bench_sha above by src/whetstone_gate/tau2/enumerate.py; nothing
+  # here is authored. tests/test_c3_tau2_enumeration.py re-derives them from that
+  # checkout on every run and diffs — so a drift between this file and the
+  # benchmark is a test failure, not a discovery made after the sweep.
+  #
+  # ⚠️ EVERY ID IS QUOTED, AND THAT IS NOT STYLE. tau2 task ids are STRINGS
+  # ("0", "11", "100"). Unquoted, YAML would parse them as integers, they would
+  # match no task, and the selection would silently be empty.
+  #
+  # ORDER: task ids AS STRINGS, BYTEWISE ASCENDING (Python's default sorted() on
+  # str), WITHIN EACH DOMAIN SEPARATELY — the architect's ruling of 2026-08-31 on
+  # CONTEXT.md §13.4's unqualified "after sorting". Not numeric: bytewise, retail
+  # puts "100".."109" ahead of "11", and airline's first twenty start at "11" and
+  # exclude "7" and "8" — a numeric sort selects a DIFFERENT sample.
+  #
+  # SHAPE: keyed by domain rather than a flat list of {id, domain} records. The
+  # information is identical and the domain cannot be lost from an id.
+  # Recorded as a Class B deviation (hard rule 2) in docs/sessions/c3-build-1.txt.
+
+  # The 34 of 164 must-not-write tasks: reference trajectories containing NO tool
+  # carrying tau2's own @is_tool(ToolType.WRITE) decorator. CONTEXT.md §11.1's
+  # T-NEG control — 24 of 50 airline (7 empty action list, 17 read-only) and
+  # 10 of 114 retail (2 empty, 8 read-only).
+  tau2_must_not_write_task_ids:
+    airline: ["0", "1", "10", "13", "2", "26", "27", "28", "3", "31", "34", "36",
+              "38", "4", "41", "43", "45", "46", "47", "48", "49", "5", "6", "9"]
+    retail: ["10", "12", "24", "25", "50", "57", "62", "65", "67", "68"]
+
+  # T-FP: the first 40 write-task ids after sorting, stratified 20 airline /
+  # 20 retail (CONTEXT.md §13.4). The complement of the set above is 130 write
+  # tasks — 26 airline, 104 retail — and these are its first 20 of each.
+  tfp_task_ids:
+    airline: ["11", "12", "14", "15", "16", "17", "18", "19", "20", "21",
+              "22", "23", "24", "25", "29", "30", "32", "33", "35", "37"]
+    retail: ["0", "1", "100", "101", "102", "103", "104", "105", "106", "107",
+             "108", "109", "11", "110", "111", "112", "113", "13", "14", "15"]
