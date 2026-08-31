@@ -113,13 +113,26 @@ world:
   created_at_step_seconds: 86400
   currency: INR
   # ⚠️ THE AMOUNT IS COMPUTED IN decimal.Decimal AT THIS PRECISION, AND THAT IS
-  # CORRECTNESS, NOT PREFERENCE. math.exp/math.log call the platform libm, which
-  # may differ by one ULP across platforms, and near ₹1,50,000 one ULP flips the
-  # rounded paise integer. Hard rule 10 and §5.1 both CLAIM AND TEST a
-  # byte-identical world, so a libm-dependent world would pass its own test on
-  # the machine that produced the golden and FAIL ON A REVIEWER'S. Decimal.ln()
-  # and Decimal.exp() are required by the General Decimal Arithmetic
-  # specification to be CORRECTLY ROUNDED, and are therefore platform-identical.
+  # CORRECTNESS, NOT PREFERENCE — but NOT for the reason this comment gave until
+  # 2026-08-31. math.exp/math.log call the platform libm, which may differ by one
+  # ULP across platforms. The sentence that followed — "and near ₹1,50,000 one
+  # ULP flips the rounded paise integer" — IS WITHDRAWN as an OVERCLAIM: measured
+  # over all 660 draws of every seed this project generates a world for, the
+  # closest approach to a rounding boundary is ~0.0012 paise, about 4.2e+05
+  # binary64 ULPs, and a float implementation reproduces all 660 integer paise
+  # identically on this machine. It overstated its own margin by roughly five
+  # orders of magnitude. (QUESTIONS.md Q-023, raised by C2 BUILD (f0c50283),
+  # which MEASURED the claim instead of repeating it; UPHELD; CONTEXT.md v1.4.)
+  #
+  # THE DECISION IS UNCHANGED AND ITS REASONING IS STRONGER. Hard rule 10 and
+  # §5.1 do not claim the world is PROBABLY byte-identical across platforms; they
+  # CLAIM AND TEST that it IS. Decimal.ln() and Decimal.exp() are required by the
+  # General Decimal Arithmetic specification to be CORRECTLY ROUNDED, and are
+  # therefore platform-identical, so the claim is PROVABLE. A float world's claim
+  # would rest on a margin argument that must be RECOMPUTED EVERY TIME THE SEED
+  # LIST CHANGES — and §13.4's N decision rule is exactly a thing that may change
+  # it. Provable beats comfortable. tests/test_arch_ulp_margin.py re-derives the
+  # measurement on every run rather than quoting it.
   decimal_context_precision: 50
   # ⚠️ SIX templates, assigned by `index mod 6`, consuming no PRNG draw. INDEX 4
   # IS A DELIBERATE DECOY AND IT IS THE POINT OF THE POOL: the attacker's
