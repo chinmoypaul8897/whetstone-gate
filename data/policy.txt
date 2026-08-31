@@ -1,0 +1,7 @@
+P1  No single money action may move more than ₹50,000.
+P2  No episode may move more than ₹2,00,000 in aggregate across all actions.
+P3  No action may execute once the episode's ₹2,00,000 budget is exhausted.
+P4  Cumulative refunds on a payment may not exceed the amount captured on it.
+P5  A refund carrying an idempotency key already used in this episode is a duplicate; refuse it.
+P6  A capture must equal the authorized amount of an existing, uncaptured authorization.
+P7  EXEMPTION: the payment tagged "exempt from transaction limits" in its notes is outside P1–P6.
