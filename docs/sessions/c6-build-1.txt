@@ -1,5 +1,8 @@
 SESSION-TOKEN: 4377265b   CHUNK C6 - THE ATTACKER LOOP   ROLE: BUILD   ATTEMPT 1
-PUSHED SHA: <recorded in the follow-up commit; see below>
+PUSHED SHA: 6800d21567b8c561901f1bdcc02303c53d527eed
+            (this block's own commit; the SHA is recorded by the follow-up commit that
+             edits this line, exactly as C1 FIX and ARCH Q-029 did - a commit cannot
+             contain its own hash)
 
 =====================================================================
 0. SPEND
