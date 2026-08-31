@@ -6,6 +6,104 @@ not a record; this file is.
 
 ---
 
+## C1 — the oracle and the attack rows — **FIX** — attempt 1 — 2026-08-31
+
+**SESSION-TOKEN:** `365deaf7` — issued **alone**, not in a batch, and the prompt states it *"is NOT
+yet recorded"* and places `QUESTIONS.md` in this fence. The row is therefore **self-recorded and
+named as the fifth**, because Q-025's remedy binds *"every token **batch**"* and no batch clause can
+reach a single issue. Without it `check_roles` **E1 failed on this session's first commit** —
+`FORGED/UNISSUED: {'365deaf7': ['2bd1d35']}` — the identical red Q-021 records for C3. **E1 is green
+again: 17 passed, 0 failed, 4 n/a, exit 0.**
+
+**What this session was:** the FIX for `docs/reviews/REVIEW_C1_1.md`, which returned **FAIL** on
+**one BLOCKER** (`F-R4`) — and on nothing else, because that review re-fetched all ten Razorpay
+pages, matched **10 of 10** digests, recounted the **40/13/18 = 71** partition exactly and found
+**zero** paraphrases.
+
+**Order of work, and it is the rule not a preference.** `CLAUDE.md` hard rule 13: the FIX session
+writes the `INCIDENTS.md` entries **before it changes a line of code**. Commit **`2bd1d35`** contains
+`INCIDENTS.md` and nothing else, and it is the first commit of the session.
+
+- **INC-18** — the BLOCKER. Three artefacts said two A4 values *"live in `config/`"*; `git grep`
+  returned prose naming each bound and **not one value**. It is a BLOCKER and not a typo because
+  through **Q-018 — the ruling C1 ITSELF obtained — RS-18 and RS-19 are both `MUST-FIRE`, so C4's
+  done-when was UNSATISFIABLE.** **Fourth occurrence of the missing-constant class**, and the
+  **first of the four found by a REVIEW** rather than by a builder tripping over it.
+- **INC-19** — the entry `REVIEW_C2_1.md` §10 declared **OWED** and could not write itself. A
+  Windows **shell redirect** left CRLF against LF and turned two invariants red — including
+  **INC-11's own test** — before the mutation baseline. **Seventh occurrence, by a route no prior
+  entry and no prompt had named**: all six name heredocs and Python scripts, none names a redirect.
+  **The guardrail WORKED**; what was owed is the entry.
+- **INC-20** — **the architect's** S2 error, not C1's. **The ruling quotes the very error string that
+  invalidates it.**
+- **INC-21** — ⚠️ **this session's own, and the eighth occurrence of INC-06's class.** Writing
+  OF-19's five pointers, this session reached for a **Python script** — which its own prompt forbids
+  in capitals and which **INC-19, written minutes earlier by this session, is the entry about.** No
+  damage (`newline=""`; 0 CR bytes; A3/A4 PASS; the 313 quoted lines an identical sequence). **The
+  entry is the deliverable**, and the under-reporting pressure is named in it: nothing broke, the
+  review is next, and leaving it out is the choice worth catching.
+
+**THE BLOCKER, CLOSED.** `config/protocol.yaml` gains `world.instant_settlement`; §8.6 gains five
+rows **[ADDED 31 Aug]** with its warning amended to **the fourth time**; `spec_constants.py` gains
+five registry rows — so all three of §8.6's consistency directions close on each key at once.
+⚠️ **ALL of A4's bounds go to `config/`, not only the two with no published figure** — C4 must
+**read** every ceiling it enforces, and a `[Razorpay-defined]` figure hardcoded in source is the same
+hard-rule-9 defect as an author-chosen one. **Q-028** RULED, APPROVED BY THE OPERATOR: ₹3,00,000 /
+5 / a refused attempt counts / outside banking hours. **Every choice is the tighter reading, so a
+wrong guess can only make this project's escape numbers SMALLER, never larger** — stated because A4
+is one of the three attacks whose thresholds are ours.
+
+⚠️ **AND THE SIXTH VALUE IS A STOP. `Q-029`, OPEN, Class A.** TASK 3a instructed this session to
+verify both Razorpay figures against RS-16/RS-17 and **STOP rather than reconcile**. **RS-17
+verifies exactly**: ₹2,00,000 = 200000 × 100 = **20,000,000** ✅. **RS-16 does not**: ₹5 Cr =
+**5,000,000,000** paise; RS-16's committed Notes says **50,000,000,000** (**10×**); the prompt
+supplied **500,000,000,000** (**100×**). **Three figures, no two equal.** Razorpay's **quoted text is
+correct and untouched** — the defect is one author-written annotation, cross-checked against five
+other `config/` money keys with **RS-17's own line as the control**, and **independently re-derived
+blind by a second agent that reached the same 10× conclusion and the same likely mechanism** (the
+`₹50 Crores` cell one column right, in the very table RS-16 quotes). ⚠️ **A `TODO_` sentinel — the
+mechanism this project built for exactly this — could NOT be used**: it needs an owner row in
+`config.py` and an entry in `test_config_loader.py`'s closed set, **both outside a fix session's
+fence**, and that gap is itself a finding recorded in Q-029. **The key is absent and loud**, and the
+gap is printed as a number (hard rule 11): **five of six landed, one open.**
+
+**`CONTEXT.md` v1.5**, one change-log row citing Q-026 + Q-027 + Q-028. **S2 redefined a THIRD
+time** — *"two executed refunds"* → *"two refunds **ISSUED**"* — with all three moves shown and why
+each failed: **WRONG** (INC-04), **UNSENDABLE** (Q-017), **UNFIRABLE** (Q-027). **Only the third is
+a one-word scope correction.** ⚠️ **§12.2 is deliberately NOT touched** and its A3 row keeps
+*"executed"*: harm is booked when money moves, S2 is scored when the gate let it be attempted, and
+**the gap between them is the new publishable quantity — Razorpay's own guard, measured.** **§2's
+line 178 corrected**; **§6's A3 cell and `PROVENANCE.md` §2.4's A3 cell RULED DEFENSIBLE and left
+alone**, with a probe that **fails if a later session "fixes" them into inaccuracy**.
+
+**TASK 6 done in full, past the declared stop line.** **OF-17** — §0's `299` → **301**, verdict
+unmoved, recomputed **two ways that agree**, and the review's diagnosis confirmed as **one of TWO
+undeclared narrowings** (§6's 2 lines **and** the 3 blanks), both now declared. ⚠️
+**`test_c1_review_probes.py` is UNTOUCHED** — the corrected count did not require editing it, so §0's
+sentence was fitted to the reviewer's assertion rather than the reverse. **OF-15/OF-16** — §0's check
+**implemented** and **fired at mutants rather than asserted**: **M-03 KILLED, which this review
+records as caught by NOTHING**, offline, because the row's `HTTP` field now contradicts its own
+quote; **M-10** killed by three tests; **M-13 (new)** killed; **CONTROL SURVIVED**. **OF-18**,
+**OF-20**, **OF-21** closed; **OF-19 partially** — every ambiguous pointer gone, the heading not
+renamed because the reviewer's own partition probe locates the `RECORDED` table by that exact string.
+
+⚠️ **THE MOMENT WORTH RECORDING FOR THE NEXT SESSION.** The mutation harness's **first run reported
+all four mutants passing, including the control and the three that must go red.** The cause was
+**INC-17 exactly** — the subprocess had lost `PYTHONPATH` and was testing the **live repository**.
+Nothing in the output looked wrong; it was caught only by **disbelieving a result that had gone this
+session's way**, which is INC-17's own closing sentence. The re-run **prints
+`whetstone_gate.__file__` AND `config.repo_root()` from inside the harness and asserts the path**
+rather than trusting the outer shell.
+
+**Counts.** `make test` **1 failed, 229 passed → 0 failed, 258 passed, 1 skipped, 2 deselected**
+(+29, all this session's); bare `pytest` **259 passed**, the one remaining red being the
+`operator_gate` CaMeL test `make test` deselects and RUN-1 closes. **`check-roles` 17 / 0 / 4, exit
+0.** **`git status --porcelain tests/goldens/` EMPTY.** **No golden read, none edited. Zero provider
+model calls; zero HTTP requests of any kind.** 🚩 **No tag cut, and none may be: only a review session
+tags, and only on a PASS.**
+
+---
+
 ## C2 — the world generator and the planted probe — **REVIEW** — attempt 1 — 2026-08-31
 
 **SESSION-TOKEN:** `94116fe2` — issued in the architect's batch and already present in
