@@ -1,4 +1,7 @@
-PUSHED SHA: <filled in by the pushing commit; see the line printed with the report>
+PUSHED SHA: dd17a34b481304391774187097d59fa73e49bb17   (tag c2-pass points here)
+  This line was a placeholder in dd17a34 itself - a commit cannot carry its own SHA - and is
+  filled by the one-line follow-up commit that immediately succeeds it. dd17a34 is the commit
+  that carries the review, the verdict and the tag target; the follow-up changes only this line.
 
 C2 - ADVERSARIAL REVIEW, ATTEMPT 1.  SESSION-TOKEN 94116fe2.  ZERO provider calls, zero tokens.
 
