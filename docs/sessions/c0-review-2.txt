@@ -1,0 +1,533 @@
+C0 RE-REVIEW REPORT - ATTEMPT 2
+================================================================================
+SESSION-TOKEN: f57e216b   role REVIEW   chunk C0   attempt 2   2026-08-31
+Review type: code - persona 2 (CODE REVIEWER). Minimum four mutants; fourteen ran.
+ASCII only, per INCIDENTS.md INC-08.
+Committed to docs/sessions/c0-review-2.txt BEFORE being printed (CLAUDE.md 6.1).
+The pushed SHA is the commit carrying this file and is stated in the printed
+report, the same convention C0 REVIEW 1 and C1 REVIEW 1 used.
+Ran concurrently with C1's review (a0cc0212) as pair P-02. Disjoint chunk.
+TOKEN SPEND: NONE. ZERO provider model calls; zero lane quota consumed.
+  Network: git clone against this repository (local) and one `pip install .`
+  from PyPI into a throwaway venv, to reproduce the non-editable install
+  B-03's second half needs. Neither is a provider call.
+================================================================================
+
+VERDICT: PASS.  c0-pass IS CUT - THE FIRST TAG THIS PROJECT HAS EVER CUT.
+
+I fixed nothing. I wrote only: docs/reviews/REVIEW_C0_2.md,
+docs/reviews/mutants/c0_mutants.md, tests/test_c0_review_2_probes.py,
+docs/reviews/OPEN_FINDINGS.md (appended), STATUS.md (appended), PROGRESS.md and
+this file. QUESTIONS.md and INCIDENTS.md were NOT touched.
+
+================================================================================
+0. HOW EVERY NUMBER BELOW WAS TAKEN - INC-17 AND INC-11 FIRST
+================================================================================
+INC-17, REPRODUCED INDEPENDENTLY BY ME BEFORE ANY EVIDENCE WAS COLLECTED:
+
+  cd <clone at 864c621>                     # PRE-FIX source on disk
+  python -c "import whetstone_gate; print(whetstone_gate.__file__)"
+  -> C:\Users\chinm\whetstone-gate\src\whetstone_gate\__init__.py   THE LIVE REPO
+
+  PYTHONPATH=<clone>/src python -c "import whetstone_gate; print(...__file__)"
+  -> <clone>\src\whetstone_gate\__init__.py                          the checkout
+  PYTHONPATH=<clone>/src python -c "from whetstone_gate import config;
+                                    print(config.repo_root())"
+  -> <clone>                        and repo_root FOLLOWS it, so the whole run
+                                    is self-consistent with the tree under test
+
+EVERY run below had PYTHONPATH set to the tree under test and PRINTED
+whetstone_gate.__file__. A run that does not state which tree it loaded is not
+evidence, and none of mine is offered without it.
+
+INC-11: every mutant was applied to a FRESH CLONE and COMMITTED, with
+`git status --porcelain` captured (empty on all 14), so no mutant could score a
+kill on tree-dirtiness. A semantics-preserving CONTROL was included.
+
+BASELINES on the live repository, at HEAD 68fcfff:
+  check-roles (python -m)  17 passed, 0 failed, 4 n/a   exit 0
+  check-roles (make shim)  identical - GNU Make 3.82.90, ~/bin/make.exe
+  selftest                 1 failed, 1 passed - RED on the CaMeL branch
+  tasks test  C0's view    215 passed, 1 skipped, 2 deselected
+  tasks test  as a stranger runs it   1 failed, 222 passed, 1 skipped, 2 desel.
+    !! the one red is tests/test_c1_review_probes.py::
+       test_section_0_states_its_own_quoted_line_count_correctly - C1's own
+       probe, over C1's own BLOCKER, landed by P-02 while this review ran.
+       NOT C0's. Both numbers are given rather than the convenient one.
+
+================================================================================
+1. B-01 .. B-04 - ATTEMPT 1's OWN EVIDENCE, RE-RUN, OLD BESIDE NEW
+================================================================================
+
+B-01  E2 AND E3.  CLOSED.
+  Fixture: attempt 1's exact four rows inserted into a FIXTURE COPY of
+  QUESTIONS.md (never the real file; restored and byte-compared after, True).
+                                   OLD 864c621          NEW HEAD
+    rows parsed by _TOKEN_ROW      8 (all 4 present)    22 (all 4 present)
+    E2  chunk BUILD n REVIEW       PASS  clean          FAIL  SHARED on ['C0']
+    E3  token reused across roles  PASS  clean          FAIL  REUSED: cafebabe
+                                                        appears as [('C1',
+                                                        'BUILD'),('C2','FIX')];
+                                                        deadbeef as [('C0',
+                                                        'BUILD'),('C0','REVIEW')]
+  The rows parsed on BOTH sides. The violations were present on BOTH sides.
+  Old said clean; new names the chunk and the pairs.
+
+  AND THE HARDER TEST THE FIX INVITES - is the real table clean for the RIGHT
+  reason, or because a row was dropped?
+    ROWS PRESENT in the ## Session tokens table : 19
+    ROWS PARSED  by _TOKEN_ROW                  : 18
+    ROWS SILENTLY DROPPED                       : 1
+      [DROPPED] | `WG-2026-08-30-CTX-13.4-A` | *(none - ...)* | BUILD | ... |
+    C0 BUILD  -> ['e210c6f5']
+    C0 REVIEW -> ['52f5307b', 'f57e216b']     <- attempt 1's, and mine
+    C0 FIX    -> ['c9521aac']
+    BUILD n REVIEW = []      E2 clean CORRECTLY - the sets are truly disjoint
+    tokens with >1 (chunk,role) pair = []     E3 clean CORRECTLY
+  E2 has real input for the first time and it is clean because the tokens really
+  are different. The one dropped row is the CTX-13.4 token Q-014 (iv) FORBIDS
+  reshaping - the row-side twin of E5_EXCEPTIONS.
+  The drop is SILENT, and that is finding OF-22 below.
+
+B-02  THE MOAT.  CLOSED.
+  All four attack forms from REVIEW_C0 B-02, plus a TWO-HOP form attempt 1 never
+  tested, plus a CLEAN CONTROL, all built under src/whetstone_gate/{gates,scorer}/
+  - Q-004's RULED layout. Every fixture torn down; "leftovers: none" asserted.
+                                                   OLD 864c621   NEW HEAD
+   1 both `from whetstone_gate.shared_predicate import intent_key`
+                                                   FAIL D3       FAIL D3
+   2 both `from whetstone_gate import shared_predicate` (SPIKE DEFECT)
+                                                   PASS  X       FAIL D3
+   3 gates/ does `from .. import scorer`           PASS  X       FAIL D1 AND D3
+   4 each imports its own helper; both helpers import it (ONE hop)
+                                                   PASS  X       FAIL D3
+   5 TWO HOPS: helper -> hop -> deep_predicate     PASS  X       FAIL D3
+                                                                 SHARED:
+                                                 ['whetstone_gate.deep_predicate']
+   6 CLEAN CONTROL - each side its own private copy PASS ok      PASS ok
+  TRANSITIVITY IS TESTED AT TWO HOPS AND HOLDS. Form 6 matters as much: D3 is
+  not hard-wired to fail, so its FAILs mean something.
+
+  MOAT_ALLOW_LIST - a pin over a list that does nothing would be decoration:
+    as shipped = set(), 0 entries
+      allow-list EMPTY                                D3 = FAIL
+      allow-list holding the one shared module         D3 = PASS  <- it really
+                                                                     can blind D3
+      allow-list restored to EMPTY                     D3 = FAIL
+  Q-015 landed as ruled: created empty, pinned empty, with "whetstone_gate" not
+  in it asserted separately - the unruled entry that was B-02's cause.
+
+B-03  THE config/ GROUP.  CLOSED in both reachable forms; one MEDIUM residue.
+  FORM 1 - `git rm config/protocol.yaml`, committed, in a clone:
+                    OLD 864c621                      NEW HEAD
+    F1              PASS "protocol.yaml and          FAIL "...\config\protocol
+                    lanes.yaml parse"  <- naming a   .yaml does not exist.
+                    file it never opened             config/ is a pre-registration
+                                                     artefact (CONTEXT.md S15.0)"
+    F2              PASS 1 explicit TODO_ sentinel   n/a "not evaluated - config/
+                    <- it was 6; five vanished,      did not load; see F1"
+                    including the void threshold
+    F3 / F4         PASS none outstanding / -        n/a / n/a, with reasons
+    summary         14 passed, 0 failed, exit 0      14 passed, 1 failed, 6 n/a,
+                                                     exit 1
+  No silent count drop: the count is not smaller, it is ABSENT, and its absence
+  is reported.
+
+  FORM 2 - a REAL `pip install .` (NON-EDITABLE) into a fresh venv:
+    repo_root() -> ...\nonedit_venv\Lib          config_dir().is_dir() -> False
+                    OLD (attempt 1)                  NEW, measured here
+    check-roles     PASS F1 / PASS F2 / PASS F3      FAIL R1 "the examined root IS
+                    over ZERO config files, exit 0   this repository ... THIS IS
+                                                     NOT THE REPOSITORY",
+                                                     FAIL F1, n/a F2/F3/F4, exit 1
+    tasks test      green                            exit 1 (ConfigFileMissing)
+    check-prereg    config/ holds 0 file(s), exit 0  UNCHANGED - exit 0  !!
+    tasks eval      -                                exit 0, carrying it  !!
+  THE BLOCKER IS CLOSED: the false statement - the word PASS beside "protocol.yaml
+  and lanes.yaml parse" over a file never opened - is gone in BOTH forms, and R1
+  fails rather than reporting green over the wrong directory.
+  THE RESIDUE is check-prereg and eval. See section 4 for my decision.
+
+B-04  THE PRE-SPEND GATE.  CLOSED.
+                                       OLD 864c621        NEW HEAD
+    as shipped                         1 failed 1 passed  1 failed 1 passed
+    camel_comparator: block deleted    2 passed  GREEN X  1 failed 1 passed  RED
+                                                          MissingRequiredValue:
+                                                          'camel_comparator.branch'
+                                                          is missing
+    config/lanes.yaml deleted entirely 1 failed 1 passed  2 failed
+                                       <- the OPERATOR    "CONFIG REFUSAL - the
+                                       gate PASSED over   pre-spend gate cannot
+                                       a file that was    even READ config/, so it
+                                       not there  X       certainly cannot certify
+                                                          that no placeholder
+                                                          remains"
+  RED FOR THE RIGHT REASON IN THE REAL TREE:
+    UndeterminedValue: lanes.yaml: 'camel_comparator.branch' is not determined
+    yet (sentinel 'TODO_C13_RUN1'). Resolved by: C13 / RUN-1 ...
+  That is the CaMeL branch, through require(), exactly as Q-009 says until RUN-1.
+  A green selftest here would have been a FAIL. It is not green.
+
+================================================================================
+2. THE RULING-DRIVEN CHANGES - RULED, OR MERELY LANDED?  ALL: RULED.
+================================================================================
+Q-014 (i)  A NEW MALFORMED TRAILER MUST FAIL.  AS RULED - tested END TO END, not
+  at unit level. A real commit carrying `Session-Token: WG-2026-09-01-NOT-EIGHT-HEX`:
+    [FAIL] E5 malformed Session-Token trailer
+           MALFORMED and NOT on the dated exception list: 4098e2a carries
+           'WG-2026-09-01-NOT-EIGHT-HEX'. ... exactly 4 SHAs ...
+    [ n/a] E4 ... 16 commit(s) carry no trailer   <- and the malformed one is NOT
+                                                     in it. E4's list did not grow.
+  check-roles exit 1.
+Q-014 (ii)  _TOKEN_TRAILER STAYS STRICT 8-HEX.  AS RULED. Pattern unchanged and
+  pinned by attempt 1's probe. Fired at six inputs: f57e216b yes, F57E216B yes,
+  f57e216 no, f57e216bc no, g57e216b no, WG-2026-08-30-CTX-13.4-A no.
+Q-014 (iii)  _TOKEN_ROW WIDENS TO (C\d+|ARCH) AND NOTHING WIDER.  AS RULED.
+    | `e210c6f5` | C0 | BUILD | ... |                        parses
+    | `0811c64a` | ARCH | BUILD | ... |                      parses  (Q-021's case)
+    | `WG-2026-08-30-CTX-13.4-A` | ARCH | BUILD | ... |      DOES NOT parse
+    | `not-hex-token` | ARCH | REVIEW | ... |                DOES NOT parse
+    | `deadbeef` | ARCHITECT | BUILD | ... |                 DOES NOT parse
+  A NON-HEX TOKEN IN AN ARCH ROW IS STILL UNPARSEABLE. The token group was not
+  touched, so a forged token cannot hide behind the widened chunk cell.
+Q-014 (iv)  THE EXCEPTION LIST PINNED AT EXACTLY FOUR.  AS RULED, AND THE PIN
+  FIRES - not read, MUTATED: M27 adds a fifth entry and is KILLED by
+  test_the_e5_exception_list_is_exactly_the_four_ctx_13_4_commits. M26 makes E5
+  except everything and is KILLED.
+Q-015  ALLOW-LIST CREATED EMPTY, ADDING TO IT CLASS A.  AS RULED. See B-02.
+Q-012's RIDER  A TEST PINS A4's BINARY-HONESTY SENTENCE.  AS RULED.
+  test_a4_still_says_it_asserts_nothing_on_binary_files asserts, on a PASSING A4,
+  that it still says "1 binary file(s) this holds BY CONSTRUCTION", "asserts
+  nothing", "cannot fail on", AND "a real assertion on the 2 text file(s) only" -
+  i.e. the size of the set A4 really covers, not the size of the set it walked.
+
+A5's TWO BRANCHES - both real, both fired, and both gaps confirmed:
+                                        git w/    OLD 864c621     NEW HEAD
+  TEXT file carrying 0x08 (INC-13)      lf        A3 PASS A4 PASS A3 PASS A4 PASS
+                                                  (no A5)         A5 FAIL
+                                                                  "0x08 at offset 14"
+  OF-01's lone CR, printf 'line one\r   -text     A3 PASS A4 PASS A3 PASS A4 PASS
+  line two\nline three\n'                                         A5 FAIL "hold NO
+                                                                  NUL byte"
+  the two dashboard PNGs                -text     -               branch B PASSES
+                                                                  BOTH (NUL in IHDR)
+  A3 AND A4 BOTH PASS IN BOTH FIRING CASES. That gap is precisely why A5 exists,
+  and it is why one branch would not have done: the two holes sit on OPPOSITE
+  sides of git's own verdict. M24 (branch T off) and M25 (branch B off) both KILLED.
+
+THE GAP THE FIX DECLARES - VERIFIED, NOT TAKEN ON TRUST, AND JUDGED:
+  fixture b"A sentence that has\x00 eaten something, and nothing here can see it."
+  git ls-files --eol (w/ side) = '-text'
+  A3 = PASS      A4 = PASS      A5 = PASS
+  THE CLAIM IS TRUE. A prose document with an eaten sentence goes green through
+  all three A checks.
+  IS PRINTING IT SUFFICIENT? Partly. Printing the limit is right and well done -
+  it is in A5's own output where a reader cannot skip it, and a test pins the
+  sentence. But A5's STATED REASON - "closing that needs a judgement about which
+  paths are prose, which is a second copy of a decision this check deliberately
+  takes from git" - DOES NOT SURVIVE. The set of tracked files git calls binary
+  is today EXACTLY TWO dashboard PNGs. Pinning that set closes the gap with NO
+  judgement about prose and NO second copy of git's heuristic: the verdict still
+  comes from git ls-files --eol, compared against an explicit list. It is the
+  same instrument the project already uses three times - TRIPWIRE_SELF_EXCLUSION
+  at 1, NULL_IS_A_VALUE at 2, E5_EXCEPTIONS at 4. That is finding OF-24, and I
+  added it as a kept probe.
+
+================================================================================
+3. THE MEDIUMS
+================================================================================
+OF-03  A2..A5 EMITTED AS n/a.  VERIFIED CLOSED.
+  .gitattributes deleted: OLD emitted "FAIL A1 .gitattributes exists" AND NOTHING
+  ELSE from the A group. NEW emits "FAIL A1 .gitattributes content" plus A2, A3,
+  A4 AND A5 each as n/a with the reason.
+  AND INC-07's OTHER HALF is confirmed real in those same two cells: A1's check
+  NAME differed between the failing branch and the passing one, so a caller's
+  lookup raised KeyError. It keeps ONE name now.
+OF-06  BLANK VALUES.  VERIFIED CLOSED, AND tpd: null IS NOT BROKEN.
+  void_threshold_breach_rate: left blank -
+    OLD  require() RETURNED None, no refusal; F2 PASS over 5 sentinels, the void
+         threshold simply gone from the count
+    NEW  require() raises BlankValue; F2 FAILS; the blank is reported SEPARATELY
+         from the declared sentinels, under BLANK_ not TODO_
+  blank_marker(0)=None, (False)=None, ([])=None - supplied values still pass.
+  NULL_IS_A_VALUE = [('lanes','reserved_from'), ('lanes','tpd')], exactly 2.
+  NO BLANK_ marker in the shipped config.  F2's COUNT IS STILL 6.  M29 KILLED.
+OF-10  ONE GROUP'S EXCEPTION CANNOT SILENCE ANOTHER.  VERIFIED CLOSED.
+  non-UTF-8 byte in .gitattributes -
+    OLD  a bare UnicodeDecodeError traceback, ZERO check output, secret scan
+         SILENCED, exit 1
+    NEW  FAIL "A! this check GROUP raised and did not run - UnicodeDecodeError
+         ... raised at check_roles.py:<line>", and B1, B2, B3, C1 ALL STILL PRINT,
+         as do D, E and F
+  Confirmed a second time in the wild: under the non-editable install B/C and E
+  both raised and were EACH NAMED, while R, A, D and F all still ran.
+OF-01 CLOSED (A5 branch B). OF-02 CLOSED (section 5). OF-04 CLOSED (Q-014 (i)).
+OF-11 half verified closed: the ast.parse walk sees every alias, and
+  test_the_walk_sees_import_forms_a_single_capture_group_missed is one of the
+  five tests that kill M15. importlib.import_module stays open, as the row says.
+GROUP 6 - the S8.6 -> registry direction CAN FAIL, fired rather than read:
+  inserting "| a constant nobody transcribed [ADDED 31 Aug] | 4242 | S13.4 |" into
+  a clone's S8.6 table gives
+    AssertionError: CONTEXT.md S8.6 carries constants the tripwire's registry has
+    never heard of ... ['a constant nobody transcribed']
+  And the tripwire fires END TO END, not only in unit fixtures: a file under src/
+  carrying PER_ACTION_CAP_PAISE = 5000000 and BALANCE = 500000000, committed,
+  makes test_no_spec_value_is_hardcoded_in_implementation_source fail with
+  "hard rule 9 violation - a CONTEXT.md S8.6 constant is hardcoded in
+  implementation source".
+
+================================================================================
+4. MY OF-09 DECISION, WITH ITS REASONING - THE ONE THE PROMPT ASKS FOR
+================================================================================
+DECISION: MEDIUM, NOT A BLOCKER. OF-09 STAYS OPEN AND NOW CARRIES A DEADLINE.
+
+WHAT IS CLOSED, MEASURED: under a real non-editable install, check-roles prints
+ROOT EXAMINED and CONFIG DIR top and bottom, R1 FAILS naming the directory and
+the cause, F1 FAILS, check-roles exits 1 and tasks test exits 1. THE THING THAT
+FOOLED ATTEMPT 1's REVIEWER - a GREEN report over the wrong directory - CANNOT
+HAPPEN IN EITHER TARGET.
+
+WHAT IS NOT CLOSED, MEASURED: check-prereg still prints "config/ holds 0 file(s):"
+and exits 0, naming no root; tasks eval carries it and exits 0. tasks.py was
+outside the FIX session's fence, and the fix SAID SO rather than rounding up.
+
+WHY MEDIUM AND NOT BLOCKER - four reasons, the fourth decides it:
+ 1 ATTEMPT 1's OWN GRADING. B-03's headline was the F group's FALSE STATEMENT -
+   the word PASS beside "protocol.yaml and lanes.yaml parse" over a file never
+   opened. That is gone. The check-prereg sentence appears in B-03's body WITH AN
+   EXPLICIT CROSS-REFERENCE, "See also F-12" - and attempt 1 graded F-12 MEDIUM,
+   where it became OF-09. I am applying the predecessor review's own severity to
+   its own residue, not inventing a lower one.
+ 2 NO PRINTED STATEMENT IS FALSE. check-prereg says, in its own words, "This is
+   not a PASS; it is 'not yet'." Its exit 0 is ALSO its correct pre-freeze value
+   in the real repository, so the exit code carries no PASS claim either way
+   today. What is wrong is the ATTRIBUTION - it blames C14 for an absence caused
+   by the wrong root. That is E4's old sin, which attempt 1 also ranked MEDIUM.
+ 3 THE REMEDY EXISTS AND IS PROVEN TO FIRE. check_examined_root is built, is red
+   on exactly this condition, and mutant M31 (R1 can no longer fail) is KILLED.
+   What is missing is CALLING IT FROM THREE MORE ENTRY POINTS - a wiring gap of a
+   few lines, not an absent capability. That is a materially different object
+   from a check that cannot go red, which is what all four of attempt 1's
+   BLOCKERs were.
+ 4 HARD RULE 9's CLAUSE IS NOT YET IN FORCE. The rule is that check-prereg
+   "recomputes them" - the SHA-256 of every config/ file's git blob against
+   PROTOCOL.md. PROTOCOL.md DOES NOT EXIST, prereg-v1 DOES NOT EXIST, and C14
+   writes both. There is nothing to recompute, so nothing is yet being silently
+   skipped.
+
+THE DEADLINE, WRITTEN DOWN NOW SO IT IS NOT REDISCOVERED ON A RUN DAY:
+  THE MOMENT PROTOCOL.md EXISTS, check-prereg EXITING 0 OVER THE WRONG ROOT IS A
+  PRE-REGISTRATION VERIFICATION THAT SILENTLY DID NOT HAPPEN - hard rule 9's
+  actual clause, FAILING OPEN, INSIDE make eval, whose entire published claim is
+  that every number regenerates. OF-09 MUST CLOSE BEFORE C14 IS REVIEWED. That
+  sentence is in OF-09's row.
+
+================================================================================
+5. MUTATION TESTING - 13 REAL MUTANTS, 13 KILLED, CONTROL SURVIVED
+================================================================================
+Source PINNED at 68fcfff. Baseline 171 passed, 1 skipped, 2 deselected;
+check-roles rc=0. Command:
+  pytest -q -m "not operator_gate"
+    --ignore=tests/test_c3_tau2_enumeration.py   (needs the un-vendored tau2 tree;
+                                                  20 constant BASELINE failures)
+    --ignore=tests/test_c1_review_probes.py      (one test red in the BASELINE;
+                                                  C1's chunk, not C0's)
+  python -m whetstone_gate.tasks check-roles
+Both exclusions are stated, not quietly dropped. With them the baseline is FULLY
+GREEN, so every failure below is attributable to the mutation and nothing else.
+
+whetstone_gate.__file__ was ...\scratchpad\mut\<ID>\src\whetstone_gate\__init__.py
+- THE MUTANT'S OWN CLONE - on ALL FOURTEEN runs. `tree clean` = yes on all 14.
+
+ ID    FILE            MUTATION                              PYTEST     VERDICT
+ M15   check_roles.py  D3 hard-wired to shared = set()       5 failed   KILLED
+                       (attempt 1's DELIBERATE SURVIVOR)     166 passed
+       killed by: all four test_d3_fires_on_every_one_of_b02s_four_attack_forms
+                  + test_the_walk_sees_import_forms_a_single_capture_group_missed
+ M21   check_roles.py  the walk stops after ONE hop          1 failed   KILLED
+       killed by: ...four_attack_forms[4 - ONE HOP]
+ M22   check_roles.py  relative imports not resolved         1 failed   KILLED
+       killed by: ...four_attack_forms[3 - a RELATIVE import crossing the moat]
+ M23   check_roles.py  `from whetstone_gate import X` not    1 failed   KILLED
+                       resolved to whetstone_gate.X
+ M32   check_roles.py  package root back in MOAT_ALLOW_LIST  1 failed   KILLED
+       killed by: test_the_moat_allow_list_is_empty
+ M24   check_roles.py  A5 branch T disabled                  9 failed   KILLED
+       killed by: test_a5_branch_T_covers_the_control_range_and_spares_tab_and_lf
+ M25   check_roles.py  A5 branch B disabled                  1 failed   KILLED
+       killed by: test_a5_branch_B_fires_on_the_OF01_reproduction
+ M26   check_roles.py  E5 excepts every malformed trailer    1 failed   KILLED
+ M27   check_roles.py  a FIFTH entry in E5_EXCEPTIONS        1 failed   KILLED
+       killed by: test_the_e5_exception_list_is_exactly_the_four_ctx_13_4_commits
+ M28   check_roles.py  B-01's ORIGINAL DEFECT restored -     3 failed   KILLED
+                       issued[token] keeps only the LAST     168 passed
+       killed by: test_e2_fires..., test_e3_fires..., and
+                  test_the_issued_parse_keeps_every_row_not_only_the_last
+ M29   config.py       loader stops refusing a YAML null     3 failed   KILLED
+ M30   config.py       B-03's cause: sweep skips a REQUIRED  2 failed   KILLED
+                       config it cannot open
+ M31   check_roles.py  R1 can no longer fail                 1 failed   KILLED
+       killed by: test_check_roles_FAILS_rather_than_passing_vacuously_on_a_
+                  non_repository
+ CTRL  config.py       CONTROL - startswith -> equivalent    171 passed SURVIVED
+                       slice. SEMANTICS-PRESERVING.          rc=0       - CORRECT
+
+ 13 real mutants, 13 killed. THE CONTROL SURVIVED, SO THE RUN IS NOT VOID.
+ Every kill is by a test that NAMES THE DEFECT, not by a coincidence.
+
+WHAT IS NOT CLAIMED: attempt 1's other 18 mutants were NOT re-run one for one.
+Several no longer apply - the code they mutated has been rewritten. NO COMBINED
+MUTATION SCORE ACROSS BOTH RUNS IS ASSERTED, because the two runs are over
+different code and adding them would be arithmetic with no meaning.
+
+ONE FIX-SESSION CLAIM CHECKED DIRECTLY INSTEAD, because INC-17 is exactly the
+trap that would have made it look false:
+  cd <clone at 864c621>; cp <HEAD>:tests/test_c0_fix_probes.py tests/
+  PYTHONPATH=<clone>/src python -c "import whetstone_gate; print(...__file__)"
+    -> <clone>\src\whetstone_gate\__init__.py      the PRE-FIX tree
+  PYTHONPATH=<clone>/src python -m pytest -q tests/test_c0_fix_probes.py
+    -> 49 failed, 6 passed
+  The fix claimed "52 probes, 46 fail against 864c621, 6 pass by design".
+  Measured today: 55 probes, 49 fail, 6 pass - the three extra failures are the
+  S8.6-registry probes the ARCH session later added to the same file.
+  THE CLAIM RECONCILES EXACTLY, verified the one way that could have shown it false.
+
+TWO TRAPS I FELL INTO MYSELF, RECORDED BECAUSE A CLEAN TRANSCRIPT WOULD HIDE BOTH:
+ 1 The harness first wrote mutants with Path.write_text, which translates \n to
+   \r\n on Windows. EVERY MUTANT ALSO BECAME A CRLF DEFECT and was killed through
+   A3/A4 rather than through its own semantics. The tell was
+   test_the_object_store_and_the_working_tree_agree failing on mutants touching
+   no line-ending code, and check-roles exiting 1 on every row. Same family as
+   INC-06, INC-09, INC-16. Fixed: the harness writes BYTES and asserts no CRLF.
+ 2 The first pinned run cloned the LIVE repository, which P-02 was committing to.
+   The baseline moved mid-run, a newly-landed C1 probe went red in the baseline,
+   and THE CONTROL MUTANT WAS SCORED KILLED BY IT. Per the prompt's own rule - a
+   run whose control is killed is VOID - THAT ENTIRE PASS WAS DISCARDED, the
+   source was pinned, and all fourteen were re-run.
+ Neither is an INCIDENTS.md entry: nothing in the repository broke, and that file
+ is not this session's.
+
+================================================================================
+6. FINDINGS
+================================================================================
+BLOCKER: NONE.
+
+OF-22  MEDIUM  A PRESENT-BUT-MALFORMED ROW OF ## Session tokens IS TREATED AS
+  ABSENT, AND E PRINTS NO ROW DENOMINATOR. Q-014 (i) settled this question for
+  the COMMIT side of E's input and built E5; the TABLE side never received it.
+  Measured on HEAD, the B-01 violation with one cell the regex cannot read:
+    | `deadbeef` | C0 | REVIEW    | ...   (control)      E2 FAIL  E3 FAIL  caught
+    | `deadbeef` | C0 | review    | ...   lower case     E2 PASS  E3 PASS  MISSED
+    | `deadbeef` | C0 | RE-REVIEW | ...                  E2 PASS  E3 PASS  MISSED
+    | `deadbeef` | C0 (re-review) | REVIEW | ...         E2 PASS  E3 PASS  MISSED
+    | `deadbeef0` | C0 | REVIEW   | ...   9 hex          E2 PASS  E3 PASS  MISSED
+  role.upper() is applied AFTER a match on (BUILD|REVIEW|FIX), so it is dead code:
+  the intent to be case-insensitive is in the source and the regex does not
+  implement it. E1 prints "18 issued row(s) ... parsed" and NEVER prints how many
+  rows the table holds; A3, A4 and A5 each reconcile their denominator out loud.
+  MEDIUM NOT BLOCKER, AND THE MITIGATION IS MEASURED: the common shape FAILS
+  CLOSED through E1 - a token recorded ONLY in a malformed row and then used on a
+  commit gives "FAIL E1 FORGED/UNISSUED: {'beefcafe': ['9a98e65']}". The open case
+  needs a token recorded once well-formed AND once malformed under a second role.
+  REMEDY is E5's, one level up.
+
+OF-23  MEDIUM  _issued_tokens PARSES ALL OF QUESTIONS.md, NOT THE TABLE, SO A ROW
+  QUOTED IN PROSE BECOMES AN ISSUED TOKEN. Measured: appending
+  "| `facefeed` | C7 | REVIEW | 2026-09-01 |" far outside the table gives
+  "facefeed is treated as ISSUED: True -> {('C7','REVIEW')}". That is a
+  FALSE-NEGATIVE PATH FOR E1 - the one clause of S7a attempt 1 found working: a
+  token never issued becomes issued by being WRITTEN ABOUT. NOT HYPOTHETICAL:
+  Q-021's body carries such a line TODAY and is invisible to the parser ONLY
+  because it happens to be indented by two spaces. INC-16 is this project's own
+  record that a habit is not a guardrail. REMEDY: scope the parse to the section.
+
+OF-24  MEDIUM  A5's DECLARED NUL-IN-PROSE GAP IS REAL - VERIFIED - AND THE REASON
+  GIVEN FOR NOT CLOSING IT DOES NOT SURVIVE. Full evidence in section 2. It
+  silences ALL THREE A checks at once, on a document, in a project with FIVE
+  recorded occurrences of a byte eaten on the way to disk (INC-06, INC-10, INC-12,
+  INC-13, INC-16), and it IS INC-10's Missing field. Printing the limit was right
+  and is well done; the objection is only to the stated reason for stopping there.
+
+OF-25  LOW  test_every_target_prints_the_root_it_examined EXERCISES EXACTLY ONE
+  TARGET. It calls check_roles.run() and asserts on that output alone; it never
+  touches check-prereg, test or eval - THE THREE TARGETS OF-09 SAYS ARE STILL OPEN.
+  In a chunk whose entire failure mode is checks that claim more than they check,
+  a TEST NAME that does so is worth a line. It also actively obscures OF-09: the
+  row honestly says the finding stays open, but a later reader greps the suite,
+  finds a green test called "every target", and concludes otherwise.
+
+INFO I-01  make test NO LONGER RUNS GREEN FROM A CLEAN CLONE - AND IT IS NOT C0's.
+  8 failures + 12 collection errors, ALL inside tests/test_c3_tau2_enumeration.py,
+  which needs vendor/tau2-bench - git-ignored under Q-010 and absent from any
+  clone. C0's done-when box says make test runs green from a clean clone and today
+  it does not. THE BREAKAGE IS C3's: attempt 1 verified nothing in tests/ imported
+  the vendored tree, and C3's tests now do. IT IS EXACTLY WHAT ATTEMPT 1 PREDICTED
+  when it raised Q-010's unruled Class A default as F-11 -> OF-08: "it moves a
+  whole dependency out of the artefact a judge clones ... It needs a ruling before
+  C19's clean-clone test." THAT RULING IS NOW OVERDUE AND ITS COST IS MEASURABLE.
+INFO I-02  ONE TEST IS RED IN THE LIVE SUITE AND IT IS C1's - see section 0.
+INFO I-03  NO FROZEN ARTEFACT EXISTS. git tag returns NOTHING: no probe-v1, no
+  prereg-v1, no cN-pass. INVARIANTS.md, PROTOCOL.md and HOLES.md do not exist.
+  PROVENANCE.md, RAZORPAY_SEMANTICS.md and config/ exist but are NOT YET FROZEN,
+  because freezing is what a tag does. So "no reported figure contradicts a frozen
+  artefact" is VACUOUSLY SATISFIED - said rather than skipped, and it stops being
+  vacuous at C14.
+
+SECRETS AND SPEND. My own scan of 72 tracked files against the 8 SECRET_PATTERNS
+shapes plus "Authorization: Bearer ..." and api_key="..." -> 0 HITS. No .env in
+the working tree, none tracked; .env.example carries bare names. No key value
+appears in this report, in the review, in the mutants table or in the probe file.
+evals/ still does not exist. ZERO provider model calls.
+
+PERSONA 2's FOUR ADDITIONS: the scorer imports no model client - scorer/ does not
+exist yet (C8's assertion); what C0 owes is the mechanism, and D1/D2/D3 correctly
+report n/a with the reason rather than PASS. The gate and the scorer share no
+first-party module - YES, AND IT NOW WORKS: six fixtures, five hostile, one clean.
+Runner day-boundary resume - C11's, out of range. No API key in any log,
+transcript, report or committed file - verified above.
+
+================================================================================
+7. KEPT PROBES ADDED - 5, ALL PASSING, EACH DEMONSTRATED RED
+================================================================================
+tests/test_c0_review_2_probes.py. A probe DETECTS; only a fix CLOSES, and
+check-roles - not make test - is what C0's done-when names.
+  test_every_row_of_the_session_tokens_table_parses_except_the_one_named_exception
+  test_the_issued_token_table_is_read_from_the_whole_file_not_from_the_table
+  test_no_tracked_file_is_binary_outside_the_named_screenshot_set
+  test_the_binary_set_pin_catches_what_A5_branch_B_lets_through  [2 params]
+DEMONSTRATED RED, not asserted: in a clone with a lone-CR file and an unparseable
+token row committed, 2 failed 3 passed; on the clean clone, 5 passed.
+
+================================================================================
+8. SUITE COUNTS, TAG, AND WHAT IS OWED
+================================================================================
+  check-roles          17 passed, 0 failed, 4 n/a, exit 0   (make and python -m)
+  selftest             1 failed, 1 passed - RED, correctly, on the CaMeL branch
+  tasks test  C0 view  215 passed, 1 skipped, 2 deselected
+  tasks test  stranger 1 failed, 222 passed, 1 skipped, 2 deselected  (the red is
+                       C1's own probe over C1's BLOCKER - see I-02)
+  clean clone          NOT GREEN - 8 failed, 12 errors, all C3's file - see I-01
+
+TAG: c0-pass IS CUT, on this session's commit. It is the FIRST TAG THIS PROJECT
+HAS EVER CUT. PROCESS.md S11's precondition is met: ARCHITECT_CHECK_1.md exists
+and predates this review, which ARCHITECT_CHECK_0 records as having been missed
+at attempt 1.
+
+OWED - QUESTIONS.md AND INCIDENTS.md ARE NOT THIS SESSION'S FILES:
+ (1) NO QUESTION IS OWED. Nothing in the card, the spec or the logs contradicted
+     anything I needed. Rule 1 was not triggered.
+ (2) NO INCIDENTS ENTRY IS OWED. The two method failures in section 5 are MINE,
+     in a throwaway harness, and nothing in the repository broke. They are
+     recorded in docs/reviews/mutants/c0_mutants.md and in PROGRESS.md, in full,
+     rather than omitted because no file demanded them.
+ (3) FOR THE ARCHITECT, NOT OWED BY ME BUT FLAGGED: OF-08 / Q-010 is an UNRULED
+     CLASS A DEVIATION and it is now COSTING SOMETHING MEASURABLE - make test no
+     longer runs green from a clean clone (I-01). Attempt 1 said it needed a
+     ruling before C19. It is overdue.
+ (4) OF-09 CARRIES A DEADLINE I HAVE WRITTEN INTO ITS ROW: it must close BEFORE
+     C14 IS REVIEWED. Section 4 gives the reasoning.
+
+A FAIL THAT IS NOT IN THE REPO DID NOT HAPPEN - AND NEITHER DOES A PASS. Every
+number above is in docs/reviews/REVIEW_C0_2.md and
+docs/reviews/mutants/c0_mutants.md, with the tree it was measured on named.
+================================================================================
