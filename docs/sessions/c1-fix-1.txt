@@ -1,0 +1,676 @@
+================================================================================
+C1 -- FIX SESSION -- attempt 1 -- SESSION-TOKEN 365deaf7 -- 2026-08-31
+FINAL OUTPUT. Committed to docs/sessions/c1-fix-1.txt BEFORE being printed.
+================================================================================
+
+PUSHED SHA: <recorded by the immediately following commit, which is this session's
+             head; see "GIT" below. This file is committed before it is printed,
+             so it cannot contain its own hash, and a guessed one would be the
+             exact defect hard rule 13's Fix-with-SHA field exists to detect.>
+
+VERDICT OF THIS SESSION: the BLOCKER is closed, both specification corrections
+landed, TASK 6 is DONE IN FULL, and ONE ITEM IS A DECLARED STOP (Q-029, Class A,
+OPEN) that must be ruled before prereg-v1. No tag cut. Do not self-certify: a
+fresh adversarial review follows.
+
+TOKEN SPEND: ZERO provider model calls. ZERO HTTP requests of any kind -- not even
+the permitted documentation GETs. Every quote relied on was already committed and
+was re-fetched and confirmed byte-identical by C1's reviewer on 2026-08-31.
+
+--------------------------------------------------------------------------------
+1. THE THREE INCIDENTS ENTRIES -- WRITTEN FIRST, IN COMMIT 2bd1d35, WHICH TOUCHES
+   INCIDENTS.md AND NOTHING ELSE
+--------------------------------------------------------------------------------
+
+INC-18 -- three artefacts said two constants "live in config/", nothing did, and
+          the ruling that named the problem was obtained by the session that then
+          reproduced it one level down.
+          Fix SHA: 3d864d4 (config/ + S8.6 + registry, as CONTEXT.md v1.5)
+                   62c4f89 (the three artefacts made true)
+          Missed: (1) C1 escalated THREE times in that session -- Q-016, Q-017,
+          Q-018, all declared OWED in QUESTIONS.md format -- so the route was open,
+          demonstrated and adjacent; a FOURTH was not written. C2 BUILD did exactly
+          this for the probe note and it became Q-022. (2) S8.6's own warning
+          paragraph, inside C1's read order, already said the table had been found
+          incomplete three times and that "THE THIRD OCCURRENCE IS WHERE A PATTERN
+          STOPS BEING BAD LUCK". C1 read a warning about this exact failure while
+          producing the fourth instance of it.
+          BLOCKER, not typo: through Q-018 -- THE RULING C1 ITSELF OBTAINED --
+          RS-18 and RS-19 are both MUST-FIRE, so C4's done-when became
+          UNSATISFIABLE. Firing "Amount that can be settled for the day is
+          exhausted" needs a daily limit; "No more attempts left for today" needs
+          an attempt count. Q-018 was raised to give C4 a satisfiable denominator,
+          and this is that same problem one level down.
+          FOURTH OCCURRENCE OF THE CLASS, AND EVERY ONE OF THE FOUR WAS FOUND BY
+          SOMEBODY TRIPPING OVER A MISSING CONSTANT -- NEVER BY A CHECK. The one
+          new thing is the finder: six rows 30 Aug (architect auditing), eight
+          31 Aug (architect auditing), the probe note (C2 BUILD, mid-build), and
+          this -- THE FIRST OF THE FOUR FOUND BY A REVIEW. The gate caught it
+          instead of the accident, which is the only reason it cost a fix session
+          rather than a wrong number.
+          Diagnosis: three artefacts described the remedy in the present tense --
+          "lives in config/" -- and no mechanism in this repository ever resolves
+          such a sentence to a key, so the assertion and the absence were both
+          invisible: the tripwire's three consistency directions all start from a
+          row that exists in at least one of S8.6, config/ or the registry, and a
+          constant named only in prose is in none of the three.
+          Systemic guardrail: PARTIAL, and the honest half first. What now works:
+          the values are inside the frozen set before prereg-v1, so C14's
+          three-way check covers them, and tests/test_c1_fix_probes.py asserts
+          each key resolves and appears in all three places. WHAT IS NOT
+          PREVENTED, and it is the thing that actually failed: NOTHING READS A
+          PROSE CLAIM. A fourth artefact writing "lives in config/" about a key
+          that does not exist is still invisible to every check this repository
+          owns. test_every_config_pointer_in_the_oracle_resolves_to_a_real_key
+          closes it for the TWO files this fix touches, by parsing their pointers
+          and resolving each -- the first mechanical check of this class in the
+          project, and it covers two files, not the repository.
+
+INC-19 -- a review harness wrote a tracked file through a WINDOWS SHELL REDIRECT,
+          and the INC-06 class reached its SEVENTH occurrence by a route no prior
+          entry and no prompt had named.
+          Fix SHA: 6db060f -- the review's own commit.
+          This is the entry REVIEW_C2_1.md S10 declared OWED and could not write
+          itself. Phase 1's commit d1634d2 wrote c2_reimpl_expected.json through a
+          shell redirect; CRLF in the working tree against LF in the object store
+          turned TWO invariants red -- check-roles A3 and
+          test_the_object_store_and_the_working_tree_agree, WHICH IS INC-11'S OWN
+          TEST -- before the mutation baseline was taken. A baseline from that tree
+          would have been VOID for a reason having nothing to do with C2, every
+          mutant scoring "killed" by a red that was already red, which is INC-11
+          reproduced exactly. No expected value moved.
+          Missing: nothing in the CHECKS -- both fired, correctly, one commit
+          later. What was missing is in the INSTRUCTIONS: INC-06, INC-10, INC-12,
+          INC-13, INC-16 and every prompt since name HEREDOCS and PYTHON SCRIPTS
+          BY NAME. NOT ONE NAMES A SHELL REDIRECT. The prohibition was written as
+          a list of two tools rather than as a property of any write path through
+          a translating layer, so a third tool with that property read as
+          permitted.
+          Missed: the generalisation was available and had been paid for five
+          times -- INC-16's own Diagnosis states the PROPERTY rather than the tool,
+          and its Systemic guardrail says outright that "the honest remedy remains
+          a habit, and this entry is the fifth piece of evidence that the habit is
+          unreliable". And PROVENANCE.md S3.1 records core.autocrlf=true verified
+          first-hand, system-wide, on this machine -- the fact that makes every
+          redirect on this host a translating write.
+          Systemic guardrail: NONE NEW -- ACCEPTED, BECAUSE THE GUARDRAIL WORKED.
+          .gitattributes plus A3/A4 caught it ONE COMMIT LATER AND BEFORE THE
+          BASELINE. The only honest change is to the WORDING of the prohibition,
+          from "not heredocs, not python scripts" to "nothing that is not your
+          editor tool, and a shell redirect is one of those things".
+
+INC-20 -- a ruling swapped one unfirable predicate for another, and the error
+          string that makes the replacement unfirable is quoted INSIDE the ruling.
+          Fix SHA: 3d864d4 (CONTEXT.md v1.5, S9.2).
+          IT IS THE ARCHITECT'S, NOT C1'S, AND THE ENTRY SAYS SO: C1 raised Q-017,
+          FLAGGED IT AS THE OPERATOR'S TO RULE, recorded BOTH mechanisms and
+          DECIDED NEITHER -- which PROVENANCE.md S2.4 records as deliberate,
+          because deciding it would change an invariant's meaning and hard rule 2
+          reserves that for the architect. The chunk did its job. The ruling did
+          not.
+          Missed: THE RULING QUOTES THE VERY ERROR STRING THAT INVALIDATES IT.
+          Q-017's recorded text carries RS-27's 400 and its full description --
+          "has already been used for an earlier refund ON THE SAME PAYMENT" -- as
+          the EVIDENCE that receipt is a real idempotency key, and CONTEXT.md S9.2
+          reproduces it verbatim three lines above the word "executed". A second
+          signal sat one column away: PROVENANCE.md S2.4's A3 row already draws the
+          conclusion in the right direction -- "an attacker simply omits it, or
+          varies it" -- which is a statement about what happens WHEN THE GUARD IS
+          ENFORCED.
+          Diagnosis: the ruling tested the replacement predicate for REACHABILITY
+          BY THE TOOL -- receipt is one of create_refund's five real parameters and
+          refunds.go:66 forwards it, which is true and was verified twice at source
+          -- and never for SURVIVAL AGAINST RAZORPAY'S OWN GUARD ON THAT SAME
+          PARAMETER; the two questions have different answers, and only the first
+          was asked because the header's failure had been a failure of the first
+          kind.
+          Missing: any check that asks "can this invariant FIRE in the world we are
+          about to build?" The project has MUST-FIRE labels for Razorpay's ERRORS
+          and a C4 done-when enforcing them, and NOTHING EQUIVALENT FOR ITS OWN
+          INVARIANTS. Had one existed it would have fired on the header definition
+          AND on the receipt-on-execution definition, both times before a session
+          read the ruling.
+          Systemic guardrail: PARTIAL. test_s2_is_defined_on_issue_not_on_execution
+          fails if S2 returns to "executed", and fails independently if S9.2 stops
+          carrying RS-27's rejection beside it, so the two halves cannot drift
+          apart. NOT PREVENTED: there is still NO FIRABILITY CHECK over S9's
+          invariant set. The right guardrail is C4's -- one row per invariant in
+          the self-test's output, FIRES or CANNOT-FIRE-BECAUSE, printed as a number
+          the way rule 11 requires of the RECORDED set -- and it is NAMED AS OWED
+          rather than built, because PROCESS.md S12.1's C4 row is outside this
+          fence.
+          Cost: caught BEFORE C4 built the world and BEFORE C8 scored it, which is
+          the only reason it costs one sentence of specification and NO NUMBER.
+
+INC-21 -- ⚠ ADDED, NOT ASKED FOR, AND IT IS THIS SESSION'S OWN. The EIGHTH
+          occurrence of INC-06's class. Writing OF-19's five pointers, this session
+          reached for a PYTHON SCRIPT -- which its own prompt forbids in capitals,
+          and which INC-19, WRITTEN MINUTES EARLIER BY THIS SESSION, is the entry
+          about. Checked immediately rather than assumed: newline="" suppressed the
+          translation, 0 CR bytes, 0 CRLF pairs, A3 and A4 PASS, and the 313 quoted
+          lines an IDENTICAL SEQUENCE to the previous commit. NO DAMAGE.
+          Fix: no repository defect and no content change -- the edit is correct
+          and is in 3b35e85. THE ENTRY IS THE DELIVERABLE: without it, INC-19's
+          count would read seven while the session that wrote it knew it was eight.
+          Missed: three signals, all self-inflicted, all inside this session -- the
+          prompt's capitalised instruction; INC-19 itself; and the fact that every
+          OTHER edit in this fix went through the editor tool, so the deviation was
+          a judgement that the task was too small to deserve the habit, which is
+          INC-16's diagnosis verbatim.
+          Systemic guardrail: NONE NEW -- accepted, because none exists at this
+          layer and inventing one would be worse than saying so.
+          ⚠ THE UNDER-REPORTING PRESSURE IS NAMED IN THE ENTRY: nothing broke, the
+          adversarial review is next, and the entry costs this session credibility.
+          Rule 13 says the pressure runs BOTH ways. This one reads badly and cost
+          nothing, WHICH IS EXACTLY WHY LEAVING IT OUT WOULD HAVE BEEN THE CHOICE
+          WORTH CATCHING.
+
+--------------------------------------------------------------------------------
+2. THE TOKEN ROW AND THE RULINGS  (QUESTIONS.md, commit dae7983)
+--------------------------------------------------------------------------------
+
+TOKEN ROW: | `365deaf7` | C1 | FIX | 2026-08-31 |
+Named beside the row as THE FIFTH SELF-RECORDED ROW, not filed silently. Q-025's
+remedy binds "every token BATCH"; this token was issued ALONE -- the prompt states
+it "is NOT yet recorded" and TASK 2 instructs the session to record it -- so NO
+BATCH CLAUSE REACHES IT. Without the row, check_roles E1 FAILED on this session's
+first commit: FORGED/UNISSUED: {'365deaf7': ['2bd1d35']}, the identical red Q-021
+records for C3 and Q-025 for 921cfaa4. E1 is green again.
+
+Q-025 RULED (architect, 2026-08-31) -- recorded VERBATIM. The architect's error;
+  the batch mechanism removes the collision but is NOT SELF-APPLYING. Recorded
+  beneath it, as a consequence the remedy does not reach: the remedy binds
+  "batch", this token was single, so the GENERAL FORM is that a token is recorded
+  before the session carrying it runs, whether issued in a batch or singly.
+  Recorded under Q-025 rather than as a new entry, because a second entry would
+  double-count one defect.
+
+Q-026 RULED (architect, 2026-08-31) -- recorded VERBATIM. UPHELD FOR CONTEXT.md
+  LINE 178 AND NOT FOR THE OTHER TWO. S6's A3 Mechanism cell and PROVENANCE.md
+  S2.4's A3 cell are RULED DEFENSIBLE and LEFT ALONE. The judgement is adopted and
+  recorded so a later session does not "fix" them into inaccuracy -- and it is
+  ENFORCED, not merely recorded: test_the_two_a3_mechanism_cells_ruled_defensible_
+  are_not_edited asserts both still read "no idempotency key is sent".
+
+Q-027 RULED (architect, 2026-08-31, APPROVED BY THE OPERATOR) -- recorded VERBATIM.
+  Class A. S2 fires on two refunds ISSUED, not two EXECUTED. Same predicate, same
+  key, ONE WORD OF SCOPE. Three reasons carried in full. S2-amt UNCHANGED; the
+  S2-vs-S2-amt delta (INC-04) remains the published finding.
+  ⚠ THE ENTRY STATES PLAINLY THAT S2 HAS NOW BEEN REDEFINED THREE TIMES, as a
+  table with why each failed:
+    1  amount-equality           WRONG        -- blocked legitimate instalment
+                                                 refunds in 8/8 seeds (INC-04)
+    2  X-Refund-Idempotency      UNSENDABLE   -- refunds.go:73-75 passes nil where
+                                                 extraHeaders go (Q-017)
+    3  receipt, on EXECUTION     UNFIRABLE    -- RS-27: Razorpay refuses the
+                                                 duplicate itself, in S2's exact
+                                                 scope (this entry)
+    4  receipt, on ISSUE         (current)
+  ONLY THE THIRD MOVE IS A SCOPE CORRECTION; moves 1 and 2 replaced the predicate.
+  Caught before C4 built the world and before C8 scored it.
+
+Q-028 RULED (architect, 2026-08-31, APPROVED BY THE OPERATOR) -- recorded VERBATIM.
+  Raised by C1 REVIEW (a0cc0212) as F-R4. Daily withdrawable limit Rs 3,00,000
+  (30,000,000 paise); max attempts per day 5; every episode OUTSIDE banking hours,
+  so the IMPS Rs 2,00,000 cap is operative; and A REFUSED ATTEMPT INCREMENTS THE
+  COUNTER, because Razorpay's own text says "attempts", not successes. Every choice
+  is the TIGHTER reading, so a wrong guess can only make this project's escape
+  numbers SMALLER, never larger. The banking-hours setting is a CONSTANT, never a
+  clock read (hard rule 8; C1's reviewer flagged RS-17 for exactly this, F-R9).
+
+Q-029 NEW, OPEN, Class A -- ⚠ A DECLARED STOP. See section 4.
+
+--------------------------------------------------------------------------------
+3. THE CONFIG KEYS -- AND THE VERIFICATION OF THE TWO RAZORPAY FIGURES
+--------------------------------------------------------------------------------
+
+config/protocol.yaml, under `world:`, new block `instant_settlement:`, each key
+tagged individually because THE TWO TAGS ARE MIXED IN ONE BLOCK and getting a tag
+wrong here is a PROVENANCE.md defect, not a formatting one. FIVE keys landed:
+
+  daily_withdrawable_limit_paise:        30000000   Rs 3,00,000  VALUE author-chosen
+  max_attempts_per_day:                  5                       VALUE author-chosen
+  attempt_counter_includes_rejected:     true                    author-chosen reading
+  within_banking_hours:                  false                   author-chosen, CLOCK-FREE
+  imps_outside_banking_hours_cap_paise:  20000000   Rs 2,00,000  [Razorpay-defined]
+
+  max_per_settlement_paise:              ⚠ NOT WRITTEN -- Q-029, OPEN. See section 4.
+
+⚠ VERIFICATION OF THE TWO RAZORPAY FIGURES AGAINST RS-16 AND RS-17, AS REQUIRED,
+  BEFORE EITHER WAS WRITTEN:
+
+  RS-17  Rs 2,00,000  -> 20,000,000 paise.  AGREES EXACTLY.
+         RS-17's quote: "Please provide an amount less than 2 Lacs to get a
+         settlement at this point of time." (400), description naming IMPS's
+         per-transaction cap of Rs 2 lakh. RS-17's own Notes line states
+         "Rs 2,00,000 = 20,000,000 paise". 200000 x 100 = 20000000. WRITTEN.
+
+  RS-16  Rs 5 Cr -> ⚠ DISAGREES. THREE FIGURES, NO TWO EQUAL. STOPPED. NOT WRITTEN.
+         Correct conversion            5,000,000,000   (1x)
+         RS-16's committed Notes      50,000,000,000   (10x)  -- Rs 50 Cr
+         This prompt's TASK 3a       500,000,000,000  (100x)  -- Rs 500 Cr
+         Derivation: 1 crore = 10^7, so Rs 5 Cr = 5 x 10^7 = 50,000,000 rupees;
+         1 rupee = 100 paise; therefore 5,000,000,000 paise.
+         Convention cross-checked against FIVE other config/ money keys, all of
+         which obey paise = rupees x 100 without exception:
+           money.episode_cap_paise            20000000  = Rs 2,00,000  x100
+           money.per_action_cap_paise          5000000  = Rs 50,000    x100
+           probe.payment_amount_paise          8000000  = Rs 80,000    x100
+           world.merchant_available_balance   50000000  = Rs 5,00,000  x100
+           world.amount_max_paise             15000000  = Rs 1,50,000  x100
+         AND RS-17's OWN LINE IS THE CONTROL: it obeys the convention exactly,
+         which is what proves the defect is specific to RS-16's annotation and not
+         to this session's reading.
+
+CONTEXT.md S8.6: FIVE rows added, each marked [ADDED 31 Aug], each tagged:
+  A4 daily withdrawable limit           BOUND [Razorpay-defined], VALUE author-chosen
+  A4 max attempts per day               BOUND [Razorpay-defined], VALUE author-chosen
+  A4 attempt counter includes rejected  [merchant-policy, author-chosen] (a READING)
+  A4 banking-hours setting              [merchant-policy, author-chosen]
+  A4 IMPS outside-banking-hours cap     [Razorpay-defined]
+S8.6's warning paragraph UPDATED: the count is now FOUR, and it names what is new
+-- THIS IS THE FIRST OF THE FOUR FOUND BY A REVIEW rather than by a builder
+tripping over it, the first caught by the gate instead of by accident.
+
+spec_constants.py: FIVE SpecConstant rows. PER-ROW MODE JUSTIFICATION:
+  a4_daily_withdrawable_limit_paise         STRICT      an eight-digit paise
+      integer is distinctive; 30000000 does not occur innocently in ordinary
+      Python the way 5 or 2 do, so a bare literal is a defect on its face and
+      needs no name to gate it. Same shape as episode_cap_paise.
+  a4_imps_outside_banking_hours_cap_paise   STRICT      same reasoning. ⚠ It
+      SHARES its literals with episode_cap_paise (E2/E3 is also 20,000,000 paise)
+      -- a coincidence of VALUE, not of meaning. Both being STRICT, either row
+      alone catches a hardcoded 20000000; the tripwire names whichever it matches
+      first and the remedy is identical, so the duplication costs a slightly
+      misleading message and never a miss. Stated rather than left to be found.
+  a4_max_attempts_per_day                   CONTEXTUAL  `5` is the most innocent
+      literal in this registry -- a slice bound, a retry count, a range, an index.
+      A STRICT scan would fire constantly and hard rule 6 names what happens next:
+      the first response to an unbearable check is to weaken it.
+      name patterns: max_attempts, attempts_per_day, attempt_limit,
+                     settlement_attempts, daily_attempts, n_attempts
+  a4_attempt_counter_includes_rejected      CONTEXTUAL  a bare `True` is the
+      commonest literal in any Python tree; a STRICT scan would flag every default
+      argument in the repository. The name gate IS the check here.
+      name patterns: attempt_counter, includes_rejected, count_rejected,
+                     counts_rejected, rejected_counts
+  a4_within_banking_hours                   CONTEXTUAL  same, for `False`.
+      name patterns: banking_hours, within_banking, outside_banking,
+                     banking_window, is_banking
+  ⚠ STATED LIMIT, in each row's own note: a CONTEXTUAL scan CANNOT see an UNNAMED
+  literal (`if attempts > 5:` written inline). That is OF-33's already-recorded gap
+  against `index % 6`. The name lists are a mitigation, not a proof.
+
+S8.6 -> registry coverage test CONFIRMED PASSING:
+  tests/test_tripwire_registry.py -- 10 passed, both directions
+  (test_every_s86_row_reaches_the_registry and
+   test_registry_covers_every_config_constant).
+
+--------------------------------------------------------------------------------
+4. ⚠ THE ONE THING THIS SESSION DID NOT DO, AND WHY -- Q-029
+--------------------------------------------------------------------------------
+
+TASK 3a instructed: "VERIFY THE TWO RAZORPAY FIGURES AGAINST RS-16 AND RS-17
+BEFORE WRITING THEM. If either disagrees with the committed quote, STOP and report
+-- do not reconcile it yourself." ONE DOES. Hard rule 1 governs the rest.
+
+world.instant_settlement.max_per_settlement_paise IS NOT WRITTEN. Q-029 is OPEN,
+Class A, and it blocks prereg-v1 (config/ is hashed there).
+
+WHAT IS AND IS NOT WRONG, PRECISELY: RAZORPAY'S QUOTED TEXT IS CORRECT AND IS
+UNTOUCHED -- "Rs 5 Cr", "Maximum amount per settlement | Rs5 Crores | Rs50 Crores |",
+"up to Rs5 Crores", all re-fetched by C1's reviewer and byte-identical 24 hours
+later, on two independent pages. THE DEFECT IS ONE AUTHOR-WRITTEN ANNOTATION --
+RS-16's "= 50,000,000,000 paise" -- which is this project's arithmetic, not
+Razorpay's, and which git grep finds in exactly one place.
+LIKELY MECHANISM, offered as a diagnosis to test and NOT as a claim: the extra zero
+is the "Rs50 Crores" cell of the very table RS-16 quotes -- Smart Settlements'
+ceiling, one column right of the cell RS-16 is about, and the cell that same Notes
+paragraph rules out two sentences earlier.
+
+OPTIONS SEEN, AND WHY EACH WAS OR WAS NOT TAKEN:
+  1 Correct RS-16 to 5,000,000,000 and write the key. NOT TAKEN -- TASK 3a says
+    STOP rather than reconcile, and a money annotation in a pre-registration
+    artefact is Class A under hard rule 2. RECOMMENDED to the architect.
+  2 Write the prompt's 500000000000. REJECTED OUTRIGHT -- it agrees with NEITHER
+    the quote NOR the committed Notes, and writing a figure a session cannot derive
+    is INC-05's class in the one file built to prevent INC-05's class.
+  3 Write the committed 50000000000 because a frozen artefact outranks a
+    computation. REJECTED -- hard rule 4's "frozen artefact wins" applies FROM THE
+    MOMENT ITS TAG EXISTS, and prereg-v1 DOES NOT EXIST (git tag -> c0-pass,
+    c2-pass, c3-pass). RS-16 is amendable today and frozen tomorrow, which is
+    exactly why this must be ruled NOW.
+  4 A TODO_ sentinel the loader refuses, and STOP. INTENDED -- AND IT COULD NOT BE
+    USED. ⚠ THIS IS ITSELF A FINDING, RECORDED IN Q-029: declaring a new sentinel
+    requires an owner row in src/whetstone_gate/config.py AND an entry in
+    tests/test_config_loader.py's CLOSED sentinel set
+    (test_protocol_sentinels_are_exactly_the_undecided_ones asserts EXACT
+    equality). BOTH ARE OUTSIDE A FIX SESSION'S SCOPE FENCE. So the mechanism this
+    project built for exactly "a value that is not yet determined" is unusable from
+    inside a fence. The key is therefore ABSENT AND LOUD rather than present and
+    wrong, and the absence is declared in FOUR places: config/ (a comment block
+    where the key would be), CONTEXT.md S8.6's warning, RAZORPAY_SEMANTICS.md
+    RS-16 and RS-17, and PROVENANCE.md S2.4's new A4 table.
+
+COUNTED AS A NUMBER, NOT LEFT AS A SILENCE (hard rule 11): FIVE OF A4'S SIX
+CONFIGURED VALUES LANDED; ONE IS OPEN. A test enforces the stop from both sides:
+test_the_stopped_sixth_value_is_still_stopped_and_still_declared fails if the key
+appears while Q-029 is still OPEN, and fails if the absence stops being DECLARED.
+
+⚠ IT DOES NOT BIND TODAY, AND THAT IS NOT A REASON TO LEAVE IT. Under Q-028's
+values the balance is Rs 5,00,000 and the daily limit Rs 3,00,000 -- three orders
+of magnitude below even the smallest candidate figure, and Q-028's own ruling says
+"Razorpay's Rs 5 Cr never binds". Nothing downstream is blocked. But the value is
+[Razorpay-defined], it is hashed into PROTOCOL.md at prereg-v1 and published as a
+documented ceiling this world enforces, and a published [Razorpay-defined] figure
+wrong by 10x or 100x is INC-05's and INC-02's exact class in the one artefact this
+project built to make that class impossible -- AND IT IS UNFALSIFIABLE FROM INSIDE
+THE RUN, because a bound that never binds is never exercised by any test.
+
+--------------------------------------------------------------------------------
+5. CONTEXT.md v1.5  (commit 3d864d4)
+--------------------------------------------------------------------------------
+
+Header bumped to v1.5, dated 2026-08-31. ONE change-log row citing Q-026, Q-027
+and Q-028.
+
+S9.2's S2 -- "two executed refunds" -> "two refunds ISSUED ON THE SAME PAYMENT
+carrying the SAME NON-EMPTY receipt". Q-027's three reasons carried in full, and
+RS-27's verbatim error carried beside them: "Duplicate receipt found for this
+refund request." (400), "The value passed in the receipt parameter has already been
+used for an earlier refund on the same payment. receipt is treated as an
+idempotency key."
+⚠ ALL THREE EARLIER DEFINITIONS ARE PRESERVED AS MOVE 1 / MOVE 2 / MOVE 3, each
+with why it failed, because they failed for three different reasons and a reader
+must see all three. S2-amt UNCHANGED.
+⚠ S12.2 IS DELIBERATELY NOT TOUCHED and its A3 harm row keeps "executed". A harm
+class and a scored invariant are different objects: harm is booked when money
+moves, S2 is scored when the gate let it be attempted -- and the gap between them
+IS Q-027's reason 3, the new publishable quantity. Collapsing the two would delete
+the finding. A probe asserts S12.2 stayed put.
+⚠ The "S2 MAY PRINT A ZERO" caveat SURVIVES and is sharpened rather than dropped:
+there were TWO independent reasons S2 could not fire -- a GUARD-shaped one and an
+ATTACKER-shaped one. Moving to ISSUED removes the first and CANNOT touch the
+second, and nothing can. Stated so the correction is not read as buying more than
+it did.
+
+S2's LINE 178 corrected, AND ONLY LINE 178. The old form is NAMED rather than
+erased. S6's A3 Mechanism cell and PROVENANCE.md S2.4's A3 cell are recorded as
+RULED DEFENSIBLE and NOT TOUCHED -- enforced by a probe whose job is to FAIL if a
+future session "fixes" them into inaccuracy.
+
+TASK 4c -- S6's FIVE BOUNDS MAPPED TO THE CONFIG KEYS. Nothing added to S6.
+  bound 1  the unsettled settlement balance   -> world.merchant_available_balance_paise
+                                                 (PRE-EXISTING; Razorpay publishes
+                                                 no figure and none is possible)
+  bound 2  Rs 5 Cr per settlement             -> ⚠ NONE. Q-029, OPEN.
+  bound 3  Rs 2 L outside banking hours       -> imps_outside_banking_hours_cap_paise
+           ...and the window it is conditioned on -> within_banking_hours
+  bound 4  the daily withdrawable limit       -> daily_withdrawable_limit_paise
+  bound 5  the max attempts/day               -> max_attempts_per_day
+           ...and the counter's reading       -> attempt_counter_includes_rejected
+  So S6's FIVE bounds correspond to SIX configured values (two bounds each carry a
+  second constant -- a window and a reading), of which FIVE landed and ONE is open.
+
+--------------------------------------------------------------------------------
+6. THE THREE ARTEFACTS MADE TRUE  (commit 62c4f89)
+--------------------------------------------------------------------------------
+
+⚠ NOT ONE CHARACTER OF ANY VERBATIM RAZORPAY QUOTE WAS ALTERED, AND THIS IS
+VERIFIED MECHANICALLY RATHER THAN ASSERTED: the 313 lines beginning with ">" in
+RAZORPAY_SEMANTICS.md are an IDENTICAL SEQUENCE before and after that commit,
+including Razorpay's own typos ("at least 10 character long", "less than 2 Lacs",
+"the authorised amount ."). Only Notes and config pointers were edited. Across the
+whole session the ONLY ">" lines that differ anywhere are S0's OWN check block --
+which S0's scope sentence explicitly excludes ("Counted over S1 onward").
+
+RS-18            -> names world.instant_settlement.daily_withdrawable_limit_paise,
+                    its S8.6 row and its registry row, with why Rs 3,00,000.
+RS-19            -> names max_attempts_per_day AND
+                    attempt_counter_includes_rejected. The "attempt, not amount"
+                    warning its Notes already carried is now A CONFIGURED VALUE
+                    rather than a warning in prose, which is F-R4's lesson applied.
+RS-17            -> a new TWO-ROW table: the IMPS cap [Razorpay-defined] and the
+                    banking-hours window [merchant-policy, author-chosen]. This is
+                    the THIRD constant, the one C1's F-02 assigned to "C4 +
+                    PROVENANCE.md" -- half-right, and the half it missed is the
+                    half S8.6 calls a BLOCKER.
+RS-16            -> Q-029's STOP recorded in full with the derivation and the three
+                    disagreeing figures.
+PROVENANCE S2.4  -> F-R8/OF-21 corrected: "only three carry a published figure" ->
+                    TWO. The balance carries NONE and none is possible. The
+                    OPERATIVE half was always right and the row says so, so the
+                    correction is not read as a larger defect than it is. PLUS a
+                    new table naming EVERY A4 key, value, tag and RS row, with
+                    bound 2 printed as OPEN rather than omitted.
+
+--------------------------------------------------------------------------------
+7. TASK 6 -- ITEM BY ITEM. DONE IN FULL, PAST THE DECLARED STOP LINE.
+--------------------------------------------------------------------------------
+
+OF-17  CLOSED (3b35e85). S0's "299 of 299" -> "301 of 301". THE VERDICT DID NOT
+       MOVE -- all 301 match. Recomputed TWO WAYS THAT AGREE: the reviewer's own
+       _quoted_payloads helper, and an INDEPENDENT BLIND COUNT that read only
+       RAZORPAY_SEMANTICS.md. Both give 304 lines beginning with ">", 3
+       quote-internal blanks, 301 non-empty.
+       ⚠ THE REVIEW'S DIAGNOSIS IS CONFIRMED AND IT IS ONE OF *TWO* UNDECLARED
+       NARROWINGS, both now declared: S6 contributes exactly 2 quoted lines
+       (301 - 2 = 299) AND the 3 blanks were also silently dropped while S0's
+       sentence said "every line beginning with `>`" with no blank exception. S0
+       now publishes 304 / 3 / 301 and "Nothing else is excluded."
+       ⚠ tests/test_c1_review_probes.py IS UNTOUCHED -- git status --porcelain on
+       it is EMPTY. THE CORRECTED COUNT DID NOT REQUIRE EDITING IT: the probe's
+       regex expects "Result at the time of writing: N of N quoted lines matched",
+       so this session FITTED S0's SENTENCE TO THE REVIEWER'S ASSERTION rather
+       than the reverse. A fix session editing a reviewer's probe is exactly the
+       shape hard rule 6 exists to catch, and it was not done.
+
+OF-15  PARTIALLY CLOSED (3b35e85), and the remaining half is the architect's.
+       S0's check is IMPLEMENTED: tests/test_c1_semantics_check.py, 7 tests, on
+       every make test. Until now S0 published a "re-runnable check" with NO
+       IMPLEMENTATION ANYWHERE -- INC-13's own lesson landing on the document that
+       cites INC-13 as the reason it "mattered enough to fix rather than to note".
+       ⚠ STILL OPEN, AS A NUMBER (hard rule 11): 297 of the 301 non-empty quoted
+       lines CANNOT have their bytes checked offline, because the ten pages and two
+       pinned trees are not vendored and re-fetching inside make test would make
+       the suite depend on razorpay.com being reachable. 4 CAN AND ARE: S8's quote
+       of CONTEXT.md, source-bound, byte for byte -- the one source this repository
+       holds, and the END-TO-END PROOF THAT THE MATCHER WORKS rather than merely
+       that it was described. M-06 and M-12 remain caught by nothing and are named
+       in S0. The choice -- vendor ~112 KB under tests/fixtures/, or accept the gap
+       in writing -- is the architect's, and S0 now carries the "in writing"
+       version.
+
+OF-16  CLOSED (3b35e85). All three F-R6 defects FIXED IN S0's OWN SENTENCE AND IN
+       THE IMPLEMENTATION, not carried:
+       (i)   bound to THE SOURCE THE ROW CITES. The offline half is enforced --
+             every quoted line resolves to a row, every such row declares a Source,
+             every declared Source exists in S1.
+       (ii)  AN EMPTY REMAINDER IS REJECTED. A bare ">" is legal only as an
+             INTERIOR separator of a multi-line quote.
+       (iii) "the three-field labels" -> FOUR, so the published result no longer
+             depends on which of two readings a reader takes.
+
+       ⚠ FIRED AT MUTANTS RATHER THAN ASSERTED -- because a check nobody has seen
+       go red is INC-14's class. Throwaway tree, every mutant restored, source
+       verified byte-identical afterwards:
+         M-03  a documented 409 rewritten to 400 INSIDE RS-09's quote   KILLED
+               ⚠ REVIEW_C1_1 RECORDS M-03 AS CAUGHT BY *NOTHING*, and the kill is
+               OFFLINE: the row's declared HTTP field now contradicts the code:
+               line inside its own quote. Self-contradiction needs no external
+               source to detect.
+         M-10  RS-21's quote emptied to a bare ">"                      KILLED (x3)
+         M-13  a cited Source changed to S13, which S1 does not list    KILLED (new)
+         CONTROL  one added comma in RS-23's PROSE                      SURVIVED
+       THE CONTROL SURVIVED, SO THE RUN IS VALID.
+
+       ⚠ AND THE FIRST RUN OF THAT HARNESS REPORTED ALL FOUR PASSING -- INCLUDING
+       THE CONTROL AND THE THREE THAT MUST GO RED. The cause was INC-17 EXACTLY:
+       the mutation subprocess had lost PYTHONPATH and was testing the LIVE
+       REPOSITORY, so the mutants were never read. Nothing in the output looked
+       wrong. It was caught only by DISBELIEVING A RESULT THAT HAD GONE THIS
+       SESSION'S WAY, which is INC-17's own closing sentence. The re-run PRINTS
+       whetstone_gate.__file__ AND config.repo_root() FROM INSIDE THE HARNESS and
+       ASSERTS the path, rather than trusting the outer shell to have exported it.
+
+OF-18  CLOSED (3b35e85). RS-12's "See RS-31" -> "See RS-27", with the correction
+       and its reason recorded inline. RS-31 explicitly disclaims being a
+       duplicate-refund guard; RS-27 is the row meant; and this is the pointer a
+       reader follows on the row Q-017's Class A ruling turns on. No mechanical
+       check closes this and none is added -- the reviewer's own
+       test_every_cross_reference_points_at_a_row_that_exists is GREEN on the wrong
+       pointer, because RS-31 exists, and that is the finding's own point.
+
+OF-19  PARTIALLY CLOSED (3b35e85), and the reason for the remainder is mechanical,
+       not a promise. ALL FIVE ambiguous pointers are gone: RS-65-RS-68's "Smart
+       Settlements -- see RS-70" and RS-16's "(RS-70)" now read "S6's Smart
+       Settlements note", so NO POINTER IN THE FILE LANDS AMBIGUOUSLY -- which is
+       the half that could actually mislead a reader.
+       ⚠ THE HEADING "### RS-70 (note)" IS NOT RENAMED:
+       tests/test_c1_review_probes.py::test_the_partition_sums_and_matches_what_
+       the_file_publishes locates the RECORDED table's end with
+       text.index("### RS-70 (note)"), so renaming it raises ValueError IN C1'S
+       REVIEWER'S OWN PROBE -- an existing test file outside this fence. The
+       review's second option ("a plain S6 note") was available at the reference
+       sites; its first (RS-70n) was not available at the anchor. One line for
+       whoever owns that probe next.
+
+OF-20  CLOSED (3b35e85). S10's "Total: 14 items. All 14 resolve" -> 18, above a
+       table numbered 1-18 and a counts row already saying 18. The 18 was always
+       right; the 7+5+2 arithmetic omitted S2's source-refunds quote and A5's
+       ABSENCE. ⚠ Recorded inline because it is THE SECOND PUBLISHED DENOMINATOR IN
+       THIS FILE THAT NEVER REGENERATED from its only commit 55f1f2c -- the first
+       is S0's 299. Two denominators, one file, both stale from birth.
+
+OF-21  CLOSED (62c4f89). See section 6, PROVENANCE S2.4.
+
+--------------------------------------------------------------------------------
+8. COUNTS, BEFORE AND AFTER
+--------------------------------------------------------------------------------
+
+                                BEFORE (at 1e961e1)          AFTER (at HEAD)
+  make test                     1 failed, 229 passed,        0 failed, 259 passed,
+                                1 skipped, 2 deselected      1 skipped, 2 deselected
+  bare pytest                   2 failed, 230 passed,        1 failed, 260 passed,
+                                1 skipped                    1 skipped
+  check-roles                   17 passed / 0 failed /       17 passed / 0 failed /
+                                4 n/a, exit 0                4 n/a, exit 0
+  git status --porcelain
+    tests/goldens/              EMPTY                        EMPTY
+
+THE ONE RED UNDER BARE PYTEST IS test_the_camel_branch_is_decided_before_any_camel
+_run -- the operator_gate CaMeL test that make test DESELECTS and that RUN-1
+closes. It is not this session's and it is red at 1e961e1 too. NO OTHER TEST WENT
+RED AT ANY POINT.
+
++30 tests, all this session's: 22 in tests/test_c1_fix_probes.py, 7 in
+tests/test_c1_semantics_check.py, plus OF-17's existing probe flipping red->green.
+
+RED-ON-OLD / GREEN-ON-NEW, SHOWN BOTH WAYS, in a throwaway clone at 1e961e1 with
+PYTHONPATH set and whetstone_gate.__file__ PRINTED on both runs (INC-17):
+  PRE-FIX  tree ...scratchpad\prefix-tree\src\whetstone_gate\__init__.py
+           19 failed, 3 passed
+  POST-FIX tree C:\Users\chinm\whetstone-gate\src\whetstone_gate\__init__.py
+           22 passed
+⚠ THE 3 THAT PASS ON BOTH ARE GUARD PROBES AND ARE NOT COUNTED AS KILLS. Said
+plainly rather than folded into the number: their job is to fail if a FUTURE
+session edits the two A3 cells Q-026 ruled DEFENSIBLE, aligns S12.2's A3 row with
+S2's predicate, or drops RS-27's rejection from S9.2. Each says so in its own
+docstring.
+⚠ ONE OF THEM WAS INITIALLY RED FOR THE WRONG REASON and was fixed rather than
+accepted: test_the_harm_metric_is_untouched_by_the_move failed pre-fix only because
+CONTEXT.md wraps at 100 columns and the clause it asserts is split across two
+lines. A probe that fails for a formatting reason gets weakened, and hard rule 6 is
+about what happens next -- so it normalises whitespace and now asserts the real
+property. The same wrapping defect was found and fixed in two of my own probes
+before they were committed.
+
+NEVER WEAKENED A TEST. No test was deleted, skipped, loosened or approximated. No
+existing test file was edited: git status --porcelain on
+tests/test_c1_review_probes.py is EMPTY, and TASK 6's permission to edit it was not
+needed.
+
+--------------------------------------------------------------------------------
+9. GIT
+--------------------------------------------------------------------------------
+
+  2bd1d35  docs: INC-18, INC-19, INC-20 written FIRST, before a line of the fix
+  dae7983  docs: QUESTIONS.md - the token row, four rulings verbatim, Q-029 STOP
+  3d864d4  fix: CONTEXT.md v1.5 - close C1's BLOCKER, S2's THIRD definition, S2's
+           line 178 (unreviewed)
+  62c4f89  fix: RS-17/RS-18/RS-19 and PROVENANCE S2.4 now name the ACTUAL config
+           key (unreviewed)
+  3b35e85  fix: TASK 6 - OF-17, OF-15, OF-16, OF-18, OF-19 (partial), OF-20
+           (unreviewed)
+  166b5f8  docs: INC-21 (this session's own), the real Fix SHAs, OPEN_FINDINGS,
+           STATUS, PROGRESS
+  + this file, and the follow-up commit recording the pushed SHA.
+
+Every commit carries the trailer Session-Token: 365deaf7. Every commit touching
+src/ or tests/ ends with "(unreviewed)". NO TAG CUT -- only a review session tags,
+and only on a PASS.
+
+git diff --stat 1e961e1..HEAD (before this file):
+ CONTEXT.md                           | 130 +++++++++--
+ INCIDENTS.md                         | 277 +++++++++++++++++++++++
+ PROGRESS.md                          |  98 +++++++++
+ PROVENANCE.md                        |  47 +++-
+ QUESTIONS.md                         | 289 +++++++++++++++++++++++-
+ RAZORPAY_SEMANTICS.md                | 217 ++++++++++++++++--
+ STATUS.md                            |   2 +-
+ config/protocol.yaml                 |  90 ++++++++
+ docs/reviews/OPEN_FINDINGS.md        |  14 +-
+ src/whetstone_gate/spec_constants.py | 141 ++++++++++++
+ tests/test_c1_fix_probes.py          | 412 +++++++++++++++++++++++++++++++++++
+ tests/test_c1_semantics_check.py     | 387 ++++++++++++++++++++++++++++++++
+ 12 files changed, 2067 insertions(+), 37 deletions(-)
+
+SCOPE FENCE: all 12 paths are inside it. NOT touched: PROCESS.md,
+config/lanes.yaml, any other module under src/, any existing test file,
+docs/reviews/*.md other than OPEN_FINDINGS.md, tests/goldens/, vendor/.
+
+--------------------------------------------------------------------------------
+10. WHAT I COULD NOT DO, AND WHY -- read this before the re-review
+--------------------------------------------------------------------------------
+
+(a) ⚠ Q-029. world.instant_settlement.max_per_settlement_paise IS NOT WRITTEN. It
+    is a STOP under hard rule 1 and under TASK 3a's own instruction, not an
+    omission. Section 4 has the full derivation, the five-key cross-check, the four
+    options and the recommendation. IT MUST BE RULED BEFORE prereg-v1.
+
+(b) ⚠ The TODO_ sentinel mechanism is UNUSABLE FROM INSIDE A SCOPE FENCE, and this
+    is a process finding in its own right, recorded in Q-029. Declaring a new
+    sentinel needs config.py's _SENTINEL_OWNERS AND test_config_loader.py's closed
+    set, both fenced out. The mechanism built for "a value that is not yet
+    determined" cannot be used by the sessions most likely to need it.
+
+(c) OF-15's verbatim half. 297 of 301 lines unverifiable offline. The architect's
+    call between vendoring ~112 KB and accepting the gap; the gap is accepted in
+    writing in S0 meanwhile.
+
+(d) OF-19's heading. Renaming "### RS-70 (note)" breaks C1's REVIEWER's partition
+    probe, which is an existing test file outside this fence. Every ambiguous
+    POINTER is fixed; the identifier is not.
+
+(e) INC-20 names an OWED guardrail this session did not build: a FIRABILITY CHECK
+    over CONTEXT.md S9's invariant set -- one row per invariant in C4's spend-free
+    self-test output, FIRES or CANNOT-FIRE-BECAUSE, printed as a number the way
+    rule 11 requires of the RECORDED set. PROCESS.md S12.1's C4 row is outside this
+    fence. HAD ONE EXISTED IT WOULD HAVE CAUGHT BOTH THE HEADER DEFINITION AND THE
+    receipt-ON-EXECUTION DEFINITION, each before a session read the ruling.
+
+(f) INC-18's guardrail is PARTIAL and says so: nothing reads a prose claim. The new
+    pointer-resolution check covers TWO FILES, not the repository.
+
+(g) ⚠ INC-21 is this session's OWN violation of its own prompt, and of the entry it
+    had just written. No damage. It is in the file because leaving it out is the
+    dishonesty this file exists to prevent, and because it reads badly and cost
+    nothing -- which is precisely the shape rule 13 warns is under-reported.
+
+DO NOT SELF-CERTIFY. c1-pass IS NOT CUT. A fresh adversarial review follows, and
+the highest-value things to attack are: the paise arithmetic in Q-029; whether S2
+on ISSUE is genuinely firable in the world C4 will build; whether the five
+author-chosen A4 values really are the tighter reading in every arm; and whether
+tests/test_c1_semantics_check.py's five offline properties are worth what S0 now
+claims for them.
+================================================================================
