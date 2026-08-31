@@ -6,6 +6,129 @@ not a record; this file is.
 
 ---
 
+## ARCH — Q-029 closure, A4's sixth and last bound — **BUILD** — attempt 1 — 2026-08-31
+
+**SESSION-TOKEN:** `8e0f4a13` — issued **alone**, not in the `f57e216b` batch, and the prompt placed
+`QUESTIONS.md` in this fence with TASK 1 instructing the row be appended. It is therefore
+**self-recorded and named as the sixth**, on exactly the ground the fifth (`365deaf7`) was: Q-025's
+remedy binds *"every token **batch**"*, and **a batch clause cannot reach an issue that is not a
+batch**. Without the row `check_roles` **E1** fails `FORGED/UNISSUED` on every commit this session
+makes. **E1 is green: 17 passed, 0 failed, 4 n/a, exit 0.** ⚠️ **Five of the six self-recorded rows
+are the same defect**, and the general remedy — *a token is recorded before the session that carries
+it runs, batch or not* — is already ruled in Q-025 and **was not applied to this one.**
+
+**What this session was:** one ruling, one config key, one annotation. **No logic was built and
+nothing else was fixed.** **Zero provider model calls; zero tokens spent.** Every figure is derived
+arithmetic over a quote already committed and already re-fetched byte-identical by C1's reviewer.
+
+**Q-029, RULED (architect, 2026-08-31), Class A — and the ruling upholds the session that stopped.**
+C1 FIX (`365deaf7`) was told to verify both Razorpay figures against RS-16/RS-17 and to **STOP rather
+than reconcile** if one disagreed. One did. **The value is 5,000,000,000 paise**, re-derived
+independently by the architect: 1 crore = 10⁷, so ₹5 Cr = 50,000,000 rupees, × 100.
+⚠️ **BOTH OTHER FIGURES WERE WRONG AND BOTH ARE RECORDED AGAINST THEIR AUTHORS** — **50,000,000,000**
+(10×) was **RS-16's own committed Notes line**, and **500,000,000,000** (100×) was **THE ARCHITECT'S
+OWN PROMPT**, named in the ruling as **the fifth architect error of 2026-08-31**. The FIX session's
+diagnosis of the extra zero — the *"₹50 Crores"* Smart Settlements cell one column right in the table
+RS-16 quotes — is recorded as **a diagnosis to test, not a finding**, and is left at that weight.
+
+**Recorded verbatim under hard rule 5, and verbatim in the strict sense.** Unlike Q-028's, which
+declares two notational substitutions (`S<n>` → `§<n>`, `Rs` → `₹`), **none was applied here**: `Rs`,
+`10^7`, `x`, `->` and the issued text's own article/noun disagreement (*"a **author-written
+annotation**"*) are all preserved. **A transcription that tidies grammar has been read for sense
+rather than copied, and the reader cannot then tell which other word was tidied.**
+
+**What landed, and it landed in all three places at once** (`5e20abe`) — the mechanism whose
+one-directional gap let fourteen constants go missing across three earlier occurrences:
+
+- `config/protocol.yaml : world.instant_settlement.max_per_settlement_paise: 5000000000`, tagged
+  `[Razorpay-defined]`, **with the derivation on one line** so the next reader neither re-derives it
+  nor repeats either error — **both wrong figures are named in the comment.**
+- `CONTEXT.md` **§8.6** gains one row, **[ADDED 31 Aug]**, `[Razorpay-defined]`. **CONTEXT.md v1.6**,
+  one change-log row.
+- `spec_constants.py` gains a **STRICT** row. **STRICT is the easy call** — `5000000000` is a
+  ten-digit paise integer that does not occur innocently — and **it cannot collide with `50000000`
+  or `30000000`**, the scan anchoring every literal with `(?<![\w.]) … (?![\w.])`. **The §8.6 ↔
+  registry coverage test passes in BOTH directions.**
+
+⚠️ **A4's FIVE DOCUMENTED BOUNDS NOW MAP TO SIX CONFIGURED VALUES AND ALL SIX ARE PRESENT** — said in
+§8.6's warning, at RS-17, in `PROVENANCE.md` §2.4 and in `config/`, **where a reader will see it.**
+Hard rule 11's shape applies to a set of **bounds** as much as to a set of episodes, and **this set
+was five-of-six for exactly one commit** — a state the previous session **printed as a number rather
+than leaving as a silence**. That is why every one of those places now says *six of six* instead of
+quietly no longer mentioning it: **a count that vanishes is worse than one that closes.**
+
+**RS-16 corrected, and the correction kept visible** (`32dfb7f`). Its Notes line read
+*"₹5 Cr = 50,000,000,000 paise"* — **wrong by 10×**. It now reads **5,000,000,000** and points at the
+config key. **The derivation table gains a VERDICT column and names ALL THREE figures**, marking one
+RULED CORRECT and each of the other two WRONG **with its author**, rather than deleting them: a
+reader who arrives holding either must be told which it is. *"Why it is not fixed here"* becomes
+*how it was fixed and by whom*, **with the STOP preserved rather than erased.**
+
+⚠️ **NOT ONE CHARACTER OF ANY VERBATIM RAZORPAY QUOTE WAS ALTERED, AND IT WAS VERIFIED MECHANICALLY
+BEFORE AND AFTER RATHER THAN ASSERTED:** all **316** lines beginning with `>` are an **identical
+sequence**, in content and in order — **SHA-256 `13d8a33c…f9b50`** at `be378ce` and after every edit,
+`diff` **empty**. **That is the ruling's own reason the fix is safe**: the defect was an
+author-written annotation, never a quote. ⚠️ **One self-caught error on the way:** the first
+verification sentence written this session cited a hash of `grep -n` **output**. Line numbers shift
+whenever anything above them moves, so **that hash would have reported a difference that is not
+one**. Corrected to the hash of the extracted **lines**, **before it was published, not after.**
+
+**`PROVENANCE.md` §2.4:** bound 2 moves from *"NONE — a DECLARED STOP"* / *"UNDETERMINED"* to its key
+and value, **with the one-commit history of that cell kept inside the cell.**
+
+**The stop test flipped on the ruling — a reversal, and it is PROVED, not claimed** (`d9d93d2`).
+`test_the_stopped_sixth_value_is_still_stopped_and_still_declared` →
+`test_the_stopped_sixth_value_is_ruled_and_landed`. Hard rule 6 requires the flip to be *provably
+meaningful — it fails on the old code* — and **it was run red twice, in throwaway clones, with
+`PYTHONPATH` set and `whetstone_gate.__file__` AND `config.repo_root()` printed from inside the run
+(INC-17)**: at **`be378ce`** it fails on the RULED assertion; at **`97a5981`** (ruled, key not yet
+written) it fails on the loader with `MissingRequiredValue` — hard rule 9's refusal, exactly as
+designed. **Both halves fail independently.** The new probe makes **four** assertions where the old
+made one per branch, and **the value is RE-DERIVED in the test (`5 * 10**7 * 100`), never
+transcribed**, so changing the figure means changing arithmetic rather than a copy of itself.
+**It is the ONLY existing test edited**, which the fence permitted and which nothing else needed.
+
+⚠️ **A SEPARATE FINDING IS RECORDED AND IS NOT CLOSED — IT IS OWED. The `TODO_` SENTINEL MECHANISM IS
+UNUSABLE FROM INSIDE A SCOPE FENCE.** Declaring one needs an owner row in
+`src/whetstone_gate/config.py` **and** an entry in `tests/test_config_loader.py`'s closed sentinel
+set (which asserts **exact** equality), and **both are outside a fix session's fence**. So the
+mechanism this project built for hard rule 9's *"a value not yet determined"* **cannot be reached by
+the sessions most likely to need it**, and what it falls back to is an absent key plus prose — the
+shape of `F-R4`, the BLOCKER that failed C1. **The architect accepts it as a real process defect.**
+⚠️ **It is not closed here because it reproduces on this session: `config.py` and
+`test_config_loader.py` are outside THIS fence too.** Named as owed, with the shape of the remedy
+deliberately left open.
+
+⚠️ **ONE FALSE CLAIM IN THE RECORD WAS STRUCK AND NAMED, NOT DELETED.** Q-028's annotation said the
+sixth value *"is written as an explicit `TODO_` sentinel the loader refuses"*. **It was not** — no
+sentinel was ever written and the key was simply absent, as Q-029, `config/`'s own comment block and
+`docs/sessions/c1-fix-1.txt` §4 all say. **It is a claim about this repository's state that was not
+true: `F-R4`'s exact class, inside the entry that closes `F-R4`.**
+
+⚠️ **ONE BLEMISH IN THIS SESSION'S OWN HISTORY, REPORTED RATHER THAN REWRITTEN.** The first commit
+(`97a5981`) carries a stray `@` as its **subject line** and another as its last line: the message was
+passed through the **Bash** tool using **PowerShell here-string** syntax (`@'…'@`), which bash does
+not parse — the two `@` characters became part of the message. **The trailer survived intact and
+`check-roles` E5 is green.** It was **not amended**: `CLAUDE.md` §5 says *no history rewrite, ever*,
+and the markers this project leaves in history are **permanent on purpose**. Every later commit used
+a message **file** written with the editor tool. ⚠️ **This is adjacent to INC-06's class without
+being an instance of it** — nothing was *written to a project file* by a shell mechanism; a commit
+message was mangled — **and it is recorded here rather than filed quietly, because "adjacent" is
+exactly the judgement a session grades itself on.**
+
+**Counts, before → after.** `make test` **259 passed → 259 passed**, 0 failed, 1 skipped, 2 deselected
+— **unchanged, the flipped probe replacing its predecessor 1:1**; `check-roles` **17 / 0 / 4, exit
+0**, unchanged; **`git status --porcelain tests/goldens/` EMPTY.** ⚠️ **One intermediate red, named
+because a report that only shows the green run is not a report:** `test_repo_invariants.py ::
+test_the_object_store_and_the_working_tree_agree` fired while three edited files were uncommitted. It
+compares the working tree against `HEAD:`, **so it fires on any uncommitted edit by design** — it is
+a clean-tree invariant, not a regression, and it went green on the next commit.
+
+🚩 **NO TAG CUT, AND NONE MAY BE.** This is a **BUILD** session, C1's re-review is still owed, and
+only a **REVIEW** session tags. **Nothing here is self-certified.**
+
+---
+
 ## C1 — the oracle and the attack rows — **FIX** — attempt 1 — 2026-08-31
 
 **SESSION-TOKEN:** `365deaf7` — issued **alone**, not in a batch, and the prompt states it *"is NOT
