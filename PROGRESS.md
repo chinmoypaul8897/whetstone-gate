@@ -77,8 +77,12 @@ way would have made invariant **S4 unfirable and deleted the moat**. **Q-042** s
 golden 3: RS-17 fires on `amount > cap`, never at the cap. **Q-038** and **Q-039** record where
 `[Razorpay-defined]` figures live and why. **Q-044** notes §16 lists the harm record under `ledger/`.
 
-**Counts.** `make test` **306 → 389 passed** (+83, all this chunk's), **1 failed** (the C2 fence
-test above), 1 skipped, 2 deselected. `check-roles` **17 passed, 0 failed, 4 n/a, exit 0** —
+**Counts, reconciled both ways rather than stated as a difference.** `make test` **306 → 389
+passed**, **1 failed** (the C2 fence test above), 1 skipped, 2 deselected:
+**`306 + 84 − 1 = 389`** — 84 new tests, all this chunk's (`test_c4_goldens.py` 18,
+`test_c4_world_semantics.py` 49, `test_c4_selftest.py` 17, by `pytest --collect-only`), minus the
+**one pre-existing test that moved from passed to failed**. A bare *"+83"* would have hidden that
+subtraction, which is the whole finding. `check-roles` **17 passed, 0 failed, 4 n/a, exit 0** —
 unchanged. `git status --porcelain tests/goldens/` **empty**.
 
 🚩 **THIS SESSION'S OWN BLEMISH, AND IT IS THE TENTH OCCURRENCE OF THE INC-06 CLASS — `INCIDENTS.md`
