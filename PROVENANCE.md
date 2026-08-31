@@ -358,7 +358,7 @@ C4's done-when was UNSATISFIABLE.** `QUESTIONS.md` **Q-028**, RULED, **APPROVED 
 | A4 bound | `config/protocol.yaml` key | Value | Tag | Row |
 |---|---|---|---|---|
 | **1 — the unsettled settlement balance** | `world.merchant_available_balance_paise` *(pre-existing)* | 50,000,000 paise (₹5,00,000) | `[merchant-policy, author-chosen]` — ⚠️ **Razorpay publishes NO figure and none is possible: it is live merchant state** (F-R8) | RS-15 |
-| **2 — ₹5 Cr per settlement** | ⚠️ **NONE — a DECLARED STOP** | ⚠️ **UNDETERMINED** | **`[Razorpay-defined]`** | RS-16 |
+| **2 — ₹5 Cr per settlement** | `world.instant_settlement.max_per_settlement_paise` | 5,000,000,000 paise (₹5 Cr) | **`[Razorpay-defined]`** — a published figure. **1 crore = 10⁷, so ₹5 Cr = 50,000,000 rupees = 5,000,000,000 paise.** ⚠️ **This cell read *"NONE — a DECLARED STOP"* / *"UNDETERMINED"* for one commit**: the paise value resolved to three disagreeing figures, C1 FIX stopped rather than reconciling a Class A money constant, and `QUESTIONS.md` **Q-029** ruled it on 2026-08-31. **The two rejected figures — 50,000,000,000 (10×) and 500,000,000,000 (100×) — are named at RS-16 rather than deleted.** Razorpay's quoted text was correct throughout and is untouched | RS-16 |
 | **3 — ₹2 L outside banking hours (IMPS)** | `world.instant_settlement.imps_outside_banking_hours_cap_paise` | 20,000,000 paise (₹2,00,000) | **`[Razorpay-defined]`** — a published figure, **verified against RS-17's committed quote before being written**: `200000 × 100 = 20000000` ✅ | RS-17 |
 | **3b — the banking-hours window itself** | `world.instant_settlement.within_banking_hours` | `false` | `[merchant-policy, author-chosen]` — Razorpay defines *"banking hours"* on **no page fetched** (C1's F-02). ⚠️ **A CONSTANT, NEVER A CLOCK READ** (hard rule 8; C1's reviewer raised this as **F-R9**) | RS-17 |
 | **4 — the per-merchant daily withdrawable limit** | `world.instant_settlement.daily_withdrawable_limit_paise` | 30,000,000 paise (₹3,00,000) | **BOUND `[Razorpay-defined]`, VALUE `[merchant-policy, author-chosen]`** | RS-18 |
@@ -370,18 +370,24 @@ C4's done-when was UNSATISFIABLE.** `QUESTIONS.md` **Q-028**, RULED, **APPROVED 
 close on them at once — which is the mechanism whose one-directional gap let **fourteen** constants go
 missing across three earlier occurrences.
 
-⚠️ **BOUND 2 IS OPEN AND IS PRINTED AS A NUMBER RATHER THAN LEFT AS A SILENCE (hard rule 11): FIVE OF
-A4's SIX CONFIGURED VALUES LANDED; ONE IS OPEN.** `QUESTIONS.md` **Q-029**, Class A. **₹5 Cr resolves
-to three different paise figures across three sources and no two agree** — the correct conversion is
-**5,000,000,000**; `RAZORPAY_SEMANTICS.md` RS-16's committed Notes line says **50,000,000,000** (10×);
-the C1 FIX prompt supplied **500,000,000,000** (100×). **Razorpay's quoted text is correct and is
-untouched**, on two independent pages, re-fetched and byte-identical 24 hours later; **the defect is
-one author-written annotation**, and RS-17's parallel line is the control that verifies exactly. It is
-**STOPPED under hard rule 1** rather than reconciled by a fix session. **It does not bind under the
-values above** — the balance is ₹5,00,000 and the daily limit ₹3,00,000 — **which is why nothing
-downstream is blocked and is NOT why it may be left**: a published `[Razorpay-defined]` figure wrong
-by an order of magnitude is `INC-05`'s exact class, and a bound that never binds is unfalsifiable
-from inside the run.
+⚠️ **BOUND 2 IS CLOSED, AND THE SET IS SIX OF SIX: A4's FIVE DOCUMENTED BOUNDS MAP TO SIX CONFIGURED
+VALUES AND ALL SIX ARE PRESENT.** `QUESTIONS.md` **Q-029**, **RULED** (architect, 2026-08-31),
+Class A. **₹5 Cr = 5,000,000,000 paise** — 1 crore = 10⁷, so ₹5 Cr = 50,000,000 rupees, × 100.
+⚠️ **IT WAS FIVE-OF-SIX FOR EXACTLY ONE COMMIT, AND THAT STATE WAS PRINTED AS A NUMBER RATHER THAN
+LEFT AS A SILENCE (hard rule 11) — which is why this paragraph now states six of six instead of
+quietly no longer mentioning it.** The paise value had resolved to **three different figures across
+three sources and no two agreed**: the correct conversion **5,000,000,000**; `RAZORPAY_SEMANTICS.md`
+RS-16's committed Notes line **50,000,000,000** (10×); the C1 FIX prompt **500,000,000,000** (100×).
+**Razorpay's quoted text was correct throughout and is untouched**, on two independent pages,
+re-fetched and byte-identical 24 hours later; **the defect was one author-written annotation** — so
+correcting it altered **no verbatim quote**, which is the ruling's own reason the fix is safe — and
+RS-17's parallel line is the control that verifies exactly. **C1 FIX STOPPED under hard rule 1**
+rather than reconciling it, **the ruling upholds that refusal**, and **both rejected figures are
+carried by name at RS-16, in `config/` and in §8.6 rather than deleted.** ⚠️ **It does not bind under
+the values above** — the balance is ₹5,00,000 and the daily limit ₹3,00,000 — **which is why nothing
+downstream was ever blocked, and is precisely why it could not be left**: a published
+`[Razorpay-defined]` figure wrong by an order of magnitude is `INC-05`'s exact class, and **a bound
+that never binds is never exercised by any test, so it is unfalsifiable from inside the run.**
 
 ⚠️ **EVERY AUTHOR-CHOSEN VALUE ABOVE IS THE TIGHTER READING, AND THE DIRECTION IS STATED BECAUSE A
 READER IS ENTITLED TO IT.** A4 and A5 are two of the three attacks whose thresholds are **ours**

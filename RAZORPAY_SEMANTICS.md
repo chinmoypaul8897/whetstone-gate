@@ -486,24 +486,37 @@ and:
 
 **HTTP** 400 · **Source** S4 (error) **and** S5 (table + prose) · **Fetched** 2026-08-30T20:42Z ·
 **World** `MUST-FIRE`
-**Notes.** ✅ **Exact figure found: ₹5 Cr = 50,000,000,000 paise.** Two independent Razorpay pages
+**Notes.** ✅ **Exact figure found: ₹5 Cr = 5,000,000,000 paise** —
+`config/protocol.yaml : world.instant_settlement.max_per_settlement_paise` = **`5000000000`**,
+`CONTEXT.md` §8.6 row *A4 max per settlement*, registry row `a4_max_per_settlement_paise`
+(**STRICT**), tag **`[Razorpay-defined]`**. Two independent Razorpay pages
 agree. In the table row above, the `₹5 Crores` cell is Instant Settlement and the `₹50 Crores` cell
 is Smart Settlements — Smart Settlements is **Dashboard-only** and has **no API support** (§6's Smart Settlements note, OF-19), so
 ₹5 Cr is the ceiling that binds a tool-calling agent.
+⚠️ **THIS LINE READ `50,000,000,000` UNTIL 2026-08-31 AND THAT WAS WRONG BY 10×.** It is corrected
+under `QUESTIONS.md` **Q-029**, **RULED** (architect, 2026-08-31, Class A) — **and the correction is
+SHOWN rather than swallowed**, immediately below, because a record that edits its own history to
+match its ruling is worth less than one that shows the fix.
 
-⚠️ **STOPPED, NOT CORRECTED — `QUESTIONS.md` Q-029, OPEN, Class A. THE PAISE FIGURE ON THE LINE
-DIRECTLY ABOVE DOES NOT RECONCILE, AND THIS ROW'S QUOTES ARE NOT THE PROBLEM.** Razorpay's quoted
-text is **correct and is untouched** — *"₹ 5 Cr"*, *"Maximum amount per settlement | ₹5 Crores |
+⚠️ **STOPPED ON 31 AUGUST, THEN RULED AND CORRECTED THE SAME DAY — `QUESTIONS.md` Q-029, Class A.
+THE PAISE FIGURE ON THE NOTES LINE DID NOT RECONCILE, AND THIS ROW'S QUOTES WERE NEVER THE PROBLEM.**
+Razorpay's quoted text is **correct and is untouched** — *"₹ 5 Cr"*, *"Maximum amount per settlement | ₹5 Crores |
 ₹50 Crores |"*, *"up to ₹5 Crores"* — all three **re-fetched by C1's reviewer and confirmed
-byte-identical 24 hours later**, on two independent pages. **The defect is confined to one
+byte-identical 24 hours later**, on two independent pages. **The defect was confined to one
 author-written annotation**, the *"= 50,000,000,000 paise"* conversion, which is **this project's
-arithmetic and not Razorpay's**.
+arithmetic and not Razorpay's** — **and that is exactly why the correction is safe: it alters no
+verbatim quote**, which is the ruling's own words. **C1 FIX (`365deaf7`) refused to reconcile it and
+STOPPED under hard rule 1; the ruling upholds that refusal and re-derives the value independently.**
 
-| Source | Figure, in paise | Re-expressed | Ratio to ₹5 Cr |
-|---|---|---|---|
-| **Correct conversion** of this row's quote | **5,000,000,000** | ₹5,00,00,000 = ₹5 Cr | **1×** |
-| **This row's Notes line**, as committed at `55f1f2c` | **50,000,000,000** | ₹50,00,00,000 = **₹50 Cr** | **10×** |
-| **The C1 FIX prompt's supplied value** | **500,000,000,000** | ₹5,00,00,00,000 = **₹500 Cr** | **100×** |
+⚠️ **ALL THREE FIGURES STAY IN THIS TABLE. THE TWO WRONG ONES ARE MARKED, NOT DELETED** — a reader
+who arrives holding either must be told which it is, and a row that quietly loses its rejected
+candidates cannot be checked.
+
+| Source | Figure, in paise | Re-expressed | Ratio to ₹5 Cr | Verdict |
+|---|---|---|---|---|
+| **Correct conversion** of this row's quote | **5,000,000,000** | ₹5,00,00,000 = ₹5 Cr | **1×** | ✅ **RULED CORRECT.** This is the value in `config/`, in §8.6 and in the registry |
+| **This row's Notes line**, as committed at `55f1f2c` | **50,000,000,000** | ₹50,00,00,000 = **₹50 Cr** | **10×** | ❌ **WRONG. Corrected 2026-08-31**, and the author is **this file** |
+| **The C1 FIX prompt's supplied value** | **500,000,000,000** | ₹5,00,00,00,000 = **₹500 Cr** | **100×** | ❌ **WRONG, and never written anywhere.** The author is **the ARCHITECT'S OWN PROMPT**, recorded against it as the fifth architect error of 2026-08-31 |
 
 **The derivation:** 1 crore = 10⁷, so ₹5 Cr = 5 × 10⁷ = **50,000,000 rupees**; 1 rupee = 100 paise;
 therefore ₹5 Cr = **5,000,000,000 paise**. **The convention is not in doubt** — five other
@@ -512,19 +525,29 @@ parallel Notes line is the control: *"₹2,00,000 = 20,000,000 paise"*, which ve
 ⚠️ **The likely mechanism, offered as the diagnosis a ruling can test rather than as a claim: the
 extra zero is the `₹50 Crores` cell of the very table this row quotes** — Smart Settlements' ceiling,
 one column to the right of the ₹5 Crores cell this row is about, and the cell this Notes paragraph
-itself rules out two sentences earlier.
+itself rules out two sentences earlier. **The ruling records that diagnosis as *"plausible … a
+diagnosis to test rather than a finding"*, and it is left standing at exactly that weight** — nothing
+about the corrected value depends on it being right.
 
-**Why it is not fixed here.** This row is a **pre-registration artefact** and the annotation is a
-**money constant**, so changing it is Class A (hard rule 2); the C1 FIX prompt's own instruction was
-to **verify against this row and STOP rather than reconcile**; and hard rule 1 says the same.
-⚠️ **`config/` therefore carries NO `max_per_settlement_paise` key, and its absence is loud rather
-than quiet** — a `TODO_` sentinel could not be used because declaring one needs an owner row in
-`src/whetstone_gate/config.py` **and** an entry in `tests/test_config_loader.py`'s closed sentinel
-set, both outside a fix session's fence. **It does not bind today** — the balance is ₹5,00,000 and
-the daily limit ₹3,00,000, three orders of magnitude below the smallest candidate — **and that is not
-a reason to leave it: a published `[Razorpay-defined]` figure wrong by 10× or 100× is INC-05's exact
-class in the artefact built to make INC-05's class impossible, and a bound that never binds is
-unfalsifiable from inside the run.**
+**How it was fixed, and by whom, because "why it is not fixed here" was the honest answer for one
+commit.** C1 FIX (`365deaf7`) was instructed to verify both Razorpay figures against RS-16 and RS-17
+and to **STOP rather than reconcile** if one disagreed. One did. It stopped — correctly, this row
+being a **pre-registration artefact** and the annotation a **money constant**, so changing it is
+Class A under hard rule 2 — and it wrote `Q-029`. **The architect ruled it the same day, upheld the
+stop, and re-derived the value independently.** ARCH BUILD (`8e0f4a13`) landed the correction.
+⚠️ **`config/` now carries `world.instant_settlement.max_per_settlement_paise` = `5000000000`**, with
+its §8.6 row and its registry row, so **A4's five documented bounds map to six configured values and
+all six are present**. For one commit that set was **five of six, printed as a number rather than
+left as a silence** (hard rule 11), because the key was **absent and loud**: a `TODO_` sentinel could
+not be used, declaring one needing an owner row in `src/whetstone_gate/config.py` **and** an entry in
+`tests/test_config_loader.py`'s closed sentinel set, both outside a fix session's fence.
+⚠️ **THAT SENTINEL GAP IS ITSELF A FINDING, ACCEPTED BY THE ARCHITECT AS A REAL PROCESS DEFECT, AND
+IT IS OWED RATHER THAN CLOSED** — the mechanism this project built for *"a value not yet determined"*
+cannot be reached by the sessions most likely to need it. **It does not bind today** — the balance is
+₹5,00,000 and the daily limit ₹3,00,000, three orders of magnitude below the smallest candidate —
+**and that is not a reason to have left it: a published `[Razorpay-defined]` figure wrong by 10× or
+100× is INC-05's exact class in the artefact built to make INC-05's class impossible, and a bound
+that never binds is unfalsifiable from inside the run.**
 
 ### RS-17 — A4, bound 3 of 5: ₹2 lakh outside banking hours (IMPS)
 
@@ -570,11 +593,14 @@ state and must never reach for `datetime.now()`.** `false` means every episode s
 banking hours, which makes the ₹2,00,000 cap **operative** — **the tighter reading**, so a wrong
 choice here can only make this project's escape numbers **smaller**, never larger.
 
-⚠️ **THE FIFTH BOUND'S PAISE VALUE IS A DECLARED STOP AND IS NOT IN `config/` — `QUESTIONS.md`
-Q-029, OPEN, Class A.** RS-16's ₹5 Cr per-settlement ceiling resolves to **three different paise
-figures across three sources and no two agree**. It is recorded at RS-16 below rather than here, and
-it is **counted rather than left silent**: of A4's six configured values, **five landed and one is
-open.**
+⚠️ **THE SIXTH VALUE IS NOW IN `config/` TOO, AND THE SET IS SIX OF SIX — `QUESTIONS.md` Q-029,
+RULED 2026-08-31, Class A.** RS-16's ₹5 Cr per-settlement ceiling had resolved to **three different
+paise figures across three sources and no two agreed**; it is
+`world.instant_settlement.max_per_settlement_paise` = **`5000000000`**, and the ruling, the
+derivation and **both rejected figures** are recorded at RS-16 rather than here. ⚠️ **It was a
+declared STOP for exactly one commit, and that state was counted rather than left silent — five
+landed, one open — which is why this paragraph now says six of six instead of quietly no longer
+mentioning it.**
 
 ### RS-18 — A4, bound 4 of 5: a per-merchant daily withdrawable limit
 

@@ -2561,9 +2561,12 @@ shape applied to a set of bounds rather than a set of episodes, and this set was
 one commit**, which is the number the previous session printed rather than left silent.
 ⚠️ **`RAZORPAY_SEMANTICS.md`'s VERBATIM RAZORPAY QUOTES WERE VERIFIED MECHANICALLY BEFORE AND AFTER
 AND ARE AN IDENTICAL SEQUENCE:** all **316** lines beginning with `>`, unchanged in content and in
-order (SHA-256 of the numbered sequence `69dca877…52648`, before and after). **The defect was an
-author-written annotation and correcting it altered no quote, which is the ruling's own reason the
-fix is safe.**
+order — **SHA-256 `13d8a33c…f9b50` of the extracted sequence, identical at `be378ce` (this session's
+starting commit) and after every edit**, `diff` empty. ⚠️ **The hash is over the LINES, not over
+`grep -n` output**: a numbered listing changes whenever anything above it moves, so it would have
+reported a difference that is not one — checked, and corrected here rather than published. **The
+defect was an author-written annotation and correcting it altered no quote, which is the ruling's own
+reason the fix is safe.**
 
 ⚠️ **A SEPARATE FINDING, RECORDED HERE AND NOT CLOSED HERE — THE `TODO_` SENTINEL MECHANISM IS
 UNUSABLE FROM INSIDE A SCOPE FENCE.** This is **a finding, not a ruling**, and it is **OWED**, not
