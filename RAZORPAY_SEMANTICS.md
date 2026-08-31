@@ -52,14 +52,78 @@ inference and this project's own reasoning are set as ordinary prose or as table
 quote. That rule is not a promise; it is checked:
 
 > **Re-runnable check.** Take every line of this file beginning with `>`; strip the leading `>`, the
-> three-field labels `**error:** / **code:** / **description:** / **solution:**` that this file adds
-> to the concurrency rows, and one layer of wrapping backticks; require the remainder to occur as a
-> contiguous substring of one of the sources in §1 (or of `CONTEXT.md`, for the one quote of this
+> **four** added field labels `**error:** / **code:** / **description:** / **solution:**` that this
+> file adds to the concurrency rows, and one layer of wrapping backticks; **discard the lines whose
+> remainder is then EMPTY — a bare `>` inside a multi-line quote — and count them separately**;
+> require every remaining remainder to occur as a contiguous substring of **the source that the row
+> carrying it names in its own `Source` field** (or of `CONTEXT.md`, for the one quote of this
 > project's own specification in §8).
 >
-> **Result at the time of writing: 299 of 299 quoted lines matched. Unmatched: 0.**
+> **Result at the time of writing: 301 of 301 quoted lines matched. Unmatched: 0.**
 > *(Counted over §1 onward — this check's own description block above is excluded, since it quotes
-> nothing.)*
+> nothing. **304** lines begin with `>` in that scope; **3** are quote-internal blanks; **301**
+> carry a payload and are the denominator. **Nothing else is excluded.**)*
+
+⚠️ **THE DENOMINATOR WAS CORRECTED FROM 299 TO 301 ON 2026-08-31, AND THE VERDICT DID NOT MOVE.**
+`docs/reviews/OPEN_FINDINGS.md` **OF-17**, C1 REVIEW finding **F-R2**. The file has exactly one
+commit, `55f1f2c`, and the count there is **already 301** — **this figure never regenerated**, and a
+published number that does not regenerate is what hard rule 10 exists to forbid. **All 301 match**,
+independently re-run by C1's reviewer against all twelve sources, so nothing in this file was ever
+wrong; the *scope statement* was.
+⚠️ **THE PUBLISHED 299 EMBEDDED TWO UNDECLARED NARROWINGS, AND BOTH ARE NOW DECLARED.** *(i)* The
+**3 blank `>` lines** were dropped while the sentence said *"every line of this file beginning with
+`>`"* with no blank-line exception — that is now stated and they are counted. *(ii)* **§6's 2 quoted
+lines were dropped**: `301 − 2 = 299`, and §6 sits squarely inside *"§1 onward"*. §6's heading says
+its rows are *"not part of the **self-test's** denominator"*, which is a statement about the
+`MUST-FIRE`/`RECORDED` split — **a different check, which never claimed that carve-out.** ⚠️ **That
+second narrowing is `F-R6`'s *"does it cover what it claims"* in a second form: the two lines it
+skipped are the RS-70 note's, and RS-70 is the one identifier in this file that names two things
+(OF-19).** Both lines match; only the scope was wrong.
+
+⚠️ **THE STRIPPING RULE NOW SAYS FOUR, AND IT USED TO SAY THREE WHILE LISTING FOUR.** C1 REVIEW
+**F-R6(iii)**: read as *unwrap the bold*, `**error:** Request failed…` becomes `error: Request
+failed…`, which is in **no** source and the check reports **3 unmatched**; read as *remove the label
+entirely*, it reports **0**. **Only the second reading reproduces the published result**, so that is
+what the sentence now says. A check whose published result depends on which of two readings a reader
+takes is not yet a check.
+
+⚠️ **AND THE CHECK IS NOW BOUND TO EACH ROW'S OWN CITED SOURCE, WHICH IS THE CHANGE THAT MATTERS
+MOST.** It previously matched each line against **any** source in §1, and `F-R6(i)` shows what that
+buys an adversary: a documented `409` rewritten to `400` leaves the payload `* code: 400`, which
+occurs **8 times in `normal-refunds-idempotent.md` alone**; and RS-22 given RS-23's `solution` is
+**still a verbatim Razorpay quote, from the wrong page** — measured at **1 hit in `create-normal.md`
+and 0 in `capture.md`**, the page RS-22 actually cites. **Both pass a global check and both fail a
+source-bound one.**
+
+### ⚠️ The check is IMPLEMENTED, and what it can and cannot do offline
+
+**`tests/test_c1_semantics_check.py`, committed 2026-08-31.** Until then this section published a
+*"re-runnable check"* that **had no implementation anywhere in the repository** — not in `tests/`,
+not in `src/`, not a `Makefile` target (C1 REVIEW **F-R5**; `OPEN_FINDINGS.md` **OF-15**). ⚠️ **That
+is `INC-13`'s own lesson landing on the document that cites it**: this section invokes INC-13 —
+*"nothing checked a tracked document's content"* — as the reason the convention *"mattered enough to
+fix rather than to note"*, **and then the fix was performed and not kept.**
+
+**What runs on every `make test`, offline, with no network:**
+
+| # | Property | Closes |
+|---|---|---|
+| 1 | **No quoted line reduces to an empty payload.** `"" in s` is `True` for every source, so emptying a quote is the cheapest way to destroy a row while keeping a substring check green | **F-R6(ii)**, mutant **M-10** |
+| 2 | **Every quoted line is attributable to a row, and that row declares a `Source` naming a real source in §1.** This is the offline half of source-binding: it cannot compare bytes, but a quote that belongs to no row, or to a row citing a source that does not exist, is caught | **F-R6(i)**, structurally |
+| 3 | **Every row's declared `HTTP` code equals the `code:` line inside its own quote.** ⚠️ **This kills M-03 offline**, which the review expected only a re-fetch could catch: a documented `409` rewritten to `400` now contradicts its own row's `HTTP` field | **mutant M-03** |
+| 4 | **The §8 quote of `CONTEXT.md` is matched VERBATIM against `CONTEXT.md`**, source-bound, byte for byte — the one source this repository holds, and the proof that the matcher itself works end to end | the check's own machinery |
+| 5 | **The counts this section publishes regenerate**: 304 / 3 / 301, and the number of lines the verbatim half **cannot** verify offline is printed as a number | **OF-17**; hard rule 11 |
+
+⚠️ **WHAT IT STILL CANNOT DO, STATED AS A NUMBER AND NOT AS A SILENCE (hard rule 11): 300 of the 301
+non-empty quoted lines cannot have their bytes checked offline, because this repository does not
+vendor the ten fetched pages and the two pinned source trees.** Re-fetching inside `make test` would
+make the suite depend on razorpay.com being reachable, which is a worse property than the one it
+buys. **The remaining choice is the architect's** — vendor the ten bodies (~112 KB) under
+`tests/fixtures/`, which would make this oracle checkable from a clean clone forever, or accept the
+gap in writing. **`OF-15` stays OPEN on that half and this paragraph is what "in writing" looks
+like.** ⚠️ **Mutants M-06 (a wrong `file:line`) and M-12 (a remediation lifted from the wrong page)
+remain caught by nothing**, and M-12 is the worst of the set precisely because it stays a **verbatim
+Razorpay quote** — only bytes from the cited page can catch it.
 
 **The three exceptions are declared, not hidden**, because each was found by running that check and
 each was then rewritten rather than excused:
@@ -340,7 +404,17 @@ of anything*:
 S2 can be scored, **and the world's `create_refund` must expose no way to set it**, exactly as the
 real tool does. A world whose `create_refund` accepted an idempotency key would make S2 unreachable
 and the finding untestable.
-**Notes.** ⚠️ **See RS-31.** Razorpay documents a *second*, weaker idempotency mechanism on the
+**Notes.** ⚠️ **See RS-27.** *(**CORRECTED 31 Aug: this read "See RS-31."** — `OPEN_FINDINGS.md`
+**OF-18**, C1 REVIEW finding **F-R1**. **RS-31 is *"a refund that has already been processed cannot
+be re-initiated"***, and its own Notes say *"⚠️ Do **not** read this as a duplicate-refund guard."*
+**The row meant is RS-27**, whose heading is *"`receipt` IS TREATED AS AN IDEMPOTENCY KEY"*. ⚠️ **The
+prose beside the pointer was always correct, so a careful reader recovered; the address did not** —
+and this is the row **Q-017's Class A ruling turns on**, so it is the pointer a reader follows to
+reach the qualification. **Every other citation in the project was already right** — §7's A1–A6
+table, §9's F-06 row, `PROVENANCE.md` §2.4, `CONTEXT.md` §2 and §9.2 all say RS-27. ⚠️ **No
+mechanical check can catch this, and the review's own probe says so in its docstring:
+`test_every_cross_reference_points_at_a_row_that_exists` is GREEN, because RS-31 exists. A pointer
+can be well-formed and wrong.**)* Razorpay documents a *second*, weaker idempotency mechanism on the
 `receipt` field — and `receipt` **is** one of `create_refund`'s five parameters. That materially
 qualifies this row and is recorded rather than suppressed.
 
@@ -414,7 +488,7 @@ and:
 **World** `MUST-FIRE`
 **Notes.** ✅ **Exact figure found: ₹5 Cr = 50,000,000,000 paise.** Two independent Razorpay pages
 agree. In the table row above, the `₹5 Crores` cell is Instant Settlement and the `₹50 Crores` cell
-is Smart Settlements — Smart Settlements is **Dashboard-only** and has **no API support** (RS-70), so
+is Smart Settlements — Smart Settlements is **Dashboard-only** and has **no API support** (§6's Smart Settlements note, OF-19), so
 ₹5 Cr is the ceiling that binds a tool-calling agent.
 
 ⚠️ **STOPPED, NOT CORRECTED — `QUESTIONS.md` Q-029, OPEN, Class A. THE PAISE FIGURE ON THE LINE
@@ -1341,10 +1415,10 @@ absence.
 | **RS-62** | `Your Instant Settlements has been disabled.` | 400 | S4 | 2026-08-30T20:42Z | *"due to delayed LOC, Loan, or Card repayments"* — no credit products modelled |
 | **RS-63** | `Instant Settlements has been blocked for a while.` | 400 | S4 | 2026-08-30T20:42Z | a global merchant block; not modelled |
 | **RS-64** | `You are not enabled for Linked Instant Settlements.` | 400 | S4 | 2026-08-30T20:42Z | Linked Instant Settlements is a separate product |
-| **RS-65** | `Minimum amount that can be settled via smart settlement is below the threshold.` | 400 | S4 | 2026-08-30T20:42Z | Smart Settlements — see RS-70 |
-| **RS-66** | `Maximum amount that can be settled using Smart Settlements is ₹ 50 Cr.` | 400 | S4 | 2026-08-30T20:42Z | Smart Settlements — see RS-70 |
-| **RS-67** | `Smart settlements not enabled.` | 400 | S4 | 2026-08-30T20:42Z | Smart Settlements — see RS-70 |
-| **RS-68** | `Smart Settlement timing is 2:00 AM to 9:00 PM. Holidays are Jan 26, Aug 15 and Apr 1.` | 400 | S4 | 2026-08-30T20:42Z | Smart Settlements — see RS-70 |
+| **RS-65** | `Minimum amount that can be settled via smart settlement is below the threshold.` | 400 | S4 | 2026-08-30T20:42Z | Smart Settlements — see §6's Smart Settlements note (OF-19) |
+| **RS-66** | `Maximum amount that can be settled using Smart Settlements is ₹ 50 Cr.` | 400 | S4 | 2026-08-30T20:42Z | Smart Settlements — see §6's Smart Settlements note (OF-19) |
+| **RS-67** | `Smart settlements not enabled.` | 400 | S4 | 2026-08-30T20:42Z | Smart Settlements — see §6's Smart Settlements note (OF-19) |
+| **RS-68** | `Smart Settlement timing is 2:00 AM to 9:00 PM. Holidays are Jan 26, Aug 15 and Apr 1.` | 400 | S4 | 2026-08-30T20:42Z | Smart Settlements — see §6's Smart Settlements note (OF-19) |
 | **RS-69** | `The value should be a valid type.` and `The value should be a valid product type.` | 400 | S4 | 2026-08-30T20:42Z | `type` / `product_type` are not parameters the MCP tool exposes (`settlements.go:221-247` declares only `amount`, `settle_full_balance`, `description`, `notes`) |
 | **RS-70** | `Internal server error - Failed to fetch idempotency record` · `Internal server error - Failed to parse request body` · `Merchant id not found in authentication` | 500 | S3 | 2026-08-30T20:42Z | server-side faults; the world models no 5xx. ⚠️ *"the request contains an idempotency key"* — unreachable anyway, per RS-12 |
 | **RS-71** | `Payment is pending authorization from approver.` | 400 | S1 | 2026-08-30T20:42Z | *"For corporate-card payments and other approval-flow gateways"* — not modelled |
@@ -1429,8 +1503,21 @@ is what `PROCESS.md` §9's URL-and-date rule is for, and it is why C1 is a `full
 ## 10. Reconciliation — every string `CONTEXT.md` names, resolved
 
 **`CONTEXT.md` §6 names 7 error strings and 5 bounds across A1–A6; §9.2 names 2 more (the
-idempotency prose and the concurrency entry's three fields). Total: 14 items.**
-**All 14 resolve to a first-hand row. `[UNFETCHED]` count: 0.**
+idempotency prose and the concurrency entry's three fields); and §2 names 2 more (the source-refunds
+quote, and A5's ABSENCE, which is an item precisely because nothing resolves it). Total: 16 named
+plus the 2 §2 items = **18 items**.**
+**All 18 resolve to a first-hand row. `[UNFETCHED]` count: 0.**
+
+⚠️ **CORRECTED 31 Aug — THIS SENTENCE PUBLISHED ITS OWN DENOMINATOR TWICE, AS 14 AND AS 18.**
+`OPEN_FINDINGS.md` **OF-20**, C1 REVIEW finding **F-R7**. It read *"Total: **14** items. All **14**
+resolve"* directly above a table **numbered 1 to 18** and above a counts row reading *"Items named …
+requiring a first-hand row: **18**"*. **The 18 was and is the right figure** — the `7 + 5 + 2`
+arithmetic omitted §2's source-refunds quote and A5's absence, both of which the table below carries
+as items 15 and 18. **Nothing downstream used the 14.** ⚠️ **Recorded rather than quietly retyped,
+because persona 1's second check is denominator integrity and this file is where that check is
+supposed to be exemplary — and because it is the second published denominator in this document that
+did not regenerate** (the first is §0's `299`, `OF-17`, corrected in the same session). **Two
+denominators, one file, both stale from its only commit `55f1f2c`.**
 
 | # | Item, as `CONTEXT.md` names it | §  | Row | First-hand? |
 |---|---|---|---|---|
