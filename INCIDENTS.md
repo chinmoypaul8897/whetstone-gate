@@ -1132,11 +1132,11 @@ absence of anything that acts without recall.
 **Fix:** ⚠️ **No repository defect and no content change to fix.** The mutation never reached a
 commit: it was applied and reverted inside the mutation run, and `context.py`'s correct content is in
 **`8d6c7cd`**, unchanged since, at the digest verified above. **The entry itself is the deliverable**,
-and it is in **`TO-BE-RECORDED`** — *this session cannot know its own commit's SHA before making it;
-the value is written in immediately afterwards, in the follow-up commit, which is the pattern
-`abd8f4f` used for C6's FINAL OUTPUT SHA. **An invented SHA is what rule 13's "an invented incident
-has no commit" exists to catch, so a declared placeholder is written instead of a plausible-looking
-hex string.*** Without this entry, INC-21's closing count would read eight while three separate
+and it is in **`ca263ee`** — *a session cannot know its own commit's SHA before making it, so that
+commit carried the declared placeholder `TO-BE-RECORDED` and this follow-up writes the value in, the
+pattern `abd8f4f` used for C6's FINAL OUTPUT SHA. **An invented SHA is what rule 13's "an invented
+incident has no commit" exists to catch, so a placeholder no reader can mistake for a digest was
+written rather than a plausible-looking hex string.*** Without this entry, INC-21's closing count would read eight while three separate
 records (Q-032, `docs/sessions/c6-build-1.txt` §9, and the prompt that commissioned this entry) say
 the answer is nine.
 **Systemic guardrail:** ⚠️ **NONE — accepted, because no mechanism exists at this layer and
