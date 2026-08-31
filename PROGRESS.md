@@ -90,7 +90,13 @@ nine before it, this one actually corrupted bytes**: `write_text` performs newli
 INC-22's `write_bytes` did not, so **1,082 CR bytes** landed in `selftest.py` and **994** in
 `test_c4_world_semantics.py`. **The object store was never wrong** — `.gitattributes`' `* text=auto
 eol=lf` normalised both blobs at `git add`, which is exactly why `PROCESS.md` §6a makes it a C0
-prerequisite — and **git's own warning is what caught it**, not any check this repository owns. Both
+prerequisite — and **git's own warning is what caught it**, because the two checks that would have
+(`check_roles` **A4** and `test_the_object_store_and_the_working_tree_agree`) look only at **tracked**
+files and these were still untracked while the corruption existed. ⚠️ **The entry's first draft said
+"nothing in this repository would have reported anything at all"; that is FALSE, it was corrected
+within the hour by this same session, and the wrong sentence is STRUCK rather than deleted** — a
+`Missing` field is a claim about the repository's state and is exactly as checkable as any other
+number, which is INC-05's class landing inside the file built to make it visible. Both
 working copies were restored from their blobs and **verified by `git hash-object`** against
 `git rev-parse HEAD:<path>`: `50f81e19…` and `eecf458c…`, **0 CR bytes each**, tree clean. ⚠️ Worth
 knowing for the next session: **`git checkout -- <path>` and `git checkout HEAD -- <path>` both

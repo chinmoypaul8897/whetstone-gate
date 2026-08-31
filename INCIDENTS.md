@@ -1302,10 +1302,32 @@ that mattered **worked**: `.gitattributes` caught the bytes at `git add`, which 
 entry confirms from the other side — **nothing records the WRITE PATH**, so after the fact the
 repository cannot distinguish an editor write from a script write **whose bytes happened to be
 normalised on the way in**. ⚠️ **One genuinely new gap this occurrence exposes:** the checks all fire
-on the **object store**, and the object store was clean, so **had `git` not printed a warning to a
+on the **object store**, and the object store was clean, so ~~**had `git` not printed a warning to a
 human-readable stream, nothing in this repository would have reported anything at all.** A
 working-tree CR sweep — one `git ls-files -z | xargs grep -lU $'\r'` — costs nothing and would have
-turned a warning into a check.
+turned a warning into a check.~~
+
+⚠️ **CORRECTED WITHIN THE HOUR, BY THIS SAME SESSION, AND STRUCK RATHER THAN DELETED — THE SENTENCE
+ABOVE IS FALSE, AND THE CHECK IT ASKS FOR ALREADY EXISTS.** Re-running `make test` after the restore
+surfaced **`tests/test_repo_invariants.py::test_the_object_store_and_the_working_tree_agree`**, which
+compares `sha256(working-tree bytes)` against `sha256(git show HEAD:<path>)` for **every tracked
+file**, and `check_roles`' **A4 — *"working tree and object store hold identical bytes"***. **A CRLF
+working copy against an LF blob is exactly the divergence both were built to catch, and both would
+have fired the moment these two files were tracked.** They did not fire earlier only because the
+files were **untracked** while the corruption existed, and by the first suite run after they were
+committed the working copies had already been restored. ⚠️ **So the honest report is the opposite of
+what was first written here: the guardrail did not merely work once, it worked TWICE** —
+`.gitattributes` kept the object store clean at `git add`, and A4 plus the object-store test stood
+ready for the working-tree half. **The only real gap is the window between authoring a file and
+tracking it**, in which no check in this repository looks at anything.
+
+⚠️ **AND THE ERROR IS ITSELF THE FINDING WORTH KEEPING.** An entry written minutes after the event,
+by the session that caused it, asserted *"nothing in this repository would have reported anything"*
+**without running the check it was describing** — which is **INC-05's class**, a precise-sounding
+claim carried from memory rather than measured, occurring inside the file that exists to make that
+class visible. It was caught by the ordinary act of re-running the suite. **A `Missing` field is a
+claim about this repository's state, and it is exactly as checkable as any other number this project
+publishes.**
 
 **Missed:** ⚠️ **The signal was in this session's own prompt, in bold, naming the exact score.** It
 was read, understood well enough to be quoted in this entry, and then not acted on at the moment it
@@ -1336,11 +1358,17 @@ object store was correct throughout.**
 **Systemic guardrail:** ⚠️ **NOT "a third wording" — INC-22's own closing sentence forbids that, and
 it was right.** *"The wording change INC-19 and INC-21 proposed has been in force and has not worked,
 so the next proposal should not be a third wording."* Two things that are **not** wordings are
-proposed instead, and neither is claimed as landed: **(1)** a working-tree CR sweep in
+proposed instead, and neither is claimed as landed: ~~**(1)** a working-tree CR sweep in
 `check_roles.py` — one line over `git ls-files`, catching the bytes where every existing check
 declines to look, and it would have made this a **check** rather than a warning a human happened to
-read; **(2)** the only real closure remains tool-level, as INC-22 said — make a non-editor write to a
-tracked file impossible or automatically recorded — and **nobody has built it.** ⚠️ **What this entry
+read;~~ ⚠️ **(1) IS WITHDRAWN BY THE CORRECTION ABOVE: `check_roles` A4 and
+`test_the_object_store_and_the_working_tree_agree` ALREADY DO THIS**, over every **tracked** file, and
+a third check would have been a duplicate of two that work. What is left of the idea is much smaller
+and is stated at its true size: the checks are blind to a file **before it is tracked**, and closing
+that would mean sweeping **untracked** files too — which is a judgement call, since untracked files
+are also where legitimate scratch work lives. **(2)** the only real closure remains tool-level, as
+INC-22 said — make a non-editor write to a tracked file impossible or automatically recorded — and
+**nobody has built it.** ⚠️ **What this entry
 adds beyond the count is one testable claim about the failure's shape: every one of the ten
 occurrences was an EDIT to an existing file, never an original authoring.** If that holds on
 re-reading INC-06, INC-10, INC-12, INC-13, INC-16, INC-19, INC-21 and INC-22, then the instruction is
