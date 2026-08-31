@@ -805,3 +805,224 @@ caught it was a session refusing to believe a result that had gone its way.* Eve
 this file was caught by a control. **This one was caught by suspicion.**
 
 ---
+
+## INC-18 — three artefacts said two constants "live in `config/`", nothing did, and the ruling that named the problem was obtained by the session that then reproduced it one level down
+
+**Date:** 2026-08-31 (found by C1 REVIEW `a0cc0212` as **F-R4**, the BLOCKER that FAILED C1; written
+up here by C1 FIX `365deaf7`, **after** the first build commit `ee3cf93`)
+**Event:** C1's adversarial review re-fetched all ten Razorpay pages, matched every digest, recounted
+the 40/13/18 partition exactly, found **zero** paraphrases — and then FAILED the chunk on one thing.
+`RAZORPAY_SEMANTICS.md` **RS-18** says the world *"reads this ceiling **from `config/`**"*; **RS-19**
+says its value *"is `[merchant-policy, author-chosen]` and **lives in `config/`**"*; `PROVENANCE.md`
+§2.4's A4 cell says the same of both. `git grep -in "daily_withdraw\|withdrawable\|attempts_per_day\|
+max_attempts\|banking_hours"` returns **only prose naming the bound. Not one hit is a value.**
+`config/protocol.yaml` has no such key; `CONTEXT.md` §8.6's constants table has no such row;
+`src/whetstone_gate/spec_constants.py` — the tripwire registry — has no such entry. A **third**
+constant, the banking-hours window that RS-17's ₹2 L bound is conditioned on, is in none of them
+either and was never even asserted to be.
+**Action:** This session wrote this entry first, then landed the remedy the review named: three
+author-chosen values **and the two Razorpay-published figures they sit beside** into
+`config/protocol.yaml` under `world.instant_settlement`, a row per value into `CONTEXT.md` §8.6's
+table, and a `SpecConstant` row per value into the registry, so all three of §8.6's own consistency
+directions close on them at once. RS-18, RS-19, a new banking-hours row and `PROVENANCE.md` §2.4's
+A4 cell now name the **actual config key** rather than a location. ⚠️ **One of the six keys could
+not be written and is a STOP, recorded as `Q-029`:** the ₹5 Cr per-settlement ceiling's paise value
+does not reconcile — RS-16's own Notes line states `50,000,000,000 paise`, this session's prompt
+supplied `500000000000`, and ₹5 Cr is **5,000,000,000** paise. Three figures, no two equal. The key
+is written as an explicit `TODO_` sentinel the loader refuses, exactly as hard rule 9 requires of a
+value that is not yet determined.
+**Expectation:** A file that says a value *"lives in `config/`"* should be describing the repository,
+not the remedy. `CONTEXT.md` §8.6 and `config/protocol.yaml`'s own header each carry the same
+sentence, verbatim: *"Any constant that is not in this table and not in `config/` is a defect, and
+finding one is a review BLOCKER."* It does not say *"unless another chunk will add it later."*
+**Missing:** A check that reads the claim. Nothing in this repository parses *"lives in `config/`"*
+out of an artefact and resolves it to a key, and nothing ever did — which is why three files could
+assert a location that has never existed. The tripwire's three directions all begin from a row that
+exists somewhere; **a constant asserted in prose and written nowhere is invisible to all three of
+them.**
+**Missed:** ⚠️ **Two signals, and the second is the one that stings.** (1) **C1 had the escalation
+route open and used it three times in the same session** — Q-016, Q-017 and Q-018 were all declared
+OWED in `docs/sessions/c1-build-1.txt` §11, in `QUESTIONS.md` format, for the architect to place.
+**A fourth was not written.** C2 BUILD did exactly that for the probe note and it became Q-022, so
+the behaviour was available, demonstrated and adjacent. (2) **§8.6's own warning paragraph, which C1
+read as part of its read order, already said the table had been found incomplete three times** and
+that *"THE THIRD OCCURRENCE IS WHERE A PATTERN STOPS BEING BAD LUCK."* C1 was reading a warning about
+this exact failure while producing the fourth instance of it. And C1's own finding **F-02** named the
+banking-hours window and assigned it to *"C4 + `PROVENANCE.md`"* — half-right, and the half it missed
+is the half §8.6 calls a BLOCKER.
+⚠️ **THE PART THAT MAKES IT A BLOCKER RATHER THAN A TYPO, and it is a consequence of the ruling C1
+ITSELF OBTAINED.** Q-018's ruling — raised by C1, and now `PROCESS.md` §12.1's C4 row — makes C4's
+done-when *"every `RAZORPAY_SEMANTICS.md` row marked `MUST-FIRE` fires in the mock world."* **RS-18
+and RS-19 are both `MUST-FIRE`.** To fire *"Amount that can be settled for the day is exhausted"* the
+world needs a daily limit; to fire *"No more attempts left for today"* it needs an attempt count.
+**C4's only routes were to invent two constants outside the frozen set — which §8.6 forbids — or to
+fail its done-when. Q-018 was raised to give C4 a satisfiable denominator, and this is that same
+problem one level down.**
+⚠️ **AND THIS IS THE FOURTH OCCURRENCE OF THE CLASS. EVERY ONE OF THE FOUR WAS FOUND BY SOMEBODY
+TRIPPING OVER A MISSING CONSTANT; NOT ONE WAS FOUND BY A CHECK.** Six rows added 30 August (the
+architect, auditing); eight added 31 August (the architect again, `ARCHITECT_CHECK_0.md` §5); the
+probe note (C2 BUILD, tripping over it while writing the world); and this (C1 REVIEW, tripping over
+it while resolving a claim). **The one difference worth recording is the finder: this is the first of
+the four found by a REVIEW rather than by a builder mid-build** — the gate catching it instead of
+the accident — and that is the only reason it cost a fix session rather than a wrong number.
+**Diagnosis:** Three artefacts described the remedy in the present tense — *"lives in `config/`"* —
+and no mechanism in the repository ever resolves such a sentence to a key, so the assertion and the
+absence were both invisible: the tripwire's three consistency directions all start from a row that
+exists in at least one of §8.6, `config/` or the registry, and a constant named only in prose is in
+none of the three.
+**Fix:** `config/protocol.yaml` gains `world.instant_settlement` (five determined keys and one
+`TODO_` sentinel); `CONTEXT.md` §8.6 gains six rows marked **[ADDED 31 Aug]** with its warning
+paragraph amended to say this is the fourth; `spec_constants.py` gains six registry rows; RS-18,
+RS-19, a new RS-17 note and `PROVENANCE.md` §2.4's A4 cell each name the actual key.
+**Fix SHA: `SHA-PENDING-INC18-A`** (the `config/` + §8.6 + registry landing) and
+**`SHA-PENDING-INC18-B`** (the three artefacts made true). ⚠️ **Both sentinels are replaced with the
+real hashes by this session's final commit, and are written as sentinels rather than guessed because
+hard rule 13's `Fix`-with-SHA field is what makes an invented incident detectable: a SHA that does
+not resolve is worse than one that does not yet exist.**
+**Systemic guardrail:** **PARTIAL, and the honest half is stated first.** *What now works:* the three
+values are inside the frozen set before `prereg-v1`, so §8.6's three-way consistency check at C14 —
+*every `config/` value has a §8.6 row; every §8.6 row has a `config/` key; every §8.6 row has a
+registry row* — covers them from here, and `tests/test_c1_fix_probes.py` asserts each of the five determined keys
+resolves through the loader and appears in all three places. *What is NOT prevented, and it is the
+thing that actually failed:* **nothing reads a prose claim.** A fourth artefact writing *"lives in
+`config/`"* about a key that does not exist would still be invisible to every check this repository
+owns. `tests/test_c1_fix_probes.py::test_every_config_pointer_in_the_oracle_resolves_to_a_real_key`
+closes that for the **two** files this fix touches by parsing their config pointers and resolving
+each — which is the first mechanical check of this class in the project, and it covers two files, not
+the repository.
+*⚠️ Why the entry is worth its length: the FAIL was not a defect in a quote, a digest or a count —
+**every one of those verified, and 10 of 10 pages were byte-identical 24 hours later.** It was that
+the strongest artefact this project has produced described a state of the repository that was not
+true, in a file whose §2.4 preamble promises "This table asserts nothing that file does not source."
+**The number was right, the citation was right, and the sentence about ourselves was wrong.***
+
+---
+
+## INC-19 — a review harness wrote a tracked file through a WINDOWS SHELL REDIRECT, and the INC-06 class reached its seventh occurrence by a route no prior entry and no prompt had named
+
+**Date:** 2026-08-31 (C2 REVIEW `94116fe2`, **after** the first build commit `ee3cf93`; declared
+**OWED** in `docs/reviews/REVIEW_C2_1.md` §5 by the session that tripped it, which may not write this
+file; written up here by C1 FIX `365deaf7`)
+**Event:** REVIEW_C2's Phase 1 committed its blind reimplementation's expected values as
+`docs/reviews/independent/c2_reimpl_expected.json` at **`d1634d2`**. The JSON was produced through a
+**Windows shell redirect**, so the working tree held **CRLF** while the object store held **LF**. Two
+repository invariants went red at once — `check-roles` **A3 no CRLF in any tracked file** and
+`tests/test_repo_invariants.py::test_the_object_store_and_the_working_tree_agree`, the latter being
+**INC-11's own test**, the one whose dirty-tree sensitivity INC-11 exists to record.
+**Action:** The shell was removed from the write path and the file rewritten with LF, in **`6db060f`**
+— before the mutation baseline was taken. The baseline was then measured on a clean tree
+(`1 failed, 226 passed, 1 skipped, 2 deselected`, the single red being C1's own probe over C1's open
+BLOCKER) and the review completed: 13 mutants, 10 killed, 1 proven equivalent, **control survived**.
+**No expected value moved** — the JSON's content was correct throughout; only its line endings were
+wrong.
+**Expectation:** Writing a file should write the bytes given to it. On this machine, with
+`core.autocrlf=true` set system-wide, a shell redirect does not.
+**Missing:** Nothing new in the checks — A3 and A4 both fired, correctly, one commit later. What was
+missing is in the **instructions**: every prior entry of this class (INC-06, INC-10, INC-12, INC-13,
+INC-16) and every session prompt since names **HEREDOCS** and **PYTHON SCRIPTS** by name. **Not one
+of them names a shell redirect.** The prohibition was written as a list of two tools rather than as a
+property of any write path that passes through a translating layer, so a third tool with the same
+property read as permitted.
+**Missed:** ⚠️ **The generalisation was available and had already been paid for five times.** INC-16's
+own `Diagnosis` states the property rather than the tool — *"the write side of the same
+tool-stack-interprets-your-literal defect INC-06, INC-10, INC-12 and INC-13 record on the read
+side"* — and INC-16's `Systemic guardrail` says outright that *"the honest remedy remains a habit,
+and this entry is the fifth piece of evidence that the habit is unreliable."* A session that had read
+INC-16 had been told, in the file's own words, that the enumeration was not the rule. **And the
+machine's own configuration is recorded in `PROVENANCE.md` §3.1 as verified first-hand:
+`core.autocrlf=true`, system-wide, `file:C:/Program Files/Git/etc/gitconfig`** — the fact that makes
+every redirect on this host a translating write.
+**Diagnosis:** A `>` redirect on Windows opens the destination in text mode, so every `\n` handed to
+it is written as `\r\n`, which is the identical mechanism as `Path.write_text` in INC-16 with a
+different tool holding it; the prohibition had been recorded as an enumeration of two named tools
+rather than as the property they share, so a third tool with that property was outside the letter of
+a rule it was squarely inside the spirit of.
+**Fix:** **`6db060f`** — the review's own commit, which removed the shell from the write path and
+rewrote the file with LF. No repository source was wrong; the damage never reached the mutation
+baseline.
+**Systemic guardrail:** ⚠️ **NONE NEW — accepted, because the guardrail that exists WORKED, and
+saying so is the honest report.** `.gitattributes` plus `check-roles` A3/A4 caught this **one commit
+later and before the baseline**, which is exactly why `.gitattributes` was a first-commit deliverable
+(`PROCESS.md` §6a). A mutation baseline taken from that dirty tree would have been **VOID for a
+reason having nothing to do with C2** — every mutant scoring as "killed" by a red that was already
+red, which is **INC-11 reproduced exactly**. *What is NOT prevented:* nothing stops a session writing
+a tracked file through a translating path, and the only change this entry can honestly make is to the
+wording of the prohibition — from *"not heredocs, not python scripts"* to **"nothing that is not your
+editor tool, and a shell redirect is one of those things."* This session's own prompt carries that
+corrected wording, which is the first time it has.
+*⚠️ Recorded because it is the SEVENTH occurrence of a class this project has documented six times,
+reached by a NEW ROUTE each time it recurs — and because the session that tripped it declared the
+entry OWED in its own review rather than letting a PASS carry it silently. The number that matters is
+not seven; it is that **six of the seven were caught by a control and one (INC-13) sat undetected for
+two days**, and the controls are the reason this one cost a line-ending and not a result.*
+
+---
+
+## INC-20 — a ruling swapped one unfirable predicate for another, and the error string that makes the replacement unfirable is quoted inside the ruling itself
+
+**Date:** 2026-08-31 (the architect's, in the Q-017 ruling of 2026-08-31; found and written up by
+C1 FIX `365deaf7`, **after** the first build commit `ee3cf93`)
+**Event:** Q-017's ruling moved invariant **S2** off `X-Refund-Idempotency` — correctly, because
+`refunds.go:73-75` passes `nil` where the SDK's `extraHeaders` go, so no refund on Razorpay's own MCP
+surface can carry the header and **S2 as defined could never fire** — and onto **`receipt`**.
+`CONTEXT.md` v1.4 §9.2 landed it as *"two **executed** refunds ON THE SAME PAYMENT carrying the SAME
+NON-EMPTY `receipt`."* ⚠️ **Razorpay rejects a duplicate `receipt` itself.**
+`RAZORPAY_SEMANTICS.md` **RS-27**: *"Duplicate receipt found for this refund request."* (**400**),
+description *"The value passed in the `receipt` parameter has already been used for an earlier refund
+**on the same payment**. `receipt` is treated as an idempotency key."* **That scope — an earlier
+refund on the same payment — is S2's scope exactly.** So in a world faithful to that rejection, which
+`PROCESS.md` §12.1's C4 row requires (RS-27's family is `MUST-FIRE`), **the second refund is never
+EXECUTED and S2 could not fire.** One unfirable predicate had been swapped for another.
+**Action:** Raised as **Q-027**, Class A, and RULED the same day (architect, **APPROVED BY THE
+OPERATOR**): **S2 fires on two refunds ISSUED with the same non-empty `receipt` on the same payment —
+not two EXECUTED.** Same predicate, same key, **one word of scope.** `CONTEXT.md` v1.5 §9.2 carries
+it with all three of S2's definitions and why each of the first two failed. **`S2-amt` is UNCHANGED**
+and the S2-vs-S2-amt delta (INC-04) remains the published finding.
+**Expectation:** A ruling that withdraws a predicate *for being unfirable* should test its
+replacement for firability — against the same third party's documented guards, not only against the
+tool surface.
+**Missing:** Any check that asks *"can this invariant fire in the world we are about to build?"* The
+project has `MUST-FIRE` labels for Razorpay's **errors** and a C4 done-when that enforces them; it
+has **nothing equivalent for its own invariants**. E1, E2, E3, S1, S2, S2-amt, S3 and S4 are defined
+in `CONTEXT.md` §9 and no artefact asserts that each is reachable in the modelled world. Had one
+existed, it would have fired on the header definition, on the `receipt`-on-execution definition, and
+on both occasions before a session read the ruling.
+**Missed:** ⚠️ **THE RULING QUOTES THE VERY ERROR STRING THAT INVALIDATES IT.** Q-017's own recorded
+text carries RS-27's 400 and its full description — *"has already been used for an earlier refund on
+the same payment"* — as the **evidence that `receipt` is a real idempotency key**, and `CONTEXT.md`
+§9.2's new S2 bullet reproduces it again, verbatim, three lines above the word *"executed."* The
+architect read that sentence while writing the definition, cited it as the ground for the move, and
+did not read it as a **guard that runs before execution**. A second signal sat one column away:
+`PROVENANCE.md` §2.4's A3 row already draws the conclusion in the right direction — *"an attacker
+simply omits it, or varies it"* — which is a statement about **what happens when the guard is
+enforced**.
+**Diagnosis:** The ruling tested the replacement predicate for **reachability by the tool** —
+`receipt` is one of `create_refund`'s five real parameters and `refunds.go:66` forwards it, which is
+true and was verified twice at source — and never for **survival against Razorpay's own guard on that
+same parameter**; the two questions have different answers, and only the first was asked because the
+header's failure had been a failure of the first kind.
+**Fix:** `CONTEXT.md` **v1.5**, §9.2 — *"two refunds ISSUED"* — landing Q-027's ruling with its three
+reasons and RS-27's verbatim error. **Fix SHA: `SHA-PENDING-INC20`**, replaced with the real hash by
+this session's final commit — a guessed SHA in this field is exactly the shape hard rule 13 exists to
+make detectable.
+**Systemic guardrail:** **PARTIAL.** *What now works:* `tests/test_c1_fix_probes.py::
+test_s2_is_defined_on_issue_not_on_execution` reads §9.2 and fails if S2's predicate returns to
+*"executed"*, and fails independently if §9.2 stops carrying RS-27's rejection alongside it — so the
+two halves of the argument cannot drift apart again. *What is NOT prevented:* **there is still no
+firability check over `CONTEXT.md` §9's invariant set.** The right guardrail is C4's — one row per
+invariant in the spend-free self-test's output, `FIRES` or `CANNOT-FIRE-BECAUSE`, printed as a number
+in the same way rule 11 requires of the `RECORDED` set — and it is **NAMED AS OWED** here rather than
+built, because `PROCESS.md` §12.1's C4 row is outside this session's fence.
+*⚠️ Why this is the architect's and not C1's, said plainly: C1 raised Q-017, flagged it as the
+**operator's** to rule, recorded **both** mechanisms and **decided neither** — which
+`PROVENANCE.md` §2.4 states was deliberate, because deciding it would change an invariant's meaning
+and hard rule 2 reserves that for the architect. The chunk did its job. The ruling did not.*
+*⚠️ And the cost, stated so the entry is not read as more dramatic than it is: **S2 has now been
+redefined THREE times** — amount-equality was **WRONG** (INC-04, false positives in 8/8 seeds), the
+header was **UNSENDABLE**, and `receipt`-on-execution was **UNFIRABLE**. Only the third move is a
+one-word scope correction rather than a new predicate. **All three were caught before C4 built the
+world and before C8 scored it, which is the only reason the total cost is one sentence of
+specification and no number at all.** An invariant redefined three times before its first measurement
+is a process working; an invariant redefined once after it is one that has published a wrong number.*
+
+---
