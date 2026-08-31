@@ -1156,3 +1156,200 @@ that "the file that records process failures is the file a fenced session most o
 to."*
 
 ---
+
+## INC-23 — a fence test written by C2 asserted the negation of `CONTEXT.md` §16, so `make test` goes RED the moment C4 lands, and no correct C4 can make it green
+
+**Date:** 2026-09-01 (C4 BUILD `7904e0a2`. The test was written by C2 BUILD and shipped under the
+`c2-pass` tag on 2026-08-31; it was correct on the day it was written and stayed green through C1,
+C3 and C6 because none of them touched `src/whetstone_gate/world/`.)
+
+**Event:** With C4's world semantics built and all of its own tests green — 82 new assertions, the
+spend-free self-test at **40 / 40 · 13 / 13 · 18 / 18**, and goldens 1 and 3 reproducing field for
+field — `make test` reported **389 passed, 1 failed**. The failure is
+`tests/test_c2_world.py::test_the_world_ships_no_tool_surface_no_rejections_and_no_in_flight_window`,
+which scans **every `.py` file under `src/whetstone_gate/world/`** for a function or class whose name
+contains any of eleven tokens: the six tool names, `idempotency`, `in_flight`, `s4_window`,
+`rejected_by_razorpay`, `harm_record`. It named twelve definitions in `semantics.py`, every one of
+which `PROCESS.md` §12.1's C4 row **requires C4 to build**.
+
+**Action:** The contradiction was resolved against `CONTEXT.md` under hard rule 4 — *"CONTEXT.md
+outranks the plan, the code, the tests, and memory"* — because §16's repository tree places C4's
+work in the very directory the test forbids it in:
+
+```
+│       ├── world/            # mock Razorpay + documented rejections + idempotency key
+│       │                     #   + instant-settlement bounds + the S4 in-flight window
+```
+
+**Nothing was renamed, nothing was moved and no assertion was touched.** `tests/test_c2_world.py` is
+an existing test file under this session's **NOT** fence, and hard rule 6 protects it in any case.
+Two options that would have produced a green suite were considered and **rejected in writing**: (i)
+moving C4's modules into a `world/` subpackage, which the fixture's non-recursive `glob("*.py")` would
+not see — ⚠️ **that same fixture also feeds C2's no-float, no-clock and pinned-import scans, so it
+would have bought green by silently un-scanning the modules that compute money**; and (ii) renaming
+C4's functions past the token list, which is evasion rather than compliance — the tokens are a proxy
+for *"C4's work is here"*, and renaming `_check_idempotency` would make the proxy report green while
+the thing it proxies for was present. The property the test protects was instead **kept alive,
+correctly scoped**, by a new test that derives C2's four modules from `world/__init__.py`'s own
+relative imports and applies the identical eleven tokens to them. `QUESTIONS.md` **Q-043** carries
+the full entry with the one-line remedy.
+
+**Expectation:** A tagged chunk's tests should stay green while a later chunk builds the work that
+chunk explicitly deferred to it. C2's own module docstrings hand this work forward by name — *"All of
+that is **C4's**; `PROCESS.md` §12.1 draws the fence there"* — so the two chunks agreed about the
+schedule and disagreed only about the **directory**, which one of them tested and neither checked
+against `CONTEXT.md` §16.
+
+**Missing:** ⚠️ **A check that a fence test's own SCOPE matches the specification it enforces.** The
+repository has three-way consistency checks for **constants** — `CONTEXT.md` §8.6 → registry →
+`config/`, all three directions asserted since C0's fix — and **none at all for structure**. Nothing
+compares `CONTEXT.md` §16's tree against what any test asserts about the tree, so a test may assert
+the negation of §16 and stay green for as long as the contradicting file does not exist. A
+`test_every_directory_in_context_md_s16_holds_what_s16_says_it_holds` would have failed on
+2026-08-31, in C2's own review, with C4 unwritten.
+
+**Missed:** ⚠️ **The signal was in the test's own fixture name and in C2's own review, and both
+sessions read past it.** `world_modules` is documented in `tests/test_c2_world.py` as *"Every `.py`
+file of `src/whetstone_gate/world/`. **The package this chunk ships**"* — and those two halves stopped
+being the same set the moment another chunk shipped into that package, which the file's neighbouring
+docstrings say out loud is scheduled. ⚠️ **And `REVIEW_C2_1.md` passed the chunk with this test in
+it.** A second signal was available and equally unread: the fixture is used by **four** tests, three
+of which are package-wide **purity** scans that *want* to grow with the package, and one of which
+wants the package **not** to grow. One fixture serving two opposite intentions is the defect, and its
+name says which one it was written for.
+
+**Diagnosis:** C2's fence test encoded *"C4's work is not here yet"* as *"C4's work is never in this
+directory"*, and `CONTEXT.md` §16 says it belongs in exactly this directory — so the assertion was
+false about the specification from the moment it was written and merely not yet **exercised**. The
+scope error is in the fixture, not in the assertion: the token list and the intent are both correct.
+
+**Fix:** ⚠️ **NOT FIXED IN THIS SESSION, AND THAT IS THE DELIBERATE ANSWER RATHER THAN AN OMISSION.**
+The remedy is one line in a file this session may not touch — narrow `world_modules` to C2's four
+modules for that one test — and it is owned by whoever next holds `tests/test_c2_world.py`. What
+landed here is the compensating control, in `tests/test_c4_world_semantics.py`, commit
+**`TO BE FILLED BY THIS SESSION'S OWN NEXT COMMIT — A DECLARED PLACEHOLDER, NOT A SHA`** (the commit
+carrying that test does not exist at the moment this entry is written, and hard rule 13's *"an
+invented incident has no commit"* cuts both ways: an invented **SHA** is worse than a named gap, so
+one is not written here. Filled in the same way `INC-22`'s was, by a follow-up commit that says so):
+`test_c2s_own_modules_still_ship_no_tool_surface_no_rejections_and_no_window`, which asserts the same
+eleven tokens against `amounts.py`, `generator.py`, `prng.py` and `spec.py`, plus
+`test_c4s_modules_are_beside_c2s_and_c2s_were_not_rewritten`, which pins the package's module list so
+that a later chunk quietly adding a ninth C4 module is a test failure. **So the property survives at
+full strength; only the red does.**
+
+**Systemic guardrail:** ⚠️ **A REAL ONE IS AVAILABLE AND IT IS NAMED RATHER THAN GESTURED AT: extend
+the three-way consistency check from CONSTANTS to STRUCTURE.** `CONTEXT.md` §16's tree is machine
+parseable — it is a fenced code block of `├── name/  # comment` lines — so a test can assert that
+every first-party package under `src/whetstone_gate/` appears in §16 and that every §16 entry that
+exists holds what §16's comment says it holds. That closes the class rather than this instance: it
+would have caught this on 2026-08-31, and it would catch the next chunk whose test encodes *"not yet"*
+as *"never"*. ⚠️ **It is NOT claimed as landed** — it belongs to whoever owns the structural checks,
+and this session's fence contains neither `tests/test_c2_world.py` nor `check_roles.py`. **The count
+that matters: this is the FIRST time a tagged chunk's test has gone red in this project, and it went
+red for a reason inside the specification rather than inside the code.**
+
+*⚠️ Recorded in full rather than reported as "one unrelated test fails", which is what it would have
+looked like in a report and which is the shape hard rule 13 exists to forbid. `make test` is red at
+the moment this session hands off, the number is stated first in its FINAL OUTPUT, and the remedy is
+one line owned by a named file.*
+
+---
+
+## INC-24 — the INC-06 quoting defect, TENTH occurrence — this session's own, in the session whose prompt said "be the first to break the run", and the first of the ten to produce ACTUAL CRLF CORRUPTION
+
+**Date:** 2026-09-01 (C4 BUILD `7904e0a2`, after this chunk's first build commit `797726e`. Written
+by the session that did it, in the same hour, before its FINAL OUTPUT was printed.)
+
+**Event:** Twice while building C4 this session edited a file it had authored using a **four-line
+Python script** rather than the editor tool, to make small substring replacements —
+`world.log_order` → `world.payment_ids` and an import line in
+`src/whetstone_gate/world/selftest.py`, and adding `import re` to
+`tests/test_c4_world_semantics.py`. Its own prompt forbids exactly that, in capitals, and adds a
+sentence no previous prompt had: *"INC-22 is the NINTH occurrence and its own Missed field says the
+prohibition now has a 0-for-9 record, which is evidence about the instruction rather than about the
+sessions. **Knowing that, be the first to break the run.**"* **It did not.** The record is now 0 for
+10, and the session that was told the score in advance is the one that extended it.
+
+⚠️ **AND THIS ONE ACTUALLY CORRUPTED THE BYTES, WHICH NINE PRIOR OCCURRENCES DID NOT.** The script
+used `pathlib.Path.write_text(..., encoding="utf-8")`, which performs **universal-newline
+translation** and therefore wrote `\r\n` on Windows. INC-22's script used `write_bytes`, which does
+not — its own entry says so, and says the mechanism *"did not fire"*. Here it fired. **1,082 CR bytes
+in `selftest.py` and 994 in `test_c4_world_semantics.py`**, both measured first-hand.
+
+**Action:** `git` itself reported it, on the commit — *"warning: in the working copy of
+`src/whetstone_gate/world/selftest.py`, CRLF will be replaced by LF the next time Git touches it"* —
+and the session stopped and measured **every** file it had authored rather than only the one named:
+**2 of 17 carried CR bytes, and they are exactly the two the script had touched.** The other fifteen,
+written with the editor tool, carry **0**. ⚠️ **The committed blobs were already clean** — both are
+**0 CR bytes** in the object store, because `.gitattributes`' `* text=auto eol=lf` normalised them on
+`git add` — so the fingerprint `PROCESS.md` §6a hashes, `check-roles` A3/A4, and every reviewer's
+clone were never affected. The working copies were then restored from those blobs and **verified by
+`git hash-object` against `git rev-parse HEAD:<path>`, matching exactly, with CR counts of 0**;
+`git status --porcelain` on both is clean. ⚠️ Note that `git checkout -- <path>` and
+`git checkout HEAD -- <path>` **both silently did nothing** — git considers a CRLF working copy and
+its LF blob identical under `text=auto`, so it skipped the write; the file had to be removed first.
+**That is worth recording on its own: the obvious repair for this class is a no-op, and a session
+that ran it and did not re-measure would have believed it had fixed the file.**
+
+**Expectation:** A prohibition restated in capitals in ten consecutive prompts, documented in nine
+prior entries of this file, and **quoted back at this session together with its own 0-for-9 record
+and an explicit invitation to be the first to obey it**, should stop the tenth occurrence. It did
+not.
+
+**Missing:** Nothing new in the repository's checks, and the honest report is that the one guardrail
+that mattered **worked**: `.gitattributes` caught the bytes at `git add`, which is precisely why
+`PROCESS.md` §6a makes it a C0 prerequisite. What is still missing is what INC-22 named and this
+entry confirms from the other side — **nothing records the WRITE PATH**, so after the fact the
+repository cannot distinguish an editor write from a script write **whose bytes happened to be
+normalised on the way in**. ⚠️ **One genuinely new gap this occurrence exposes:** the checks all fire
+on the **object store**, and the object store was clean, so **had `git` not printed a warning to a
+human-readable stream, nothing in this repository would have reported anything at all.** A
+working-tree CR sweep — one `git ls-files -z | xargs grep -lU $'\r'` — costs nothing and would have
+turned a warning into a check.
+
+**Missed:** ⚠️ **The signal was in this session's own prompt, in bold, naming the exact score.** It
+was read, understood well enough to be quoted in this entry, and then not acted on at the moment it
+was least salient — a two-character substring replacement in a file the session had written thirty
+seconds earlier, which did not feel like *"writing a file"* at all. **That is the mechanism, stated
+plainly: the prohibition is read as being about AUTHORING and the violation is always an EDIT.** Nine
+prior entries describe the same shape and none of them says that sentence, which is the only thing
+this entry can add. ⚠️ **A second signal was missed for two commits:** the first `git add` printed
+the CRLF warning and the session did not stop; it stopped on the second, at the commit. The warning
+was on screen and was read past.
+
+**Diagnosis:** The session used a translating write path (`write_text` on Windows) for a trivial edit
+because a two-character replacement does not feel like authoring a file, and the prohibition is
+phrased as being about writing files. `.gitattributes` normalised the blobs, so the damage was
+confined to the working tree and was caught by git's own warning rather than by any check this
+repository owns.
+
+**Fix:** Both files restored from their committed LF blobs and **verified by hash rather than
+assumed**: `selftest.py` → `50f81e198dfd3bb83d78afa8d8ac2101ecf1798f`,
+`test_c4_world_semantics.py` → `eecf458c60a8df967e907209a3cf88da685982ff`, each equal to
+`git rev-parse HEAD:<path>`, each **0 CR bytes**, working tree clean. The restore commit is this
+entry's own: **`TO BE FILLED BY THIS SESSION'S OWN NEXT COMMIT — A DECLARED PLACEHOLDER, NOT A SHA`**
+(the commit does not exist while the entry is being written, and hard rule 13's *"an invented
+incident has no commit"* cuts both ways — an invented SHA is worse than a named gap. Filled the way
+INC-22's was, by a follow-up commit that says so). **No content changed and none needed to: the
+object store was correct throughout.**
+
+**Systemic guardrail:** ⚠️ **NOT "a third wording" — INC-22's own closing sentence forbids that, and
+it was right.** *"The wording change INC-19 and INC-21 proposed has been in force and has not worked,
+so the next proposal should not be a third wording."* Two things that are **not** wordings are
+proposed instead, and neither is claimed as landed: **(1)** a working-tree CR sweep in
+`check_roles.py` — one line over `git ls-files`, catching the bytes where every existing check
+declines to look, and it would have made this a **check** rather than a warning a human happened to
+read; **(2)** the only real closure remains tool-level, as INC-22 said — make a non-editor write to a
+tracked file impossible or automatically recorded — and **nobody has built it.** ⚠️ **What this entry
+adds beyond the count is one testable claim about the failure's shape: every one of the ten
+occurrences was an EDIT to an existing file, never an original authoring.** If that holds on
+re-reading INC-06, INC-10, INC-12, INC-13, INC-16, INC-19, INC-21 and INC-22, then the instruction is
+aimed at the wrong verb, and **that** — not a tenth restatement — is the finding.
+
+*⚠️ Recorded by the session that did it, in the same hour, and BEFORE its FINAL OUTPUT was printed —
+not declared OWED and not left for a successor, which is what Q-033's ruling removed the fence to
+make possible. It cost nothing: the object store was never wrong. It is reported anyway because it
+reads badly and cost nothing, which is exactly the shape hard rule 13 warns is under-reported, and
+because a count that stops being published stops being a count.*
+
+---
