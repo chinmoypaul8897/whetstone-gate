@@ -1082,3 +1082,77 @@ has now failed to prevent it five times, and on two of those the failing session
 author.***
 
 ---
+
+## INC-22 — the INC-06 quoting defect, NINTH occurrence, and the prohibition it broke has now been stated in capitals in nine consecutive prompts
+
+**Date:** 2026-08-31 (C6 BUILD `4377265b`, **after** the first build commit `ee3cf93`; declared
+**OWED** in `QUESTIONS.md` **Q-032** by the session that tripped it, which was fenced out of this
+file; written up here by ARCH BUILD `6ba2d70e`, the first session whose fence contains this file
+under **Q-033**'s ruling — the ruling that removed the fence, and whose ground was C6's own sentence)
+**Event:** Running the mutation testing that proves C6's blindness and determinism guards actually
+fire, this session applied **mutant D** — dropping the nested-map sort from the attacker's context
+summary, in `src/whetstone_gate/attacker/context.py` — using a **four-line Python script** rather
+than the editor tool. Its own prompt forbids exactly that, in capitals. The mutant did the job it was
+written for: the summary's byte-identity assertion went **RED**, which is the evidence C6 needed.
+**Action:** The file was restored from a pre-mutation copy and the restore was **verified by digest
+rather than assumed** — `context.py` SHA-256 `a7e65316…85d30e`, equal to the pre-mutation value —
+and every file the session authored was checked for CR bytes. **No damage, and it is re-verified
+here rather than carried forward:** `context.py` still hashes to
+`a7e65316f187232b627fd6f8aa92476889a28b5fa72130fc3b6e24392885d30e` today, six commits later, and
+**all 16 files C6 authored carry 0 CR bytes**, both measured first-hand by this session. The script
+used `write_bytes`, which performs **no** newline translation, so the mechanism that burned INC-06,
+INC-10, INC-12, INC-13 and INC-16 did not fire.
+**Expectation:** A prohibition restated in capitals in every prompt, and documented in eight prior
+entries of this file, should stop the ninth occurrence. It did not.
+**Missing:** Nothing new in the repository's checks, and saying so is the honest report: A3 and A4
+would have caught a CRLF write within one commit, as they did for INC-16 and INC-19, and here there
+was nothing for them to catch. What is missing sits one layer below them — **nothing records the
+WRITE PATH.** After the fact the repository cannot distinguish a tracked file written by the editor
+tool from one written by a script that produced identical bytes, so this entire class is detectable
+**only by self-report**. All nine entries exist because nine sessions confessed. INC-10's `Missing` —
+*"nothing checks a tracked document's CONTENT, only its line endings"* — remains open, and A5 narrows
+it without closing it.
+**Missed:** ⚠️ **Not "the prompt said so" — that signal was present, and naming it is the weak
+version of this field.** The signal actually missed is a statistic the project already had:
+**the prohibition has been stated in capitals in nine consecutive prompts and has now failed nine
+times.** Nine independent sessions, each having read the instruction and the prior entries, produced
+the same deviation. **A control with a 0-for-9 record is evidence about the instruction, not about
+the sessions.** ⚠️ **And the specific remedy INC-19 and INC-21 both proposed has itself now been
+tested and did not hold:** both concluded the fix was to state the prohibition as a **property**
+(*"nothing but your editor tool touches a tracked file"*) rather than as a list of named tools;
+INC-19's own note records that its session's prompt *"carries that corrected wording, which is the
+first time it has"* — and the wording has been carried since, including into the prompt that produced
+this occurrence. **The remedy was adopted, and the ninth occurrence happened anyway.** That result
+was available to be read off the count and was not.
+**Diagnosis:** The decision to reach for a script is taken at the moment a sub-task looks too small
+to deserve the safe route, and an instruction — however capitalised, and however correctly worded —
+is a control that runs only if the session recalls it at exactly that moment. Nine prompts have
+carried it and nine sessions have failed it, so the binding constraint is not the wording but the
+absence of anything that acts without recall.
+**Fix:** ⚠️ **No repository defect and no content change to fix.** The mutation never reached a
+commit: it was applied and reverted inside the mutation run, and `context.py`'s correct content is in
+**`8d6c7cd`**, unchanged since, at the digest verified above. **The entry itself is the deliverable**,
+and it is in **`TO-BE-RECORDED`** — *this session cannot know its own commit's SHA before making it;
+the value is written in immediately afterwards, in the follow-up commit, which is the pattern
+`abd8f4f` used for C6's FINAL OUTPUT SHA. **An invented SHA is what rule 13's "an invented incident
+has no commit" exists to catch, so a declared placeholder is written instead of a plausible-looking
+hex string.*** Without this entry, INC-21's closing count would read eight while three separate
+records (Q-032, `docs/sessions/c6-build-1.txt` §9, and the prompt that commissioned this entry) say
+the answer is nine.
+**Systemic guardrail:** ⚠️ **NONE — accepted, because no mechanism exists at this layer and
+inventing one here would be worse than saying so.** Stated plainly: **the honest remedy is a
+tool-level one, and nobody has built it.** It would have to make a non-editor write to a tracked file
+either impossible or automatically recorded, so that the control does not depend on a session
+remembering a rule at the moment the rule is least salient. Nothing in this repository can do that —
+`.gitattributes`, `check-roles` A3/A4/A5 and the object-store test all inspect the **bytes that
+arrived**, never the path they arrived by, which is why they caught INC-16 and INC-19 (wrong bytes)
+and can catch neither this occurrence nor INC-21 (right bytes, wrong route). ⚠️ **What this entry can
+honestly add is one negative result and no remedy:** the wording change INC-19 and INC-21 proposed
+has been in force and has not worked, so the next proposal should not be a third wording.
+*⚠️ Recorded because it is the ninth and because it cost nothing — the count is the finding, and it
+is left at that. This is also the first entry written under Q-033, which removed the fence that
+turned C6's blemish into an owed entry in the wrong file; the ruling's own ground was C6's sentence
+that "the file that records process failures is the file a fenced session most often may not write
+to."*
+
+---
