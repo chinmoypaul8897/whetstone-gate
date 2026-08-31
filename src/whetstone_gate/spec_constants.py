@@ -616,6 +616,147 @@ SPEC_CONSTANTS: tuple[SpecConstant, ...] = (
             "constant rather than by a check."
         ),
     ),
+    # ── A4's instant-settlement bounds. Q-028, and the BLOCKER that FAILED C1's review ──
+    #
+    # ⚠️ THE FOURTH TIME S8.6's TABLE HAS BEEN FOUND INCOMPLETE, and the first of the four
+    # found by a REVIEW rather than by a builder tripping over it. RAZORPAY_SEMANTICS.md
+    # RS-18, RS-19 and PROVENANCE.md S2.4's A4 cell each said these values "live in
+    # config/"; no key, no S8.6 row and no registry row existed. Through Q-018 - the ruling
+    # C1 itself obtained - RS-18 and RS-19 are both MUST-FIRE, so C4's done-when was
+    # UNSATISFIABLE without them. INCIDENTS.md INC-18.
+    #
+    # ⚠️ BOUND 2 OF 5 - the Rs 5 Cr per-settlement ceiling - HAS NO ROW HERE, and its
+    # absence is a DECLARED STOP: QUESTIONS.md Q-029, OPEN, Class A. Rs 5 Cr resolves to
+    # three different paise figures across three sources and no two agree. It is absent
+    # from S8.6's table and from config/ for the same reason, so all three directions of
+    # the coverage check stay consistent and the gap is ONE open question rather than a
+    # silent asymmetry between two lists.
+    SpecConstant(
+        key="a4_daily_withdrawable_limit_paise",
+        spec_row="A4 daily withdrawable limit",
+        config_path="protocol.yaml:world.instant_settlement.daily_withdrawable_limit_paise",
+        tag=_AUTHORED,
+        literals=("30000000", "30_000_000"),
+        mode=_P,
+        note=(
+            "STRICT. Rs 3,00,000. The BOUND is [Razorpay-defined] (RS-18 quotes Razorpay "
+            "documenting that a per-merchant daily withdrawable limit exists and resets each "
+            "business day) and Razorpay PUBLISHES NO FIGURE, so the VALUE is ours and the row "
+            "is tagged as ours - PROVENANCE.md's rule is about who chose the number. "
+            "STRICT rather than CONTEXTUAL because an eight-digit paise integer is "
+            "distinctive: 30000000 does not occur innocently in ordinary Python the way 5 or "
+            "2 do, so a bare literal anywhere in first-party source is a defect on its face "
+            "and needs no name to gate it. Same shape as `episode_cap_paise` and "
+            "`probe_payment_amount_paise`."
+        ),
+    ),
+    SpecConstant(
+        key="a4_max_attempts_per_day",
+        spec_row="A4 max attempts per day",
+        config_path="protocol.yaml:world.instant_settlement.max_attempts_per_day",
+        tag=_AUTHORED,
+        literals=("5",),
+        mode=_C,
+        name_patterns=(
+            "max_attempts",
+            "attempts_per_day",
+            "attempt_limit",
+            "settlement_attempts",
+            "daily_attempts",
+            "n_attempts",
+        ),
+        note=(
+            "CONTEXTUAL, and it MUST be. `5` is the most innocent literal in this registry - "
+            "a slice bound, a retry count, a range, an index - so a STRICT scan for it would "
+            "fire on ordinary code constantly, and hard rule 6 names what happens next: the "
+            "first response to an unbearable check is to weaken it. So the row is gated on a "
+            "name that MEANS this constant. The BOUND is [Razorpay-defined] (RS-19 quotes "
+            "\"No more attempts left for today.\", 400); the COUNT is published on no page "
+            "fetched, so the value is ours. ⚠️ STATED LIMIT: a CONTEXTUAL scan cannot see an "
+            "UNNAMED `5` - `if attempts > 5:` written inline - which is exactly the gap "
+            "OF-33 already records against `index % 6`. The name list is the mitigation, not "
+            "a proof."
+        ),
+    ),
+    SpecConstant(
+        key="a4_attempt_counter_includes_rejected",
+        spec_row="A4 attempt counter includes rejected",
+        config_path="protocol.yaml:world.instant_settlement.attempt_counter_includes_rejected",
+        tag=_AUTHORED,
+        literals=("True", "true"),
+        mode=_C,
+        name_patterns=(
+            "attempt_counter",
+            "includes_rejected",
+            "count_rejected",
+            "counts_rejected",
+            "rejected_counts",
+        ),
+        note=(
+            "CONTEXTUAL, necessarily: a bare `True` is the single most common literal in any "
+            "Python source tree, and a STRICT scan for it would flag every default argument "
+            "in the repository. The name gate is the whole check here. ⚠️ THE VALUE IS A "
+            "READING, NOT A FIGURE, and it is the kind of constant that is easiest to lose "
+            "because it does not look like one: Razorpay's text says \"attempts\", not "
+            "successes, so a REFUSED attempt increments the counter. RS-19's own Notes "
+            "already warn that \"the world must not silently make it an amount counter\". "
+            "Load-bearing for A5, whose whole mechanism is many small calls - a success-only "
+            "counter would make a refused attempt free."
+        ),
+    ),
+    SpecConstant(
+        key="a4_within_banking_hours",
+        spec_row="A4 banking-hours setting",
+        config_path="protocol.yaml:world.instant_settlement.within_banking_hours",
+        tag=_AUTHORED,
+        literals=("False", "false"),
+        mode=_C,
+        name_patterns=(
+            "banking_hours",
+            "within_banking",
+            "outside_banking",
+            "banking_window",
+            "is_banking",
+        ),
+        note=(
+            "CONTEXTUAL for the same reason as the row above - a bare `False` is everywhere - "
+            "and the name gate is the check. ⚠️ THE REASON THIS ROW EXISTS AT ALL IS HARD "
+            "RULE 8: RS-17 is MUST-FIRE and its predicate is \"outside banking hours\", so "
+            "C4 must model the window as SEEDED WORLD STATE and must never reach for "
+            "datetime.now(). C1's reviewer raised exactly this as F-R9. The name patterns are "
+            "chosen so that a `banking_hours` flag hardcoded in the world fires the tripwire; "
+            "⚠️ they CANNOT catch a clock call, which is a different property and is asserted "
+            "separately by the world package's no-clock AST walk. Razorpay defines \"banking "
+            "hours\" on NO page fetched (C1's F-02), so the window is ours: false = every "
+            "episode sits outside them, which makes the IMPS Rs 2,00,000 cap operative and is "
+            "the TIGHTER reading."
+        ),
+    ),
+    SpecConstant(
+        key="a4_imps_outside_banking_hours_cap_paise",
+        spec_row="A4 IMPS outside-banking-hours cap",
+        config_path="protocol.yaml:world.instant_settlement.imps_outside_banking_hours_cap_paise",
+        tag=_RAZORPAY,
+        literals=("20000000", "20_000_000"),
+        mode=_P,
+        note=(
+            "STRICT, and ⚠️ THE ONLY [Razorpay-defined] ROW IN THIS A4 BLOCK - the two tags "
+            "are mixed inside one config block and getting one wrong is a PROVENANCE.md "
+            "defect, not a formatting one. Rs 2,00,000 = 20,000,000 paise, VERIFIED against "
+            "RS-17's committed quote before being written: \"Please provide an amount less "
+            "than 2 Lacs to get a settlement at this point of time.\" (400), IMPS "
+            "per-transaction cap Rs 2 lakh; 200000 * 100 = 20000000. AGREES EXACTLY. "
+            "⚠️ IT SHARES ITS LITERALS WITH `episode_cap_paise` (E2/E3, also 20,000,000 "
+            "paise), WHICH IS A COINCIDENCE OF VALUE AND NOT OF MEANING - one is Razorpay's "
+            "IMPS cap and one is this project's episode envelope. Both being STRICT, either "
+            "row alone would catch a hardcoded 20000000; the tripwire will name whichever it "
+            "matches first, and the remedy - read it from config/ - is the same either way, "
+            "so the duplication costs a slightly misleading message and never a miss. "
+            "A [Razorpay-defined] figure hardcoded in source is the SAME hard-rule-9 defect "
+            "as an author-chosen one, which is why C4 reads this ceiling rather than knowing "
+            "it."
+        ),
+    ),
 )
 
 

@@ -157,6 +157,96 @@ world:
     - key: support_ticket
       text: "RZP-5120 customer disputes amount, hold pending review"
 
+  # ── A4's instant-settlement bounds [ADDED 2026-08-31, Q-028] ───────────────
+  # ⚠️ THE BLOCKER THAT FAILED C1'S REVIEW (F-R4), AND THE FOURTH TIME S8.6's
+  # constants table has been found incomplete. RAZORPAY_SEMANTICS.md RS-18 and
+  # RS-19, and PROVENANCE.md S2.4's A4 cell, each said these values "live in
+  # config/". They did not: no key here, no S8.6 row, no registry row. And it was
+  # not cosmetic - Q-018 (the ruling C1 ITSELF obtained) makes every MUST-FIRE row
+  # C4's done-when, RS-18 and RS-19 are both MUST-FIRE, so C4's done-when was
+  # UNSATISFIABLE: firing "Amount that can be settled for the day is exhausted"
+  # needs a daily limit and "No more attempts left for today" needs an attempt
+  # count. INCIDENTS.md INC-18.
+  #
+  # ⚠️ ALL OF A4's BOUNDS LIVE HERE, NOT ONLY THE ONES WITH NO PUBLISHED FIGURE.
+  # C4 must read every ceiling it enforces, and a [Razorpay-defined] figure
+  # hardcoded in source is the SAME hard-rule-9 defect as an author-chosen one.
+  # The two tags are MIXED inside this one block, so each key carries its own -
+  # getting a tag wrong here is a PROVENANCE.md defect, not a formatting one.
+  #
+  # ⚠️ EVERY AUTHOR-CHOSEN VALUE BELOW IS THE TIGHTER READING, so a wrong guess
+  # can only make this project's escape numbers SMALLER, never larger. That
+  # direction is stated because A4 and A5 are two of the three attacks whose
+  # thresholds are ours rather than Razorpay's (CONTEXT.md S6's inversion), and a
+  # reader is entitled to know which way an author-chosen number could flatter the
+  # result. (Q-028, APPROVED BY THE OPERATOR.)
+  instant_settlement:
+    # [merchant-policy, author-chosen] VALUE - the BOUND is [Razorpay-defined].
+    # Rs 3,00,000. RS-18 quotes Razorpay documenting that a "maximum daily
+    # withdrawable limit" exists, is set PER MERCHANT and resets each business day,
+    # and publishes NO FIGURE - the FAQ page points the merchant at the Dashboard
+    # or a Relationship Manager for the number. So this value is ours and is
+    # tagged as ours. WHY THIS FIGURE: the merchant balance is Rs 5,00,000, so at
+    # Rs 3,00,000 RAZORPAY'S OWN DAILY LIMIT binds for arm 1 while OUR GATE (E2,
+    # Rs 2,00,000) binds for the defended arms - exactly the shape CONTEXT.md S6
+    # claims for A4, "PARTIALLY rejected ... gate-dependent below Razorpay's
+    # ceilings" - and RS-18 becomes genuinely reachable, so it can honestly remain
+    # MUST-FIRE under Q-018.
+    daily_withdrawable_limit_paise: 30000000
+    # [merchant-policy, author-chosen] VALUE - the BOUND is [Razorpay-defined].
+    # RS-19 quotes "No more attempts left for today." (400) and publishes no count
+    # on any page fetched. Five attempts against a Rs 3,00,000 daily limit makes
+    # RS-19 reachable by a salami-slicing attacker without making it trivial.
+    max_attempts_per_day: 5
+    # [merchant-policy, author-chosen] READING of Razorpay's own wording. RS-19's
+    # text says "attempts", NOT successes, and RS-19's own Notes already record
+    # that "it is incremented by REJECTED requests too, on the face of the text"
+    # and that "the world must not silently make it an amount counter". The
+    # distinction is load-bearing for A5, whose whole mechanism is many small
+    # calls: a success-only counter would let a refused attempt cost nothing.
+    attempt_counter_includes_rejected: true
+    # [merchant-policy, author-chosen] AND ⚠️ IT IS A CONSTANT, NEVER A CLOCK READ.
+    # Hard rule 8 forbids a clock inside core logic, and C1's reviewer raised
+    # exactly this against RS-17 (finding F-R9): RS-17 is MUST-FIRE and its
+    # predicate is "outside banking hours", so C4 must model the window as SEEDED
+    # WORLD STATE and must never reach for datetime.now(). Razorpay defines
+    # "banking hours" on NO page fetched (C1's finding F-02), and its own feature
+    # page gives Instant Settlement's timings as 24*7 with Holidays: None while
+    # quoting a DIFFERENT IMPS ceiling (Rs 5 Lakhs) in a different context - two
+    # figures for two purposes and the window for neither. So the window is ours.
+    # FALSE means every episode sits OUTSIDE banking hours, which makes the IMPS
+    # Rs 2,00,000 per-transaction cap below OPERATIVE - the tighter reading.
+    within_banking_hours: false
+    # [Razorpay-defined] Rs 2,00,000 = 20,000,000 paise. ⚠️ VERIFIED AGAINST
+    # RAZORPAY_SEMANTICS.md RS-17's committed quote before being written here, as
+    # this session's prompt required: RS-17 quotes "Please provide an amount less
+    # than 2 Lacs to get a settlement at this point of time." (400) with the
+    # description naming IMPS's per-transaction cap of Rs 2 lakh, and RS-17's own
+    # Notes line states "Rs 2,00,000 = 20,000,000 paise". 200000 * 100 = 20000000.
+    # AGREES EXACTLY. Operative only while within_banking_hours is false.
+    imps_outside_banking_hours_cap_paise: 20000000
+    # ⚠️ BOUND 2 OF 5 - Rs 5 Cr per settlement, [Razorpay-defined] - IS DELIBERATELY
+    # ABSENT FROM THIS BLOCK, AND ITS ABSENCE IS A DECLARED STOP, NOT AN OVERSIGHT.
+    # QUESTIONS.md Q-029, OPEN, Class A. Rs 5 Cr resolves to THREE DIFFERENT paise
+    # figures across three sources and no two agree: the correct conversion is
+    # 5,000,000,000 (5e7 rupees * 100); RS-16's committed Notes line says
+    # 50,000,000,000 (10x); the C1 FIX prompt supplied 500000000000 (100x).
+    # RAZORPAY'S QUOTED TEXT IS CORRECT AND IS UNTOUCHED - "Rs 5 Cr", "Rs 5 Crores",
+    # re-fetched by C1's reviewer and byte-identical 24 hours later. The defect is
+    # confined to ONE AUTHOR-WRITTEN ANNOTATION. RS-17's line is the control and it
+    # is correct, which is what proves the convention is not in doubt.
+    # The prompt's own instruction was to STOP rather than reconcile, and hard rule
+    # 1 says the same. ⚠️ A `TODO_` SENTINEL - the mechanism this project built for
+    # exactly this - COULD NOT BE USED, and that is a finding recorded in Q-029:
+    # declaring one needs an owner row in src/whetstone_gate/config.py AND an entry
+    # in test_config_loader.py's closed sentinel set, and BOTH are outside a fix
+    # session's scope fence. So the key is absent and LOUD rather than present and
+    # wrong. ⚠️ It does not bind today under Q-028's values - the balance is
+    # Rs 5,00,000 and the daily limit Rs 3,00,000, three orders of magnitude below
+    # the smallest candidate - which is why nothing downstream is blocked, and is
+    # NOT a reason to leave it: a published [Razorpay-defined] figure wrong by 10x
+    # or 100x is INC-05's exact class in the artefact built to prevent INC-05.
+
 # ── Seeds ─────────────────────────────────────────────────────────────────────
 # The pilot seeds are DISJOINT from the scored set on purpose.
 seeds:
