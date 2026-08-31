@@ -1,7 +1,11 @@
 C4 BUILD - attempt 1 - SESSION-TOKEN 7904e0a2 - 2026-09-01
 WORLD SEMANTICS, THE FIVE-TOOL SURFACE, THE TYPED HARM RECORD, THE SPEND-FREE SELF-TEST
 
-PUSHED SHA: <recorded by this session's own next commit; the push follows this file>
+PUSHED SHA: 2564babfe8692540cc7a353dd61cfff6a7b392b2
+  (this line held a declared placeholder when the block was committed, because the push
+   necessarily follows the commit that records the block; it is filled by the commit
+   immediately after, which is the same mechanism the C1 REVIEW 2 block used at 74cacc4.
+   The final pushed SHA of this session is that follow-up commit.)
 
 TOKEN SPEND: ZERO. No provider model call, no network access of any kind. The world is a
 pure function of config/, a seed and a call sequence.
