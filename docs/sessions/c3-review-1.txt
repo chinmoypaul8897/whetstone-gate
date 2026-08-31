@@ -1,0 +1,354 @@
+C3 REVIEW REPORT - ATTEMPT 1
+================================================================================
+SESSION-TOKEN: a66c389d   role REVIEW   chunk C3   attempt 1   2026-08-31
+Review type: full - personas 1 (evaluation integrity) AND 2 (code).
+Minimum eight mutants plus a control; eleven mutants ran.
+ASCII only, per INCIDENTS.md INC-08.
+Committed to docs/sessions/c3-review-1.txt BEFORE being printed (CLAUDE.md 6.1).
+The pushed SHA is the commit carrying this file and is stated in the printed
+report, the same convention C0 REVIEW and C1 REVIEW used.
+May have run concurrently with C2's review as pair P-03. Disjoint chunk.
+I FIXED NOTHING AND I BUILT NOTHING.
+
+TOKEN SPEND: NONE. ZERO provider model calls; zero lane quota consumed.
+  No network operation at all. The vendored checkout is local; the only
+  `git clone` was of this repository onto itself into an OS temp directory.
+
+VERDICT
+================================================================================
+  ***  PASS  ***   ZERO BLOCKERs.   1 MEDIUM, 5 LOW, 3 INFO.
+  `c3-pass` CUT. docs/reviews/ARCHITECT_CHECK_1.md exists, which S11 requires.
+
+1. THE VENDORED TREE, AT BOTH ENDS
+================================================================================
+  The external-answer-key claim rests entirely on this tree being unmodified.
+
+  START  git -C vendor/tau2-bench rev-parse HEAD
+         -> a2c024725189473d2d7cea3a5cfdbcc67478e41f
+         git -C vendor/tau2-bench status --porcelain -> (EMPTY)
+  END    git -C vendor/tau2-bench rev-parse HEAD
+         -> a2c024725189473d2d7cea3a5cfdbcc67478e41f
+         git -C vendor/tau2-bench status --porcelain -> (EMPTY)
+
+  The mutation run never wrote to it. vendor/ is git-ignored (`vendor/*/`), so a
+  clone has no tau2-bench; src/, data/tau2/domains/ and .git/HEAD were COPIED IN
+  READ-ONLY and every copied file SHA-256-verified byte-identical first.
+
+2. MY BLIND DERIVATION BESIDE C3's, COUNT BY COUNT
+================================================================================
+  docs/reviews/independent/c3_enumeration.md was written and COMMITTED AT
+  e89f63c BEFORE src/whetstone_gate/tau2/, tests/test_c3_tau2_enumeration.py,
+  PROGRESS.md, INCIDENTS.md, docs/sessions/c3-build-1.txt or protocol.yaml's
+  `selections:` block had been opened, and before any diff was read.
+
+  Method deliberately unlike C3's: an ast decorator walk PLUS the runtime
+  __tool_type__/__mutates_state__ cross-check C3 declined to commit, reading raw
+  json rather than Sierra's pydantic models, censusing all three domains.
+
+  FIELD                     BLIND (mine)   C3 / derived   VERDICT
+  airline.total             50             50             AGREE
+  airline.empty             7              7              AGREE
+  airline.read_only         17             17             AGREE
+  airline.must_not_write    24             24             AGREE
+  airline.write             26             26             AGREE
+  retail.total              114            114            AGREE
+  retail.empty              2              2              AGREE
+  retail.read_only          8              8              AGREE
+  retail.must_not_write     10             10             AGREE
+  retail.write              104            104            AGREE
+  COMBINED.must_not_write   34             34             AGREE
+  COMBINED.total            164            164            AGREE
+  COMBINED.write            130            130            AGREE
+
+  BOTH PARTITIONS COMPARED ID FOR ID, not merely by cardinality:
+    airline empty ids      AGREE  (7/7)    only-mine=[] only-theirs=[]
+    airline read-only ids  AGREE  (17/17)  only-mine=[] only-theirs=[]
+    retail  empty ids      AGREE  (2/2)    only-mine=[] only-theirs=[]
+    retail  read-only ids  AGREE  (8/8)    only-mine=[] only-theirs=[]
+    7+17+26 = 50 ; 2+8+104 = 114 ; 34+130 = 164. Every partition sums.
+
+  reward_basis census, all three domains:
+    airline  (DB, COMMUNICATE) x50                              AGREE
+    retail   (DB, NL_ASSERTION) x112 ; (DB,) x2                 AGREE
+    telecom  (ENV_ASSERTION,) x2253 ; (ENV_ASSERTION, ACTION) x32   AGREE
+    telecom, any basis carrying DB: False                       AGREE
+    (Key order differs cosmetically only: C3 sorts each basis, my blind pass
+     kept file order. Same multiset, compared as such.)
+
+  WRITE tools, from the decorator, by ast AND by runtime __tool_type__:
+    airline 6, retail 7, name for name                          AGREE
+    ast == runtime on the full tool set AND the WRITE subset, both domains.
+    mutates_state=True set == the WRITE set; ZERO overrides.
+    So C3's declined cross-check is independently confirmed sound AT THE PIN.
+
+  T-FP, 40 ids, compared AS AN ORDERED LIST against both the derivation and
+  config/protocol.yaml:
+    airline: 11 12 14 15 16 17 18 19 20 21 22 23 24 25 29 30 32 33 35 37
+    retail : 0 1 100 101 102 103 104 105 106 107 108 109 11 110 111 112 113
+             13 14 15
+    ORDERED equal to derivation: True.  ORDERED equal to config/: True.
+
+  DIVERGENCES: NONE. Not one count, not one id, in either direction.
+  Full diff: docs/reviews/independent/c3_enumeration_diff.txt
+
+  Two blind observations that mattered: I flagged that a FLAT 40-id list would
+  collapse to 37 distinct strings (airline and retail both hold "11","14","15")
+  - C3 had already keyed the lists by domain; and I recorded, before reading
+  anything, that `requestor` is absent from all 692 reference actions, which
+  became OF-30.
+
+3. MY SORT CHOICE, AND WHETHER THE RULING WAS NEEDED
+================================================================================
+  RECORDED BEFORE C3's WAS READ: ascending BYTEWISE (code-point) order on the
+  task id AS A STRING, within each domain, first 20 of each.
+
+  Why, independently: Task.id IS `str` and every id in tasks.json is a json
+  string, so bytewise is the type's own order and needs no coercion the spec
+  never mentions; int(id) RAISES ON ALL 2,285 TELECOM IDS, so a numeric rule is
+  not even total over tau2's id space; and a stranger regenerating the sample
+  from the pin deserves the instruction with the fewest hidden premises.
+
+  C3's committed rule is the same rule. AGREE.
+
+  WAS THE RULING NEEDED? YES - measured, not assumed:
+    airline  bytewise vs numeric: 4 of 20 ids differ
+             only-bytewise 35, 37 ; only-numeric 7, 8
+    retail   bytewise vs numeric: 28 ids differ - 14 of 20 REPLACED
+             only-bytewise 100-109, 110-113 ; only-numeric 2-9, 16-21
+  Two competent readers of S13.4's unqualified "after sorting" would have shared
+  6 of 20 retail tasks. S13.4 as worded was UNDER-SPECIFIED. That is a finding on
+  the SPECIFICATION, not on C3, which found it and raised it.
+  `git tag -l` was `c0-pass` only - prereg-v1 does not exist - so closing it now
+  is PRE-FREEZE disambiguation, NOT post-hoc selection.
+
+4. THE db_reward WALK, FIRED RED
+================================================================================
+  Does it walk db_reward's OWN closure? Yes - it starts at
+  tau2.evaluator.evaluator_env, confirmed at source to be where db_reward is
+  computed (evaluator_env.py:125-131, :332-338). 24 tau2 modules reached,
+  ZERO text-generation clients.
+
+  CAN IT GO RED? Fired twice, both by me:
+    (a) my own independent walk pointed at tau2.evaluator.evaluator_nl_assertions
+        -> litellm ON THE PATH, plus tau2.utils.llm_utils.
+    (b) mutant M8 repoints DB_REWARD_MODULE at that module inside the harness:
+        test_the_db_reward_path_reaches_no_text_generation_client FAILS. KILLED.
+
+  Two ways the walk could have lied, both checked, both clean:
+    - _closure silently `continue`s on an unresolvable tau2.* name. Re-ran it
+      recording those: 126 unresolved names on the db_reward path, ALL 126 are
+      `from <real module> import <symbol>`, ZERO real modules silently dropped.
+    - _imports uses ast.walk, so a DEFERRED `import litellm` inside a function
+      body is still seen. Verified on a control fixture.
+  Both are now kept probes.
+
+  Re-verified AT SOURCE at the pin (persona 1's third-party rule; four false
+  claims have already reached this spec):
+    evaluator_nl_assertions.py:121 = `assistant_message = generate(`
+                              :122 = `model=DEFAULT_LLM_NL_ASSERTIONS,`
+    config.py:24 = `DEFAULT_LLM_NL_ASSERTIONS = "gpt-4.1-2025-04-14"`
+    docs/evaluation.md:122-126 carries the db_reward sentence complete.
+    EvaluationCriteria.reward_basis default_factory IS [DB, COMMUNICATE].
+  ALL FOUR HOLD.
+
+  And the honest half is asserted rather than glossed:
+  test_importing_any_tau2_module_loads_a_model_client_through_the_package_init
+  states in the repository that importing ANY tau2.* module pulls litellm in, so
+  "no model client is ever loaded in our process" would be FALSE and is not what
+  the project claims.
+
+5. MUTATION TABLE - 11 MUTANTS, 10 KILLED, CONTROL SURVIVED
+================================================================================
+  Source pinned at e89f63c (this review's own Phase-1 commit), in a THROWAWAY
+  CLONE outside the repository, because C2's review may have been concurrent as
+  P-03 and a moving baseline is what voided a complete C0 pass.
+
+  whetstone_gate.__file__ ON EVERY ONE OF THE 13 RUNS (baseline + 11 + control):
+    ...\scratchpad\mut\tree\src\whetstone_gate\__init__.py      (PYTHONPATH set)
+  Live-tree runs printed:
+    C:\Users\chinm\whetstone-gate\src\whetstone_gate\__init__.py
+  EVERY MUTANT WAS COMMITTED BEFORE IT RAN (INC-11), tree clean each time.
+
+  BASELINE: 215 passed, 1 skipped, 2 deselected
+  COMMAND : PYTHONPATH=<clone>/src python -m pytest -q -m "not operator_gate"
+              --ignore=tests/test_c1_review_probes.py
+  (C1's probe is red in the baseline over C1's own open BLOCKER; leaving it in
+   would score a kill on every row INCLUDING THE CONTROL. Nothing else excluded.)
+
+  #   SHA       operator targeted            result        killed by
+  M1  27088c9   WRITE-tool decorator match   KILLED (7)    split, write-count,
+                WRITE_TOOL_TYPE -> GENERIC                 config-counts, tfp,
+                                                           ruled-sort, committed,
+                                                           report
+  M2  b0a1551   empty-vs-read-only split     KILLED (5)    split + 3 classify
+                empty -> READ_ONLY                         params + no-criteria
+                (headline 34 UNCHANGED - this is the proof the SUB-counts are
+                 checked, not just the total)
+  M3  90e4819   domain filter                KILLED        3 failed, 12 errors
+                DOMAINS += telecom
+  M4  f0b5df9   sort direction               KILLED (2)    tfp, committed
+                sorted(reverse=True)
+  M5  3b5c27c   slice bound                  KILLED (2)    tfp, committed
+                [:wanted] -> [:wanted+1]
+  M6  f9ce596   strings-not-ints guard       KILLED (3)    committed,
+                yaml ["11", -> [11,                        EVERY_COMMITTED_ID_
+                                                           IS_A_STRING, report
+  M7  a0abd45   unknown-tool refusal         KILLED (1)    an_action_naming_an_
+                if unknown -> if False and                 unknown_tool_is_a_
+                                                           refusal
+  M8  fe475b1   db_reward closure walk       KILLED (1)    db_reward_path_
+                DB_REWARD_MODULE -> nl_assert              reaches_no_text_
+                                                           generation_client
+  M9  85b5b86   no-reimplementation scan     KILLED (1)    adapter_does_not_
+                real hashlib grader planted                reimplement_the_hash_
+                INSIDE enumerate.py                        comparison
+  M10 1eedda1   the ruled sort itself        KILLED (3)    tfp, non_ascii_refusal,
+                sorted(key=int)                            committed
+  M11 bcc5a08   unreadable-decorator refusal *** SURVIVED ***   NOTHING
+                else: raise -> elif False     215 passed, 1 skipped, 2 deselected
+                                              - BYTE-FOR-BYTE THE BASELINE
+  CTL 1152872   semantics-preserving          *** SURVIVED ***  -> RUN IS VALID
+                local ids_seen -> seen_task_ids
+                                              215 passed, 1 skipped, 2 deselected
+
+  M11 IS FINDING F-1 / OF-26 AND IS REPORTED, NOT DROPPED. The branch it disables
+  is the one whose own message reads "a misread write tool silently moves a task
+  into the must-not-write control, and that control is a published number". Its
+  only test feeds a fixture whose SOLE decorated def is the unreadable one, so
+  under the mutation `found` is {} and the UNRELATED "no decorated tools were
+  found at all" refusal raises instead; a bare pytest.raises with no match=
+  cannot tell the two apart.
+  EQUIVALENCE, STATED EXACTLY: at the pinned SHA the mutant IS equivalent - all
+  30 airline+retail decorators are plain @is_tool(ToolType.MEMBER) - the pin is
+  separately enforced by a test that CAN go red, and the tree is verified
+  unmodified. NO PUBLISHED NUMBER IS AFFECTED. Hence MEDIUM, not BLOCKER.
+  Remedy is one line: match="cannot read", or a readable tool in the fixture.
+
+  One thing the table cannot show: under M1,
+  test_write_tools_are_read_from_tau2s_own_decorator did NOT fail, because its
+  own re-derivation keys off tau2_enum.WRITE_TOOL_TYPE - the constant M1 mutates
+  - so both sides moved together. Seven other tests killed M1, so nothing is
+  unguarded, but a test that imports the constant it checks is nearer hard rule
+  3's line than it reads.
+
+6. FINDINGS
+================================================================================
+  F-1  MEDIUM  OF-26  Mutant M11 survives the whole suite: the guard on the
+                      externally-authored competence control cannot be told
+                      apart from an unrelated refusal. Equivalent at the pin; no
+                      published number affected. enumerate.py:281-287,
+                      test_c3_tau2_enumeration.py:243-254.
+  F-2  LOW     OF-27  report() prints DIFFERS on a drifted pre-registration and
+                      returns 0 unconditionally. Not wired into tasks.py or the
+                      Makefile, and make test enforces the equality anyway.
+  F-3  LOW     OF-28  tool_types reads args[0] only, so
+                      @is_tool(tool_type=ToolType.WRITE) is silently recorded
+                      READ (and an attribute-qualified callee is skipped),
+                      contradicting its own docstring. Latent: neither shape
+                      occurs at the pin. Could not be shown by a mutant because
+                      that means editing vendor/, which is read-only.
+                      GUARDED FROM THE OTHER SIDE by a kept probe.
+  F-4  LOW     OF-29  The "PURE - from here down" banner is false for eight
+                      functions below it; cfg.load is uncached so tfp_quota()
+                      opens config/protocol.yaml every call. Hard rule 8's
+                      SUBSTANCE is honoured - all real computation is pure - but
+                      C5 depends on C3 and could trust the banner.
+  F-5  LOW     OF-30  c3-build-1.txt:97-98 reports "550 assistant actions"; NO
+                      airline or retail action carries a `requestor` key at all,
+                      and no code or test computes that census. The counts and
+                      the conclusion are right; the characterisation is not.
+                      MADE CHECKABLE by a kept probe.
+  F-6  LOW     OF-31  The DEFAULT_LLM_NL_ASSERTIONS test pins the constant's NAME
+                      but not the VALUE S11.1 quotes. One `==` from closed.
+
+  INFO-1  Bytewise puts 14 of retail's 20 T-FP tasks in ids 100-113. Legitimate
+          consequence of a pre-registered rule and NOT a defect, but C18 should
+          say in one sentence that the sample is the first 20 of a bytewise sort,
+          not a random draw. Airline gives 20 of its 26 write tasks (77%) against
+          retail's 20 of 104 (19%).
+  INFO-2  test_every_committed_id_is_a_string's own assert cannot be false
+          (_committed_ids raises first). The behaviour IS protected and DOES go
+          red - M6 - via the exception. Cosmetic.
+  INFO-3  reward_basis()'s fallback returns an UNSORTED tuple while the live path
+          sorts. That is what lets its own test DETECT the fallback being
+          reached. Correct as written; worth a comment before someone "fixes" it.
+
+  DELIBERATELY NOT RE-RAISED: OF-08 / REVIEW_C0_2 I-01. make test's clean-clone
+  failures do land in tests/test_c3_tau2_enumeration.py, but the cause is Q-010's
+  unruled Class A default putting vendor/ outside the repository. Filing it
+  against C3 moves the finding to the wrong owner. Named so it is visibly not
+  overlooked.
+
+7. SUITE COUNTS (live tree, end of session)
+================================================================================
+  pytest tests/test_c3_tau2_enumeration.py -q      39 passed
+  pytest -q -m "not operator_gate"
+         --ignore=tests/test_c1_review_probes.py   219 passed, 1 skipped,
+                                                   2 deselected
+                                                   (215 before my 4 probes)
+  pytest -q  (nothing excluded)                    2 failed, 227 passed,
+                                                   1 skipped
+  python -m whetstone_gate.tasks test (make test)  1 failed, 226 passed,
+                                                   1 skipped, 2 deselected
+  python -m whetstone_gate.tasks check-roles       17 passed, 0 failed, 4 n/a, OK
+
+  BOTH RED TESTS ARE OUTSIDE C3 AND NEITHER IS MINE TO CLOSE.
+   - test_c1_review_probes.py::test_section_0_states_its_own_quoted_line_count_
+     correctly is C1's open FAIL (F-R2), owned by C1's FIX session.
+   - test_lanes_operator_placeholders.py::test_the_camel_branch_is_decided_
+     before_any_camel_run is an operator_gate that fails until RUN-1 decides the
+     CaMeL branch; make test deselects it by design.
+  C3's own module is green in every configuration.
+
+  NO FROZEN ARTEFACT IS CONTRADICTED, AND THE REASON IS THAT NONE EXISTS.
+  `git tag -l` returned `c0-pass` ONLY. probe-v1 and prereg-v1 do not exist and
+  PROTOCOL.md has not been written, so config/protocol.yaml was still editable
+  when C3 added to it and check-prereg correctly reports NOT-YET-FROZEN. Stated
+  rather than skipped, because otherwise the sentence costs nothing.
+
+8. WHAT I WROTE, AND WHAT I DID NOT
+================================================================================
+  WROTE: docs/reviews/REVIEW_C3_1.md
+         docs/reviews/independent/c3_enumeration.md  (Phase 1, blind, e89f63c)
+         docs/reviews/independent/c3_enumeration.py  (the blind harness)
+         docs/reviews/independent/c3_enumeration_diff.txt
+         docs/reviews/mutants/c3_mutants.md
+         tests/test_c3_review_probes.py              (4 kept probes, all green)
+         docs/reviews/OPEN_FINDINGS.md  (APPENDED)
+         STATUS.md  (APPENDED; the three earlier "Last updated" paragraphs and
+                     every other session's line left VERBATIM)
+         PROGRESS.md, docs/sessions/c3-review-1.txt
+  DID NOT TOUCH: QUESTIONS.md, INCIDENTS.md, tests/goldens/, vendor/,
+         config/, src/, tests/test_c3_tau2_enumeration.py, evals/.
+  I FIXED NOTHING. The parser, the pytest.raises, report()'s exit code and the
+  banners are all still exactly as C3 built them.
+
+  THE 4 KEPT PROBES (tests/test_c3_review_probes.py, all passing):
+   - no airline/retail tool decorator uses the tool_type= keyword form or an
+     attribute-qualified callee at the pin  -> closes OF-28 from the other side
+   - the db_reward import walk drops no REAL tau2 module (126 unresolved names,
+     all symbols)
+   - ast.walk still sees a deferred `import litellm`
+   - no reference action carries a `requestor` key at all; key union and the
+     142/550 counts pinned  -> closes OF-30 from the other side
+
+9. OWED
+================================================================================
+  NOTHING.
+  Nothing is owed to QUESTIONS.md: no ambiguity blocked me and no ruling was
+  issued to me. My token a66c389d was already recorded; I wrote no row.
+  Nothing is owed to INCIDENTS.md: nothing broke that meets rule 13's bar - no
+  measurement was voided, no artefact mangled, no evidence discarded, and the
+  one INC-11 firing (on my own uncommitted doc edits, before I committed them)
+  is the guardrail working as designed, not an incident.
+  Saying so explicitly, because "nothing to report" and "I did not look" are
+  indistinguishable otherwise.
+
+10. TAG
+================================================================================
+  `c3-pass` CUT on this PASS, by this REVIEW session, as CLAUDE.md S5 requires.
+  ARCHITECT_CHECK_1.md exists, which S11 requires for a PASS.
+  DO NOT SELF-CERTIFY IS NOT IN TENSION WITH THIS: the tag records a review
+  verdict reached against an external answer key by a session that built none of
+  it, and every number behind it is re-derivable from the pinned SHA by anyone.
+================================================================================
