@@ -1,0 +1,109 @@
+C2 REVIEW 1 — PHASE 2a — REIMPLEMENTATION DIFF
+session 94116fe2
+
+INC-17 EVIDENCE — the tree actually loaded:
+  whetstone_gate.__file__ = C:\Users\chinm\whetstone-gate\src\whetstone_gate\__init__.py
+  sys.executable          = C:\Users\chinm\whetstone-gate\.venv\Scripts\python.exe
+  reimplementation        = C:\Users\chinm\whetstone-gate\docs\reviews\independent\c2_reimpl.py
+
+==============================================================================
+A. SIXTEEN RAW-DRAW VECTORS — the amount path
+==============================================================================
+         raw     reimpl         C2  u agrees  verdict
+           0      50000      50000      True  AGREE
+             why: u = 0 — §8.6a: 'u = 0 gives exactly 50000'. The closed interval's floor.
+           1      50000      50000      True  AGREE
+             why: u = 2^-32 — one step off the floor; the smallest non-zero draw.
+         677      50000      50000      True  AGREE
+             why: the LOWEST raw this session found over seeds 0-199999 (seed 49041, draw 1).
+  1073741824     208090     208090      True  AGREE
+             why: u = exactly 0.25 — an exact dyadic rational, no rounding in `u` itself.
+  2147483648     866025     866025      True  AGREE
+             why: u = exactly 0.50 — the midpoint; geometric mean of the interval.
+  3221225472    3604217    3604217      True  AGREE
+             why: u = exactly 0.75.
+  4294967295   15000000   15000000      True  AGREE
+             why: u = 2^32 - 1 — §8.6a: 'u -> 1 gives exactly 15000000'. The ceiling.
+  4294967294   15000000   15000000      True  AGREE
+             why: one step below the ceiling.
+  4294954628   14999748   14999748      True  AGREE
+             why: the HIGHEST raw this session found over seeds 0-199999 (seed 153502).
+  1894840345     619182     619182      True  AGREE
+             why: straddle LOW: amount 619182.49999999987... -> HALF_UP rounds DOWN.
+  3763271754    7403482    7403482      True  AGREE
+             why: straddle HIGH: amount 7403481.50000000163... -> HALF_UP rounds UP.
+  2949329170    2511856    2511856      True  AGREE
+             why: CLOSEST approach found to a .5 boundary: 1.23e-10 paise below it.
+  4174750378   12786633   12786633      True  AGREE
+             why: 12786632.50000000661... -> rounds UP; the largest straddle found.
+  4167386882   12662203   12662203      True  AGREE
+             why: Q-023's own witness draw (seed 2046, index 3) - re-derived here.
+  2863311530    2240702    2240702      True  AGREE
+             why: 0xAAAAAAAA - an alternating bit pattern belonging to no seed's draw.
+  1431655765     334716     334716      True  AGREE
+             why: 0x55555555 - its complement; exercises the shift/XOR path differently.
+
+==============================================================================
+B. FIFTEEN WHOLE-SEED VECTORS — all 12 payments, field for field, POSITIONALLY
+==============================================================================
+seed 2001         AGREE  — 11 raw draws, balance, 12 payments x 9 fields
+                  why: SCORED + LADDER. The golden-7 seed; the only cross-check that already exists.
+seed 2002         AGREE  — 11 raw draws, balance, 12 payments x 9 fields
+                  why: LADDER. Adjacent to the golden - catches an off-by-one in seed handling.
+seed 2005         AGREE  — 11 raw draws, balance, 12 payments x 9 fields
+                  why: LADDER, last. The ladder block's upper edge.
+seed 2046         AGREE  — 11 raw draws, balance, 12 payments x 9 fields
+                  why: SCORED. Q-023's witness seed - the closest approach over the frozen 660.
+seed 2050         AGREE  — 11 raw draws, balance, 12 payments x 9 fields
+                  why: SCORED, last. The scored block's upper edge.
+seed 2101         AGREE  — 11 raw draws, balance, 12 payments x 9 fields
+                  why: PILOT, first. Disjoint from the scored set by construction.
+seed 2110         AGREE  — 11 raw draws, balance, 12 payments x 9 fields
+                  why: PILOT, last. The pilot block's upper edge.
+seed 16697        AGREE  — 11 raw draws, balance, 12 payments x 9 fields
+                  why: LOW-END CLUSTER: 7 of its 11 draws fall in the bottom decile of u.
+seed 32423        AGREE  — 11 raw draws, balance, 12 payments x 9 fields
+                  why: HIGH-END CLUSTER: 7 of its 11 draws fall in the top decile of u.
+seed 81859        AGREE  — 11 raw draws, balance, 12 payments x 9 fields
+                  why: WIDEST SPAN found: raw 880881 and raw 4293618963 in the same seed.
+seed 49041        AGREE  — 11 raw draws, balance, 12 payments x 9 fields
+                  why: carries the lowest raw found (677 -> the interval floor, 50000 paise).
+seed 153502       AGREE  — 11 raw draws, balance, 12 payments x 9 fields
+                  why: carries the highest raw found (4294954628 -> 14999748 paise).
+seed 0            AGREE  — 11 raw draws, balance, 12 payments x 9 fields
+                  why: seed 0 - the degenerate seed; `a` starts at the additive identity.
+seed 1            AGREE  — 11 raw draws, balance, 12 payments x 9 fields
+                  why: seed 1.
+seed 4294967295   AGREE  — 11 raw draws, balance, 12 payments x 9 fields
+                  why: seed 2^32 - 1 - the seed at the 32-bit mask boundary.
+
+==============================================================================
+C. OUT-OF-DOMAIN PROBES — reported, NOT counted as findings
+==============================================================================
+§8.6's seed list is 2001-2050 plus 2101-2110. Behaviour outside it is undefined
+by the specification, so a divergence here is recorded and is not a finding.
+seed 4294967296: AGREE
+    reimpl = [1144304738, 1416247, 958946056, 627933444, 2007157716, 2340967985, 2642484575, 2787370982, 1958536065, 2496316458, 1057668038]
+    C2     = [1144304738, 1416247, 958946056, 627933444, 2007157716, 2340967985, 2642484575, 2787370982, 1958536065, 2496316458, 1057668038]
+    why: seed 2^32 - probes whether the seed is masked into 32 bits before use.
+seed -1: AGREE
+    reimpl = [3850105811, 813802916, 3073704848, 4054706436, 3630262831, 2315588663, 2922715533, 2042566601, 583504547, 4245337221, 3742924205]
+    C2     = [3850105811, 813802916, 3073704848, 4054706436, 3630262831, 2315588663, 2922715533, 2042566601, 583504547, 4245337221, 3742924205]
+    why: a negative seed - probes the sign handling of the initial state.
+
+==============================================================================
+D. THE RAW STREAM BEYOND THE ELEVEN-DRAW BUDGET
+==============================================================================
+Golden 7 pins eleven draws. A generator that agreed on eleven and diverged on
+the twelfth would still be wrong, and a later chunk taking more draws would
+silently move every number. 200 draws are compared on each of six seeds.
+seed 2001: AGREE on all 200 draws
+seed 2005: AGREE on all 200 draws
+seed 2046: AGREE on all 200 draws
+seed 2050: AGREE on all 200 draws
+seed 2101: AGREE on all 200 draws
+seed 2110: AGREE on all 200 draws
+
+==============================================================================
+TOTAL DIVERGENCES: 0
+==============================================================================

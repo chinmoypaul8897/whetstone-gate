@@ -40,6 +40,7 @@ from __future__ import annotations
 
 import json
 import sys
+from pathlib import Path
 
 import c2_reimpl as R
 
@@ -129,5 +130,15 @@ def emit() -> dict:
 
 
 if __name__ == "__main__":
-    json.dump(emit(), sys.stdout, indent=2, sort_keys=False)
-    sys.stdout.write("\n")
+    # ⚠️ WRITTEN HERE WITH `newline="\n"` RATHER THAN REDIRECTED THROUGH THE SHELL.
+    # The first run of this file redirected stdout on Windows, which wrote CRLF into a
+    # tracked file and turned `test_gitattributes_is_correct_and_in_the_first_commit`
+    # (check A3) and `test_the_object_store_and_the_working_tree_agree` RED — the working
+    # tree and the object store disagreed, which is exactly the condition `PROCESS.md` §6a
+    # says would make the pre-registration fingerprint depend on which OS computed it.
+    # Taking the shell out of the path is the fix; `newline="\n"` is what enforces it.
+    target = Path(__file__).with_name("c2_reimpl_expected.json")
+    with target.open("w", encoding="utf-8", newline="\n") as handle:
+        json.dump(emit(), handle, indent=2, sort_keys=False)
+        handle.write("\n")
+    sys.stdout.write(f"wrote {target} with LF line endings\n")
