@@ -1,0 +1,471 @@
+C3 BUILD - FINAL OUTPUT
+================================================================================
+SESSION-TOKEN: da356dbb   role BUILD   chunk C3   attempt 1   2026-08-31
+ASCII only, per INCIDENTS.md INC-08.
+Committed to docs/sessions/c3-build-1.txt BEFORE being printed (CLAUDE.md 6.1).
+The pushed SHA is the commit carrying this file and is stated in the printed
+report - the same convention arch-worldgen-1, c1-build-1 and c0-fix-1 used.
+That one line is the ONLY difference between this file and the printed block.
+================================================================================
+
+
+0. SCOPE, SPEND, AND THE VENDORED CHECKOUT AT BOTH ENDS
+--------------------------------------------------------------------------------
+TOKEN SPEND: NONE. ZERO provider model calls. No Groq, no Google, no network
+operation of any kind was needed or made. This chunk reads local files from a
+vendored checkout and enumerates them.
+
+VENDOR VERIFIED AT SESSION START:
+  git -C vendor/tau2-bench rev-parse HEAD
+    a2c024725189473d2d7cea3a5cfdbcc67478e41f
+  git -C vendor/tau2-bench status --porcelain
+    (empty)
+
+VENDOR VERIFIED AT SESSION END:
+  git -C vendor/tau2-bench rev-parse HEAD
+    a2c024725189473d2d7cea3a5cfdbcc67478e41f
+  git -C vendor/tau2-bench status --porcelain
+    (empty)
+
+The checkout was never edited, patched, monkey-patched on disk, or installed
+over. `git status --porcelain --ignored` shows only __pycache__ directories,
+which tau2-bench's own .gitignore covers. The external-answer-key claim rests
+entirely on this tree being unmodified, and it is.
+
+
+1. WHY THIS CHUNK RAN FIRST, AND THE ANSWER IT WAS ASKED FOR
+--------------------------------------------------------------------------------
+CONTEXT.md S21.4 names the tau2 adapter THE PROJECT'S #1 TIME RISK - "the step
+most likely to eat a day" - and PROCESS.md S12.1 schedules it FIRST; revision 1
+scheduled it TENTH, behind a chunk that depends on it. tau2-bench is the ONLY
+source of tasks, gold behaviour and a grader this project did not author, and
+PROCESS.md S14 puts it on the NEVER-CUT list.
+
+IT CAN BE DRIVEN, AND THE SPECIFICATION'S NUMBERS ARE RIGHT. Every count below
+was DERIVED from the pinned checkout before being compared to anything.
+
+
+2. TASK 1 - THE ENUMERATION. ALL SIX SUB-COUNTS REPRODUCE.
+--------------------------------------------------------------------------------
+                                      CONTEXT.md S11.1     REPRODUCED AT THE PIN
+  must-not-write, total               34 of 164            34 of 164      MATCH
+  airline must-not-write              24 of 50             24 of 50       MATCH
+    - empty action list                7                    7             MATCH
+    - read-only trajectory            17                   17             MATCH
+  retail must-not-write               10 of 114            10 of 114      MATCH
+    - empty action list                2                    2             MATCH
+    - read-only trajectory             8                    8             MATCH
+
+  NO COUNT FAILED TO REPRODUCE. Nothing needed adjusting, and no QUESTIONS.md
+  entry was owed on this. S11.1's "The spec's 34/164 figure is exactly right" is
+  now a re-derived statement rather than a checked-once one.
+
+2b. THE 130 WRITE TASKS AND EVERY PARTITION (PROCESS.md S9)
+  write tasks, total                  130 (26 airline + 104 retail)       MATCH
+
+  airline   7 empty +  17 read-only +  26 write =  50
+  retail    2 empty +   8 read-only + 104 write = 114
+  TOTAL    34 must-not-write        + 130 write = 164
+
+  Per domain:  24 + 26 =  50   (airline)
+               10 + 104 = 114  (retail)
+  No task id appears in two buckets; every id appears in exactly one. Asserted.
+
+2c. WRITE TOOLS COME FROM THE DECORATOR, NEVER A HAND-LIST
+  Read from tau2's own @is_tool(ToolType.WRITE) with `ast`. A hand-list would be
+  an answer key we authored.
+    airline: 14 decorated tools = 6 WRITE, 6 READ, 2 GENERIC
+      book_reservation, cancel_reservation, send_certificate,
+      update_reservation_baggages, update_reservation_flights,
+      update_reservation_passengers
+    retail:  16 decorated tools = 7 WRITE, 7 READ, 2 GENERIC
+      cancel_pending_order, exchange_delivered_order_items,
+      modify_pending_order_address, modify_pending_order_items,
+      modify_pending_order_payment, modify_user_address,
+      return_delivered_order_items
+
+  ! CROSS-CHECKED AGAINST TAU2'S OWN RUNTIME METADATA FOR THIS BUILD. The set
+  the ast parser returns was compared to the set tau2's own metaclass builds at
+  import time (the __tool_type__ attribute is_tool sets): IDENTICAL on all 14
+  airline and all 16 retail decorated tools, with ZERO mutates_state overrides
+  in either domain. The parser is used rather than the import because importing
+  ANY tau2.* module executes vendor/tau2-bench/src/tau2/__init__.py, which pulls
+  in the whole framework including litellm, at a measured ~22 s. The cross-check
+  is evidence in this report, not a committed test, for that reason.
+
+  ! Zero reference-trajectory actions name a tool the domain's toolkit does not
+  define (0 airline, 0 retail), and zero name a `user` requestor (142 airline
+  and 550 assistant actions, 0 user). Both are printed as zeros because an
+  unknown action name would default its task INTO the must-not-write control -
+  inflating the one number S11.1 calls the externally-authored competence check.
+  The enumeration REFUSES on either rather than defaulting.
+
+2d. TELECOM IS EXCLUDED, AND THE REASON IS ASSERTED, NOT THE CONCLUSION
+                                      CONTEXT.md S11.1     REPRODUCED AT THE PIN
+  [ENV_ASSERTION]                     2,253                2,253          MATCH
+  [ENV_ASSERTION, ACTION]                32                   32          MATCH
+  total telecom tasks                 2,285                2,285          MATCH
+  any reward_basis carrying DB        (none)               False          MATCH
+
+  So there is NO DB-hash write signal to score and telecom CANNOT HOST the
+  must-not-write control at all. S11.1 withdrew an earlier unsourced "unsound"
+  claim and replaced it with this structural one; this re-derives the structure.
+
+2e. THE reward_basis CENSUS
+                                      CONTEXT.md S11.1     REPRODUCED AT THE PIN
+  airline, all [DB, COMMUNICATE]      50                   50             MATCH
+  retail  [DB, NL_ASSERTION]          112                  112            MATCH
+  retail  [DB]                        2                    2              MATCH
+  Every airline and retail task states its reward_basis EXPLICITLY, so tau2's
+  own [DB, COMMUNICATE] default is never reached here. Printed as a fact.
+
+
+3. TASK 2 - THE T-FP SELECTION, PRE-REGISTERED
+--------------------------------------------------------------------------------
+THE SORT RULE, as ruled by the architect on 2026-08-31 and written into the
+module docstring and into config/protocol.yaml so it is checkable:
+
+  SORT THE WRITE-TASK IDS AS STRINGS, BYTEWISE ASCENDING (Python's default
+  sorted() over str), WITHIN EACH DOMAIN SEPARATELY, AND TAKE THE FIRST 20 OF
+  EACH. Not numerically, not by file order, not by any tau2-internal ordering.
+
+  airline  20 of 26 write ids   first = "11"   last = "37"
+  retail   20 of 104 write ids  first = "0"    last = "15"
+  total selected: 40
+
+! THE RULING IS LOAD-BEARING, AND A TEST PROVES IT RATHER THAN ASSUMING IT.
+  The bytewise and numeric readings select DIFFERENT samples in BOTH domains:
+    airline - numeric would start at "7"; bytewise EXCLUDES "7" and "8"
+    retail  - bytewise puts "100".."109" AHEAD of "11"
+  Left to "whatever sort the language defaults to", a pre-registered sample
+  would have been decided by an implementation detail after the fact, which is
+  the opposite of pre-registration.
+
+COMMITTED TO config/protocol.yaml under `selections:` (commit 7fb09d4):
+  tau2_must_not_write_task_ids:   34, keyed by domain (24 airline, 10 retail)
+  tfp_task_ids:                   40, keyed by domain (20 airline, 20 retail)
+
+  vendor.tau2_bench_sha was VERIFIED, not rewritten. NO existing key or value
+  was changed. config/lanes.yaml was not touched.
+  Editing config/ was legal ONLY because prereg-v1 does not exist yet
+  (CONTEXT.md S15.0). After that tag it is frozen even if wrong.
+
+  ! EVERY ID IS QUOTED. tau2 task ids are STRINGS ("0", "11", "100"). Unquoted,
+    YAML parses them as integers, they match no task, and the selection is
+    silently empty. A test asserts every committed id is a str.
+
+  ! CLASS B DEVIATION, recorded rather than silently taken (hard rule 2): the
+    prompt asks for the 34 "each with its domain"; both lists are committed as
+    DOMAIN-KEYED MAPPINGS rather than flat {id, domain} records. Identical
+    information, and the domain cannot be separated from an id.
+
+  ! The ids were HAND-WRITTEN with the editor tool and then MACHINE-VERIFIED
+    against the derived enumeration, and that verification is a COMMITTED TEST
+    rather than a one-off - because INC-06, INC-10, INC-12, INC-13 and INC-16
+    are FIVE occurrences in this project of literal text mangled between a tool
+    call and a file. All four lists reported MATCH.
+
+
+4. TASK 3 - THE db_reward NON-USE, ASSERTED OVER THE PATH WE CALL
+--------------------------------------------------------------------------------
+THE SENTENCE THIS PROJECT USES, and the imprecise version is FALSE:
+  "We score on db_reward alone - a hash comparison, no model. tau2-bench's full
+   retail reward multiplies in an LLM-judged natural-language assertion, and we
+   do not use it."
+
+BOTH SOURCE LINES S11.1 CITES, RE-VERIFIED AT THE PINNED SHA. NO DRIFT:
+  src/tau2/evaluator/evaluator_nl_assertions.py:121
+      assistant_message = generate(
+  src/tau2/evaluator/evaluator_nl_assertions.py:122
+      model=DEFAULT_LLM_NL_ASSERTIONS,
+  src/tau2/config.py:24
+      DEFAULT_LLM_NL_ASSERTIONS = "gpt-4.1-2025-04-14"
+  The `generate(` call IS on line 121 as S11.1 says; the `model=` keyword is its
+  first continuation line. Both locations are exactly where S11.1 puts them.
+
+THE TEST: a static module-graph walk over db_reward's OWN transitive imports,
+starting at tau2.evaluator.evaluator_env (where EnvironmentEvaluator computes
+db_reward), NOT over tau2 as a whole. RESULT: 24 first-party modules, and
+  litellm                             NOT reachable
+  tau2.utils.llm_utils                NOT reachable  (tau2's `generate` lives here)
+  tau2.evaluator.evaluator_nl_assertions  NOT reachable
+  openai / anthropic / google / cohere / mistralai / groq / boto3 / bedrock /
+  transformers / vllm / huggingface_hub    NOT reachable
+
+THREE THINGS KEEP THAT HONEST, AND THEY ARE THE PART WORTH READING:
+
+  (i) THE WALK CAN GO RED. The same walk pointed at evaluator_nl_assertions -
+      the LLM-judged path we deliberately do not use - MUST find litellm AND
+      tau2.utils.llm_utils, and does. A walk that finds nothing anywhere is a
+      walk with a broken regex, and this is the seeded-defect discipline applied
+      to the check itself.
+
+  (ii) A FACT A NAIVE CHECK WOULD HAVE HIDDEN, ASSERTED INSTEAD.
+      vendor/tau2-bench/src/tau2/__init__.py imports the whole framework -
+      agents, the user simulator, the runner - so IMPORTING ANY tau2.* MODULE
+      EXECUTES IT AND LOADS litellm INTO THE PROCESS (measured ~22 s). That is a
+      property of Python package initialisation, NOT of the db_reward path. It
+      is why the test is a STATIC module-graph walk and why the adapter imports
+      no tau2 module at all. It is also why "no model client is ever loaded in
+      our process" would be a FALSE sentence - this project has already had to
+      withdraw four claims about third-party code - so the true, narrower
+      sentence is the one it publishes, and a test pins the fact.
+
+  (iii) ONE PROVIDER SDK IS REACHABLE FROM THE db_reward PATH AND THIS SESSION
+      SAYS SO FIRST RATHER THAN LETTING A DENYLIST SWALLOW IT.
+      `elevenlabs` - a SPEECH-synthesis SDK - is imported by
+      tau2.data_model.voice for a pydantic type (VoiceSettings), inside
+      `try: ... except ImportError`, and it is NOT INSTALLED in this venv.
+      It is not a text-generation client, nothing on the reward path calls it,
+      and it does not touch the claim. But a reviewer would find it on their
+      own, so a test names it, asserts tau2.data_model.voice is the ONLY module
+      in the closure that reaches it, and asserts the import is still guarded.
+      A NEW provider import anywhere in that closure fails the test.
+
+
+5. TASK 4 - THE ADAPTER READS THE GRADER, IT DOES NOT REIMPLEMENT IT
+--------------------------------------------------------------------------------
+db_reward is CALLED, never reimplemented. A reimplemented grader is an answer
+key we authored, which is the single thing this project exists to avoid.
+
+  test_the_adapter_does_not_reimplement_the_hash_comparison scans the whole
+  package, with comments and docstrings stripped, for: hashlib, sha256, sha1,
+  md5, hexdigest, digest, get_db_hash, db_hash, db_reward, calculate_reward,
+  DBCheck. ZERO findings.
+
+  ! THE SCAN IS PROVED NON-VACUOUS TWO WAYS, because a scan that has never fired
+    is indistinguishable from a broken regex:
+      - it is pointed at a PLANTED reimplementation (import hashlib; def
+        db_reward(...) comparing a sha256 hexdigest) and MUST report findings;
+      - and a second test asserts the docstring stripper did not eat the file -
+        real code tokens survive, prose does not - so the first test cannot
+        report PASS over an empty string. That is REVIEW_C0's own "a check that
+        reports PASS over nothing" class, guarded against inside the check
+        written to avoid it.
+
+  ! One function was RENAMED during the build for this reason and it is recorded
+    rather than left tidy: telecom_carries_db_reward ->
+    telecom_reward_basis_includes_db. The old name passed the scan only by an
+    accident of word-boundary matching. A near-miss that survives by luck is not
+    a thing to leave in a file whose whole subject is not writing a grader.
+
+  ! SCOPE HELD. Driving a task end to end with the user simulator is C5's and
+    nothing here does it. No HalfDuplexAgent, no user simulator, no episode.
+
+
+6. TASK 5 - INC-17 AS PLACED
+--------------------------------------------------------------------------------
+PLACED IN INCIDENTS.md (commit d4094b6), in hard rule 13's format, in this
+session's own prose, carrying every supplied fact. It is ARCHITECT-SUPPLIED and
+IS NOT THIS SESSION'S FINDING, and the entry says so in its Date line: found by
+the ARCH world-generation session (0811c64a), INDEPENDENTLY REPRODUCED BY THE
+ARCHITECT at 2026-08-31T03:45 IST.
+
+  Title: "a probe run inside a clone of an OLD commit tested the LIVE
+          repository, and reported the opposite of the truth"
+  Event / Action / Expectation / Missing / Missed / Diagnosis / Fix /
+  Systemic guardrail - all eight present, in order, none empty.
+
+  Diagnosis (two sentences, naming the mechanism): an editable install registers
+  a finder that resolves the package BY NAME independently of the working
+  directory, so checking out an old commit changes the files on disk but not the
+  module the interpreter imports; the check therefore had no oracle - it re-ran
+  the new code against the new code and reported agreement as proof of a
+  difference.
+
+  Fix: NO SOURCE CHANGE AND NO COMMIT SHA, stated plainly rather than left
+  looking like an omission. The PROCEDURE is fixed: set PYTHONPATH to the tree
+  under test AND print whetstone_gate.__file__ as part of the evidence.
+
+  Systemic guardrail carries THE LIVE CONSEQUENCE:
+  ! THE C0 RE-REVIEW MUST RE-RUN 46 PROBES AGAINST PRE-FIX SOURCE. DONE NAIVELY,
+    ALL 46 WILL REPORT PASS, and the review will conclude either that the probes
+    are worthless or that the broken code was already correct. BOTH CONCLUSIONS
+    ARE FALSE AND BOTH ARE REACHABLE FROM A CLEAN-LOOKING TRANSCRIPT.
+    A code-side guardrail - a conftest assertion that whetstone_gate.__file__
+    lies under the pytest rootdir - is NAMED AS OWED and NOT built here:
+    tests/conftest.py is an existing test file and outside C3's scope fence.
+
+  ! THIS APPLIED TO THIS SESSION TOO, and is recorded: C3 wrote no probe that
+    needed to run against an older tree, so no PYTHONPATH manoeuvre was
+    performed and none is claimed. Every test in this chunk runs against the
+    working tree and asserts external facts, so the class does not arise here.
+
+
+7. TASK 6 - Q-020, DECLARED OWED (QUESTIONS.md is outside this fence)
+--------------------------------------------------------------------------------
+In QUESTIONS.md's exact format, for the architect to place:
+
+### Q-020 - C3 is a `full` chunk with no golden
+**Raised by:** architect * **Date:** 2026-08-31 * **Status:** **RULED**
+**Blocking:** nothing - C3 was built under the ruling below.
+**Deviation class:** n/a - an architect ruling, not a session deviation.
+**Context:** hard rule 3 says a `full` chunk with no golden may not be built;
+PROCESS.md S5.2's nine goldens assign none to C3.
+**RULING (architect, 2026-08-31):** C3's golden is TAU2-BENCH ITSELF AT THE
+PINNED SHA a2c024725189473d2d7cea3a5cfdbcc67478e41f. Rule 3 exists because "a
+test whose expected value was produced by the code it tests proves nothing."
+C3's expected values are Sierra's task files, read from an unmodified
+third-party checkout - external BY CONSTRUCTION, which is the strongest form of
+what rule 3 protects. This is Q-016's reasoning applied to C3. ENFORCEMENT: C3's
+REVIEW must INDEPENDENTLY RE-DERIVE the 34/164 split, the six sub-counts, the
+reward_basis census and the 40 T-FP ids from the same SHA, by its own method,
+and diff. A divergence is a finding. No reimplementation of tau2 is required -
+there is nothing of ours to reimplement - and that substitution is what the
+review's PASS condition reads instead.
+
+BUILD SESSION'S NOTE, added to make the enforcement executable rather than
+aspirational: the tests do not transcribe a single expected number. They PARSE
+CONTEXT.md S11.1 and S13.4 for the counts and the T-FP rule, and derive the
+other side from the checkout, so the two sides come from two places and neither
+is a copy living in a test file. Every parser asserts it matched exactly once,
+because a parser that silently reads nothing is the same class of defect as the
+check it replaces.
+
+
+8. Q-021 - RAISED BY THIS SESSION, DECLARED OWED. IT IS WHY THE SUITE IS RED.
+--------------------------------------------------------------------------------
+### Q-021 - C3's prompt requires the Session-Token trailer on every commit, and
+             fences the session out of the file where the token must be recorded
+**Raised by:** C3 BUILD (`da356dbb`) * **Date:** 2026-08-31 * **Status:** OPEN
+**Blocking:** `make test` and `make check-roles` are RED for this one reason.
+Nothing else in C3 is blocked; the chunk is complete.
+**Deviation class:** A - it changes a reported number (check-roles' pass count
+and the suite's exit status).
+**Context:** CLAUDE.md S5 requires the trailer `Session-Token: <token>` on every
+commit AND requires the token to be "recorded in QUESTIONS.md under
+## Session tokens". `check_roles.py` E1 FAILS on a token that is not in that
+table. C3's SCOPE FENCE names QUESTIONS.md under NOT.
+**Options seen:**
+  1. Write the row into QUESTIONS.md - closes E1, but reaches outside an
+     explicit hard fence. C1 BUILD faced the same shape with Q-016/017/018 and
+     "said so rather than reaching outside the fence", which this project's own
+     records praise.
+  2. Omit the trailer - forbidden. The token WAS issued; omitting it defeats E4,
+     and history is never rewritten, so it could not be corrected later.
+  3. Carry the trailer, leave the row to the architect, report the RED loudly
+     with its exact remedy.
+**Default taken pending a ruling:** OPTION 3. The trailer is on all six commits;
+the fence was not crossed; nothing was weakened, skipped or loosened to get
+green (hard rule 6), and no test was edited.
+**Evidence that E1 is WORKING rather than broken** - it is the same firing
+recorded for 0811c64a, whose PROGRESS.md entry says so:
+  [FAIL] E1 no commit carries an UNISSUED token
+         FORGED/UNISSUED: {'da356dbb': ['5032cb6', '39516dd', '7fb09d4']}
+         - not present in QUESTIONS.md ## Session tokens
+**REMEDY - ONE ROW:**
+  | `da356dbb` | C3 | BUILD | 2026-08-31 |
+
+
+9. COUNTS - BEFORE AND AFTER, AND EVERY MOVE EXPLAINED
+--------------------------------------------------------------------------------
+  python -m whetstone_gate.tasks test
+    BEFORE  117 passed, 1 skipped, 2 deselected            (as the prompt states)
+    AFTER   154 passed, 2 FAILED, 1 skipped, 2 deselected
+    MOVE    +39 tests, ALL of them this chunk's, ALL passing.
+            117 + 39 = 156 = 154 + 2. The two failures are NOT among the 39.
+
+  python -m whetstone_gate.tasks check-roles
+    BEFORE  17 passed, 0 failed, 4 n/a, exit 0             (as the prompt states)
+    AFTER   16 passed, 1 FAILED, 4 n/a, exit 1
+    MOVE    E1 went PASS -> FAIL. Nothing else moved. D1 is still n/a because
+            gates/ and scorer/ do not exist yet (C8, C9).
+
+  ! THE THREE FAILURES ARE ONE CAUSE: da356dbb is not in QUESTIONS.md's token
+    table (Q-021, section 8). check-roles E1 fails;
+    test_no_commit_carries_a_forged_or_reused_session_token fails because E1
+    does; and test_check_roles_exits_zero fails BECAUSE check-roles now exits 1.
+    One row closes all three.
+
+  ! `make test` was ALSO transiently RED mid-session on
+    test_the_object_store_and_the_working_tree_agree, on the uncommitted
+    config/protocol.yaml. That is OPEN_FINDINGS OF-07, is known, is not this
+    chunk's, and was NOT weakened. It cleared on commit, as it is meant to.
+
+
+10. GIT
+--------------------------------------------------------------------------------
+Six commits, atomic, each one logical unit, every message saying what + why and
+citing spec sections. Every commit carries `Session-Token: da356dbb`. Both
+commits touching src/ or tests/ end with "(unreviewed)".
+
+  7fb09d4  chore: pre-register the 34 must-not-write and 40 T-FP tau2 task ids
+  39516dd  feat: tau2 adapter A - the enumeration, read from the pinned
+           checkout (unreviewed)
+  5032cb6  test: C3 - the 34/164 split, the ruled sort, and the db_reward
+           non-use (unreviewed)
+  d4094b6  docs: INC-17 - an editable install made a probe test the live repo,
+           not the checkout
+  5dfb119  docs: STATUS.md and PROGRESS.md for the C3 build session
+  (this file's commit)  docs: commit the C3 FINAL OUTPUT block before printing it
+
+NO TAG WAS CUT. Nothing is self-certified.
+
+git diff --stat dd75733 HEAD  (session start -> before this file's commit):
+  INCIDENTS.md                         |  61 +++
+  PROGRESS.md                          | 165 ++++++++
+  STATUS.md                            |  36 +-
+  config/protocol.yaml                 |  41 ++
+  src/whetstone_gate/tau2/__init__.py  |  24 ++
+  src/whetstone_gate/tau2/enumerate.py | 694 +++++++++++++++++++++++++++++++++
+  tests/test_c3_tau2_enumeration.py    | 732 +++++++++++++++++++++++++++++++++++
+  7 files changed, 1748 insertions(+), 5 deletions(-)
+
+ONLY FILES INSIDE THE FENCE. vendor/tau2-bench UNCHANGED (section 0).
+STATUS.md's 5 deletions are exactly two things and nothing else: the four-line
+"Last updated" pointer, which exists to be updated, and C3's OWN `todo | -` row.
+NO other chunk's review-history cell was touched, erased or rewritten.
+
+
+11. THE TRIPWIRE - LIVE, AND THIS IS THE FIRST CHUNK WITH REAL LOGIC
+--------------------------------------------------------------------------------
+test_no_spec_value_is_hardcoded_in_implementation_source PASSES on the new
+package. It did not have to be worked around and no exemption was added - there
+is no escape comment by design, and none was wanted.
+
+  Read from config/ rather than written into source:
+    the pinned SHA          -> protocol.yaml:vendor.tau2_bench_sha
+    34                      -> selections.tau2_must_not_write_task_count
+    130                     -> selections.tau2_write_task_count
+    40                      -> selections.tfp_task_count
+    20 / 20                 -> selections.tfp_stratification.{airline,retail}
+  Derived, never written anywhere: 164 (= 34 + 130 = 50 + 114), 50, 114, 24, 26,
+  10, 104, 7, 17, 2, 8, 2285, 2253, 32.
+
+  The registry's CONTEXTUAL rows were actively avoided while naming things: no
+  identifier binding a small integer under a name matching "turns", "split",
+  "prec", "method", "draws", "probe_index" or the fee patterns. The tripwire
+  strips comments and docstrings before scanning, so the prose above is safe by
+  the scan's own deliberate design, not by accident.
+
+
+12. WHAT I COULD NOT DO, AND WHY
+--------------------------------------------------------------------------------
+  (a) I DID NOT WRITE THE da356dbb ROW INTO QUESTIONS.md. The fence names that
+      file under NOT. This is Q-021 and it is the sole cause of the RED suite.
+  (b) I DID NOT WRITE Q-020 OR Q-021 INTO QUESTIONS.md, for the same reason.
+      Both are in sections 7 and 8 above, in that file's exact format, OWED.
+  (c) I DID NOT BUILD INC-17's conftest guardrail. tests/conftest.py is an
+      existing test file and outside the fence. It is NAMED AS OWED in the
+      incident entry itself, not merely in this report.
+  (d) I DID NOT COMMIT THE ast-vs-runtime DECORATOR CROSS-CHECK AS A TEST. It
+      would add a ~22 s tau2 import - and litellm - to every test process. It
+      was run in this session and its result is in section 2c. A reviewer can
+      re-run it in one command; the enumeration's own correctness does not
+      depend on it, and the fast path is the one the suite exercises.
+  (e) NO TAG. Only a review session cuts cN-pass, and C3 has not been reviewed.
+
+
+13. ANY COUNT THAT DID NOT REPRODUCE
+--------------------------------------------------------------------------------
+  NONE. Every figure CONTEXT.md S11.1 states about tau2-bench - the 34/164
+  split, all six sub-counts, the 130 write tasks, the airline and retail
+  reward_basis census, the telecom 2,253 / 32 of 2,285, and both cited source
+  line numbers - reproduced EXACTLY from the pinned checkout on the first
+  derivation. No number was adjusted, and no code was changed to make a count
+  agree.
+
+  DO NOT SELF-CERTIFY. A fresh adversarial review follows, and per Q-020 its
+  PASS condition is that it RE-DERIVES all of the above by its own method and
+  diffs.
+================================================================================
