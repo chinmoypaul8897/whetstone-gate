@@ -744,3 +744,64 @@ repository existed (INC-13). **Five occurrences, five sessions, five tools. The 
 about it has now failed to prevent it four times.***
 
 ---
+
+## INC-17 — a probe run inside a clone of an OLD commit tested the LIVE repository, and reported the opposite of the truth
+
+**Date:** 2026-08-31 (found by the ARCH world-generation session `0811c64a`; **independently
+reproduced by the architect** at 03:45 IST; written up here by C3 BUILD `da356dbb`, **after** the
+first build commit `ee3cf93`)
+**Event:** To meet hard rule 6's *"provably meaningful"* bar — a flipped or newly added test must
+be shown to **fail** against the source it was written for — that session cloned this repository
+into an OS temp directory, checked the clone out at the commit **before** its change, copied in its
+new probe, and ran `pytest` from inside the clone. It printed **`1 passed`**. A probe whose entire
+purpose is to FAIL against pre-fix source had **passed** against it.
+**Action:** The session **disbelieved its own passing result** rather than banking it. It printed
+`whetstone_gate.__file__` and found the module resolving to **the live repository**, not to the
+clone. Re-run with `PYTHONPATH` pointing at the clone's `src/`, the probe **failed**, correctly.
+⚠️ **The architect reproduced this independently and it is not one session's anecdote:** standing
+inside a clone checked out at `11f8345`, with the pre-fix source on disk and visible in the working
+directory, `import whetstone_gate` resolved to
+`C:\Users\chinm\whetstone-gate\src\whetstone_gate\__init__.py`. With `PYTHONPATH` set it resolved
+into the clone. **CONFIRMED.**
+**Expectation:** A test executed inside a checkout of an old commit tests **that old commit**. That
+is the entire premise of the manoeuvre, and it is the premise every "N of M probes fail against the
+pre-fix source" claim in this repository rests on.
+**Missing:** **Nothing in this repository asserts that the code under test is the code the session
+thinks it is.** The established idiom here — build a throwaway git repo under `tmp_path` and point
+a check at it — is *correct* for the `check-roles` probes, because those read **files** from a path
+handed to them. It **does not generalise** to a probe that **imports `whetstone_gate`**, because the
+import goes through the interpreter's path and the venv, **not** through the working directory. The
+two look identical in a diff and are opposites in effect.
+**Missed:** **Two signals, both already in the repository.** (1) `pyproject.toml` records the
+**editable install** — the whole mechanism, written down, in a file every session reads. (2)
+`PROGRESS.md`'s C0 FIX entry already claims *"46 of 52 probes fail against the pre-fix source"*, and
+that claim was produced by **exactly this manoeuvre**. The signal was not merely available; it was a
+published number resting on the defect.
+**Diagnosis:** An editable install registers a finder that resolves the package **by name**,
+independently of the working directory, so checking out an old commit changes the files on disk but
+**not the module the interpreter imports**. The check therefore had no oracle at all: it re-ran the
+*new* code against the *new* code and reported agreement as proof of a difference.
+**Fix:** ⚠️ **No source change, and no commit SHA — stated plainly rather than left looking like an
+omission.** Nothing in this repository was wrong; the **procedure** was. The procedure is now: when
+running any probe against an older tree, **set `PYTHONPATH` to that tree's `src/` AND print
+`whetstone_gate.__file__` as part of the evidence**, so the transcript shows which tree was loaded
+instead of asserting it. An entry whose `Fix` names a SHA it does not have would be an invented
+incident, and hard rule 13 exists partly to make invented incidents detectable — so this one says
+what it is.
+**Systemic guardrail:** ⚠️ **PARTIAL, and the live consequence is the important half.**
+**THE C0 RE-REVIEW MUST RE-RUN 46 PROBES AGAINST PRE-FIX SOURCE.** Done naively — clone, check out
+the old commit, run `pytest` — **all 46 will report PASS**, and the review will conclude either that
+the probes are worthless or that the broken code was already correct. **Both conclusions are false
+and both are reachable from a clean-looking transcript.** That is `REVIEW_C0.md`'s own *"a check that
+reports PASS over nothing"* class, arriving in the **verification procedure** rather than in the
+code — which is why it earns an entry even though no line of source is wrong. The architect carries
+the instruction into the re-review prompt. *What is NOT prevented:* nothing mechanical stops the next
+session from repeating it. A code-side guardrail — a `conftest.py` assertion that
+`whetstone_gate.__file__` lies under the pytest rootdir — is **NAMED AS OWED** and is deliberately
+**not built here**: `tests/conftest.py` is an existing test file and outside C3's scope fence.
+*⚠️ THE REASON THIS IS THE WORST SHAPE A FAILURE CAN TAKE IN THIS PROJECT, and it is why the entry is
+long: the defect's output was **green**, its direction was **flattering**, and the only thing that
+caught it was a session refusing to believe a result that had gone its way.* Every other entry in
+this file was caught by a control. **This one was caught by suspicion.**
+
+---
