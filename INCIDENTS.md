@@ -1227,10 +1227,10 @@ scope error is in the fixture, not in the assertion: the token list and the inte
 The remedy is one line in a file this session may not touch — narrow `world_modules` to C2's four
 modules for that one test — and it is owned by whoever next holds `tests/test_c2_world.py`. What
 landed here is the compensating control, in `tests/test_c4_world_semantics.py`, commit
-**`TO BE FILLED BY THIS SESSION'S OWN NEXT COMMIT — A DECLARED PLACEHOLDER, NOT A SHA`** (the commit
-carrying that test does not exist at the moment this entry is written, and hard rule 13's *"an
-invented incident has no commit"* cuts both ways: an invented **SHA** is worse than a named gap, so
-one is not written here. Filled in the same way `INC-22`'s was, by a follow-up commit that says so):
+**`5e74d122d6b149dd8ecc016f292a10a40af4365a`** *(this field carried an explicit declared placeholder
+until the commit existed — hard rule 13's "an invented incident has no commit" cuts both ways, and an
+invented **SHA** is worse than a named gap. Filled by a follow-up commit that says so, the same way
+`INC-22`'s was)*:
 `test_c2s_own_modules_still_ship_no_tool_surface_no_rejections_and_no_window`, which asserts the same
 eleven tokens against `amounts.py`, `generator.py`, `prng.py` and `spec.py`, plus
 `test_c4s_modules_are_beside_c2s_and_c2s_were_not_rewritten`, which pins the package's module list so
@@ -1348,12 +1348,15 @@ repository owns.
 **Fix:** Both files restored from their committed LF blobs and **verified by hash rather than
 assumed**: `selftest.py` → `50f81e198dfd3bb83d78afa8d8ac2101ecf1798f`,
 `test_c4_world_semantics.py` → `eecf458c60a8df967e907209a3cf88da685982ff`, each equal to
-`git rev-parse HEAD:<path>`, each **0 CR bytes**, working tree clean. The restore commit is this
-entry's own: **`TO BE FILLED BY THIS SESSION'S OWN NEXT COMMIT — A DECLARED PLACEHOLDER, NOT A SHA`**
-(the commit does not exist while the entry is being written, and hard rule 13's *"an invented
-incident has no commit"* cuts both ways — an invented SHA is worse than a named gap. Filled the way
-INC-22's was, by a follow-up commit that says so). **No content changed and none needed to: the
-object store was correct throughout.**
+`git rev-parse HEAD:<path>`, each **0 CR bytes**, working tree clean.
+
+⚠️ **AND THE `Fix` FIELD CARRIES NO REPAIR COMMIT, BECAUSE THERE IS NOTHING TO REPAIR IN GIT AND
+SAYING SO IS THE ACCURATE ENTRY.** The restore changed **working-tree bytes only**; the blobs
+`50f81e19…` and `eecf458c…` were already correct in the commits that introduced them (`8a94fc6` and
+`5e74d122d6b149dd8ecc016f292a10a40af4365a`), so no commit records the fix and inventing one to fill
+this field would be the exact failure hard rule 13 names. **The commit that carries this entry is
+`d8ff71a`**, and the commit that corrects its `Missing` field is the one immediately after it. This
+field held an explicit declared placeholder until those SHAs existed.
 
 **Systemic guardrail:** ⚠️ **NOT "a third wording" — INC-22's own closing sentence forbids that, and
 it was right.** *"The wording change INC-19 and INC-21 proposed has been in force and has not worked,
