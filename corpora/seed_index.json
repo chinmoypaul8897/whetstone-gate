@@ -1,0 +1,60 @@
+{
+  "_comment": [
+    "OUR SELECTION RECORD - which pinned third-party file seeds the attacker, and what",
+    "its bytes hash to. This file is OURS and is committed; the third party's bytes are",
+    "NOT (QUESTIONS.md Q-010, ruled: pin, do not commit).",
+    "Every sha256 below was computed FIRST-HAND by the C6 build session (SESSION-TOKEN",
+    "4377265b) on 2026-08-31 from the bytes returned at the pin. corpora/MANIFEST.md",
+    "carries the fetch commands and the verification; PROVENANCE.md section 3.3 carries",
+    "the licences, each verified at source.",
+    "R-Judge is absent from this file BY DESIGN: it ships no licence file of any kind, so",
+    "it is CITED, NEVER VENDORED (CONTEXT.md section 11.3, PROCESS.md section 12.2)."
+  ],
+  "sources": [
+    {
+      "corpus": "injecagent",
+      "origin_url": "https://github.com/uiuc-kang-lab/InjecAgent",
+      "pin": "f19c9f2c79a41046eb13c03c51a24c567a8ffa07",
+      "path": "data/attacker_cases_dh.jsonl",
+      "sha256": "999d52e15af3c80a3303a09430af0f3878d1f91e4c573ca7b477a91cdfa6b991",
+      "adapter": "injecagent_jsonl",
+      "licence": "MIT (c) 2023 Qiusi Zhan - the file is spelled LICENCE, British"
+    },
+    {
+      "corpus": "injecagent",
+      "origin_url": "https://github.com/uiuc-kang-lab/InjecAgent",
+      "pin": "f19c9f2c79a41046eb13c03c51a24c567a8ffa07",
+      "path": "data/attacker_cases_ds.jsonl",
+      "sha256": "87952398c989d8ca841724e38ecdbb789676d3841e19dfc44aac7b710df9cb1f",
+      "adapter": "injecagent_jsonl",
+      "licence": "MIT (c) 2023 Qiusi Zhan - the file is spelled LICENCE, British"
+    },
+    {
+      "corpus": "agentdojo",
+      "origin_url": "https://github.com/ethz-spylab/agentdojo",
+      "pin": "089ed468cf3ed0322acc66b0211f26d9d90dbf60",
+      "path": "src/agentdojo/data/suites/banking/injection_vectors.yaml",
+      "sha256": "4eb98a601c108d9b4d88f5d3f2dbf455f775a718975a0ae2624b4cf0d0f6f819",
+      "adapter": "agentdojo_injection_vectors_yaml",
+      "licence": "MIT (c) 2024 Edoardo Debenedetti, Jie Zhang, Mislav Balunovic, Luca Beurer-Kellner, Marc Fischer, and Florian Tramer"
+    },
+    {
+      "corpus": "agentharm",
+      "origin_url": "https://huggingface.co/datasets/ai-safety-institute/AgentHarm",
+      "pin": "e23b3fe60a0da9037314b88e5ee3a0c054970dad",
+      "path": "benchmark/harmful_behaviors_validation.json",
+      "sha256": "40cd099915258b41142acfc88a9f2b4e15cd631c5490ad02a0dce0cf2b9c175e",
+      "adapter": "agentharm_behaviors_json",
+      "licence": "MIT License with an additional clause (c) 2024 Gray Swan AI and UK AI Safety Institute - FIELD-OF-USE CLAUSE BINDS, see PROVENANCE.md section 3.3"
+    },
+    {
+      "corpus": "asb",
+      "origin_url": "https://github.com/agiresearch/ASB",
+      "pin": "1f561dccf92d55302368fa67679b4ba9d9c8fdc4",
+      "path": "data/all_attack_tools.jsonl",
+      "sha256": "c960ab1e60dee2038d51bc64e8f119e565c037c95a8565f176899de8d819a4b2",
+      "adapter": "asb_jsonl",
+      "licence": "MIT (c) 2024 AGI Research"
+    }
+  ]
+}

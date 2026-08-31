@@ -1,0 +1,11 @@
+# The fetched corpus payloads are PINNED, NOT COMMITTED — QUESTIONS.md Q-010, ruled.
+#
+# corpora/MANIFEST.md carries every source, its exact SHA, the fetch commands and the
+# verification. corpora/seed_index.json carries OUR selection record and the SHA-256 of
+# each pinned file, so a fetched tree is checked against a hash this repository holds.
+#
+# ⚠️ AgentHarm additionally ships a `canary_guid` — a contamination canary belonging to
+# somebody else's benchmark — and its licence carries a field-of-use clause. This
+# repository flips PUBLIC on 4 September (CLAUDE.md §5). Not republishing it is the
+# conservative direction and costs this project nothing.
+fetched/
