@@ -99,9 +99,9 @@ committed tree could be quietly edited, whereas a SHA cannot.
 | Source | Note |
 |---|---|
 | τ²-bench | licence to be recorded in `PROVENANCE.md` |
-| AgentDojo | licence to be recorded at its pin |
+| AgentDojo | ✅ **LICENCE RECORDED by C6, 2026-08-31** — **MIT** © 2024 Edoardo Debenedetti, Jie Zhang, Mislav Balunović, Luca Beurer-Kellner, Marc Fischer, and Florian Tramèr (⚠️ §11.3 named no holder; MIT requires the notice). `PROVENANCE.md` §3.3. ⚠️ **The PIN is still C13 / C16's** — C6 pinned only the banking **injection corpus** file, in `corpora/MANIFEST.md`; `config/protocol.yaml:vendor.agentdojo_sha` remains `TODO_C13_C16` and C6 did not resolve another chunk's sentinel |
 | CaMeL | licence to be recorded at its pin |
-| InjecAgent | ⚠️ its licence file is spelled **`LICENCE`**, British-style — a US-spelling `LICENSE` lookup finds nothing and would wrongly report "no licence" |
-| AgentHarm | ⚠️ carries a **field-of-use clause** — read it before use |
-| ASB | licence to be recorded |
-| **R-Judge** | ⚠️ **ships NO licence file of any kind.** Therefore **cited, never vendored, never redistributed** (`CONTEXT.md` §11.3, `PROCESS.md` §12.2). Its Finance subset is a deliberate drop, recorded rather than silently omitted |
+| InjecAgent | ✅ **RECORDED by C6, 2026-08-31** — **MIT** © 2023 Qiusi Zhan. ⚠️ its licence file is spelled **`LICENCE`**, British-style; **both spellings were fetched to prove the miss**: `LICENCE` → HTTP 200, `LICENSE` → **HTTP 404**. `PROVENANCE.md` §3.3 |
+| AgentHarm | ✅ **RECORDED by C6, 2026-08-31** — **"MIT License with an additional clause"** © 2024 **Gray Swan AI and UK AI Safety Institute** (⚠️ §11.3 named only the second of the two holders). ⚠️ **field-of-use clause binds even though the dataset is NOT gated** (`"gated": false`, verified) — **our use qualifies and `PROVENANCE.md` §3.3 says so** |
+| ASB | ✅ **RECORDED by C6, 2026-08-31** — **MIT** © 2024 AGI Research. `PROVENANCE.md` §3.3 |
+| **R-Judge** | ✅ **VERIFIED FIRST-HAND by C6, 2026-08-31 — it ships NO licence file of any kind.** GitHub's repository API reports `"license": null` and the repository root holds no licence-shaped file. Therefore **cited, never vendored, never redistributed** (`CONTEXT.md` §11.3, `PROCESS.md` §12.2). Its Finance subset is a deliberate drop, recorded rather than silently omitted. ⚠️ **Verified from repository METADATA only — not one byte of the corpus was fetched**, which is the whole point of the rule. `PROVENANCE.md` §3.3 |

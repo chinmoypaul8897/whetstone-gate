@@ -497,6 +497,98 @@ Razorpay's pages** — no Razorpay page's text has changed since 2026-08-30. The
 through F-06 in `RAZORPAY_SEMANTICS.md` §9. **F-06 is HIGH severity**: it qualifies the S2 finding and
 is `QUESTIONS.md` **Q-017**, owed. **F-01** is a misattributed quote inside `CONTEXT.md` §6.
 
+### 3.3 The attacker corpora — verified FIRST-HAND by C6 BUILD, 2026-08-31
+
+⚠️ **FOUR FALSE CLAIMS ABOUT THIRD-PARTY CODE HAVE REACHED THIS SPECIFICATION**
+(`INCIDENTS.md` INC-05). So **not one row below is carried forward from `CONTEXT.md`
+§11.3 on trust.** §11.3 is a previous session's reading; **this is the first-hand
+record.** Every licence was fetched from its own source by the C6 build session
+(`SESSION-TOKEN: 4377265b`) on **2026-08-31**, and every row carries the URL fetched and
+the HTTP status returned. Nothing here is `[UNFETCHED]`.
+
+| Corpus | Licence, **read at source** | URL fetched | HTTP | Date |
+|---|---|---|---|---|
+| **InjecAgent** | **MIT** © 2023 Qiusi Zhan | `raw.githubusercontent.com/uiuc-kang-lab/InjecAgent/main/LICENCE` | **200** | 2026-08-31 |
+| **AgentDojo** | **MIT** © 2024 Edoardo Debenedetti, Jie Zhang, Mislav Balunović, Luca Beurer-Kellner, Marc Fischer, and Florian Tramèr | `raw.githubusercontent.com/ethz-spylab/agentdojo/main/LICENSE` | **200** | 2026-08-31 |
+| **AgentHarm** | **"MIT License with an additional clause"** © 2024 **Gray Swan AI and UK AI Safety Institute** | `huggingface.co/datasets/ai-safety-institute/AgentHarm/raw/main/LICENSE` | **200** | 2026-08-31 |
+| **Agent Security Bench** | **MIT** © 2024 AGI Research | `raw.githubusercontent.com/agiresearch/ASB/main/LICENSE` | **200** | 2026-08-31 |
+| **R-Judge** | ⚠️ **NONE — no licence file of any kind** | `api.github.com/repos/Lordog/R-Judge` | **200** | 2026-08-31 |
+
+#### The four facts that are load-bearing, each with the evidence rather than the assertion
+
+**1. ⚠️ InjecAgent's licence file is spelled `LICENCE`, British — and the miss is
+DEMONSTRATED, not asserted.** §11.3 warns that *"a build script globbing `LICENSE*` will
+silently miss it"*. **Both spellings were fetched here:** `LICENCE` → **HTTP 200**, 1,066
+bytes, `MIT License / Copyright (c) 2023 Qiusi Zhan`; `LICENSE` → **HTTP 404**. A
+US-spelling lookup returns nothing and would wrongly report *"no licence"* — which, for an
+MIT-licensed corpus, is a false negative that would cost this project a source it is
+entitled to use.
+
+**2. ⚠️ AgentHarm's field-of-use clause binds, and the dataset is NOT gated — so nothing
+prompts a reader to look.** Verified against the HuggingFace API: `"gated": false`,
+`"private": false`, `cardData.license` = **`"other"`**, card `lastModified`
+**2024-12-19T13:27:30Z** — each figure §11.3 states, confirmed here. There is therefore
+**no click-through to accept**, and the clause binds regardless. The shipped `LICENSE`
+opens:
+
+> MIT License with an additional clause
+>
+> Copyright (c) 2024 Gray Swan AI and UK AI Safety Institute
+>
+> We prohibit using the dataset and benchmark for purposes besides improving the
+> safety and security of AI systems.
+
+⚠️ **OUR USE QUALIFIES, AND THIS FILE SAYS SO EXPLICITLY, WHICH IS WHAT §11.3 REQUIRES.**
+This project measures whether a policy gate in front of a payments MCP server stops an
+adversary, publishes what got through, and voids its own result if the adversary was not
+genuinely trying. It exists to **improve the safety and security of an AI system**, which
+is the permitted purpose in the clause's own words. AgentHarm is used as a source of
+**attack forms for the adversary**, and the finding it contributes to is a defensive one.
+
+⚠️ **AND ONE CORRECTION TO §11.3, FOUND BY READING THE FILE RATHER THAN THE CARD.** §11.3
+says *"Author is the **UK AI SAFETY Institute** per the card and its LICENSE (not
+'Security')"*. **The Safety-not-Security point is correct and is confirmed here** — the
+repository owner is `ai-safety-institute` and the card says so. **But the copyright line
+names TWO holders, and §11.3 names one:** the file reads *"Copyright (c) 2024 **Gray Swan
+AI and** UK AI Safety Institute"*. An attribution block built from §11.3 alone would omit
+**Gray Swan AI**, which is a licence-notice defect and not a cosmetic one — MIT requires
+the copyright notice to be reproduced. **This row is the corrected attribution.**
+
+**3. ⚠️ R-Judge ships no licence file of any kind — CITED, NEVER VENDORED.** Verified two
+ways, and **neither fetched a byte of the corpus**: the GitHub repository API reports
+`"license": null`, and the repository root listing holds **no licence-shaped file**
+(`README.md`, `assets`, `cache`, `config`, `data`, `eval`, `requirements.txt`, `results` —
+nothing matching `licen*` or `copying*`). With no licence there is no grant, so it is
+**cited, never vendored, never redistributed** (`PROCESS.md` §12.2's deliberate drop,
+recorded rather than silently omitted). `corpora/seed_index.json` names it nowhere and
+``tests/test_c6_attacker.py::test_r_judge_is_cited_never_vendored`` asserts the attacker
+package does not reach for it.
+
+**4. AgentDojo's copyright holders are named here and are not in §11.3.** §11.3 records
+the licence as *"MIT"* with no holder. MIT requires the notice; the six names are in the
+table above, read from the file.
+
+#### What ships, and what does not
+
+⚠️ **The corpus payloads are PINNED, NOT COMMITTED** — `QUESTIONS.md` **Q-010**'s ruled
+pattern. `corpora/MANIFEST.md` carries every pin, the fetch commands and the verification;
+`corpora/seed_index.json` carries the SHA-256 of each pinned file and
+`src/whetstone_gate/attacker/corpus.py` **checks every hash before it parses anything**.
+Three reasons, and the second and third are this chunk's own rather than Q-010's:
+
+- A pin cannot drift; a committed copy can be edited quietly.
+- **AgentHarm's field-of-use clause plus a harmful-behaviour payload, in a repository that
+  flips PUBLIC on 4 September** (`CLAUDE.md` §5). Pinning rather than republishing is the
+  conservative direction and costs this project nothing it needs.
+- **AgentHarm ships a `canary_guid`** — a contamination canary belonging to somebody
+  else's benchmark. Republishing it would damage their ability to detect training
+  contamination. The adapter reads past it and never carries it into a corpus entry, and a
+  test asserts that.
+
+⚠️ **`QUESTIONS.md` Q-032 records what this does NOT close:** the corpus pins are verified
+on every load but sit **outside the frozen set**, so `make check-prereg` does not hash
+them, while the inputs to every other published number are hashed. Raised, not defaulted.
+
 ---
 
 ## 4. The limitation this file exists to keep visible
