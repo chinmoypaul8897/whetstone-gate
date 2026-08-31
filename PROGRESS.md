@@ -6,6 +6,137 @@ not a record; this file is.
 
 ---
 
+## C1 — adversarial re-review — **REVIEW** — attempt 2 — 2026-08-31 — ✅ **PASS, `c1-pass` CUT**
+
+**SESSION-TOKEN:** `df238be6` — ⚠️ **NOT in the batch, so this session recorded its own row, and it
+is the EIGHTH to do so.** The prompt states the token *"IS NOT IN THE BATCH"* and instructs the
+session to append the row; without it `check-roles` **E1** goes `FORGED/UNISSUED` on this session's
+first commit — the identical red Q-021 records for C3, Q-025 for `921cfaa4`, and `QUESTIONS.md`'s own
+note records for `365deaf7`, `8e0f4a13` and `6ba2d70e`. **APPEND ONLY:** `git diff QUESTIONS.md`
+showed exactly one `+` line and no `-`, verified before commit, because a **concurrent architect
+goldens session held that file throughout** and committed six times while this review ran. E1 parses
+**21 → 22** issued rows and stays **PASS**.
+
+**Zero provider model calls. Zero tokens spent on any lane.** 22 HTTP GETs to public documentation
+and to `raw.githubusercontent.com`, permitted and required by `PROCESS.md` §11a — and needed, because
+the substitution Q-016 makes for this chunk *is* the re-fetch.
+
+### The verdict, and the one thing it turns on
+
+**PASS. Zero BLOCKERs.** Attempt 1's `F-R4` is closed, and it was verified **by this session's own
+`grep` and its own loader call rather than from any report**: six configured A4 values × three places
+(`config/`, `CONTEXT.md` §8.6, `spec_constants.py`) = **18 of 18 present**, all six resolving
+**through the loader**, every tag right **on the merits**.
+
+⚠️ **THE ARITHMETIC THAT FAILED TWO PEOPLE, RE-DERIVED FROM FIRST PRINCIPLES AND NOT FROM THE FILE.**
+1 crore = 10⁷, so ₹5 Cr = 5 × 10⁷ = **50,000,000 rupees**; × 100 = **5,000,000,000 paise.**
+`config/` carries `5000000000`. The 10× figure (50,000,000,000) is ₹50 Cr and is what RS-16's Notes
+carried until 31 Aug; the 100× figure (500,000,000,000) is ₹500 Cr and is what the C1 FIX **prompt**
+supplied. **The FIX session was right to refuse all three and stop.** And the convention behind it —
+asserted in prose in three artefacts and by **no test** — was recomputed over **every** money key:
+**nine keys, zero exceptions.**
+
+⚠️ **THE ONE TAG THAT COULD HAVE BEEN WRONG BY 10× WAS CHECKED AT SOURCE, NOT IN THE REPOSITORY.**
+RS-16's quote of S5's comparison table **does not carry the header row**, so its column attribution
+is author prose beside a quote. Fetched and read: `Feature| Instant Settlement | Smart Settlements |`
+sits above `Maximum amount per settlement | ₹5 Crores | ₹50 Crores |`. **₹5 Crores IS the Instant
+Settlement column.** RS-16 is right, and the fix session's diagnosis of where the extra zero came
+from — the ₹50 Crores cell one column right — is confirmed at exactly the weight the ruling gave it.
+
+### The check §0 says cannot run offline, run
+
+**301 of 301 quoted lines matched, SOURCE-BOUND** — each required to be a contiguous substring of
+*the source its own row cites*, which is the stronger reading `F-R6(i)` demanded and the one §0's
+implementation can only do structurally. **12 of 12 sources re-fetched byte-identical, ZERO DRIFT**,
+on the third independent fetch; both claimed-404 URLs returned 404 with the identical 135,098-byte
+shell. **There is nothing to record with two dates.**
+
+⚠️ **AND THE QUOTES HAVE NOT MOVED, ACROSS THE WHOLE SPAN.** The §1-onward `>` sequence hashes to
+`04b453c9…44108f5c` at `55f1f2c`, `62c4f89`, `3b35e85`, `32dfb7f` **and HEAD** — 304 lines, 301
+non-empty, at every one. **The fix session's *"313 identical"* and the arch session's *"316
+identical"* are both right and are counting different things**: the whole-file count moved when §0's
+own check block was rewritten, which §0's scope sentence explicitly excludes. Each verified its own
+commit pair; the claim is true and **truer than either checked**. It is now pinned by `test_p1_…`.
+
+⚠️ **THE INTEGRITY CLAIM HELD, AND IT WAS WORTH CHECKING.** `tests/test_c1_review_probes.py` has
+exactly one commit, `4cfddc0`, blob `3a3af44da22f06bed96dbd0fd3468fb49a1fea1c` at that commit **and**
+at HEAD. **No reviewer's probe file in this project — C0, C0_2, C1, C2, C3 — has ever been touched by
+a later session.** Hard rule 6 has held, and it is now mechanical rather than habitual.
+
+### Mutation: 11/18 → 16/18, control survived both runs
+
+Attempt 1's four *"caught by NOTHING"* re-run: **M-03 now dies** (the fix's headline claim
+reproduces), **M-12 now dies** to this review's `P1`, and **M-02 and M-06 still survive**. Eleven new
+mutants aimed at the six A4 keys and at §0's five published properties. **Two paired mutants carry
+their own controls**, which is what makes a survival mean something rather than being a shrug:
+**M-24/M-25** (the sixth key's tag survives a flip; the identical flip on a key inside `A4_KEYS` is
+killed — the difference is *membership of a five-entry dict*) and **M-26/M-27** (a documented `400`
+rewritten to `409` inside RS-22's own quote survives; the identical corruption on RS-01 is killed —
+the difference is `> **code:** 400` versus `> * code: 400`).
+
+**12 kept probes, all GREEN.** Attempt 1 shipped a deliberately-red probe, which was right for a
+FAIL; **a chunk cannot be done while a test in its own area is red**, so the defects that would need
+one went to `OPEN_FINDINGS.md` with the committed mutant that proves each. Every probe closes a gap a
+mutant **demonstrated**: `M-12`/`M-22`/`M-26` (P1), `M-15` (P2), `M-16`/`M-24` (P3).
+
+⚠️ **The three survivors — `M-02`, `M-06`, `M-23` — are ALL PROSE.** That is the residual gap as a
+property rather than three anecdotes: **the verbatim quotes, the `config/` values and every A4 tag
+are now guarded; the prose is not** — and the prose is where four of the eight findings live.
+
+### Eight findings, all MEDIUM or LOW: `OF-39` … `OF-46`
+
+The two sharpest: **`OF-40`**, a live M-03-class escape because §0's property 3 cannot cross the `**`
+in `> **code:** 400`, so RS-22/23/24 — **the rows attempt 1 named as the most dangerous in the
+file** — are silently excluded *and* mis-categorised, with `assert (12, 4, 16)` pinning the
+mis-categorisation. And **`OF-41`**, `PROVENANCE.md` §2.2:298 still reading *"three of five carry a
+published figure"* — `F-R8`'s exact claim, **unchanged since `7a101a6`**, sixty-three lines above the
+correction that cites `F-R8` by name, in the section whose whole heading is *"Razorpay documents
+these; we copied them"*. `OF-21` is closed at the cell the reviewer named, not as a property of the
+file. **Every one of the eight is one edit, and all are legal only while `prereg-v1` does not exist.**
+
+### Counts, and a red that is not this chunk's
+
+`make check-roles` **17 passed / 0 failed / 4 n/a, exit 0.** C1's own selection: **green at every base
+SHA** (65 → 77 passed).
+
+⚠️ **`make test` IS RED, AND THE RED BELONGS TO THE CONCURRENT GOLDENS SESSION.**
+`tests/test_c2_world.py::test_the_golden_is_the_byte_for_byte_file_the_architect_authored` fails with
+*"expected exactly one published golden-7 SHA-256 …, found 3"*: it parses `tests/goldens/README.md`
+for `` SHA-256 `<64 hex>` `` and demands exactly one, and `5559b72` placed goldens 1 and 3 there.
+**Measured at HEAD as `1 failed, 293 passed`** — note that the entry directly below this one reports
+`294 passed` as *unchanged*, which is the same 294 tests with one of them now failing. **Not C1's and
+not this review's to fix**; `tests/goldens/` is read-only to a review and `test_c2_world.py` is C2's.
+Flagged loudly because the session that caused it may not know. ⚠️ **It also forced a methodological
+choice:** INC-11 is precisely the entry about a mutation baseline taken from an already-red tree, so
+this review scored against a **C1 selection green at each base SHA** and says so in the mutants file
+rather than quietly scoring against a red one.
+
+### ⚠️ This session's own blemish, reported because it reads badly and cost nothing
+
+A fan-out agent this session launched fetched S4 with `curl -o` into the **repository root**, leaving
+an untracked `s4.md` (18,159 bytes, digest `95776ebd…dd98cccd` — incidentally a fourth corroboration
+of S4). `CLAUDE.md` §4: *"Throwaway work goes to a fresh OS temp directory, never into the
+repository."* **It never entered git**, was caught by this session's own `git status` and removed in
+the same minute; every other fetch of the run went to the scratchpad, and the mutation harness lived
+there and was deliberately not committed. **It is adjacent to INC-06's class without being an
+instance** — nothing was written to a *project* file through a translating layer; a throwaway landed
+in the wrong directory. ⚠️ **An `INCIDENTS.md` entry is OWED and this session could not write it**:
+`INCIDENTS.md` is held by the concurrent architect session and is outside this prompt's fence. It is
+recorded here, in `REVIEW_C1_2.md` INFO-3, in `OPEN_FINDINGS.md` and in the FINAL OUTPUT.
+
+**One more thing this session got wrong and fixed rather than hid:** the probe
+`test_no_reviewer_probe_file_has_ever_been_edited_by_a_later_session` was first written to assert
+*exactly one commit per file*, and **it went red inside this session, on this session's own file**,
+the moment a second commit refined `P3`. The invariant is **one author, not one commit** — a review
+amending its own probe before it is finished has done nothing wrong — so it is now asserted over the
+`Session-Token` trailer. The mistake is left recorded in the probe's own docstring.
+
+**No tag but `c1-pass`, and it is cut by this review because a review PASS is the only thing that
+cuts one.** `REVIEW_C1_1.md` stands unaltered beside `REVIEW_C1_2.md`. This review fixed nothing it
+reviewed.
+
+---
+
 ## ARCH — goldens 1 and 3, four rulings, one owed incident — **BUILD** — attempt 1 — 2026-08-31
 
 **SESSION-TOKEN:** `6ba2d70e` — ⚠️ **NOT in the `f57e216b` batch, so this session recorded its own
