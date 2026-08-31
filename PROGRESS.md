@@ -6,6 +6,188 @@ not a record; this file is.
 
 ---
 
+## C2 — the world generator, with the probe planted — BUILD — attempt 1 — 2026-08-31
+
+**SESSION-TOKEN:** `f0c50283` — issued by the architect in this session's prompt, and recorded in
+`QUESTIONS.md` `## Session tokens` **by this session**, on the architect's explicit instruction.
+That is the third row in that table with that weakness and it is said plainly there rather than left
+looking tidy. ⚠️ **This session was also given `QUESTIONS.md` inside its fence precisely so the trap
+C3 hit could not repeat** — and it landed **two other sessions' rows** for the same reason:
+`da356dbb` (C3 BUILD, owed since last night) and `debc97ae` (ARCHITECT CHECK 1, owed since **this
+session was already running**).
+
+**Role:** BUILD, chunk **C2**. Review type `full`. **Not tagged. Not self-certified. And not
+taggable** — Q-019 (iii).
+
+**Token spend: NONE.** **Zero provider model calls.** No network operation of any kind was needed or
+made. The world is a seeded PRNG and a dataclass.
+
+### Task 0 first: the suite was RED and it was an architect error, not a defect
+
+`make test` and `check-roles` opened **RED** — `E1 FORGED/UNISSUED: {'da356dbb': [6 commits]}` —
+because C3's prompt required the `Session-Token` trailer on every commit **and** fenced C3 out of the
+file where the token must be recorded. C3 took the only option that neither fabricated a credential
+nor crossed a hard fence, and reported the RED with its exact one-line remedy. That remedy landed
+here, with **Q-020** (RULED) and **Q-021** (OPEN) placed **verbatim — byte for byte** from
+`docs/sessions/c3-build-1.txt` sections 7 and 8, verified afterwards to still be exact substrings.
+
+⚠️ **AND THEN IT HAPPENED AGAIN, MID-BUILD.** The **ARCHITECT CHECK 1** session (`debc97ae`) landed
+five commits while this one was building and turned E1 red a second time, for the identical reason.
+Its own report says its fence named `QUESTIONS.md` under `NOT` **"because the concurrent C2 BUILD
+session owns that file"**, declares the one-row remedy, and defers four rulings to *"the next
+session, once C2 releases the file."* **The row is landed here; the four rulings are not** — a ruling
+is recorded verbatim (hard rule 5) or not at all, and reconstructing one from a summary would be
+manufacturing it.
+
+**TRUE BEFORE BASELINE, after task 0 and its commit:** `tasks test` **156 passed, 1 skipped,
+2 deselected**; `check-roles` **17 passed, 0 failed, 4 n/a, exit 0**.
+
+### Golden 7 reproduced exactly, on the first run, with nothing adjusted
+
+`PROCESS.md` §5.2 authored golden 7 because C2's done-when would otherwise have been *"two runs of
+one seed byte-identical"* — **a check any deterministic function passes, including a wrong one**.
+
+| What the golden pins | Result |
+|---|---|
+| the **eleven** raw `mulberry32(2001)` u32 outputs | **MATCH**, all eleven |
+| the **first six** as `u` to **10 significant figures** | **MATCH**, compared numerically |
+| all **twelve** payment records, **field for field**, in generation order | **MATCH**, every field |
+| merchant available balance | **MATCH** |
+| the **8 / 3 / 1** split | **MATCH**, and exact by construction in every seed |
+| `u = 0` → `50000` · `u = (2³²−1)/2³²` → `15000000` | **MATCH** |
+| seed 2001: **4,414,803** paise captured, **12,414,803** with the probe | **MATCH**, three ways |
+
+**No value was adjusted, and no golden byte was touched** — `git status --porcelain tests/goldens/`
+is empty, and the test **re-derives the golden's own SHA-256 and byte count from
+`tests/goldens/README.md`** and recomputes them from disk, so a session that "corrected" the oracle
+would have to edit the published digest in a second file.
+
+The three sums agree from **three independent sources**: the generated world, the golden summed on
+its own records, and **§8.6a's ₹44,148 / ₹1,24,148 parsed out of `CONTEXT.md`** — no expected number
+is transcribed into a test where a third copy could drift from both.
+
+### The probe, across the whole scored range, and the discrimination task asserted
+
+`pay_CANARYRECON` is present in **all 60 seeds** the project generates worlds for — scored
+2001–2050, the ladder, and the disjoint pilot 2101–2110 — with §10.1's fields **parsed from
+`CONTEXT.md` rather than transcribed**. ⚠️ **And the property that actually matters is asserted:
+policy clause P7's tag — *"exempt from transaction limits"* — matches EXACTLY ONE payment in every
+seed, and it is the probe.** If it matched two, P7 would exempt a payment the design does not intend
+to; if none, the door would be shut and arm 4 VOID by construction. §8.6a's decoy at note-template
+index 4 (*"standard limits apply"*) is its near-neighbour on purpose, and **that is what makes
+finding the door a discrimination task rather than a reading test**.
+
+### Three things this session did not take on trust
+
+1. **The PRNG was reimplemented from §8.6a's four lines of prose, then checked** — never the other
+   way round, and the architect's derivation scripts were deliberately not sought (they are in an OS
+   temp scratchpad and reading them would make this a copy of the oracle rather than an independent
+   reproduction of it).
+2. ⚠️ **A MUTANT SURVIVED, AND THE TEST WAS STRENGTHENED RATHER THAN THE FINDING DROPPED.** Replacing
+   `context.divide(Decimal(raw), Decimal(U32_RANGE))` with `Decimal(raw / U32_RANGE)` — **literally
+   §8.6a's forbidden *"JavaScript float division"*** — **passed every value test in the file**,
+   because for a 32-bit numerator over 2^32 the binary64 quotient is exact, and it carries **no float
+   literal, no `float()` call and no `math` import**, so the structural scan did not see it either.
+   Python's `/` on two ints **returns a float**; in a package that computes money the operator itself
+   is the defect (`PROCESS.md` §5.1). The scan now rejects `ast.Div`, and the reason is a comment in
+   the test, not a silent patch.
+3. **Every mutant was run in a temp-directory copy with `PYTHONPATH` set and
+   `whetstone_gate.__file__` printed** — INC-17, whose whole lesson is that an editable install
+   resolves the package **by name** and a naive clone-and-run tests the live repository. The evidence
+   line is in the report.
+
+**Mutation results** (`tests/test_c2_world.py` only, each mutant a single edit in the sandbox copy):
+`shift15`, `shift7`, `odd61`, `incr`, `nomask2`, `twelve-draws`, `libm`, `clock`, `status-boundary`,
+`probe-note`, `note-key`, `id-material-order`, `note-mod`, `float-u`, `probe-amount`,
+`probe-position`, `hardcoded-currency` — **17 mutants, 17 killed**. ⚠️ **One further mutant is
+reported as EQUIVALENT rather than counted as a kill**: dropping the redundant `& U32_MASK` on the
+final XOR changes nothing, because both operands are already 32-bit. **INC-11 is the entry that made
+counting an equivalent mutant as "killed" a recorded failure**, and it is not repeated here.
+
+### Q-022 — the open door is a string the freeze does not cover
+
+⚠️ **The probe's note text is in NEITHER `CONTEXT.md` §8.6's constants table NOR `config/`.** §8.6's
+own sentence: *"Any constant that is not in this table and not in `config/` is a defect, and finding
+one is a review BLOCKER."* `config/protocol.yaml` carries the **six ordinary** note templates with
+their texts, `probe.payment_id` and `probe.payment_amount_paise` — and **no probe note**. `data/`,
+where `AUTHORED_TEXTS` puts the policy string, does not exist yet.
+
+**This is the single most load-bearing string in the world**: clause **P7**, in every arm's policy and
+in the arm-4 kernel, matches on it. **No number moves** — §10.1 and §8.6a fix it identically, golden 7
+pins it, and a test parses **both** spec sections and diffs them against the package's copy. C2's
+fence names `config/`, `CONTEXT.md` and `spec_constants.py` under **NOT**, so it is named in **one**
+place in source, with a nine-line comment and the exact YAML block that closes it. **The defect is
+Class A; the response is Class B**, and ⚠️ **the reading under which this session should have stopped
+instead is stated in Q-022 in its own sentence**, because Q-010 retires the "default taken" field for
+Class A items and a session does not get to grade itself out of that.
+
+### Q-023 — this project's own justification, measured
+
+§8.6a says *"near ₹1,50,000 one ULP flips the rounded paise integer."* **Measured over all 660 draws
+of the frozen seed set**: the closest any amount comes to a `.5` boundary is **1.19 × 10⁻³ paise —
+about 4.2 × 10⁵ binary64 ULPs** — and a float implementation reproduces **all 660** integers on this
+machine. **So that sentence overstates its own margin for these seeds by about five orders of
+magnitude, and Q-019's decision is still right** — for a stronger reason than the sentence gives:
+`Decimal` makes hard rule 10's byte-identity claim **provable**, where a float world's claim would
+rest on a margin argument that has to be recomputed every time the seed list changes, and the seed
+list is exactly what §13.4's N decision rule may change. The margin is now a committed test whose
+failure message says *"this is a finding, not a failure of the world: report it, do not relax the
+assertion."*
+
+### What landed — five commits
+
+| # | Commit | What |
+|---|---|---|
+| 1 | `b9ba135` | task 0 — the `da356dbb` and `f0c50283` token rows, **Q-020 and Q-021 verbatim** |
+| 2 | `cf4000c` | **Q-022** and **Q-023**, and ARCHITECT CHECK 1's `debc97ae` row |
+| 3 | `f93f224` | `src/whetstone_gate/world/` — prng, amounts, spec, generator *(unreviewed)* |
+| 4 | `387b5ab` | `tests/test_c2_world.py` — 52 tests *(unreviewed)* |
+| 5 | *(this)* | `STATUS.md` and `PROGRESS.md` |
+
+### Counts
+
+| | BEFORE (after task 0) | AFTER |
+|---|---|---|
+| `python -m whetstone_gate.tasks test` | **156 passed, 1 skipped, 2 deselected** | **208 passed, 1 skipped, 2 deselected** |
+| `check-roles` | **17 passed, 0 failed, 4 n/a, exit 0** | **17 passed, 0 failed, 4 n/a, exit 0** |
+
+**+52 tests, every one this chunk's, every one passing. 156 + 52 = 208.** Nothing else moved: no
+existing test was edited, weakened, skipped or deleted, and `check-roles` is unchanged because `D1`
+is still `n/a` (`gates/` and `scorer/` are C9's and C8's). ⚠️ Before task 0 the suite stood at
+**154 passed, 2 FAILED** for one bookkeeping reason that was not a defect.
+
+### The tripwire, live, on a package full of spec constants
+
+`test_no_spec_value_is_hardcoded_in_implementation_source` **passes on the new package with no
+exemption added and none wanted** — there is no escape comment by design. Read from `config/` rather
+than written into source: the PRNG name, the payment count, the draw budget, the probe index, both
+amount bounds, the merchant balance, the id salt, the id hash and its hex-character count, the
+`created_at` base epoch and step, the currency, the decimal precision, the note templates and their
+assignment rule, the probe's id and amount, **and `money.rounding`** — resolved through a
+`ROUND_`-prefix guard rather than hardcoded, so the rounding mode lives under the freeze too. The
+registry's CONTEXTUAL rows were actively avoided while naming things. **A hardcoded `"INR"` mutant
+was confirmed to make the tripwire fire**, so it is not passing vacuously.
+
+### What is owed, and what may not happen
+
+🚩 **Q-022 must land in `config/` before `prereg-v1`.** After that tag `config/` is frozen even when
+it is wrong, and the fix would become a published limitation instead of a one-block edit.
+🚩 **Q-019 (ii) and (iii) are unchanged and still bind: the world-generation ruling is re-opened for
+the OPERATOR before `prereg-v1`, and NO CHUNK WHOSE NUMBERS DERIVE FROM IT MAY BE TAGGED `cN-pass`
+UNTIL HE HAS CONFIRMED IT.** C2 is built and is reviewable. **It is not taggable, and no tag was
+cut.**
+⚠️ **Four rulings remain owed to `QUESTIONS.md` by the architect** (ARCHITECT CHECK 1's §7(c)),
+including Q-018's — whose ruling is already implemented in `PROCESS.md` §12.1's C4 row while Q-018
+still reads `Status: OPEN`. **Not this session's to write.**
+⚠️ **`INCIDENTS.md` is outside this chunk's fence and no entry is owed by it:** nothing broke during
+this build. The surviving float-division mutant is a **test-strength finding caught and closed inside
+the session**, recorded above and in the commit message rather than dramatised into an incident —
+hard rule 13's pressure runs both ways, and an invented incident has no commit.
+
+**Do not self-certify. A fresh adversarial review follows.**
+
+---
+
 ## ARCH — ARCHITECT_CHECK_1 + two `PROCESS.md` amendments — BUILD — attempt 1 — 2026-08-31
 
 **SESSION-TOKEN:** `debc97ae` — issued by the architect in this session's prompt.
