@@ -217,7 +217,7 @@ def test_p2_every_a4_value_printed_in_context_8_6_equals_the_value_in_config(rep
 
 
 @pytest.mark.parametrize("key", sorted(A4_ALL_SIX))
-def test_p3_every_a4_tag_is_asserted_including_the_sixth_key(key):
+def test_p3_every_a4_tag_is_asserted_including_the_sixth_key(key, repo_root):
     """⚠️ **THE SIXTH KEY'S TAG WAS ASSERTED BY NOTHING, AND A TAG IS A PROVENANCE DEFECT.**
 
     ``test_c1_fix_probes.A4_KEYS`` holds **five** keys and partitions them on *exactly one*
@@ -257,6 +257,31 @@ def test_p3_every_a4_tag_is_asserted_including_the_sixth_key(key):
         f"{key}'s spec_row is {constant.spec_row!r}, not {spec_row!r} — the §8.6 → registry "
         f"direction matches on this string, so a drift here silently unlinks the two lists."
     )
+
+    # ⚠️ AND THE SAME TAG IN §8.6, WHICH IS THE THIRD PLACE AND WAS THE UNGUARDED ONE.
+    # Mutant M-16 flipped the tag in CONTEXT.md's own §8.6 cell — leaving the registry and
+    # config/ untouched — and SURVIVED, because the registry is what every existing tag
+    # assertion reads. §8.6 is the table PROVENANCE.md and the tripwire are both pointed at,
+    # so a reader is told one provenance while the registry carries another.
+    context = (repo_root / "CONTEXT.md").read_text(encoding="utf-8")
+    row = next(ln for ln in context.split("\n") if ln.startswith(f"| **{spec_row}**"))
+    other = (
+        "[Razorpay-defined]"
+        if expected != "[Razorpay-defined]"
+        else "[merchant-policy, author-chosen]"
+    )
+    assert expected in row, (
+        f"CONTEXT.md §8.6's row for {spec_row!r} does not carry the tag {expected!r} that "
+        f"the registry carries.\n  row: {row[:240]}"
+    )
+    if expected == "[Razorpay-defined]":
+        # The author-chosen phrase legitimately appears in the two mixed BOUND/VALUE rows,
+        # so only the purely-Razorpay rows can assert the other tag's absence.
+        assert other not in row, (
+            f"CONTEXT.md §8.6's row for {spec_row!r} carries BOTH tags. This value is "
+            f"Razorpay's published figure; tagging it as ours would move it out of the set "
+            f"PROVENANCE.md says we chose.\n  row: {row[:240]}"
+        )
 
 
 # ── P4 ────────────────────────────────────────────────────────────────────────────────
