@@ -6,6 +6,106 @@ not a record; this file is.
 
 ---
 
+## C0 — repo, checks, loader, tripwire, Makefile targets — **REVIEW** — attempt 2 — 2026-08-31
+
+**SESSION-TOKEN:** `f57e216b` — issued in the architect's batch and **already present in
+`QUESTIONS.md` when checked, before any edit**. The batch clause Q-025 asked for is working here
+too, and this session therefore wrote **no** token row.
+
+**Role:** REVIEW, chunk **C0**, type `code` (persona 2 — CODE REVIEWER), minimum four mutants.
+**I fixed nothing.** ✅ **`c0-pass` CUT — the first tag this project has ever cut.**
+
+**Token spend: NONE. ZERO provider model calls; zero lane quota consumed.** The only network
+operations were `git clone` against the project's own local repository and one `pip install .` from
+PyPI into a throwaway venv, which is not a provider call.
+
+**Concurrency.** C1's review (`a0cc0212`) was in flight as pair **P-02**. Its chunk is disjoint.
+This session wrote only `docs/reviews/REVIEW_C0_2.md`, `docs/reviews/mutants/c0_mutants.md`,
+`tests/test_c0_review_2_probes.py`, `docs/reviews/OPEN_FINDINGS.md` (appended),
+`STATUS.md` (appended), this file and `docs/sessions/`. **`QUESTIONS.md` and `INCIDENTS.md` were
+not touched.** ⚠️ P-02 committed to the live repository *during* this session, and it changed a
+measurement — see "What went wrong in my own method" below. It is recorded rather than hidden.
+
+### VERDICT: **PASS**
+
+| | attempt 1's BLOCKER | after my own re-run |
+|---|---|---|
+| **B-01** | E2/E3 structurally unable to fire | **CLOSED** — `PASS/PASS` → `FAIL/FAIL` on §7a's two named violations, and the real table is clean **for the right reason** |
+| **B-02** | the moat defeated by hard rule 8's own spike defect | **CLOSED** — 4 attack forms + a **two-hop** form all FAIL; the **clean control still PASSES** |
+| **B-03** | the F group reports `config/` complete over a missing pre-registration artefact | **CLOSED in both reachable forms**; residue is attempt 1's own F-12 → **OF-09**, MEDIUM, open with a deadline |
+| **B-04** | the pre-spend gate flips GREEN when its key is deleted | **CLOSED** — RED in both fixtures, RED for the right reason in the real tree |
+
+### The two traps this review had to avoid before it could measure anything
+
+**INC-17, reproduced independently by me before any evidence was taken.** Standing in a clone at
+`864c621`, `import whetstone_gate` resolves to **the live repository** — the editable install puts
+`C:\Users\chinm\whetstone-gate\src` on `sys.path` via a `.pth`. With `PYTHONPATH` set to the clone
+it resolves into the clone, **and `config.repo_root()` follows it**, so the whole run is
+self-consistent with the tree under test. **`whetstone_gate.__file__` is printed for every single
+run in this review**, because a run that does not state which tree it loaded is not evidence.
+
+**INC-11.** Every mutant was applied to a fresh clone and **committed**, with
+`git status --porcelain` captured, so no mutant could score a kill on tree-dirtiness.
+
+### Mutation: 13 real mutants, 13 killed, control survived
+
+Source pinned at `68fcfff`; baseline `171 passed, 1 skipped, 2 deselected`, `check-roles` rc=0.
+**M15 — the survivor attempt 1 deliberately left alive — is killed**, by all four B-02 attack-form
+probes at once. Twelve more aimed at code that did not exist at attempt 1 (the transitive walk, both
+A5 branches, E5 and its four-entry pin, the blank refusal, the required-config refusal, R1) are all
+killed, each by a test that **names its defect**. The semantics-preserving **CONTROL SURVIVED**, so
+the run is not void. Table and method: `docs/reviews/mutants/c0_mutants.md`.
+
+### What went wrong in my own method, recorded because a clean transcript would have hidden both
+
+1. **The harness wrote mutants with `Path.write_text`**, which translates `\n` → `\r\n` on Windows.
+   **Every mutant became a CRLF defect** and was killed through A3/A4 rather than through its own
+   semantics; the tell was `test_the_object_store_and_the_working_tree_agree` failing on mutants
+   that touch no line-ending code. Same family as INC-06, INC-09, INC-16. Fixed: the harness writes
+   **bytes** and asserts no CRLF was introduced.
+2. **The first pinned run cloned the LIVE repository**, which P-02 was committing to. The baseline
+   moved mid-run, a newly-landed C1 probe went red in the baseline, and **the control mutant was
+   scored KILLED by it**. Per the prompt's own rule — *a run whose control is killed is void* —
+   **that entire pass was discarded**, the source was pinned at one commit, and all fourteen were
+   re-run.
+
+Neither is an `INCIDENTS.md` entry: nothing in the repository broke, and that file is not this
+session's.
+
+### Findings
+
+**ZERO BLOCKERs.** **OF-22** (a present-but-malformed *row* is treated as absent, blinding E2/E3;
+E prints no row denominator — the row-side twin of Q-014 (i), MEDIUM because the common case still
+fails closed through E1, **measured**), **OF-23** (`_issued_tokens` parses all of `QUESTIONS.md`, so
+a row quoted in prose becomes an issued token — Q-021's body carries such a line today, saved only
+by two spaces of indentation), **OF-24** (A5's declared NUL-in-prose gap is real — *verified* — and
+the stated reason for not closing it does not survive: pinning the binary-file set closes it with no
+judgement about prose), and **OF-25** (LOW — a test called *every target* that exercises one).
+
+**Closed with my own old-beside-new evidence rather than on the fix session's word:** OF-01, OF-02,
+OF-03, OF-04, OF-06, OF-10. ⚠️ **OF-09 stays OPEN and now carries a deadline: before C14 is
+reviewed**, because the moment `PROTOCOL.md` exists, `check-prereg` exiting 0 over the wrong root is
+a pre-registration check failing open inside `make eval`.
+
+### Numbers, both of them, rather than the convenient one
+
+`check-roles` **17 passed, 0 failed, 4 n/a, exit 0** — identical through `make` (GNU Make 3.82.90,
+the `~/bin` shim) and through `python -m`. `selftest` **1 failed, 1 passed** — RED on the CaMeL
+branch, correctly (Q-009). `tasks test` **215 passed, 1 skipped, 2 deselected** on C0's view, and
+**1 failed, 222 passed, 1 skipped, 2 deselected** as a stranger runs it — ⚠️ **the one red is C1's
+own probe standing over C1's BLOCKER**, landed by P-02 while this review ran. Not C0's, and not
+silently excluded. ⚠️ Separately, **`make test` no longer runs green from a clean clone**: 8 failures
+and 12 collection errors, all inside `tests/test_c3_tau2_enumeration.py`, which needs the `vendor/`
+tree **OF-08**'s unruled Class A default put outside the repository. **C3's, not C0's** — and
+precisely what attempt 1 predicted when it raised OF-08.
+
+**Secrets:** my own scan of 72 tracked files against 10 shapes → **0 hits**; no `.env` in the tree or
+tracked. **Frozen artefacts:** `git tag` is empty and `PROTOCOL.md`/`INVARIANTS.md`/`HOLES.md` do not
+exist, so **nothing is frozen yet** and the "no figure contradicts a frozen artefact" check is
+vacuously satisfied — stated rather than skipped, because it stops being vacuous at C14.
+
+---
+
 ## C1 — `RAZORPAY_SEMANTICS.md` + `PROVENANCE.md` A1–A6 — **REVIEW** — attempt 1 — 2026-08-31
 
 **SESSION-TOKEN:** `a0cc0212` — issued in this session's prompt and, unlike the previous session's,
