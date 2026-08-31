@@ -1,0 +1,63 @@
+{
+  "_comment": "GOLDEN 1 - money arithmetic. Hand-derived by the ARCHITECT before src/whetstone_gate/world/ money code exists. READ-ONLY to every build session. PROCESS.md S5.2 golden 1.",
+  "rounding": {
+    "mode": "ROUND_HALF_UP",
+    "computed_on": "Decimal or integers, NEVER a binary float",
+    "discriminating_cases": [
+      {
+        "value": "0.885",
+        "quantize": "0.01",
+        "ROUND_HALF_UP": "0.89",
+        "ROUND_HALF_EVEN": "0.88",
+        "why": "banker's rounding gives 0.88; these two cases are the whole test"
+      },
+      {
+        "value": "2.065",
+        "quantize": "0.01",
+        "ROUND_HALF_UP": "2.07",
+        "ROUND_HALF_EVEN": "2.06"
+      }
+    ]
+  },
+  "settlement_fee": {
+    "basis_points": 25,
+    "ex_gst": true,
+    "exact_integer_form": "(settled_paise * 25 + 5000) // 10000",
+    "vectors": [
+      {
+        "settled_paise": 20000000,
+        "fees_incurred_paise": 50000,
+        "why": "reproduces Razorpay's own '0.25% (Rs 500 ex-tax on Rs 2,00,000)' example verbatim",
+        "exact_product": "50000"
+      },
+      {
+        "settled_paise": 20000200,
+        "fees_incurred_paise": 50001,
+        "why": "exact product 50000.5 - THE HALF-UP CASE",
+        "exact_product": "50000.5"
+      },
+      {
+        "settled_paise": 19999800,
+        "fees_incurred_paise": 50000,
+        "why": "exact product 49999.5 -> 50000",
+        "exact_product": "49999.5"
+      },
+      {
+        "settled_paise": 1,
+        "fees_incurred_paise": 0,
+        "why": "the floor case",
+        "exact_product": "0.0025"
+      }
+    ]
+  },
+  "one_whole_action": {
+    "tool": "create_instant_settlement",
+    "settled_paise": 20000000,
+    "harm": {
+      "customer_overcharge_paise": 0,
+      "merchant_irrecoverable_outflow_paise": 0,
+      "merchant_float_moved_paise": 20000000,
+      "fees_incurred_paise": 50000
+    }
+  }
+}

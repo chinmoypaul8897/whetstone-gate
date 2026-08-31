@@ -48,12 +48,75 @@ Defined in full in `PROCESS.md` §5.2. Each is authored before its consuming chu
 
 ## Status
 
-**One of nine authored. Golden 7 landed 2026-08-31. Eight are still owed.**
+**Three of nine authored. Golden 7 landed 2026-08-31; goldens 1 and 3 landed 2026-08-31, later the
+same day. Six are still owed.**
 
 | # | File | State | Authored |
 |---|---|---|---|
+| **1** | `golden1_money.json` | ✅ **authored** | **2026-08-31**, by the **architect**, before any money code in `src/whetstone_gate/` exists |
+| **3** | `golden3_harm_vector.json` | ✅ **authored** | **2026-08-31**, by the **architect**, before the typed harm record exists |
 | **7** | `world_seed_2001.json` | ✅ **authored** | **2026-08-31**, by the **architect**, before `src/whetstone_gate/world/` exists |
-| 1 · 2 · 3 · 4 · 5 · 6 · 8 · 9 | — | ⏳ **owed** | each before its consuming chunk is built |
+| 2 · 4 · 5 · 6 · 8 · 9 | — | ⏳ **owed** | each before its consuming chunk is built |
+
+⚠️ **C4 IS NOW UNBLOCKED.** `PROCESS.md` §12.1's C4 done-when reads *"Goldens 1 and 3 reproduce
+exactly"*, and hard rule 3 says **a `full` chunk with no golden may not be built.** C4 is a `full`
+chunk and both of its goldens now exist, hand-derived before the code that will consume them. **C4
+was the only chunk blocked on these two**; the six still owed block C7, C8, C9, C10, C11 and C18,
+which are unchanged.
+
+### Golden 1 — `golden1_money.json`
+
+**SHA-256 `4db9344bad5568da8e73ee78c88ababa673880e93e40b00c0d5583a5dc90a2c4`** · **1,874 bytes**.
+
+**One line:** the money arithmetic C4 must reproduce — the `ROUND_HALF_UP` mode with Razorpay's two
+discriminating cases (`0.885 → 0.89`, `2.065 → 2.07`, each carrying the `ROUND_HALF_EVEN` answer
+beside it so the test can only pass one way), the ex-GST settlement fee in its exact integer form
+over **four** `settled_paise` vectors, and **one whole `create_instant_settlement` action** with all
+four harm components stated.
+
+It pins the **one fee this project models** and nothing else. `PROCESS.md` §5.2 records why that
+matters: revision 1's "fee identity" golden belonged to Razorpay **Route**, carried a 2% gateway fee
+and an 18% GST multiplier **this project does not model**, and did not reconcile against its own
+stated balance — so a build session told *"code must reproduce the goldens exactly"* would have
+implemented a fee engine that does not exist here and shipped an 18% error into a published harm
+component. That golden is deleted; this one replaces it.
+
+Each fee vector carries its **exact product** as a decimal string beside the expected integer, so the
+half-up case is legible as arithmetic rather than as an assertion: `20,000,200` gives exactly
+`50,000.5`, and `19,999,800` gives exactly `49,999.5`. **Banker's rounding fails both discriminating
+cases and one fee vector**, which is what makes this fixture a test rather than a restatement.
+
+### Golden 3 — `golden3_harm_vector.json`
+
+**SHA-256 `06f2ca363b8a3046ae110a100881269a54bcdf561fe5e25ee2624f840f20f136`** · **3,355 bytes**.
+
+**One line:** the harm vector on one worked **five-entry** episode — every one of the four components
+computed by hand per entry and per episode, carrying the `create_instant_settlement` sweep that moves
+float and incurs a fee with **zero** irrecoverable outflow, **two** `rejected_by_razorpay` records
+that contribute **zero to all four** while still counting toward CANARY-B reach and toward the
+productive-action confound, plus the episode's CANARY-A breach, its CANARY-B reach and its
+productive-action count.
+
+⚠️ **It interlocks with golden 7 and says so in its own text.** The episode is built on **seed 2001's
+world**, and its `pay_54cd5f529e3350` target is a real seed-2001 captured payment — golden 7 pins that
+id at `amount_paise` **811,853**, and golden 3's two 300,000-paise refunds against it sit inside that
+capture on purpose. **The two fixtures are therefore not independent**, and a reviewer should read
+them as one interlocking pair: a defect in the pinned world would move golden 3's ledger with it.
+
+It also carries **three findings, stated in the fixture rather than left for a later session to
+rediscover**: the `receipt`-collision entry that makes **S2 fire on ISSUE** (Q-027) while harm stays
+**zero** because Razorpay rejects the duplicate — *"that gap is the quantity Q-027 exists to
+publish"*; CANARY-B reach counted as **2**, the DENIED/rejected entry included, which is `PROCESS.md`
+§5.2 golden 4's rule exhibited a chunk early; and the **structural zero** on
+`customer_overcharge_paise`, ruled at `QUESTIONS.md` **Q-030** and pinned here so that a later session
+cannot read the zero as a defect and quietly "fix" the mapping.
+
+⚠️ **THE SESSION THAT PLACED GOLDENS 1 AND 3 COMPUTED NO VALUE IN EITHER, AND MAY NOT.** Same
+discipline as golden 7 below, and it binds harder here because both files are arithmetic: **the fee
+formula was not implemented anywhere, and neither was the §12.2 harm mapping, not even to "check" a
+file.** A golden verified by a reimplementation has stopped being independent — the digest and the
+byte count above **are** the verification, recorded as observed after the copy, and the copy was
+byte-for-byte rather than a retype.
 
 ### Golden 7 — `world_seed_2001.json`
 
@@ -95,6 +158,20 @@ independent, so no `mulberry32` and no amount formula was written anywhere to "c
 That stood from C0 until 2026-08-31. It is kept because *"this directory was empty, and here is when
 and by whom it stopped being empty"* is a claim a reviewer can check, and a Status section that
 silently rewrites itself into looking complete is not.
+
+**Then, from golden 7's landing until goldens 1 and 3 landed later the same day, it read:**
+
+> **One of nine authored. Golden 7 landed 2026-08-31. Eight are still owed.**
+>
+> | # | File | State | Authored |
+> |---|---|---|---|
+> | **7** | `world_seed_2001.json` | ✅ **authored** | **2026-08-31**, by the **architect**, before `src/whetstone_gate/world/` exists |
+> | 1 · 2 · 3 · 4 · 5 · 6 · 8 · 9 | — | ⏳ **owed** | each before its consuming chunk is built |
+
+Kept on the same ground, and the ground is now load-bearing twice rather than once: **the count has
+moved 0 → 1 → 3 in a single day**, and a reader who can see each step can check the claim *"authored
+before the code that consumes it"* against the git log for each of the three. A table that only ever
+shows its latest state cannot be checked that way — it can only be believed.
 
 ---
 
