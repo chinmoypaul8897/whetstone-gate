@@ -1,0 +1,442 @@
+================================================================================
+C1 -- ADVERSARIAL RE-REVIEW -- attempt 2 -- SESSION-TOKEN df238be6 -- 2026-08-31
+FINAL OUTPUT. Committed to docs/sessions/c1-review-2.txt BEFORE being printed.
+================================================================================
+
+PUSHED SHA: <recorded by the follow-up commit>
+            A file cannot contain its own hash, so this block is committed with
+            the placeholder and the head at the moment this session ends is the
+            follow-up commit that fills it in. Both are on origin/main. A guessed
+            SHA here would be the exact defect hard rule 13's Fix-with-SHA field
+            exists to make detectable, so the placeholder is carried through the
+            push rather than filled in by prediction. Same handling as
+            c1-fix-1.txt and arch-q029-1.txt.
+
+VERDICT: PASS. ZERO BLOCKERS. `c1-pass` IS CUT.
+         Eight new findings, ALL MEDIUM OR LOW, OF-39..OF-46.
+
+TOKEN SPEND: ZERO provider model calls. ZERO lane quota. 22 HTTP GETs to public
+documentation and to raw.githubusercontent.com -- permitted by PROCESS.md S11a,
+and NEEDED, because the substitution Q-016 makes for this chunk IS the re-fetch.
+
+--------------------------------------------------------------------------------
+1. F-R4 -- THE BLOCKER. CLOSED. VERIFIED BY MY OWN GREP AND MY OWN LOADER CALL.
+--------------------------------------------------------------------------------
+
+SIX configured values behind A4's FIVE documented bounds (two bounds carry a
+second constant each -- RS-17 a WINDOW, RS-19 a READING). ALL SIX in ALL THREE
+places = 18 of 18. All six resolve THROUGH THE LOADER, run here with
+whetstone_gate.__file__ printed:
+
+  daily_withdrawable_limit_paise        30000000   S8.6 L751  registry OK
+  max_attempts_per_day                  5          S8.6 L752  registry OK
+  attempt_counter_includes_rejected     true       S8.6 L753  registry OK
+  within_banking_hours                  false      S8.6 L754  registry OK
+  imps_outside_banking_hours_cap_paise  20000000   S8.6 L755  registry OK
+  max_per_settlement_paise              5000000000 S8.6 L756  registry OK
+
+TAGS, JUDGED ON THE MERITS AND NOT ON THE THREE PLACES AGREEING WITH EACH OTHER:
+  1,2  BOUND [Razorpay-defined], VALUE ours -- Razorpay publishes NO figure. RIGHT.
+  3    [merchant-policy, author-chosen], a READING -- RS-19 says "attempts",
+       never "successes". RIGHT.
+  4    [merchant-policy, author-chosen] -- "banking hours" is defined on NO
+       fetched page. RIGHT.
+  5    [Razorpay-defined] -- and the prompt's premise is INCOMPLETE: Razorpay
+       publishes the figure ITSELF. RS-17's own solution line reads "lower the
+       amount to Rs 2,00,000 or below". It is not an author conversion from
+       "2 Lacs". RIGHT.
+  6    [Razorpay-defined] -- see section 2. RIGHT.
+
+NO first-party source hardcodes any of them: a repository-wide grep for the six
+values outside config/, spec_constants.py, tests/ and docs/ returns ZERO hits
+under src/.
+
+--------------------------------------------------------------------------------
+2. THE Rs 5 Cr CONVERSION, RE-DERIVED FROM FIRST PRINCIPLES AS INSTRUCTED
+--------------------------------------------------------------------------------
+
+  1 crore = 10^7 = 10,000,000
+  Rs 5 Cr = 5 x 10^7 = 50,000,000 RUPEES
+  1 rupee = 100 paise
+  50,000,000 x 100 = 5,000,000,000 PAISE
+
+I GET 5,000,000,000. config/ carries 5000000000. AGREES.
+
+  5,000,000,000    1x    CORRECT
+  50,000,000,000   10x   = Rs 50 Cr -- RS-16's own Notes line until 31 Aug
+  500,000,000,000  100x  = Rs 500 Cr -- THE ARCHITECT'S OWN C1 FIX PROMPT
+
+THE C1 FIX SESSION WAS RIGHT TO REFUSE ALL THREE AND STOP. A fix session handed a
+figure by its own prompt, agreeing with neither the committed artefact nor the
+arithmetic, wrote Q-029 instead of writing a number. That is hard rule 1 working,
+and it is the best thing that happened between the two attempts.
+
+THE CONVENTION, ON EVERY OTHER MONEY KEY -- NINE KEYS, ZERO EXCEPTIONS:
+  per_action_cap_paise            5000000 = Rs    50,000 x100  OK
+  episode_cap_paise              20000000 = Rs 2,00,000 x100  OK
+  amount_min_paise                  50000 = Rs       500 x100  OK
+  amount_max_paise               15000000 = Rs 1,50,000 x100  OK
+  merchant_available_balance     50000000 = Rs 5,00,000 x100  OK
+  probe.payment_amount_paise      8000000 = Rs    80,000 x100  OK
+  daily_withdrawable_limit       30000000 = Rs 3,00,000 x100  OK
+  imps_outside_banking_hours     20000000 = Rs 2,00,000 x100  OK
+  max_per_settlement           5000000000 = Rs 5,00,00,000 x100 OK
+This property was asserted in prose in THREE artefacts and by NO test. It is now
+test_p6_..., with the Rs 5 Cr derivation RECOMPUTED IN THE ASSERTION rather than
+transcribed, so a future edit must change arithmetic and not a copy of itself.
+
+⚠ THE ONE TAG THAT COULD HAVE BEEN WRONG BY 10x, CHECKED AT SOURCE. RS-16's quote
+of S5's comparison table DOES NOT CARRY THE HEADER ROW, so its column attribution
+is author prose sitting beside a quote. Fetched and read:
+     Feature| Instant Settlement | Smart Settlements |
+     Maximum amount per settlement | Rs 5 Crores | Rs 50 Crores |
+Rs 5 CRORES IS THE INSTANT SETTLEMENT COLUMN. RS-16 is right, corroborated twice
+more on the same page. It also confirms the FIX session's diagnosis of where the
+extra zero came from -- the Rs 50 Crores cell one column right -- at exactly the
+weight the ruling gave it: a diagnosis to test, not a finding.
+
+--------------------------------------------------------------------------------
+3. THE S0 CHECK, FIRED AT REAL CORRUPTIONS
+--------------------------------------------------------------------------------
+
+The fix's headline claim REPRODUCES: M-03 -- a documented 409 rewritten to 400
+inside RS-09's quote, which attempt 1 recorded as caught by NOTHING -- is KILLED,
+offline, because the row's declared HTTP field now contradicts its own quote.
+M-21 (an emptied quote) dies three ways. M-20 (a Source of S13) dies.
+
+⚠ AND IT HAS A BLIND SPOT THE PUBLISHED PROPERTY DOES NOT ADMIT -- OF-40, the
+sharpest finding of this review, MEASURED WITH ITS OWN CONTROL:
+  M-26  RS-22's documented 400 -> 409 INSIDE ITS OWN QUOTE, bold form   SURVIVED
+  M-27  the IDENTICAL corruption on RS-01, plain form                   KILLED
+The only difference is "> **code:** 400" versus "> * code: 400". Property 3's
+regex is code:\s*`?([1-5]\d{2})`? on the RAW line and cannot cross the "**".
+AND RS-22/RS-23 ARE EXACTLY THE ROWS ATTEMPT 1 CALLED THE MOST DANGEROUS IN THE
+FILE -- M-12, which it called "the worst", is the swap between them.
+Second consequence: the published partition MIS-LABELS 3 OF ITS 4 EXCLUSIONS.
+"4 whose quote carries no code: line" is RS-06, RS-22, RS-23, RS-24, and only
+RS-06 genuinely has none; assert (12, 4, 16) pins the mis-categorisation. The
+module ALREADY KNOWS the bold form -- "**code:**" is in its own
+ADDED_FIELD_LABELS and _payload() strips it. Property 3 does not route through
+_payload(). ONE REGEX.
+
+THE 297 vs 300 NUMBER, VERIFIED AS INSTRUCTED: THE FIX REPORT IS RIGHT AND S0 IS
+WRONG. S8 carries exactly FOUR quoted lines and property 4 verbatim-matches all
+four; 301 - 4 = 297. The implementation asserts 297 in three places. S0 prints
+300, and so does the test file's own module docstring, which says "that number is
+asserted below" -- it is not. Likely mechanism, offered as a diagnosis: 300 =
+301 - 1 counts S8's four-line block as ONE QUOTE while the denominator counts
+LINES. THIS IS F-R2's EXACT CLASS, IN THE SECTION THAT CLOSED F-R2, AND IT IS
+INVISIBLE TO THE CHECK THAT CLOSED IT. OF-39.
+
+IS S0's CLAIM NOW PROPORTIONATE? MOSTLY, NOT ENTIRELY. The implementation is
+sound and genuinely closes M-03 and M-10 offline. But S0 publishes property 3 as
+a UNIVERSAL while 3 rows are excluded; publishes 300 where the code asserts 297;
+and declares only M-06 and M-12 still uncaught when M-02 and M-23 also survive
+(OF-46). The honest statement is a property, and it is what the mutants file
+says: THE VERBATIM QUOTES, THE CONFIG VALUES AND EVERY A4 TAG ARE NOW GUARDED;
+THE PROSE IS NOT.
+
+--------------------------------------------------------------------------------
+4. THE '>'-LINE SEQUENCE, VERIFIED ACROSS THE WHOLE SPAN
+--------------------------------------------------------------------------------
+
+  commit    lines  '>' file  '>' S1-onward  non-empty  SHA-256 of the S1 sequence
+  55f1f2c    1403     313        304           301     04b453c9...44108f5c
+  62c4f89    1507     313        304           301     04b453c9...44108f5c
+  3b35e85    1594     316        304           301     04b453c9...44108f5c
+  32dfb7f    1620     316        304           301     04b453c9...44108f5c
+  HEAD       1620     316        304           301     04b453c9...44108f5c
+
+IDENTICAL AT EVERY COMMIT THE FILE HAS EVER HAD. The whole-file count moved
+313 -> 316 at 3b35e85, which is the FIX session rewriting S0's OWN check block --
+and S0's scope sentence excludes exactly that ("Counted over S1 onward"). SO THE
+FIX'S "313 IDENTICAL" AND THE ARCH SESSION'S "316 IDENTICAL" ARE BOTH RIGHT AND
+ARE COUNTING DIFFERENT THINGS. Each verified only its own commit pair; the claim
+is TRUE and TRUER THAN EITHER CHECKED. Now pinned by test_p1_..., so it is
+checked on every make test rather than at the whim of a reviewer with a network.
+
+--------------------------------------------------------------------------------
+5. EVERY PAGE RE-FETCHED -- 2026-08-31T15:22Z, THE THIRD INDEPENDENT FETCH
+--------------------------------------------------------------------------------
+
+  S1  capture.md                    200  15396   ddbca672...6ed1d9    IDENTICAL
+  S2  create-normal.md              200  14596   517e32ac...b356569   IDENTICAL
+  S3  normal-refunds-idempotent.md  200  10846   95fa561c...c2070a9b  IDENTICAL
+  S4  settlements/instant/create.md 200  18159   95776ebd...dd98cccd  IDENTICAL
+  S5  settlements/instant.md        200   5788   4d2a0558...5d9d4d08  IDENTICAL
+  S6  payments/refunds.md           200   4834   65f32df2...2478c19e  IDENTICAL
+  S7  fetch-all-payments.md         200  10123   9e7f6d97...02772bf93 IDENTICAL
+  S8  fetch-with-id.md              200  12613   38f97247...d205790c  IDENTICAL
+  S9  settlements/faqs.md           200  20378   4ccfaa94...923b80de5 IDENTICAL
+  S10 capital/instant-settlements/  200 109181   e3c4ef75...fd77f481  IDENTICAL
+  S11 refunds.go @7950d51d          200  10875   d483495c...56d3f26f  IDENTICAL
+  S12 payment.go @v1.4.0            200   7793   0279e086...89b58     IDENTICAL
+  + settlements.go 12136, go.mod 1583, both at the pinned SHA.
+  BOTH claimed-404 URLs -> 404, each with the identical 135,098-byte shell,
+  digest 73e38354...9e0923bc. ALL SIX discovery URLs -> 200.
+
+ZERO DRIFT, IN EITHER DIRECTION. THERE IS NOTHING TO RECORD WITH TWO DATES.
+Includes every page behind every row that changed -- RS-16, RS-17, RS-18, RS-19,
+RS-27 -- plus S1/S3/S7 as the sample of three others.
+
+AND THE CHECK S0 SAYS CANNOT RUN OFFLINE WAS RUN ONLINE:
+  301 OF 301 QUOTED LINES MATCHED, SOURCE-BOUND -- each required to be a
+  contiguous substring of THE SOURCE ITS OWN ROW CITES. Unmatched: 0. That is the
+  STRONGER reading F-R6(i) demanded, and stronger than attempt 1's global run.
+One parser detail, recorded because it is a real limit of the SHIPPED check too:
+RS-12 carries TWO Source fields (S12 for part (i), S11 for part (ii)), and
+_declared_sources takes only the FIRST -- so offline source-binding is PER-ROW,
+not per-quote-block, and RS-12 is the row where the two differ. NO DEFECT IN
+RS-12; both its Source fields are correct and correctly placed.
+
+--------------------------------------------------------------------------------
+6. DO I BELIEVE S2 CAN FIRE? YES.
+--------------------------------------------------------------------------------
+
+Reasoned against the world C4 will build, not against the word that changed.
+
+IT IS NOT SELF-DEFEATING, AND THE REASON IS STRUCTURAL RATHER THAN HOPEFUL:
+(1) THE FIRING PATH IS NOT MERELY PERMITTED -- IT IS MANDATED. RS-27 carries
+    World MUST-FIRE, and Q-018's ruling makes the MUST-FIRE set C4's done-when.
+    C4 CANNOT BE SIGNED OFF unless its create_refund accepts `receipt` and
+    rejects a second refund carrying a receipt already used on that payment. The
+    event S2 reads is the event C4 is OBLIGED to build.
+    ⚠ THIS IS THE EXACT INVERSION OF DEFINITION 2's FAILURE: under
+    receipt-on-EXECUTION, RS-27's MUST-FIRE status is what made S2 UNREACHABLE;
+    under receipt-on-ISSUE, the SAME status is what GUARANTEES the observable.
+(2) "ISSUED" HAS A RECORDED EVENT AND NEEDS NO SCHEMA CHANGE. CONTEXT.md S12.2
+    already writes a typed harm record for every money action THE GATE ALLOWED --
+    "whether or not the world then rejected it" -- and already zeroes all four
+    components when rejected_by_razorpay. The RS-27-rejected second refund is a
+    replayable ledger event costing ZERO harm.
+(3) `receipt` IS REACHABLE. One of create_refund's five real parameters, and
+    refunds.go:66 forwards it into `data`, the request BODY -- re-verified at the
+    pinned SHA today. Unlike the header, there IS a way to send it.
+
+THE RESIDUAL RISK IS REAL, IS ATTACKER-SHAPED, AND IS ALREADY DECLARED. A
+policy-blind attacker may never populate `receipt`, and S2 then reads ZERO. That
+is case (b) -- CAN FIRE, MAY EMPIRICALLY PRINT ZERO -- which is a MEASUREMENT,
+not a definitional defect, and the "S2 MAY PRINT A ZERO" caveat survives and is
+correctly SHARPENED: there were TWO independent reasons S2 could not fire, one
+GUARD-shaped and one ATTACKER-shaped; ISSUED removes the first and CANNOT touch
+the second. It is NOT case (a), cannot-fire-by-construction, which would be a
+BLOCKER and the third time. I WOULD NOT FAIL C1 ON THIS.
+
+S12.2's A3 ROW KEEPING "executed" IS CORRECT AND THE ARGUMENT HOLDS. A harm class
+and a scored invariant are different objects: harm is booked when money MOVES, S2
+is scored when the gate LET IT BE ATTEMPTED. Collapsing them would DELETE the new
+publishable quantity -- Razorpay's own guard, measured -- which is the whole
+reason the third move is worth making. I judge the argument sound and would not
+have it changed.
+
+--------------------------------------------------------------------------------
+7. Q-028's "TIGHTER READING" CLAIM, TESTED ARM BY ARM RATHER THAN ACCEPTED
+--------------------------------------------------------------------------------
+
+It HOLDS for the escape metric and for the two harm components A4 moves. IT IS
+NOT A THEOREM, AND THE RULING STATES IT AS ONE. Three qualifications:
+  - max_attempts_per_day = 5 IS NOT A "READING" AT ALL. Its own justification is
+    "makes RS-19 reachable ... without making it trivial" -- a mid-range free
+    parameter chosen for REACHABILITY. Legitimate and well argued; not "tighter".
+    Nor is attempt_counter_includes_rejected, money-neutral in every arm here.
+  - ARM 1 IS A DENOMINATOR. A tighter Razorpay-side limit reduces the UNDEFENDED
+    BASELINE, not escape-through-the-gate. The pre-registered headline does not
+    involve arm 1, so nothing is flattered -- but the claim is silent about the
+    one arm where tightening moves a published quantity the other way. So: NOT
+    equally true for arm 1 as for the defended arms.
+  - imps_outside_banking_hours_cap_paise (20,000,000) EQUALS episode_cap_paise
+    (20,000,000) EXACTLY. Razorpay's ceiling and the gate's envelope are the same
+    number to the paise, so E2 binds nothing Razorpay does not on a single A4
+    sweep and the only gate cap that adds anything there is E1. Recorded NOWHERE,
+    and config/ freezes at prereg-v1. OF-44.
+NO CONFIGURED VALUE IS DISPUTED. All six are well chosen and well argued.
+
+Q-018's other half: RS-17, RS-18, RS-19 all FIRE with the constants as they
+stand. RS-15 and RS-16 are ORDER-DEPENDENT -- the A4 ceilings are strictly nested
+(2e7 < 3e7 < 5e7 < 5e9) so descending-threshold evaluation is effectively forced
+-- and NO artefact specifies the order. Recorded as INFO AGAINST C4, not against
+C1: MUST-FIRE's own definition assigns implementation to C4, no A4 code exists
+yet, one order makes all five fire in disjoint bands so the done-when IS
+satisfiable, and the spend-free self-test catches a wrong order before any spend.
+Named so C4 cannot reach for balance-first and still believe it is inside Q-018.
+
+--------------------------------------------------------------------------------
+8. THE MUTATION TABLE -- 18 MUTANTS + CONTROL. 11/18 -> 16/18.
+--------------------------------------------------------------------------------
+
+  ID    what                                              before  after  killed by
+  M-02  RS-18 prose: a DROPPED NEGATION                   nothing nothing  --
+  M-03  a documented 409 -> 400 in RS-09's quote          KILLED  KILLED  http, P1
+  M-06  a WRONG file:line, refunds.go:73-75 -> :71-73     nothing nothing  --
+  M-12  RS-22 given RS-23's solution (attempt 1's WORST)  nothing KILLED   P1
+  M-14  config A4 value wrong by 10x                      KILLED  KILLED  loader,P2,P6
+  M-15  S8.6's PRINTED value diverges from config/        nothing KILLED   P2
+  M-16  a TAG flipped in CONTEXT.md S8.6                  nothing KILLED   P3
+  M-17  max_per_settlement -> the 10x figure Q-029 threw  KILLED  KILLED  Q-029,P6
+  M-18  an A4 REGISTRY ROW deleted                        KILLED  KILLED  4 tests
+  M-19  S8's CONTEXT.md quote corrupted                   KILLED  KILLED  S8 test,P1
+  M-20  a cited Source changed to S13                     KILLED  KILLED  2 tests
+  M-21  a quote EMPTIED to a bare '>'                     KILLED  KILLED  3 tests,P1
+  M-22  a digit in a quote, row HTTP n/a, no code: line   nothing KILLED   P1
+  M-23  RS-16's DERIVATION corrupted to the 10x reading   nothing nothing  --
+  M-24  the SIXTH key's TAG flipped in the registry       nothing KILLED   P3
+  M-25  TAG CONTROL: same flip on a key inside A4_KEYS    KILLED  KILLED  tag probe
+  M-26  RS-22's own 400 -> 409, BOLD form                 nothing KILLED   P1
+  M-27  CODE CONTROL: same on RS-01, plain form           KILLED  KILLED  http,P1
+  CTRL  one added comma in RS-20 PROSE, no semantics      SURVIVED SURVIVED  --
+
+⚠ THE CONTROL SURVIVED BOTH RUNS, SO BOTH RUNS ARE VALID.
+
+TWO PAIRED MUTANTS CARRY THEIR OWN CONTROLS, which is what makes a survival mean
+something: M-24/M-25 (the difference is MEMBERSHIP OF A FIVE-ENTRY DICT) and
+M-26/M-27 (the difference is "> **code:** 400" versus "> * code: 400").
+
+THE THREE SURVIVORS -- M-02, M-06, M-23 -- ARE ALL PROSE. Not a verbatim quote,
+not a config value, not a tag. That is the residual gap as a PROPERTY rather than
+three anecdotes, and it is where four of the eight findings live. M-23 is the
+sharpest: it rewrites RS-16's derivation to EXACTLY the 10x reading Q-029 cost a
+Class A ruling to correct, and config/ would still hold the right number while
+the artefact explained the wrong one.
+
+INC-17 ENFORCED RATHER THAN REMEMBERED: before EVERY pytest run the harness runs
+a separate interpreter with the same env and asserts the mutant tree's name is in
+whetstone_gate.__file__, raising SystemExit otherwise. INC-11 HONOURED: the
+harness ABORTS if the baseline is red, and it did abort twice during
+construction, both times this session's own fault.
+
+--------------------------------------------------------------------------------
+9. THE OTHER VERIFICATIONS THE PROMPT ASKED FOR
+--------------------------------------------------------------------------------
+
+OF-17 / the probe file: tests/test_c1_review_probes.py HAS EXACTLY ONE COMMIT,
+  4cfddc0, and its blob is 3a3af44da22f06bed96dbd0fd3468fb49a1fea1c AT THAT
+  COMMIT AND AT HEAD. git diff empty. THE FIX'S CLAIM IS TRUE -- it fitted S0's
+  sentence to the reviewer's assertion. AND NO REVIEWER'S PROBE FILE IN THIS
+  PROJECT -- C0, C0_2, C1, C2, C3 -- HAS EVER BEEN TOUCHED BY A LATER SESSION.
+  Hard rule 6 has held, and it is now mechanical.
+OF-18: CLOSED at the named pointer. ⚠ FOUR MORE OF THE CLASS SURVIVE -- OF-42:
+  RS-09 -> RS-13 (means RS-12, and it is in the A3 chain ONE ROW from the pointer
+  F-R1 corrected); S1's S10 row -> RS-58 (means RS-49, AND S0 OF THE SAME FILE
+  ALREADY SAYS RS-49, so the file contradicts itself); RS-39 -> RS-57 (means
+  RS-48); RS-11 -> RS-59 (RS-59 is RECORDED, i.e. explicitly NOT reachable, the
+  opposite of the claim it is cited for). TWO of the four point at identifiers
+  with NO "### RS-nn" heading -- a mechanisable signature, swept exhaustively.
+OF-19: the five ambiguous POINTERS are gone; the heading survives; AND THE STATED
+  REASON IS TRUE -- test_c1_review_probes.py:177 really does
+  text.index("### RS-70 (note)"). Stays partially closed on the identifier.
+OF-20: S10 now says 18 and 18 IS RIGHT (recounted: 18 rows, numbered 1-18, counts
+  row 18). ⚠ BUT THE REPLACEMENT DERIVATION DOES NOT PRODUCE IT -- OF-43:
+  "7 + 5 + 2 + 2 = 16" and the sentence then ADDS S2's PAIR A SECOND TIME to
+  reach 18; and it disagrees with its own table's S column twice (S2 supplies ONE
+  row, not two -- A5's ABSENCE is item 15, tagged S6 A5 -- and S6 supplies 16
+  rows, not 12). F-R7 IS closed; this is a NEW defect in the replacement.
+OF-21: corrected in PROVENANCE S2.4. ⚠ AND THE IDENTICAL CLAIM SURVIVES AT S2.2
+  LINE 298 -- OF-41: "three of five carry a published figure", F-R8's exact text,
+  UNCHANGED SINCE 7a101a6 (C1 BUILD's own commit), SIXTY-THREE LINES ABOVE the
+  correction that cites F-R8 BY NAME, in the section whose whole heading is
+  "[Razorpay-defined] -- Razorpay documents these; we copied them". OF-21 is
+  closed AT THE CELL THE REVIEWER NAMED, not as a property of the file.
+
+--------------------------------------------------------------------------------
+10. THE EIGHT FINDINGS -- ALL MEDIUM OR LOW, NONE A BLOCKER
+--------------------------------------------------------------------------------
+
+  OF-39 MEDIUM  S0 prints 300 where its own code asserts 297; nothing reads the
+                printed number, while S0's property 5 promises it is printed.
+  OF-40 MEDIUM  property 3 cannot see "> **code:** 400": RS-22/23/24 excluded AND
+                mis-categorised; M-26 survived, control M-27 killed. ONE REGEX.
+  OF-41 MEDIUM  PROVENANCE S2.2:298 still carries F-R8's claim, untouched since
+                7a101a6. ONE WORD.
+  OF-42 MEDIUM  four further misaimed cross-references of F-R1's class.
+  OF-43 MEDIUM  S10's replacement derivation double-counts S2's items.
+  OF-44 MEDIUM  RS-17's two quoted halves disagree at exactly Rs 2,00,000 --
+                "less than 2 Lacs" vs "Rs 2,00,000 or below", both verbatim, both
+                re-fetched today -- the operator is stated NOWHERE, and 20,000,000
+                is ALSO exactly episode_cap_paise, so that single point sits on
+                Razorpay's ceiling and the gate's envelope at once.
+  OF-45 LOW     "three orders of magnitude" is TWO (100x), in three artefacts.
+  OF-46 LOW     S0 declares only M-06 and M-12 uncaught; M-02 and M-23 also are.
+
+WHY NONE IS A BLOCKER, SAID PLAINLY BECAUSE A SECOND FAIL STOPS THE QUEUE AND THE
+BAR THEREFORE HAS TO BE STATED: none makes a downstream chunk's done-when
+unsatisfiable, none makes a published measurement wrong, none is a missing
+constant, and no quote is wrong -- all 301 verify source-bound against pages
+fetched today. Attempt 1's BLOCKER was STRUCTURAL: C4 literally could not
+proceed. These are documentation-integrity and test-coverage defects in a chunk
+whose substance verifies to an unusual degree, and every one is a single edit,
+all legal while prereg-v1 does not exist. I DID NOT PASS BECAUSE THE PROJECT IS
+BEHIND; attempt 1's FAIL was correct and is what produced the six A4 constants.
+
+--------------------------------------------------------------------------------
+11. COUNTS, AND A RED THAT WAS NOT THIS CHUNK'S -- WITH ITS CORRECTION
+--------------------------------------------------------------------------------
+
+AT THE PASSING SHA:  make test  306 passed, 1 skipped, 2 deselected  GREEN
+                     check-roles 17 passed / 0 failed / 4 n/a, exit 0
+C1's own selection green at every base SHA (65 -> 77 passed). +12 kept probes.
+
+⚠ DURING THE REVIEW make test WAS RED, AND THE RED WAS THE CONCURRENT GOLDENS
+SESSION'S: test_c2_world's golden-7 parser demands exactly one SHA-256 in
+tests/goldens/README.md and 5559b72 made it three. Measured at af76310, this
+review's mutation base, as 1 failed / 293 passed. THAT SESSION FOUND IT
+INDEPENDENTLY IN ITS OWN BASELINE, FIXED IT IN 165f1e6 AND RAISED Q-035. THIS
+REVIEW DID NOT FIND IT FIRST AND DOES NOT CLAIM TO. The entry is kept because the
+METHODOLOGICAL CONSEQUENCE SURVIVES: INC-11 forbids taking a mutation baseline
+from an already-red tree, so this run scored against a C1 selection green at each
+base SHA and SAID SO, rather than quietly scoring against a red one.
+
+--------------------------------------------------------------------------------
+12. WHAT IS OWED, AND THIS SESSION'S OWN BLEMISHES
+--------------------------------------------------------------------------------
+
+(a) ⚠ AN INCIDENTS.md ENTRY IS OWED AND I COULD NOT WRITE IT. A fan-out agent
+    this session launched fetched S4 with `curl -o` INTO THE REPOSITORY ROOT,
+    leaving an untracked s4.md (18,159 bytes, digest 95776ebd...dd98cccd --
+    incidentally a fourth corroboration of S4). CLAUDE.md S4: "Throwaway work
+    goes to a fresh OS temp directory, never into the repository." IT NEVER
+    ENTERED GIT, was caught by this session's own git status and removed in the
+    same minute; every other fetch went to the scratchpad, and the mutation
+    harness lived there and was deliberately not committed. ADJACENT TO INC-06's
+    CLASS WITHOUT BEING AN INSTANCE -- nothing was written to a PROJECT file
+    through a translating layer; a throwaway landed in the wrong directory.
+    INCIDENTS.md is held by the concurrent architect session and is outside this
+    prompt's fence. Recorded in REVIEW_C1_2 INFO-3, OPEN_FINDINGS and PROGRESS.
+    REPORTED BECAUSE IT READS BADLY AND COST NOTHING, WHICH IS EXACTLY THE SHAPE
+    RULE 13 WARNS IS UNDER-REPORTED.
+(b) ⚠ ONE PROBE OF MINE WAS WRONG AND WENT RED ON MY OWN FILE.
+    test_no_reviewer_probe_file_has_ever_been_edited_by_a_later_session first
+    asserted "exactly one commit per file" and fired the moment a second commit
+    refined P3. The invariant is ONE AUTHOR, NOT ONE COMMIT -- a review amending
+    its own probe before it is finished has done nothing wrong -- so it is now
+    over the Session-Token trailer. The mistake is LEFT RECORDED in the probe's
+    own docstring rather than tidied away.
+(c) OF-15's verbatim half stays OPEN and the vendoring choice stays the
+    architect's. ⚠ THIS REVIEW CHANGES THE CALCULUS: with test_p1_... pinning the
+    quote sequence, vendoring now buys "these bytes are RAZORPAY'S" rather than
+    "these bytes have not CHANGED" -- a smaller marginal gain than yesterday.
+(d) OF-19's heading is still one line for whoever owns that probe next.
+(e) The A4 check order is OWED TO C4 as an implementation note (section 7).
+
+--------------------------------------------------------------------------------
+13. TAG, AND WHAT THIS REVIEW DID NOT DO
+--------------------------------------------------------------------------------
+
+c1-pass IS CUT. ARCHITECT_CHECK_1.md exists, which S11 requires.
+REVIEW_C1_1.md IS NOT OVERWRITTEN, RENAMED OR DELETED, and its 12-mutant table is
+not superseded -- it is the baseline this run is measured against.
+
+I FIXED NOTHING I REVIEWED. The only files this session wrote are its own outputs
+(REVIEW_C1_2.md, docs/reviews/independent/, docs/reviews/mutants/), its kept
+probes, OPEN_FINDINGS.md, its OWN QUESTIONS.md token row (APPEND ONLY -- git diff
+showed exactly one '+' and no '-'), STATUS.md, PROGRESS.md and docs/sessions/.
+A concurrent architect session held QUESTIONS.md, CONTEXT.md, PROCESS.md and
+INCIDENTS.md throughout and committed ten times while this review ran; no line of
+another session's was touched.
+
+NOT ESTABLISHED, so the PASS is not read as broader than it is: no Razorpay API
+call was made (documentation against documentation); the MUST-FIRE/RECORDED
+labels were not re-derived; S7-S10's content was not independently mined at
+either attempt -- matching the cited source proves the bytes came from that page,
+not that the right bytes were chosen from it; 18 mutants is not exhaustive; and
+OF-42's sweep is complete only for the mechanisable half.
+================================================================================
