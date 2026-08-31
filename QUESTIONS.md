@@ -259,7 +259,43 @@ before writing its own pair row. It is recorded rather than quietly fixed: `Q-02
 | Pair | Chunks | Fences (disjoint) | Recorded | Issued |
 |---|---|---|---|---|
 | P-01 | C0-FIX (`c9521aac`) + C1 BUILD (`20cd5b79`) | C0-FIX: `src/whetstone_gate/{check_roles,config,spec_constants}.py`, `tests/` · C1: `RAZORPAY_SEMANTICS.md`, `PROVENANCE.md` | 2026-08-31 | 2026-08-31 |
+| P-02 | C0 REVIEW (`f57e216b`) + C1 REVIEW (`a0cc0212`) | C0: src/whetstone_gate/{check_roles,config,spec_constants}.py + tests · C1: RAZORPAY_SEMANTICS.md + PROVENANCE.md | 2026-08-31 | 2026-08-31 |
+| P-03 | C3 REVIEW (`a66c389d`) + C2 REVIEW (`94116fe2`) | C3: src/whetstone_gate/tau2/ · C2: src/whetstone_gate/world/ | 2026-08-31 | 2026-08-31 |
+
 *(Before P-01: no concurrent pairs. C0 ran alone.)*
+
+⚠️ **P-02 AND P-03 ARE THE FIRST REVIEW PAIRS, recorded by session `921cfaa4` on 2026-08-31 BEFORE
+EITHER PROMPT IS ISSUED**, which is what the amended §1 requires and what did **not** happen for the
+`f0c50283` / `debc97ae` pair (`Q-024`).
+
+**NEITHER PAIR CONTAINS A CHUNK AND ITS DEPENDENCY, which is the amendment's one hard condition.**
+- **P-02** — C0 is the repository skeleton, the config loader and `check_roles`; C1 is two root
+  markdown artefacts, `RAZORPAY_SEMANTICS.md` and `PROVENANCE.md`, and **imports nothing at all**.
+  C1 does not depend on C0 and C0 cannot depend on C1: a documentation artefact is not importable.
+- **P-03** — C3 is `src/whetstone_gate/tau2/`, an enumeration over a vendored third-party checkout;
+  C2 is `src/whetstone_gate/world/`, the seeded generator. **Neither package imports the other**,
+  and neither chunk's card lists the other as a dependency. §1's own worked examples name this
+  shape: *"C7's and C8's reviews may not pair, because C8 depends on C7; C1's and C3's may, and
+  C2's and C4's may."*
+
+**ALL FOUR SESSIONS WRITE ONLY** their own `docs/reviews/REVIEW_<N>_<attempt>.md`,
+`docs/reviews/OPEN_FINDINGS.md`, `STATUS.md` and `PROGRESS.md`. **The source fences are disjoint by
+construction; the journals are shared, and the journals are the real hazard** — `INC-06`, `INC-10`
+and `INC-12` are three occurrences of that one class in three different sessions.
+
+**THE OPERATOR'S BOUND THEREFORE APPLIES TO ALL FOUR, carried verbatim as P-01 carries it:** *"append
+only, never rewrite another session's lines, re-verify your own bytes after any rebase"*, and **IF A
+PUSH IS REJECTED TWICE FOR THE SAME SESSION, THAT SESSION STOPS AND WAITS** rather than grinding on
+a rebase loop. It was **PROVEN on 2026-08-31**, when C0-FIX and C1 ran concurrently for 45 minutes
+with zero collisions (`PROCESS.md` §1).
+
+⚠️ **TWO CONDITIONS THIS TABLE CANNOT ENFORCE AND THEREFORE STATES.** First, §1 also requires that
+**a chunk's review may not begin before the architect has recomputed that chunk's build report and
+committed its `ARCHITECT_CHECK`** — that is unchanged by the amendment, it is the architect's, and
+**recording a pair here does not satisfy it.** Second, **four review sessions are being prepared
+while C2's and C3's own reviews are among them**; `Q-019`'s condition (iii) is discharged for C2 (see
+that entry), so `c2-pass` is cuttable on a PASS, but **only a review session tags, and only on a
+PASS.**
 
 ⚠️ **ARCHITECT RULING — the rule is EXTENDED, and that is recorded rather than assumed.**
 `PROCESS.md` §1's concurrency rule names *"two **BUILD** sessions"*. **P-01 is one FIX and one
