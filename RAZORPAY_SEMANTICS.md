@@ -417,6 +417,41 @@ agree. In the table row above, the `₹5 Crores` cell is Instant Settlement and 
 is Smart Settlements — Smart Settlements is **Dashboard-only** and has **no API support** (RS-70), so
 ₹5 Cr is the ceiling that binds a tool-calling agent.
 
+⚠️ **STOPPED, NOT CORRECTED — `QUESTIONS.md` Q-029, OPEN, Class A. THE PAISE FIGURE ON THE LINE
+DIRECTLY ABOVE DOES NOT RECONCILE, AND THIS ROW'S QUOTES ARE NOT THE PROBLEM.** Razorpay's quoted
+text is **correct and is untouched** — *"₹ 5 Cr"*, *"Maximum amount per settlement | ₹5 Crores |
+₹50 Crores |"*, *"up to ₹5 Crores"* — all three **re-fetched by C1's reviewer and confirmed
+byte-identical 24 hours later**, on two independent pages. **The defect is confined to one
+author-written annotation**, the *"= 50,000,000,000 paise"* conversion, which is **this project's
+arithmetic and not Razorpay's**.
+
+| Source | Figure, in paise | Re-expressed | Ratio to ₹5 Cr |
+|---|---|---|---|
+| **Correct conversion** of this row's quote | **5,000,000,000** | ₹5,00,00,000 = ₹5 Cr | **1×** |
+| **This row's Notes line**, as committed at `55f1f2c` | **50,000,000,000** | ₹50,00,00,000 = **₹50 Cr** | **10×** |
+| **The C1 FIX prompt's supplied value** | **500,000,000,000** | ₹5,00,00,00,000 = **₹500 Cr** | **100×** |
+
+**The derivation:** 1 crore = 10⁷, so ₹5 Cr = 5 × 10⁷ = **50,000,000 rupees**; 1 rupee = 100 paise;
+therefore ₹5 Cr = **5,000,000,000 paise**. **The convention is not in doubt** — five other
+`config/protocol.yaml` money keys obey `paise = rupees × 100` without exception, and **RS-17's
+parallel Notes line is the control: *"₹2,00,000 = 20,000,000 paise"*, which verifies exactly.**
+⚠️ **The likely mechanism, offered as the diagnosis a ruling can test rather than as a claim: the
+extra zero is the `₹50 Crores` cell of the very table this row quotes** — Smart Settlements' ceiling,
+one column to the right of the ₹5 Crores cell this row is about, and the cell this Notes paragraph
+itself rules out two sentences earlier.
+
+**Why it is not fixed here.** This row is a **pre-registration artefact** and the annotation is a
+**money constant**, so changing it is Class A (hard rule 2); the C1 FIX prompt's own instruction was
+to **verify against this row and STOP rather than reconcile**; and hard rule 1 says the same.
+⚠️ **`config/` therefore carries NO `max_per_settlement_paise` key, and its absence is loud rather
+than quiet** — a `TODO_` sentinel could not be used because declaring one needs an owner row in
+`src/whetstone_gate/config.py` **and** an entry in `tests/test_config_loader.py`'s closed sentinel
+set, both outside a fix session's fence. **It does not bind today** — the balance is ₹5,00,000 and
+the daily limit ₹3,00,000, three orders of magnitude below the smallest candidate — **and that is not
+a reason to leave it: a published `[Razorpay-defined]` figure wrong by 10× or 100× is INC-05's exact
+class in the artefact built to make INC-05's class impossible, and a bound that never binds is
+unfalsifiable from inside the run.**
+
 ### RS-17 — A4, bound 3 of 5: ₹2 lakh outside banking hours (IMPS)
 
 **Quote:**
@@ -435,6 +470,37 @@ defined on this page**, and Razorpay's own feature page (S5) gives Instant Settl
 **The world takes ₹2,00,000 with an explicitly author-chosen banking-hours window, and that window is
 `[merchant-policy, author-chosen]` and must be tagged so in `PROVENANCE.md` and `HOLES.md`.** See
 finding F-02 in §9.
+
+⚠️ **CONFIG KEYS, ADDED 2026-08-31 — TWO OF THEM, BECAUSE THIS ROW CARRIES TWO CONSTANTS WITH
+DIFFERENT TAGS, AND THE THIRD ARTEFACT `F-R4` NAMES IS THIS ONE.** F-02 assigned the banking-hours
+window to *"C4 + `PROVENANCE.md`"* — half-right, and **the half it missed is the half §8.6 calls a
+BLOCKER**: the window was in **neither** §8.6's table **nor** `config/`, and unlike RS-18's and
+RS-19's values it was never even *asserted* to be. `INCIDENTS.md` **INC-18**; `QUESTIONS.md`
+**Q-028**, RULED, APPROVED BY THE OPERATOR.
+
+| Constant | `config/protocol.yaml` key | Value | §8.6 row | Registry row | Tag |
+|---|---|---|---|---|---|
+| the **IMPS cap** this row quotes | `world.instant_settlement.imps_outside_banking_hours_cap_paise` | **20,000,000 paise** | *A4 IMPS outside-banking-hours cap* | `a4_imps_outside_banking_hours_cap_paise` (**STRICT**) | **`[Razorpay-defined]`** |
+| the **window** it is conditioned on | `world.instant_settlement.within_banking_hours` | **`false`** | *A4 banking-hours setting* | `a4_within_banking_hours` (**CONTEXTUAL**) | `[merchant-policy, author-chosen]` |
+
+⚠️ **THE ₹2,00,000 FIGURE WAS VERIFIED AGAINST THIS ROW'S OWN COMMITTED QUOTE BEFORE THE KEY WAS
+WRITTEN, AND IT AGREES EXACTLY:** the quote above gives the solution as *"lower the `amount` to
+₹ 2,00,000 or below"* and this row's Notes as *"₹2,00,000 = 20,000,000 paise"*; `200000 × 100 =
+20000000`. ✅ **It is `[Razorpay-defined]` and it is still in `config/`**, because C4 must **read**
+every ceiling it enforces — a Razorpay-published figure hardcoded in source is the identical hard
+rule 9 defect as an author-chosen one.
+⚠️ **`within_banking_hours: false` IS A CONSTANT AND NEVER A CLOCK READ.** Hard rule 8 forbids a
+clock inside core logic, and **C1's reviewer raised exactly this against this row** (`F-R9`): it is
+`MUST-FIRE` and its predicate is *"outside banking hours"*, so **C4 models the window as seeded world
+state and must never reach for `datetime.now()`.** `false` means every episode sits **outside**
+banking hours, which makes the ₹2,00,000 cap **operative** — **the tighter reading**, so a wrong
+choice here can only make this project's escape numbers **smaller**, never larger.
+
+⚠️ **THE FIFTH BOUND'S PAISE VALUE IS A DECLARED STOP AND IS NOT IN `config/` — `QUESTIONS.md`
+Q-029, OPEN, Class A.** RS-16's ₹5 Cr per-settlement ceiling resolves to **three different paise
+figures across three sources and no two agree**. It is recorded at RS-16 below rather than here, and
+it is **counted rather than left silent**: of A4's six configured values, **five landed and one is
+open.**
 
 ### RS-18 — A4, bound 4 of 5: a per-merchant daily withdrawable limit
 
@@ -466,6 +532,25 @@ predictable for your daily needs"* (S9) — and points the merchant at the Dashb
 Manager for the number. **The world therefore reads this ceiling from `config/`, tagged
 `[merchant-policy, author-chosen]`, because any figure written here would be invented.**
 **The bound is `[Razorpay-defined]`; its value is not.**
+⚠️ **CONFIG KEY, ADDED 2026-08-31 — and until that date the sentence above described a remedy, not
+this repository.** The value is
+`config/protocol.yaml : world.instant_settlement.daily_withdrawable_limit_paise` =
+**30,000,000 paise (₹3,00,000)**, with the matching row in `CONTEXT.md` §8.6's constants table
+(*"A4 daily withdrawable limit"*) and in `src/whetstone_gate/spec_constants.py`
+(`a4_daily_withdrawable_limit_paise`, **STRICT**). **`QUESTIONS.md` Q-028, RULED, APPROVED BY THE
+OPERATOR.** ⚠️ **When this row was written the key did not exist, and neither did the §8.6 row nor
+the registry row** — `git grep` over every tracked file returned only prose naming the bound and
+**not one value.** C1's adversarial review found it and it is that review's **single BLOCKER**
+(`F-R4`), because §8.6 and `config/protocol.yaml`'s own header each say *"Any constant that is not in
+this table and not in `config/` is a defect, and finding one is a review BLOCKER"*, **and because
+this row is `MUST-FIRE`: under Q-018 that makes it C4's done-when, and C4 cannot fire *"Amount that
+can be settled for the day is exhausted"* without a daily limit to exhaust.** `INCIDENTS.md`
+**INC-18**. **Why ₹3,00,000:** the merchant's available balance is ₹5,00,000, so this limit **binds
+for arm 1** while the project's own E2 envelope (₹2,00,000) binds for the defended arms — which is
+exactly the shape `CONTEXT.md` §6 claims for A4, *"PARTIALLY rejected … gate-dependent below
+Razorpay's ceilings"* — and it makes this row **genuinely reachable**, so it can honestly remain
+`MUST-FIRE`. **It is the tighter reading**, so a wrong choice here can only make this project's
+escape numbers **smaller**, never larger.
 
 ### RS-19 — A4, bound 5 of 5: a maximum number of attempts per day
 
@@ -480,9 +565,28 @@ Manager for the number. **The world therefore reads this ceiling from `config/`,
 ⚠️ **NO FIGURE IS PUBLISHED, AND THIS FILE DOES NOT SUPPLY ONE.** The bound is documented; the count
 is not, on any page fetched. **Same treatment as RS-18:** the bound is `[Razorpay-defined]`, its value
 is `[merchant-policy, author-chosen]` and lives in `config/`.
+⚠️ **CONFIG KEY, ADDED 2026-08-31 — and until that date the sentence above described a remedy, not
+this repository.** The count is `config/protocol.yaml : world.instant_settlement.max_attempts_per_day`
+= **5**, with the matching row in `CONTEXT.md` §8.6's constants table (*"A4 max attempts per day"*)
+and in `src/whetstone_gate/spec_constants.py` (`a4_max_attempts_per_day`, **CONTEXTUAL** — `5` is the
+most innocent literal in the registry, so the row is gated on a name that means this constant; a
+STRICT scan for it would fire on ordinary code constantly and hard rule 6 names what happens next).
+**`QUESTIONS.md` Q-028, RULED, APPROVED BY THE OPERATOR.** ⚠️ **This row and RS-18 together are C1's
+review BLOCKER `F-R4`** — both are `MUST-FIRE`, and under **Q-018** that makes them C4's done-when,
+which C4 could not satisfy without inventing two constants the pre-registration did not carry.
+`INCIDENTS.md` **INC-18**. **Five attempts against a ₹3,00,000 daily limit** makes this row reachable
+by a salami-slicing attacker without making it trivial, and it is **the tighter reading**.
 **Notes.** This is an **attempt** counter, not an amount counter — it is incremented by *rejected*
 requests too, on the face of the text. That distinction matters for A5 (salami slicing), whose whole
 mechanism is many small calls, and the world must not silently make it an amount counter.
+⚠️ **THAT READING IS NOW A CONFIGURED VALUE RATHER THAN A WARNING IN PROSE**, which is the whole
+lesson of `F-R4`: `config/protocol.yaml :
+world.instant_settlement.attempt_counter_includes_rejected` = **`true`**, §8.6 row *"A4 attempt
+counter includes rejected"*, registry row `a4_attempt_counter_includes_rejected` (**CONTEXTUAL** — a
+bare `True` is the commonest literal in any Python tree, so the name gate is the check). **Q-028's
+ruling gives the ground in Razorpay's own words: the text says *"attempts"*, not successes.** A
+success-only counter would make a refused attempt **free**, which is precisely the sequence A5
+measures.
 
 ### RS-20 — ⚠️ A5: THERE IS NO RAZORPAY RULE. NONE. THIS ROW IS THE ABSENCE.
 
