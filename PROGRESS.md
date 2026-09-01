@@ -6,6 +6,172 @@ not a record; this file is.
 
 ---
 
+## C13 — THE CaMeL COMPARATOR — **FIX** attempt 2 — 2026-09-02 — 🔁 **BOTH BLOCKERS CLOSED, SIX MUTANT SURVIVORS KILLED, AND FOUR INCIDENTS OF WHICH TWO ARE THIS SESSION'S OWN**
+
+**SESSION-TOKEN:** `91eb51c1` — **NOT in the batch.** Appended as
+`| `91eb51c1` | C13 | FIX | 2026-09-02 |` and numbered **from the table**: **39 rows before it, so
+it is row 40**, the **twenty-fifth** self-recorded row. **Ordinals 11, 12 and 18 are still asserted
+by no paragraph** (`df238be6`, `0852ea56`, `9c0c6734`) and are **not this session's to close**.
+⚠️ **Row 39 (`3605d31c`) is in the tree only because THIS SESSION'S OWN COMMIT `e2b4778` SWEPT IT** —
+`INC-48`, below. The chain still reconciles exactly: `8c49c4d3` counted 37 and made itself 38,
+`3605d31c` counted 38 and made itself 39, this session counted 39 and is 40.
+
+**Pushed SHA:** see the FINAL OUTPUT in `docs/sessions/c13-fix-2.txt`.
+**Verdict:** ⚠️ **NO TAG.** A FIX session does not certify its own fix.
+
+---
+
+### What this session was asked to do, and what it did
+
+**C13 REVIEW 2 (`8c49c4d3`) returned FAIL on two BLOCKERs**, neither about a number and neither
+about `CONTEXT.md`. Both are closed. **Hard rule 13 first:** `INC-46` and `INC-47` were written and
+committed at **`6ab21b8`**, *before a line of code changed*.
+
+**B-3 — CLOSED** (`778c8f2` the `config/` edit + `4be0b86` the reader).
+`config/lanes.yaml:202`'s `branch_a_condition` still read *"the model id is still served AND the run
+completes inside the 90-minute box"* — the trigger `Q-057`'s ruling **narrowed**. `Q-064` named it,
+under its own ⚠️ heading, in the same entry as the citation defect; C13 FIX 1 closed the citation
+half. `Q-079`'s ruling was recorded **verbatim at `e2b4778` before the edit** (hard rule 5).
+The key now states Branch A's condition as **the run completing**, and a **`branch_b_condition` key
+is ADDED**, so Branch B's trigger exists in `config/` as a **stated condition** — carrying the
+diagnosis requirement, the `PROTOCOL.md`-before-the-branch order, and *"it errored is not a cause,
+and a harness defect is never Branch B"* — rather than only as the **negation** of Branch A.
+⚠️ **The second commit is the half that matters.** `Q-064` had already printed the cause as a number
+— *"nothing reads either key"* — so correcting the string alone would have left **a pre-registered
+condition that nothing asserts**, which is a comment.
+`test_the_pre_registered_branch_condition_carries_the_DIAGNOSIS_requirement` reads **both keys
+through the loader** and cross-checks every required phrase against `CONTEXT.md` §8.5.1 **first**, so
+if the architect amends the law it goes red *there* — the correct place. **Proved red four ways in a
+fresh OS temp sandbox**, including at `Q-079`'s actual HEAD state, which dies on
+`MissingRequiredValue`: hard rule 9's refusal, not a silent pass.
+⚠️ **A non-cp1252 glyph was drafted into a config VALUE and removed before the commit** —
+`INC-08`/`INC-25`/`INC-45`'s hazard, on the operator's own console, caught by this session's own
+diagnostic dying on it. `make check-prereg` = **NOT-YET-FROZEN**; blob SHA-256
+**`f9f190dc…` → `23b8db92…`**, carried for C14. `camel_comparator.branch` is **still
+`TODO_C13_RUN1`** and `make selftest` is **still RED on it, for that reason**.
+
+**B-4 — CLOSED** (`0beb8ee`), by **remedy (a)**, the stronger of the two REVIEW 2 offered.
+`INC-39`'s `Action` claimed the citation was corrected *"at all four first-party sites **and in
+`Q-057`'s fact 4**"*. Four landed; the fifth did not — and **no fix commit deletes a line from
+`QUESTIONS.md` at all**, measured here across all seven (`ef4b8d5` +1/−0, `f17709c` +214/−0, total
+deletions **zero**). A **dated correction note is appended to `Q-057` directly beneath fact 4** — not
+at the end, because `Q-057`'s status is *"BLOCKING RUN-1 if unread"* and RUN-1 reads fact 4 — naming
+`replay_task`, **140-145**, the read at **`:148`**, the call at **`:305`**, and stating that `:321`
+is inside `replay_user_task`, **a function with no caller**. ⚠️ **Fact 4 is left standing and is not
+edited**: it is the historical record of what `c2b7f419` found. `INC-39`'s `Action` is **corrected
+in place with a dated note, its original words left standing**.
+
+**`OF-103` — SETTLED, and neither number was wrong.** Measured over the git blob at pin `f083b6b3`:
+`ast.Assign` = **(139, 146)**, the assignment statement `trace_path = ( … )` including its
+parentheses; `Assign.value` = **(140, 145)**, the expression, which is what
+`_log_path_construction` returns. **Prefer `140-145`** — it is generated from the call graph and
+cannot drift, which is `INC-39`'s own remedy. Both records **labelled**, neither corrected.
+
+**All six mutant survivors KILLED** (`b07365f`, `dfffba7`), each proved dead by firing the mutant in
+a fresh OS temp sandbox whose `vendor/` is a **read-only junction**, so not one byte of `vendor/` is
+touched and every mutant lands on **first-party** source. `N11` (OF-96), `N13` (OF-97), `N8` (OF-98),
+first-wins (OF-100), `N14` **and** `N15` (OF-101), `N6` (OF-102). Control 98 passed before and after
+every one.
+
+---
+
+### ⚠️ Two of this session's own fixtures were wrong, and both are declared rather than quietly repaired
+
+**(i) `APPENDIX` is not symmetric with `TABLE_NUMBER`, and the first fixture written for it pinned
+nothing.** A leading-junk appendix (*"see Appendix C, …"*) is rejected by `match` too; `APPENDIX`
+ends in `.+` and `.` does not match a newline, so `fullmatch` and `match` differ **only on a
+multi-line value**. Measured (`N15` **SURVIVED**), corrected to a smuggled-second-line fixture,
+re-measured (`N15` **KILLED**).
+
+**(ii) `OF-100`'s first test was GREEN BY ACCIDENT OF ITS FIXTURE**, found by an independent
+adversarial check of this session's *own landed commit*. It fired one definition order, where *"keep
+the last"* and *"keep whichever is absolute"* agree — so an **ORACLE-2** mutant (*prefer the
+definition containing `/var/logs`*) **survived the entire C13 file at `b07365f`**. `dfffba7` adds the
+**mirror** — the same fixture reversed, asserting the reversal actually happened — and it dies.
+⚠️ **That is `INC-26` / `INC-29` / `OF-82`'s class for the FOURTH time, in a test written to close a
+mutation survivor, by the session closing it.**
+
+---
+
+### Four incidents, and the last two are this session's
+
+* **`INC-46`** (B-3). A **question carried two defects under a title that named one**, so the prompt,
+  the commit subject and the `OPEN_FINDINGS.md` disposition all inherited the *title's* scope.
+  `Missed:` **the warning was in capitals, under its own ⚠️ heading, in the entry being worked from**
+  — *"AND THE SAME KEY IS BEHIND `Q-057` TOO, WHICH IS THE HALF THAT IS EASY TO MISS"* — and repeated
+  verbatim in `OF-62`'s own row.
+* **`INC-47`** (B-4), and the finding is about **hard rule 13's format itself**. Its rationale names
+  **two** pressures — to under-report a failure, and to dramatise one. ⚠️ **This is a THIRD the
+  format does not catch: an `Action` field that OVERSTATES WHAT WAS DONE.** `Fix:` is bound to a
+  commit and cannot be invented; **`Action:` is bound to nothing.**
+* ⚠️ **`INC-48` — this session's own `e2b4778` swept `3605d31c`'s token row and 41-line paragraph,
+  and its `Swept:` line says "nothing".** The numstat check read **79/1**; the commit recorded
+  **128/1**; the 49 lines landed **between the check and the commit**. Nothing is lost, nothing is
+  rewritten, and `3605d31c`'s content is intact and present exactly once. **The guardrail is proved
+  in a throwaway repository, both directions:** `git commit -- <paths>` commits the **working tree**
+  and ignores the index; `git add -- <paths>` then `git commit` **with no pathspec** commits the
+  **index snapshot**, so a concurrent write landing after the `add` is simply not in the commit.
+  Every commit from `eb17627` onward uses it, and `3605d31c`'s two untracked files under
+  `docs/reviews/independent/` were in the tree at commit time and are in **none** of them.
+  ⚠️ **One consequence belongs to `3605d31c` and must reach it:** its paragraph says its row is
+  *"committed first, and the Phase-1 seal is the commit after it"*. **The ordering holds** — the row
+  precedes the seal in the tree — but the row is **not in a commit of its own**; it is in `e2b4778`.
+* ⚠️ **`INC-49` / `Q-080` — a declared STOP, and `make test` is RED at HEAD because of it.**
+  `c4d4460`'s message carries a **prose line** beginning `Session-Token:` at column 0, explaining
+  that four earlier commits already carried the trailer. `check_roles.py`'s `_TOKEN_TRAILER_ANY`
+  **cannot tell a trailer from a quotation of one**, so **E5 fails** — while **E1, E2 and E3 all
+  pass**, because the real trailer is well formed and the commit's role separation is not in doubt.
+  All three remedies are the architect's: amending is a **history rewrite** (`CLAUDE.md` §5,
+  *"ever"* — and the stated rationale, tag destruction, does not apply to an untagged unpushed tip,
+  **which is exactly the gap hard rule 1 says a session must not close on its own**); extending
+  `E5_EXCEPTIONS` is forbidden by that list's own comment; and fixing the parser edits
+  `check_roles.py`, under **NOT** in this fence, and re-opens **`Q-014` (i)**.
+  **Nothing was edited and no workaround was built.** ⚠️ **The generalisable half is why `Q-080`
+  exists at all:** git defines a trailer as the message's **last paragraph**; this parser scans the
+  whole body, so **any commit message that writes about tokens can trip it** — and this project
+  requires sessions to write about their own tokens.
+
+---
+
+### Measured, not asserted
+
+| | before | after |
+|---|---|---|
+| `make test` | **711 passed · 0 failed · 1 skipped · 2 deselected** | ⚠️ **721 passed · 1 FAILED · 1 skipped · 2 deselected** |
+| `tests/test_c13_camel_comparator.py` | 88 passed | **98 passed, 0 failed** |
+| `make check-roles` | 17 passed / 0 failed / 4 n/a | ⚠️ **16 / 1 / 4** — E5 on `c4d4460` |
+| `make selftest` | RED on `camel_comparator.branch` | **still RED, on the same sentinel, for the same reason** |
+| `make check-prereg` | NOT-YET-FROZEN | **NOT-YET-FROZEN** (`PROTOCOL.md` does not exist) |
+
+**Both counts were measured by this session, before and after.** The **+10** are this session's ten
+new C13 cases. ⚠️ **The ONE failure is `test_check_roles_exits_zero`, it is this session's own, and
+nothing else in the suite is red** — attributed rather than left for a reviewer to discover.
+
+**Standing properties, proved not assumed:** all **three** vendored trees at their pins
+(`rev-parse` == pin, `status --porcelain` **empty**, `git diff <pin>` **0 bytes**);
+`git status --porcelain tests/goldens/` **EMPTY**; **zero provider calls and zero tokens** — no
+`evals/` path in any commit and no usage ledger exists; the untracked `grep.exe.stackdump` belongs to
+no session and **was not deleted**.
+
+---
+
+### Owed to C14, and named rather than gestured at
+
+* ⚠️ **`Q-074`** — the **fifth** citation site, `tests/test_lanes_operator_placeholders.py:141`.
+  Confirmed still present, still the **only live-text site**, and still **printed in full by
+  `make selftest`** — the most-read copy of the five. Outside this fence.
+* ⚠️ **`OF-99`** — `Q-064`'s **actual remedy**, a repository-wide superseded-string tripwire.
+  **Re-confirmed absent at HEAD:** `grep -rn superseded` over `tests/`, `src/` and the `Makefile`
+  returns **nothing**. Outside this fence. **The class has now bitten twice and no mechanism knows a
+  citation has copies.**
+* ⚠️ **`Q-080`** — the E5 trailer-vs-quotation defect, which is why `make test` is red.
+* **`Q-079`** is **ruled and landed**; its generalisable half — *no mechanism knows that a QUESTION
+  has more than one defect in it* — is owed alongside `OF-99`.
+
+🚩 **NO TAG.** `c13-pass` is cut only by a review session, and only on a PASS.
+
+---
+
 ## C6 — THE ATTACKER LOOP — **FIX** attempt 2 — 2026-09-01 — 🔁 **THREE BLOCKERS CLOSED, FOUR MUTANT SURVIVORS KILLED, AND THE TWO ENTRIES THE REVIEW COULD NOT WRITE**
 
 **SESSION-TOKEN:** `4e1c8a92` — **NOT in the batch.** Appended as
