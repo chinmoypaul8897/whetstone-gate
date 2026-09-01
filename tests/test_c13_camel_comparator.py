@@ -983,6 +983,28 @@ def test_a_shadowed_module_function_resolves_to_the_definition_PYTHON_binds(tmp_
         "the definition Python actually binds had destroyed it"
     )
 
+    # -- ⚠️ THE MIRROR, AND WITHOUT IT THIS TEST IS GREEN BY ACCIDENT OF ITS FIXTURE. -----
+    # One order proves nothing about WHICH RULE is being followed. With the relative
+    # definition first and the absolute second, "keep the last" and "keep whichever one is
+    # absolute" give the SAME answer, so a derivation implementing either passes above.
+    # Reversing the two definitions separates them: last-wins must now report the RELATIVE
+    # root, and any rule that prefers the absolute literal reports "/var/logs" and dies.
+    # (INC-26, INC-29 and OF-82 are this same class - a fixture that holds the discriminating
+    # variable constant - three times in this repository already.)
+    first, second = shadowed.split("def replay_task", 2)[1:]
+    mirrored = "def replay_task".join(["", second, first])
+    assert mirrored.index('"/var/logs"') < mirrored.index('"logs"'), (
+        "the mirror must put the ABSOLUTE definition FIRST, or it is the same case again"
+    )
+    reflected = invocation.live_log_path_from_source(mirrored + caller)
+    assert reflected.root_literal == "logs", (
+        "with the RELATIVE definition written SECOND it is the one Python binds, so the "
+        "derivation must report it. A rule that merely prefers the absolute literal - or "
+        "that prefers the FIRST - passes the case above and fails here, which is the whole "
+        "reason this mirror exists"
+    )
+    assert reflected.is_relative is True
+
     # ⚠️ And the two halves of `_named_functions` now agree with each other. The method
     # half always kept the last; this asserts it, so a future edit cannot re-split them.
     methods = invocation._named_functions(
