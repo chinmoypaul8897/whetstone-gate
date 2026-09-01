@@ -1,4 +1,4 @@
-PUSHED SHA: ae95b8c  (ae95b8cdae19f90d4b38b6aa7794470418ace5ee)
+PUSHED SHA: 9a20fc5  (9a20fc5303a63aefe79ba0160b1d79bbff9df0fc)
             The FINAL OUTPUT block itself is the LAST-BUT-ONE commit; this line and
             the <SESSIONS_SHA> line below were filled in by the FOLLOWING commit,
             because neither SHA can exist inside the object it names.
@@ -376,7 +376,7 @@ with "(unreviewed)". No force-push, no tag move, no amend, no history rewrite, N
   6ae1be9  docs: STATUS and PROGRESS - both C6 BLOCKERs closed, and the one red this fix EXPOSED
   7830b0e  docs: INC-30 and Q-051 - this session committed a concurrent REVIEW's probe file under its own token
   ae95b8c  docs: the C6 FIX 1 FINAL OUTPUT block, committed verbatim before it is printed
-  <this>   docs: record the pushed SHA in the C6 FIX 1 FINAL OUTPUT block
+  9a20fc5  docs: record the pushed SHA in the C6 FIX 1 FINAL OUTPUT block  <- FINAL, PUSHED
 
 (7db3e72, 51404cc and 754c0bd interleave in the log and are the CONCURRENT C4 REVIEW
 session's, not this one's. !! But 17585ab is MINE AND CARRIES FIVE OF THEIRS - see 7(a).)
