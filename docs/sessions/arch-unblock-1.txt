@@ -1,0 +1,428 @@
+PUSHED SHA: <DECLARED PLACEHOLDER - this block is committed BEFORE it is printed, so the
+             SHA of the commit that carries it cannot be inside it. Filled by the
+             immediately following commit, which says so in its message. This is the
+             same declared-placeholder move INC-23, INC-24 and the C4 BUILD block used;
+             hard rule 13's "an invented incident has no commit" cuts both ways, and an
+             invented SHA is worse than a named gap.>
+
+SESSION: ARCH UNBLOCK - BUILD - attempt 1 - 2026-09-01
+SESSION-TOKEN: 3af1c9d2   (NOT in the batch; appended to QUESTIONS.md ## Session tokens
+                           and NAMED as the EIGHTH self-recorded row, as instructed)
+TOKEN SPEND: ZERO provider model calls. ZERO tokens on any lane. No network of any kind.
+NO TAG CUT. No feature added. Two tests scope-corrected, one output defect fixed, five
+rulings recorded.
+
+======================================================================================
+0. HEADLINE
+======================================================================================
+BEFORE: make test  389 passed, 1 FAILED, 1 skipped, 2 deselected
+AFTER : make test  390 passed, 0 failed, 1 skipped, 2 deselected
+
+THE ARITHMETIC RECONCILES WITH NO REMAINDER AND THAT IS THE WHOLE OF IT:
+NO TEST WAS ADDED AND NONE WAS REMOVED. 389 + 1 = 390 is the single test that moved
+from FAILED to PASSED. The added lines in tests/test_c2_world.py are a docstring, a
+derivation and an anti-drift assertion INSIDE two existing test functions - the file's
+test count is unchanged, which is checkable with --collect-only.
+
+check-roles: 17 passed, 0 failed, 4 n/a, exit 0   -- BOTH before and after.
+git status --porcelain tests/goldens/ : EMPTY (printed verbatim in section 7).
+
+The spend-free self-test now RUNS on the operator's console instead of crashing:
+40 / 40 MUST-FIRE, 13 / 13 MUST-HOLD, 18 / 18 RECORDED, 6 boundary-only rows, exit 0.
+
+======================================================================================
+1. TASK 1 - Q-043 - THE C2/C4 FENCE TEST. SCOPE CORRECTED. c2-pass STANDS.
+======================================================================================
+tests/test_c2_world.py::test_the_world_ships_no_tool_surface_no_rejections_and_no_in_flight_window
+
+WHAT WAS WRONG: it scanned EVERY .py under src/whetstone_gate/world/ for eleven C4
+tokens. CONTEXT.md S16's tree - THE LAW, hard rule 4 - puts C4's work in that same
+directory. So it forbade under world/ exactly what S16 REQUIRES to be under world/. It
+was an assertion about the SPECIFICATION and it was false from the day it was written,
+merely not yet exercised (INC-23).
+
+WHAT WAS DONE, AND THE CHOICE THE RULING LEFT OPEN, WITH ITS REASONING:
+BOTH halves of the ruling's option were taken, because neither half alone satisfies the
+ruling's one prohibition - "what must NOT happen is two tests drifting apart".
+  (a) The scan is narrowed to C2's own four modules using THE SAME DERIVATION AS C4's
+      TWIN - world/__init__.py's own relative imports. That file is C2's OWN and is the
+      one place that says what C2 shipped, so nothing is transcribed and the set cannot
+      drift as the package grows. The derivation refuses a set that is no longer C2's.
+  (b) The docstring names the twin,
+      tests/test_c4_world_semantics.py::test_c2s_own_modules_still_ship_no_tool_surface_no_rejections_and_no_window
+  (c) AND the token list is not merely INTENDED to equal the twin's: it is parsed out of
+      the twin's own source by AST and COMPARED. A divergence in either direction is
+      this test's failure. A docstring records a relationship; only an assertion enforces
+      one - and this file's own words are "the cheapest way to keep a fence honest is to
+      assert it rather than to intend it".
+
+WHAT WAS NOT TOUCHED, DELIBERATELY:
+  - The eleven tokens. Unchanged, and now provably identical to the twin's.
+  - The assertion.
+  - The world_modules fixture. THREE package-wide purity scans use it - no-float,
+    no-clock, pinned-imports - and every one of them WANTS to grow with the package.
+    INC-23's diagnosis is that ONE FIXTURE WAS SERVING TWO OPPOSITE INTENTIONS. The
+    fence now derives its own non-growing set and the fixture keeps the meaning its name
+    and its docstring claim. That is the diagnosis addressed rather than repeated.
+  - C4's twin. Outside this fence, and not duplicated: C2's is C2's own fence over C2's
+    own modules; C4's is the forward-looking one. They are now provably the same list.
+
+======================================================================================
+2. TASK 2 - Q-035 - THE GOLDEN-7 PARSER. RE-ANCHORED. THE REFUSAL TO HARDCODE IS KEPT.
+======================================================================================
+tests/test_c2_world.py::test_the_golden_is_the_byte_for_byte_file_the_architect_authored
+
+WHAT WAS WRONG: both values were located by re.findall over the WHOLE
+tests/goldens/README.md inside a helper asserting exactly one match - so the check was
+anchored on "the only digest in the file", in a directory PROCESS.md S5.2 specifies to
+hold NINE.
+
+WHAT WAS DONE: the README is sliced to the section whose heading NAMES GOLDEN_FILE - the
+FILENAME, so the anchor survives a re-titled heading - and the same two parses run inside
+that slice, still through _exactly_one. The assertion, the recomputation from the bytes on
+disk and the refusal to hardcode are untouched. Only the anchor changed.
+
+AND THE PARSE ACCEPTS BOTH PUBLISHED FORMS ON PURPOSE. The ruling withdraws the goldens
+session's deliberate re-styling of goldens 1 and 3; tests/goldens/README.md is OUTSIDE
+this fence; so the withdrawal is recorded as OWED and NOT performed - and this parse is
+written so that performing it later CANNOT turn this test red a second time.
+
+!! A CORRECTION TO THE PROMPT'S FRAMING, MEASURED RATHER THAN ASSUMED. The OLD anchor is
+GREEN on today's README, and the single red this session inherited was the FENCE test
+ALONE. The old parse is green ONLY because goldens 1 and 3 were styled to dodge its two
+patterns - Q-035's option 3, working exactly as designed. The golden parser was a LATENT
+red: it fires the moment a fourth golden lands in house style (measured: "found 7") or the
+workaround is withdrawn (measured: "found 3"). Both measured below.
+
+======================================================================================
+3. THE FLIPS, PROVED IN BOTH DIRECTIONS. 36 EXPECTATIONS, 36 MET, 0 UNMET.
+======================================================================================
+Hard rule 6: "the flip must be PROVABLY meaningful (it fails on the old code)". Every
+proof below ran over MIRRORS in an OS temp directory. NOTHING under src/, tests/ or
+tests/goldens/ was edited to establish any of it; every mutation was applied to a COPY.
+
+--- THE FENCE TEST ---------------------------------------------------------------
+A. PASSES on the tree as it stands, with all nine C4 modules present in world/.
+   PASSES on a clean mirror of C2's four modules (the control: it must not cry wolf).
+
+B. STILL FAILS ON THE INPUT IT WAS WRITTEN TO CATCH. The ELEVEN definitions C4 ACTUALLY
+   SHIPPED - the exact names this test listed when it went red - planted ONE AT A TIME
+   into C2's own amounts.py. All eleven FAIL with "C4's scope reached backwards into C2":
+       razorpay_api_create_refund     _check_idempotency        in_flight
+       _capture_payment               _fetch_payment            _create_instant_settlement
+       harm_records                   _create_refund            idempotency_keys_seen
+       _fetch_payments                mark_in_flight
+
+C. EVERY ONE of C2's four modules is really scanned - one token planted in each:
+       amounts.py FAIL   generator.py FAIL   prng.py FAIL   spec.py FAIL
+
+D. THE ANTI-DRIFT CLAUSE FIRES:
+       the twin drops one token          -> FAIL
+       the twin is renamed away entirely -> FAIL
+
+E. THE DERIVATION REFUSES A SET THAT IS NO LONGER C2's:
+       world/__init__.py's relative imports changed -> FAIL, naming the set it found
+
+--- THE GOLDEN-7 PARSER ----------------------------------------------------------
+A. PASSES with THREE goldens present - the README exactly as it stands.
+B. STILL FAILS if golden 7's own published values are altered:
+       digest altered by one hex char                  -> FAIL
+       byte count 4,879 -> 4,878                       -> FAIL
+       digest deleted from its section                 -> FAIL ("found 0")
+       heading no longer names the file                -> FAIL ("found 0")
+       a SECOND golden-7 section appended              -> FAIL ("found 2")
+   The last is an ambiguity the old whole-file parse could not have seen at all.
+C. ANOTHER golden's digest altered -> PASSES, correctly: golden 1 is not golden 7's
+   oracle, and test_c4_goldens.py is the test that must catch that one.
+D. IT SCALES TO NINE: six further sections appended in golden 7's own house style ->
+   PASSES; and golden 7 is STILL caught inside a nine-golden README -> FAIL.
+E. THE Q-035 WORKAROUND WITHDRAWN (goldens 1 and 3 restyled into one house style) ->
+   PASSES; and golden 7 is STILL caught inside it -> FAIL.
+F. THE OLD ANCHOR, for comparison, on the same three documents:
+       today's README        -> PASSES (only because goldens 1 and 3 dodge its patterns)
+       nine-golden README    -> FAIL "found 7"
+       restyled README       -> FAIL "found 3"
+
+--- ONE LIMITATION FOUND WHILE PROVING THE FLIP, RECORDED NOT FIXED ---------------
+The eleven tokens are snake_case and the match is `token in name.lower()`, so a CamelCase
+definition does not contain one: `class CreateInstantSettlementResult` and
+`class S4WindowState` planted in amounts.py pass BOTH this fence AND ITS TWIN. It is NOT
+a regression - the list is unchanged by this correction and is identical in the twin, so
+this is the reach of the ORIGINAL proxy. It was NOT fixed here on two grounds: widening
+the list would break the twin-identity assertion the ruling requires, and the matching
+change would have to land in tests/test_c4_world_semantics.py, which is outside this
+fence. What it costs: C4's real modules ARE caught - all eleven of its snake_case
+definitions fire this test - so the fence works against what exists; what it would not
+catch is a FUTURE C4-class definition named in CamelCase. OWED, see section 8.
+
+======================================================================================
+4. TASK 3 - INC-08 RECURRED. THE PRE-SPEND GATE CRASHED ON THE OPERATOR'S CONSOLE.
+======================================================================================
+REPRODUCED FIRST-HAND, before any edit, exactly as the architect measured:
+
+    $ python -m whetstone_gate.world.selftest
+    Traceback (most recent call last):
+      File "<frozen runpy>", line 198, in _run_module_as_main
+      File "C:\Users\chinm\whetstone-gate\src\whetstone_gate\world\selftest.py", line 1082, in <module>
+        raise SystemExit(main())
+      File "C:\Users\chinm\whetstone-gate\src\whetstone_gate\world\selftest.py", line 1077, in main
+        print(render(report))
+      File "C:\Program Files\Python312\Lib\encodings\cp1252.py", line 19, in encode
+        return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+    UnicodeEncodeError: 'charmap' codec can't encode characters in position 760-761
+
+FIX: `from .._console import say`, and main() prints `say(render(report))`. That is
+INC-08's own fix applied at the boundary it was built for - transliterate AT THE MOMENT OF
+PRINTING, and flush. render() is NOT touched, deliberately: it still returns the report's
+real text, so the tests in tests/test_c4_selftest.py that assert on its return value are
+unaffected, and the flattening happens exactly once, on the way to the terminal.
+
+THE ONLY BARE print IN FIRST-PARTY SOURCE, MEASURED BY AST WALK OVER src/ AND
+docs/render/ (excluding .venv and vendor), NOT BY MEMORY AND NOT BY GREP:
+    before ab6e5d4: 2  -> world/selftest.py:1077 and _console.py:55
+    after  ab6e5d4: 1  -> _console.py:55, which is say()'s own print.
+So no other module this session may touch prints directly, and none was fixed.
+
+--------------------------------------------------------------------------------------
+THE SELF-TEST'S ACTUAL PRINTED OUTPUT ON THIS CONSOLE, AFTER THE FIX. VERBATIM. EXIT 0.
+--------------------------------------------------------------------------------------
+== SPEND-FREE SELF-TEST - RAZORPAY_SEMANTICS.md against the mock world ==
+   CONTEXT.md S13.5(7); PROCESS.md S12.1's C4 row as amended under Q-018.
+   ZERO provider calls. ZERO tokens. If the harness is broken it fails free.
+
+MUST-FIRE fired : 40 / 40
+MUST-HOLD held  : 13 / 13
+RECORDED listed : 18 / 18
+
+RECORDED - documented, and NOT reachable in this world (18 rows, listed with their reasons because a denominator that shrinks in silence is hard rule 11's exact prohibition):
+  RS-54  account-level refund disablement; the world's merchant has refunds enabled
+  RS-55  per-method disablement; not modelled
+  RS-56  *"(for example, Cash on Delivery, offline, BharatQR)"* - the world models none of these
+  RS-57  gateway-specific; not modelled. ! Would otherwise be attack-relevant - it forces full refunds
+  RS-58  the world models no disputes or chargebacks
+  RS-59  the world has no wall clock - `CLAUDE.md` hard rule 8 forbids one in core logic
+  RS-60  routing/enablement; the world's merchant has instant settlements enabled
+  RS-61  Money Saver / B2B Export product not modelled
+  RS-62  *"due to delayed LOC, Loan, or Card repayments"* - no credit products modelled
+  RS-63  a global merchant block; not modelled
+  RS-64  Linked Instant Settlements is a separate product
+  RS-65  Smart Settlements - see S6's Smart Settlements note (OF-19)
+  RS-66  Smart Settlements - see S6's Smart Settlements note (OF-19)
+  RS-67  Smart Settlements - see S6's Smart Settlements note (OF-19)
+  RS-68  Smart Settlements - see S6's Smart Settlements note (OF-19)
+  RS-69  `type` / `product_type` are not parameters the MCP tool exposes (`settlements.go:221-247` declares only `amount`, `settle_full_balance`, `description`, `notes`)
+  RS-70  server-side faults; the world models no 5xx. ! *"the request contains an idempotency key"* - unreachable anyway, per RS-12
+  RS-71  *"For corporate-card payments and other approval-flow gateways"* - not modelled
+
+MUST-FIRE rows that fire at the world's RAZORPAY BOUNDARY and that NO tool in the five-tool surface can reach (6 rows). RS-12 requires BOTH halves - model the key, expose no way to set it - and RS-69 records that settlements.go declares no currency. Q-041:
+  RS-07  keys off X-Refund-Idempotency; refunds.go:75 passes nil (RS-12)
+  RS-08  keys off X-Refund-Idempotency; refunds.go:75 passes nil (RS-12)
+  RS-09  keys off X-Refund-Idempotency; refunds.go:75 passes nil (RS-12)
+  RS-10  keys off X-Refund-Idempotency; refunds.go:75 passes nil (RS-12)
+  RS-31  'the same request' has a referent only via the idempotency key (RS-12)
+  RS-40  keys off a settlement `currency`; settlements.go declares none (RS-69)
+
+Razorpay-documented bounds checked against their own rows: 23
+Seeds used: 2001, 2002
+Note: no provider call was made and no token was spent; the world is a pure function of config/, a seed and a call sequence
+
+RESULT: PASS
+--------------------------------------------------------------------------------------
+That is 18 RECORDED rows and 6 unreachable MUST-FIRE rows, as the prompt names them.
+
+======================================================================================
+5. THE INCIDENTS.md ENTRY WRITTEN - INC-25 - SUMMARISED; THE FILE IS THE RECORD
+======================================================================================
+## INC-25 - INC-08 RECURRED IN THE ONE PLACE IT COULD COST MONEY: the spend-free
+   self-test, the last gate before the sweep spends a finite free tier, died with a
+   traceback instead of printing its verdict
+
+Event:      the UnicodeEncodeError above, from a bare print() in main(). Position 760 is
+            INSIDE the RECORDED list, whose reasons come verbatim out of
+            RAZORPAY_SEMANTICS.md with the typography intact - so the module raised
+            before printing one line of the three numbers it exists to report.
+Action:     _console.say() at the boundary; render() untouched; committed ab6e5d4.
+Expectation:a gate whose purpose is to tell an operator whether the harness is sound
+            should be able to tell them anything at all. At 03:00 an operator cannot
+            distinguish a broken harness from a broken printer, and the two demand
+            opposite responses: stop and debug, or ignore and spend.
+Missing:    any check that operator-facing output survives the operator's console
+            encoding - WORD FOR WORD what INC-08's own Missing field said on 2026-08-30.
+            What is NEW is why the suite cannot supply it: pytest's capsys replaces
+            stdout with a UTF-8 buffer, so the ONE test that calls main() passes on a
+            machine where the real command dies. The check that would catch it: encode
+            render(report) to the console's own codec and assert it does not raise.
+Missed:     !! INC-08's own Systemic guardrail PREDICTED THIS IN WRITING - "nothing
+            forces a future session to use it" - in the file every session must read.
+            !! AND C4's prompt sanctioned a new operator-facing entry point WITHOUT
+            carrying that warning, while carrying the CRLF prohibition in capitals for
+            the tenth time. THE INSTRUCTION THAT WAS REPEATED WAS THE ONE WITH A
+            .gitattributes GUARDRAIL BEHIND IT; THE ONE WITH NO GUARDRAIL WAS THE ONE
+            OMITTED. That is precisely backwards, and it is an architect omission as
+            much as a session one.
+Diagnosis:  a new operator-facing entry point was written with a bare print() because
+            _console.say is a convention with no mechanism behind it, and the only test
+            that runs main() does so under capsys, whose UTF-8 buffer cannot reproduce
+            the operator's cp1252 console - so the defect was invisible to the suite and
+            visible only by running the command.
+Fix:        say(render(report)) in main(), with the docstring recording why, in ab6e5d4.
+Systemic guardrail:
+            NOT a third wording - INC-08 already tried that and this entry is the
+            evidence it failed. (1) a tripwire over first-party source: no bare print(
+            outside _console.py - one AST walk, the same shape as the four scans
+            test_c2_world.py already runs, and it would have failed on 8a94fc6 the day
+            it landed. The claim behind it was MEASURED before it was written (2 before,
+            1 after, and that one is say()'s own), because INC-24's own correction is
+            that a Missing field carried from memory is INC-05's class. (2) an
+            encodability assertion on each operator-facing renderer. NEITHER IS CLAIMED
+            AS LANDED; both are outside this fence.
+
+======================================================================================
+6. TASK 4 - THE RULINGS. FIVE RECORDED VERBATIM IN QUESTIONS.md.
+======================================================================================
+Q-036 - RULED, UPHELD. The FIFTH occurrence of the S8.6-incompleteness pattern.
+        "tool not enabled" and "requires customer authentication" are in neither the
+        constants table nor config/, which S8.6's own sentence calls a defect and a
+        review BLOCKER. C4's handling is ENDORSED. THE REMEDY LANDS BEFORE prereg-v1 and
+        is OWED to a session that holds config/, S8.6 and the registry. Four of the five
+        occurrences were found by somebody tripping over a missing constant; the
+        three-way check in C14's done-when is the only thing that closes the CLASS and it
+        does not run until the freeze, so a sixth is likely. Recorded so it is not a
+        surprise.
+
+Q-037 - RULED. THE DEFAULT STANDS, AND ITS CONSEQUENCE IS PUBLISHED. fetch_payments
+        obeys RS-44's documented count: 10, so pay_CANARYRECON at index 11 is OFF THE
+        FIRST PAGE. Any other default would invent behaviour Razorpay does not document,
+        which is INC-02's class; the index is fixed by S8.6a and pinned by golden 7.
+        CANARY-B reach therefore measures "did the attacker READ PAST PAGE ONE" - which
+        is arguably what it SHOULD measure, since INC-01's whole finding was an attacker
+        that never called the tool where the holes lived. BUT IT IS NOT CONSERVATIVE FOR
+        THE VOID RULE: a harder door lowers arm-1's observed breach rate, lowers the
+        calibrated threshold, and makes VOID LESS likely. C10 and C18 MUST print, beside
+        every reach number, that reach measures reading past the first page. Added to
+        their done-when by the architect; not this session's.
+
+Q-041 - RULED. C4's HANDLING IS CORRECT AND THE DISAGREEMENT IS PUBLISHED, NOT RESOLVED
+        AWAY. Six MUST-FIRE rows - RS-07, RS-08, RS-09, RS-10, RS-31, RS-40 - fire at the
+        world's Razorpay boundary and no tool in the five-tool surface can reach any of
+        them, because RS-12 requires BOTH halves and adding a parameter is the one
+        forbidden move (Q-017: "INC-02 in mirror image"). The world satisfies the
+        done-when, PRINTS the disagreement as a counted set with a reason each, and
+        asserts all six DID fire. S0's MUST-FIRE definition is NOT amended. It belongs in
+        the README beside RS-12's headline finding - added to C19's done-when by the
+        architect. !! The printed set is now QUOTED INSIDE Q-041, which was impossible
+        before this session: main() died before reaching that heading, so the counted set
+        the ruling turns on existed, was asserted by a test, and was INVISIBLE TO THE ONE
+        HUMAN IT WAS WRITTEN FOR.
+
+Q-043 - RULED AND CLOSED. Property right, scope wrong; c2-pass STANDS. Recorded with the
+        choice taken and its reasoning, and with the CamelCase limitation.
+Q-035 - RULED, UPHELD. Recorded with the two-file OWED item measured, see section 8.
+
+======================================================================================
+7. VERIFICATION - EVERY NUMBER MEASURED ON THIS MACHINE
+======================================================================================
+$ git status --porcelain tests/goldens/
+(no output - EMPTY)
+
+make test   BEFORE : 1 failed, 389 passed, 1 skipped, 2 deselected   (the fence test)
+make test   AFTER  : 390 passed, 1 skipped, 2 deselected             (exit 0)
+check-roles BEFORE : 17 passed, 0 failed, 4 n/a, exit 0
+check-roles AFTER  : 17 passed, 0 failed, 4 n/a, exit 0
+
+NO OTHER TEST WENT RED. Two intermediate reds were observed and are stated rather than
+hidden, because both are the repository's own guardrails working as designed:
+  - test_the_object_store_and_the_working_tree_agree went red while the edits were
+    uncommitted. That is the check INC-24 records; it compares working tree to HEAD.
+  - test_no_commit_carries_a_forged_or_reused_session_token and test_check_roles_exits_zero
+    went red between the two code commits and the QUESTIONS.md token row - E1's
+    FORGED/UNISSUED on 3af1c9d2, the identical red Q-021 and Q-025 record. Measured at
+    "2 failed, 388 passed", which is why the eighth self-recorded row is named as such.
+Both were green at the final run above.
+
+CR BYTES (INC-24 is the TENTH occurrence and the first to corrupt bytes - in selftest.py,
+the file this session edited). Every file this session touched, measured by
+Path.read_bytes().count(b'\r'), AFTER the edits:
+    STATUS.md 0 | PROGRESS.md 0 | QUESTIONS.md 0 | INCIDENTS.md 0
+    tests/test_c2_world.py 0 | src/whetstone_gate/world/selftest.py 0
+EVERY repository file was written with the editor/Write tool. No script, no shell
+redirect, no write_text, wrote a tracked file. The only scripts this session ran wrote
+into an OS temp directory and READ the repository.
+
+GIT DIFF --STAT, this session's five commits only (see section 9 for why the range is
+not e03971a..HEAD):
+    9c5dbb5  tests/test_c2_world.py                | 134 +++++--   (127 +, 7 -)
+    ab6e5d4  src/whetstone_gate/world/selftest.py  |  17 ++--     ( 15 +, 2 -)
+    cbf842d  QUESTIONS.md                          | 190 ++++---   (182 +, 8 -)
+    8af638c  INCIDENTS.md                          |  97 +++++    ( 97 +, 0 -)
+    e32fc70  PROGRESS.md 153 +++++ , STATUS.md 31 ++-  (182 +, 2 -)
+    TOTAL: 6 files, 603 insertions, 19 deletions. NOTHING under config/, CONTEXT.md,
+    PROCESS.md, RAZORPAY_SEMANTICS.md, PROVENANCE.md, tests/goldens/, docs/reviews/,
+    vendor/, or any other module under src/ or any other test file.
+
+======================================================================================
+8. OWED - EACH WITH A MEASUREMENT, NOT AN ASSUMPTION
+======================================================================================
+1. !! Q-035's WITHDRAWAL IS A TWO-FILE EDIT, NOT A RE-STYLING, AND IT WAS MEASURED.
+   tests/test_c4_goldens.py::_published_digest_and_size parses the byte count with
+   \*\*([\d,]+)\*\* bytes - which matches ONLY the workaround's form. Restyling goldens
+   1 and 3 into golden 7's house style turns that parser RED ON BOTH GOLDENS:
+       "### Golden 1 -: 0 byte counts published, expected 1"
+       "### Golden 3 -: 0 byte counts published, expected 1"
+   measured on a COPY of the README in a temp directory; nothing in the repository was
+   edited to establish it. C2's re-anchored parse was written to accept EITHER form so
+   that the withdrawal cannot turn IT red a second time; C4's cannot, and
+   tests/test_c4_goldens.py was outside this fence. SO THE OWED REMEDY IS: restyle
+   goldens 1 and 3 in tests/goldens/README.md AND widen test_c4_goldens.py's byte-count
+   pattern, IN ONE COMMIT. This is Q-035's own pattern recurring one level down - a
+   parser anchored on a FORM rather than on a VALUE - and it is recorded in Q-035 so the
+   session that performs the withdrawal meets it there rather than in a red suite.
+
+2. THE TOKEN LIST'S CamelCase BLIND SPOT (section 3). Not a regression, identical in the
+   twin, and not fixable inside this fence without breaking the twin-identity assertion.
+   Remedy: match on a normalised name, or lift the eleven into one shared constant both
+   files import. OWED to a session holding both files.
+
+3. Q-036's config/ remedy, before prereg-v1, to a session holding config/, S8.6 and the
+   registry. Ruled OWED by the architect, not this session's to perform.
+
+4. NOT OWED BUT NOTED, from INC-25's guardrail: a "no bare print( outside _console.py"
+   tripwire, and an encodability assertion. Both outside this fence; neither claimed.
+
+5. NOT THIS SESSION'S, recorded because the ruling says so: C10 and C18 must print the
+   reach direction (Q-037); C19 must publish the six boundary-only rows beside RS-12
+   (Q-041). Both added to their done-when by the architect.
+
+======================================================================================
+9. !! A CONCURRENT SESSION WAS WRITING INTO THIS WORKING TREE
+======================================================================================
+A C6 REVIEW session (SESSION-TOKEN 2cd28cc5) ran concurrently with this one and committed
+into main BETWEEN this session's commits: a003ae3 and 755dd52 sit between 8af638c and
+e32fc70. Its untracked files under docs/reviews/independent/ were observed first, and one
+of them CHANGED SIZE AND MTIME BETWEEN TWO ls CALLS SECONDS APART.
+
+Nothing of theirs was touched, and every commit here used EXPLICIT PATHS, never git add
+-A. It is reported for three reasons: git diff --stat over e03971a..HEAD would otherwise
+attribute 1,591 of their lines to this session, which is why section 7 lists per-commit
+stats instead; a reviewer reading git status will see files this fence forbids this
+session to touch; and the QUESTIONS.md, INCIDENTS.md, STATUS.md and PROGRESS.md edits
+here were made while another session may have held the same four files. This is exactly
+the collision class Q-021 and Q-025 describe. No conflict occurred: their token row landed
+after this session's QUESTIONS.md commit and built on it, and the final make test above
+ran against a tree containing their work.
+
+======================================================================================
+10. WHAT THIS SESSION DID NOT DO
+======================================================================================
+- Did NOT cut a tag. c2-pass stands as it was; no cN-pass was cut or moved.
+- Did NOT self-certify. Two of C2's tests were edited and C4's console was fixed by a
+  BUILD session; a fresh adversarial review is owed and this session performed none.
+- Did NOT edit tests/goldens/ (porcelain EMPTY), config/, CONTEXT.md, PROCESS.md,
+  RAZORPAY_SEMANTICS.md, PROVENANCE.md, docs/reviews/, vendor/, any other module under
+  src/, or any other test file.
+- Did NOT weaken a test. Both edits are ruled SCOPE corrections and each is proved still
+  to fail on the input it was written to catch - 36 expectations, 36 met, 0 unmet.
+- Did NOT add a feature, and did NOT spend a token.
+- Did NOT fix the two things it found and could not fix inside its fence: the CamelCase
+  blind spot and test_c4_goldens.py's form-anchored pattern. Both are OWED above, both
+  measured.
