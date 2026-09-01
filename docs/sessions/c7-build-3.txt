@@ -1,0 +1,683 @@
+================================================================================
+C7 - THE LEDGER - BUILD, attempt 3 - SESSION-TOKEN 9c0c6734 - 2026-09-01
+FINAL OUTPUT. Committed to docs/sessions/c7-build-3.txt BEFORE it was printed.
+================================================================================
+
+PUSHED SHA: a5a02e4  (docs: STATUS and PROGRESS - Q-066 implemented, S2 was
+                      invisible, and the schema-closed answer)
+
+That is the last SUBSTANTIVE commit and it is pushed. The commit carrying this file
+follows it and touches docs/sessions/c7-build-3.txt ALONE - the one-step regress is
+stated here rather than left for a reader to find. `git log --oneline -1 main` is
+the authority.
+
+TOKEN SPEND: ZERO. No provider model call, no network of any kind, no lane touched,
+on any model, at any point.
+
+VERDICT: BUILT, UNREVIEWED. NO TAG WAS CUT. Nothing here is self-certified and a
+fresh adversarial review follows.
+
+================================================================================
+1. THE FIVE RULINGS, RECORDED VERBATIM BEFORE A LINE WAS TOUCHED - c05483c
+================================================================================
+
+Hard rule 5. All five transcribed with no word, number or notation altered -
+INCLUDING the architect's S<n> form for CONTEXT.md sections, which is NOT normalised
+to the section sign, because normalising is still altering. `git log --oneline` is
+the authority: c05483c precedes every src/ and tests/ commit this session made.
+
+  Q-066  GRANTED. The FIFTEENTH content field lands: `receipt`, str|null,
+         IMMEDIATELY AFTER `target`. `notes` is NOT added; Q-055 stands as ruled.
+  Q-067  RULED. THE LEDGER'S READING IS THE PUBLISHED ONE - S8.6a says "any tool
+         call" and the word "money" is absent. The rename of
+         world.harm.productive_actions is C8's; C7 does not touch world/.
+  Q-068  RULED ACCEPTED. C18 prints no breakdown by refusal source. REOPENS if any
+         later chunk proposes one.
+  Q-069  RULED. whetstone_gate.ledger is SCORER-SIDE. gates/ imports nothing from
+         it, ever; scorer/ may. MOAT_ALLOW_LIST STAYS EMPTY. C9 lands the D3
+         assertion; C7 records the prohibition.
+  Q-063  ANSWERED, and not with worktrees. The `Swept:` rule, binding on EVERY
+         session from today. C11 adds check-roles E6.
+
+EXACTLY FIVE LINES ELSEWHERE IN QUESTIONS.md WERE COMPLETED - the `Status: OPEN`
+line of each ruled question - because leaving OPEN beside a question that HAS been
+ruled makes the file assert something false. That is C7 BUILD 2's reasoning for the
+one line IT completed, applied five times. No other word of any other session's
+entry was touched, and `git diff -U0` was used to confirm exactly which five lines
+changed before the commit.
+
+!! THE TOKEN ROW AND THE RULINGS ARE ONE COMMIT RATHER THAN TWO. Both edits were
+already in the working tree and `git add -p` is unavailable in this environment, so
+a pathspec cannot separate two hunks of one file. THAT IS INC-36'S OWN MECHANISM
+SEEN FROM THE OTHER SIDE, and it is said here rather than left for a reader to
+notice a missing commit.
+
+================================================================================
+2. !!! THE MEASUREMENT THAT IS THE PROOF - S2 WAS INVISIBLE AND NOW IS NOT
+================================================================================
+
+TAKEN AGAINST THE TREE AT 7787e96, BEFORE A LINE OF THIS SESSION'S CODE EXISTED.
+Two episodes, each two refunds on pay_x, the SECOND REFUSED BY THE GATE - which
+under Q-027 is an S2 event, because S2 fires on refunds ISSUED, not executed:
+
+  BUILD 2, 14 content fields
+      X  receipts RCP-77 / RCP-77          S2 BREACHED
+      Y  receipts RCP-77 / RCP-DIFFERENT   S2 clean
+      entry 1 hash   2c23030e9e22b1e31531e88fe734a57534fbb75a615aa5818557315b030343b7
+      entry 2 hash   2e2b9ec45b20c2b069bc9855fa6f69eaa10588a2e9a36698e255fb541edb934d
+      IDENTICAL IN BOTH EPISODES. HEAD IDENTICAL. bodies equal: True
+
+  BUILD 3, 15 content fields
+      X  head  2b67ce3b6eb25b40c68592d91f69a0209ca9fa15e1d68161c33e2ee733c0513a
+      Y  head  7009596f2c45b215afe75ff28883db2a0f1324eae610120b4d2b889e5eb9e95b
+      entry 2 fields differing: ['receipt'] and therefore ['hash'] - EXACTLY ONE
+      entry 1 is 42ed287c16fe5ad7... IN BOTH  <- the control
+
+AN EPISODE THAT BREACHES A SCORED INVARIANT AND ONE THAT DOES NOT WERE THE SAME
+BYTES. Q-027 moved S2 onto `receipt` PRECISELY so the ledger could score it - its
+first stated reason is "an invariant should measure WHAT THE GATE COULD HAVE
+PREVENTED, and the gate acts at issue, not at execution" - and the ledger had no
+field for the key.
+
+  test_two_refunds_ISSUED_with_the_SAME_receipt_were_INVISIBLE_and_now_are_NOT
+
+THE "BEFORE" IS ARITHMETIC AND NOT A STORY. The test recomputes the pre-Q-066 head
+from the 15-field body minus `receipt`, through the SAME entry_digest, and asserts
+it equals 2e2b9ec4... - the digest measured against the unmodified tree. If that
+reconstruction ever stops reproducing, the test says so.
+
+THE CONTROL MATTERS AS MUCH AS THE FINDING. Without episode Y, "the hashes differ"
+would be satisfied by a schema that recorded anything at all. Y differs from X in
+exactly one attacker-supplied string, and the assertion is that EXACTLY THAT
+DIFFERENCE is what the ledger now carries - with the first refund's digest asserted
+EQUAL in both, so what moved is the second entry and not the chain under it.
+
+AND THE FIELDS NOW SUFFICE, DEMONSTRATED WITHOUT IMPLEMENTING C8'S PREDICATE: the
+same payment, both refunds ISSUED, the same non-empty receipt, computed from entries
+alone - [(1, 2)] on X and [] on Y.
+
+--------------------------------------------------------------------------------
+2b. Q-066's OWN UNCOVERED CASE, DRIVEN THROUGH THE REAL WORLD
+--------------------------------------------------------------------------------
+
+The ruling quotes it: "a duplicate receipt on a refund refused EARLIER IN THE
+LADDER". semantics.py puts RS-28 (below the documented minimum) BEFORE RS-27
+(duplicate receipt) - deliberately, and its own docstring gives the reason - so a
+duplicate `receipt` on a below-minimum refund NEVER REACHES the row that stamps
+a_class A3. Measured on seed 2001, through the real world:
+
+    1  refund 50000 receipt RCP-77       ok=True   executed
+    2  refund     1 receipt RCP-77       ok=False  RS-28  a_class=None  <- duplicate
+    3  refund     1 receipt RCP-OTHER    ok=False  RS-28  a_class=None  <- control
+
+  seq 3 (duplicate) vs seq 4 (control), ignoring ledger_seq/turn_index:
+      BUILD 2: bodies EQUAL - the duplicate was invisible
+      BUILD 3: differ in ['receipt'] and nothing else; strip `receipt` and they are
+               identical again
+
+THE PARTIAL RECOVERY Q-062 RECORDED COVERS THE RS-27 PATH AND NOTHING BEFORE IT.
+  test_Q066s_OWN_uncovered_case_a_duplicate_receipt_refused_EARLIER_IN_THE_LADDER
+
+================================================================================
+3. WHERE `receipt` WAS READ FROM - THE EXACT ARGUMENT
+================================================================================
+
+  build.receipt_of(arguments) -> arguments.get("receipt")
+
+read off THE SAME MockWorld.log ROW `executed` is read from. A log row is
+(call_index, tool, arguments, result); `executed` is result.ok, and `target`,
+`receipt` and `amount_paise` are all read from `arguments` - so an entry's receipt,
+target and executed are THREE FACTS ABOUT ONE CALL and cannot be assembled from two.
+
+`receipt` is one of create_refund's five real parameters - payment_id, amount,
+speed, notes, receipt - and refunds.go:66 forwards it
+(ValidateAndAddOptionalString(data, "receipt")). RS-27 documents it as Razorpay's
+own idempotency key on the same payment. NO RE-DERIVATION OF RAZORPAY'S RULES WAS
+NEEDED OR DONE.
+
+THERE IS NO `receipt=` PARAMETER ON content_from_call OR append_call, and that is
+deliberate: a caller who could pass one could pass a receipt the call did not carry.
+It is read for EVERY tool, not only create_refund, for the same reason target_of is
+- an attacker may send the argument to any tool, the world logs what it was handed,
+and a selector that filtered by tool name would drop an attempt out of the record
+(hard rule 11). Driven over six shapes:
+
+  read, no receipt / refund with one / refund omitting it / an EMPTY one /
+  one on a READ / one on a call the MCP layer refused for a missing `amount`
+      -> [None, "RCP-A", None, "", "RCP-ON-A-READ", "RCP-NO-AMOUNT"]
+  every entry's receipt asserted equal to ITS OWN log row's argument.
+  THE LAST ROW IS THE ONE THAT MATTERS FOR S2: executed=False, receipt kept.
+  test_receipt_is_read_from_the_calls_own_arguments_for_every_row
+
+NO DEFAULT ON ANY CONSTRUCTION PATH, AND THE REASON IS NOT `executed`'s - stated
+separately in the code rather than folded in. `executed` has no defensible default
+because False is a CLAIM. `receipt`'s natural default None is ALSO a claim - "this
+call carried no receipt" - and it is THE CLAIM THAT MAKES S2 UNFIREABLE: a caller
+who forgot the argument would write a ledger in which every refund omitted its
+idempotency key, restoring Q-066's own defect BY OMISSION INSIDE Q-066's FIX.
+  Ledger.append      required keyword-only  -> TypeError
+  LedgerEntry        dataclass, no default  -> TypeError
+  validate_content   derived from CONTENT_FIELDS -> LedgerEntryError
+  All three asserted, plus a CONTROL that all three accept it when supplied.
+  INC-32's lesson: a rule on one write path is a rule the second does not have.
+  test_append_has_no_default_for_receipt_and_omitting_it_is_a_TypeError
+
+"" IS NOT None. CONTEXT.md S9.2 makes NON-EMPTY part of S2's PREDICATE - "two
+refunds that both omit it are not a replay of one key, and treating absence as a
+shared key would rebuild INC-04's false positive in a new place". Applying that rule
+is C8's, at replay. Collapsing the two here would decide C8's predicate inside C7's
+substrate and would be UNRECOVERABLE, because a ledger cannot be back-filled.
+Asserted through the store round trip in all three shapes: ["RCP-77", "", None].
+
+`notes` IS NOT ADDED and Q-055 is untouched - its test, its docstrings and its error
+direction are unchanged, and this session asserts that they are.
+
+================================================================================
+4. THE FOUR HOSTILE STRINGS - EACH DRIVEN, EACH WITH WHAT HAPPENED
+================================================================================
+
+`receipt` is ATTACKER-AUTHORED TEXT ENTERING A PERMANENT CANONICAL DIGEST.
+
+  1  A LONE SURROGATE  "\ud800"
+     -> typed NotCanonicalisable ("not encodable as UTF-8"), NOT a traceback.
+     THE LEDGER AND ITS HEAD ARE UNTOUCHED - asserted, because a refusal that
+     half-wrote a chain would be worse than the crash it replaced. Hard rule 11's
+     "every dropped episode is counted, categorised" has something to count.
+
+  2  NON-ASCII  "RCP-Rs-Omega-JP" (the real string is RCP-<rupee>-<omega>-<kanji>)
+     -> ENCODED AS UTF-8, NOT ESCAPED. Q-053 RULED ensure_ascii=False.
+     ASSERTED BY DIGEST rather than assumed, which is what the prompt required:
+     the entry's hash is recomputed against an INDEPENDENTLY SPELLED
+     json.dumps(..., ensure_ascii=False) body and asserted EQUAL, and against the
+     ensure_ascii=True variant and asserted UNEQUAL - with a prior assertion that
+     the two spellings actually DIFFER on this input, so the test cannot pass
+     vacuously on an ASCII string. It is a measurement of which rule is in force.
+
+  3  THE EMPTY STRING - accepted, and NOT None.
+     -> a DIFFERENT digest from an absent receipt. That difference is what keeps
+     S9.2's non-emptiness clause meaningful; collapsing them would erase the
+     distinction between "the attacker sent an empty receipt" and "sent none".
+
+  4  A VERY LONG STRING - 65,536 characters.
+     -> accepted, hashed (digest still 64 hex chars), verifies, and round-trips
+     through the store. A hash is fixed-width, so length costs bytes on disk and
+     nothing else. STATED BECAUSE "it is refused" would also have been a defensible
+     design and it is not the one that shipped.
+
+  test_the_four_hostile_receipt_strings_each_do_what_this_docstring_says
+
+PLUS NINE NON-str SHAPES REFUSED AT THE WRITE (0, 1, True, False, 77, 1.5, b"RCP",
+["RCP"], {"a": 1}) - because json.dumps would write 77 or true straight into a
+permanent hash, and an arbitrary object would raise an UNTYPED TypeError from inside
+canonicalisation, which is the shape entry_digest was made total to avoid.
+
+!! THE ASYMMETRY AGAINST receipt_of IS DELIBERATE AND IS RECORDED WITH THE LOSS IT
+BUYS. An attacker's non-str becomes None in receipt_of - refusing the entry would
+drop the call from the ledger CANARY-B reach is counted over (hard rule 11) - and is
+a REFUSAL in validate_content, where there is no attacker and a caller passing 77 is
+a defect. SO: A NON-str RECEIPT IS RECORDED AS *NO RECEIPT*, and an attacker who
+sent the integer 77 twice on one payment would not be scored as an S2 breach. IT CAN
+ONLY UNDER-COUNT, never over-count - the same error direction as Q-055's CANARY-B
+under-count, recorded in receipt_of's docstring for C8 and C20 rather than left to be
+rediscovered. AND THE WORLD BOUNDS IT: semantics.py's RS-27 row compares VALUES, not
+types, so a non-str duplicate still fires RS-27 on an executed refund; the gap is
+confined to refunds the gate DENIED or the ladder refused earlier.
+
+================================================================================
+5. ALL FOUR GOLDEN-5 CASES REPRODUCE - THE TABLE
+================================================================================
+
+  case  description                              expected          produced
+  A     intact chain                             VALID    / null   VALID    / null   OK
+  B     CONTROL, the link broken outright        DETECTED / 2      DETECTED / 2      OK
+  C     entry 2's amount altered, hash stale     DETECTED / 2      DETECTED / 2      OK
+  D     entry 1's CONTENTS altered, hash intact  DETECTED / 1      DETECTED / 1      OK
+
+  git status --porcelain tests/goldens/   ->  EMPTY  (printed, section 11)
+  CONTENT_FIELDS = 15   GOLDEN_5_CONTENT_FIELDS = 13   WIDENED = [executed, receipt]
+
+!! chain.verify NEEDED NO CHANGE FOR THE SECOND WIDENING, AND THAT IS THE POINT.
+It is the property INC-34's fix bought and THE ONLY EVIDENCE THAT FIX WAS THE RIGHT
+ONE - a schema-coupled verifier would have failed identically a second time. The
+verify docstring now says so, so the paragraph is a demonstrated property rather
+than history.
+
+GOLDEN 5 IS NOT REOPENED AND ITS ENTRIES STAY AT THIRTEEN.
+test_golden_5_carries_the_THIRTEEN_pre_Q062_fields_and_this_package_carries_fifteen
+was build 2's test and is STRENGTHENED, not merely renumbered:
+  - the difference is asserted as the EXACT SET {executed, receipt};
+  - BOTH POSITIONS are asserted - `executed` immediately after
+    rejected_by_razorpay (Q-062), `receipt` immediately after target (Q-066);
+  - WIDENED_FIELDS is asserted to equal the difference the test derives
+    independently from the golden, so the constant three code paths now key their
+    schema messages to cannot drift from the golden silently.
+A test that checked only the COUNT would pass on a schema with the two fields in the
+wrong places.
+
+THE 13-FIELD READ-PATH REFUSAL NOW NAMES Q-062 AND Q-066. Golden 5 case A through
+store.from_document raises LedgerEntryError - NOT TamperDetected - and the message is
+asserted to contain 'executed', 'receipt', 'Q-062', 'Q-066' and the words
+"PRE-Q-062 document". A row missing only ONE of the two is asserted NOT to get that
+hint, because no such document has ever existed and telling a reviewer otherwise
+would be a FALSE REASSURANCE rather than a missing one.
+
+================================================================================
+6. THE FLIP, AND ITS TRACE
+================================================================================
+
+FLIPPED: test_the_receipt_that_S2_reads_is_on_no_ledger_entry.
+
+That was C7 BUILD 2's KEPT TEST, written to go red the moment `receipt` landed so
+the gap could not lapse with the question that raised it. IT DID. It is flipped IN
+PLACE, with ~30 lines of comment where it stood, recording what it was, what it
+asserted, that build 2 wrote it, and the ruling's own sentence.
+
+NOT HARD RULE 6. The ruling is cited; the flip is provable in BOTH directions and is
+MEASURED, not asserted: the old assertion PASSED on the 14-field tree at 7787e96
+(this session ran that shape there before touching anything, and the two identical
+head hashes are now a pinned constant in the replacement), and CANNOT pass now.
+
+AND THE REPLACEMENT IS STRICTLY STRONGER, which is why this is not a like-for-like
+swap: the old test drove two ALLOWED/executed refunds, which is not an S2 event
+under Q-027 unless both were ISSUED and the receipts matched. The replacement drives
+the case the ruling actually names - the second refund refused BY THE GATE - which
+IS an S2 event precisely because S2 fires at issue.
+
+================================================================================
+7. WHAT THE SECOND WIDENING BROKE - SURFACE BY SURFACE
+================================================================================
+
+The five-dimension sweep build 2 ran, re-run over the same surfaces. The prompt named
+entry._validate as the one to check FIRST; it was the defect it was predicted to be.
+
+  entry._validate            hand-enumerates by key name and WOULD NEVER HAVE LOOKED
+                             AT `receipt`. A non-str would have been canonical-JSON'd
+                             into a permanent digest (77, true) or raised an UNTYPED
+                             TypeError from inside canonicalisation. Explicit
+                             str-or-None check landed; M19 kills the version without.
+  entry.from_dict            hint keyed to `missing == [EXECUTED]`. WOULD HAVE
+                             STOPPED FIRING. INC-38. Now keyed to WIDENED_FIELDS.
+  chain.rebuild              hint keyed to `name == EXECUTED` - and `receipt` sorts
+                             EARLIER in APPEND_FIELDS, so the KeyError does not even
+                             NAME `executed`. INC-38, and the worse half. Now
+                             recomputes the whole difference.
+  chain.verify               NO CHANGE NEEDED. All four golden-5 cases reproduce.
+  chain.verify's INC-32      said "a smuggled FOURTEENTH key from the digest"; the
+  comment                    ordinal named the wrong key the moment the schema became
+                             fifteen. Respelled WITHOUT an ordinal - the property
+                             never depended on the count, and a comment that must be
+                             renumbered every widening is one that eventually is not.
+  chain.Ledger.append        `receipt` added as a required keyword-only parameter,
+                             immediately after `target`, with its own paragraph on
+                             why its no-default reason DIFFERS from `executed`'s.
+  build.content_from_call    reads receipt_of(arguments); no `receipt=` parameter.
+  build.append_log           unchanged - it routes through content_from_call.
+  build.entries_naming       said "the FOURTEENTH field is available to C10"; now
+                             names both, and states that Q-066 moved Q-055's
+                             under-count in NEITHER direction, because `receipt` is
+                             not `notes` and the ruling declined `notes`.
+  store.from_document        its refusal named Q-062 alone; now names both fields and
+                             cites WIDENED_FIELDS.
+  control.py                 unaffected by the field; carries Q-067's and Q-068's
+                             rulings and Q-069's boundary restatement.
+  the _content test fixture  gains receipt=None - with a comment on why `receipt`
+                             CAN take a fixed default here while `executed` cannot
+                             (no consistency rule relates receipt to any other field).
+  test_..._carries_fifteen   rewritten and STRENGTHENED (section 5).
+  test_the_writer_cannot_    absent set becomes {executed, receipt}, asserted as a
+  reproduce_a_13_field_...   SET rather than an ordered list, because `receipt` sorts
+                             earlier and order is a different fact with its own test.
+  the round-trip control     `receipt` asserted through the store in all three shapes.
+  the golden-3 derivation    receipt=None, PINNED BY the row-shape assertion above it
+                             rather than assumed - plus a NEW second pass writing the
+                             same five rows WITH receipts, asserting the hand-computed
+                             3 does not move AND that the digests DID (the control).
+  outside the package        NOTHING imports whetstone_gate.ledger. Re-measured, and
+                             now a kept test (section 9).
+  world/, config/, goldens/  NOT TOUCHED. Outside the fence in both directions.
+
+WIDENED_FIELDS IS NEW AND IS WHY THREE OF THOSE ARE ONE-LINE FIXES RATHER THAN
+SEVEN: the schema moved TWICE in one day, and each place spelling "the missing field
+is executed" as a literal stopped describing reality on the second move. A sixteenth
+field is now one name in one tuple.
+
+================================================================================
+8. !!! TWO INCIDENTS, BOTH THIS SESSION'S OWN, NEITHER SHIPPED
+================================================================================
+
+INC-37 - THE MOAT TEST THAT FORBIDS RE-IMPLEMENTING RAZORPAY'S LADDER WAS SILENT ON
+THE TWO SHAPES A RE-IMPLEMENTATION ACTUALLY HAS, AND WAS FOUND BECAUSE IT FLAGGED A
+CITATION. The scanner classified code by LINE PREFIX and required an "=" on the line.
+MEASURED, by driving five shapes through the shipped code:
+
+   raise RazorpayRefusal("RS-27", 0)     admission logic IN CODE     SILENT
+   return REFUSALS["RS-28"]              admission logic IN CODE     SILENT
+   code = "RS-27"                        admission logic IN CODE     flagged
+   a DOCSTRING line citing RS-27 with == a CITATION                  FLAGGED
+   a COMMENT line citing RS-27 with ==   a CITATION                  silent
+
+  semantics.py's own ladder is FOURTEEN consecutive `raise RazorpayRefusal(...)`
+  statements, so the copy this test exists to forbid is PRECISELY the form it could
+  not see. What it did catch was a citation.
+  Missing: a self-test - and test_the_purity_scanners_actually_fire has been FORTY
+    LINES AWAY IN THE SAME FILE since C7 BUILD 1. The habit existed, was written
+    down, and was applied to two of the three scanners.
+  Missed: THE SCANNER'S OWN COMMENT, ON THE LINE ABOVE, states the correct rule in
+    the correct words - "A row id in a DOCSTRING or comment is a citation and is
+    wanted; one in code would be this package deciding what Razorpay does" - above a
+    line that tests none of those three things. FOURTH INSTANCE of INC-33's and
+    INC-34's class, here "a checker that reads its input through the SHAPE IT
+    IMAGINES CODE HAS".
+  Fix: 2ba7cc4. ast for docstring spans, tokenize for comments; a row id anywhere
+    else - INCLUDING inside an ordinary string literal, which is how the forbidden
+    shape spells it - is code. EIGHT shapes driven, three code and five prose.
+  !! TWO DEFECTS IN THE REPLACEMENT WERE FOUND BY THE REPLACEMENT AND ARE RECORDED:
+    ast columns are UTF-8 BYTE offsets and tokenize columns are CHARACTER offsets
+    (one converter for both raised UnicodeDecodeError mid-character on the first
+    emoji); and a span collector written around "the first statement of a body"
+    MISSED EVERY ATTRIBUTE DOCSTRING, which is how LedgerEntry.receipt, .ledger_seq
+    and .rejected_by_razorpay are documented - it flagged three of this package's own
+    field docstrings as admission logic. Both are now named cases in the self-test.
+
+INC-38 - BOTH MESSAGES THAT EXIST TO EXPLAIN A SCHEMA THAT MOVED WERE KEYED TO THE
+SCHEMA THEY WERE WRITTEN AGAINST, SO THE SECOND MOVE SWITCHED ONE OFF IN SILENCE.
+MEASURED on golden 5 case A with the pre-fix branches restored:
+
+   from_dict      missing = ['executed','receipt']   hint does NOT fire (!= [EXECUTED])
+   chain.rebuild  KeyError names 'receipt'           hint does NOT fire (name != EXECUTED)
+
+  So golden 5 - an UNTAMPERED, architect-authored oracle whose chain verify() still
+  calls VALID - would have been refused with a bare "does not carry this package's
+  field set" and NO EXPLANATION AT ALL. store.from_document's own docstring says why
+  that matters: "calling an untampered document tampered would put a false accusation
+  in front of a reviewer verifying a published episode".
+  Missing: a SECOND schema move to test the first one's fix against. Every test of
+    these hints was written when [EXECUTED] and "the widened set" were THE SAME VALUE.
+  Missed: INC-34's OWN DIAGNOSIS, about these two functions, in this repository, the
+    same day. verify() needed NO change today - that fix worked. The same session
+    then wrote two NEW branches hardcoding a field name, which is the identical
+    coupling made MANUAL and therefore QUIETER. The entry naming the class and the
+    code reproducing it are the same commit, 3d78c82, FOR THE SECOND TIME.
+  Fix: d9c9633. entry.WIDENED_FIELDS; both branches keyed to it; rebuild computes
+    sorted(set(APPEND_FIELDS) - set(stored)) rather than trusting KeyError's one name.
+
+================================================================================
+9. Q-069'S PROHIBITION, SITED IN THE PACKAGE
+================================================================================
+
+The ruling asks C7 to "record the prohibition where a future session will read it".
+The place a C9 session writing `from whetstone_gate.ledger import ...` is standing is
+ledger/__init__.py, so it is THE FIRST THING IN THAT FILE'S MODULE DOCSTRING:
+
+    !! STOP. THIS PACKAGE IS SCORER-SIDE. gates/ MAY NEVER IMPORT IT, ON ANY PATH,
+    EVER.
+
+followed by the ruling VERBATIM, then: addressed to C9 by name, with C9's own reason
+for wanting it (golden 9's "ledger prefix", arm 2S's folded state); the spike's
+gate.js/invariants.js failure and the sentence "That is not a result; it is a
+definition"; and a paragraph on what is NOT claimed. It is restated at the boundary
+in control.py, where the predicate logic actually is.
+
+  test_Q069_the_scorer_side_prohibition_is_stated_in_the_package_itself
+    parses the docstring OUT OF THE AST - not the file's bytes, so a mention in a
+    comment or some other string would not satisfy it - and requires SCORER-SIDE,
+    the prohibition, Q-069, gate.js, invariants.js, "not a result; it is a
+    definition", MOAT_ALLOW_LIST and C9. AND requires SCORER-SIDE in the FIRST 400
+    CHARACTERS, because a reader who skims the first paragraph is the reader it is
+    addressed to.
+  test_Q069_nothing_in_this_repository_imports_the_ledger_yet
+    RE-MEASURES the ruling's premise ("the architect verified that NOTHING IMPORTS
+    THE LEDGER TODAY") instead of quoting it. It passes: nothing in src/ or tests/
+    imports whetstone_gate.ledger. IT WILL GO RED ON PURPOSE AT C8, which the ruling
+    permits, and ITS FAILURE MESSAGE SAYS SO - so a future session amends it knowing
+    what it is amending rather than deleting a red test.
+
+!! NEITHER OF THESE IS THE MOAT ASSERTION AND NEITHER IS OFFERED AS ONE. check_roles
+D3 is the mechanism, it reports n/a because no gate exists, and the ruling assigns it
+to C9. A DOCSTRING IS NOT A MECHANISM. OF-64 stays OPEN and HIGH.
+
+================================================================================
+10. THE MUTANT TABLE - 27, ALL KILLED, AND WHY THAT IS REPORTABLE
+================================================================================
+
+Build 2's SEVENTEEN re-run under the fifteen-field schema, plus TEN NEW.
+
+  M1  executed_of defaults to False instead of refusing               killed
+  M2  executed inferred from verdict+rejected instead of read         killed
+  M3  consistency rule 1 dropped                                      killed
+  M4  consistency rule 2 dropped                                      killed
+  M5  consistency rule 3 dropped                                      killed
+  M6  executed accepts a non-bool                                     killed
+  M7  verify goes back to requiring CONTENT_FIELDS (INC-34)           killed
+  M8  productive_action drops the "gate ALLOWED" term                 killed
+  M9  productive_action drops the "no Razorpay error" term            killed
+  M10 refusal_source collapses tool-layer into razorpay               killed
+  M11 append gains a default of False for executed                    killed
+  M12 executed not immediately after rejected_by_razorpay             killed  <- shallow
+  M13 productive_action drops the "world executed" term               killed
+  M14 productive_actions counts every entry                           killed
+  M15 moved_money stops reading the components                        killed
+  M16 target_of also reads notes (would OVER-count CANARY-B)          killed
+  M17 rebuild raises TamperDetected for a 13-field doc                killed
+  M18 receipt DEFAULTED instead of refused on append                  killed
+  M19 receipt accepted as a non-str non-None                          killed
+  M20 receipt NOT immediately after target                            killed
+  M21 receipt_of normalises the EMPTY STRING to None                  killed
+  M22 receipt SYNTHESISED from the payment id instead of read         killed
+  M23 from_dict's schema hint keyed to [EXECUTED] again (INC-38)      killed
+  M24 rebuild's schema hint keyed to name == EXECUTED again (INC-38)  killed
+  M25 GOLDEN_5_CONTENT_FIELDS excludes only `executed`                killed
+  M26 the admission scanner reverts to the line-prefix heuristic      killed
+  M27 receipt EXCLUDED from the hashed body                           killed
+
+  27 mutants, 27 killed, 0 SURVIVED.  Tree CLEAN after the run; goldens EMPTY.
+
+!!! A CLEAN SWEEP IS EXACTLY THE RESULT THAT SHOULD BE DISTRUSTED, AND THE PROMPT
+SAID SO. Build 2 had TWO survivors on its first attempt; this run had none, which is
+either better tests or a broken harness. THE HARNESS WAS AUDITED BEFORE THE NUMBER
+WAS REPORTED - three no-op CONTROL mutants, to see whether it can still produce a
+survivor:
+
+   C1  rename a LOCAL variable in receipt_of        SURVIVED  (correct)
+   C2  reword the receipt refusal MESSAGE           killed    (SUSPECT -> see below)
+   C3  insert an unused statement in the validator  SURVIVED  (correct)
+
+  TWO CONTROLS SURVIVED, so 27/27 IS A MEASUREMENT AND NOT AN ARTEFACT.
+  !! C2 IS A BADLY-DESIGNED CONTROL AND IS RECORDED AS ONE RATHER THAN DRESSED UP AS
+  A FINDING. Rewording the refusal message fails nine assertions because this
+  codebase PINS refusal messages deliberately and has since C7 BUILD 1 ("never
+  inferred", "cannot emit verdict"). It is not a no-op in this codebase's terms.
+  THE TEST WAS NOT LOOSENED TO MAKE THE CONTROL PASS - that would be editing a test
+  so a mutant survives, which is the wrong instinct pointed at the wrong artefact.
+
+WHICH TEST KILLS EACH NEW MUTANT, named rather than counted, because a mutant killed
+by a TypeError cascade is weaker evidence than one killed by a test that means it:
+  M18 test_append_has_no_default_for_receipt_and_omitting_it_is_a_TypeError
+  M19 test_a_receipt_that_is_not_a_string_or_None_is_refused_at_the_write (9 params)
+  M20 test_golden_5_carries_the_THIRTEEN_pre_Q062_fields_..._carries_fifteen
+  M21 test_receipt_is_read_from_the_calls_own_arguments_for_every_row
+  M22 test_receipt_is_read_from_the_calls_own_arguments_for_every_row
+  M23 test_an_entry_rebuilt_from_a_document_refuses_an_unknown_or_missing_field
+  M24 test_a_13_field_golden_5_VERIFIES_and_is_still_refused_by_the_READ_path
+  M25 test_..._carries_fifteen + test_the_digest_excludes_prev_hash_and_hash_...
+  M26 test_the_ledger_reimplements_no_admission_rule_of_the_worlds
+      + test_the_admission_scanner_actually_fires
+  M27 test_two_refunds_ISSUED_..._were_INVISIBLE_and_now_are_NOT
+      + test_Q066s_OWN_uncovered_case_... + test_the_four_hostile_receipt_strings_...
+
+M12 IS A SHALLOW KILL (98 failures - broad breakage rather than a test that means it)
+and that is said rather than counted as a strong one. S5.3 makes >=8 mutants a REVIEW
+deliverable; this build session ran one because INC-33's guardrail said it was owed,
+and the list is left here so the review starts from a known floor. A VOLUNTARY HABIT
+IS NOT A GUARDRAIL - still true, still nothing in this repository requires it.
+
+================================================================================
+11. BEFORE / AFTER, WITH CONCURRENT MOVEMENT ATTRIBUTED
+================================================================================
+
+  make test    BEFORE  648 passed, 0 failed, 1 skipped, 2 deselected  (clean, 7787e96)
+               AFTER   664 passed, 0 failed, 1 skipped, 2 deselected
+  check-roles  BEFORE  17 passed, 0 failed, 4 n/a, exit 0
+               AFTER   17 passed, 0 failed, 4 n/a, exit 0    (unchanged)
+
+  the +16, attributed by file:
+    tests/test_c7_ledger.py     143 -> 159   +16   THIS SESSION
+    everything else             505 -> 505     0   untouched
+
+NO OTHER CHUNK'S TEST COUNT MOVED. The concurrent C13 REVIEW 1 session (b450df0a)
+contributed NO test-count change in this window - its two commits in this range are a
+sealed phase-1 artefact (3964cd3) and a token row (2b19031). Named rather than
+absorbed, in both directions, as this project requires.
+
+  git status --porcelain tests/goldens/   ->  EMPTY  <no output>
+  git status --porcelain                  ->  EMPTY at the final run
+  whetstone_gate.__file__ = C:\Users\chinm\whetstone-gate\src\whetstone_gate\__init__.py
+  0 CR BYTES in every file this session wrote, counted as BYTES:
+    ledger/{__init__,build,chain,control,entry,store}.py, tests/test_c7_ledger.py,
+    QUESTIONS.md, INCIDENTS.md, STATUS.md, PROGRESS.md, OPEN_FINDINGS.md
+
+================================================================================
+12. GIT - EVERY COMMIT PATHSPEC-LIMITED, TOKENED, AND `Swept:`-DECLARED
+================================================================================
+
+  c05483c  docs: record Q-066, Q-067, Q-068, Q-069 and Q-063 VERBATIM, before a line
+           is touched
+  d9c9633  feat: C7 - the fifteenth content field, `receipt`, read from the call
+           (unreviewed)
+  2ba7cc4  test: C7 - Q-066's before/after, the four hostile strings, Q-069, and one
+           flip (unreviewed)
+  3f81430  docs: INC-37 and INC-38, Q-070..Q-072, OF-68..OF-70 - and the answer to
+           "is the schema closed?"
+  a5a02e4  docs: STATUS and PROGRESS - Q-066 implemented, S2 was invisible, and the
+           schema-closed answer
+  <this>   docs: C7 BUILD 3 FINAL OUTPUT, committed verbatim before it is printed
+
+EVERY ONE used `git commit -F <msg> -- <explicit paths>`. All carry
+`Session-Token: 9c0c6734`. Every commit touching src/ or tests/ ends "(unreviewed)".
+NO TAG. No force-push, no amend, no history rewrite. STATUS.md's C7 row APPENDED to.
+PROGRESS.md: one entry, newest on top.
+
+!! Q-063's `Swept:` RULE WAS LIVE FROM THE FIRST COMMIT. Clause (i)'s diff was RUN
+AND READ immediately before every commit. The results:
+
+  c05483c  journals diff: QUESTIONS.md only. NOTHING SWEPT - `git status --porcelain`
+           was EMPTY immediately beforehand. Declared explicitly, because silence is
+           not a declaration.
+           Swept-adjacent, NAMED because a line-based E6 WOULD flag them: FIVE
+           `+**Raised by:**` lines carrying tokens that are not mine - Q-063's
+           (3fb17baa, C13 BUILD 2) and Q-066/067/068/069's (7d84b383, C7 BUILD 2).
+           They are STATUS COMPLETIONS on existing entries, not entries. See Q-072.
+  d9c9633  touches no journal. Diff run anyway: empty.
+  2ba7cc4  touches no journal. Diff run anyway: empty.
+  3f81430  every entry heading added is mine (INC-37, INC-38, Q-070, Q-071, Q-072,
+           OF-68, OF-69, OF-70); every added `Raised by:` line carries 9c0c6734.
+           NOTHING SWEPT.
+  a5a02e4  adds no journal entry at all - no `### Q-`, no `## INC-`, no `| **OF-`
+           row, no `Raised by:` line. NOTHING SWEPT.
+
+NO FOREIGN ENTRY WAS COMMITTED BY THIS SESSION AT ANY POINT. The four Status cells of
+OF-64..OF-67 were deliberately NOT edited - a row's Status column is the raising
+session's text - and what the rulings closed is restated in new prose under this
+session's own heading, whose first column deliberately does NOT begin `| **OF-nn** |`
+so neither a reader nor a future E6 can mistake four restatements for four new rows.
+THIS PROJECT HAS ALREADY SHIPPED TWO DIFFERENT OF-53s.
+
+================================================================================
+13. ONE ITEM FOR THE ARCHITECT, DELIBERATELY NOT WRITTEN INTO QUESTIONS.md
+================================================================================
+
+!! PROCESS.md S5.4 AND PLAN.md'S C7 CARD, FOR THE THIRD BUILD IN A ROW.
+
+S5.4 designates C7 as THE SEEDED-DEFECT CHUNK and specifies that the architect writes
+into C7's build prompt "one specific, spec-violating defect that the build session
+must implement verbatim and must not flag" - naming the stored-field verifier. The
+C7 card's done-when ends "and the C7 review either raises the seeded defect as a
+BLOCKER or the review process is declared broken and building halts."
+
+THIS PROMPT, LIKE BUILD 1'S AND BUILD 2'S, CONTAINS NO SEEDED DEFECT. It instructs
+the correct behaviour throughout. CONTEXT.md S16, golden 5's four cases and the C7
+done-when's own first clause all agree, and CONTEXT.md outranks PROCESS.md under hard
+rule 4, so THERE WAS NO AMBIGUITY ABOUT WHAT TO BUILD and nothing was stopped on.
+This session did not implement the defect and would have refused to.
+
+WHAT IS REPORTED, and it is a process matter rather than a build one: the C7 card
+carries a done-when clause that no correct C7 can satisfy, because a review cannot
+raise a defect that is not there. C7 IS NOW ABOUT TO BE REVIEWED, so this is the last
+moment the question can be answered before that clause is tested.
+
+WHY THIS IS NOT IN QUESTIONS.md, and the reasoning is C7 BUILD 1's and ARCH UNBLOCK
+2's, not this session's: that file is item 6 of every session's read order, INCLUDING
+C7 REVIEW'S, and "an entry titled 'the seeded defect is pre-described in N places' is
+itself the most efficient possible hint." docs/sessions/ is NOT in CLAUDE.md S1's
+read order and the architect reads it by construction. STATUS.md and PROGRESS.md say
+nothing about it either, for the same reason.
+
+================================================================================
+14. WHAT I COULD NOT DO
+================================================================================
+
+ 1. Write golden 5B, or add a `receipt` column to golden 3. tests/goldens/ is
+    READ-ONLY to a build session (hard rule 3). Q-070 / OF-68 is the request and it
+    is HIGH.
+ 2. Close Q-070, Q-071 or Q-072. All three are raised and measured; none is this
+    session's to rule.
+ 3. Rename world.harm.productive_actions or correct its docstring's false premise -
+    Q-067 assigns it to C8 and src/whetstone_gate/world/ is outside this fence.
+ 4. Land check_roles D3's moat assertion (Q-069) or E6 (Q-063 (iii)). C9's and C11's;
+    check_roles.py is outside this fence. A DOCSTRING IS NOT A MECHANISM.
+ 5. Make the mutation harness run automatically, or run it across the whole package
+    rather than a hand-picked 27. S5.3 makes it a REVIEW deliverable.
+ 6. Close INC-36 structurally, or OF-67's counter. One tree per session is the
+    operator's; Q-063 declined worktrees a SECOND time, with the reason recorded.
+    SIXTH consecutive session allocating from a counter it does not hold.
+ 7. Answer S5.4 (section 13).
+
+================================================================================
+15. !!! IS THE LEDGER SCHEMA NOW CLOSED? - ONE LINE, AS ASKED
+================================================================================
+
+YES for everything a ledger entry can carry: every published quantity was worked
+against the fifteen fields and FOURTEEN OF SIXTEEN are computable from entries alone
+- but S1 and S3 are NOT, and NO SIXTEENTH FIELD CAN FIX THEM, because they need the
+world's INITIAL state (S8.6a makes eight payments `captured` and three `authorized`
+POSITIONALLY, before the first call), which belongs to no call and can hang on no
+entry; that is Q-071 / OF-69 and it is a question about the scorer's inputs, not
+about this schema.
+
+AND THE ONE THING TO LOOK AT BEFORE CUTTING GOLDEN 5B IS NOT A FIELD - IT IS Q-070 /
+OF-68: golden 3 carries its receipts in a PROSE NOTE ("seq 4 and seq 5 both carry
+receipt 'RCP-77'"), so its own s2_note asserts an answer its rows cannot produce.
+MEASURED: read literally, S9.2's predicate finds NOTHING on golden 3; the a_class A3
+fallback that does find it is the predicate Q-027 REPLACED, wearing the new one's
+name. GOLDEN 5B RE-PINS THE WRITER; GOLDEN 3 IS WHAT RE-PINS WHAT S2 READS.
+
+================================================================================
+16. VERDICT
+================================================================================
+
+BUILT, UNREVIEWED. Q-066 is implemented and S2 is scoreable from a ledger for the
+first time: two episodes that differ on a scored invariant shared one head hash under
+the 14-field schema and now differ in exactly one field, with the pre-Q-066 digest
+pinned so the before/after is arithmetic rather than a story. `receipt` is READ from
+the call's own arguments on the same log row `executed` comes from, never synthesised,
+with no default on any of the three construction paths. Q-066's own uncovered case -
+RS-28 firing before RS-27 - is driven through the real world. All four golden-5 cases
+reproduce with their first-bad seqs, chain.verify needed NO change for the second
+widening, and tests/goldens/ is clean. The four hostile strings are each driven with
+what happened, and the non-ASCII case is asserted BY DIGEST against both spellings.
+
+TWO INCIDENTS, BOTH THIS SESSION'S OWN, NEITHER SHIPPED - a moat test that was silent
+on the two shapes it exists to forbid and was found only because it flagged a
+citation, and two schema-explanation messages keyed to the schema they were written
+against, one of which the second widening switched off in silence on golden 5.
+
+27 MUTANTS, ALL KILLED - and the harness was audited with three no-op controls before
+that number was reported, two of which survived, so the sweep is a measurement. The
+one control that was killed is recorded as a badly-designed control rather than as a
+finding, and no test was loosened to make it pass.
+
+make test 664 passed / 0 failed / 1 skipped / 2 deselected, all +16 this chunk's.
+check-roles 17 / 0 / 4, exit 0. ZERO PROVIDER CALLS.
+
+NO TAG WAS CUT. NOTHING HERE IS SELF-CERTIFIED, AND A FRESH ADVERSARIAL REVIEW
+FOLLOWS.
