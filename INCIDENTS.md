@@ -2728,8 +2728,9 @@ while the live construction at 139-146 is split one path segment per line and th
 matches it. The guard was bound to the only text that satisfied it, which happened to be dead code,
 so it was **anti-correlated** with the property it named.
 
-**Fix:** `<SHA-FIX-B1>` (filled in by the follow-up commit `<SHA-FILL>`; this entry was written and
-committed first, as hard rule 13 requires). `invocation.live_log_path_from_source` /
+**Fix:** **`f4a38b7`** ⚠️ *(this entry was written and committed at `ef4b8d5` **before** that commit
+existed, as hard rule 13 requires, and the SHA was filled in afterwards rather than invented — an
+invented incident has no commit)*. `invocation.live_log_path_from_source` /
 `live_log_path`; the four corrected citations; the corrected failure mode; and
 `test_the_live_log_path_is_located_by_ast_and_proved_reachable`. Mutants re-run: **M15 SURVIVES**
 (the derivation never looks at the dead helpers), **M16 KILLED** (`is_relative` goes false),
@@ -2793,11 +2794,14 @@ was supposed to prove the move was written against the helper the refusal delega
 passed identically before and after the move and could not distinguish the two designs it exists to
 distinguish.
 
-**Fix:** `<SHA-FIX-B2>` (filled in by the follow-up commit `<SHA-FILL>`; this entry was written and
-committed first). `test_the_RENDERER_refuses_each_incomplete_figure_in_turn`, parametrized over
-both figure tuples × each required field. Mutants: deleting `assert_provenance(HEADLINE_FIGURES)`
-alone → RED; deleting `assert_provenance(CITED_TABLE_FIGURES)` alone → RED; deleting both (M8b) →
-RED.
+**Fix:** **`f4a38b7`**, extended by **`5d13fcd`** ⚠️ *(this entry was written and committed at
+`ef4b8d5` before either existed)*. `test_the_RENDERER_refuses_each_incomplete_figure_in_turn`,
+parametrized over **each guarded figure tuple × each required field**. `5d13fcd` added a **third**
+guarded tuple, `TABLE_4_BANKING_FIGURES`, and the parametrization covers it too, so the binding grew
+with the renderer instead of being outgrown by it. Measured: deleting **all three**
+`assert_provenance` calls → **18 failed**; `HEADLINE_FIGURES` alone → **6 failed**;
+`CITED_TABLE_FIGURES` alone → **6 failed**; `TABLE_4_BANKING_FIGURES` alone → **6 failed**. Each
+refusal dies on its own, which is what *"bound"* has to mean when there is more than one.
 
 **Systemic guardrail:** **none — accepted, because** the general form (*a test named for a caller
 that exercises only its callee*) needs a name-to-call-graph check over the whole suite, which is

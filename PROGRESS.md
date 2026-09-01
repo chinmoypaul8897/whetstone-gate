@@ -6,6 +6,172 @@ not a record; this file is.
 
 ---
 
+## C13 — THE CaMeL COMPARATOR — **FIX** attempt 1 — 2026-09-01 — ⚠️ **BOTH BLOCKERS CLOSED, POLARITY REVERSED, `CONTEXT.md` v1.9 — AND STILL NO TAG**
+
+**SESSION-TOKEN:** `fd8a67e9` — **NOT in the batch.** Appended as
+`| `fd8a67e9` | C13 | FIX | 2026-09-01 |` and numbered **from the table**: **35 rows before it,
+so row 36**; the **twenty-first** self-recorded row and the **twentieth** to carry a paragraph.
+The prose total and the table now agree — which is `OF-78`'s closure on its numbers, and **not**
+on its cause.
+
+**Pushed SHA:** see this session's FINAL OUTPUT, `docs/sessions/c13-fix-1.txt`.
+
+### 1. What this session was, and the order it did things in
+
+A **FIX** session after `REVIEW_13_1.md`'s **FAIL**. Hard rule 13 says the incident entries come
+**first**, so `INC-39` and `INC-40` were written and **committed** (`ef4b8d5`) before a line of
+code changed, and the fix SHAs are filled in afterwards rather than invented. **C13 is still
+UNREVIEWED after this session and no tag was cut.**
+
+### 2. B-1 — the citation named a line in a function with no caller, and the guards were ANTI-CORRELATED
+
+`invocation.py` told the operator, in four places and in `Q-057`'s recorded fact 4, that pass 2
+reads pass 1's logs at `replay_privileged_llm.py:321` and that a wrong working directory produces
+*"a silent zero"*. **Both halves were wrong.** At the pin, `:321` is inside `replay_user_task`,
+called only from `replay_suite` (`:344`), called only from `replay_benchmark` (`:356`) — and
+**`replay_benchmark` has no caller anywhere in the tree**; `models.py:16` imports only
+`PrivilegedLLMReplayer` and `UserInjectionTasksGetter`. **The live path is `replay_task`, 139-146,
+read at `:148` by `trace_path.read_text()`, called at `:305`.** ⚠️ **So it CRASHES LOUDLY with an
+unhandled `FileNotFoundError`** — `query` has no `try`/`except`, AgentDojo catches only
+`AbortAgentError` — **and the silent zero was the DEAD helper's `glob()` behaviour.** RUN-1 needed
+that distinction: a loud crash inside a 90-minute box is diagnosable and a silent zero is not.
+
+⚠️ **THE REAL DEFECT WAS THE TESTS, AND IT WAS MECHANICAL.** Both guards asserted the substring
+`'Path("logs") / pipeline_name'`, which occurs **at exactly two lines in that file, 321 and 341,
+both in dead functions** — the live construction is split one segment per line and never matched
+it. So the guard bound to the only text that satisfied it, which was dead code.
+
+**The fix is a derivation, not a corrected sentence.** `live_log_path_from_source` finds every
+function that builds a `Path(".../logs")`, finds what `PrivilegedLLMReplayer.query` can reach
+transitively, and **refuses unless exactly one is REACHABLE** — then reports the span, the read
+call, the call site, and whether the path is relative. The plan's `same_working_directory` prose is
+**generated from it** and asserted to contain the `file:line` it produced.
+
+| mutant | before | after |
+|---|---|---|
+| **M15** delete the three dead helpers (live behaviour byte-identical) | ⚠️ both tests **RED** | ✅ **SURVIVES** |
+| **M16** make the live path absolute (requirement destroyed) | ⚠️ both **GREEN** | ✅ **KILLED** |
+| **M17** live replayer stops reading pass 1's logs | ⚠️ both **GREEN** | ✅ **KILLED** |
+
+Run on a **copy in a fresh OS temp directory**; `vendor/` was never opened for writing. Both forms
+of M16 are covered — an absolute literal, and a `.resolve()` on the path.
+
+⚠️ **`INC-39`'s `Missed` field is the uncomfortable one and it is written out:** `Q-058`'s ruling —
+which **C13 itself raised** and the architect adopted eleven hours earlier — says *"a URL to a paper
+is not a URL to a table."* Build 1 **opened the page**. It did not open the **call graph**. That is
+the same class one level in, inside the artefact built to enforce it.
+
+### 3. B-2 — a refusal no test bound, and a test named for the thing it did not call
+
+`render_branch_b` opens with `assert_provenance(...)`, and `branch_b.py`'s own header says why that
+matters: *"a property enforced only in a test file is a property that holds until somebody adds a
+figure without running the tests."* **Mutant M8b deleted both calls and the whole suite stayed
+green**, because `test_the_renderer_REFUSES_a_figure_with_incomplete_provenance` calls
+`assert_provenance` directly and **never the renderer**. ⚠️ **`INC-40`'s `Missed`: the test was
+NAMED for the renderer and called the helper** — `INC-33`'s tautology in a different hat, and
+**`INC-35` is nearer still** (*"a test named 'term by term' could not discriminate two of the three
+terms"*) and was already in the file when this test was written.
+
+The renderer now guards **three** tuples and each is bound by its own cases: **M8b (all three) → 18
+failed; HEADLINE only → 6; CITED only → 6; TABLE_4 only → 6.** ⚠️ **The field checks were NOT
+rewritten** — six mutants, six kills already — because it was only the binding that was missing.
+
+### 4. `CONTEXT.md` v1.9 — P2 is a PRE-REGISTRATION, not a retreat
+
+The ruling was **recorded verbatim in `QUESTIONS.md` (`f17709c`) BEFORE the amendment (`041abe4`)**.
+`REVIEW_13_1` opened **Table 4, Appendix B**, which no session had. Re-verified here from the same
+URL: on **both Gemini models** the no-policies configuration records **ZERO** successful banking
+attacks, and **P2's shape holds on exactly two of the paper's seven configurations** — `o3 High`
+(1 and 0) and Table 7's `Claude 3.5 Sonnet` (1 and 0) — while on **`o4 Mini High` CaMeL WITH
+policies also records 1**, so *"the with-policies configuration blocks it"* was never universal.
+
+**Branch A runs `gemini-2.0-flash-lite-001`**, so P2's published premise **does not reproduce on the
+family Branch A would use**. P2 now says so **before the run**: it is **expected not to
+discriminate**, the **non-reproduction is itself the recorded result**, a run blocking nothing on
+banking is **consistent with the paper** and must not be scored as CaMeL underperforming, and a
+banking attack succeeding **without** policies would **contradict the paper's own table** and be
+worth more than the original P2. **Either outcome is informative.** ⚠️ **C18 scores P1–P3 and must
+receive this**, which is why it is written into `BRANCH_B.md` in terms and not only into the law.
+
+**Verified, not asserted:** control-byte scan over **every byte** before and after — **CR 0, TAB 0,
+no `0x08`, nothing else below `0x20` but LF** (INC-13 put a raw backspace in this file and it sat
+two days); **LF 2339 → 2361 = +22, exactly `29 − 7`**; only **one heading line** changed in the
+whole diff, the title; and **every §8.5 parser re-resolves** — all eight anchors still exactly once.
+**P1 and P3 untouched. No published number moves.** The Change log gains **v1.9's row and the v1.8
+row that was never written** (`OF-63`).
+
+### 5. `Q-064` — four of five, and the fifth declared
+
+`config/lanes.yaml:195`/`:201` and `PROCESS.md:1204`/`:1313`, each quoted before and after, with
+**Table 7 named explicitly at all four** because it *is* P2's citation. ⚠️ **Legal only because
+`prereg-v1` does not exist — checked with `git tag -l`, not assumed.** `make check-prereg` =
+**NOT-YET-FROZEN**; `PROTOCOL.md` **does not exist** (it is C14's), so **no recorded SHA needed
+updating** — the blob digest moved `39ad4334…` → `f9f190dc…` and nothing had registered the first.
+
+⚠️ **A FIFTH SITE EXISTS AND `Q-064` NAMES IT, THE PROMPT DID NOT:**
+`tests/test_lanes_operator_placeholders.py:141`. Outside this session's fence, **stopped**, raised
+as **`Q-074`**. It is the least dangerous of the five and **the most read** — the docstring of the
+one test deliberately red in `make selftest`, printed in full every time anyone runs the pre-spend
+gate. **A session working from the prompt alone would have fixed four and reported "all sites
+fixed" in good faith**, which is `Q-064`'s own point: *no mechanism knows that a citation has
+copies.*
+
+### 6. What this session STOPPED on
+
+⚠️ **`OF-77` — the `CONTEXT.md` §4 edit was NOT made.** The scope fence (*"CONTEXT.md (TASK 2
+ONLY)"*, labelled **hard**), `Q-058`'s ruling (*"S4 is CLEAN and is not touched except as TASK 1c
+specifies"* — and TASK 1c was C13 BUILD 2's, already spent) and ⚠️ **the row's own status cell,
+written by the review that raised it — *"OPEN — for C19, not for the C13 FIX"*** — all say the same
+thing, and one line of the same prompt says the opposite. Stopped under hard rule 1 and raised as
+**`Q-073`**, **which carries the one-line replacement written out in full** so landing it is an edit
+rather than a research task. §8.5's *Presentation* bullet is stopped on for the identical reason.
+
+### 7. Corrections to this session's own prompt, and to its own working
+
+* ⚠️ **The prompt's BEFORE state is arithmetically impossible and the real numbers are different.**
+  It says `make test` gives *"665 passed / 1 failed / 1 skipped (the failure is the operator
+  gate)"*. **`make test` DESELECTS the `operator_gate` marker** (`pyproject.toml:42-43`), so it
+  cannot report that failure at all. Measured: **`make test` = 664 passed, 1 skipped, 2 deselected,
+  ZERO failed**; **`make selftest` = 1 failed, 1 passed, 665 deselected** — and *that* is where the
+  `665` comes from. Both runs collect 667. **The operator gate is red in `selftest` and invisible in
+  `test`, exactly as designed.** After this session: **`make test` 698 passed / 1 skipped**,
+  `make selftest` unchanged and still red on `camel_comparator.branch`.
+* ⚠️ **Two bugs in this session's own new code, found by RENDERING the output and reading it**
+  rather than by trusting the derivation. `banking_rows` keyed on the base model alone, but
+  `CITED_TABLE_FIGURES` carries Tables 5, 6 **and** 7 under one base model across five suites, so
+  the dict collapsed to the **last** row — `Workspace` — and the artefact printed *"1 of 7"* with a
+  **Table 5** label on a **Table 7** row. It now keys on **table AND base model AND suite**, and an
+  assertion pins it. **That is the same quiet collapse `test_the_citation_correction…` already warns
+  about for its own dict, one function over.**
+* ⚠️ **A sequencing slip, declared rather than left for a review to find.** Hard rule 5 says a ruling
+  is recorded *"before anything else is touched"*. `CONTEXT.md` was edited in the working tree
+  **before** `Q-058 (Table 4)` was written; the entry was then written and **committed first**, so
+  the **commit** order is ruling-then-amendment and the audit trail reads correctly. The
+  working-tree order did not match the rule. Recorded in `Q-058 (Table 4)` itself.
+* ⚠️ **`INC-25` reproduced, in this session's own throwaway debug script** — a bare `print()` of the
+  rendered artefact died with `UnicodeEncodeError` on the cp1252 console. **No project code was
+  involved**; `__main__.py` goes through `_console.say()` throughout. Recorded because that incident
+  says *"there is no mechanism behind this rule"*, and this is one more datum that there is not.
+
+### 8. Standing properties, checked rather than carried
+
+**Zero provider model calls. Zero tokens. No `evals/` path in any commit.** CaMeL was not run, not
+installed and not imported, and **whether the model id is still served was NOT checked** — that is
+Branch A's condition and RUN-1's alone. **Both vendored trees are at their pins with empty
+`git status --porcelain` and `git diff <pin>` of exactly `0` bytes — proven, not assumed.**
+`git status --porcelain tests/goldens/` is **EMPTY**. `whetstone_gate.__file__` resolves to this
+repository's own `src/`. Throwaway work — every mutation harness — ran in **fresh OS temp
+directories**.
+
+**Concurrent session:** **C6 REVIEW 2 (`ec8e57ad`)** shares this tree. It appended its token row
+(row 35) and its self-record paragraph before this session started, and during this session it
+added four **untracked** files under `docs/reviews/independent/`. **Every commit here used explicit
+pathspecs and could not reach them.** `git status --porcelain` over the five shared journals was
+read before each journal commit; **nothing foreign was swept**, and the one `Swept:` line that names
+a non-`fd8a67e9` token explains why it is **not** a sweep.
+
+---
+
 ## C13 — THE CaMeL COMPARATOR — **REVIEW** attempt 1 — 2026-09-01 — 🚩 **FAIL, NO TAG** · but ⚠️ **`CONTEXT.md` v1.8 IS RIGHT and this review re-derived it from its own fetch**
 
 **SESSION-TOKEN:** `b450df0a` — **NOT in the batch.** Appended as

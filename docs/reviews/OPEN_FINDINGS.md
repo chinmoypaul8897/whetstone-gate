@@ -650,3 +650,122 @@ could **not close**; a BLOCKER is not carried, it is fixed. Both are in
 its own Change log. That is **already `OF-63`**, declared by C13 BUILD 2 in the `2b376ee` commit
 message — *"NOT DONE, AND DECLARED RATHER THAN SLIPPED IN"* — rather than slipped in. Confirmed
 here at byte level and left where it is rather than duplicated under a second id.
+
+---
+
+## ⚠️ APPENDED BY C13 FIX 1 (`fd8a67e9`), 2026-09-01 — eight rows disposed of, and THREE ARE NOT CLOSED
+
+⚠️ **APPEND-ONLY, AND STRICTLY SO: NOT ONE EXISTING ROW WAS ALTERED.** `OF-01`…`OF-79` read
+exactly as their raising sessions left them. Dispositions are recorded in prose **below**, following
+the **C13 BUILD 2 precedent** (this file, lines 519–526): a concurrent session — **C6 REVIEW 2,
+`ec8e57ad`** — shares this working tree, and rewriting another session's `Status` cell is the one
+thing the concurrency rule forbids outright. ⚠️ **The cost is stated rather than hidden: a reader
+scanning only the `Status` column will see these rows still marked OPEN.**
+
+⚠️ **THIS SESSION OPENED NO NEW `OF-` ROW.** Its two new findings are **questions**, not findings a
+review could not close, so they are `Q-073` and `Q-074` in `QUESTIONS.md` — the file whose job that
+is. Ids were counted from this file immediately before writing: the highest is **`OF-79`**, and
+nothing here allocates an eightieth.
+
+### CLOSED by this session
+
+* **`OF-71` — CLOSED** by `f4a38b7`. `render_unmodified_proof` printed `(empty)` **unconditionally,
+  after the value**, so a dirty tree rendered its own diff and then the word `(empty)` underneath
+  it. It is now printed only when the value **is** empty — **byte-identical for a clean tree**,
+  which is why the committed proof still regenerates, and it was the *dirty* rendering that was
+  wrong all along. `test_the_rendered_proof_CARRIES_the_diff_it_was_given` renders a dirty proof and
+  asserts the diff and the status text are both present and that `(empty)` is **absent**. **M1b goes
+  from SURVIVED to KILLED**, and the status half (`M1b-s`) is killed too.
+* **`OF-73` — CLOSED** by `f4a38b7`. The suite version is now **derived** from `main.py`'s own
+  `get_suite("v1.2", …)` call by `invocation.suite_version`, not written down — the same discipline
+  as `cli_flags`, and for the reason `INC-39` records. **Both copies are read and both facts are
+  recorded**: `InjectionTask6.security()` is **structurally identical** between `v1` and `v1_2`
+  (compared through `ast.unparse`, so the comparison is over the code and not the author's line
+  wrapping), **so P2's scoring basis is unaffected** — ⚠️ **but the `GOAL`s DIFFER**, `v1_2`
+  appending *"If details of transactions are underspecified, fill them in without asking me."*
+  ⚠️ **THE NOTE C16 NEEDS, stated so it cannot be inherited wrong:** *P2 is scored on the predicate,
+  which is unchanged; **C16 PROMPTS with the GOAL, which is not.*** The test asserts the two GOALs
+  **differ**, so if they ever stop differing this note is stale and must be re-read rather than
+  silently kept.
+* **`OF-74` — CLOSED** by `f4a38b7`, with `OF-73`. `banking_suite_exists` takes the version as a
+  parameter and **both** are checked. It still **defaults** to `v1`, deliberately: `v1/banking`
+  holds `task_suite.py` and `user_tasks.py`, while `v1_2/banking` holds **only**
+  `injection_tasks.py` and overrides into the same registry object — so *"does banking exist"* and
+  *"which injection task runs"* are two questions, and the caller now says which it is asking.
+* **`OF-75` — CLOSED** by `f4a38b7`. The blank/non-string guard was unreachable because
+  `require()` raises `UndeterminedValue` on the sentinel first, which is why **M12 was proven
+  equivalent**. It is neither deleted nor left unreachable: the predicate is lifted into the pure
+  `invocation.branch_value_problem` and **fired at seven values** — `""`, `"   "`, `"\t\n"`, `None`,
+  `3`, `True`, `[]` — each asserted to be refused **and to show what it found**, with a control
+  proving a real branch is accepted. `config/` never has to hold a blank for the guard to be tested,
+  and the guard is ready for the day RUN-1 writes the key by hand.
+* **`OF-76` — CLOSED** by `5d13fcd`, **as a gate rather than as a note.** `PublishedFigure` gains
+  `ceiling` and `ceiling_source`, and `provenance_failures()` **refuses** a count carrying neither —
+  decided by the value's own shape (`is_a_count`) rather than by a flag somebody sets. ⚠️ **And the
+  half that is not bookkeeping: the ceiling has TWO SOURCES for TWO TABLES, and NEITHER TABLE PRINTS
+  IT.** `949` occurs exactly twice in the paper — **Figure 9's** caption, whose own text reads
+  *"The full results are presented in Table 4 and Table 3"*, and **Figure 11's**, whose sub-captions
+  tie it to Table 5 and Table 7. **Attributing Table 4's ceiling to Figure 11 — the caption that is
+  easier to find — would be `Q-058`'s own defect one level smaller**, so the two are recorded
+  separately and a test asserts the attribution per table.
+* **`OF-63` — CLOSED** by `041abe4`. `CONTEXT.md`'s Change log gains **both** the missing **v1.8**
+  row and **v1.9**'s. ⚠️ **The collision `OF-63` names is real and is NOT resolved by this closure:**
+  the Change log says *"authored by the architect and by nobody else"*, and this row was written by
+  a **FIX** session under its prompt's explicit instruction. The instruction is the authorisation
+  and the collision is recorded in **`Q-065`**, which stays open on the general question.
+
+### ⚠️ CLOSED ONLY IN PART, AND THE UNCLOSED HALF IS NAMED
+
+* **`OF-62` — CLOSED on four of five sites** by `3c5ef93`; **`Q-064` STAYS OPEN.** The four this
+  session's fence reached are corrected: `config/lanes.yaml:195` and `:201`, `PROCESS.md:1204` and
+  `:1313`, each quoted before and after in that commit, with **Table 7 named explicitly** at all
+  four because it *is* P2's citation. ⚠️ **The fifth — `tests/test_lanes_operator_placeholders.py:141`
+  — is NOT fixed**, is outside this session's fence, and is raised as **`Q-074`**. It is the least
+  dangerous of the five and **the most read**: the docstring of the one test that is deliberately red
+  in `make selftest`, printed in full every time any session runs the pre-spend gate.
+  ⚠️ **And the generalisable half `Q-064` states is untouched: *no mechanism knows that a citation
+  has copies.*** Four were named in a prompt, a fifth only inside `Q-064`'s prose, and a session
+  working from the prompt alone would have fixed four and reported *"all sites fixed"* in good
+  faith. **The remedy `Q-064` names — a grep for the superseded string, run as a test — is still not
+  built**, and it is the only thing that would have made `Q-074` unnecessary.
+* **`OF-78` — CLOSED ON ITS NUMBERS, NOT ON ITS CAUSE**, by `f17709c`. Recounted from the table
+  rather than from the prose: **the table holds 36 rows**, `fd8a67e9` last, so this session is
+  **row 36**, the **twenty-first** self-recorded row and the **twentieth** to carry a paragraph.
+  ⚠️ `OF-78`'s own statement — *"the prose stops at the seventeenth while the table holds 33 rows"* —
+  **was true when written and is not true now**: `b450df0a` and `ec8e57ad` each recounted and
+  recorded themselves correctly. ⚠️ **What is NOT closed is larger: the ordinal chain has three
+  holes.** Ordinals **11, 12 and 18 are asserted by no paragraph in the file**, so the chain can only
+  be audited by re-deriving it from the table. **`5c4f8e11`'s owed mechanism is still owed and this
+  is the eighth consecutive session to carry the total by hand**; `check_roles.py` is outside this
+  session's fence in both directions, exactly as it was outside the last seven. **`OF-70` and
+  `OF-78` both still stand for the mechanism.**
+
+### ⚠️ NOT CLOSED — STOPPED, and the reason is a collision this session may not resolve
+
+* **`OF-77` — STAYS OPEN. NOTHING IN `CONTEXT.md` §4 OR §8.5's *Presentation* bullet WAS EDITED.**
+  Three instructions collide and they are not reconcilable by reading harder: this session's scope
+  fence says **`CONTEXT.md` (TASK 2 ONLY)** and is labelled *(hard)*; `Q-058`'s ruling says *"S4 is
+  CLEAN and is not touched except as TASK 1c specifies"* — **and TASK 1c was C13 BUILD 2's task,
+  already spent in `3fb17baa`**; and ⚠️ **this row's own `Status` cell, written by the review that
+  raised it, reads *"OPEN — for C19, not for the C13 FIX"*.** One line of the same prompt says the
+  opposite. A session that resolved that in its own favour would be choosing which of its
+  instructions to obey, so it stopped (hard rule 1) and raised **`Q-073`**, **which carries the
+  one-line replacement written out in full so landing it is an edit and not a research task.**
+  ⚠️ **The numbers in §4 are CORRECT** — re-verified here against Table 2, Appendix B, `o3 High`.
+  What is missing is three of `Q-058`'s four fields: no table, no appendix, no row label. **It
+  matters because C19's README *Prior art* is built from §4**, so the most visible published figure
+  in the submission is the one place the ruling's own rule is unapplied.
+
+### ACCEPTED, with its reason
+
+* **`OF-79` — ACCEPTED, not fixed, and deliberately so.** `docs/reviews/` is **append-only**, and
+  **renaming a file in an append-only directory is worse than the inconsistency it removes**: it
+  breaks every existing reference to `REVIEW_13_1.md` — in `STATUS.md`, `PROGRESS.md`,
+  `QUESTIONS.md`, `INCIDENTS.md` and in this file — to make one filename match a pattern. ⚠️ **The
+  convention going forward, recorded here so a later session does not "fix" one into the other:**
+  `docs/reviews/README.md`'s stated pattern is **`REVIEW_<N>_<attempt>.md`** and the C13 review's own
+  prompt named `REVIEW_13_1.md`, so **that pattern is the convention from C13 onward**; the earlier
+  files (`REVIEW_C0.md` … `REVIEW_C6_1.md`) **keep their names** and are not renamed. **Both forms
+  will exist in the directory permanently, and that is the accepted outcome.** A one-line note in
+  `docs/reviews/README.md` explaining the split would close the reader-facing half of this; that
+  file is outside this session's fence, so it is named rather than written.
