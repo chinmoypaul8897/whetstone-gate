@@ -36,7 +36,7 @@
       "path": "src/agentdojo/data/suites/banking/injection_vectors.yaml",
       "sha256": "4eb98a601c108d9b4d88f5d3f2dbf455f775a718975a0ae2624b4cf0d0f6f819",
       "adapter": "agentdojo_injection_vectors_yaml",
-      "licence": "MIT (c) 2024 Edoardo Debenedetti, Jie Zhang, Mislav Balunovic, Luca Beurer-Kellner, Marc Fischer, and Florian Tramer"
+      "licence": "MIT (c) 2024 Edoardo Debenedetti, Jie Zhang, Mislav Balunovic, Luca Beurer-Kellner, Marc Fischer, and Florian Tramèr"
     },
     {
       "corpus": "agentharm",
