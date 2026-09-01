@@ -6,6 +6,198 @@ not a record; this file is.
 
 ---
 
+## C13 — THE CaMeL COMPARATOR — **REVIEW** attempt 2 — 2026-09-01 — ❌ **FAIL: TWO BLOCKERS NOBODY HAD LOOKED AT — AND BOTH OF REVIEW 1's ARE PROPERLY CLOSED**
+
+**SESSION-TOKEN:** `8c49c4d3` — **NOT in the batch.** Appended as
+`| `8c49c4d3` | C13 | REVIEW | 2026-09-01 |` and numbered **from the table**: **37 rows before it,
+so it is row 38**, the **twenty-third** self-recorded row and the **twenty-second** to carry a
+paragraph. `4e1c8a92`'s paragraph states it counted 36 and made itself 37; that reconciles exactly
+and was checked rather than assumed. **Ordinals 11, 12 and 18 are still asserted by no paragraph**
+and are not this session's to close. **Tenth consecutive session to carry the total by hand**;
+`5c4f8e11`'s owed mechanism is still owed and a review session could not have written it — a review
+session **fixes nothing**.
+
+**Verdict: FAIL. Tag `c13-pass` NOT cut.** `REVIEW_13_2.md`, `mutants/c13_mutants_2.md`, and five
+artefacts under `independent/`.
+
+---
+
+### THE ONE SENTENCE THAT MATTERS MOST, AND IT IS NOT THE VERDICT
+
+**Both of REVIEW 1's BLOCKERs are closed, and closed properly.** B-1's guard was *anti-correlated*
+with the property it was named for — it died when dead code was deleted and lived when the
+requirement was destroyed. It is now bound by `ast` to the function
+`PrivilegedLLMReplayer.query` actually reaches, and **all seven of this session's B-1 mutants land
+the right way round**. B-2's refusal was unbound; it is now bound three ways and dies three ways,
+and the killing test **calls the renderer**. `CONTEXT.md` v1.9 audits clean to the byte. Table 4's
+figures were re-derived from the paper by this session's own reader and **every one matches**.
+
+**The FAIL is for two things nobody had looked at.**
+
+---
+
+### THE SEAL, MOVED RATHER THAN PRETENDED — `OF-80`'s FIRST OUTING
+
+`OF-80` is RULED and this is the first review to run under it. **Phase 1 was blind to the FIX, not
+to the FINDINGS.** `docs/reviews/independent/c13_review2_criteria.md` — acceptance criteria, exact
+probes and **expected results** for B-1, B-2 and every `OF-` item — was **committed at `e2f8aab`
+before a single fix artefact was opened**. That commit is the seal.
+
+**ALL EIGHT PRE-COMMITTED POLARITIES HELD:**
+
+| pre-committed | expected | measured |
+|---|---|---|
+| M15 delete the three dead helpers | **SURVIVE** | ✅ SURVIVED |
+| M16-abs-posix / M16-abs-win / M16-resolve | **KILLED** | ✅ all KILLED |
+| D1 / D2 / D3, each refusal deleted alone | **RED alone** | ✅ 6 / 6 / 6 failed |
+| C-ctl, the control | **MUST RENDER** | ✅ renders |
+
+⚠️ **NOT OPENED BEFORE THE SEAL**, declared so it is checkable: the seven fix commits (no `git
+show`, no `git diff`, no `git log -p`), `docs/sessions/c13-fix-1.txt`, the camel_comparator package,
+the C13 test file. ⚠️ **ONE PARTIAL LEAK, DECLARED IN THE SEAL ITSELF:** a `grep -n "OF-7[1-9]"` to
+locate rows returned the **first line of eleven disposition bullets**, so eleven headline verdicts
+were seen; no body text was read, and every criterion is written as *what must be true*, never as
+*what was done*. ⚠️ `CONTEXT.md` at v1.9 **was** read — the FILE, never the DIFF — because the read
+order mandates §4 and §8.5 and the blindness list does not name it.
+
+---
+
+### WHAT WAS MEASURED
+
+**B-1, in a fresh OS temp clone with `whetstone_gate.__file__` printed and the mutation COMMITTED
+inside it** (REVIEW 1 records that editing without committing produced three false SURVIVORS,
+because the harness reads `git cat-file blob`). Each mutant run **twice** — pin as-is, and repinned
+so vendor-integrity collateral is separated from the property. Baseline: **87 passed, 0 failed**.
+
+```
+                  pin as-is             repinned      PROPERTY tests that died
+M15               5 failed, 82 passed   1 failed      NONE            <-- SURVIVES, correctly
+M16-abs-posix     6 failed, 81 passed   2 failed      1
+M16-abs-win       6 failed, 81 passed   2 failed      1
+M16-resolve      10 failed, 77 passed   6 failed      2
+M16-dunder-file  10 failed, 77 passed   6 failed      2   (REVIEW 1's own M16 form)
+M17              10 failed, 77 passed   6 failed      2
+M17-glob          7 failed, 80 passed   3 failed      2
+```
+
+**The two-rule `is_relative` check, probed at the function rather than inferred from a kill:**
+`/var/logs` → PurePosix True / PureWindows **False**; `C:/logs` → PurePosix **False** / PureWindows
+True; `logs` → both False. **The code evaluates both and each absolute flavour is caught by exactly
+one rule.** ⚠️ But only one half is pinned by a test — see `OF-96`.
+
+**The corrected failure mode, verified independently and mechanically:** `replay_task` spans
+**129-238**; its only `Try` is **185-198** catching `SecurityPolicyDeniedError`; **line 148 is not
+inside it**. `PrivilegedLLMReplayer.query` spans **287-315** with **zero** `Try` blocks. AgentDojo's
+`run_task_with_pipeline` catches **only** `AbortAgentError`. → **unhandled `FileNotFoundError`. It
+crashes loudly.** RUN-1 can act on that sentence.
+
+**B-2:** D1 / D2 / D3 → **6 / 6 / 6 failed**; all three → **18**. ⚠️ **AND THE CONTROL HOLDS:**
+unmutated, `render_branch_b` returns **17,103 chars / 199 lines**, **29 figures** guarded, **zero**
+failing provenance. *A gate that refuses everything is not a gate.*
+
+**`CONTEXT.md` v1.9:** every byte scanned — **CR 0, TAB 0, 0x08 0, no other control byte** at v1.8,
+v1.9 and HEAD. **LF delta 2,361 − 2,339 = 22 = numstat's 29 − 7.** Exact. **P1 (282 B) and P3
+(283 B) byte-identical.** **37 headings before, 37 after, sequence identical** — no section moved.
+All 8 §8.5 anchors resolve; P1/P2/P3 parse. **Clean.**
+
+**Table 4, re-derived from this session's own fetch** — `https://arxiv.org/html/2503.18813v2`,
+HTTP 200, **2026-09-01T17:41:00Z**, **2,554,718 bytes**, SHA-256
+`b5cd7970e905f1504439c3eddb3855ab18d951d10bf806ec2f5f3baa02ca8a51`; appendices resolved from the
+`<h2 class="ltx_title_appendix">` of each table's enclosing section, never from anybody's say-so:
+
+| base model | `CaMeL (no policies)` | `CaMeL` |
+|---|---|---|
+| Claude 4 Sonnet / Claude 4 Sonnet* | 0 / 0 | 0 / 0 |
+| **Gemini 2.5 Flash** | **0** | **0** |
+| **Gemini 2.5 Pro** | **0** | **0** |
+| o3 High | **1** | **0** |
+| **o4 Mini High** | **1** | ⚠️ **1** |
+
+✅ **Both Gemini models record 0 for `CaMeL (no policies)`; `o4 Mini High` records 1 for `CaMeL`
+itself. v1.9 is right.** And *"exactly two of seven"* is **derived** by `p2_holds_for`, not asserted.
+
+**The ceiling, per table.** `949` appears in **exactly two captions** (four raw substring hits —
+LaTeXML emits Figure 11's math three times; both numbers are stated rather than the convenient one).
+**Figure 9's caption** carries Table 4's ceiling and its own text says *"The full results are
+presented in Table 4 and Table 3"*; **Figure 11's** carries Table 7's, its sub-captions naming
+Table 5 and Table 7. **Asserted per table, not once: swapping the attribution in EITHER direction is
+KILLED** (N3, N4).
+
+---
+
+### THE TWO BLOCKERS
+
+**B-3 — `config/lanes.yaml:202` `branch_a_condition` still encodes the un-narrowed Branch-B
+trigger.** `Q-064` names it under its own ⚠️ heading as *"THE HALF THAT IS EASY TO MISS"*. Commit
+`3c5ef93` — subject *"Q-064: the four surviving pre-v1.8 citation sites"* — changes the comment and
+`branch_b_action` only; `branch_a_condition` is **not in the diff**, and the FIX's FINAL OUTPUT names
+it once, as a **parse** check. **Nothing anywhere declares it un-narrowed**; `OF-62` reads
+PART-CLOSED *"four of five sites"*, which counts only citation sites. `config/` is a pre-registration
+artefact and after `prereg-v1` hard rule 4 makes it **outrank `CONTEXT.md`**. Legal to fix today,
+illegal after C14. Raised as **`Q-079`**.
+
+**B-4 — `Q-057`'s fact 4 still cites `:321`, and three records say it was corrected.** REVIEW 1's
+remedy named **five** sites; **four landed** — in `src/`, `:321` now survives only as
+explicitly-labelled history. The fifth did not: `QUESTIONS.md:4716` still reads
+*"`replay_privileged_llm.py:321` reads…"*, with no correction note. **No fix commit deletes a line
+from `Q-057`** (`f17709c` is +214/−0). Yet **INC-39's `Action` field**, **`docs/sessions/c13-fix-1.txt:91`**
+and REVIEW 1's remedy list all state it was corrected there. ⚠️ Hard rule 13 exists to make
+`INCIDENTS.md` trustworthy; **this is a third failure mode the format does not catch — a real
+incident whose `Action` claims more than was done.**
+
+---
+
+### FOUR CORRECTIONS TO THIS SESSION'S OWN WORKING, INCLUDING ONE TO ITS OWN BREAKAGE
+
+1. ⚠️ **THIS REVIEW'S OWN PHASE-1 SEAL TURNED `make test` RED.** `e2f8aab` was committed **before**
+   the token row was appended, so `check-roles` E1 reported
+   `FORGED/UNISSUED: {'8c49c4d3': ['e2f8aab']}` and two repo invariants failed. **`OF-89`'s class,
+   landing on a reviewer for the second consecutive review.** Declared, not quietly repaired. The
+   honest ordering is *register the row, then commit the seal*; this session did it the other way.
+2. ⚠️ **An early framing of the two-rule `is_relative` result was too strong and is corrected in the
+   review.** *"Both halves are load-bearing"* is true **of the function** and false **end-to-end**:
+   running `N11` + `M16-abs-win` together, the property test still dies — on
+   `claim.root_literal == "logs"`, not on `is_relative`. The finding is that the Windows half is
+   **untested**, not that M16 escapes.
+3. **The prompt names `docs/reviews/REVIEW_C13_1.md`; the file on disk is `REVIEW_13_1.md`**
+   (`OF-79`'s naming divergence, still open and still deliberate). This review is `REVIEW_13_2.md`,
+   per its own fence and the `docs/reviews/README.md` pattern.
+4. **`949` is not "exactly twice" as bytes.** It is twice as **captions** and **four times** as raw
+   substrings, because LaTeXML emits Figure 11's math three times. The prompt's phrasing is right on
+   the reading that matters and the byte count is recorded anyway.
+
+---
+
+### CONCURRENCY, AND THE SUITE COUNTS SEPARATED RATHER THAN BLAMED
+
+⚠️ **`make test` at HEAD is RED — 7 failed, 699 passed, 1 skipped, 2 deselected — and NONE of it is
+C13's.** Two failures are **this session's own** unregistered token (above, now fixed). The rest are
+the **concurrent C6 FIX 2 session (`4e1c8a92`)**'s uncommitted in-flight edits to
+`src/whetstone_gate/attacker/context.py`, `…/estimate.py`, `tests/test_c6_attacker.py` and
+`tests/test_c6_fix_probes.py` — exactly the paths this session's prompt assigns to it. **The count
+moved between two runs minutes apart** because that session is editing the tree while it is
+measured; both figures are stated. **The C13 file alone, in this review's isolated clone: 87 passed,
+0 failed** — the number every mutation judgement is taken against.
+
+**Standing properties, all measured here:** `make selftest` **1 failed / 1 passed / 707 deselected**,
+red on `camel_comparator.branch` and **for that reason** (the loader *refusing* a sentinel, not
+defaulting); both vendored trees at their pins, **empty status**, **0-byte** diffs; `tests/goldens/`
+clean; **0 `evals/` paths** across all seven fix commits; **0 usage ledgers** — C13 spent no tokens,
+and **this review made zero provider calls**. ⚠️ **Whether the model id is still served was NOT
+checked** — Branch A's condition and RUN-1's alone.
+
+**`Q-073`'s stop was RIGHT** — the fence, `Q-058`'s spent exception clause and `OF-77`'s own
+*"for C19, not for the C13 FIX"* all verified independently, and `Q-073` writes out the replacement
+line it declined to land, which is not what work-avoidance looks like. **`Q-074`'s fifth site** is
+confirmed present, confirmed the **only live-text site of 66 repo-wide hits**, and confirmed
+**printed in full by `make selftest`** — and it is **the repository's, not C13's**. ⚠️ **`Q-064`'s
+actual remedy, a repo-wide superseded-string tripwire, still does not exist** (`OF-99`).
+
+**New findings:** `OF-96`…`OF-103`. **Mutants: 25 run — 18 killed, 6 survived, 1 equivalent**, with
+every survivor characterised **by exhibit** rather than by argument.
+
+---
+
 ## C6 — THE ATTACKER LOOP — **REVIEW** attempt 2 — 2026-09-01 — ❌ **FAIL: THREE BLOCKERS AND FOUR NON-EQUIVALENT MUTANT SURVIVORS — AND FIX 1's TWO BLOCKERS ARE PROPERLY CLOSED**
 
 **SESSION-TOKEN:** `ec8e57ad` — **NOT in the batch.** Appended as

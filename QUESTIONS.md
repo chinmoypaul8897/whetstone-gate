@@ -84,6 +84,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `ec8e57ad` | C6 | REVIEW | 2026-09-01 |
 | `fd8a67e9` | C13 | FIX | 2026-09-01 |
 | `4e1c8a92` | C6 | FIX | 2026-09-01 |
+| `8c49c4d3` | C13 | REVIEW | 2026-09-01 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -468,6 +469,37 @@ was run and READ immediately before every commit this session made (`Q-063` clau
 and each result — including every `Swept:` line, or the absence of one and why — is recorded in
 `docs/sessions/c6-fix-2.txt`; and the file's bytes were re-verified after the append and carry
 **0 CR bytes**.
+
+⚠️ **AND `8c49c4d3` IS THE TWENTY-THIRD SELF-RECORDED ROW AND THE TWENTY-SECOND TO CARRY A
+PARAGRAPH. RE-DERIVED FROM THE TABLE, AND THE THREE HOLES ARE STILL THERE.** This session's
+prompt — **C13 REVIEW, attempt 2**, 2026-09-01 — opened with `8c49c4d3` and said, in its own words:
+*"Token row NUMBERED FROM THE TABLE — the ordinal chain has three holes (11, 12, 18), so re-derive
+yours and state the table's row count."*
+**Counted from the file, immediately before appending:**
+
+* **The table held 37 data rows** (lines 50–86), `4e1c8a92` being the last. **37 before this one, so
+  this is row 38.** ⚠️ `4e1c8a92`'s paragraph states it counted **36** and made itself row **37**;
+  that reconciles exactly, and it is checked rather than assumed.
+* **This session is therefore the twenty-third self-recorded row and the twenty-second to carry a
+  paragraph**, the gap of exactly one still being `9c0c6734`'s uncounted row, named by `b450df0a`
+  and unchanged since.
+* ⚠️ **The three holes are UNCHANGED AND ARE NOT THIS SESSION'S TO CLOSE.** The ordinals asserted by
+  paragraphs in this section are now **5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 19, 20, 21, 22** and
+  this one at **23**; **11, 12 and 18 are still asserted by no paragraph**, and the three rows
+  carrying none of their own are still `df238be6`, `0852ea56` and `9c0c6734`.
+* ⚠️ **THIS IS THE TENTH CONSECUTIVE SESSION TO CARRY THE TOTAL BY HAND.** `5c4f8e11`'s owed
+  mechanism is still owed, and this session could not have written it either: a **review session
+  fixes nothing**, and its fence names `src/` under **NOT** in terms. `OF-70` and `OF-78` both still
+  stand for the mechanism.
+
+⚠️ **AND THIS SESSION LEARNED WHY THE ROW MATTERS BY BREAKING IT.** Its Phase-1 seal commit
+`e2f8aab` was made **before** this row existed, so `make check-roles` E1 reported
+`FORGED/UNISSUED: {'8c49c4d3': ['e2f8aab']}` and **`make test` went red on two invariants**
+(`test_check_roles_exits_zero`, `test_no_commit_carries_a_forged_or_reused_session_token`) until
+this append. **That is `OF-89`'s class landing on a reviewer for the second consecutive review** —
+a Phase-1 seal turning the suite red — and it is recorded here rather than quietly repaired, because
+`OF-89` predicted exactly this and nothing has changed to stop it. The honest ordering is
+**register the row, then commit the seal**; this session did it the other way and says so.
 
 ## ⚠️ THE TOKEN BATCH, 2026-08-31 — and this is what ends the collision class
 
@@ -6547,5 +6579,86 @@ process fact the architect decides, not a fix session.
 
 **Default taken:** ⚠️ **NONE. NOT EDITED, AND REPORTED AS UNDONE IN THIS SESSION'S FINAL OUTPUT**
 rather than worked around or quietly dropped.
+
+**RULING (architect, \<date>):** *\<pending>*
+
+---
+
+## ⚠️ RAISED BY C13 REVIEW 2 (`8c49c4d3`), 2026-09-01
+
+### Q-079 — ⚠️ CLASS A, DUE BEFORE `prereg-v1`: `Q-064` NAMED TWO DEFECTS IN THE SAME `config/` BLOCK AND ONLY ONE WAS CLOSED — `branch_a_condition` STILL ENCODES THE UN-NARROWED BRANCH-B TRIGGER
+**Raised by:** C13 REVIEW 2 (`8c49c4d3`) · **Date:** 2026-09-01 · **Status:** ⚠️ **OPEN —
+BLOCKING `prereg-v1`, which is C14** · **Class:** **A** — after the freeze a `config/` value
+**outranks `CONTEXT.md`** (hard rule 4), so this decides which Branch-B trigger the project is
+bound to.
+**`INCIDENTS.md`:** **OWED** — a review session's fence names `INCIDENTS.md` under **NOT**, and the
+concurrent C6 FIX 2 session (`4e1c8a92`) holds the file. Declared in this session's FINAL OUTPUT.
+
+**Context.** `Q-064` is titled *"`Q-058` is corrected in `CONTEXT.md` and FOUR other artefacts still
+carry the old citation"*, and its table lists four **citation** sites. But it carries a second,
+separately-headed defect in the same `config/` block:
+
+> ⚠️ **AND THE SAME KEY IS BEHIND `Q-057` TOO, WHICH IS THE HALF THAT IS EASY TO MISS.**
+> `camel_comparator.branch_a_condition` reads *"the model id is still served AND the run completes
+> inside the 90-minute box"*. v1.8 **narrowed Branch B's trigger** to *"a cause that has been
+> DIAGNOSED"*, with *"it errored is not a cause, and a harness defect is never Branch B."* The
+> `config/` pair still encodes the **un-narrowed** trigger — the one `Q-057` records as reachable by
+> our own bug. **So a freeze taken now would lock in BOTH corrected facts in their uncorrected form,
+> not one.**
+
+**MEASURED AT HEAD BY THIS SESSION.** `config/lanes.yaml`:
+
+```
+:202  branch_a_condition: "the model id is still served AND the run completes inside the 90-minute box"
+:203  branch_b_action:    "ship as a citation of Table 2, Appendix B ('Full results tables'), the o3
+                           High block, banking column ... out of 949 attacks in total"   <-- CORRECTED
+```
+
+`git show 3c5ef93 -- config/lanes.yaml` — the commit whose subject is *"Q-064 — the four surviving
+pre-v1.8 citation sites"* — changes **the comment and `branch_b_action` only**. `branch_a_condition`
+is **not in the diff**. The FIX's FINAL OUTPUT names it once, at line 315, and only as a **parse**
+check: *"config/lanes.yaml still parses; branch_a_condition and branch_b_action still read through
+the loader."*
+
+⚠️ **AND IT IS UNDECLARED.** `docs/reviews/OPEN_FINDINGS.md` records `OF-62` as **PART-CLOSED —
+"four of five sites; the fifth is `Q-074`"**, which counts only citation sites. A reader of that
+line believes one docstring remains outstanding. **Nothing anywhere states that
+`branch_a_condition` was left un-narrowed.**
+
+**Why it is Class A and not tidying.** Branch B is the **negation** of `branch_a_condition`. As
+written, `config/` binds the project to taking Branch B whenever *"the run does not complete"*, with
+**no diagnosis requirement** — which is precisely what `Q-057`'s ruling forbade, in its own words:
+*"CONSEQUENTLY BRANCH B'S TRIGGER IS NARROWED: Branch B is taken only on a cause that has been
+DIAGNOSED and recorded, and 'it errored' is not a cause. A pre-registration whose negative branch can
+be reached by our own bug measures nothing."* And *"the model id is still served"* is the exact
+phrasing that ruling identifies as **indistinguishable from a harness defect**, because
+`"google" in model` is substring containment and dispatch **succeeds** on the suffixed string.
+
+**Checked, not assumed:** `git tag -l` returns `c0-pass`…`c4-pass`; **`prereg-v1` does not exist**,
+so amending `config/` is legal **today** and illegal the moment C14 cuts the tag.
+
+**Options seen:**
+  1. **Narrow `branch_a_condition` to v1.9's language before `prereg-v1`** — or add a
+     `branch_b_condition` carrying the diagnosed-cause requirement explicitly, since the defect is
+     that Branch B's trigger exists in `config/` only as a negation. It is a `config/` edit, so it
+     is the architect's under hard rule 2.
+  2. **Freeze as-is and publish the contradiction as a limitation.** ⚠️ Rejected on the merits for
+     the same reason `Q-064` rejected it: the fact is not unverified, it is **known false and ruled
+     false**, and freezing it deliberately is worse than having missed it.
+  3. **Rule that `branch_a_condition` is adequate** because Branch A's condition really is *"it
+     runs"*, and that the diagnosis requirement lives in `CONTEXT.md` §8.5.1 alone. ⚠️ This is the
+     option that needs stating rather than assuming, because after `prereg-v1` hard rule 4 makes
+     `config/` the winner of exactly that tie.
+
+**Default taken:** ⚠️ **NONE — A REVIEW SESSION FIXES NOTHING.** `config/` is named under **NOT** in
+this session's fence in terms. Nothing was edited and no workaround was built (hard rule 1).
+
+⚠️ **AND THE GENERALISABLE HALF.** `Q-064`'s own closing sentence is *"no mechanism knows that a
+citation has copies."* This entry is the next size up: **no mechanism knows that a QUESTION has more
+than one defect in it.** `Q-064` carried two, its title named one, the prompt that acted on it
+enumerated four sites of that one, and the half with its own ⚠️ heading — *"the half that is easy to
+miss"* — was missed. **A question's title is not its scope**, and the remedy is the same shape as
+everywhere else here: enumerate the defects a question raises as a list the fix session ticks off,
+rather than as prose a reader has to hold.
 
 **RULING (architect, \<date>):** *\<pending>*
