@@ -884,7 +884,18 @@ def ascii_safe(s: str) -> str:
 
 def say(*parts: Any, **kw: Any) -> None:
     """The ONLY printing route in this file.  Every argument is forced to ASCII first."""
-    sys.stdout.write(" ".join(ascii_safe(str(p)) for p in parts) + kw.get("end", chr(10)))
+    # BINARY WRITE WITH AN EXPLICIT LF. print() on Windows translates the
+    # newline to a carriage-return pair, and this file's own captured output is a
+    # TRACKED artefact -- INCIDENTS.md INC-16 is that exact API rewriting every
+    # line ending in a tracked file on this machine. This session committed two
+    # CRLF files before noticing, which is recorded in the review rather than
+    # quietly repaired.
+    # and this file's own captured output is a TRACKED artefact -- INCIDENTS.md INC-16
+    # is that exact API rewriting every line ending in a tracked file on this machine.
+    # This session committed two CRLF files before noticing; see the review.
+    sys.stdout.buffer.write(
+        (" ".join(ascii_safe(str(p)) for p in parts) + kw.get("end", chr(10))).encode("ascii")
+    )
 
 
 def _cp1252_ok(s: str) -> bool:
