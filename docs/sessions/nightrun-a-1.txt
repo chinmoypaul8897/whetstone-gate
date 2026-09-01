@@ -1,0 +1,497 @@
+NIGHT RUN - SESSION A.  TWO TASKS, TWO CHUNKS, TWO TOKENS.
+  TASK 1  SESSION-TOKEN: 9c7c5973   CHUNK C0   ROLE: FIX   ATTEMPT 2
+  TASK 2  SESSION-TOKEN: 363a2e9f   CHUNK C6   ROLE: FIX   ATTEMPT 3
+
+PUSHED SHA: ee01e0c8a25dc1e5ebfcd8bd3edcefa07d2b9d3a
+            - the last of this session's content commits (INC-53/54 Fix SHAs).
+            !! THIS BLOCK IS ITSELF INSIDE A LATER COMMIT, so the pushed head is one
+               further than the SHA above: a commit cannot contain its own hash.
+
+TOKEN SPEND: ZERO. NO PROVIDER MODEL CALL WAS MADE BY EITHER TASK. Every model in
+every run here is a mock; evals/ does not exist in this repository.
+
+=====================================================================
+THE GATE HELD. BOTH TASKS RAN. NOTHING WAS LEFT RED.
+=====================================================================
+  After TASK 1:  make test        = 738 passed, 1 skipped, 2 deselected  GREEN
+                 make check-roles = 17 passed, 0 failed, 5 n/a, exit 0
+                 vendored pins    = MATCH / 0 / 0 on all three checkouts
+                 tests/goldens/   = clean
+  So TASK 2 started.
+
+  ONE TRANSIENT RED IS REPORTED RATHER THAN RE-RUN AWAY. The first post-commit
+  make test failed test_the_object_store_and_the_working_tree_agree with a
+  CalledProcessError from `git show HEAD:<path>`: the concurrent C13 REVIEW 3
+  session (c09c385b) had a path in the index that was not yet in HEAD. A
+  shared-working-tree race, INC-30's family, not a defect; the immediate re-run
+  with that session's work committed was green. A session that re-runs until
+  green and reports only the green run is doing the thing this project exists to
+  criticise, so the failing run is stated.
+
+=====================================================================
+=============  TASK 1  -  C0 FIX  (9c7c5973)  =======================
+=====================================================================
+
+--- 1a. Q-080 RULED REMEDY 3. THE RED AT HEAD IS CLEARED. -------------
+Recorded VERBATIM in QUESTIONS.md at 061dcd9 before a line of code was touched.
+E1, E4 and E5 now read _trailer_block(body) instead of the whole message.
+_TOKEN_TRAILER is BYTE-IDENTICAL and Q-014 (i) is NOT reopened; only WHERE the
+patterns are applied narrows. E5_EXCEPTIONS untouched, still pinned at four.
+
+  ALL FOUR PROOFS, RUN:
+
+  (i)   make check-roles exits 0. E5 = PASS and no longer names c4d4460.
+
+  (ii)  E5 STILL FAILS on a genuinely malformed trailer, in a throwaway repo:
+          malformed in the LAST PARAGRAPH               -> RED   (as required)
+          malformed ALONE IN ITS OWN PARAGRAPH inside
+            the trailing trailer run, above a real one  -> RED
+        The second is the residual Q-081 names, asserted CAUGHT rather than
+        hoped away. A checker that stopped checking is not a fix.
+
+  (iii) THE FOUR E5_EXCEPTIONS BEHAVE EXACTLY AS BEFORE. Verdicts, before and
+        after, identical:
+          966324740c4d9de40e407a356bcf24d3d76af65d  excepted malformed  (9663247)
+          6d08cf3ff75189db5e9f49fdc6f59a20466b26d4  excepted malformed  (6d08cf3)
+          d67550e46282af4f513810c1cc812ed91dfeac90  excepted malformed  (d67550e)
+          ec3064dc74c999dec0bc5277e1ca96705b907547  excepted malformed  (ec3064d)
+        E5's line reads, unchanged: "no NEW malformed trailer. 4 commit(s) carry
+        the ONE-OFF exception recorded in Q-014 (iv)".
+
+  (iv)  A commit QUOTING Session-Token: at column 0 in an EARLIER PROSE
+        PARAGRAPH now PASSES. Asserted twice - with and without the harness's
+        Co-Authored-By paragraph beneath it. That is the class, not the instance.
+
+  ***  Q-081 - A DECLARED CLASS A DEVIATION FROM THE RULING'S OWN WORDING,  ***
+  ***  AND IT IS THE LOUDEST THING IN THIS REPORT.                          ***
+
+  The ruling glosses remedy 3 as "the message's LAST PARAGRAPH (git
+  interpret-trailers)". THAT WAS IMPLEMENTED LITERALLY FIRST AND MEASURED OVER
+  THE WHOLE LOG BEFORE ANYTHING SHIPPED:
+
+      (a) the literal gloss - last paragraph only  -> 74 of 277 commits change
+      (b) what shipped - the trailing RUN of
+          paragraphs whose EVERY line is
+          trailer-shaped                           ->  1 of 277 commits changes
+
+  git interpret-trailers STOPS AT THE FIRST BLANK LINE. Verified against git
+  itself, not inferred: on 1f82c48 it returns Co-Authored-By AND NOTHING ELSE;
+  synthetically, "A-Key: 1" + blank + "B-Key: 2" returns B-Key ONLY, while the
+  same two lines with no blank between them return BOTH.
+
+  This project's own convention puts a blank line between Session-Token: and the
+  harness's Co-Authored-By:. So under (a):
+      E1 - the check that catches a token that was never issued - falls from
+      261 of 277 commits to 187, and E4 prints a FALSE STATEMENT about 74
+      commits that DO carry a trailer.
+  That is Q-014 (ii)'s recorded defect at EIGHTEEN TIMES the scale, which is
+  hard rule 6: no loosening an assertion to get green. (a) would have made
+  check-roles green by making E1 stop looking at 27% of the log - including
+  every commit this session itself makes.
+
+  So (b) shipped, and the deviation is DECLARED, in full, with both numbers, in
+  QUESTIONS.md Q-081 and INCIDENTS.md INC-52. THE ARCHITECT IS ASKED TO RULE:
+  does (b) stand, or is (a) to ship with its blind spot published as a
+  limitation? IF (a), Q-014 (ii) SHOULD BE REOPENED IN THE SAME RULING, because
+  E4 will again say something false about commits that do carry a trailer, and
+  this time the number is 74.
+
+  THE ONE COMMIT (b) STILL LOSES IS NAMED, NOT ROUNDED AWAY: 97a5981. Its
+  message begins and ends with a bare "@" - a leaked PowerShell here-string
+  delimiter, INC-06's class - so its last paragraph is "Session-Token: 8e0f4a13"
+  followed by "@", and git interpret-trailers --parse RETURNS NOTHING FOR IT
+  EITHER. git has never been able to read that commit's trailer. E4 now
+  separates "carries no Session-Token: line at all" (16) from "carries one
+  OUTSIDE the trailer block" (1, NAMED), because folding them together is
+  Q-014 (ii)'s false statement again. OF-121.
+
+--- 1b. THE MOAT MEASUREMENT ------------------------------------------
+
+  ***********************************************************************
+  ***  DOES D3 PASS OVER A DYNAMIC IMPORT?   ANSWER: YES.              ***
+  ***  THE MOAT ASSERTION WAS EVADABLE. MEASURED, NOT ARGUED.          ***
+  ***********************************************************************
+
+  In a FRESH OS TEMP CLONE, whetstone_gate.__file__ printed:
+    ...\scratchpad\moat\src\whetstone_gate\__init__.py
+
+  A minimal src/whetstone_gate/scorer/ holding one predicate, and a minimal
+  src/whetstone_gate/gates/ reaching it three ways, one module each:
+
+    planted in gates/                                        D1     D2     D3
+    -----------------------------------------------------  -----  -----  -----
+    importlib.import_module("whetstone_gate.scorer.pred")   PASS   PASS   PASS
+    __import__("whetstone_gate.scorer.pred", fromlist=..)   PASS   PASS   PASS
+    getattr(whetstone_gate, "scorer") + sys.modules[...]    PASS   PASS   PASS
+
+  D3's own printed detail: "src/whetstone_gate/gates and src/whetstone_gate/
+  scorer share no first-party module on any path. The allow-list holds 0
+  entr(y/ies)."
+
+  AND THE REACH WAS LIVE, NOT DEAD CODE:
+    gates.arm2.decide(6_000_000, 5_000_000) -> "DENY", computed by
+    scorer/predicate.py, whose __file__ was printed from the same process.
+
+  That is the line CLAUDE.md hard rule 8 calls "the whole moat" and CONTEXT.md
+  S7 makes the submission's central argument. In the spike, gate.js and
+  invariants.js both called world.js:intentKey, so the invariant could not have
+  fired unless the gate had a bug - "that is not a result; it is a definition."
+  This is that, in Python, with the guard printing "clean". INCIDENTS.md INC-51.
+
+  WHAT WAS DONE ABOUT IT: D4, a SOURCE-TEXT refusal scan over both packages,
+  alongside the AST walk, refusing 14 names outright - importlib, __import__,
+  sys.modules, getattr, setattr, exec, eval, compile, runpy, pkgutil, imp,
+  globals, locals, vars. A dynamic import in gates/ or scorer/ is a REFUSAL, not
+  a puzzle to resolve: both are pure predicate packages under hard rule 8,
+  neither has any legitimate need for one, and BOTH ARE STILL UNWRITTEN (C8,
+  C9), so the constraint lands BEFORE their builders rather than as a retrofit.
+  Removing a name is a Class A deviation, pinned by a test the same way
+  MOAT_ALLOW_LIST is.
+
+  FIRED, BOTH WAYS:
+    shape planted in gates/         D1     D2     D3     D4     verdict
+    -----------------------------  -----  -----  -----  -----  -----------
+    importlib.import_module         PASS   PASS   PASS   FAIL   CAUGHT
+    __import__                      PASS   PASS   PASS   FAIL   CAUGHT
+    getattr + sys.modules           PASS   PASS   PASS   FAIL   CAUGHT
+    exec of a source string         PASS   PASS   PASS   FAIL   CAUGHT   <- MY OWN
+                                                                            SHAPE,
+                                                                            not in
+                                                                            OF-110
+    STATIC import (the control)     FAIL   PASS   FAIL   PASS   CAUGHT by AST
+    CLEAN - written twice on purpose PASS  PASS   PASS   PASS   correctly silent
+    EMPTY packages                  PASS   PASS   PASS   PASS   PASS, not silence
+
+  Recorded in check_roles.py's D docstring that the guard is now AST *plus*
+  source text, naming OF-110 and C6 REVIEW 3, and stating what each half cannot
+  see: the AST walk sees every static import exactly and cannot see a call; the
+  text scan sees the vocabulary and cannot see semantics. NEITHER IS THE MOAT
+  ALONE, and the docstring says so.
+
+  OWED, AND NOT EXTENDED - exactly as TASK 1b instructed: tests/test_c2_world.py,
+  tests/test_c3_tau2_enumeration.py and tests/test_c13_camel_comparator.py carry
+  the identical AST-only limit and are OWED TO C2, C3 AND C13. (C6's own is
+  CLOSED - see TASK 2.)
+
+--- 1c. THE SUPERSEDED-STRING TRIPWIRE, FIRED BOTH WAYS ---------------
+  Q-064's named remedy has never existed and let the same defect through twice.
+  It now exists in tests/test_repo_invariants.py, driven by an explicit
+  SUPERSEDED_STRINGS list carrying, per entry: the superseded claim, its
+  replacement, the ruling that superseded it, and the paths where it may
+  legitimately still appear.
+
+  THE HARD PART IS NOT THE GREP. A repo-wide count found 147 occurrences of the
+  string across 28 files; OF-99 measured 66, of which one was live. A tripwire
+  that cannot tell a LIVE CLAIM from a RECORDED ONE fires 146 times on its first
+  run and is switched off on its second. TWO EXPLICIT DISCRIMINATORS:
+    1. PATH - docs/sessions/, docs/reviews/ and the four journals are
+       append-only history; a superseded citation there is the record working.
+    2. QUOTATION - a line that quotes the claim in order to say it is wrong is
+       not making it. THAT IS Q-080's OWN LOGIC ARRIVING IN A SECOND FILE THREE
+       DAYS LATER. camel_comparator/branch_b.py:39 is the case that forced it.
+  And the pattern matches the CLAIM, not the string - a citing verb immediately
+  in front - so live text stays free to name Tables 5-7, which CONTEXT.md
+  S8.5.1's own "NOT Tables 5-7" clause depends on.
+
+  FIRED AT THE REAL REPOSITORY AS IT STOOD ONE COMMIT EARLIER (28b6eec):
+      LIVE hits: 1  ->  tests/test_lanes_operator_placeholders.py:141
+                        "ships as a citation of Tables 5-7 of arXiv 2503.18813v2
+                         with the `CONTEXT.md` S8.5.1"
+      That is exactly Q-074's site. 1 of 147.
+  FIRED AT APPEND-ONLY HISTORY (six paths) AND AT A QUOTATION: SILENT ON BOTH.
+  AFTER 1d: 0 live hits.
+
+--- 1d. Q-074's FIFTH SITE, CORRECTED ---------------------------------
+  tests/test_lanes_operator_placeholders.py's docstring now carries CONTEXT.md
+  v1.9's citation with all four fields Q-058's ruling requires - Table 2,
+  Appendix B ("Full results tables"), the `o3 High` block, `banking` column -
+  identifies Tables 5-7 as Appendix C / Claude 3.5 Sonnet where CaMeL is BEHIND
+  on banking, and RETAINS Table 7 as S8.5.2's P2 citation, which the ruling
+  requires and an over-correction would have lost.
+
+  ASCII-ONLY: the file's non-ASCII byte count is 18 BEFORE and 18 AFTER, so the
+  make selftest output that INC-08/INC-25/INC-45 killed three sessions on is
+  untouched. Verified by printing the docstring through cp1252 and by reading
+  the real make selftest failure output.
+
+  AND THE TRIPWIRE WOULD HAVE CAUGHT IT: a test fires it at the docstring's
+  PREVIOUS text and asserts it trips, then at the current text and asserts it
+  does not. The closure is checked against the mechanism, not asserted.
+
+--- 1e. RECORDED, NOT BUILT -------------------------------------------
+  OF-67 / OF-70 / OF-78 - the session-token ordinal mechanism. OWED FOR THE
+    ELEVENTH CONSECUTIVE SESSION. Three holes remain in the chain: ordinals
+    11, 12 and 18, rows df238be6, 0852ea56, 9c0c6734. OWED TO C11.
+    !! THIS IS THE FIRST SESSION WHOSE FENCE CONTAINED check_roles.py, AND ITS
+       PROMPT NAMED THE ITEM UNDER "RECORD, DO NOT BUILD". So the reason changed
+       from "unreachable" to "out of scope by instruction" - a better-attested
+       owing than the ten before it, not a weaker one.
+  E6, the Swept: detector (Q-063 (iii)) - NOT URGENT, AND SAID SO RATHER THAN
+    LEFT AMBIGUOUS. The inverted git rule closes the check-to-commit window
+    INC-48 fell through. The Swept: declaration REMAINS REQUIRED, because a
+    write landing BEFORE the add is still staged. Open, still C11's, no longer
+    pressing.
+
+--- TASK 1 COUNTS, ALL MEASURED BY THIS SESSION -----------------------
+  make test        1 failed, 721 passed, 1 skipped, 2 deselected
+                -> 738 passed, 1 skipped, 2 deselected            GREEN
+  make check-roles 16 passed, 1 failed, 4 n/a, exit 1
+                -> 17 passed, 0 failed, 5 n/a, exit 0
+  16 new probes. 10 of the 12 named ones FAIL against the pre-fix source
+  (clone at 28b6eec, whetstone_gate.__file__ printed). THE 2 THAT PASS ON BOTH
+  ARE DELIBERATE: "E5 still fires" and "the patterns were not widened" are
+  no-change probes, and a probe asserting a check still checks must pass before
+  and after.
+
+  INCIDENTS: INC-51 (the moat measured evadable) and INC-52 (the ruling's own
+  gloss would have blinded 74 of 277 commits), both written BEFORE a line of
+  code changed, both with non-empty Diagnosis and Missed, both Fix SHAs left as
+  an explicit PENDING placeholder and filled in afterwards - never invented.
+
+=====================================================================
+=============  TASK 2  -  C6 FIX 3  (363a2e9f)  =====================
+=====================================================================
+
+REVIEW 3 returned ZERO BLOCKERS. All three of REVIEW 2's are closed, proved by
+revert-goes-red; all four old survivors are dead; 31 of 33 sealed polarities
+held. THE BEHAVIOUR IS RIGHT AND NOTHING THAT WORKS WAS REWRITTEN.
+
+--- 2a. THE SIX SURVIVORS, ALL KILLED, EACH RE-RUN SHOWING KILLED -----
+
+  mutant  what was unpinned                     the fixture that pins it        re-run
+  ------  ------------------------------------  ------------------------------  ------------
+  N14     value != generic (Q-046's own         3 refusal values leaking        KILLED
+          assertion) is never the SOLE killer   NOTHING else                    4 failed
+  N12     LAYER 3, the residue catch-all        4 policy-word-free lines        KILLED
+                                                ADDED to the summary            4 failed
+  N15     LAYER 1's exemption BOUNDARY          3 cap formattings in            KILLED
+                                                STATE_LABEL + the other side    3 failed
+  N13     refusal_lines != 1, the "> 1" half    summaries with 2, 3, 5 lines    KILLED
+                                                                                3 failed
+  N4      crossing()'s ">" at exactly the       base DERIVED from config/ so    KILLED
+          target, which is S13.4's "<="         k=8 lands exactly; fired at     2 failed
+                                                target-1 / target / target+1
+  N9      the relative-import resolution        3 relative forms added to the   KILLED
+          INC-43 itself added                   positive control                2 failed
+
+  THE MECHANISM MATTERS MORE THAN THE SIX INSTANCES. EVERY FIXTURE IS BUILT SO
+  THE MUTATED ASSERTION IS THE **SOLE** KILLER, and a new helper - _sole_killer -
+  ASSERTS EXACTLY THAT. That is the whole defect these four are: every leak the
+  previous suite planted carried a cap value AND a clause AND an arm word, so
+  two or three layers fired on each and NO SINGLE LAYER WAS EVER THE THING THAT
+  FAILED - which is what left each individually deletable with the suite green.
+  "assert findings" is satisfied by any layer; it cannot pin a layer.
+
+--- 2b. THE FOUR INSIDE THE BLINDNESS GUARD ---------------------------
+  Each carries TWO FURTHER SHAPES OF THIS SESSION'S OWN, beyond the review's
+  exhibit, and all are caught:
+    N14  3 values total: the review's, plus "Contact your account manager." and
+         "The requested operation was not completed."
+    N12  4 lines total: the review's two, plus "OPERATOR NOTE: this episode is
+         being watched." and "Your third attempt went to a human."
+    N15  3 formattings: bare paise, Indian-grouped rupees, and the EPISODE cap
+         comma-grouped - so neither the number nor the rendering is what is
+         pinned. AND THE OTHER SIDE OF THE BOUNDARY: a cap legitimately inside
+         the state JSON must NOT fire, because deleting the exemption makes the
+         guard red on a CORRECT context, which is how a guard gets disabled.
+    N13  three counts: 2, 3 and 5 denial lines, each asserting the printed count.
+
+  AND ONE OF MY OWN PLANTED SHAPES WAS REJECTED BY MY OWN CHECK, WHICH IS THE
+  POINT: "STATE SO FAR [DENIED once]: " is caught TWICE - LAYER 2's vocabulary
+  sees "denied", the new surface scan sees "DENIED" - so it pins neither, and
+  _sole_killer refused it. That rejection is now an assertion
+  (test_the_sole_killer_helper_REJECTS_a_shape_that_two_layers_catch), not an
+  anecdote - which is also how self-mutant SM-2 got killed.
+
+  OF-104 / M-1 CLOSED - the finding that reaches the claim the submission rests
+  on. The guard's own opening sentence is "a denial leaks neither WHICH ARM IS
+  RUNNING nor which clause fired", and the regex encoding precisely that ran
+  over the refusal VALUE and nothing else. It now runs over the authored
+  SURFACE, IN BOTH COPIES, FIXED INDEPENDENTLY - copy 1 against a hand-built
+  context, copy 2 against run_episode's REAL output. Silent on the clean tree.
+
+--- 2c. THE RULING, APPLIED TO MYSELF - AND IT FOUND FIVE -------------
+
+  ***  THE FIRST SELF-MUTANT RUN WAS 9 KILLED / 5 SURVIVED, AND EVERY       ***
+  ***  SURVIVOR WAS ON CODE THIS SESSION HAD JUST WRITTEN.                  ***
+
+  id      what                                            first run   final
+  ------  ----------------------------------------------  ----------  --------------
+  N-M1a   OF-104's scan removed from COPY 1               KILLED      KILLED 5 failed
+  N-M1b   OF-104's scan removed from COPY 2               SURVIVED    KILLED 3 failed
+  SM-1    _with_extra_summary_line: AUTHORED filter drop  SURVIVED    EQUIVALENT
+  SM-2    _sole_killer's exclusivity assertion weakened   SURVIVED    KILLED 1 failed
+  SM-3    OF-104's scan narrowed: "arms?" alt removed     KILLED      KILLED 3 failed
+  SM-4    the N9 sibling row's client not planted         KILLED      KILLED 1 failed
+  SM-5    _with_extra_summary_line: replaced==1 disarmed  SURVIVED    EQUIVALENT
+  SM-6    crossing()'s k=0 case removed                   SURVIVED    KILLED 1 failed
+
+  N-M1b IS THE UNCOMFORTABLE ONE AND IT IS THE WHOLE POINT. This session added
+  the OF-104 scan to BOTH copies of the guard, then mutated its own work as the
+  ruling requires. DELETING IT FROM COPY 2 LEFT ALL 99 TESTS GREEN. Not because
+  the scan is wrong - because COPY 2 HAD NEVER BEEN FIRED AT A LEAK AT ALL. It
+  ran only over correct contexts, so it could only ever print "no findings",
+  which is verbatim the state REVIEW_C6_2 measured for the import walk: "a
+  walker that terminated at the package root looked identical to one that found
+  nothing: both print no findings."
+  So N12/N14's CLASS REAPPEARED INSIDE THE FIX FOR N12/N14's CLASS, and nothing
+  but a self-directed mutant could have found it - no review had seen this code,
+  and the review that named OF-104 had by definition not seen its remedy.
+  OF-123. Closed by lifting copy 2's scan into _loop_blindness_findings and
+  firing it at three leaky labels through run_episode's real output.
+
+  THE TWO EQUIVALENCES, PROVED - and both are mutants I SHOULD NOT HAVE WRITTEN.
+  REVIEW_C6_3's own N10 note is the precedent, and they are RECORDED RATHER THAN
+  DELETED, because a mutant table that drops its author's mistakes is not a
+  record:
+    SM-1  BY EXHIBIT. Enumerated across four history depths (3, 5, 15, 15 parts):
+          the number of parts containing STATE_LABEL is 1 WITH the origin filter
+          and 1 WITHOUT it, EVERY TIME, so the helper returns a byte-identical
+          context either way.
+    SM-5  BY CONSTRUCTION. Disarming an assertion that is true on every input any
+          test supplies cannot fail for any suite.
+
+  FINAL: 14 MUTANTS - 12 KILLED - 2 EQUIVALENT - 0 NON-EQUIVALENT SURVIVORS.
+  Baseline 111 passed on the unmutated clone. Every mutation in a FRESH OS TEMP
+  CLONE with whetstone_gate.__file__ printed:
+    ...\scratchpad\c6mut\src\whetstone_gate\__init__.py
+  Each mutant: applied by exact-string replacement, file SHA-256 asserted
+  CHANGED, suite run, restored, digest asserted BACK. NOTHING IN THIS REPOSITORY
+  WAS MUTATED.
+  !! docs/reviews/mutants/ IS OUTSIDE THIS FENCE, so c6_mutants_4.md is OWED TO
+     THE NEXT C6 REVIEW and is named here rather than skipped.
+
+--- 2d. THE OF- ITEMS REVIEW 3 LEFT OPEN ------------------------------
+  OF-104  CLOSED  the arm/clause regex over the SURFACE, both copies
+  OF-105  CLOSED  N14
+  OF-106  CLOSED  N12
+  OF-107  CLOSED  N15
+  OF-108  CLOSED  N4
+  OF-109  CLOSED  N9
+  OF-110  C6 HALF CLOSED - a source-text refusal scan beside the AST walk over
+          src/whetstone_gate/attacker/, WRITTEN SEPARATELY from check_roles.py's
+          D4 and deliberately not imported from it: a probe that borrows the
+          predicate it is checking cannot find a defect in the predicate, and
+          this is the package whose lanes PROCESS.md S8 reserves. Fired at FIVE
+          dynamic forms - the three OF-110 named PLUS sys.modules and exec,
+          which it did not - each asserting BOTH that the AST walk stays silent
+          AND that the text scan fires. Zero hits on the package as it stands.
+          C2's, C3's and C13's walkers still carry the limit and are OWED.
+  OF-111  CLOSED  N13
+  OF-112  STAYS OPEN. OF-82's fourth instance lives in
+          tests/test_c6_review_probes.py - REVIEW_C6_1's OWN PROBE FILE. INC-30
+          and INC-31 are exactly a fix session committing to a reviewer's probe
+          file. A FIX SESSION IS NOT THE RIGHT AUTHOR of a change to a review's
+          own evidence. Not touched.
+  OF-113  STAYS OPEN, AND THE CORRECTION IS STATED RATHER THAN MADE. INC-42's
+          Action lists the caller's tool schemas among what the guard SUBTRACTS;
+          measured, they are SCANNED. INCIDENTS.md is APPEND-ONLY (Q-033), so
+          another session's entry is NOT rewritten; the correction is in INC-53
+          and in OPEN_FINDINGS. That makes THREE overstated Action fields -
+          INC-47, OF-113, and this session's own INC-54 - and INC-47's diagnosis
+          already says why: "Fix: is bound to a commit and cannot be invented,
+          Action: is bound to nothing." INC-54 adds a sixth field to that
+          observation: SO IS "Measured:".
+  OF-114  STAYS OPEN and is not C6's. It is REVIEW_C6_3's record of its own
+          error, and a fix session does not close a review's self-record.
+  OF-123  RAISED - see N-M1b above.
+
+--- TASK 2 COUNTS, ALL MEASURED BY THIS SESSION -----------------------
+  C6 suite     77 passed -> 111 passed  (test_c6_attacker 69, fix_probes 36,
+                                          review_probes 6)
+  make test    738 passed -> 772 passed, 1 skipped, 2 deselected   GREEN
+  check-roles  17 passed, 0 failed, 5 n/a, exit 0
+  mutants      6 non-equivalent survivors -> 14 run, 12 KILLED, 2 EQUIVALENT,
+               0 non-equivalent survivors
+
+  INCIDENTS: INC-53 (a fix session left six mutants alive in the code it had
+  just written) and INC-54 (THIS SESSION'S OWN - see below), both written before
+  a line of TASK 2 code changed.
+
+=====================================================================
+THIS SESSION'S OWN DEFECT - INC-54, REPORTED RATHER THAN ABSORBED
+=====================================================================
+  The 363a2e9f token-row paragraph asserted:
+      "Measured after this append: 43 issued row(s) covering 43 token(s)."
+  make check-roles PRINTS 42.
+
+  _TOKEN_ROW requires 8 hex AND a (C\d+|ARCH) chunk cell, and the table's first
+  row - WG-2026-08-30-CTX-13.4-A, chunk cell "(none - a CONTEXT.md S13.4
+  correction, not a numbered chunk)" - matches neither. So 43 DATA ROWS PARSE TO
+  42 ISSUED TOKENS, and it reconciles exactly with the paragraph above it, which
+  measured 41 of 42.
+
+  THE FIGURE WAS DERIVED AND FORMATTED AS A MEASUREMENT - one paragraph after
+  this same session corrected somebody else's unmeasured claim, in a session
+  whose entire subject is measured claims, with the n-1 arithmetic already
+  visible in its own output an hour earlier.
+
+  51f0624 carries the wrong figure in its message and IS NOT AMENDED: no history
+  rewrite, CLAUDE.md S5, the same ground Q-080 option 1 was rejected on. The
+  correction is in QUESTIONS.md with the arithmetic written out, in PROGRESS.md,
+  and here.
+
+=====================================================================
+GIT, EVIDENCE AND HYGIENE
+=====================================================================
+  EVERY COMMIT USED `git add -- <explicit paths>` THEN A BARE `git commit` WITH
+  NO PATHSPEC, per the inverted rule proved by C13 FIX 2 and recorded in INC-48,
+  and every Swept: check was verified ON THE STAGED SNAPSHOT
+  (git diff --cached), never on the working tree.
+
+  EVERY Swept: LINE THIS SESSION WROTE:
+    061dcd9  Swept: nothing - STAGED SNAPSHOT, 179/0 QUESTIONS.md. c09c385b had
+             uncommitted work under docs/reviews/independent/; NOT in this index.
+    28b6eec  Swept: nothing - STAGED SNAPSHOT. Same, re-verified.
+    ea3bd12  Swept: nothing - STAGED SNAPSHOT, four paths, all mine.
+    867b571  Swept: nothing - STAGED SNAPSHOT, 2/2 INCIDENTS.md.
+    4cb0c77  Swept: nothing - STAGED SNAPSHOT, 190/0, 1/1, 80/0. c09c385b had
+             committed its OPEN_FINDINGS and STATUS work at 290b260 before this
+             staging; its token appears in my added text only because my prose
+             names it.
+    51f0624  Swept: nothing - STAGED SNAPSHOT, 24/0 QUESTIONS.md.
+    df741d4  Swept: nothing - STAGED SNAPSHOT.
+    f03d359  Swept: nothing - STAGED SNAPSHOT, two paths, both mine.
+    6bcc15a  Swept: nothing - STAGED SNAPSHOT, 150/0, 1/1, 86/0; no foreign
+             Raised-by line in the staged diff.
+    ee01e0c  Swept: nothing - STAGED SNAPSHOT, 1/1 INCIDENTS.md.
+  NOTHING OF THE CONCURRENT SESSION'S WAS SWEPT, ON ANY COMMIT.
+
+  Token rows registered BEFORE each task's first commit, numbered FROM THE
+  TABLE, re-counted at TASK 2 rather than inherited: row 42 (9c7c5973, C0, FIX)
+  and row 43 (363a2e9f, C6, FIX). NEVER CROSSED. E1/E2/E3 all clean.
+
+  git status --porcelain tests/goldens/    EMPTY
+  VENDORED PIN TRIPLE, all three, rev-parse / status --porcelain / diff <pin>:
+    tau2-bench              MATCH / 0 lines / 0 lines
+    camel-prompt-injection  MATCH / 0 lines / 0 lines
+    agentdojo               MATCH / 0 lines / 0 lines
+  make selftest  STILL RED on camel_comparator.branch - NOT THIS SESSION'S, and
+                 the corrected Q-074 docstring was read out of its real failure
+                 output and renders cleanly through cp1252.
+  CR bytes: 0 in every file this session touched, counted as BYTES.
+  grep.exe.stackdump: UNTRACKED, UNTOUCHED, NOT DELETED.
+  No destructive command, no history rewrite, NO TAG.
+  _console.say() is the package's human-facing output path and was not bypassed;
+  every artefact this session wrote is UTF-8 with LF and was verified after
+  writing.
+
+=====================================================================
+WHAT I COULD NOT DO
+=====================================================================
+  1. c6_mutants_4.md - docs/reviews/mutants/ is outside TASK 2's fence. The full
+     mutant table is in this file instead. OWED to the next C6 review.
+  2. OF-110 for C2, C3 and C13 - their test files are outside both fences.
+     OWED to those chunks.
+  3. OF-67 / OF-70 / OF-78 - the session-token ordinal mechanism. In fence,
+     but named under RECORD-DO-NOT-BUILD. OWED to C11. Three holes stand:
+     ordinals 11, 12, 18 (df238be6, 0852ea56, 9c0c6734).
+  4. E6, the Swept: detector - C11's, and no longer urgent; said so explicitly.
+  5. OF-112 - a review's own probe file. OF-113 - append-only, corrected in
+     prose. OF-114 - a review's self-record. Each says why above.
+  6. Q-081's RULING - the trailer parser ships under a DECLARED Class A
+     deviation from Q-080's wording. THE CODE IS LANDED AND GREEN; THE RULING IS
+     WHAT IS OUTSTANDING. OF-120.
+
+DO NOT SELF-CERTIFY. NO TAG WAS CUT BY THIS SESSION. Fresh adversarial reviews
+follow BOTH tasks, and only a review session may tag.
