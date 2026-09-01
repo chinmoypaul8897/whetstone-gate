@@ -689,7 +689,21 @@ immediately before appending: 42 data rows, `9c7c5973` last, so this is row 43.*
 * ⚠️ **`make check-roles` E2 IS THE REASON THE TWO ROWS ARE SEPARATE AND MUST STAY SEPARATE.** E2
   fails if a chunk's BUILD and REVIEW share a token and E3 fails if a token holds more than one
   `(chunk, role)` pair. **One session holding two tokens is legal; one token holding two chunks is
-  not.** Measured after this append: **43 issued row(s) covering 43 token(s)**, E1/E2/E3 all clean.
+  not.** Measured after this append: **42 issued row(s) covering 42 token(s)**, E1/E2/E3 all clean.
+* ⚠️ **CORRECTION, MADE BY THIS SESSION AGAINST ITSELF, AND RECORDED RATHER THAN OVERWRITTEN.** The
+  line above **first read *"43 issued row(s) covering 43 token(s)"*, which this session WROTE BEFORE
+  IT RAN THE CHECK** — an inference from the row count, presented in the shape of a measurement.
+  **`make check-roles` then printed 42.** The number is right and the inference was wrong: the
+  table's **43 data rows** parse to **42 issued tokens**, because `check_roles._TOKEN_ROW` requires
+  an 8-hex token and a `(C\d+|ARCH)` chunk cell, and the first row —
+  `WG-2026-08-30-CTX-13.4-A`, chunk cell *"(none — `CONTEXT.md` §13.4 correction, not a numbered
+  chunk)"* — matches neither. It is **the same row `Q-014 (iv)` pins as the E5 one-off**, so the
+  arithmetic is `43 − 1 = 42` and it reconciles with every earlier paragraph: `9c7c5973`'s append
+  measured **41 of 42**. ⚠️ **The commit that landed this paragraph (`51f0624`) carries the wrong
+  figure in its message and IS NOT AMENDED** — no history rewrite, `CLAUDE.md` §5 — so the
+  correction lives here, in `PROGRESS.md`, and in this session's FINAL OUTPUT. **Writing a number
+  you have not yet measured, in a session whose whole subject is measured claims, is the defect this
+  project exists to catch, and it is reported as this session's own.**
 
 **No other session's line was touched by this append.** `Swept:` verified on the **STAGED SNAPSHOT**.
 
