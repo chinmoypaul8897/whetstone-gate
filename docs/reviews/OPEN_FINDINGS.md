@@ -825,14 +825,14 @@ three colliding instructions independently. **`OF-78` and `OF-79` are unchanged 
 
 | ID | Chunk | Severity | Finding | Spec citation | Raised by | Status | Closed by (SHA) |
 |---|---|---|---|---|---|---|---|
-| **OF-96** | C13 | **MEDIUM** | ⚠️ **THE WINDOWS HALF OF `_is_relative_literal` IS PINNED BY NO TEST, AND THE END-TO-END KILL OF `M16-abs-win` DOES NOT COME FROM `is_relative` AT ALL.** `invocation.py:354-363` evaluates `PurePosixPath(root).is_absolute() or PureWindowsPath(root).is_absolute()`, and its docstring justifies *both, deliberately*. **MEASURED (mutant `N11`, SURVIVED):** delete the Windows disjunct and the whole suite stays green. **Non-equivalent by exhibit:** `C:/logs` and `C:\logs` both flip `is_relative` from `False` to `True`. The fixture in `test_the_live_log_path_is_located_by_ast_and_proved_reachable` fires only a POSIX-absolute form (`Path("/var/logs")`) and a `.resolve()` form — **no Windows-absolute form anywhere.** ⚠️ **And running `N11` + `M16-abs-win` TOGETHER, the property test still dies** — on `claim.root_literal == "logs"`, not on `is_relative`. So the code's claim is true and the suite cannot see half of it. **This is `B-2`'s shape one level smaller, inside the code written to close `B-2`.** **Remedy: one fixture with a drive-letter root.** | `INCIDENTS.md` INC-39; `docs/reviews/README.md` | **C13 REVIEW 2 (`8c49c4d3`)** | ⚠️ **OPEN** | — |
-| **OF-97** | C13, **RUN-1** | **MEDIUM** | **`crashes_loudly`'s WHOLE DISCRIMINATION IS PINNED BY NO TEST — IN THE FIELD RUN-1's OPERATOR GUIDANCE IS GENERATED FROM.** `invocation.py:319-326` exists only to tell `read_text` (a loud `FileNotFoundError`) from `glob` (a silent zero) — **INC-39's central distinction**. **MEASURED (mutant `N13`, SURVIVED):** add `"glob"` to the loud set and nothing fails. **Non-equivalent by exhibit:** a claim with `read_call='glob'` goes `False -> True`. The tree-level mutant `M17-glob` dies on `claim.read_call == "read_text"`, so the **False** direction of this field is never asserted anywhere. **Remedy: one assertion that a glob claim is NOT loud.** | `INCIDENTS.md` INC-39; `CONTEXT.md` §8.5.1 | **C13 REVIEW 2 (`8c49c4d3`)** | ⚠️ **OPEN** | — |
-| **OF-98** | C13 | **MEDIUM** | **THE *"EXACTLY ONE REACHABLE"* REFUSAL WEAKENS TO *"AT LEAST ONE"* UNDETECTED — AND THAT REFUSAL IS THE SENTENCE INC-39's REMEDY RESTS ON.** `invocation.py:502`. **MEASURED (mutant `N8`, SURVIVED):** `len(live) != 1` becomes `len(live) < 1` and the suite stays green. **Non-equivalent by exhibit:** on a source with **two** reachable `Path("logs")` constructions HEAD refuses (*"reaches 2 function(s) … not exactly one"*) and the mutant silently takes `sorted(live)[0]`. Nothing in the suite constructs that state — the fixture's `M17` case has **zero** reachable, and `0 < 1` still raises, so the existing case cannot discriminate the two designs. **Remedy: a two-construction fixture.** | `INCIDENTS.md` INC-39 | **C13 REVIEW 2 (`8c49c4d3`)** | ⚠️ **OPEN** | — |
-| **OF-99** | **process**, C14 | **MEDIUM** | ⚠️ **`Q-064`'s NAMED REMEDY STILL DOES NOT EXIST: THERE IS NO REPOSITORY-WIDE TRIPWIRE TEST FOR A SUPERSEDED STRING.** `Q-064` and `Q-074` both name it — *"A grep for the superseded string, run as a test, would have caught all four in one line."* **SEARCHED FIRST-HAND:** no occurrence of `superseded` anywhere under `tests/`, `src/` or the `Makefile`. `tests/test_repo_invariants.py` carries repository-wide scans for CRLF, secret-shaped strings, forged session tokens, the `gates/`↔`scorer/` module graph, undetermined config values and hardcoded spec values — **and nothing for a citation.** This review's own repo-wide grep found **66 hits** for `Tables? 5[-–—]7`, of which exactly **one** is live text. **The class has now bitten twice and no mechanism knows a citation has copies.** **Not C13's** — it belongs to whichever chunk owns the repository-wide tripwires. | `Q-064`, `Q-074`; `PROCESS.md` §9 | **C13 REVIEW 2 (`8c49c4d3`)** | ⚠️ **OPEN — for whichever chunk owns the tripwires** | — |
-| **OF-100** | C13 | **MEDIUM** | **`_named_functions` KEEPS THE *FIRST* MODULE-LEVEL DEFINITION WHERE PYTHON KEEPS THE *LAST* — AND THE LAST METHOD. THE TWO HALVES DISAGREE WITH EACH OTHER, AND ONE DISAGREES WITH THE INTERPRETER.** `invocation.py:425-435`: `found.setdefault(node.name, node)` for module functions, `found[f"{cls}.{m}"] = child` for methods. **Demonstrated on a shadowed redefinition:** with `replay_task` defined twice, the second using `Path("/var/logs")`, `live_log_path_from_source` reports `root_literal='logs'`, `is_relative=True` — it analysed the definition **Python never binds**. **Latent, not live** (CaMeL has no shadowed redefinition at the pin), but it is *analysing code the run does not execute*, which is the sentence `INC-39` was written about. ⚠️ **This is the quiet-collapse class the review prompt asked to be swept for, and it is the only instance found beyond the two the FIX reported itself.** The package's four dict **comprehensions** were enumerated and all four key uniquely; this one is a plain dict build, which is why a comprehension sweep misses it. | `INCIDENTS.md` INC-39; `CLAUDE.md` hard rule 8 | **C13 REVIEW 2 (`8c49c4d3`)** | ⚠️ **OPEN** | — |
-| **OF-101** | C13 | LOW | **`fullmatch` IS LOAD-BEARING IN `Q-058`'s GUARD AND IS PINNED BY NO TEST.** `branch_b.py:180`. **MEASURED (mutant `N14`, SURVIVED):** `TABLE_NUMBER.fullmatch` becomes `.match` and accepts **`Table 5-7`** (singular) while still rejecting **`Tables 5-7`** (plural) — and the plural is the only range the parametrised fixture fires. **REVIEW 1's own `M6` equivalence proof said in terms** that *"the strength of the check is `fullmatch`, not the absence of `s?`"*, and that strength is unasserted. **Remedy: add a singular-range fixture.** | `Q-058`'s ruling; `docs/reviews/mutants/c13_mutants.md` M6 | **C13 REVIEW 2 (`8c49c4d3`)** | ⚠️ **OPEN** | — |
-| **OF-102** | C13, C18 | LOW | **`banking_rows`' TABLE KEY IS LOAD-BEARING ONLY BY TUPLE ORDERING.** **MEASURED (mutant `N6`, SURVIVED, equivalent TODAY):** drop `figure.table == table` and `p2_holds_for` returns the same verdict — but only because `CaMeL` collides across Tables 5, 6 and 7 in `CITED_TABLE_FIGURES` and last-wins happens to pick Table 7, whose rows are last. Append a table after it, or reorder the tuple, and `p2_holds_for` silently reads another table's row. ⚠️ **The FIX repaired exactly this class in exactly this function** (`banking_rows` keyed on base model alone, collapsing five suites to the last row) **and the repair is one ordering away from being invisible again.** **Remedy: assert the dict's size, or key on `(table, row)`.** | `CONTEXT.md` §8.5.2; `INCIDENTS.md` INC-40 | **C13 REVIEW 2 (`8c49c4d3`)** | ⚠️ **OPEN** | — |
-| **OF-103** | C13, process | LOW | **THE SPAN THE RECORDS CITE AND THE SPAN THE ARTEFACT GENERATES DIFFER BY ONE LINE AT EACH END.** `INCIDENTS.md` INC-39, `docs/sessions/c13-fix-1.txt` and `REVIEW_13_1.md` all say the live path is at **139-146**; `live_log_path_from_source` derives **(140, 145)** — the **expression**, where the records give the **assignment statement** — and `citation()` emits `…:140-145`. **MEASURED:** `140-145` appears **nowhere** in the repository as text, and `139-146` appears nowhere in `src/`, `tests/` or `config/`, so nothing published is wrong. But a reader comparing the incident record against the artefact finds two spans for one construction, **neither labelled statement-vs-expression**. | `INCIDENTS.md` INC-39 | **C13 REVIEW 2 (`8c49c4d3`)** | ⚠️ **OPEN — wording** | — |
+| **OF-96** | C13 | **MEDIUM** | ⚠️ **THE WINDOWS HALF OF `_is_relative_literal` IS PINNED BY NO TEST, AND THE END-TO-END KILL OF `M16-abs-win` DOES NOT COME FROM `is_relative` AT ALL.** `invocation.py:354-363` evaluates `PurePosixPath(root).is_absolute() or PureWindowsPath(root).is_absolute()`, and its docstring justifies *both, deliberately*. **MEASURED (mutant `N11`, SURVIVED):** delete the Windows disjunct and the whole suite stays green. **Non-equivalent by exhibit:** `C:/logs` and `C:\logs` both flip `is_relative` from `False` to `True`. The fixture in `test_the_live_log_path_is_located_by_ast_and_proved_reachable` fires only a POSIX-absolute form (`Path("/var/logs")`) and a `.resolve()` form — **no Windows-absolute form anywhere.** ⚠️ **And running `N11` + `M16-abs-win` TOGETHER, the property test still dies** — on `claim.root_literal == "logs"`, not on `is_relative`. So the code's claim is true and the suite cannot see half of it. **This is `B-2`'s shape one level smaller, inside the code written to close `B-2`.** **Remedy: one fixture with a drive-letter root.** | `INCIDENTS.md` INC-39; `docs/reviews/README.md` | **C13 REVIEW 2 (`8c49c4d3`)** | ⚠️ **CLOSED by `b07365f`** — mutant `N11` KILLED; both drive-letter flavours fired AT THE FUNCTION | b07365f |
+| **OF-97** | C13, **RUN-1** | **MEDIUM** | **`crashes_loudly`'s WHOLE DISCRIMINATION IS PINNED BY NO TEST — IN THE FIELD RUN-1's OPERATOR GUIDANCE IS GENERATED FROM.** `invocation.py:319-326` exists only to tell `read_text` (a loud `FileNotFoundError`) from `glob` (a silent zero) — **INC-39's central distinction**. **MEASURED (mutant `N13`, SURVIVED):** add `"glob"` to the loud set and nothing fails. **Non-equivalent by exhibit:** a claim with `read_call='glob'` goes `False -> True`. The tree-level mutant `M17-glob` dies on `claim.read_call == "read_text"`, so the **False** direction of this field is never asserted anywhere. **Remedy: one assertion that a glob claim is NOT loud.** | `INCIDENTS.md` INC-39; `CONTEXT.md` §8.5.1 | **C13 REVIEW 2 (`8c49c4d3`)** | ⚠️ **CLOSED by `b07365f`** — mutant `N13` KILLED; the FALSE direction and the SILENT-ZERO sentence both asserted | b07365f |
+| **OF-98** | C13 | **MEDIUM** | **THE *"EXACTLY ONE REACHABLE"* REFUSAL WEAKENS TO *"AT LEAST ONE"* UNDETECTED — AND THAT REFUSAL IS THE SENTENCE INC-39's REMEDY RESTS ON.** `invocation.py:502`. **MEASURED (mutant `N8`, SURVIVED):** `len(live) != 1` becomes `len(live) < 1` and the suite stays green. **Non-equivalent by exhibit:** on a source with **two** reachable `Path("logs")` constructions HEAD refuses (*"reaches 2 function(s) … not exactly one"*) and the mutant silently takes `sorted(live)[0]`. Nothing in the suite constructs that state — the fixture's `M17` case has **zero** reachable, and `0 < 1` still raises, so the existing case cannot discriminate the two designs. **Remedy: a two-construction fixture.** | `INCIDENTS.md` INC-39 | **C13 REVIEW 2 (`8c49c4d3`)** | ⚠️ **CLOSED by `b07365f`** — mutant `N8` KILLED; the two-reachable state constructed and PROVEN to be two | b07365f |
+| **OF-99** | **process**, C14 | **MEDIUM** | ⚠️ **`Q-064`'s NAMED REMEDY STILL DOES NOT EXIST: THERE IS NO REPOSITORY-WIDE TRIPWIRE TEST FOR A SUPERSEDED STRING.** `Q-064` and `Q-074` both name it — *"A grep for the superseded string, run as a test, would have caught all four in one line."* **SEARCHED FIRST-HAND:** no occurrence of `superseded` anywhere under `tests/`, `src/` or the `Makefile`. `tests/test_repo_invariants.py` carries repository-wide scans for CRLF, secret-shaped strings, forged session tokens, the `gates/`↔`scorer/` module graph, undetermined config values and hardcoded spec values — **and nothing for a citation.** This review's own repo-wide grep found **66 hits** for `Tables? 5[-–—]7`, of which exactly **one** is live text. **The class has now bitten twice and no mechanism knows a citation has copies.** **Not C13's** — it belongs to whichever chunk owns the repository-wide tripwires. | `Q-064`, `Q-074`; `PROCESS.md` §9 | **C13 REVIEW 2 (`8c49c4d3`)** | ⚠️ **OPEN — NOT C13's, and re-confirmed absent by this FIX.** `grep -rn superseded` over `tests/`, `src/` and the `Makefile` returns NOTHING at HEAD. **Owed to C14** | — |
+| **OF-100** | C13 | **MEDIUM** | **`_named_functions` KEEPS THE *FIRST* MODULE-LEVEL DEFINITION WHERE PYTHON KEEPS THE *LAST* — AND THE LAST METHOD. THE TWO HALVES DISAGREE WITH EACH OTHER, AND ONE DISAGREES WITH THE INTERPRETER.** `invocation.py:425-435`: `found.setdefault(node.name, node)` for module functions, `found[f"{cls}.{m}"] = child` for methods. **Demonstrated on a shadowed redefinition:** with `replay_task` defined twice, the second using `Path("/var/logs")`, `live_log_path_from_source` reports `root_literal='logs'`, `is_relative=True` — it analysed the definition **Python never binds**. **Latent, not live** (CaMeL has no shadowed redefinition at the pin), but it is *analysing code the run does not execute*, which is the sentence `INC-39` was written about. ⚠️ **This is the quiet-collapse class the review prompt asked to be swept for, and it is the only instance found beyond the two the FIX reported itself.** The package's four dict **comprehensions** were enumerated and all four key uniquely; this one is a plain dict build, which is why a comprehension sweep misses it. | `INCIDENTS.md` INC-39; `CLAUDE.md` hard rule 8 | **C13 REVIEW 2 (`8c49c4d3`)** | ⚠️ **CLOSED by `b07365f` + `dfffba7`** — `setdefault` → assignment; and the MIRROR, because the first test was GREEN BY ACCIDENT OF ITS FIXTURE (an ORACLE-2 mutant survived the whole file) | b07365f, dfffba7 |
+| **OF-101** | C13 | LOW | **`fullmatch` IS LOAD-BEARING IN `Q-058`'s GUARD AND IS PINNED BY NO TEST.** `branch_b.py:180`. **MEASURED (mutant `N14`, SURVIVED):** `TABLE_NUMBER.fullmatch` becomes `.match` and accepts **`Table 5-7`** (singular) while still rejecting **`Tables 5-7`** (plural) — and the plural is the only range the parametrised fixture fires. **REVIEW 1's own `M6` equivalence proof said in terms** that *"the strength of the check is `fullmatch`, not the absence of `s?`"*, and that strength is unasserted. **Remedy: add a singular-range fixture.** | `Q-058`'s ruling; `docs/reviews/mutants/c13_mutants.md` M6 | **C13 REVIEW 2 (`8c49c4d3`)** | ⚠️ **CLOSED by `b07365f`** — mutants `N14` AND `N15` KILLED; `APPENDIX` was NOT symmetric and is declared | b07365f |
+| **OF-102** | C13, C18 | LOW | **`banking_rows`' TABLE KEY IS LOAD-BEARING ONLY BY TUPLE ORDERING.** **MEASURED (mutant `N6`, SURVIVED, equivalent TODAY):** drop `figure.table == table` and `p2_holds_for` returns the same verdict — but only because `CaMeL` collides across Tables 5, 6 and 7 in `CITED_TABLE_FIGURES` and last-wins happens to pick Table 7, whose rows are last. Append a table after it, or reorder the tuple, and `p2_holds_for` silently reads another table's row. ⚠️ **The FIX repaired exactly this class in exactly this function** (`banking_rows` keyed on base model alone, collapsing five suites to the last row) **and the repair is one ordering away from being invisible again.** **Remedy: assert the dict's size, or key on `(table, row)`.** | `CONTEXT.md` §8.5.2; `INCIDENTS.md` INC-40 | **C13 REVIEW 2 (`8c49c4d3`)** | ⚠️ **CLOSED by `b07365f`** — mutant `N6` KILLED; pinned ORDER-INDEPENDENTLY, not by asserting a size | b07365f |
+| **OF-103** | C13, process | LOW | **THE SPAN THE RECORDS CITE AND THE SPAN THE ARTEFACT GENERATES DIFFER BY ONE LINE AT EACH END.** `INCIDENTS.md` INC-39, `docs/sessions/c13-fix-1.txt` and `REVIEW_13_1.md` all say the live path is at **139-146**; `live_log_path_from_source` derives **(140, 145)** — the **expression**, where the records give the **assignment statement** — and `citation()` emits `…:140-145`. **MEASURED:** `140-145` appears **nowhere** in the repository as text, and `139-146` appears nowhere in `src/`, `tests/` or `config/`, so nothing published is wrong. But a reader comparing the incident record against the artefact finds two spans for one construction, **neither labelled statement-vs-expression**. | `INCIDENTS.md` INC-39 | **C13 REVIEW 2 (`8c49c4d3`)** | ⚠️ **CLOSED by `0beb8ee`** — SETTLED as statement-vs-expression and LABELLED in both records; neither number was wrong | 0beb8ee |
 
 ⚠️ **APPEND-ONLY, AND STRICTLY SO: NOT ONE EXISTING ROW WAS ALTERED.** `OF-01`…`OF-95` read
 byte-for-byte as they did before this block. Ids were counted from this file immediately before
@@ -957,3 +957,111 @@ rather than a backlog row.
 * **`OF-53`** — **OPEN.** `spec_constants.AUTHORED_TEXTS` still holds exactly three paths and
   `data/generic_denial.txt` is still not among them. `Q-049`'s owed registry row is still owed; the
   guarantee is still supplied by a test rather than by the registry.
+
+---
+
+## ⚠️ DISPOSITION BY C13 FIX 2 (`91eb51c1`), 2026-09-02 — `OF-96`…`OF-103`, and the two BLOCKERs
+
+**Seven CLOSED with a SHA, one OPEN and it says why.** The `Status` and `Closed by` cells of
+`OF-96`…`OF-103` are updated **in place**, because those rows are **C13 REVIEW 2's (`8c49c4d3`)** and
+disposing of a review's findings is the FIX session's job. ⚠️ **NOTHING ELSE IN THIS FILE WAS
+TOUCHED** — `OF-01`…`OF-95` read byte-for-byte as they did before, including every row belonging to
+the concurrent **C6 REVIEW 3** session (`3605d31c`), whose work was in flight from the same working
+tree while this session ran. **Rewriting a concurrent session's cell is the one thing `Q-063`
+forbids outright.**
+
+⚠️ **AND THIS SESSION OPENS NO NEW `OF-` ROW.** Its own three new findings need a **ruling** or are
+**records of what broke**, not backlog rows: `Q-079` (ruled, and landed), `Q-080` (a declared STOP),
+and `INCIDENTS.md` `INC-46`, `INC-47`, `INC-48`, `INC-49`.
+
+### The two BLOCKERs
+
+* **`B-3` — CLOSED** by **`778c8f2`** (the `config/` edit, its own commit, citing `Q-079`) and
+  **`4be0b86`** (the reader without which the edit is decorative). `branch_a_condition` no longer
+  says *"the model id is still served"* — the phrasing `Q-057`'s ruling identifies as
+  indistinguishable from a harness defect — and a **`branch_b_condition` key is ADDED**, so Branch
+  B's trigger exists in `config/` as a **stated condition** carrying the diagnosis requirement,
+  rather than only as the negation of Branch A. ⚠️ **The half that matters is the second commit:**
+  `Q-064` had already printed this defect's cause as a number — *"nothing reads either key"* — so
+  correcting the string alone would have left **a pre-registered condition that nothing asserts**,
+  which is a comment. `test_the_pre_registered_branch_condition_carries_the_DIAGNOSIS_requirement`
+  reads both keys **through the loader** and cross-checks every required phrase against
+  `CONTEXT.md` §8.5.1 **first**, so if the architect amends the law it goes red *there*.
+  Proved red four ways in a fresh OS temp sandbox, including at `Q-079`'s actual HEAD state.
+
+* **`B-4` — CLOSED** by **`0beb8ee`**, by **remedy (a)**, the stronger of the two REVIEW 2 offered.
+  A **dated correction note is APPENDED to `Q-057`, directly beneath fact 4** — not at the end of
+  the entry, because `Q-057`'s status is *"BLOCKING RUN-1 if unread"* and RUN-1 reads fact 4. It
+  names `replay_task`, the construction at **140-145**, the read at **`:148`**, the call at
+  **`:305`**, and states that **`:321` is inside `replay_user_task`, a function with no caller**.
+  ⚠️ **Fact 4 itself is LEFT STANDING and is not edited** — it is the historical record of what
+  `c2b7f419` found, and overwriting it would destroy the evidence of the original error while
+  claiming to correct it. `INC-39`'s `Action` field is **corrected in place with a dated note, its
+  original words left standing**, for the same reason one turn down.
+
+### `OF-96`…`OF-103`, each with the commit that closed it
+
+* **`OF-96` — CLOSED** by `b07365f`. Mutant **`N11` KILLED**. ⚠️ **Asserted AT THE FUNCTION and not
+  end-to-end**, because REVIEW 2 proved an end-to-end assertion cannot do it: the end-to-end kill of
+  a Windows-absolute mutant comes from `claim.root_literal == "logs"`, **not** from `is_relative`.
+  Both flavours fired (`C:/logs` and `C:\logs`), plus UNC — **and the two exhibits that prove EACH
+  rule load-bearing**, `PurePosixPath("C:/logs").is_absolute() is False` and
+  `PureWindowsPath("/var/logs").is_absolute() is False`, so neither disjunct can be deleted while
+  the others still pass. That last pair is what stops this becoming the same near-miss one level in.
+* **`OF-97` — CLOSED** by `b07365f`. Mutant **`N13` KILLED**. Constructed **through the real
+  derivation** — `glob` is in `_READ_CALLS`, so a globbing live function genuinely yields
+  `read_call='glob'` — rather than by hand-building the dataclass, so the test pins the path the run
+  takes. It also asserts that **the sentence RUN-1 is handed flips with it**, which was the
+  `# pragma: no cover` branch.
+* **`OF-98` — CLOSED** by `b07365f`. Mutant **`N8` KILLED**. The fixture **proves `len(live) == 2`
+  before it asserts the refusal**, so the test cannot pass for some other reason; the message must
+  name the count **and** both candidates; and a **control** removes one edge and shows the same
+  source resolving cleanly — *a gate that refuses everything is not a gate.*
+* **`OF-99` — OPEN. NOT C13's, and re-confirmed absent by this session.** `grep -rn superseded` over
+  `tests/`, `src/` and the `Makefile` returns **nothing** at HEAD. ⚠️ **Owed to C14**, with `Q-074`.
+* **`OF-100` — CLOSED** by `b07365f` **and `dfffba7`**. `setdefault` → assignment, so the derivation follows the
+  definition **Python actually binds**, and the module half now agrees with the method half. **Fixed
+  although latent**, because this module's entire job is *analysing code the run does not execute* —
+  `INC-39`'s sentence with the nouns changed.
+  ⚠️ **AND THE FIRST TEST FOR IT WAS GREEN BY ACCIDENT OF ITS FIXTURE, WHICH AN INDEPENDENT
+  ADVERSARIAL CHECK OF THIS SESSION'S OWN LANDED WORK FOUND.** It fired one definition order,
+  where *"keep the last"* and *"keep whichever is absolute"* agree — so an **ORACLE-2** mutant
+  (*prefer the definition containing `/var/logs`*) **SURVIVED the entire C13 file at `b07365f`**.
+  `dfffba7` adds the **mirror** — the same fixture reversed, asserting the reversal actually
+  happened — and ORACLE-2 now dies. **This is `INC-26` / `INC-29` / `OF-82`'s class for the
+  fourth time, in a test written to close a mutation survivor, by the session closing it.**
+* **`OF-101` — CLOSED** by `b07365f`. Mutants **`N14` AND `N15` KILLED**. The singular `Table 5-7`
+  lands, plus a conjunction, a table with its appendix glued on, and a figure range, so the pin is
+  on **trailing junk** rather than on one literal. ⚠️ **AND THE PART WORTH READING: `APPENDIX` is
+  NOT symmetric with `TABLE_NUMBER`, and the first fixture written for it pinned nothing.** A
+  leading-junk appendix is rejected by `match` too; `APPENDIX` ends in `.+` and `.` does not match a
+  newline, so the two differ **only on a multi-line value**. Measured (`N15` **SURVIVED**), then
+  corrected to a smuggled-second-line fixture, then re-measured (`N15` **KILLED**). Declared rather
+  than quietly repaired.
+* **`OF-102` — CLOSED** by `b07365f`. Mutant **`N6` KILLED**. Each table is asserted to return **its
+  own** rows; the `CaMeL` collision across Tables 5, 6 and 7 is **exhibited**, so the assertions are
+  not read as belt-and-braces; and the property is pinned **order-independently** by reversing the
+  tuple — which no accident of declaration order can satisfy. ⚠️ REVIEW 2's suggested remedy was
+  *"assert the dict's size, or key on `(table, row)`"*; **neither was taken**, because a size
+  assertion would still pass under a reorder, which is the actual failure mode.
+* **`OF-103` — CLOSED** by `0beb8ee`, and **settled rather than corrected, because neither number
+  was wrong.** Measured over the git blob at pin `f083b6b3`, not inferred: `ast.Assign` = `(139,
+  146)`, `Assign.value` = `(140, 145)`. **`139-146` is the assignment statement** `trace_path = ( … )`
+  including its parentheses; **`140-145` is the expression**, the `Path("logs") / …` chain, which is
+  what `_log_path_construction` returns (`node.value.lineno … node.value.end_lineno`). Line 139 is
+  `trace_path = (` and line 146 is the closing `)`. **`140-145` is the one to prefer** — it is
+  generated from the call graph and cannot drift, which is `INC-39`'s own remedy — and both records
+  are **labelled**, so a reader is not left with two numbers and no explanation.
+
+### ⚠️ And one row this session did NOT close, which is `OF-62`'s and is a finding about this file
+
+**`OF-62`'s disposition line above reads *"CLOSED on four of five sites; the fifth is `Q-074`"*, and
+it counts CITATION sites only.** `OF-62`'s own row states the second defect in terms — *"The same
+key is behind `Q-057` too: `branch_a_condition` still encodes the un-narrowed Branch-B trigger"* —
+so **the row was right and the disposition narrowed it.** Nothing in this file said
+`branch_a_condition` had been left un-narrowed, and a reader of that line believed one docstring
+remained. ⚠️ **The disposition line is NOT edited here** — it is C13 FIX 1's record of what C13 FIX 1
+did, and it belongs to that session the same way `Q-057`'s fact 4 belongs to `c2b7f419`. It is
+recorded instead in `INCIDENTS.md` **INC-46**, whose `Missing` field names the general form: **an
+`OPEN_FINDINGS.md` disposition can silently re-scope a finding to the half that was fixed, and
+nothing compares a disposition against the row it disposes of.**
