@@ -3950,8 +3950,7 @@ narrower mechanism: every leak the suite plants carries a cap value *and* a clau
 word, so each is caught by two or three layers at once and **no single layer is ever the sole
 killer** — which is what makes each individually deletable.
 
-**Fix:** **`PENDING`** *(the source commit does not exist yet; this SHA is filled in by this session
-once it does, and is NOT invented)* — six mutants killed with a named test each and the mutant
+**Fix:** **`f03d359`** — six mutants killed with a named test each and the mutant
 re-run showing KILLED; **eight further shapes planted by this session, two per blindness-guard
 survivor**; and this session's **own** new surface mutated before handoff, with any survivor
 reported rather than a clean sweep claimed.
@@ -4019,8 +4018,7 @@ row but one, so a derivation from the first reads as a measurement of the second
 one row that differs. The session wrote the journal paragraph before running the command it cited,
 which turns any such near-miss into a false statement in the record.
 
-**Fix:** **`PENDING`** *(the source commit does not exist yet; this SHA is filled in by this session
-once it does, and is NOT invented)* — the corrected figure and the arithmetic in `QUESTIONS.md`,
+**Fix:** **`df741d4`** (the wrong figure is in **`51f0624`**, which is NOT amended) — the corrected figure and the arithmetic in `QUESTIONS.md`,
 with the superseded sentence quoted rather than erased.
 
 **Systemic guardrail:** ⚠️ **NONE IN CODE — ACCEPTED, AND THE REASON IS NAMED RATHER THAN WAVED
