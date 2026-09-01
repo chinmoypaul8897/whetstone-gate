@@ -3783,7 +3783,7 @@ walk over those two node types cannot record the edge; D3 then computes the inte
 closures neither of which contains the crossing. The walk was not wrong about what it saw; it was
 complete over the wrong set.
 
-**Fix:** **`PENDING`** *(the source commit does not exist yet; this SHA is filled in by this session once it does, and is NOT invented)* — a **source-text refusal scan** (`D4`) over both packages, alongside the AST
+**Fix:** **`ea3bd12`** — a **source-text refusal scan** (`D4`) over both packages, alongside the AST
 walk, listing `importlib`, `__import__`, `sys.modules`, `getattr`, `setattr`, `exec`, `eval`,
 `compile`, `runpy`, `pkgutil`, `imp`, `globals`, `locals` and `vars`. **A dynamic import inside
 `gates/` or `scorer/` is a REFUSAL, not a puzzle to resolve** — neither package has any legitimate
@@ -3864,7 +3864,7 @@ this project's own two-paragraph trailer convention. The second half is independ
 non-trailer line inside the last paragraph disqualifies the whole block, so a message-corruption
 artefact silently costs a commit its trailer.
 
-**Fix:** **`PENDING`** *(the source commit does not exist yet; this SHA is filled in by this session once it does, and is NOT invented)* — `_trailer_block()` as described above, plus **E4's detail now separates
+**Fix:** **`ea3bd12`** — `_trailer_block()` as described above, plus **E4's detail now separates
 *"carries no `Session-Token:` line at all"* from *"carries one that is OUTSIDE its trailer block"***,
 names the second class and prints its count, so `97a5981` is a **reported number** instead of a
 silent reclassification into a list that would then be saying something false about it.
