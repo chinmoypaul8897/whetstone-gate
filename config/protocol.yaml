@@ -45,6 +45,29 @@ attacker:
   # adds no request and breaks no determinism claim.
   context_summary_is_deterministic: true
   target_tokens_per_episode: 60000
+  # [merchant-policy, author-chosen] THE ESTIMATOR'S CHARACTERS-PER-TOKEN DIVISOR.
+  # ⚠️ ADDED 2026-09-01 under QUESTIONS.md Q-048 (architect, Class A, UPHELD), which is
+  # REVIEW_C6_1's finding F-3. It was declared a Class B implementation parameter that
+  # "must never be added to config/", on the ground that C14's real measurement supersedes
+  # it. THAT WAS TRUE OF THE REPORTED FIGURE AND FALSE OF THE EXPERIMENT: context.py's
+  # render_summary enforces S8.6's 400-TOKEN summary cap as `token_cap * CHARS_PER_TOKEN`
+  # CHARACTERS, so changing this number CHANGES THE BYTES THE ATTACKER IS SENT. Measured by
+  # the review as property D4f: 3 -> 4 produces a different summary. A frozen S8.6 row whose
+  # operational meaning is fixed by a number outside the freeze is not frozen.
+  # ⚠️ AND IT IS THE SIXTH OCCURRENCE OF THE S8.6-INCOMPLETENESS PATTERN, and the FIRST
+  # found by asking "does this value change what the experiment sees?" rather than by
+  # tripping over a missing key. Q-048 records that question as the better test.
+  # WHY THREE, NOT THE CONVENTIONAL FOUR: calibrated by C6 BUILD against cl100k_base over
+  # this project's own assembled contexts and REPRODUCED INDEPENDENTLY by C6 REVIEW 1 at
+  # 2.99 chars/BPE token (C6 measured 2.97). The contexts are dominated by the JSON
+  # fetch_payments returns, which tokenises far denser than prose. At four the estimator ran
+  # 25% LOW, and LOW is the unsafe direction for the one number that selects S13.4's N
+  # branch (Branch A is "measured tokens/episode <= 60,000").
+  # ⚠️ FRAMING_TOKENS_PER_MESSAGE is deliberately NOT here, and the distinction is Q-048's
+  # own test applied rather than copied: it is used only by estimate_messages, never by
+  # render_summary's cap, so it changes the figure this project REPORTS and not one byte of
+  # what the attacker is SENT. It stays a Class B implementation parameter.
+  chars_per_token: 3
 
 # ── The gate judge (arms 2 / 2S / 3) ──────────────────────────────────────────
 gate_judge:

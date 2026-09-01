@@ -298,6 +298,39 @@ SPEC_CONSTANTS: tuple[SpecConstant, ...] = (
         ),
     ),
     SpecConstant(
+        key="attacker_chars_per_token",
+        spec_row="attacker chars-per-token estimator divisor",
+        config_path="protocol.yaml:attacker.chars_per_token",
+        tag=_AUTHORED,
+        literals=("3",),
+        mode=_C,
+        name_patterns=(
+            "chars_per_token",
+            "char_per_token",
+            "chars_token",
+            "token_divisor",
+            "estimator_divisor",
+        ),
+        note=(
+            "⚠️ ADDED 2026-09-01 by QUESTIONS.md Q-048 (Class A, UPHELD), which is "
+            "REVIEW_C6_1's finding F-3 — THE SIXTH OCCURRENCE OF THE §8.6-INCOMPLETENESS "
+            "PATTERN and the FIRST found by asking 'does this value change what the "
+            "experiment sees?' rather than by tripping over a missing key. It was declared a "
+            "Class B parameter that 'must never be added to config/', and that was true of "
+            "the FIGURE and false of the EXPERIMENT: context.render_summary enforces §8.6's "
+            "400-token summary cap as `token_cap * chars_per_token` CHARACTERS, so the value "
+            "decides the BYTES THE ATTACKER IS SENT (measured, review property D4f: 3 -> 4 "
+            "renders a different summary). CONTEXTUAL, and it could not be STRICT: `3` is the "
+            "single most innocent integer in Python, and a STRICT scan for it would fire on "
+            "correct code everywhere until somebody switched the tripwire off — this module's "
+            "own docstring names that as how a tripwire dies. It is a defect only when bound "
+            "to a name that means this divisor. ⚠️ FRAMING_TOKENS_PER_MESSAGE gets NO row, "
+            "deliberately: it is used only by estimate_messages and never by the cap, so it "
+            "moves the figure this project REPORTS and not one byte of what the attacker is "
+            "SENT — Q-048's own test, applied rather than copied."
+        ),
+    ),
+    SpecConstant(
         key="attacker_target_tokens_per_episode",
         spec_row="attacker tokens/episode target",
         config_path="protocol.yaml:attacker.target_tokens_per_episode",
