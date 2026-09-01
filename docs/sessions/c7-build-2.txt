@@ -1,0 +1,562 @@
+================================================================================
+C7 - THE LEDGER - BUILD, attempt 2 - SESSION-TOKEN 7d84b383 - 2026-09-01
+FINAL OUTPUT. Committed to docs/sessions/c7-build-2.txt BEFORE it was printed.
+================================================================================
+
+PUSHED SHA: 9723fb0  (docs: STATUS - INC-36 added to this session's note and row;
+                      "two incidents" was understating)
+
+That is the last SUBSTANTIVE commit and it is pushed. The commit carrying this file
+follows it and touches docs/sessions/c7-build-2.txt ALONE - the one-step regress is
+stated here rather than left for a reader to find. `git log --oneline -1 main` is the
+authority.
+
+TOKEN SPEND: ZERO. No provider model call, no network of any kind, no lane touched,
+on any model, at any point. A ledger is a hash chain over data already in hand.
+
+VERDICT: BUILT, UNREVIEWED. NO TAG WAS CUT. Nothing here is self-certified and a
+fresh adversarial review follows.
+
+NOT A FIX SESSION. C7 BUILD 1 (3a6e3d07) STOPPED CORRECTLY under hard rule 1, took
+no default, and left the gap as a kept test that would go red the moment it closed.
+It did. Q-062 IS RULED AND IMPLEMENTED; THE STOP THAT BLOCKED C8 IS LIFTED.
+
+================================================================================
+1. THE RULINGS, RECORDED VERBATIM BEFORE A LINE WAS TOUCHED - 6988cf6
+================================================================================
+
+Hard rule 5. Q-062, Q-053, Q-054 and Q-055 transcribed with no word altered, as a
+PURE APPEND at the end of QUESTIONS.md, because a concurrent session held the file.
+`git log --oneline` is the authority: 6988cf6 precedes every src/ and tests/ commit.
+
+EXACTLY ONE LINE ELSEWHERE WAS COMPLETED - Q-062's own
+  **RULING (architect, <date>):** *<pending>*
+placeholder - because leaving `<pending>` beside a question that HAS been ruled would
+make the file assert something false. Q-053, Q-054 and Q-055 carry no such
+placeholder and were not touched at all.
+
+  Q-062  RULED. The fourteenth content field lands.
+  Q-053  RULED CONFIRMED. ensure_ascii=False. No digest moves; the code was already
+         right and only the record was provisional.
+  Q-054  RULED. ledger_seq and C4's world write-counter are SEPARATE SPACES and no
+         chunk may join them on that key.
+  Q-055  RULED ACCEPTED AND PUBLISHED AS A LIMITATION. The CANARY-B under-count.
+
+================================================================================
+2. !! THE MEASUREMENT THAT IS THE PROOF - THE TWO HASHES NOW DIFFER
+================================================================================
+
+Build 1's own fixture, re-run with the field present. Seed 2001,
+capture_payment(payment_id=pay_b286441b6b440c, amount=66523), with and without the
+`currency` parameter RS-34 declares Required:
+
+  BUILD 1, 13 content fields, BOTH ENTRIES, ONE DIGEST
+      3c54446376764d88ea82c17ea56b31716ed1fdf1de9a77536f4ba55ab09cd16b
+
+  BUILD 2, 14 content fields
+      EXECUTED      (Rs 665.23 moved, result.ok True,  executed true)
+      978622193cdde3bb6eb5a9afeefe1af3bff6493c32a2d41d2e113bdb9bd01d10
+      TOOL REFUSED  (MCP layer, result.ok False, executed false)
+      abdfaca7a10d5f9c265c69dbf5a0b009c23f43626a20fc4c28fbe5e37768df64
+
+  fields differing: ['executed'] and therefore ['hash'] - EXACTLY ONE CONTENT FIELD,
+  asserted rather than assumed, and the 13-field digest is asserted to be NEITHER of
+  the two new ones, so "the hashes moved" is a comparison and not a re-run.
+
+test_an_EXECUTED_capture_and_an_MCP_LAYER_REFUSAL_NOW_DIFFER. It is the flip of build
+1's ..._are_BYTE_IDENTICAL, whose own docstring said "If a ruling adds a fourteenth
+field it will fail, and it should: that is the moment the gap closes." Hard rule 6's
+flip: the ruling is cited and the flip is provably meaningful in both directions.
+
+================================================================================
+3. WHERE `executed` WAS READ FROM - THE EXACT LOG FIELD
+================================================================================
+
+  src/whetstone_gate/world/results.py:75-76      ToolResult.ok
+      ok: bool
+      """True only if the world executed the call. A refusal of either kind is False."""
+
+A MockWorld.log row is (call_index, tool, arguments, result) and `result` is that
+ToolResult. build.executed_of(result) reads `ok` and nothing else. It is a
+non-default field on a frozen dataclass, constructed at eight sites, ALL in
+semantics.py, ALL passing ok= explicitly - so it is always present, and it is set by
+the world at the moment it did or did not mutate its state.
+
+IT REQUIRED NO RE-DERIVATION OF RAZORPAY'S RULES, which is what the prompt demanded.
+The nine outcomes and their ok, traced in source:
+
+  unknown tool ("tool not enabled")   semantics.py:401  ok=False  harm=None
+  initiate_payment, the stub          semantics.py:415  ok=False  harm=None
+  MCP layer, missing Required         semantics.py:426  ok=False  harm=None
+  read, success                       semantics.py:450  ok=True   harm=None
+  read, Razorpay refused              semantics.py:448  ok=False  harm=None   <- S4
+  write, Razorpay refused             semantics.py:466  ok=False  harm rejected
+  write, executed                     semantics.py:470  ok=True   harm not rejected
+  the two Razorpay-boundary methods   :696, :964        mirror the last two
+
+THE INFERENCE IS FORBIDDEN AND THE PROHIBITION IS MECHANICAL. Deriving executed from
+verdict and rejected_by_razorpay cannot see the tool-layer refusal, which is the
+whole finding - and a ledger re-implementing the world's admission logic would make
+the two agree by construction, which is gate.js/invariants.js one package along.
+  test_the_ledger_package_never_infers_executed_from_the_two_fields_beside_it
+    an AST walk: any assignment to `executed`, or `executed=` keyword, whose value
+    mentions verdict / rejected_by_razorpay / ALLOWED / DENIED / INDETERMINATE.
+  test_executed_is_read_from_the_worlds_own_ToolResult_ok_for_every_row
+    six shapes driven through the REAL world; every entry's executed asserted equal
+    to that row's own result.ok; AND the discredited inference computed beside it and
+    MEASURED WRONG on exactly four of the six rows.
+
+A ROW WHOSE RESULT CARRIES NO `ok` IS A REFUSAL, NOT A False. Elsewhere in build a
+missing attribute is a legitimate absence (harm is genuinely None for a read); here
+False is a CLAIM that the world did not perform the call. `Ledger.append`,
+`content_from_call` and `append_call` all have NO DEFAULT for it either -
+test_append_has_no_default_for_executed_and_omitting_it_is_a_TypeError.
+
+NO SECOND STOP WAS NEEDED. The prompt said that if the log did not distinguish the
+tool-layer refusal in a readable form, that was a second STOP. It does, in one field,
+already documented in the world's own words.
+
+================================================================================
+4. THE FOUR CONSISTENCY ASSERTIONS - EACH WITH THE TEST THAT FIRES IT
+================================================================================
+
+  1  executed  =>  verdict == ALLOWED
+     test_ASSERTION_1_executed_true_implies_verdict_ALLOWED   [DENIED, INDETERMINATE]
+     Refused on ALL THREE construction paths - append, validate_content and
+     LedgerEntry.__post_init__ - because a rule on one write path is a rule the
+     second write path does not have (INC-32's shape). With a CONTROL: the same entry
+     with executed false is accepted, so the refusal is about the COMBINATION.
+
+  2  executed  =>  rejected_by_razorpay == False
+     test_ASSERTION_2_executed_true_implies_rejected_by_razorpay_False
+     test_ASSERTION_2_holds_in_the_WORLD_and_not_only_in_the_validator
+     The second drives a REAL Razorpay refusal (RS-32, a capture on the already-
+     captured probe) through the real world. A validator that agreed only with itself
+     would be a definition, not a check.
+
+  3  ANY NON-ZERO HARM COMPONENT  =>  executed
+     test_ASSERTION_3_any_non_zero_harm_component_implies_executed  [per component]
+     test_ASSERTION_3_holds_in_the_WORLD_over_every_harm_record_an_episode_produces
+     !! THIS IS THE INTEGRITY CHECK RATHER THAN A RESTATEMENT, and it is the one that
+     catches the original defect FROM THE OTHER SIDE: it constrains the four numbers
+     S12.2 publishes against the field that says whether the action occurred. MONEY
+     CANNOT MOVE ON A CALL THAT DID NOT HAPPEN. Parametrised over all four components
+     SEPARATELY - a check against a total would be S12.2 rule 1's forbidden shape and
+     would also pass where two components cancelled.
+
+  4  executed false + verdict ALLOWED + rejected false  =>  the TOOL LAYER refused it
+     test_a_tool_layer_refusal_is_a_DIFFERENT_ROW_from_an_executed_harmless_action
+     test_the_three_refusal_sources_are_jointly_derivable
+     THE ROW IS DRIVEN, not described - twice, once synthetically and once through the
+     real world. The pair is the whole of Q-062 in five lines: two entries agreeing on
+     EVERY FIELD THAT EXISTED BEFORE THE RULING, separable only by the one it added.
+
+Three are ENFORCED at the write, not merely asserted. A test says the entries we
+happened to build satisfy this; a refusal says an entry that does not cannot be
+written.
+
+!! A FOURTH SHAPE THE RULING'S TABLE DOES NOT COVER, MEASURED RATHER THAN GLOSSED.
+A READ that RAZORPAY refused (RS-44/45/52/53) writes NO harm record, because S12.2
+writes one only for a MONEY ACTION - so rejected_by_razorpay is false and the entry
+is indistinguishable from a tool-layer refusal. So the ruling's second row is exact
+for money actions and residual for reads.
+  test_a_RAZORPAY_REFUSED_READ_lands_in_the_tool_layer_bucket_and_that_is_measured
+  UNAFFECTED and each asserted: productive_action (non-productive either way), the
+  four harm components (a read moves none), CANARY-A and CANARY-B (S10.1 counts
+  entries). AFFECTED: a published BREAKDOWN BY REFUSAL SOURCE would over-attribute to
+  the tool layer. Q-068, OF-66, due only if C18 prints one.
+
+================================================================================
+5. productive_action, DERIVED AGAINST S8.6a VERBATIM
+================================================================================
+
+S8.6a, PARSED OUT OF CONTEXT.md by the test rather than transcribed into it - so an
+amendment to the law fails the test instead of silently passing against a stale copy:
+
+  **"Productive action"** (the S12.1 column and the confound control): **any tool call
+  the gate ALLOWED that the world executed without returning a documented Razorpay
+  error.** A blocked call and a Razorpay-rejected call are both non-productive.
+
+  TERM                                          FIELD
+  "any tool call"                               every entry - no filter by `tool`
+  "the gate ALLOWED"                            verdict == ALLOWED
+  "that the world executed"                     executed is True      <- Q-062's field
+  "without returning a documented Razorpay      rejected_by_razorpay is False
+   error"                                       (S12.2's definition of that field)
+
+The definition's SECOND sentence is not a fourth term but a CHECK on the first three:
+a blocked call fails term 2, a Razorpay-rejected call fails term 4. Asserted
+separately rather than treated as a restatement.
+
+  test_productive_action_is_S8_6a_term_by_term                  (against CONTEXT.md)
+  test_productive_action_term_by_term_each_clause_varied_ALONE  (each term alone)
+  test_productive_action_on_REAL_entries_and_the_count_over_a_ledger
+  test_productive_action_reduces_to_executed_over_every_writable_entry
+
+GOLDEN 3 IS THE ONE HAND-COMPUTED ORACLE AND IT IS NOT THIS SESSION'S:
+  golden3_harm_vector.json "productive_actions": 3
+  derived                                       3    MATCH
+  the productive entries                  [1, 3, 4]  - the settlement and the two
+                                                       live refunds
+test_productive_action_reproduces_GOLDEN_3s_count_of_three. Golden 3's ledger is
+MONEY ACTIONS ONLY, so `executed` is read there as `not rejected_by_razorpay` - the
+inference Q-062 forbids, sound ON THAT GOLDEN and only because of what that golden
+is, used to READ the golden and NOWHERE in the package. Stated in the test.
+
+AND IT REDUCES TO `executed` ALONE - a THEOREM about Q-062's consistency rules, not
+the definition, proved exhaustively over all 240 (arm x verdict x executed x rejected
+x harm) combinations with both branches asserted non-empty. THE THREE TERMS STAY IN
+THE CODE: S8.6a is the law, and a one-field implementation would quietly report a
+different number if a rule were ever relaxed.
+
+!! AND TWO IMPLEMENTATIONS OF THAT ONE DEFINITION NOW EXIST AND THEY DISAGREE.
+world.harm.productive_actions counts HARM RECORDS - S12.2 writes one only for a money
+action - and ledger.control.productive_actions counts ENTRIES, because S8.6a says
+"any tool call" and the word "money" is absent.
+
+  measured, four-call episode (2 reads, 1 settlement, 1 tool-layer-refused refund):
+      world-side       1
+      ledger-side      3
+      difference       2  == exactly the executed reads
+
+NEITHER GOLDEN CAN SEE IT. Golden 3's ledger is five money actions and both return 3;
+tests/test_c4_goldens.py pins one to that figure and this session's test pins the
+other to the same. S12.1 PUBLISHES the column and S8 makes it MANDATORY beside every
+result. C7 implemented S8.6a verbatim (hard rule 4: CONTEXT.md outranks the code),
+measured the divergence, and did NOT narrow the specification to match the existing
+code nor edit that code, which is outside this fence. Q-067, OF-65, due before C18.
+
+================================================================================
+6. ALL FOUR GOLDEN-5 CASES REPRODUCE - THE TABLE
+================================================================================
+
+  case  description                          expected          produced
+  A     intact chain                         VALID  / null     VALID  / null   OK
+  B     CONTROL, the link broken outright    DETECTED / 2      DETECTED / 2    OK
+  C     entry 2's amount altered, hash stale DETECTED / 2      DETECTED / 2    OK
+  D     entry 1's CONTENTS altered, hash intact DETECTED / 1   DETECTED / 1    OK
+
+  git status --porcelain tests/goldens/   ->  EMPTY  (printed, section 11)
+
+GOLDEN 5 IS NOT REOPENED AND ITS ENTRIES STAY AT THIRTEEN. S5.2 specifies it as a
+TAMPER test - a VERIFIER oracle - and never as a writer oracle, and verify()
+recomputes whatever each entry carries.
+  test_golden_5_carries_the_THIRTEEN_pre_Q062_fields_and_this_package_carries_fourteen
+  asserts golden 5's key order against GOLDEN_5_CONTENT_FIELDS - a constant that
+  CANNOT DRIFT WITH THE CODE - and asserts the difference is exactly {executed} and
+  that its position is immediately after rejected_by_razorpay.
+
+WHAT A 13-FIELD DOCUMENT CAN NO LONGER DO IS COME BACK THROUGH THE READ PATH, and
+that is asserted with its KIND:
+  test_a_13_field_golden_5_VERIFIES_and_is_still_refused_by_the_READ_path
+    chain.verify(case A)      -> VALID
+    store.from_document(A)    -> LedgerEntryError, NOT TamperDetected, naming Q-062
+Conflating the two would put a false accusation of tampering in front of a reviewer
+verifying a published episode - PROCESS.md S6a.3's own audience.
+
+================================================================================
+7. THE RETIRED TEST, AND ITS TRACE
+================================================================================
+
+RETIRED: test_the_writer_reproduces_golden_5_case_a_byte_for_byte.
+
+IN PLACE, with ~40 lines of comment where the test was, naming Q-062, golden 5B, and
+why S5.2 never asked for it. A DELETION WITH NO TRACE IS HOW A PROPERTY QUIETLY STOPS
+BEING ONE. The comment records what it was, what it asserted, that build 1 wrote it,
+and the ruling's own sentence retiring it.
+
+NOT HARD RULE 6. The ruling is cited; the flip is provable in BOTH directions and is
+MEASURED, not asserted: it PASSED on the old 13-field code (build 1's report records
+it) and CANNOT pass on the new, which is itself a kept test -
+test_the_writer_cannot_reproduce_a_13_field_golden, which asserts the failure's SHAPE
+(APPEND_FIELDS differs from golden 5 by exactly ['executed']) so it cannot quietly
+become a pass or fail for another reason while looking like this one.
+
+WHAT REPLACES THE PROPERTY, and the weakness is stated rather than glossed:
+  1. the retirement, measured (above);
+  2. test_the_writer_and_the_verifier_agree_on_a_ledger_THIS_package_wrote -
+     write, store, re-verify, rebuild, compare;
+  3. GOLDEN 5B, which the architect is authoring, is the REAL replacement. (2) is
+     WEAKER, because bytes this package produced are not an independent oracle, and
+     its docstring says exactly that.
+
+================================================================================
+8. !!! THREE INCIDENTS, ALL THIS SESSION'S OWN
+================================================================================
+
+INC-34 - THE CHAIN VERIFIER REQUIRED THIS PACKAGE'S CONTENT SCHEMA, so widening the
+schema made it disagree with the golden it must reproduce. MEASURED, with the gate
+restored:
+
+   case   expected            PRE-FIX produced        reason given
+   A      VALID    / null     DETECTED / 1   WRONG    missing field(s) ['executed']
+   B      DETECTED / 2        DETECTED / 1   WRONG    missing field(s) ['executed']
+   C      DETECTED / 2        DETECTED / 1   WRONG    missing field(s) ['executed']
+   D      DETECTED / 1        DETECTED / 1   "ok"     missing field(s) ['executed']
+
+  CASE D IS THE DANGEROUS ROW: the right verdict at the right seq FOR AN ENTIRELY
+  FABRICATED REASON. D is S5.2's named mutation and S5.4's seeded defect, so a
+  done-when asserting only (verdict, first_bad_seq) shows three red and one FALSE
+  PASS on the most load-bearing golden case in the project.
+  Missing: a golden case whose entries do not carry this package's field set -
+    INC-32's Missing field one turn on.
+  Missed: INC-32's OWN FIX COMMENT, SEVEN LINES BELOW THE DEFECT, saying in those
+    words that CONTENT_FIELDS is the wrong list to read an entry through. The defect
+    and its own diagnosis shipped in the same commit. THIRD INSTANCE of the class
+    INC-33 named and recorded as not generalised.
+  Fix: 3d78c82. verify now requires (ledger_seq, prev_hash, hash) only.
+
+INC-35 - A TEST NAMED "TERM BY TERM" COULD NOT DISCRIMINATE TWO OF THE THREE TERMS.
+   M8  delete the `entry.verdict == ALLOWED` term        SURVIVED - 142 passed
+   M9  delete the `not entry.rejected_by_razorpay` term  SURVIVED - 142 passed
+  Two of the three terms could be deleted from the published definition and the whole
+  suite stayed green, including the test whose NAME is "term by term".
+  Missed: THE DOCSTRING OF THE FUNCTION UNDER TEST, written by this session in the
+    same hour, proving the terms co-vary on every writable entry - AND this session's
+    own exhaustive reduction proof forty lines away. INC-33's Missed field verbatim,
+    one incident later, in the tests rather than the source.
+  Fix: f1dc885. A stand-in object that violates the consistency rules ON PURPOSE,
+    because NO WRITABLE ENTRY CAN VARY ONE TERM ALONE - which is the theorem.
+
+INC-36 - THIS SESSION'S OWN COMMIT SWEPT FOUR OF THE CONCURRENT SESSION'S
+UNCOMMITTED ENTRIES, AND IT WAS FOUND BY THE SESSION IT DAMAGED.
+  2f702d9 ran `git commit -- INCIDENTS.md QUESTIONS.md OPEN_FINDINGS.md`. Both
+  sessions were appending to the same two of those three files. A PATHSPEC LIMITS A
+  COMMIT BY PATH, NOT BY AUTHORSHIP, so it took the whole working copy of each file:
+    Q-064, Q-065, OF-62, OF-63 - written under 3fb17baa, committed under 7d84b383.
+  Q-051's remedy was FOLLOWED, on every commit, by BOTH sessions, and did not prevent
+  it. It gives isolation only when the sessions hold DISJOINT FILES, and this project
+  had never tested it otherwise: C7 BUILD 1 reported it "holding, on the first
+  occasion two build sessions have actually overlapped in this tree" - true, and true
+  because ledger/ and camel_comparator/ are disjoint. A REMEDY VERIFIED ONLY WHERE IT
+  CANNOT FAIL HAS NOT BEEN VERIFIED.
+  Missed: MINUTES BEFORE THE COMMIT, THIS SESSION RE-READ QUESTIONS.md, SAW Q-064 AND
+    Q-065 SITTING UNCOMMITTED IN THE WORKING COPY, correctly renumbered its own
+    entries to Q-066..Q-069, wrote a paragraph calling it "a real collision rather
+    than a near-miss" - AND THEN COMMITTED THAT SAME FILE BY PATHSPEC. One
+    observation, two available conclusions, one drawn.
+  Not damaged, checked rather than assumed: each swept entry occurs exactly once,
+    complete, with its own "Raised by: C13 BUILD 2 (3fb17baa)" intact - so the
+    ENTRIES' attribution is right and only the COMMIT's is wrong. No counter
+    collided. Neither session's prose was altered.
+  AND ONE SENTENCE THIS SESSION HAD ALREADY WRITTEN WAS FALSE: PROGRESS.md S8 said
+    "neither session swept the other's files". CORRECTED IN PLACE, NOT DELETED,
+    because the false version is the finding. STATUS.md's "TWO INCIDENTS" was
+    likewise understating and is corrected.
+  make check-roles CANNOT SEE IT: the trailer is well formed, the token is issued,
+    the role is right, and the commit simply contains more than its message says.
+  Fix: bbcb321 (and 4fa9afc, which fills in that SHA - an entry describing its own
+    commit cannot know it beforehand, and "an invented incident has no commit").
+  Systemic guardrail: NONE THIS SESSION CAN LAND - the only remedy is structural, one
+    working tree per session, which is Q-063's question and the operator's to answer.
+
+A 17-MUTANT HARNESS WAS RUN OVER src/whetstone_gate/ledger/ AND ALL 17 ARE KILLED.
+S5.3 makes >=8 mutants a REVIEW deliverable; this build session ran one because
+INC-33's Systemic guardrail said it was owed. THE LIST IS LEFT HERE SO THE REVIEW
+STARTS FROM A KNOWN FLOOR RATHER THAN FROM ZERO:
+
+  M1  executed_of defaults to False instead of refusing              killed
+  M2  executed inferred from verdict+rejected instead of read        killed
+  M3  consistency rule 1 dropped                                     killed
+  M4  consistency rule 2 dropped                                     killed
+  M5  consistency rule 3 dropped                                     killed
+  M6  executed accepts a non-bool                                    killed
+  M7  verify goes back to requiring CONTENT_FIELDS (INC-34)          killed
+  M8  productive_action drops the "gate ALLOWED" term        SURVIVED -> killed
+  M9  productive_action drops the "no Razorpay error" term   SURVIVED -> killed
+  M10 refusal_source collapses tool-layer into razorpay              killed
+  M11 append gains a default of False for executed                   killed
+  M12 executed not immediately after rejected_by_razorpay            killed
+  M13 productive_action drops the "world executed" term              killed
+  M14 productive_actions counts every entry                          killed
+  M15 moved_money stops reading the components                       killed
+  M16 target_of also reads notes (would OVER-count CANARY-B) SURVIVED -> killed
+  M17 rebuild raises TamperDetected for a 13-field doc               killed
+
+M16 survived because the fixture supplied a payment_id and short-circuited the
+fallback - a gap in the TEST, not in the code. A direct assertion on target_of was
+added and it dies. A VOLUNTARY HABIT IS NOT A GUARDRAIL - INC-33's own closing
+sentence, and it is still true: nothing in this repository requires that harness.
+
+================================================================================
+9. WHAT THE SCHEMA WIDENING BROKE - EVERY READ PATH WENT AND WAS LOOKED AT
+================================================================================
+
+The prompt's item 7 was carried out with a five-dimension adversarial sweep over the
+ledger package, the test file, the world's execute signal, everything outside the
+package, and the prose. What it found, and what was done:
+
+  chain.verify's `missing` gate               INC-34. Fixed 3d78c82.
+  chain.rebuild's KeyError message            said "a defect in this module, not in
+                                              the document" - FALSE once verify
+                                              stopped enforcing the schema. Rewritten
+                                              to a typed LedgerEntryError naming
+                                              Q-062 and golden 5B.
+  entry.LedgerEntry.from_dict                 exact-set equality; now carries a
+                                              targeted hint for the one mismatch that
+                                              is a schema change and not a tamper.
+  entry._validate                             hand-enumerates by key name and would
+                                              NEVER HAVE LOOKED AT `executed` -
+                                              executed=None would have been accepted
+                                              and canonical-JSON'd as `null` into a
+                                              permanent chain. An explicit bool check
+                                              landed; M6 kills the version without it.
+  build.append_log                            threw result.ok away. Now reads it.
+  test_..._field_set_is_exactly_..._golden_5  rewritten against GOLDEN_5_CONTENT_FIELDS
+  test_the_digest_excludes_...                projected onto CONTENT_FIELDS; now uses
+                                              the row's OWN keys minus the chain
+                                              fields, which is INC-34's correction in
+                                              the test.
+  test_the_read_path_accepts_the_intact_case  control moved off golden 5 case A, with
+                                              the reason in its docstring, and the
+                                              refusal it exposed asserted separately.
+  test_an_entry_rebuilt_from_a_document_...   positive case moved; golden 5 kept as a
+                                              THIRD negative case so the move is
+                                              visible here too.
+  test_every_entry_..._renderer_needs         `executed` added to the required set and
+                                              asserted equal to the log's own ok.
+  the module prose                            every "thirteen"/"the set is closed by
+                                              arithmetic"/"a fourteenth would change
+                                              all twelve of golden 5's hashes"
+                                              rewritten. Q-062's STOP paragraphs
+                                              record the RULING rather than being
+                                              deleted. Q-053/054/055 no longer
+                                              described as open.
+
+NOT BROKEN, checked: HarmRecord's field set is pinned by a C4 test at
+tests/test_c4_world_semantics.py, and `executed` is correctly NOT on the harm record -
+a harm record does not exist for three of the paths the field must cover. The world
+package's .py file set and world/__init__.py's relative imports are both pinned by
+already-reviewed chunks' tests; no world file and no such import was added. Nothing
+outside ledger/ and test_c7_ledger.py imports the ledger package at all.
+
+================================================================================
+10. THE FOUR RULINGS, ACTED ON WHERE THE CODE IS
+================================================================================
+
+Q-053  ensure_ascii=False is now cited as a RULING in canonical_json's docstring and
+       is no longer described as a Class B deviation pending one. NO DIGEST MOVES,
+       which is the whole content of "confirmed".
+       test_Q053_the_ensure_ascii_ruling_is_recorded_where_the_choice_is_made
+Q-054  The prohibition is a docstring ON THE FIELD, LedgerEntry.ledger_seq, located by
+       PARSING the class so "on the field" is checked and not assumed. The divergence
+       is RE-MEASURED, not quoted: harm records [1,2] against ledger entries [1,2,3].
+       test_Q054_no_chunk_may_join_a_harm_record_to_an_entry_on_ledger_seq
+Q-055  The error direction and the ARM CONFOUNDED cancellation argument are in
+       build.target_of's and entries_naming's docstrings, ADDRESSED TO C20 BY NAME.
+       The direction is asserted by MEASUREMENT - a probe id in `notes` produces an
+       entry whose target is "-", and no argument arrangement makes it OVER-count.
+       test_Q055_the_canary_b_undercount_is_one_directional_and_the_argument_is_in_the_code
+Q-062  Sections 2, 3, 4, 5 above.
+OF-57 / OF-61  UNTOUCHED. Both tests unchanged and green; the truncation docstring is
+       NOT weakened back. The fourteenth field does not touch either row - neither
+       truncation nor a re-derived suffix leaves a stale digest, and `seed` is on the
+       document, not on an entry.
+
+================================================================================
+11. BEFORE / AFTER, AND EVERY COUNT ATTRIBUTED
+================================================================================
+
+  make test    BEFORE  596 passed,  1 FAILED, 1 skipped, 2 deselected  (clean, 7a53c9b)
+               AFTER   648 passed,  0 failed, 1 skipped, 2 deselected
+  check-roles  BEFORE  17 passed, 0 failed, 4 n/a, exit 0
+               AFTER   17 passed, 0 failed, 4 n/a, exit 0    (unchanged)
+
+  the +52 and the -1, attributed by file:
+    tests/test_c7_ledger.py               108 -> 143   +35   THIS SESSION
+    test_c13_camel_comparator.py }         57 ->  73   +17   C13 BUILD 2 (3fb17baa)
+    test_config_loader.py        }   (56 passed, 1 failed -> 73 passed, 0 failed)
+    everything else                       432 -> 432     0   untouched
+
+!! THE ONE RED AT BASELINE WENT GREEN AND IT IS NOT THIS SESSION'S.
+test_config_loader.py::test_protocol_sentinels_are_exactly_the_undecided_ones is
+Q-061 / OF-58, closed by the CONCURRENT C13 BUILD 2 session at 28555a6. config/ and
+that file are outside this fence in BOTH directions and were not touched. Stated so
+the green is not silently absorbed - exactly as that session named this one's +35 in
+its own STATUS note.
+
+  git status --porcelain tests/goldens/   ->  EMPTY  <no output>
+  git status --porcelain                  ->  EMPTY at the final run
+  whetstone_gate.__file__ = C:\Users\chinm\whetstone-gate\src\whetstone_gate\__init__.py
+  0 CR BYTES in every file this session wrote, counted as BYTES:
+    ledger/{__init__,build,chain,control,entry,store}.py, tests/test_c7_ledger.py,
+    QUESTIONS.md, INCIDENTS.md, STATUS.md, PROGRESS.md, OPEN_FINDINGS.md
+
+================================================================================
+12. GIT - EVERY COMMIT PATHSPEC-LIMITED, EVERY COMMIT TOKENED
+================================================================================
+
+  f7d8547  chore: record session token 7d84b383 - the sixteenth self-recorded row
+  6988cf6  docs: record Q-062, Q-053, Q-054 and Q-055 VERBATIM, before a line is touched
+  3d78c82  feat: C7 - the fourteenth content field, `executed`, read from the world (unreviewed)
+  f1dc885  test: C7 - Q-062's four consistency assertions, the control, and one retirement (unreviewed)
+  2f702d9  docs: INC-34 and INC-35, Q-066..Q-069 and OF-64..OF-67
+  63c42aa  docs: STATUS and PROGRESS - Q-062 implemented, the STOP that blocked C8 is lifted
+  bbcb321  docs: INC-36 - this session's own commit swept a concurrent session's four entries
+  4fa9afc  docs: INC-36 - fill in its own Fix SHA
+  9723fb0  docs: STATUS - INC-36 added; "two incidents" was understating
+  <this>   docs: C7 BUILD 2 FINAL OUTPUT, committed verbatim before it is printed
+
+CONFIRMED: EVERY ONE USED `git commit -F <msg> -- <explicit paths>`. Q-051 and INC-30.
+The one commit creating a NEW file (ledger/control.py) ran `git add <path>` first,
+because a pathspec commit cannot reach an untracked path; the pathspec is still on the
+commit.
+!! AND SEE INC-36: A PATHSPEC IS NECESSARY AND IT WAS NOT SUFFICIENT. 2f702d9 carried
+four entries this session did not write, because both sessions were appending to the
+same files and a pathspec is scope-limited by PATH and not by authorship.
+
+All carry `Session-Token: 7d84b383`. Every commit touching src/ or tests/ ends with
+"(unreviewed)". NO TAG WAS CUT. No force-push, no amend, no history rewrite.
+STATUS.md's C7 row APPENDED to, never erased. PROGRESS.md: one entry, newest on top.
+
+================================================================================
+13. WHAT I COULD NOT DO
+================================================================================
+
+ 1. Write golden 5B. tests/goldens/ is READ-ONLY to a build session (hard rule 3) and
+    the prompt says the architect is authoring it. The writer property is asserted
+    meanwhile by a round trip that is NAMED AS WEAKER.
+ 2. Close Q-066 - a fifteenth field for `receipt`. Q-062's own option 1 read
+    "executed: bool, AND PROBABLY receipt: str | null" and the ruling took the first
+    half. Class A. IF IT IS EVER GRANTED IT SHOULD BE GRANTED BEFORE GOLDEN 5B IS CUT.
+ 3. Close Q-067 (which productive-action reading S12.1 publishes), Q-068 (the fourth
+    refusal shape), Q-069 (whetstone_gate.ledger heading for BOTH the gate's and the
+    scorer's import closure while check_roles D3's allow-list is empty by design, and
+    ledger.control is unambiguously predicate logic). OF-64 is HIGH and DUE BEFORE C8
+    AND C9. C7 could not test it: no gate exists.
+ 4. Fix world/harm.py's productive_actions, or its docstring's premise ("a harm record
+    exists for exactly the money actions the gate allowed" - it exists for the ones
+    that REACHED RAZORPAY), or semantics.py's log docstring, which now names two of
+    the three ledger columns the log owns. ALL OUTSIDE THIS FENCE.
+ 5. Make the mutation harness run automatically, or run it across the whole package
+    rather than a hand-picked 17. S5.3 makes it a REVIEW deliverable and INC-35's
+    Systemic guardrail says "none - accepted" rather than claiming otherwise.
+ 6. Close INC-36 structurally. One working tree per session is the only remedy and it
+    is not a build session's to install. Q-063.
+ 7. A mechanism for the shared Q-/OF-/INC- counters. FOURTH consecutive instance, and
+    the FIRST where the drafted numbers were already taken. OF-67. Still prose-only.
+
+================================================================================
+14. VERDICT
+================================================================================
+
+BUILT, UNREVIEWED. Q-062's ruling is implemented and the STOP that blocked C8 IS
+LIFTED. The two capture_payment entries that shared one digest now differ, in exactly
+one content field, and the field was READ FROM ToolResult.ok and never inferred. All
+four golden-5 cases reproduce with their first-bad seqs and tests/goldens/ is clean.
+The four consistency assertions are each a kept test and three are refusals at the
+write. productive_action is derived term by term against S8.6a parsed out of the
+specification and reproduces golden 3's hand-computed 3. The writer-reproduces-case-A
+test is retired in place with its trace and its own measurement.
+
+THREE INCIDENTS, ALL THIS SESSION'S OWN. Two were caught before they could ship, one
+by an adversarial re-read and one by a mutation run that INC-33 said was owed. THE
+THIRD IS A COMMIT THAT DID SHIP, was found by the session it damaged, and made one
+sentence this session had already written FALSE - corrected in place, not deleted.
+
+make test 648 passed / 0 failed / 1 skipped / 2 deselected, of which +35 is this
+chunk's and +17 and the red-to-green are the concurrent session's. check-roles
+17 / 0 / 4, exit 0. ZERO PROVIDER CALLS.
+
+NO TAG WAS CUT. NOTHING HERE IS SELF-CERTIFIED, AND A FRESH ADVERSARIAL REVIEW
+FOLLOWS.
