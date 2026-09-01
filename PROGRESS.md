@@ -6,6 +6,200 @@ not a record; this file is.
 
 ---
 
+## C13 — THE CaMeL COMPARATOR — **BUILD** attempt 2 — 2026-09-01 — ⚖️ two Class A rulings landed · `CONTEXT.md` **v1.8** · suite **GREEN** · **one HIGH finding stopped on, due before `prereg-v1`** · ZERO provider calls
+
+**SESSION-TOKEN:** `3fb17baa` — **NOT in the batch.** Appended as
+`| `3fb17baa` | C13 | BUILD | 2026-09-01 |` and numbered **from the table** as the **seventeenth**
+self-recorded row, with the concurrent session's sixteenth (`7d84b383`) already in place when the
+count was taken. **The count has now been right without a correction three times running**, since
+the architect stopped numbering it in the prompt and started pointing at `5c4f8e11`'s
+reconciliation table. **Fifteen of seventeen are still the same defect**, and the mechanism
+(`check_roles.py` counting the rows itself) is **still OWED** for the fourth consecutive session —
+`check_roles.py` is outside this fence too.
+
+**Ran concurrently with C7 BUILD 2 (`7d84b383`) in ONE working tree.** See *"the concurrency"*.
+
+**Token spend: ZERO.** No provider model call. CaMeL was never run, the Google models endpoint was
+never contacted, and **no model id was checked for being served** — that is Branch A's condition
+and it is RUN-1's to test, not a build session's. The only network was **two HTTP GETs to
+`arxiv.org`**, which §8's lane reservation does not cover and this session's prompt required.
+
+**Not a FIX session.** C13 BUILD 1 (`c2b7f419`) raised `Q-057` and `Q-058` **correctly**, stopped on
+both, and built its artefacts so the correction would be one edit rather than a rewrite. Both are
+answered here. Nothing build 1 did was undone.
+
+### 1. The rulings, recorded verbatim BEFORE anything else was touched (`1ace6bb`)
+
+Hard rule 5. The two Class A rulings arrived as **one quoted block** and are split across `Q-057`
+and `Q-058` at the sentence where they change subject, **with no word altered**; the unsplit block
+is carried in `docs/sessions/c13-build-2.txt`. `Q-061`'s ruling (TASK 4) is recorded the same way.
+Each entry's **original `Status` line is kept inside the new one** rather than overwritten.
+
+  * **`Q-057` RULED** — the run is **TWO PASSES**. `+camel+secpol` is a pipeline name CaMeL emits at
+    `models.py:188`, not a `--model` argument. ⚠️ **Class A rather than a typo because
+    `"google" in model` is TRUE for the suffixed string, so DISPATCH SUCCEEDS** and the whole string
+    reaches the Google client as a model id; the provider error is indistinguishable from Branch B's
+    own trigger. **A pre-registration whose negative branch can be reached by our own bug measures
+    nothing.** Branch B's trigger is consequently **narrowed to a DIAGNOSED cause**.
+  * **`Q-058` RULED** — build 1 is correct and the specification was wrong. The headline banking
+    pair is **Table 2, Appendix B, `o3 High`**; **Tables 5–7 are Appendix C, Claude 3.5 Sonnet**,
+    where CaMeL is **behind** the undefended model on banking. **Table 7 is RETAINED** — it is P2's
+    citation and build 1 verified it exactly.
+  * **`Q-061` RULED** — the **test** was wrong, the config right, and `config/` was not to be
+    touched.
+
+### 2. `CONTEXT.md` v1.8 (`2b376ee`) — three edits, and nothing else in the file moved
+
+The version line; §8.5.1's whole *"Pre-declared decision"* block; and TASK 1c's two remaining
+`Tables 5–7` sites. **Both 1c sites were read in their own sentences and judged one at a time**:
+§4's AgentDojo row and §11.2's published-numbers bullet each cite the range beside the
+**injection-count** claim and **neither states a utility figure** — §4's utility pair lives one row
+up, in the **CaMeL** row, which cites no table and is clean exactly as the ruling says. So under the
+ruling both **stay**, with **Table 7 named explicitly**, Tables 5–7 identified as Appendix C /
+Claude 3.5 Sonnet, and each site now saying plainly that the range is **not** the source of the
+`o3 High` pair. **Neither was ambiguous, so neither was stopped on**, and both are quoted before and
+after in the FINAL OUTPUT so the judgement can be checked rather than taken.
+
+⚠️ **CR bytes in `CONTEXT.md`: 0 before, 0 after**, and no control byte other than LF anywhere in
+the file — INC-13 put a raw `0x08` in here once and it sat for two days. ⚠️ **Every parser that
+reads this file returns exactly what it returned before the amendment**: the gemini id,
+`max_tokens=8192`, the interpreter size, the deny-by-default string, the 90-minute timebox, **all
+eight §8.5 line references**, the Branch-B reason and P1/P2/P3. That was checked, not hoped for —
+`_spec_text` normalises §8.5 *including* its subsections, and every anchor is a *"occurs exactly
+once"* check that new prose could have broken.
+
+### 3. The guardrail — the point of the `Q-058` ruling, not its footnote (`ef61362`, `28555a6`)
+
+*"FROM NOW ON, EVERY PUBLISHED THIRD-PARTY FIGURE CARRIES THE TABLE OR FIGURE NUMBER, ITS APPENDIX,
+ITS BASE MODEL AND ITS ROW."* Build 1 asserted those four were **truthy** and never fired the
+assertion at a figure missing one. ⚠️ **Truthiness cannot tell `Table 2` from `Tables 5-7`**, and a
+range where a table belongs is the entire defect. So:
+
+  * `PublishedFigure.provenance_failures()` checks all four **by format**, returns a **list** so a
+    failure names the field, and `render_branch_b` **REFUSES to render** on it — a refusal holds
+    outside pytest, an assertion does not;
+  * it is **fired at six fixtures**: no table, no appendix, no base model, no row, no base-model
+    source, and **`Tables 5-7`**. Each must fail *and* name the field.
+
+⚠️ **And the new rule immediately found something in our own artefact, which is the best evidence
+it is a rule and not decoration: Appendix C names NO base model anywhere.** Its whole prose is the
+heading, Figure 18's caption and three tables. `Claude 3.5 Sonnet` is attributed from **§6.3** —
+*"run with Claude 3.5 Sonnet"* — and **Figure 11's caption**. Carrying it as though Appendix C said
+so would be `Q-058`'s own defect one level smaller, **in the artefact whose subject is unsourced
+claims**. Every figure now records `base_model_source`, footnoted per table.
+
+**The paper was re-fetched independently** and reproduced exactly: HTTP 200, **2,554,718 bytes**,
+SHA-256 `b5cd7970…` — identical to build 1's. Table 2's `o3 High` block and Tables 5, 6 and 7 were
+re-extracted first-hand, and the **appendix attribution was confirmed from the paper's own section
+ids**: Table 2 under `A2` = *Appendix B, "Full results tables"*, Tables 5–7 under `A3` = *Appendix
+C, "Baseline results"*.
+
+### 4. The harness — the flag claim made true, and RUN-1's first action
+
+Build 1's report said the flags were *"derived from `main.py`'s signature"*; **in the code they were
+four string literals**. `cli_flags()` now parses `def main(...)` at the pin with `ast`, refuses
+unless the file still routes through `cyclopts.run` (the kebab-casing rule is cyclopts' and nobody
+else's), refuses on two `main`s or none, and `require_flags()` refuses **by name** on any parameter
+that has gone. **The argv is byte-identical to build 1's** — what changed is that the claim is now
+true in the code rather than in a report. RUN-1's plan gains **`preflight`** — `python main.py
+--help`, spends nothing, **RUN-1's first action**, because this argv has never been executed and no
+session may spend a token to try it — and **`same_working_directory`**, because
+`replay_privileged_llm.py:321` opens a **relative** `Path("logs")` and pass 2 started elsewhere
+**reports nothing rather than failing.**
+
+### 5. TASK 3 — the class build 1 named, swept
+
+Build 1 verified 8 of 8 claims that lived in `models.py` and `security_policy.py`, and **both errors
+lived elsewhere**. Every remaining §8.5/§8.5.1/§8.5.2 claim is now **VERIFIED-AT-PIN**, with the
+not-yet-opened ones opened here: `check_policy` is called at **exactly one site in the whole CaMeL
+repository**; `banking.py:17` imports AgentDojo's `BankingEnvironment`; `_supported_model_names` is
+**12 + 5×3**; **`MODEL_NAMES` is consumed on AgentDojo's side** by `base_attacks.py:141-146` and
+`ImportantInstructionsAttack`'s `{model}` placeholder — the *"what model are you?"* claim, checked
+on the AgentDojo side for the first time. ⚠️ **`InjectionTask6` is reproduced at
+`injection_tasks.py:331-338` statement by statement**, and **one precision point is now asserted
+rather than left in prose: the sum is over transactions FILTERED TO THE ATTACKER IBAN**, which
+§11.2's shorthand *"outgoing"* does not say. P1's *"0.01 transfers"* are `InjectionTask0/1/2/3/8` —
+**five of nine, counted**.
+
+### 6. TASK 4 — `Q-061` closed, and `config/` untouched
+
+The `==` over a set the plan requires to shrink is gone. What replaced it holds all the way to
+`prereg-v1`: no NEW key drifts in; every remaining sentinel is **owned**; no key changes hands; and
+**`vendor.agentdojo_sha` is asserted STILL PRESENT BY NAME**, because it is C16's and a bare subset
+check would have permitted an early, silent resolution. **Fired three ways in `tmp_path`.** ⚠️ **The
+CLASS is not closed** — `Q-043` and `Q-051` are the same shape in files this fence names under NOT.
+
+### 7. ⚠️ The finding this session stopped on, and it has a deadline — `Q-064` / `OF-62`
+
+`grep -rn "Tables 5"` **after** the amendment landed found **four surviving copies of the corrected
+citation**, all outside the fence. Two are in **`config/lanes.yaml`** — `branch_b_action` still
+reads *"ship as a citation of Tables 5–7"*, and `branch_a_condition` still encodes the
+**un-narrowed** Branch-B trigger. ⚠️ **`config/` is a pre-registration artefact, and hard rule 4
+says a FROZEN one OUTRANKS `CONTEXT.md`.** The clause is dormant today — `prereg-v1` does not
+resolve, checked — and goes live **tonight, at C14**, at which point the project is formally bound
+to the citation the ruling called wrong. **Nothing reads either key: one grep hit, the definition.
+That is why no test fails on it, and why a human reads it at C14.** Nothing was edited and no
+workaround was built. Also `Q-065` / `OF-63`: **v1.8 has no Change-log row**, which that section
+reserves to the architect by name.
+
+⚠️ **The generalisable half, which is worth more than the instance:** the ruling governs *how a
+figure is cited* and says nothing about *how many copies of a citation exist*. Four survived, in
+three file classes, because **no mechanism knows a citation has copies**. `BRANCH_B.md` parses its
+citation from source; nothing else does. **A grep for the superseded string, run as a test, catches
+all four in one line.**
+
+### 8. Counts, and whose movement is whose
+
+| | BEFORE (session start) | AFTER |
+|---|---|---|
+| `make test` | 596 passed / **1 failed** / 1 skipped / 2 deselected | **648 passed / 0 failed** / 1 skipped / 2 deselected |
+| `make selftest` | 1 failed, 1 passed — **RED** | 1 failed, 1 passed — **STILL RED, correctly** |
+| `make check-roles` | 17 / 0 / 4, exit 0 | **unchanged**, exit 0 |
+| `git status --porcelain tests/goldens/` | EMPTY | **EMPTY** |
+
+**+52 passes, and the split is measured rather than estimated.** Total collected went 600 → 651.
+This session's two files went **57 → 73 = +16**, so the concurrent C7 BUILD 2 session contributed
+**+35**. Passes: **+16 mine (all new, all green) + 1 mine (`test_protocol_sentinels_…` red → green)
++ 35 C7's = +52.** ⚠️ **The one BEFORE failure was C13 build 1's declared STOP and it is closed
+here**; the object-store test went red only while the tree was dirty and is green with everything
+committed. ⚠️ **`make selftest` must stay red and does** — `camel_comparator.branch` is still
+`TODO_C13_RUN1`, and a build session that turned it green would have decided from a chair a question
+the specification reserves for a timeboxed operator run.
+
+### 9. The concurrency, and one thing `git commit -- <paths>` does not give you
+
+C7 BUILD 2 (`7d84b383`) held `src/whetstone_gate/ledger/`, `tests/test_c7_ledger.py` and
+`INCIDENTS.md` **in this same working tree** throughout. Every commit here used
+`git commit -- <explicit paths>` and **none swept the other session's files** — audited with
+`git status --porcelain` immediately before each. ⚠️ **But `git commit -- <paths>` commits the
+WORKING TREE state of those paths**, so it gives **file** isolation and never gave **within-file**
+isolation: at one point `QUESTIONS.md` carried this session's rulings *and* C7's uncommitted `Q-062`
+ruling line, and one command would have committed both under this token. It did not, and how is
+recorded in **`Q-063`** rather than left to be inferred from a diff. **`Q-063` also asks the larger
+question nobody has ruled on: whether two sessions may share one working tree at all.** `INC-30`,
+`ARCH UNBLOCK 2`'s counter collision, `Q-062`'s renumbering near-miss and `Q-063` are **four
+instances of one cause**, and a `git worktree` per session removes all four for one command.
+
+### 10. Owed, and what this session could not do
+
+⚠️ **`INCIDENTS.md` IS HELD BY THE CONCURRENT C7 SESSION and is named under NOT in this fence, so
+FOUR entries are OWED, declared rather than skipped** — hard rule 13's format, `Diagnosis` and
+`Missed` filled in: the three build 1 declared (`Q-058`'s citation, `Q-057`'s invocation, `Q-061`'s
+sentinel equality — the first two now *ruled*, which changes their `Fix` line, not their existence)
+and **one new: `Q-064`, the four surviving copies of a corrected citation.** Its `Missed` is the
+sharpest of the four: **the ruling was applied to the file it named and nobody grepped for the
+string it corrected.**
+
+**Also owed, re-declared:** `check_roles.py` counting the self-recorded token rows itself.
+
+**Did NOT do, deliberately:** did not touch `config/`, `PROCESS.md`, `INCIDENTS.md`,
+`tests/goldens/`, `vendor/`, any other package under `src/`, or any existing test file but
+`tests/test_config_loader.py` under TASK 4. Did not run CaMeL, contact the Google endpoint, or check
+whether a model id is served. Did not decide the branch. Did not let `make selftest` go green. **Did
+not cut a tag, and did not self-certify.**
+
+---
+
 ## C7 — THE LEDGER — **BUILD** attempt 1 — 2026-09-01 — 🔨 built, unreviewed · all four golden-5 cases reproduce · **one STOP declared that blocks C8** · ZERO provider calls
 
 **SESSION-TOKEN:** `3a6e3d07` — **NOT in the batch.** Appended as
