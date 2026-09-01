@@ -20,11 +20,14 @@ from whetstone_gate.attacker.context import (
     render_summary,
 )
 from whetstone_gate.attacker.corpus import (
+    CorpusCoverage,
     CorpusEntry,
     CorpusSource,
     CorpusUnavailable,
     InputProvenance,
     classify_provenance,
+    corpora_in_order,
+    coverage_report,
     load_entries,
     load_sources,
     seed_for_turn,
@@ -44,13 +47,14 @@ from whetstone_gate.attacker.loop import (
     TurnRecord,
     run_episode,
 )
-from whetstone_gate.attacker.texts import attacker_system_prompt
+from whetstone_gate.attacker.texts import attacker_system_prompt, generic_denial
 
 __all__ = [
     "AssembledContext",
     "AttackerSettings",
     "BudgetComparison",
     "ContextPart",
+    "CorpusCoverage",
     "CorpusEntry",
     "CorpusSource",
     "CorpusUnavailable",
@@ -67,8 +71,11 @@ __all__ = [
     "assemble",
     "attacker_system_prompt",
     "classify_provenance",
+    "corpora_in_order",
+    "coverage_report",
     "estimate_messages",
     "estimate_text",
+    "generic_denial",
     "load_entries",
     "load_sources",
     "render_summary",
