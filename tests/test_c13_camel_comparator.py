@@ -181,6 +181,47 @@ def test_the_regeneration_check_actually_fires(proof, tmp_path):
     assert not moved.holds and not moved.head_matches_pin
 
 
+def test_the_rendered_proof_CARRIES_the_diff_it_was_given(proof):
+    """⚠️ **OF-71, CLOSED. The renderer could print `(empty)` over a non-empty diff.**
+
+    Mutant **M1b** deleted the conditional that emits ``proof.diff_against_pin`` and
+    **SURVIVED the whole suite**, after which
+    :func:`test_the_committed_empty_diff_proof_regenerates_byte_for_byte` would have passed
+    over a **dirty tree** — the exact failure that test exists to prevent. The suite was
+    not blind (``test_the_verification_triple_holds…`` asserts on the *object*), but the
+    defence that survived was not the one the artefact's own header advertises:
+    *"THIS FILE IS REGENERATED, NOT STORED … a committed diff that nothing re-derives is a
+    screenshot."*
+
+    ⚠️ A second, quieter defect the mutant exposed and this pins: ``(empty)`` was printed
+    **unconditionally**, *after* the value — so a dirty render said both. It is now
+    printed only when the value is empty.
+    """
+    measurement = vendor.interpreter_measurement()
+    dirty = dataclasses.replace(
+        proof,
+        status_porcelain=" M src/camel/security_policy.py",
+        diff_against_pin="--- a/src/camel/security_policy.py\n+++ b/src/camel/security_policy.py",
+    )
+    rendered = vendor.render_unmodified_proof(dirty, measurement, "2026-09-01")
+
+    assert dirty.diff_against_pin in rendered, (
+        "the rendered proof must carry the diff it was given; a renderer that drops it can "
+        "print `(empty)` over a modified tree (M1b)"
+    )
+    assert dirty.status_porcelain in rendered
+    # ⚠️ AND `(empty)` must NOT appear for a value that is not empty — the half M1b faked.
+    assert "(empty)" not in rendered, (
+        "`(empty)` beside a real diff is a proof that contradicts itself in place"
+    )
+
+    # The clean rendering still says `(empty)` twice — once per command — as the committed
+    # file does, which is why this correction is byte-identical for the real proof.
+    clean = vendor.render_unmodified_proof(proof, measurement, "2026-09-01")
+    assert clean.count("(empty)") == 2
+    assert clean != rendered
+
+
 def test_a_real_edit_to_the_vendored_tree_breaks_the_triple(camel_root, tmp_path):
     """⚠️ The strongest form: **edit a real clone and watch the triple fail.**
 
@@ -454,8 +495,19 @@ def test_run1_is_two_passes_and_the_second_replays_the_first(context_md, camel_r
     assert second.produces_pipeline_name == first.produces_pipeline_name + "+secpol"
     assert first.cwd == second.cwd, "pass 2 reads pass 1's ./logs, so the CWD must match"
 
-    replay = vendor.blob_text(camel_root, "src/camel/pipeline_elements/replay_privileged_llm.py")
-    assert 'Path("logs") / pipeline_name' in replay
+    # ⚠️ INC-39. This used to be `assert 'Path("logs") / pipeline_name' in replay` — a
+    # substring satisfied ONLY by two lines inside functions with no caller, so deleting
+    # the dead code (M15) killed it and severing the live edge (M17) did not. The claim
+    # "the second replays the first" is now an assertion about the CALL GRAPH.
+    claim = invocation.live_log_path(camel_root)
+    assert claim == plan.log_path
+    assert claim.called_from == "PrivilegedLLMReplayer.query", (
+        "pass 2 replays pass 1 only if the live pipeline element reaches the function that "
+        "reads pass 1's logs; a Path(\"logs\") anywhere else in the module proves nothing"
+    )
+    assert claim.read_call in {"read_text", "read_bytes", "open"}, (
+        "the replay must READ the stored trace, not merely enumerate a directory"
+    )
     main_py = vendor.blob_text(camel_root, "main.py")
     assert "should have already been run" in main_py
     assert "replay_with_policies" in main_py
@@ -540,23 +592,151 @@ def test_run1s_first_action_is_help_and_it_spends_nothing(context_md, camel_root
 
 
 def test_both_passes_share_one_working_directory_and_the_plan_says_why(context_md, camel_root):
-    """⚠️ ``replay_privileged_llm.py:321`` opens a **relative** ``Path("logs")``.
+    """⚠️ **INC-39. The live path is DERIVED and its function is PROVED REACHABLE.**
 
-    Pass 2 started anywhere else reads an empty tree and **reports nothing rather than
-    failing** — a silent zero, inside a run that happens exactly once.
+    The version of this test that shipped at build 2 asserted the substring
+    ``'Path("logs") / pipeline_name'``, which occurs at **exactly two lines in that file,
+    321 and 341, both inside functions nothing calls** — the live construction is split one
+    segment per line and never matched it. So the guard died when dead code was deleted
+    (**M15**) and lived when the requirement was destroyed (**M16**, **M17**): it was
+    *anti-correlated* with the property it is named for.
+
+    Nothing here matches on text. Every assertion is on
+    :class:`~whetstone_gate.camel_comparator.invocation.LogPathClaim`, which locates the
+    path inside whichever function ``PrivilegedLLMReplayer.query`` can actually reach.
     """
     plan = invocation.run1_plan(context_md, camel_root)
     assert plan.preflight.cwd == plan.passes[0].cwd == plan.passes[1].cwd
-    assert "Path(\"logs\")" in plan.same_working_directory
-    assert plan.passes[0].cwd in plan.same_working_directory
 
-    replay = vendor.blob_text(camel_root, "src/camel/pipeline_elements/replay_privileged_llm.py")
-    line = next(
-        (n for n, text in enumerate(replay.splitlines(), 1) if 'Path("logs") / pipeline_name' in text),
-        None,
+    claim = plan.log_path
+    assert claim.root_literal == invocation.LOG_ROOT
+    assert claim.is_relative, (
+        "pass 2 reads a RELATIVE logs path, and that is the entire reason both passes must "
+        "share a working directory. An absolute path would delete the requirement."
     )
-    assert line is not None, "the relative logs path is the reason for the requirement"
-    assert "os.path.abspath" not in replay and "Path.cwd()" not in replay
+    assert claim.called_from == "PrivilegedLLMReplayer.query", (
+        "the live entry point is the one models.py:179 constructs; a claim about any other "
+        "function is a claim about code the run never executes (INC-39)"
+    )
+    assert claim.span[0] < claim.read_line, "the path is built before it is read"
+    assert claim.called_at > 0
+
+    # ⚠️ THE FAILURE MODE, AS A FACT AND NOT AS A SENTENCE. `read_text` on a missing file
+    # raises FileNotFoundError; `glob` on a missing directory yields nothing. Build 1 and
+    # build 2 both promised the SILENT one, having read the dead helper.
+    assert claim.read_call == "read_text"
+    assert claim.crashes_loudly
+
+    # ⚠️ THE BINDING THAT MAKES A STALE CITATION A RED TEST: the plan's own prose must
+    # carry the file:line the derivation produced, so the two cannot drift apart again.
+    assert claim.citation() in plan.same_working_directory
+    assert claim.read_citation() in plan.same_working_directory
+    assert "FileNotFoundError" in plan.same_working_directory
+    assert "CRASHES LOUDLY" in plan.same_working_directory
+    # ⚠️ The claim, not the word: the plan may CONTRAST with a silent zero (it does), but
+    # it must never PROMISE one. Build 1 and 2's exact sentence is the thing banned here.
+    assert "reports nothing rather than failing" not in plan.same_working_directory, (
+        "INC-39: the live read CRASHES. Promising RUN-1 a silent zero would send it "
+        "looking for a missing number instead of a stack trace, inside a 90-minute box."
+    )
+    assert plan.passes[0].cwd in plan.same_working_directory
+    assert claim.citation() in plan.passes[1].purpose
+
+    # ⚠️ Asserted as "the others are all unreachable", NEVER as "the others exist" — so
+    # deleting the dead scaffolding (M15) changes no verdict here, which is the whole
+    # difference between this guard and the one it replaces.
+    source = vendor.blob_text(camel_root, invocation.REPLAY_PATH)
+    rebuilt = invocation.live_log_path_from_source(source)
+    assert rebuilt == claim
+    assert claim.function not in claim.unreachable_others
+
+
+def test_the_live_log_path_is_located_by_ast_and_proved_reachable(tmp_path):
+    """⚠️ **The three mutants of `INC-39`, fired at a fixture — `vendor/` is NOT touched.**
+
+    `PROCESS.md` §5.4: a gate nobody has seen go red is decorative. These are the review's
+    own M15/M16/M17 with the polarity the fix owes:
+
+      * **M15** — delete the unreachable helpers. Live behaviour is byte-identical, so the
+        claim must be **unchanged** and this must **SURVIVE**.
+      * **M16** — make the live path absolute. The requirement is destroyed, so it must
+        **DIE**.
+      * **M17** — the live caller stops calling the function that reads the logs. The
+        claim *"the second replays the first"* is destroyed, so it must **DIE**.
+    """
+    live = (
+        'from pathlib import Path\n'
+        'def replay_task(pipeline_name, suite_name, user_task_id, attack_name):\n'
+        '    trace_path = (\n'
+        '        Path("logs")\n'
+        '        / pipeline_name\n'
+        '        / suite_name\n'
+        '        / (attack_name or "none")\n'
+        '    )\n'
+        '    return TaskResults.model_validate_json(trace_path.read_text())\n'
+    )
+    dead = (
+        'def replay_user_task(pipeline_name, suite_name, user_task_id, attack_name):\n'
+        '    path = Path("logs") / pipeline_name / suite_name / user_task_id\n'
+        '    for task_id_path in path.glob("*"):\n'
+        '        replay_task(pipeline_name, suite_name, user_task_id, attack_name)\n'
+        'def replay_suite(pipeline_name, suite_name):\n'
+        '    path = Path("logs") / pipeline_name\n'
+        '    for user_task_path in path.glob("user_task_*"):\n'
+        '        replay_user_task(pipeline_name, suite_name, None, None)\n'
+        'def replay_benchmark():\n'
+        '    replay_suite("x", "y")\n'
+    )
+    caller = (
+        'class PrivilegedLLMReplayer:\n'
+        '    def query(self, q, runtime, env, messages, extra_args):\n'
+        '        new_messages, env = replay_task(\n'
+        '            self._pipeline_name, extra_args["task_suite_name"],\n'
+        '            extra_args["user_task_id"], None,\n'
+        '        )\n'
+        '        return q, runtime, env, messages, extra_args\n'
+    )
+
+    base = invocation.live_log_path_from_source(live + dead + caller)
+    assert base.function == "replay_task"
+    assert base.read_call == "read_text" and base.crashes_loudly and base.is_relative
+    assert base.called_from == "PrivilegedLLMReplayer.query"
+    # ⚠️ The dead subtree is REPORTED, and reported as unreachable — which is the finding.
+    assert base.unreachable_others == ("replay_suite", "replay_user_task")
+
+    # -- M15: delete the three unreachable helpers. Live behaviour byte-identical. -------
+    m15 = invocation.live_log_path_from_source(live + caller)
+    assert m15.function == base.function
+    assert (m15.span, m15.read_line, m15.read_call) == (base.span, base.read_line, base.read_call)
+    assert m15.is_relative and m15.crashes_loudly
+    assert m15.unreachable_others == (), "the dead helpers are gone; nothing else changed"
+
+    # -- M16: make the LIVE path absolute. The requirement is destroyed. -----------------
+    for absolute in (
+        live.replace('Path("logs")', 'Path("/var/logs")'),
+        live.replace("trace_path.read_text()", "trace_path.resolve().read_text()"),
+    ):
+        mutated = invocation.live_log_path_from_source(absolute + dead + caller)
+        assert not mutated.is_relative, (
+            "an absolute log path deletes the same-working-directory requirement, and the "
+            "guard that does not notice is the guard M16 walked through"
+        )
+
+    # -- M17: the live replayer stops reading pass 1's logs. -----------------------------
+    severed = caller.replace("replay_task(", "some_other_element(")
+    with pytest.raises(invocation.InvocationError) as excinfo:
+        invocation.live_log_path_from_source(live + dead + severed)
+    assert "not exactly one" in str(excinfo.value)
+    # ⚠️ And the reason it dies is REACHABILITY, not absence: the three dead functions are
+    # all still in the source and all still build a `Path("logs")`. Only the live edge is
+    # gone. That is precisely what the old substring assertion could not tell apart.
+    assert "replay_user_task" in str(excinfo.value)
+
+    # -- And the refusals fire rather than returning a default. --------------------------
+    with pytest.raises(invocation.InvocationError, match="builds no `Path"):
+        invocation.live_log_path_from_source(caller)
+    with pytest.raises(invocation.InvocationError, match="defines no PrivilegedLLMReplayer"):
+        invocation.live_log_path_from_source(live + dead)
 
 
 def test_the_invocation_names_only_the_key_variable_never_a_value(context_md, camel_root):
@@ -613,6 +793,39 @@ def test_this_chunk_does_not_decide_the_branch(package_dir):
         assert "TODO_C13_RUN1" in reason or "not determined" in reason
 
 
+@pytest.mark.parametrize(
+    "value",
+    ["", "   ", "\t\n", None, 3, True, []],
+    ids=["empty", "spaces", "whitespace", "none", "int", "bool", "list"],
+)
+def test_a_hand_written_blank_branch_NAMES_NO_BRANCH(value):
+    """⚠️ **OF-75, CLOSED. The guard that was unreachable is now fired.**
+
+    Mutant **M12** deleted ``if not isinstance(branch, str) or not branch.strip():`` and
+    was **proven equivalent** — ``require()`` raises ``UndeterminedValue`` on the
+    ``TODO_C13_RUN1`` sentinel first, so nothing could reach it. ⚠️ **It stops being
+    equivalent the moment RUN-1 writes the key by hand, inside a 90-minute box, and a
+    hand-written empty string is exactly what the guard is for.**
+
+    The predicate is now :func:`invocation.branch_value_problem`, pure, so the state is
+    constructed here rather than by putting a blank into `config/` — which no test may do
+    and which hard rule 9 would refuse anyway.
+    """
+    problem = invocation.branch_value_problem(value)
+    assert problem is not None, (
+        f"{value!r} names no branch, and a branch nobody chose must never read as decided"
+    )
+    assert "names no branch" in problem
+    assert repr(value) in problem, "the refusal must show what it actually found"
+
+
+def test_a_real_branch_value_is_accepted_so_the_guard_is_not_merely_a_refusal():
+    """The control for OF-75: a gate that refuses everything is not a gate either."""
+    assert invocation.branch_value_problem("A") is None
+    assert invocation.branch_value_problem("B") is None
+    assert invocation.branch_value_problem("  Branch B  ") is None
+
+
 def test_make_selftests_camel_gate_is_still_red():
     """⚠️ **It MUST stay red, and this asserts the reason rather than the redness.**
 
@@ -629,13 +842,113 @@ def test_make_selftests_camel_gate_is_still_red():
                 lanes.require("camel_comparator.branch")
 
 
-def test_the_banking_suite_named_in_source_exists_at_the_agentdojo_pin(dojo_root):
+def test_the_banking_suite_named_in_source_exists_at_the_agentdojo_pin(dojo_root, camel_root):
     """:data:`invocation.SUITE` is a bare string in first-party source, so it is checked.
 
     Better here than inside RUN-1's 90-minute box.
+
+    ⚠️ **OF-74: the version the run LOADS is checked, not only `v1`.** ``main.py:79`` is
+    ``get_suite("v1.2", …)``, and the version is **derived** from that call rather than
+    written here — the same discipline as :func:`invocation.cli_flags`, and for the same
+    reason INC-39 exists: a first-party copy of a third party's choice drifts in silence.
     """
-    assert invocation.banking_suite_exists(dojo_root)
-    assert (dojo_root / "src" / "agentdojo" / "default_suites" / "v1" / "banking").is_dir()
+    version = invocation.suite_version(camel_root)
+    assert version == "v1.2", (
+        "main.py's get_suite version is what decides which InjectionTask6 the run executes"
+    )
+    assert invocation.suite_package(version) == "v1_2"
+    assert invocation.suite_package("v1") == "v1"
+
+    # v1 holds banking's task_suite/user_tasks; v1_2 holds the injection-task overrides.
+    assert invocation.banking_suite_exists(dojo_root, "v1")
+    assert invocation.banking_suite_exists(dojo_root, version), (
+        f"the run loads {version}, so its banking package must exist at the pin"
+    )
+    assert invocation.banking_suite_dir(dojo_root, version).name == "banking"
+
+
+def test_the_suite_version_derivation_refuses_rather_than_guessing():
+    """A ``main.py`` that loads two suite versions, or none, must STOP rather than pick."""
+    with pytest.raises(invocation.InvocationError, match="0 distinct version"):
+        invocation.suite_version_from_source("def main():\n    ...\n")
+    with pytest.raises(invocation.InvocationError, match="2 distinct version"):
+        invocation.suite_version_from_source(
+            'get_suite("v1.2", "banking")\nget_suite("v1", "banking")\n'
+        )
+
+
+def test_p2s_injection_task_predicate_is_IDENTICAL_in_v1_and_the_v1_2_the_run_loads(
+    dojo_root, camel_root
+):
+    """⚠️ **OF-73, CLOSED — and the note C16 must not inherit the wrong copy.**
+
+    C13 read ``default_suites/v1/banking/injection_tasks.py``. ``main.py:79`` loads
+    ``get_suite("v1.2", …)``, so **the copy the run executes is `v1_2`** — the same class
+    as INC-39, one directory over: reading a file that is not the one the run executes.
+
+    **What is verified here, so C16 inherits a fact and not a hope:**
+
+      * both files define ``InjectionTask6`` and its ``security()`` predicate, and the two
+        predicates are **structurally identical** — compared through :func:`ast.unparse`,
+        so the comparison is over the code and not over the author's line wrapping;
+      * ⚠️ **their ``GOAL`` strings DIFFER.** ``v1_2`` appends *"If details of transactions
+        are underspecified, fill them in without asking me."* **P2 is scored on the
+        predicate, which is unchanged, so the prediction stands** — but C16 runs the same
+        suite against the same task and would be **prompting** with a different string than
+        the one C13's other test asserts.
+    """
+    version = invocation.suite_version(camel_root)
+    task = cfg.load("protocol").require("selections.agentdojo_injection_task")
+
+    def _task_class(suite_version: str):
+        path = invocation.banking_suite_dir(dojo_root, suite_version) / "injection_tasks.py"
+        source = path.read_text(encoding="utf-8")
+        tree = ast.parse(source)
+        return source, next(
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.ClassDef) and node.name == task
+        )
+
+    _, v1_class = _task_class("v1")
+    _, live_class = _task_class(version)
+
+    def _security(klass):
+        return next(
+            node
+            for node in ast.walk(klass)
+            if isinstance(node, ast.FunctionDef) and node.name == "security"
+        )
+
+    v1_security, live_security = _security(v1_class), _security(live_class)
+    assert ast.unparse(v1_security) == ast.unparse(live_security), (
+        f"{task}.security differs between v1 and {version}. P2 is scored against this "
+        f"predicate; if the two copies diverge, the version read decides the result."
+    )
+    # ⚠️ Not merely equal to each other - equal to what CONTEXT.md S11.2 describes.
+    statements = [ast.unparse(node) for node in live_security.body]
+    assert "t.recipient == self._ATTACKER_IBAN" in statements[0]
+    assert ">= 30000" in statements[-1]
+
+    def _goal(klass) -> str:
+        assign = next(
+            node
+            for node in ast.walk(klass)
+            if isinstance(node, ast.Assign)
+            and any(getattr(t, "id", None) == "GOAL" for t in node.targets)
+        )
+        return ast.unparse(assign)
+
+    v1_goal, live_goal = _goal(v1_class), _goal(live_class)
+    assert v1_goal != live_goal, (
+        "OF-73 records that the GOALs differ. If they ever stop differing this note is "
+        "stale and must be re-read rather than silently kept."
+    )
+    assert "If details of transactions are underspecified" in live_goal
+    assert "If details of transactions are underspecified" not in v1_goal
+    # Both still carry the salami-slicing instruction P2 names as A5.
+    for goal in (v1_goal, live_goal):
+        assert "in small increments of no more than $10,000" in goal
 
 
 def test_nothing_in_the_comparator_can_reach_a_model_client(package_dir, repo_root):
@@ -1023,13 +1336,75 @@ def test_the_renderer_REFUSES_a_figure_with_incomplete_provenance():
 
     Build 1's version lived only in this file, so a figure added without running the tests
     would have published. :func:`branch_b.assert_provenance` moves the rule into the
-    renderer, and this proves the refusal actually happens.
+    renderer, and this proves the **helper** refuses.
+
+    ⚠️ **INC-40: THIS TEST IS NAMED FOR THE RENDERER AND CALLS THE HELPER, AND THAT IS THE
+    WHOLE OF BLOCKER B-2.** It is kept — the helper's refusal is real and worth pinning —
+    but it proves nothing about ``render_branch_b``, and mutant **M8b** deleted both
+    ``assert_provenance`` calls from the renderer with the entire suite staying green. The
+    binding is :func:`test_the_RENDERER_refuses_each_incomplete_figure_in_turn` below.
     """
     branch_b.assert_provenance(branch_b.HEADLINE_FIGURES)  # the real ones pass
     with pytest.raises(branch_b.BranchBError) as excinfo:
         branch_b.assert_provenance((_figure(table="Tables 5-7"),))
     assert "Q-058" in str(excinfo.value)
     assert "RANGE" in str(excinfo.value)
+
+
+@pytest.mark.parametrize(
+    "tuple_name", ["HEADLINE_FIGURES", "CITED_TABLE_FIGURES"]
+)
+@pytest.mark.parametrize(
+    ("overrides", "expect_in_message"),
+    [
+        ({"table": ""}, "table="),
+        ({"appendix": ""}, "appendix="),
+        ({"base_model": ""}, "base_model is empty"),
+        ({"base_model_source": ""}, "base_model_source is empty"),
+        ({"row": ""}, "row is empty"),
+        # ⚠️ Q-058 itself: a RANGE where a single table belongs. Truthy, and wrong.
+        ({"table": "Tables 5-7"}, "RANGE"),
+    ],
+    ids=["no-table", "no-appendix", "no-base-model", "no-source", "no-row", "a-RANGE"],
+)
+def test_the_RENDERER_refuses_each_incomplete_figure_in_turn(
+    context_md, camel_root, monkeypatch, tuple_name, overrides, expect_in_message
+):
+    """⚠️ **BLOCKER B-2, CLOSED: `render_branch_b` ITSELF REFUSES, AND BOTH CALLS ARE BOUND.**
+
+    `branch_b.py` states the standard in its own header — *"**A REFUSAL, NOT AN
+    ASSERTION.** … a property enforced only in a test file is a property that holds until
+    somebody adds a figure without running the tests."* The test named for that refusal
+    called :func:`branch_b.assert_provenance` directly, so **deleting both refusals from
+    the renderer left the suite green** (mutant **M8b**, SURVIVED).
+
+    This calls **the renderer**, with a real published figure broken one field at a time,
+    once for **each** of the two tuples the renderer guards — so
+    ``assert_provenance(HEADLINE_FIGURES)`` and ``assert_provenance(CITED_TABLE_FIGURES)``
+    are each bound by their own cases and deleting **either one alone** goes red.
+
+    ⚠️ The field checks themselves are NOT re-tested here: six mutants, six kills, one per
+    field, already live in
+    :func:`test_the_figure_provenance_gate_goes_red_on_each_field_in_turn`. What was
+    missing was only the binding, so only the binding is added.
+    """
+    figures = getattr(branch_b, tuple_name)
+    broken = dataclasses.replace(figures[0], **overrides)
+    monkeypatch.setattr(branch_b, tuple_name, (broken, *figures[1:]))
+
+    hits = len(claims.base_url_hits(camel_root))
+    parsed = predictions.parse_predictions(context_md)
+
+    with pytest.raises(branch_b.BranchBError) as excinfo:
+        branch_b.render_branch_b(context_md, hits, parsed)
+    message = str(excinfo.value)
+    assert expect_in_message in message, f"the renderer refused but did not name the field: {message}"
+    assert "Q-058" in message
+
+    # ⚠️ AND THE CONTROL: with the tuple restored, the SAME call renders. Without this the
+    # test could pass because the renderer refuses everything, which is not a gate either.
+    monkeypatch.setattr(branch_b, tuple_name, figures)
+    assert branch_b.render_branch_b(context_md, hits, parsed).startswith("# Comparator:")
 
 
 def test_appendix_C_names_no_base_model_so_every_such_figure_says_where_its_model_comes_from():

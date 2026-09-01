@@ -203,13 +203,18 @@ def render_unmodified_proof(
         "$ git rev-parse HEAD",
         proof.head_sha,
         "",
+        # ⚠️ OF-71: `(empty)` is printed ONLY when the value is empty. It used to be
+        # printed UNCONDITIONALLY, after the value, so a dirty tree rendered its own diff
+        # and then the word "(empty)" underneath it — and mutant M1b, which deletes the
+        # value and leaves the literal, SURVIVED the whole suite. A proof that can print
+        # "(empty)" over a non-empty diff is the screenshot this file exists to not be.
+        # Byte-identical for a clean tree, which is why the committed proof still
+        # regenerates; it is the DIRTY rendering that was wrong.
         "$ git status --porcelain",
-        *( [proof.status_porcelain] if proof.status_porcelain else [] ),
-        "(empty)",
+        proof.status_porcelain or "(empty)",
         "",
         f"$ git diff {proof.pinned_sha}",
-        *( [proof.diff_against_pin] if proof.diff_against_pin else [] ),
-        "(empty)",
+        proof.diff_against_pin or "(empty)",
         "",
         "# ------------------------------------------------------------------------------",
         "# THE MEASUREMENT, AND WHY IT CARRIES FOUR NUMBERS INSTEAD OF ONE.",

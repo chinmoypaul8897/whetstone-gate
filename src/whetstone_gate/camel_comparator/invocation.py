@@ -29,13 +29,41 @@ nothing.
   * ``main.py``'s own docstring for that flag: *"replay the run with the given model
     enforcing security policies. **Note that the equivalent run (with same model and attack
     config) should have already been run.**"*
-  * ``replay_privileged_llm.py:321`` reads
-    ``Path("logs") / pipeline_name / suite_name / user_task_id / attack_name`` — i.e. **the
-    stored logs of the earlier ``+camel`` pass.**
+  * ``replay_task`` builds ``Path("logs") / pipeline_name / suite_name / user_task_id /
+    (attack_name or "none") / f"{injection_task_id or 'none'}.json"`` and **reads it with
+    ``read_text()``** — i.e. **the stored logs of the earlier ``+camel`` pass.** The span,
+    the read and the call site are **derived by** :func:`live_log_path`, never written
+    down here; see the correction below.
 
 So Branch A is **two passes**: pass 1 produces ``+camel`` and is the pass that spends
 tokens; pass 2 adds ``--replay-with-policies``, replays pass 1's logs through
 ``BankingSecurityPolicyEngine``, and produces ``+camel+secpol``.
+
+═══════════════════════════════════════════════════════════════════════════════════════
+⚠️ INC-39 — THE CITATION THAT WAS HERE NAMED A LINE IN A FUNCTION WITH NO CALLER
+═══════════════════════════════════════════════════════════════════════════════════════
+Builds 1 and 2 cited ``replay_privileged_llm.py:321`` and said that a pass 2 started from
+the wrong directory *"reads an empty tree and reports nothing rather than failing — a
+silent zero"*. **Both halves were wrong**, and C13 REVIEW 1 found it by tracing the call
+graph instead of the line:
+
+  * ``:321`` is inside ``replay_user_task``, called only by ``replay_suite`` (``:344``),
+    called only by ``replay_benchmark`` (``:356``) — and **``replay_benchmark`` has no
+    caller anywhere in the tree.** ``models.py:16`` imports only ``PrivilegedLLMReplayer``
+    and ``UserInjectionTasksGetter``. It is stale scaffolding.
+  * ⚠️ **The live path therefore FAILS LOUDLY, not silently.** ``replay_user_task`` uses
+    ``path.glob("*")``, which over a missing directory yields nothing — a silent zero.
+    ``replay_task`` uses ``trace_path.read_text()``, which over a missing file raises
+    **``FileNotFoundError``**, and nothing catches it: ``PrivilegedLLMReplayer.query`` has
+    no ``try``/``except``, and AgentDojo's ``run_task_with_pipeline`` catches only
+    ``AbortAgentError``. **RUN-1 needs to know which it is: a loud crash inside a
+    90-minute box is diagnosable and a silent zero is not.**
+
+⚠️ **This is `Q-058`'s own generalisation one level in, inside the artefact built to
+enforce it** — *"a URL to a paper is not a URL to a table"*. Build 1 opened the page. It
+did not open the **call graph**. So the remedy is the same shape as everywhere else here:
+the line is **derived**, and its enclosing function is **proved reachable**, by
+:func:`live_log_path_from_source`.
 
 ⚠️ **AND THE FAILURE MODE IS WORSE THAN A CRASH, WHICH IS WHY THE RULING NARROWED BRANCH
 B.** ``models.py:100`` is ``if "google" in model`` — **substring containment**, not a
@@ -61,7 +89,7 @@ from __future__ import annotations
 import ast
 import re
 from dataclasses import dataclass, field
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 
 from .. import config as cfg
 from . import claims, vendor
@@ -74,6 +102,29 @@ and asserted against it by ``test_the_banking_suite_named_here_exists_at_the_pin
 
 ENTRY_POINT = "main.py"
 """CaMeL's own CLI (``cyclopts.run(main)`` at ``main.py:114``)."""
+
+REPLAY_PATH = "src/camel/pipeline_elements/replay_privileged_llm.py"
+"""CaMeL's replayer. ⚠️ **The FILE, never a line** — the line is derived. INC-39."""
+
+REPLAY_CALLER_CLASS = "PrivilegedLLMReplayer"
+REPLAY_CALLER_METHOD = "query"
+"""The **live** entry point, from ``models.py:179``. Everything else in that module that
+opens a ``logs/`` path is reachable only from ``replay_benchmark``, which has no caller."""
+
+LOG_ROOT = "logs"
+"""The directory name pass 1 writes and pass 2 reads. Both are **relative**, which is the
+whole of the same-working-directory requirement."""
+
+_ABSOLUTISERS = frozenset(
+    {"resolve", "absolute", "cwd", "abspath", "realpath", "expanduser"}
+)
+"""Any of these on the log path would make the requirement go away — and M16 is exactly
+that mutation, so :attr:`LogPathClaim.is_relative` is what has to notice it."""
+
+_READ_CALLS = frozenset({"read_text", "read_bytes", "open", "glob", "iterdir", "rglob"})
+"""⚠️ **Which one it is decides the failure mode, so it is REPORTED, not assumed.**
+``read_text`` over a missing file raises ``FileNotFoundError``; ``glob`` over a missing
+directory yields nothing. INC-39 is that distinction getting inverted."""
 
 
 class InvocationError(RuntimeError):
@@ -113,15 +164,42 @@ class Run1Plan:
     user_task_count: int
     branch_undecided_because: str | None
     log_root: str
+    log_path: LogPathClaim
+    """⚠️ **The derivation** :attr:`same_working_directory` **is generated from** — the
+    live path, its read, its call site and whether it is relative, all located by
+    :mod:`ast`. Carried as data so RUN-1 can read the facts and not only the sentence."""
+
     same_working_directory: str
-    """Why both passes MUST run from one directory, in the words of the code that requires
-    it. ``replay_privileged_llm.py:321`` opens a **relative** ``Path("logs")``, so pass 2
-    run from anywhere else reads an empty tree and **reports nothing rather than failing**
-    — a silent zero inside a single-shot 90-minute box."""
+    """Why both passes MUST run from one directory, **generated from** :attr:`log_path`.
+
+    ⚠️ **INC-39: this field used to carry a hand-written citation to
+    ``replay_privileged_llm.py:321`` — a line inside a function with no caller — and to
+    promise a *silent zero*. The live read is ``read_text()``, so it raises an unhandled
+    ``FileNotFoundError`` instead.** It now says whichever of the two the derivation
+    actually finds, and the `file:line` in it is the one :func:`live_log_path` produced."""
 
     @property
     def branch_is_decided(self) -> bool:
         return self.branch_undecided_because is None
+
+
+def branch_value_problem(branch: object) -> str | None:
+    """What is wrong with a branch **value**, or ``None``. ⚠️ Pure, so it can be fired.
+
+    ⚠️ **OF-75 IS WHY THIS IS A SEPARATE FUNCTION AND NOT AN `if` INSIDE THE CALLER.**
+    Mutant **M12** deleted that `if` and was **proven equivalent** — because
+    ``require()`` raises ``UndeterminedValue`` on the ``TODO_`` sentinel first, so today
+    nothing can reach the guard. *Today* is the load-bearing word: it stops being
+    equivalent the moment RUN-1 writes the key **by hand**, inside a 90-minute box, and a
+    hand-written empty string is exactly what this guard is for.
+
+    An unreachable guard that looks like a check is worse than no guard, so it is not left
+    unreachable and it is not deleted: it is **lifted out to where a test can construct the
+    state that reaches it**, without `config/` ever having to hold a blank.
+    """
+    if not isinstance(branch, str) or not branch.strip():
+        return f"camel_comparator.branch is {branch!r}, which names no branch."
+    return None
 
 
 def branch_is_undecided() -> str | None:
@@ -136,9 +214,7 @@ def branch_is_undecided() -> str | None:
         branch = cfg.load("lanes").require("camel_comparator.branch")
     except cfg.ConfigError as exc:
         return f"{type(exc).__name__}: {exc}"
-    if not isinstance(branch, str) or not branch.strip():
-        return f"camel_comparator.branch is {branch!r}, which names no branch."
-    return None
+    return branch_value_problem(branch)
 
 
 def spec_timebox_minutes(context_md: str) -> int:
@@ -200,6 +276,302 @@ def _find_function(tree: ast.Module, name: str, path: str) -> ast.FunctionDef:
             f"wrong function would hand RUN-1 an argv that silently does something else."
         )
     return found[0]
+
+
+@dataclass(frozen=True)
+class LogPathClaim:
+    """Where pass 2 reads pass 1's logs — **located by** :mod:`ast`, **proved reachable**.
+
+    ⚠️ **INC-39 IS THE REASON EVERY FIELD HERE IS DERIVED RATHER THAN WRITTEN.** The
+    previous version of this claim was a sentence carrying a line number, and the line
+    number was inside a function nothing calls. A sentence cannot be wrong about a call
+    graph it never consulted; this object can only be built by consulting one.
+    """
+
+    function: str
+    """The function that actually builds the path — **derived**, not named in advance."""
+
+    span: tuple[int, int]
+    """First and last line of the path expression."""
+
+    read_line: int
+    read_call: str
+    """⚠️ **The failure mode, as a fact.** ``read_text`` → unhandled ``FileNotFoundError``
+    (loud). ``glob`` → an empty iterator (a silent zero). INC-39 is these two swapped."""
+
+    called_at: int
+    called_from: str
+    """The live call site. Its existence is what makes :attr:`function` reachable at all."""
+
+    root_literal: str
+    is_relative: bool
+    """⚠️ **The same-working-directory requirement, as a boolean.** False the moment the
+    root is absolute or anything in the function resolves it."""
+
+    unreachable_others: tuple[str, ...]
+    """Every OTHER function in the module that opens a ``logs/`` path and **cannot be
+    reached** from the live caller. Reported so the dead scaffolding is on the record —
+    and asserted only as *"the others are all unreachable"*, never as *"they exist"*, so
+    deleting them changes no verdict."""
+
+    @property
+    def crashes_loudly(self) -> bool:
+        """⚠️ True when a missing log tree RAISES instead of reporting nothing.
+
+        RUN-1 needs this: a loud crash inside the 90-minute box is diagnosable, and a
+        silent zero is a number nobody can tell from a real one.
+        """
+        return self.read_call in {"read_text", "read_bytes", "open"}
+
+    def citation(self) -> str:
+        """``<file>:<start>-<end>`` — the citation, generated from the derivation."""
+        return f"{REPLAY_PATH}:{self.span[0]}-{self.span[1]}"
+
+    def read_citation(self) -> str:
+        return f"{REPLAY_PATH}:{self.read_line}"
+
+
+def _path_root_literal(node: ast.AST) -> str | None:
+    """The string in ``Path("...")`` at the head of a ``/``-chain, or ``None``.
+
+    Walks the **left spine** of the ``BinOp`` chain, because ``Path("logs") / a / b`` parses
+    as ``((Path("logs") / a) / b)`` and the root is the deepest left operand.
+    """
+    while isinstance(node, ast.BinOp) and isinstance(node.op, ast.Div):
+        node = node.left
+    if (
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "Path"
+        and len(node.args) == 1
+        and isinstance(node.args[0], ast.Constant)
+        and isinstance(node.args[0].value, str)
+    ):
+        return node.args[0].value
+    return None
+
+
+def _is_relative_literal(root: str) -> bool:
+    """Whether a ``Path(...)`` literal is relative — **on POSIX *and* Windows rules.**
+
+    ⚠️ Both, deliberately. ``PureWindowsPath("/var/logs").is_absolute()`` is **False**
+    (no drive), so a Windows-only check would call CaMeL's own POSIX-style absolute path
+    relative and M16 would walk straight through the guard written to stop it.
+    """
+    return not (
+        PurePosixPath(root).is_absolute() or PureWindowsPath(root).is_absolute()
+    )
+
+
+def _log_path_construction(func: ast.FunctionDef) -> tuple[str, tuple[int, int], str] | None:
+    """``(assigned name, (start, end), root literal)`` for a ``Path(".../logs")/…`` in *func*.
+
+    ⚠️ **Matched on the root's final COMPONENT, not on the whole literal.** ``Path("logs")``
+    and ``Path("/var/logs")`` must both be found, because M16 — *make the live path
+    absolute* — is exactly the second, and a matcher that stopped recognising the path once
+    it was made absolute would report **"no live path"** instead of **"the requirement is
+    gone"**. Those are different findings and only one of them is true.
+    """
+    for node in ast.walk(func):
+        if not isinstance(node, ast.Assign) or len(node.targets) != 1:
+            continue
+        target = node.targets[0]
+        if not isinstance(target, ast.Name):
+            continue
+        root = _path_root_literal(node.value)
+        if root is None or PurePosixPath(root).name != LOG_ROOT:
+            continue
+        start = node.value.lineno
+        end = node.value.end_lineno or start
+        return target.id, (start, end), root
+    return None
+
+
+def _base_name(node: ast.AST) -> str | None:
+    """The root ``Name`` of an attribute/call chain — ``a.b().c()`` → ``a``.
+
+    ⚠️ Chains are unwrapped rather than matched one level deep so that
+    ``trace_path.resolve().read_text()`` is still recognised as a **read of the log
+    path**. A one-level matcher would miss it and report *"the path is never read"*, which
+    is again the wrong finding for M16's second form.
+    """
+    while isinstance(node, (ast.Call, ast.Attribute)):
+        node = node.func if isinstance(node, ast.Call) else node.value
+    return node.id if isinstance(node, ast.Name) else None
+
+
+def _read_site(func: ast.FunctionDef, name: str) -> tuple[int, str] | None:
+    """The first ``<name>….<read call>()`` in *func*, as ``(line, attribute)``."""
+    sites = [
+        (node.lineno, node.func.attr)
+        for node in ast.walk(func)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr in _READ_CALLS
+        and _base_name(node.func.value) == name
+    ]
+    return sorted(sites)[0] if sites else None
+
+
+def _absolutises(func: ast.FunctionDef, name: str) -> bool:
+    """Whether *func* turns *name* — or any path — into an absolute one."""
+    for node in ast.walk(func):
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
+            if node.func.attr in _ABSOLUTISERS:
+                return True
+    return False
+
+
+def _named_functions(tree: ast.Module) -> dict[str, ast.FunctionDef]:
+    """Every function in the module by **bare name**, methods included as ``Class.method``."""
+    found: dict[str, ast.FunctionDef] = {}
+    for node in tree.body:
+        if isinstance(node, ast.FunctionDef):
+            found.setdefault(node.name, node)
+        elif isinstance(node, ast.ClassDef):
+            for child in node.body:
+                if isinstance(child, ast.FunctionDef):
+                    found[f"{node.name}.{child.name}"] = child
+    return found
+
+
+def _bare_calls(func: ast.FunctionDef) -> set[str]:
+    """Every ``name(...)`` call in *func*. Attribute calls are not resolved — deliberately:
+    an unresolved edge can only make the reachable set SMALLER, never larger, so a claim
+    of *"reachable"* built on it is never an over-claim."""
+    return {
+        node.func.id
+        for node in ast.walk(func)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+
+
+def _reachable_from(functions: dict[str, ast.FunctionDef], root: str) -> set[str]:
+    """Transitive closure of bare-name calls out of *root*."""
+    seen: set[str] = set()
+    queue = [root]
+    while queue:
+        current = queue.pop()
+        if current in seen or current not in functions:
+            continue
+        seen.add(current)
+        queue.extend(_bare_calls(functions[current]))
+    return seen
+
+
+def live_log_path_from_source(source: str) -> LogPathClaim:
+    """Locate the log path pass 2 **actually** reads, over source **text** — pure.
+
+    ⚠️ **Split out for the same reason** :func:`cli_flags_from_source` **is** (`PROCESS.md`
+    §5.4): a gate that cannot be pointed at a mutated input is a gate nobody has seen go
+    red. Every mutant behind INC-39 is fired at *this* function, so **not one byte of
+    ``vendor/`` is touched to prove it fires.**
+
+    The derivation, in order, so the refusals are legible:
+
+      1. every function that builds a ``Path("logs")/...`` — there are three at the pin;
+      2. the live caller, ``PrivilegedLLMReplayer.query``;
+      3. what that caller can reach, transitively, through bare-name calls;
+      4. **the intersection, which must be exactly one function.** That one is the live
+         path; the rest are named as unreachable and nothing asserts they exist.
+    """
+    tree = ast.parse(source)
+    functions = _named_functions(tree)
+
+    constructions = {
+        name: built
+        for name, node in functions.items()
+        if (built := _log_path_construction(node)) is not None
+    }
+    if not constructions:
+        raise InvocationError(
+            f"{REPLAY_PATH} builds no `Path({LOG_ROOT!r})` path at the pin. Pass 2 reads "
+            f"pass 1's logs by that path; if it is gone, the two-pass protocol Q-057 "
+            f"records is no longer what the code does."
+        )
+
+    caller = f"{REPLAY_CALLER_CLASS}.{REPLAY_CALLER_METHOD}"
+    if caller not in functions:
+        raise InvocationError(
+            f"{REPLAY_PATH} defines no {caller} at the pin. That method IS the live entry "
+            f"point (models.py:179 constructs it); without it there is no code path from "
+            f"the CLI to the replay at all."
+        )
+
+    reachable = _reachable_from(functions, caller)
+    live = sorted(set(constructions) & reachable)
+    if len(live) != 1:
+        raise InvocationError(
+            f"{caller} reaches {len(live)} function(s) that open a `Path({LOG_ROOT!r})` "
+            f"path ({live}), not exactly one. Candidates in the module: "
+            f"{sorted(constructions)}. ⚠️ INC-39: citing a line inside a function nothing "
+            f"calls is how this claim was wrong before, so 'exactly one REACHABLE one' is "
+            f"the whole check and a bare 'the string is present' is not."
+        )
+
+    name = live[0]
+    variable, span, root = constructions[name]
+    read = _read_site(functions[name], variable)
+    if read is None:
+        raise InvocationError(
+            f"{REPLAY_PATH}:{name} builds the log path and never reads it. The claim that "
+            f"pass 2 replays pass 1's stored logs rests on that read."
+        )
+    call_lines = sorted(
+        node.lineno
+        for node in ast.walk(functions[caller])
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == name
+    )
+    return LogPathClaim(
+        function=name,
+        span=span,
+        read_line=read[0],
+        read_call=read[1],
+        called_at=call_lines[0],
+        called_from=caller,
+        root_literal=root,
+        is_relative=(
+            _is_relative_literal(root) and not _absolutises(functions[name], variable)
+        ),
+        unreachable_others=tuple(sorted(set(constructions) - reachable)),
+    )
+
+
+def live_log_path(root: Path | None = None) -> LogPathClaim:
+    """:func:`live_log_path_from_source` over the **git blob** at the pin."""
+    root = root if root is not None else vendor.vendor_root()
+    return live_log_path_from_source(vendor.blob_text(root, REPLAY_PATH))
+
+
+def same_working_directory_reason(cwd: str, claim: LogPathClaim) -> str:
+    """RUN-1's same-working-directory warning, **generated from the derivation.**
+
+    ⚠️ **The citation in this sentence is the one** :func:`live_log_path_from_source`
+    **produced**, so the prose cannot drift from the code the way INC-39's did. The failure
+    mode is likewise read off :attr:`LogPathClaim.crashes_loudly` rather than asserted.
+    """
+    if claim.crashes_loudly:
+        consequence = (
+            f"pass 2 started from any other directory raises an UNHANDLED "
+            f"FileNotFoundError at {claim.read_citation()} ({claim.read_call}) - "
+            f"{claim.called_from} has no try/except and AgentDojo catches only "
+            f"AbortAgentError. IT CRASHES LOUDLY, which is the diagnosable failure and "
+            f"NOT a silent zero"
+        )
+    else:  # pragma: no cover - the pin reads with read_text; kept so the claim stays honest
+        consequence = (
+            f"pass 2 started from any other directory reads an EMPTY tree via "
+            f"{claim.read_call} at {claim.read_citation()} and reports nothing rather "
+            f"than failing - a SILENT ZERO, which is the undiagnosable failure"
+        )
+    return (
+        f"BOTH PASSES RUN FROM `{cwd}`. {claim.citation()} ({claim.function}, called at "
+        f"{REPLAY_PATH}:{claim.called_at} from {claim.called_from}) opens a RELATIVE "
+        f'Path("{claim.root_literal}") / <pass-1 pipeline name> / ... , so {consequence} '
+        f"- inside a single-shot 90-minute box."
+    )
 
 
 def cli_flags_from_source(source: str) -> dict[str, str]:
@@ -280,6 +652,9 @@ def run1_plan(context_md: str, root: Path | None = None) -> Run1Plan:
     root = root if root is not None else vendor.vendor_root()
     lanes = cfg.load("lanes")
     protocol = cfg.load("protocol")
+    # ⚠️ DERIVED, and its enclosing function PROVED REACHABLE, before any prose uses it.
+    # INC-39: the citation this replaces was inside a function nothing calls.
+    log_path = live_log_path(root)
 
     model_string = lanes.require("camel_comparator.model_string")
     injection_task = protocol.require("selections.agentdojo_injection_task")
@@ -336,11 +711,14 @@ def run1_plan(context_md: str, root: Path | None = None) -> Run1Plan:
         Invocation(
             label="pass 2 of 2 - the security-policy replay",
             purpose=(
-                "Adds --replay-with-policies. PrivilegedLLMReplayer re-executes pass 1's "
-                "STORED programs through BankingSecurityPolicyEngine and produces the "
-                "`+camel+secpol` pipeline. It reads logs/<pass-1 name>/... "
-                "(replay_privileged_llm.py:321), so it MUST run from the same working "
-                "directory as pass 1, AFTER pass 1 has completed."
+                f"Adds --replay-with-policies. PrivilegedLLMReplayer re-executes pass 1's "
+                f"STORED programs through BankingSecurityPolicyEngine and produces the "
+                f"`+camel+secpol` pipeline. It reads logs/<pass-1 name>/... "
+                f"({log_path.citation()} - {log_path.function}, read at "
+                f"{log_path.read_citation()} by {log_path.read_call}, called at "
+                f"{REPLAY_PATH}:{log_path.called_at} from {log_path.called_from}), so it "
+                f"MUST run from the same working directory as pass 1, AFTER pass 1 has "
+                f"completed."
             ),
             argv=[*common, replay_flag],
             cwd=cwd,
@@ -359,22 +737,70 @@ def run1_plan(context_md: str, root: Path | None = None) -> Run1Plan:
         injection_task=injection_task,
         user_task_count=user_task_count,
         branch_undecided_because=branch_is_undecided(),
-        log_root=f"{cwd}/logs",
-        same_working_directory=(
-            f"BOTH PASSES RUN FROM `{cwd}`. replay_privileged_llm.py:321 opens a RELATIVE "
-            f'Path("logs") / <pass-1 pipeline name> / ... , so pass 2 started from any '
-            f"other directory reads an EMPTY tree and reports nothing rather than failing "
-            f"- a silent zero inside a single-shot 90-minute box."
-        ),
+        log_root=f"{cwd}/{log_path.root_literal}",
+        log_path=log_path,
+        same_working_directory=same_working_directory_reason(cwd, log_path),
     )
 
 
-def banking_suite_exists(root: Path | None = None) -> bool:
-    """Whether AgentDojo's banking suite is present in the vendored checkout.
+def suite_version_from_source(source: str) -> str:
+    """The AgentDojo suite version ``main.py`` loads — **derived from its own call**.
+
+    ⚠️ **OF-73/OF-74.** C13 read ``default_suites/v1/banking``; ``main.py:79`` is
+    ``get_suite("v1.2", suite_name)``, so the copy the run executes is ``v1_2``. Writing
+    ``"v1"`` here would be a second copy of a third party's choice — INC-02's class, and
+    the same class as INC-39 one file over: **reading a file that is not the one the run
+    executes.** So it is parsed, and a change to it is a loud refusal.
+    """
+    versions = sorted(
+        {
+            str(node.args[0].value)
+            for node in ast.walk(ast.parse(source))
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "get_suite"
+            and node.args
+            and isinstance(node.args[0], ast.Constant)
+            and isinstance(node.args[0].value, str)
+        }
+    )
+    if len(versions) != 1:
+        raise InvocationError(
+            f"{ENTRY_POINT} calls get_suite with {len(versions)} distinct version(s) "
+            f"({versions}) at the pin, not one. C16 runs this same suite and would be "
+            f"scored against whichever copy a session happened to read."
+        )
+    return versions[0]
+
+
+def suite_version(root: Path | None = None) -> str:
+    """:func:`suite_version_from_source` over ``main.py``'s git blob."""
+    root = root if root is not None else vendor.vendor_root()
+    return suite_version_from_source(vendor.blob_text(root, ENTRY_POINT))
+
+
+def suite_package(version: str) -> str:
+    """AgentDojo's dotted suite version → its package directory. ``v1.2`` → ``v1_2``."""
+    return "v" + version.lstrip("v").replace(".", "_")
+
+
+def banking_suite_dir(dojo_root: Path, version: str) -> Path:
+    """Where a given suite version's ``banking`` package lives in the AgentDojo checkout."""
+    return dojo_root / "src" / "agentdojo" / "default_suites" / suite_package(version) / SUITE
+
+
+def banking_suite_exists(root: Path | None = None, version: str = "v1") -> bool:
+    """Whether AgentDojo's banking suite is present, **for the version asked about**.
 
     ⚠️ Asserted rather than assumed because :data:`SUITE` is a bare string in first-party
     source. If AgentDojo ever renames the directory, this goes false and a test says so —
     instead of RUN-1 discovering it inside the 90-minute box.
+
+    ⚠️ **OF-74: the version is now a PARAMETER and it defaults to ``v1`` deliberately.**
+    ``v1`` is where banking's ``task_suite.py`` and ``user_tasks.py`` live; ``v1_2``
+    carries **only** ``injection_tasks.py`` and overrides into the same registry object.
+    So *"does banking exist"* and *"which injection task will run"* are two questions, and
+    conflating them is what OF-73 records. The caller says which it is asking.
     """
     root = root if root is not None else vendor.agentdojo_root()
-    return (root / "src" / "agentdojo" / "default_suites" / "v1" / SUITE).is_dir()
+    return banking_suite_dir(root, version).is_dir()
