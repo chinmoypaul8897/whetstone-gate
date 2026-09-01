@@ -2479,7 +2479,7 @@ scope-limited by **path** and not by **authorship**; when two sessions append to
 pathspec provides no isolation whatever, and Q-051's remedy had only ever been exercised on the
 disjoint-file case where it cannot fail.
 
-**Fix:** `<this commit>` — this entry, plus the correction of the false sentence in `PROGRESS.md`
+**Fix:** `bbcb321` — this entry, plus the correction of the false sentence in `PROGRESS.md`
 §8, committed with a pathspec on `INCIDENTS.md` and `PROGRESS.md` after reading
 `git status --porcelain` immediately beforehand and finding the tree **clean**, so this commit
 sweeps nothing. ⚠️ **No history is rewritten and no content is restored, because none was lost** —
