@@ -223,9 +223,16 @@ if __name__ == "__main__":
     from whetstone_gate._console import say          # INC-25's guardrail
 
     vectors = build_vectors()
-    (HERE / "c4_reimpl_expected.json").write_text(
-        json.dumps(vectors, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
-        encoding="utf-8")
+    # ⚠️ newline="\n" IS LOAD-BEARING, NOT STYLE.  `.gitattributes` is `* text=auto eol=lf`
+    # and `test_repo_invariants.py::test_the_object_store_and_the_working_tree_agree`
+    # compares working-tree bytes against the object store, so a CRLF artefact turns the
+    # suite red for a reason having nothing to do with C4 — and a mutation baseline taken
+    # from that tree is VOID (INC-11).  This session wrote the file with a bare
+    # `write_text` first and tripped exactly that, which is C2 REVIEW's own recorded
+    # defect one tool along; the trap is INC-24's class and is recorded rather than
+    # quietly corrected.
+    with open(HERE / "c4_reimpl_expected.json", "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(json.dumps(vectors, indent=2, ensure_ascii=False, sort_keys=True) + "\n")
     say(f"vectors: {len(vectors)}")
     for name, rows in vectors.items():
         tail = rows[-1] if rows else {}
