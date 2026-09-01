@@ -6669,6 +6669,19 @@ declared its own leak rather than claiming the seal held.
 **Default taken:** ⚠️ **NONE — `PROCESS.md` is named under NOT in this session's fence.** Recorded
 so `REVIEW_C6_3` meets a question rather than a surprise.
 
+⚠️ **ANSWERED IN PART, 2026-09-02, AND THE ANSWER IS RECORDED ELSEWHERE IN THIS FILE RATHER THAN
+HERE — cross-referenced so a reader of this entry finds it.** `REVIEW_C6_3`'s prompt (`3605d31c`)
+opened with a ruling on `OF-80` that adopts this entry's **option 1** and **option 2** together, and
+it is transcribed **verbatim** under *"RULINGS RECORDED BY C6 REVIEW 3 (`3605d31c`), 2026-09-02"*
+above: *"on a RE-review, PHASE 1 IS BLIND TO THE FIX, NOT TO THE FINDINGS … you write down what a
+correct fix MUST satisfy, as executable criteria with EXPECTED RESULTS, and COMMIT THAT."* The same
+block carries the **scoped-reimplementation** ruling. ⚠️ **What is still open is clause 2 of this
+entry** — the ruling arrived in a *prompt*, not in `PROCESS.md` §10 template 2, so **the next
+re-review of any chunk meets the same question unless the template gains the clause**. `PROCESS.md`
+is named under **NOT** in `REVIEW_C6_3`'s fence exactly as it was in this one's, so that session
+could not land it either. **This status line is added, and the `RULING` line below is left as the
+architect wrote it**, because a review session records a ruling and does not close a question.
+
 **RULING (architect, \<date>):** *\<pending>*
 
 ---

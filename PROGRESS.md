@@ -6,6 +6,152 @@ not a record; this file is.
 
 ---
 
+## C6 — THE ATTACKER LOOP — **REVIEW** attempt 3 — 2026-09-02 — ⚠️ **FAIL, WITH ZERO BLOCKERS: ALL THREE OF REVIEW 2's ARE CLOSED AND SIX NON-EQUIVALENT MUTANTS SURVIVE IN THE FIX'S OWN NEW CODE**
+
+**SESSION-TOKEN:** `3605d31c` · **NOT in the batch.** Appended as
+`| `3605d31c` | C6 | REVIEW | 2026-09-02 |` and numbered **from the table**: **38 rows before it, so
+it is row 39**, the **twenty-fourth** self-recorded row and the **twenty-third** to carry a
+paragraph. **Ordinals 11, 12 and 18 are still asserted by no paragraph** (`df238be6`, `0852ea56`,
+`9c0c6734`) and are **not this session's to close**. The chain reconciles: `8c49c4d3` counted 37 and
+made itself 38, this session counted 38 and made itself 39, `91eb51c1` counted 39 and is 40.
+⚠️ **This session registered its row BEFORE its Phase-1 seal** — the ordering `OF-89` asks for and
+the one the two preceding reviews got backwards — **and the row nonetheless landed in a concurrent
+session's commit `e2b4778` under token `91eb51c1`**, which that session records as `INC-48`.
+**Verified here: the content is intact, complete and present exactly once.**
+
+**Pushed SHA:** see the FINAL OUTPUT in `docs/sessions/c6-review-3.txt`.
+**Verdict:** ⚠️ **FAIL. NO `c6-pass` TAG CUT.**
+
+---
+
+### The verdict, and why its shape is unusual
+
+**All three of `REVIEW_C6_2`'s BLOCKERs are CLOSED**, each proved by reverting it in a **fresh OS
+temp clone** and watching a named test go red — never by reading a diff. **All four old mutant
+survivors are KILLED.** The behaviour is right and the numbers are right.
+
+**What fails it is coverage of the new tests themselves.** 26 mutants ran: **18 KILLED, 2 EQUIVALENT
+BY EXHIBIT, and 6 NON-EQUIVALENT SURVIVORS** — every one on code no review has seen, and **four of
+the six inside the blindness guard `Q-031`'s ruling makes the substitute for the golden C6 does not
+have.** `docs/reviews/README.md`'s bar is *"every mutant killed or proven equivalent"*, and this
+session's fence names `tests/` under **NOT**, so unlike `REVIEW_C6_1` — which closed its four
+survivors with kept probes in its own commit — **this review may not close them.**
+
+### Phase 1, and the boundary drawn tighter than the ruling required
+
+`OF-80`'s ruling and the scoped-reimplementation ruling were **recorded verbatim in `QUESTIONS.md`
+before anything else was read or touched** (hard rule 5). The seal is `c477cf8`: **32 probes, each
+with its EXPECTED POLARITY committed in advance**, plus a reimplementation importing **nothing** from
+`src/`. Not opened before it: the five fix commits, `docs/sessions/c6-fix-2.txt`,
+`src/whetstone_gate/attacker/`, `tests/test_c6_*.py`.
+
+⚠️ **AND TWO ITEMS IN THE PROMPT'S OWN READ ORDER WERE DEFERRED, WITH THE REASON NAMED RATHER THAN
+INFERRED.** `INCIDENTS.md` INC-41…INC-45 and `OPEN_FINDINGS.md`'s `Closed by` cells were **written by
+the FIX** — rule 13 makes `Fix:` a field carrying a commit SHA, and `de7feee` filled in the
+dispositions — so reading either in Phase 1 is reading the fix through a different file.
+**`OF-47`…`OF-95` were read at `29f40e3`, `REVIEW_C6_2`'s own commit: the finding without the
+disposition.** The architect rulings (`Q-031`, `Q-037`, `Q-046`, `Q-047`, `Q-048`, `OF-87`/`OF-88`)
+**were** read: hard rule 5 makes a ruling bind and criteria cannot be written without them.
+
+**31 of 33 polarities held.** The two that differed **both differed in the fix's favour** and are
+reported as findings against this review: `P-12` (a system-prompt span was predicted to escape the
+guard; it is **caught**) and `P-28` (`OF-84`'s cross-seed corpus fraction was predicted to be at best
+documented; it is **PRINTED**).
+
+### B-1 — CLOSED, and the figure is GENERATED rather than corrected
+
+Proved by mutation, four ways: `base 16495 → 9`, halved `→ 10`, doubled `→ 6`, zero `→ 12`;
+`full_listing_chars 2887 → 9`, `1500 → 18`, `900 →` **the `None` branch prints a sentence and not a
+number**, which the method's own docstring requires. Two accesses of `CROSSOVER_NOTE` return
+**distinct objects** (PEP 562 — no cached second home), and a **fresh subprocess** with
+`WHETSTONE_CONFIG_DIR` at `chars_per_token: 4` prints **11**. **A planted hardcoded crossover DIES.**
+**The named fixture reproduces** — 2,887 / 240 / base **16,495**, every k in the declared linear
+region, k=9 over and k=8 under — driven through `run_episode` by this review's **own** driver.
+**C1 holds**: ROUTE A over the note's own printed anchors gives the figure it prints, and this
+review's blind ROUTE A reproduces `REVIEW_C6_2`'s `k = 9` from `REVIEW_C6_2`'s anchors.
+⚠️ **The sharpest correction is not the number**: `tokens_per_read` now subtracts the **displaced**
+result, so the marginal is **5,298** and not the 5,802 an additive reading gives.
+
+### B-2 and B-3 — CLOSED, and what is not
+
+**B-2:** M17 dies; so do **93 needles in eight leak-shape families derived in Phase 1 from
+*"what does a GATE know that §10.1 forbids the attacker to learn?"*** — 93/93 in the denial value,
+with a clean control at **0 hits**. The four blindness claims re-derived by this review's own method
+over the package's **actual assembled bytes**: **0 AUTHORED hits** at turns 1, 6, 7, 12 and 20, with
+the door **OPEN on WORLD** and **CLOSED on AUTHORED**.
+**B-3:** four static import forms fire, `whetstone_gate.config` **is** reachable from
+`render_summary`'s path, and the vacuous test is **replaced** by one rooted at `context.py` that can
+fail.
+
+⚠️ **THE HEADLINE MEDIUM (`OF-104`), AND IT IS A MEDIUM BECAUSE THE MUTANTS DIE.** Claim 4's guard is
+blind to an **arm identity** anywhere but the refusal value, while its own opening sentence names arm
+identity as the thing it exists to prevent. `LAST_REFUSAL_LABEL = "LAST TOOL REFUSAL (arm 2S): "` →
+**all four guards, 0 findings**; M17 verbatim → 6. The three label mutants die on **one** test — the
+byte-count fixture — because the label's **LENGTH** moved `base_tokens`, **not because its CONTENT
+leaks**; with it deselected the suite is **76 passed and every guard silent**, and the natural repair
+to that red (re-measuring a fixture that is *supposed* to move) ships the differential green.
+**Remedy verified here to catch both forms and to produce no false positive on the clean tree.**
+
+### The six survivors, each non-equivalent by exhibit
+
+`N14` `value != generic` is never the sole killer, so `Q-046`'s central assertion is unpinned ·
+`N12` LAYER 3, the residue catch-all, deletes with all 77 C6 tests green while `INC-42`'s `Action`
+calls it *"a second, INDEPENDENT layer"* · `N15` LAYER 1's exemption boundary is unexercised (the fix
+plants a **clause** in `STATE_LABEL`, never a **cap value**) · `N4` `crossing()`'s `>` is unpinned at
+exactly the target — at `base_tokens = 17,616`, `tokens_at(8) = 60,000` exactly and HEAD gives 9
+against the mutant's 8, which is `OF-87`'s inclusive-boundary class one level over **inside the code
+written to close B-1** · `N9` the relative-import resolution `INC-43` added has no case in the
+control that exists to pin it · `N13` `refusal_lines != 1` loses its `> 1` half.
+
+⚠️ **`INC-42`'s own `Diagnosis` names the class — *a check written against the shape the author
+imagined, silent on the shape that occurs* — and counts five instances in one day. These are six
+through ten, and every one is inside the code written to close instances four and five.**
+`INC-42`'s `Systemic guardrail` predicted exactly this: *"NONE THAT CLOSES THE CLASS — ACCEPTED, AND
+THE REASON IS THAT FOUR SESSIONS HAVE NOW TRIED."*
+
+### The `OF-` items, the incidents, the commit and the regressions
+
+**`OF-81`…`OF-88`, `OF-89`, `OF-91`, `OF-93` all CLOSED and verified** — `OF-87` driven at exactly
+400 and 401 tokens, `OF-88` at 1,800 entries with **1,709 dropped and PRINTED** and both hard-refusal
+boundaries raising, `OF-84`'s every figure reproduced independently (19/20 on all 60 seeds, 3.82%,
+348/498 = 69.88%, 248/498 = 49.80%, 37.5% of ASB, 80 seeds). `OF-90`, `OF-92`, `OF-94`, `OF-95`,
+`OF-47`, `OF-49`, `OF-52`, `OF-53` **open, each saying why**.
+**The five incidents carry rule 13's eight fields exactly once, in order**; INC-44 and INC-45 are
+attributed to `ec8e57ad` in their first line and correctly kept **separate**. ⚠️ **One `Action`
+overstates** (`OF-113`): INC-42 says the guard **subtracts** the caller's tool schemas; measured, it
+**scans** them — which is what the guard's own docstring says. **The single five-file commit's reason
+HOLDS**: no whole-file partition leaves every intermediate green.
+**Regressions:** `tests/goldens/` clean; **no `evals/` path in any fix commit**; **`evals/` does not
+exist at all**; `make selftest` still RED on `camel_comparator.branch = TODO_C13_RUN1`, which is
+correct and is not C6's.
+
+### Suite, measured twice, with the failure attributed
+
+```
+measurement 1   1 failed, 711 passed, 1 skipped, 2 deselected
+measurement 2   1 failed, 721 passed, 1 skipped, 2 deselected
+```
+The **+10** is the concurrent C13 FIX 2 session landing tests between the runs. The one failure is
+`tests/test_repo_invariants.py::test_check_roles_exits_zero` on `check-roles` **E5**, caused by
+`c4d4460` (token `91eb51c1`) word-wrapping prose so that `Session-Token: 91eb51c1, so …` begins a
+line. **Not C6's and not this session's**; that session records it as `INC-49` and declares a STOP.
+C6's own three files alone: **77 passed.**
+
+**SPEND: ZERO PROVIDER MODEL CALLS.** Every mutation ran in a fresh OS temp clone with the clone's
+`whetstone_gate.__file__` printed (INC-17); this repository was never mutated. The untracked
+`grep.exe.stackdump` at the repository root belongs to no session and was not touched.
+
+### What this session could not do
+
+* **Close the six survivors.** `tests/` is named under **NOT** in this fence in terms.
+* **Land `Q-077`'s clause 2** — a `PROCESS.md` §10 template-2 clause requiring a re-review to declare
+  its seal's leak. `PROCESS.md` is under **NOT**. A cross-reference to the recorded ruling was added
+  to `Q-077` instead.
+* **Write an `INCIDENTS.md` entry.** `INCIDENTS.md` is under **NOT**; nothing this session did
+  requires one, and `OF-114` records this review's own tripwire defect in the file it may write.
+
+---
+
 ## C13 — THE CaMeL COMPARATOR — **FIX** attempt 2 — 2026-09-02 — 🔁 **BOTH BLOCKERS CLOSED, SIX MUTANT SURVIVORS KILLED, AND FOUR INCIDENTS OF WHICH TWO ARE THIS SESSION'S OWN**
 
 **SESSION-TOKEN:** `91eb51c1` — **NOT in the batch.** Appended as
