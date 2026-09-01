@@ -1150,3 +1150,83 @@ and reported **FAIL** against a config reading *"IT **RUNS**: both passes … **
 config's**; the recogniser was widened, the sealed original is preserved in a comment at the site,
 and the requirement it recognises is unchanged. **A review that reports only its own successes is
 not evidence of anything.**
+
+---
+
+## ⚠️ APPENDED BY NIGHT RUN SESSION A / C0 FIX (`9c7c5973`), 2026-09-02 — OF-120…OF-122, and the disposition of OF-99, OF-110, OF-67, OF-70, OF-78
+
+**APPEND-ONLY. No existing row was altered and no `Status` cell above this block was
+touched** — `OF-99`'s and `OF-110`'s closures are recorded **here**, beneath their rows, in the
+same shape `OF-65` and `OF-78` were re-scoped, because the concurrent **C13 REVIEW 3** session
+(`c09c385b`) holds this file and rewriting a line of it would be `INC-36`'s class.
+
+⚠️ **The ids are `OF-120`…`OF-122` because this file was re-read immediately before the append**
+and the highest id present was **`OF-119`**, landed by `c09c385b` minutes earlier. Counted from
+the file, not inherited from a prompt — `OF-67`'s own finding.
+
+### Disposition of the findings this session was pointed at
+
+* **`OF-99` — CLOSED by `ea3bd12`.** ⚠️ `Q-064`'s named remedy — *"A grep for the superseded
+  string, run as a test, would have caught all four in one line"* — **now exists**, in
+  `tests/test_repo_invariants.py`, driven by an explicit `SUPERSEDED_STRINGS` list carrying, per
+  entry, the superseded claim, its replacement, the ruling that superseded it, and the paths where
+  it may legitimately still appear. **FIRED AT THE REAL REPOSITORY AS IT STOOD ONE COMMIT EARLIER
+  (`28b6eec`): 1 live hit out of 147 occurrences across 28 files, and it is exactly `Q-074`'s
+  site.** Fired at append-only history (six paths) and at a **quotation** of the claim: silent on
+  both. ⚠️ **The discrimination `OF-99` said the mechanism needed — *"a tripwire that cannot
+  distinguish a live claim from a recorded one will be disabled within a day"* — is TWO explicit
+  rules, not a hope:** path (history records what was said) and quotation (*a quotation of X is not
+  X*, which is `Q-080`'s own logic arriving in a second file three days later). **The pattern
+  matches the CLAIM, not the string** — a citing verb immediately in front — so live text stays
+  free to name Tables 5-7, which `CONTEXT.md` §8.5.1's own ⚠️ NOT-clause depends on.
+* **`OF-110` — HALF CLOSED by `ea3bd12`, AND THE HALF THAT CLOSED IS THE ONE IT DID NOT NAME.**
+  `OF-110` named C2's, C3's, C6's and C13's walkers and **did not name `check_roles.py` D3**, which
+  is the walk behind `CLAUDE.md` hard rule 8's *"whole moat"*. ⚠️ **MEASURED: it was evadable.** In
+  a fresh OS temp clone a minimal `gates/` reached a minimal `scorer/` predicate by
+  `importlib.import_module`, by `__import__` and by `getattr` on the package root plus
+  `sys.modules`, and **D1, D2 and D3 all reported PASS on all three**, while the gate really did
+  return `DENY` computed by the scorer's module. `INCIDENTS.md` **INC-51**. **D4** — a source-text
+  refusal of 14 names, over both packages — closes it for this check and is fired at five shapes
+  (including `exec`, which `OF-110` did not name), each asserted RED **with D1/D3 asserted still
+  PASSING**, so the finding stays a measurement rather than becoming a claim.
+  ⚠️ **STILL OPEN AND EXPLICITLY OWED, named rather than gestured at:** `tests/test_c2_world.py`,
+  `tests/test_c3_tau2_enumeration.py`, `tests/test_c6_fix_probes.py` and
+  `tests/test_c13_camel_comparator.py` each carry the identical AST-only limit. **This session's
+  fence names every one of them under NOT**, and TASK 1b said so in terms: *"DO NOT extend this to
+  C2/C3/C6/C13's own walkers — those are their chunks' and are outside this fence. Name them in
+  your report as owed."* **They are owed to C2, C3, C6 and C13 respectively.**
+* **`Q-074`'s fifth site — CLOSED by `ea3bd12`.** `tests/test_lanes_operator_placeholders.py`'s
+  docstring now carries `CONTEXT.md` v1.9's citation with all four fields `Q-058` requires — Table
+  2, Appendix B, `o3 High`, `banking` — identifies Tables 5-7 as Appendix C / `Claude 3.5 Sonnet`,
+  and **RETAINS Table 7 as §8.5.2's P2 citation**, which the ruling requires and an over-correction
+  would have lost. It is ASCII-only: the file's non-ASCII byte count is **18 before and 18 after**,
+  so the `make selftest` output that `INC-08`/`INC-25`/`INC-45` killed three sessions on is not
+  touched. **And the closure is checked against the mechanism rather than asserted:** a test fires
+  the tripwire at the docstring's *previous* text and asserts it trips, then at the current text and
+  asserts it does not.
+* **`OF-67`, `OF-70`, `OF-78` — RE-DECLARED AS OWED, AND THIS SESSION IS THE FIRST THAT COULD HAVE
+  CLOSED THEM AND WAS TOLD NOT TO.** The session-token ordinal mechanism — `5c4f8e11`'s
+  *"`check_roles.py` parses this table for E1 and could count the rows outside the batch itself"* —
+  is owed for the **eleventh consecutive session**, and the chain still has **three holes: ordinals
+  11, 12 and 18, rows `df238be6`, `0852ea56`, `9c0c6734`.** ⚠️ **Every previous session declared it
+  owed because `check_roles.py` was outside its fence. This one had `check_roles.py` INSIDE its
+  fence** and its prompt named the item under **RECORD, DO NOT BUILD**. **So the reason has changed
+  from "unreachable" to "out of scope by instruction", and that is a better-attested owing, not a
+  weaker one.**
+* **check-roles `E6` — the `Swept:` detector (`Q-063` (iii), `OF-70`) — NOT URGENT, AND THIS SESSION
+  SAYS SO RATHER THAN LEAVING IT AMBIGUOUS.** The git rule inverted this session: `git add --
+  <paths>` then a **bare** `git commit` commits the **index snapshot**, so the check-to-commit
+  window `INC-48` fell through is closed. **The `Swept:` declaration remains required** — a write
+  landing *before* the `add` is still staged — but the residual is much narrower than the window E6
+  was designed against. **E6 stays open and stays C11's; it is no longer the pressing one.**
+
+### New findings
+
+| id | area | severity | finding | refs | raised by | status | closed by |
+|---|---|---|---|---|---|---|---|
+| **OF-120** | **process**, ARCHITECT | **MEDIUM** | ⚠️ **`check_roles.py`'s TOKEN PARSER NOW SHIPS UNDER AN UNRULED CLASS A DEVIATION FROM A RULING'S OWN WORDING, AND THE DEVIATION IS THE ONLY REASON THE CHECK STILL SEES 27% OF THE LOG.** `Q-080`'s ruling glosses remedy 3 as *"the message's LAST PARAGRAPH (`git interpret-trailers`)"*. **MEASURED before shipping: implemented literally it changes the `Session-Token:` verdict on 74 of 277 commits**, because `git interpret-trailers` stops at the first blank line (verified against git itself on `1f82c48` and on seven synthetic cases) and this project's own convention puts one between `Session-Token:` and the harness's `Co-Authored-By:`. That would take **E1 from 261/277 commits to 187/277** and make **E4 print a false statement about 74 commits that do carry a trailer** — `Q-014 (ii)`'s recorded defect at eighteen times the scale, i.e. **hard rule 6**. What shipped is git's own trailer-paragraph criterion **extended across a blank line only between paragraphs that are themselves entirely trailers**: 1 of 277 verdicts changes. ⚠️ **The architect is asked to confirm (b) or to direct the literal (a) with its blind spot published as a limitation — and if (a), `Q-014 (ii)` should be reopened in the same ruling.** `QUESTIONS.md` **Q-081**; `INCIDENTS.md` **INC-52**. | `Q-014`, `Q-080`, `Q-081`; `CLAUDE.md` hard rules 2, 6 | **NIGHT RUN A / C0 FIX (`9c7c5973`)** | ⚠️ **OPEN — the code is landed and green; the RULING is what is outstanding** | — |
+| **OF-121** | **process**, C11 | LOW | **NOTHING ASSERTS THAT A COMMIT'S TRAILER IS READABLE BY GIT ITSELF, AND ONE COMMIT'S HAS NOT BEEN SINCE THE DAY IT WAS WRITTEN.** `97a5981`'s message both begins and ends with a bare `@` line — a PowerShell here-string delimiter (`@'…'@`) that leaked into it, `INC-06`'s quoting class — so its last paragraph is `Session-Token: 8e0f4a13` followed by `@`, and **`git interpret-trailers --parse` returns nothing for it**: one non-trailer line disqualifies the whole paragraph in git too. **It went unnoticed for a day because the old parser scanned the whole body and never asked git anything.** E4 now counts and NAMES this class rather than folding it into *"carry no trailer"* (which would be `Q-014 (ii)`'s false statement again), so the *reporting* is closed. ⚠️ **What is NOT closed: nothing stops the NEXT such message.** A check that ran `git interpret-trailers --parse` per commit and compared it against `_trailer_block` would catch both the corruption and any future drift between this project's parser and git's — it is the natural companion to `E6` and belongs with it. **Low because the token `8e0f4a13` appears on six other commits, so no issued token is invisible and E1's token SET is unchanged.** | `Q-080`, `Q-081`; `INC-06`, `INC-52`; `Q-063` (iii) | **NIGHT RUN A / C0 FIX (`9c7c5973`)** | ⚠️ **OPEN — the reporting half is closed by `ea3bd12`; the PREVENTION half is C11's, with E6** | — |
+| **OF-122** | **C8**, **C9** | **MEDIUM** | ⚠️ **D4 REFUSES `getattr`, `setattr`, `exec`, `eval`, `vars`, `globals`, `locals` AND `sys.modules` OUTRIGHT INSIDE `gates/` AND `scorer/`, AND THE TWO CHUNKS THAT WILL WRITE THOSE PACKAGES HAVE NOT BEEN TOLD.** The refusal is deliberate and is argued at the constant (`MOAT_REFUSED_DYNAMIC`): both packages are pure predicate logic under hard rule 8, neither has any legitimate need for reflection, and **a text scan cannot decide from text whether a particular `getattr` reaches a module** — so the vocabulary is refused rather than pattern-matched, because the false-positive cost is a rewording and the false-negative cost is the submission's central claim (`INC-51`). ⚠️ **BUT IT IS A REAL CONSTRAINT ON UNWRITTEN CODE, LANDED BY A CHUNK THAT OWNS NEITHER PACKAGE**, and `INC-28`'s class — *"for the third time, a scope fence excluded the exact file the session's own ruling told it to write"* — is what happens when a builder meets a constraint it was never handed. **It is recorded here so C8 and C9 meet it in `OPEN_FINDINGS.md` rather than in a red check**, and so the alternative is on the record: **removing a name is a Class A deviation requiring an architect ruling**, exactly as adding to `MOAT_ALLOW_LIST` is, and `tests/test_c0_fix_probes.py` pins the set so a diff that narrows it meets a named assertion. ⚠️ **It is also a false-positive risk this session did not have to pay and the builders will:** a docstring in either package that merely *mentions* `importlib` trips D4. | `CLAUDE.md` hard rule 8; `CONTEXT.md` §7; `OF-110`; `INC-51`, `INC-28` | **NIGHT RUN A / C0 FIX (`9c7c5973`)** | ⚠️ **OPEN — for C8 and C9, before they write a line of either package** | — |
+
+**No other session's line was touched by this append.** The `Swept:` check was run on the **STAGED
+SNAPSHOT** (`git diff --cached`), not the working tree.

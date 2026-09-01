@@ -6,6 +6,196 @@ not a record; this file is.
 
 ---
 
+## C0 — REPO, TOOLCHAIN, CANONICAL FILES — **FIX** attempt 2 — 2026-09-02 — ⚠️ **THE RED AT HEAD IS CLEARED, AND THE MOAT WAS MEASURED EVADABLE BY THREE SHAPES WHILE PRINTING `clean`**
+
+**SESSION-TOKEN:** `9c7c5973` · **NOT in the batch.** NIGHT RUN SESSION A, **TASK 1 of 2**.
+Appended as `| `9c7c5973` | C0 | FIX | 2026-09-02 |` and numbered **from the table**: **41 rows
+before it, so it is row 42**, the **twenty-seventh** self-recorded row and the **twenty-sixth** to
+carry a paragraph. Cross-derived a second way: 41 rows less the **15** nobody self-recorded = **26
+before this one**, exactly the ordinal `c09c385b` claimed. **Ordinals 11, 12 and 18 are still
+asserted by no paragraph** (`df238be6`, `0852ea56`, `9c0c6734`) and are **not this session's to
+close**. ⚠️ **THIS SESSION CARRIES TWO TOKENS, ONE PER CHUNK** — `9c7c5973` for C0 and `363a2e9f`
+for C6 — and `363a2e9f` was **not** registered here: it is registered at the top of TASK 2, from a
+re-counted table, because a concurrent session holds this file.
+⚠️ **THE ROW WAS COMMITTED BEFORE THIS TASK'S FIRST OTHER COMMIT** (`061dcd9`), which is `OF-89`'s
+ordering, and `check-roles` E1 was never red on this session.
+
+**Pushed SHA:** see the FINAL OUTPUT in `docs/sessions/nightrun-a-1.txt`.
+**Verdict:** ⚠️ **NO TAG. Nothing is self-certified; a fresh adversarial review follows.**
+
+---
+
+### 1. What this session was for, and what it actually found
+
+TASK 1a was *"clear the red"* — `Q-080`/`INC-49`, one commit's quoted trailer turning `make test`
+red at HEAD. That took an hour. **TASK 1b is what mattered, and its answer is a measurement:**
+
+> ⚠️ **THE MOAT ASSERTION WAS EVADABLE. `check_roles.py` D1, D2 AND D3 ALL REPORTED `PASS` OVER A
+> `gates/` MODULE THAT CALLED A `scorer/` PREDICATE ON EVERY DECISION.**
+
+`OF-110` (C6 REVIEW 3, `3605d31c`) had measured that `__import__`, `importlib.import_module` and
+`getattr(pkg, "name")` escape an AST import walk **by construction**, and named C2's, C3's, C6's and
+C13's walkers. **It did not name D3** — which is the walk behind `CLAUDE.md` hard rule 8's *"whole
+moat"* and `CONTEXT.md` §7's central argument. Pointed at D3 in a fresh OS temp clone, with
+`whetstone_gate.__file__` printed:
+
+| planted in `gates/` | D1 | D2 | D3 | D4 (new) |
+|---|---|---|---|---|
+| `importlib.import_module("whetstone_gate.scorer.predicate")` | PASS | PASS | PASS | **FAIL** |
+| `__import__("whetstone_gate.scorer.predicate", fromlist=[…])` | PASS | PASS | PASS | **FAIL** |
+| `getattr(whetstone_gate, "scorer")` + `sys.modules[…]` | PASS | PASS | PASS | **FAIL** |
+| `exec("from whetstone_gate.scorer.predicate import over_cap")` — **this session's own shape, not in `OF-110`** | PASS | PASS | PASS | **FAIL** |
+| **STATIC import — the control** | **FAIL** | PASS | **FAIL** | PASS |
+| **CLEAN — written twice on purpose** | PASS | PASS | PASS | PASS |
+
+D3's printed detail read *"share no first-party module on any path. The allow-list holds 0
+entr(y/ies)."* ⚠️ **And the reach was live, not dead code:** `gates.arm2.decide(6_000_000,
+5_000_000)` returned `DENY`, computed by `scorer/predicate.py`, whose `__file__` was printed from
+the same process. **In the spike, `gate.js` and `invariants.js` both called `world.js:intentKey`, so
+the invariant could not have fired unless the gate had a bug. This is that, in Python, with the
+guard saying `clean`.** `INCIDENTS.md` **INC-51**.
+
+**The fix is `D4`:** a **source-text** refusal of 14 names — `importlib`, `__import__`,
+`sys.modules`, `getattr`, `setattr`, `exec`, `eval`, `compile`, `runpy`, `pkgutil`, `imp`,
+`globals`, `locals`, `vars` — over both packages, **alongside** the AST walk. The two halves see
+different things and **neither is the moat alone**, and the docstring says so, naming `OF-110` and
+C6 REVIEW 3. **A dynamic import inside `gates/` or `scorer/` is a REFUSAL, not a puzzle to
+resolve**: both are pure predicate packages under hard rule 8 and neither has any legitimate need
+for one — and **both are still unwritten (C8, C9), so the constraint lands before their builders
+rather than as a retrofit.** Removing a name is a Class A deviation, pinned by a test the same way
+`MOAT_ALLOW_LIST` is.
+
+⚠️ **The four other walkers are NOT extended and are OWED**, exactly as TASK 1b instructed:
+`tests/test_c2_world.py`, `tests/test_c3_tau2_enumeration.py`, `tests/test_c6_fix_probes.py` and
+`tests/test_c13_camel_comparator.py` each carry the identical AST-only limit, every one of them is
+named under **NOT** in this fence, and they are owed to C2, C3, C6 and C13.
+
+---
+
+### 2. `Q-080`, and the deviation this session declared rather than took
+
+The ruling was recorded **verbatim before anything else was touched** (hard rule 5, `061dcd9`), and
+it names remedy 3: read the trailer **block**, not the whole body. `_TOKEN_TRAILER` is
+**byte-identical** and `Q-014 (i)` is not reopened; only *where* the patterns are applied narrows.
+
+⚠️ **BUT THE RULING'S PARENTHETICAL GLOSS — *"the message's LAST PARAGRAPH (`git
+interpret-trailers`)"* — WAS IMPLEMENTED LITERALLY FIRST AND MEASURED BEFORE IT WAS SHIPPED, AND IT
+WOULD HAVE BLINDED THE GUARD ON 74 OF 277 COMMITS.**
+
+| parser | commits whose verdict changes |
+|---|---|
+| **(a) the literal gloss** — last paragraph only | **74** |
+| **(b) what shipped** — the trailing run of paragraphs whose every line is trailer-shaped | **1** |
+
+`git interpret-trailers --parse` **stops at the first blank line** — verified against git itself on
+`1f82c48` and on seven synthetic cases: `A-Key: 1` + blank + `B-Key: 2` parses to **`B-Key` only**,
+and the same two lines with no blank between them parse to **both**. **This project's own convention
+puts a blank line between `Session-Token:` and the harness's `Co-Authored-By:`**, so under (a) the
+token sits one paragraph too high. That takes **E1 — the check that catches a token that was never
+issued — from 261 of 277 commits to 187**, and makes **E4 print a false statement about 74 commits
+that do carry a trailer**: `Q-014 (ii)`'s recorded defect at **eighteen times the scale**.
+
+**That is hard rule 6** — *"no deleting, skipping, loosening, or approximating an assertion to get
+green"* — so (b) shipped and **the deviation is declared as Class A in `Q-081`, with both numbers,
+as the loudest thing in this session's report rather than a footnote.** The architect is asked to
+confirm (b) or to direct (a) with its blind spot published as a limitation; and if (a), `Q-014 (ii)`
+should be reopened in the same ruling. `INCIDENTS.md` **INC-52**; `OF-120`.
+
+⚠️ **THE ONE COMMIT (b) STILL LOSES IS NAMED RATHER THAN ROUNDED AWAY: `97a5981`**, whose message
+both begins and ends with a bare `@` — a leaked PowerShell here-string delimiter, `INC-06`'s class —
+so **git itself has never been able to read that commit's trailer either**. E4 now separates *"no
+`Session-Token:` line at all"* (16) from *"one OUTSIDE the trailer block"* (1, named), because
+folding them together is `Q-014 (ii)`'s false statement again. `OF-121`.
+
+**The four proofs TASK 1a required, all run:** (i) `make check-roles` exits **0** and E5 no longer
+names `c4d4460`; (ii) E5 **still RED** on a malformed trailer in the last paragraph **and** on one
+alone in its own paragraph inside the trailing run — the residual `Q-081` names, constructed in a
+throwaway repository and asserted caught; (iii) the four `E5_EXCEPTIONS` behave **exactly as
+before** — `6d08cf3`, `9663247`, `d67550e`, `ec3064d`, all four still the ONE-OFF `Q-014 (iv)`
+exception, list still pinned at 4; (iv) a commit quoting `Session-Token:` at column 0 in an earlier
+prose paragraph now **PASSES**, asserted both with and without the `Co-Authored-By` paragraph.
+
+---
+
+### 3. `OF-99` and `Q-074` — the tripwire, and the site it would have caught
+
+`Q-064` and `Q-074` both say the same sentence: *"A grep for the superseded string, run as a test,
+would have caught all four in one line."* **`OF-99` searched and found nothing.** It now exists, in
+`tests/test_repo_invariants.py`, driven by an explicit list carrying per entry the superseded claim,
+its replacement, the ruling that superseded it, and the paths where it may legitimately still
+appear.
+
+⚠️ **THE HARD PART IS NOT THE GREP.** `OF-99` measured **66 hits, exactly one live**; a repo-wide
+count here found **147 occurrences across 28 files**. A tripwire that cannot tell a **live claim**
+from a **recorded one** fires 146 times on its first run and is switched off on its second. **Two
+explicit discriminators, both fired both ways:**
+
+1. **PATH** — `docs/sessions/`, `docs/reviews/` and the four journals are append-only history; a
+   superseded citation there is the record working correctly.
+2. **QUOTATION** — a line that quotes the claim in order to say it is wrong is not making it. That
+   is **`Q-080`'s own logic arriving in a second file three days later**, and
+   `camel_comparator/branch_b.py:39` is the case that forced it.
+
+And the pattern matches the **claim**, not the string — a citing verb immediately in front — so live
+text stays free to name Tables 5-7, which `CONTEXT.md` §8.5.1's own ⚠️ NOT-clause depends on.
+
+**FIRED AT THE REAL REPOSITORY AS IT STOOD ONE COMMIT EARLIER (`28b6eec`): 1 live hit, and it is
+exactly `tests/test_lanes_operator_placeholders.py:141` — `Q-074`'s site.** Then TASK 1d corrected
+it, and the scan now returns **0**.
+
+The correction carries all four fields `Q-058` requires — **Table 2, Appendix B, `o3 High`,
+`banking`** — identifies Tables 5-7 as Appendix C / `Claude 3.5 Sonnet`, and **retains Table 7 as
+§8.5.2's P2 citation**, which the ruling requires and an over-correction would have lost. It is
+**ASCII-only**: 18 non-ASCII bytes before, 18 after, so the `make selftest` output that
+`INC-08`/`INC-25`/`INC-45` killed three sessions on is untouched.
+
+---
+
+### 4. Measured by this session, at each boundary
+
+| | before | after |
+|---|---|---|
+| `make test` | **1 failed, 721 passed**, 1 skipped, 2 deselected | ✅ **738 passed, 1 skipped, 2 deselected** |
+| `make check-roles` | 16 passed, **1 failed**, 4 n/a, **exit 1** | ✅ **17 passed, 0 failed, 5 n/a, exit 0** |
+| `make selftest` | RED on `camel_comparator.branch` | RED on `camel_comparator.branch` — **not this session's** |
+| `git status --porcelain tests/goldens/` | empty | **empty** |
+| vendored-pin triple, all three checkouts | — | **MATCH / 0 lines / 0 lines** |
+
+**16 new probes. 10 of the 12 named ones FAIL against the pre-fix source** (clone at `28b6eec`,
+`whetstone_gate.__file__` printed). **The 2 that pass on both are deliberate**: *"E5 still fires"*
+and *"the patterns were not widened"* are no-change probes, and a probe asserting that a check still
+checks must pass before and after — saying so is the point of `PROCESS.md` §5.4.
+
+⚠️ **ONE TRANSIENT RED IS REPORTED RATHER THAN QUIETLY RE-RUN AWAY.** The first post-commit
+`make test` failed `test_the_object_store_and_the_working_tree_agree` with a `CalledProcessError`
+from `git show HEAD:<path>`: the concurrent **C13 REVIEW 3** session (`c09c385b`) had a path in the
+index that was not yet in `HEAD`. It is a **shared-working-tree race, not a defect** — `INC-30`'s
+family — and the immediate re-run, with that session's work committed, was green. **The failing run
+is stated here because a session that re-runs until green and reports only the green run is doing
+the thing this project exists to criticise.**
+
+---
+
+### 5. Owed, and to whom — recorded, not built
+
+* **`OF-67`, `OF-70`, `OF-78` — the session-token ordinal mechanism.** Owed for the **eleventh
+  consecutive session**; three holes remain in the chain (ordinals **11, 12, 18**; rows
+  `df238be6`, `0852ea56`, `9c0c6734`). ⚠️ **This is the first session whose fence CONTAINED
+  `check_roles.py`, and its prompt named the item under RECORD, DO NOT BUILD.** So the reason
+  changed from *"unreachable"* to *"out of scope by instruction"* — a better-attested owing, not a
+  weaker one. **Owed to C11.**
+* **check-roles `E6`, the `Swept:` detector (`Q-063` (iii)).** ⚠️ **No longer urgent, and this
+  session says so rather than leaving it ambiguous.** The inverted git rule — `git add -- <paths>`
+  then a **bare** `git commit`, committing the index snapshot — closes the check-to-commit window
+  `INC-48` fell through. The `Swept:` declaration remains required, because a write landing
+  *before* the `add` is still staged. **Open, still C11's, no longer pressing.**
+* **`OF-110`'s other four walkers** — C2's, C3's, C6's and C13's — **owed to those chunks.**
+* **`OF-122`** — D4's refusal of `getattr`/`exec`/`sys.modules` inside `gates/` and `scorer/` is a
+  real constraint on **unwritten** code, landed by a chunk that owns neither package. **Recorded so
+  C8 and C9 meet it in `OPEN_FINDINGS.md` rather than in a red check** — `INC-28`'s class.
+
+---
+
 ## C13 — THE CaMeL COMPARATOR — **REVIEW** attempt 3 — 2026-09-02 — ⚠️ **FAIL, WITH ZERO BLOCKERS: BOTH OF REVIEW 2's ARE CLOSED, ALL SIX SURVIVORS ARE KILLED, AND FIVE NON-EQUIVALENT SURVIVORS SIT IN THE FIX'S OWN NEW CODE**
 
 **SESSION-TOKEN:** `c09c385b` · **NOT in the batch.** Appended as
