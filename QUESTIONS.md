@@ -85,6 +85,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `fd8a67e9` | C13 | FIX | 2026-09-01 |
 | `4e1c8a92` | C6 | FIX | 2026-09-01 |
 | `8c49c4d3` | C13 | REVIEW | 2026-09-01 |
+| `3605d31c` | C6 | REVIEW | 2026-09-02 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -500,6 +501,47 @@ this append. **That is `OF-89`'s class landing on a reviewer for the second cons
 a Phase-1 seal turning the suite red — and it is recorded here rather than quietly repaired, because
 `OF-89` predicted exactly this and nothing has changed to stop it. The honest ordering is
 **register the row, then commit the seal**; this session did it the other way and says so.
+
+⚠️ **AND `3605d31c` IS THE TWENTY-FOURTH SELF-RECORDED ROW AND THE TWENTY-THIRD TO CARRY A
+PARAGRAPH. RE-DERIVED FROM THE TABLE, AND THE THREE HOLES ARE STILL THERE.** This session's
+prompt — **C6 REVIEW, attempt 3**, 2026-09-02 — opened with `3605d31c` and said, in its own words:
+*"⚠️ Token row NUMBERED FROM THE TABLE. REVIEW 2 of C13 counted 37 and made itself 38; C6 FIX 2
+counted 36 and made itself 37. Re-derive yours from the HEADINGS and state the row count you found.
+Ordinals 11, 12 and 18 are asserted by no paragraph and are NOT yours to close."*
+**Counted from the file, immediately before appending:**
+
+* **The table held 38 data rows** (lines 50–87), `8c49c4d3` being the last. **38 before this one, so
+  this is row 39.** ⚠️ `8c49c4d3`'s paragraph states it counted **37** and made itself row **38**;
+  that reconciles exactly, and it is checked rather than assumed.
+* **This session is therefore the twenty-fourth self-recorded row and the twenty-third to carry a
+  paragraph**, the gap of exactly one still being `9c0c6734`'s uncounted row, named by `b450df0a`
+  and unchanged since.
+* ⚠️ **RE-DERIVED FROM THE HEADINGS, AS THE PROMPT REQUIRED, RATHER THAN FROM THE PREDECESSOR'S
+  LIST.** The numbered self-record headings in this section assert the ordinals **5, 6, 7, 8, 9, 10,
+  13, 14, 15, 16, 17, 19, 20, 21, 22, 23** and this one at **24**. **Ordinals 11, 12 and 18 are
+  still asserted by no paragraph in this file**, and the three rows carrying none of their own are
+  still `df238be6`, `0852ea56` and `9c0c6734`. **They are NOT this session's to close** and are not
+  closed here.
+* ⚠️ **THIS IS THE ELEVENTH CONSECUTIVE SESSION TO CARRY THE TOTAL BY HAND**, and the **third**
+  that could not have written the mechanism under any reading of its fence: a review session
+  **fixes nothing**, and `src/` is named under **NOT** in this prompt's scope fence in terms.
+  `5c4f8e11`'s owed mechanism — *"`check_roles.py` parses this table for E1 and could count the rows
+  outside the batch itself"* — is still owed. `OF-70` and `OF-78` both still stand for it.
+
+⚠️ **AND THIS SESSION REGISTERED THE ROW BEFORE ITS PHASE-1 SEAL, WHICH IS THE ONLY THING IN THIS
+PARAGRAPH THAT IS NEW.** `8c49c4d3`'s paragraph immediately above records `OF-89`'s class landing on
+a reviewer for the **second** consecutive review — a Phase-1 seal committed before the token row,
+turning `make test` red on `test_check_roles_exits_zero` and
+`test_no_commit_carries_a_forged_or_reused_session_token`. **This prompt stated that history up front
+and instructed the reverse ordering**, and this session followed it: this row is committed **first**,
+and the Phase-1 seal is the commit after it. **The streak is broken by the prompt telling the session
+what the last two got wrong, not by the mechanism `OF-70` still names** — which is the same shape as
+`c2b7f419`'s improvement over the numbering and carries the same limitation: it removes the recurring
+error and not the underlying one.
+The row was appended and **no other session's line was touched**; `git status --porcelain` over the
+five shared journals was **empty** immediately before this commit (the only untracked path in the
+tree is `grep.exe.stackdump`, which belongs to no session and was not touched); and the file's bytes
+were re-verified after the append and carry **0 CR bytes**.
 
 ## ⚠️ THE TOKEN BATCH, 2026-08-31 — and this is what ends the collision class
 
@@ -6661,4 +6703,89 @@ miss"* — was missed. **A question's title is not its scope**, and the remedy i
 everywhere else here: enumerate the defects a question raises as a list the fix session ticks off,
 rather than as prose a reader has to hold.
 
-**RULING (architect, \<date>):** *\<pending>*
+**RULING (architect, 2026-09-02), recorded verbatim (hard rule 5), by C13 FIX 2 (`91eb51c1`)
+BEFORE it acted on it:**
+
+> *Q-079 is RULED. `config/lanes.yaml:202`'s `branch_a_condition` still reads 'the model id is still
+> served AND the run completes inside the 90-minute box' — the trigger Q-057 NARROWED, surviving in
+> the artefact that OUTRANKS CONTEXT.md once `prereg-v1` exists (hard rule 4). Q-057's ruling is
+> explicit that a provider error on the suffixed string is a HARNESS DEFECT, that 'a
+> pre-registration whose negative branch can be reached by our own bug measures nothing', and that
+> Branch B is taken ONLY on a cause that has been DIAGNOSED. As written, config binds this project
+> to the rule the ruling replaced, and 'the model id is still served' is the very phrasing the
+> ruling identifies as indistinguishable from a harness defect. CORRECT IT TO MATCH CONTEXT.md v1.9,
+> including the diagnosis requirement and the words 'it errored is not a cause'. It is legal today
+> only because `git tag -l` returns c0-pass..c4-pass and `prereg-v1` does not exist; after C14 it
+> would be unfixable. THE ARCHITECT'S ERROR IS RECORDED: the C13 FIX 1 prompt named four citation
+> sites when Q-064 named five defects across two kinds, and carried only the citation half of that
+> config block.*
+
+**What landed under it (C13 FIX 2, `91eb51c1`).** `config/lanes.yaml`'s `camel_comparator` block is
+amended in a commit of its own. `branch_a_condition` no longer names the model id: it states Branch
+A's condition as **the run completing**, in `CONTEXT.md` v1.9 §8.5.1's own terms. A
+**`branch_b_condition` key is ADDED**, so Branch B's trigger exists in `config/` as a **stated
+condition** rather than only as the negation of another key — which is the shape `Q-079` names under
+option 1 — and it carries the diagnosis requirement, the `PROTOCOL.md`-before-the-branch order, and
+the words *"it errored is not a cause, and a harness defect is never Branch B"* verbatim.
+⚠️ **AND THE PART WITHOUT WHICH THE CORRECTION IS WORTH NOTHING:**
+`test_the_pre_registered_branch_condition_carries_the_DIAGNOSIS_requirement` in
+`tests/test_c13_camel_comparator.py` reads **both** keys **through the loader** and asserts what they
+say. `Q-064` measured the cause and printed it as a number — *"nothing reads either key"* — and C13
+REVIEW 1 measured the same thing. **A pre-registered condition that nothing asserts is a comment**,
+and the reason this defect survived a fix session that had the file open is exactly that.
+⚠️ **Checked, not assumed, immediately before the edit:** `git tag -l` returns
+`c0-pass`…`c4-pass`; `prereg-v1` does not resolve; `make check-prereg` reports **NOT-YET-FROZEN**
+because `PROTOCOL.md` does not yet exist. The BEFORE and AFTER SHA-256 of the file's **git blob** are
+carried in this session's FINAL OUTPUT so C14 writes the manifest against the corrected file.
+⚠️ **NOT changed, and named so it is not read as covered:** `camel_comparator.branch` still holds its
+`TODO_C13_RUN1` sentinel — RUN-1 decides the branch and a fix session that decided it would be
+inventing a result — so `make selftest` is still RED, on that sentinel, for that reason.
+
+---
+
+## ⚠️ RULINGS RECORDED BY C6 REVIEW 3 (`3605d31c`), 2026-09-02 — OF-80's scope, and the scoped reimplementation
+
+**Recorded VERBATIM, as they were issued in this session's prompt, BEFORE anything else was read or
+touched** (`CLAUDE.md` hard rule 5, §6.6). Both arrived as one block, under the heading *"TWO
+RULINGS. RECORD BOTH VERBATIM BEFORE ANYTHING ELSE."*, and are transcribed here as one block,
+unsplit and unparaphrased. They answer `Q-077` (raised by C6 FIX 2 against `OF-80`), which this
+session's Phase 1 did **not** read, and they are the law this session's Phase 1 ran under.
+
+> "OF-80's RULING BINDS THIS SESSION: on a RE-review, PHASE 1 IS BLIND TO THE FIX, NOT TO THE
+> FINDINGS. You read REVIEW_C6_2.md in full, then — WITHOUT opening the fix commits
+> (`1252fdc 9c809c2 fe3984f de7feee 1f82c48`), docs/sessions/c6-fix-2.txt, the current
+> src/whetstone_gate/attacker/, or the current tests/test_c6_*.py — you write down what a correct fix
+> MUST satisfy, as executable criteria with EXPECTED RESULTS, and COMMIT THAT. Only then do you look
+> at what was done. C13 REVIEW 2 ran first under this rule and pre-committed eight polarities, eight
+> of which held; that is what makes a re-review a test rather than a description.
+>
+> AND THE REIMPLEMENTATION REQUIREMENT IS SCOPED, NOT WAIVED. docs/reviews/README.md says a `full`
+> review with no reimplementation CANNOT PASS, and REVIEW 2 already reimplemented the context
+> assembly and the token accounting from S8.6's text and ran 30 vectors. RULED: ON A RE-REVIEW THE
+> REIMPLEMENTATION IS OF THE CHANGED SURFACE, INDEPENDENTLY DERIVED — here, the CROSSOVER SERIES and
+> the BLINDNESS SCAN — written from CONTEXT.md S8.6/S13.3 and config/ alone, importing nothing from
+> `src/`. Re-deriving the whole loop a third time would spend ninety minutes re-proving what is
+> already committed and sealed; re-deriving what CHANGED is the part no reviewer has ever checked.
+> The reimplementation still cannot pass by being absent."
+
+**Applied by:** C6 REVIEW 3 (`3605d31c`), 2026-09-02.
+* **Ruling 1** is applied by sealing `docs/reviews/independent/c6_review3_criteria.md` — a
+  pre-committed expected polarity for every one of B-1, B-2, B-3, the four mutant survivors
+  (M3, M19, M17, M18) and every `OF-` item the fix was asked to close — **before** any fix commit,
+  `docs/sessions/c6-fix-2.txt`, `src/whetstone_gate/attacker/` or `tests/test_c6_*.py` was opened.
+  ⚠️ **AND THE BOUNDARY WAS DRAWN TIGHTER THAN THE RULING REQUIRED, in one place, and it is named
+  rather than left to be inferred.** The prompt's own READ-IN-ORDER list names `INCIDENTS.md`
+  INC-41…INC-45 and `docs/reviews/OPEN_FINDINGS.md` OF-47…OF-95. Both were **written by the FIX**:
+  INC-41…INC-45 carry a `Fix:` field with its commit SHA, and `OF-80`…`OF-95`'s `Closed by` cells
+  were filled in by `de7feee`. Reading either in Phase 1 would be reading the fix through a
+  different file. **So Phase 1 read `OF-47`…`OF-95` at `29f40e3` — REVIEW 2's own commit, before the
+  disposition — and deferred INC-41…INC-45, `Q-075` and `Q-077` to Phase 2**, which is the reading
+  that makes *"blind to the fix, not to the findings"* mean something. `Q-031`, `Q-037`, `Q-046`,
+  `Q-048` and the `OF-87`/`OF-88` rulings **were** read in Phase 1: they are architect rulings, they
+  are law under hard rule 5, and criteria cannot be written without them.
+* **Ruling 2** is applied by `docs/reviews/independent/c6_review3_reimpl.py`, which imports nothing
+  from `src/`, re-derives the crossover series and the blindness scan from `CONTEXT.md` §8.6 /
+  §13.3 / §13.4 and `config/protocol.yaml` alone, and carries **six leak shapes derived from what a
+  gate reason could contain** rather than from the fix's list. `REVIEW_C6_2`'s
+  `independent/c6_reimpl.py` — the whole-loop reimplementation, 30 vectors, 41 property agreements —
+  stands as the `full` chunk's reimplementation of record and is **not** superseded by this file.
