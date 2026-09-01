@@ -75,6 +75,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `7b99a85a` | C6 | FIX | 2026-09-01 |
 | `0852ea56` | C4 | REVIEW | 2026-09-01 |
 | `5c4f8e11` | ARCH | BUILD | 2026-09-01 |
+| `3a6e3d07` | C7 | BUILD | 2026-09-01 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -236,6 +237,34 @@ session's fence names `src/` under `NOT` — and it is recorded as **OWED** rath
 **What has NOT changed: twelve of thirteen are still the same defect**, Q-025's clause still reads
 *"every token batch"*, and the remedy the `6ba2d70e` paragraph named has now failed to be applied
 seven times running. The row was appended and **no other session's line was touched**.
+
+⚠️ **AND `3a6e3d07` IS THE FOURTEENTH SELF-RECORDED ROW. THE PROMPT DID NOT NUMBER IT, AND THAT
+IS THE ONLY NEW THING IN THIS PARAGRAPH — IT IS ALSO THE FIX THE TWO PARAGRAPHS ABOVE ASKED
+FOR.** This session's prompt — C7 BUILD, attempt 1, 2026-09-01 — opened with `3a6e3d07`, was
+**not** part of the `f57e216b` batch, and stated the gap in its own words: *"⚠️ Your token
+`3a6e3d07` is NOT in the batch. QUESTIONS.md is in your fence — append …
+⚠️ **NUMBER IT FROM THE FILE, NOT FROM THIS PROMPT.** Two prompts running have now numbered
+that row wrong, once by one and once by two, and the last session left a reconciliation table
+in the token preamble. Count it yourself."*
+**Counted from the reconciliation table above, which enumerates rows 1–13 and is the instrument
+that made counting possible: this is the fourteenth.** It is a single issue, not a batch, so
+Q-025's clause still does not reach it — the identical gap `365deaf7`, `8e0f4a13`, `6ba2d70e`,
+`3af1c9d2`, `2cd28cc5`, `7b99a85a` and `5c4f8e11` each record — and without the row
+`check_roles.py` **E1 fails on every commit this session makes**.
+⚠️ **WHAT CHANGED, AND IT IS A REAL IMPROVEMENT RATHER THAN A FIFTEENTH APOLOGY.** The
+`7b99a85a` paragraph named the cost of the architect numbering the row in advance —
+*"numbering in advance is exactly the step that can now be wrong by one"* — and `5c4f8e11`'s
+found it wrong **by two**, which is the paragraph that built the reconciliation table. **This
+prompt stopped numbering it.** It states the gap, gives the row's exact text, names both prior
+miscounts, and hands the count to the session that can read the file. That is the cheapest
+possible version of the remedy `5c4f8e11` recorded as **OWED** — *"`check_roles.py` parses this
+table for E1 and could count the rows outside the batch itself"* — and it does not replace it:
+**the mechanism is still owed, and a hand-count is still a hand-count.** What is no longer true
+is that the number arrives pre-committed to being wrong.
+**What has NOT changed: thirteen of fourteen are still the same defect**, Q-025's clause still
+reads *"every token batch"*, and the remedy the `6ba2d70e` paragraph named has now failed to be
+applied eight times running. The row was appended and **no other session's line was touched**;
+the file's bytes were re-verified after the append and carry **0 CR bytes**.
 
 ## ⚠️ THE TOKEN BATCH, 2026-08-31 — and this is what ends the collision class
 
