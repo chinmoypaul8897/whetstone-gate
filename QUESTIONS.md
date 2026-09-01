@@ -4537,7 +4537,9 @@ it matched **exactly once**. **8 of 8 claims reproduce at the pin.**
 ---
 
 ### Q-057 — ⚠️ CLASS A: `google:...+camel+secpol` is a PIPELINE NAME CaMeL emits, not a `--model` argument, and RUN-1 is a TWO-PASS protocol
-**Raised by:** C13 BUILD (`c2b7f419`) · **Date:** 2026-09-01 · **Status:** **OPEN — not
+**Raised by:** C13 BUILD (`c2b7f419`) · **Date:** 2026-09-01 · **Status:** ⚠️ **RULED**
+(architect, 2026-09-01; recorded verbatim by **C13 BUILD 2**, `3fb17baa`) — *the status line as
+`c2b7f419` wrote it, kept rather than overwritten:* **OPEN — not
 blocking C13; BLOCKING RUN-1 if unread** · **Class:** **A** — it changes the command the
 operator executes, and RUN-1 is a single-shot 90-minute box.
 **`INCIDENTS.md`:** **OWED** — C13's fence names `INCIDENTS.md` under **NOT** (the concurrent
@@ -4952,7 +4954,11 @@ other's files**, audited commit by commit across all four of C13's and all five 
 `Q-051`'s remedy held on the first occasion two build sessions have actually overlapped in this tree
 since it was written.
 
-**RULING (architect, <date>):** *<pending>*
+**RULING (architect, 2026-09-01): RULED — the fourteenth content field LANDS.** Recorded verbatim,
+with Q-053, Q-054 and Q-055, in `## ⚠️ RULINGS RECORDED BY C7 BUILD 2` at the end of this file, and
+implemented at C7 BUILD 2 (`7d84b383`). ⚠️ **This one line is the only text outside that appended
+section that this session wrote into another session's entry**, and it is written because leaving
+`<pending>` beside a question that HAS been ruled would make this file assert something false.
 
 ---
 
@@ -4972,3 +4978,121 @@ are listed here so a session that reads only this file still meets them.
 | **`config/` §8.6 constants table is the tripwire's authoritative list** | `CONTEXT.md` §8.6, `PROCESS.md` §4 rule 9 | *"Any constant that is not in this table and not in `config/` is a defect, and finding one is a review BLOCKER."* |
 | **AD-CMP is a declared sample, not full coverage** — `InjectionTask6` × all 16 user tasks; the other 8 injection tasks are the **named** dropped set | `CONTEXT.md` §13.4 | no silent truncation |
 | **Two deliberate drops:** R-Judge's Finance subset (cited, never vendored — it ships **no licence file**) and `groq/compound*` as ladder points (agentic systems, not raw models) | `PROCESS.md` §12.2 | recorded rather than silently omitted; the ladder ships **four** points and the reason is printed on the figure |
+
+---
+
+## ⚠️ RULINGS RECORDED BY C7 BUILD 2 (`7d84b383`), 2026-09-01 — Q-062, Q-053, Q-054, Q-055
+
+**Recorded VERBATIM, BEFORE a line of code was touched.** `CLAUDE.md` hard rule 5: *"RULINGS ARE
+RECORDED VERBATIM in QUESTIONS.md before anything else is touched."* The four below are the text of
+the architect's C7 BUILD 2 prompt, transcribed without paraphrase, reordering or abbreviation. The
+commit that carries this section (`docs:`) precedes every commit that changes `src/` or `tests/`, and
+`git log --oneline` is the authority on that ordering.
+
+⚠️ **APPENDED, NOT WOVEN IN.** A concurrent **C13 BUILD 2** session (`3fb17baa`) may hold this file,
+so this section is a pure append at the end. **Exactly one line elsewhere in the file was completed:**
+`Q-062`'s `**RULING (architect, <date>):** *<pending>*` placeholder, which now names this section.
+`Q-053`, `Q-054` and `Q-055` carry no such placeholder and were **not touched at all** — their
+rulings live here. Nothing else in this file was altered by this session except its own token row.
+
+---
+
+### Q-062 — RULED. The fourteenth content field LANDS.
+
+> "Q-062 is RULED: the fourteenth content field LANDS. `executed`, boolean, non-null on every entry,
+> positioned IMMEDIATELY AFTER `rejected_by_razorpay`. C7 BUILD 1's stop was correct and its
+> measurement decides it: two capture_payment entries on seed 2001, one that moved Rs 665.23 and one
+> the MCP tool layer refused, identical in all thirteen content fields and carrying the SAME HASH
+> 3c54446376764d88ea82c17ea56b31716ed1fdf1de9a77536f4ba55ab09cd16b. A ledger in which an action that
+> happened and an action that never happened are the same bytes is not a ledger. S8.6a's productive-
+> action control — which S8 makes MANDATORY beside every result — E1, E2, E3 and S3 are all
+> uncomputable without it, and a fourteenth field is cheaper than any of them being unscoreable.
+>
+> DEFINITION, and it is the ruling's operative half: `executed` is TRUE if and only if the world
+> ACTUALLY PERFORMED the action against mock Razorpay state. It is therefore FALSE for all three
+> refusal sources, which become jointly derivable for the first time:
+>     gate refused        -> executed false, verdict DENIED or INDETERMINATE
+>     Razorpay refused    -> executed false, rejected_by_razorpay true
+>     TOOL LAYER refused  -> executed false, verdict ALLOWED, rejected_by_razorpay false
+>                            <- the row that was previously indistinguishable from success
+>
+> GOLDEN 5 IS UNAFFECTED AND IS NOT REOPENED. S5.2 specifies it as a TAMPER test — a VERIFIER oracle
+> — and never as a writer oracle. Its three entries remain valid 13-field entries that a correct
+> verifier must still verify, and all four cases must still reproduce with their first-bad seqs,
+> because verify() recomputes whatever each entry carries. C7 BUILD 1's writer-reproduces-case-A test
+> was that session's own addition beyond S5.2 and it RETIRES, with the reason in its place in the
+> file rather than a silent deletion. THE ARCHITECT IS AUTHORING GOLDEN 5B to re-pin the writer under
+> the 14-field schema before C7's review; do not wait for it and do not write it — tests/goldens/ is
+> read-only to you (hard rule 3)."
+
+**Status:** **RULED — CLOSED by C7 BUILD 2 (`7d84b383`), 2026-09-01.** Implemented; the before/after
+measurement is in `docs/sessions/c7-build-2.txt` §2 and in
+`tests/test_c7_ledger.py::test_an_EXECUTED_capture_and_an_MCP_LAYER_REFUSAL_NOW_DIFFER`.
+⚠️ **THE STOP IS LIFTED AND C8 IS UNBLOCKED** on the entry-schema ground Q-062 named. What Q-062
+recorded as its *second instance of the same root cause* — **`receipt` is on no entry**, so S2's
+uncovered path stays invisible to the replay — **is NOT closed by this ruling**, which names one
+field and not two. It is carried forward rather than allowed to lapse with the question that raised
+it: see the C7 BUILD 2 questions appended below this section.
+
+---
+
+### Q-053 — RULED CONFIRMED. `ensure_ascii=False`.
+
+> "Q-053 RULED CONFIRMED: `ensure_ascii=False`. UTF-8, per S16, golden 5's hash_rule and RFC 8785.
+> C7's derivation was correct; it is now a ruling rather than a Class B choice."
+
+**Status:** **RULED — CLOSED by C7 BUILD 2 (`7d84b383`), 2026-09-01.** The behaviour is unchanged;
+what changed is its standing. `whetstone_gate.ledger.chain.canonical_json`'s docstring no longer
+describes it as *"a Class B deviation recorded with its reasoning"* and now cites this ruling, and
+`test_a_non_ascii_target_is_hashed_as_utf8_and_not_escaped` cites it too. **No digest moves**, which
+is the whole content of "confirmed": the code was already right and only the record was provisional.
+
+---
+
+### Q-054 — RULED. `ledger_seq` and the world's write counter are SEPARATE SPACES.
+
+> "Q-054 RULED: `ledger_seq` (the ledger's row) and C4's world write-counter are SEPARATE SPACES and
+> NO CHUNK MAY JOIN THEM ON THAT KEY. Build 1 measured the divergence — harm records [1,2]
+> against ledger entries [1,2,3]. Write the prohibition as a docstring on the field."
+
+**Status:** **RULED — CLOSED by C7 BUILD 2 (`7d84b383`), 2026-09-01.** The prohibition is a docstring
+on `LedgerEntry.ledger_seq` itself, so it is read by anyone who reads the field, and
+`test_no_chunk_may_join_a_harm_record_to_an_entry_on_ledger_seq` re-measures the divergence rather
+than quoting it. ⚠️ **It binds C8, C10, C17 and C18** — every chunk that reads both objects — and the
+prohibition is stated where those chunks will look, which is the field, not this file.
+
+---
+
+### Q-055 — RULED ACCEPTED AND PUBLISHED AS A LIMITATION.
+
+> "Q-055 RULED ACCEPTED AND PUBLISHED AS A LIMITATION: CANARY-B reads `target` only, so a probe id
+> in a refund's `notes` is invisible. It can only UNDER-count, and an under-count identical
+> across arms cancels in ARM CONFOUNDED's ratio. Record the error direction and that argument in
+> the code, so C20 can publish it rather than rediscover it."
+
+**Status:** **RULED — CLOSED by C7 BUILD 2 (`7d84b383`), 2026-09-01.** The error direction and the
+cancellation argument are in `whetstone_gate.ledger.build.target_of`'s docstring and in
+`entries_naming`'s, addressed to **C20** by name, and
+`test_the_canary_b_undercount_is_one_directional_and_the_argument_is_in_the_code` asserts the
+direction by measurement — a probe id in `notes` produces an entry whose `target` is `-`, so the
+selector misses it, and no arrangement of arguments makes the selector **over**-count.
+⚠️ **What is accepted is the under-count, not a claim that it is zero.** §10.2's ARM CONFOUNDED rule
+is a **ratio** — an arm is flagged below 50% of arm 1's reach — so an under-count identical across
+arms cancels there and moves nothing; it does move the **absolute** column §10.2 publishes, and it
+moves the calibration input if free-text mentions of the probe are common in arm 1 and rare
+elsewhere. **That asymmetry is measurable at C14 and is not measurable now**, which is why this is
+accepted-and-published rather than accepted-and-dismissed.
+
+---
+
+### OF-57 and OF-61 — NOT closed, and their tests stay.
+
+> "OF-57 / OF-61 stay OPEN and their tests stay. Do not weaken the truncation docstring back."
+
+**Complied with.** `test_a_truncated_tail_is_NOT_detected_and_that_is_a_stated_limitation` and
+`test_a_re_derived_suffix_is_NOT_detected_and_that_is_the_same_limitation` are unchanged and still
+pass; `chain.py`'s stated limitation is unchanged in substance. ⚠️ **The fourteenth field does not
+touch either row**: neither truncation nor a re-derived suffix leaves a stale digest, and widening
+the body a digest is taken over changes nothing about what *anchors the end of a chain*. `OF-61`'s
+`seed` is still covered by no digest for the same reason it was before — it is on the document, not
+on an entry — and adding `executed` did not and could not change that.
