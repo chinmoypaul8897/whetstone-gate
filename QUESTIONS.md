@@ -71,6 +71,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `6ba2d70e` | ARCH | BUILD | 2026-08-31 |
 | `df238be6` | C1 | REVIEW | 2026-08-31 |
 | `3af1c9d2` | ARCH | BUILD | 2026-09-01 |
+| `2cd28cc5` | C6 | REVIEW | 2026-09-01 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -142,6 +143,24 @@ says is backwards — but it has stopped being a surprise, and the honest readin
 consecutive one-offs is the one the `6ba2d70e` paragraph already gives: **Q-025's clause was
 written to the wrong scope, and the fix is to widen it from "every token batch" to "every token",
 not to keep counting.**
+
+⚠️ **AND `2cd28cc5` IS THE NINTH SELF-RECORDED ROW. THE COUNT IS NOW EIGHT OF NINE ON THE SAME
+DEFECT, AND THIS ONE IS A REVIEW SESSION RATHER THAN AN ARCH OR FIX SESSION — WHICH IS THE ONLY
+NEW INFORMATION IN IT.** This session's prompt — C6 ADVERSARIAL REVIEW, attempt 1, 2026-09-01 —
+opened with `2cd28cc5`, was **not** part of the `f57e216b` batch, and stated the gap up front in
+its own words: *"⚠️ YOUR TOKEN `2cd28cc5` IS NOT IN THE BATCH. Append … yourself, or check-roles
+E1 FAILS on your own commits."* **It is a single issue, not a batch, so Q-025's remedy still does
+not reach it** — the identical gap the `365deaf7`, `8e0f4a13`, `6ba2d70e` and `3af1c9d2`
+paragraphs each record.
+⚠️ **WHAT IS NEW: THE FIVE ONE-OFFS ARE NOW BUILD, FIX, ARCH ×2 AND REVIEW — EVERY ROLE THE
+PROCESS HAS.** The `6ba2d70e` paragraph already gave the honest reading — *Q-025's clause was
+written to the wrong scope* — and the four preceding one-offs could still, just about, be read as
+an ARCH-and-FIX habit. **They cannot any more.** A REVIEW session, whose whole purpose is to be a
+different session from the builder, has now written its own row into the table that records the
+build/review separation. **That is the sharpest possible statement of why the clause should read
+"every token" rather than "every token batch"**, and it is recorded here rather than as a fifth
+apology. The row was appended and **no other session's line was touched**; the file's bytes were
+re-verified after the append.
 
 ## ⚠️ THE TOKEN BATCH, 2026-08-31 — and this is what ends the collision class
 
