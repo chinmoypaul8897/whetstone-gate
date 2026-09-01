@@ -196,10 +196,19 @@ lanes:
 # one-line reason verbatim. NOT Tables 5-7: those are Appendix C, Claude 3.5 Sonnet, where
 # CaMeL is BEHIND on banking. Table 7 stays P2's citation. (Q-058, Q-064; CONTEXT.md v1.9.)
 # ⚠️ Branch B is published as a RESULT, not hidden as a failure.
+# ⚠️ BRANCH B'S TRIGGER IS NARROWED, AND IT IS STATED HERE RATHER THAN LEFT AS A NEGATION.
+# Q-057's ruling: "google" in model is SUBSTRING CONTAINMENT, so passing the suffixed pipeline
+# name to --model makes dispatch SUCCEED and hands the whole suffixed string to genai.Client as
+# a model id - and the provider error that follows is INDISTINGUISHABLE from Branch B's own
+# trigger. "A pre-registration whose negative branch can be reached by our own bug measures
+# nothing." So branch_a_condition below no longer says "the model id is still served": that is
+# the exact phrasing the ruling identifies as indistinguishable from a harness defect.
+# (Q-057, Q-064, Q-079; CONTEXT.md v1.9 §8.5.1.)
 camel_comparator:
   model_string: "google:gemini-2.0-flash-lite-001"
   branch: TODO_C13_RUN1
-  branch_a_condition: "the model id is still served AND the run completes inside the 90-minute box"
+  branch_a_condition: "IT RUNS: both passes of the two-pass protocol complete inside the 90-minute box, from the same working directory. Pass 1 is `--model google:gemini-2.0-flash-lite-001 --suites banking --run-attack`; pass 2 is the same command with --replay-with-policies, and it reads the logs/ tree pass 1 wrote. Publish the live table"
+  branch_b_condition: "THE RUN DOES NOT COMPLETE, ON A CAUSE THAT HAS BEEN DIAGNOSED AND RECORDED IN PROTOCOL.md BEFORE A BRANCH IS SELECTED. 'It errored' is not a cause, and a harness defect is NEVER Branch B - a provider error on the suffixed string is a HARNESS DEFECT, because dispatch succeeds on substring containment and the suffixed string reaches genai.Client as a model id (Q-057). A pre-registration whose negative branch can be reached by our own bug measures nothing"
   branch_b_action: "ship as a citation of Table 2, Appendix B ('Full results tables'), the o3 High block, banking column of arXiv 2503.18813v2 - CaMeL 81.2% +/- 19.1 against Native Tool Calling API 62.5% +/- 23.7 - with the CONTEXT.md §8.5.1 reason verbatim. NOT Tables 5-7 (Appendix C, Claude 3.5 Sonnet, where CaMeL is BEHIND on banking); Table 7 remains §8.5.2's P2 citation, out of 949 attacks in total"
 
 # ── Models present on the dashboards that CONTEXT.md §13.2 does NOT list ──────
