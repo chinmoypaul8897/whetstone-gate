@@ -842,6 +842,39 @@ def test_the_windowed_context_stops_growing_which_is_what_the_window_is_FOR():
     A large, realistic tool result is used deliberately — a short one would make the test
     pass for the wrong reason, because the growth it is meant to catch would be too small
     to see.
+
+    ⚠️ **THE ASSERTION IS NON-GROWTH, AND IT WAS BYTE-CONSTANCY UNTIL 2026-09-01.**
+    `QUESTIONS.md` **Q-050** (architect, 2026-09-01, UPHELD) / `INCIDENTS.md` **INC-29**.
+    The old form was ``len(set(steady)) == 1``, which is a **strictly different property**
+    from the one this test's own name, docstring and failure message all state — and
+    `CONTEXT.md` §8.6 makes it **unsatisfiable by any correct implementation**, not merely
+    stricter. §13.3 requires the summary to carry §8.6's folded state; that state carries
+    ``turns_remaining``, counting ``20 … 1``; so at turn 11 it goes ``10`` → ``9``, the
+    summary loses one character, and the estimate falls by exactly one token, once::
+
+        turn 10   authored  deterministic summary   len=196  est=66
+        turn 11   authored  deterministic summary   len=195  est=65   <- the entire delta
+                  every other part byte-identical (sys 706, schemas 16, 6× world 2810)
+
+        per_turn[7:] = [6038, 6038, 6038, 6038, 6037, 6037, 6037, 6037, 6037, 6037, ...]
+
+    ``ceil(196/3) = 66`` and ``ceil(195/3) = 65``. Padding to ``"09"`` would change §8.6's
+    JSON shape, and §8.6 is a pre-registration artefact. **So no correct §13.3 summary can
+    satisfy the old assertion at any ``turn_budget >= 10``.**
+
+    ⚠️ **This is a correction, not a weakening, and the ruling required the difference to be
+    SHOWN rather than claimed.** The property this catches is unchanged — a context that
+    *grows* after the window fills still fails here, which is the spike's ~300K-token defect
+    and the only thing the window exists to prevent. What it stops asserting is a byte
+    identity the spec forbids. **And the old form was only ever green for INC-26's own
+    reason:** before the F-1 fix the loop folded the last *tool result* into the summary, so
+    in this fixture the summary sat pinned at exactly ``token_cap × divisor`` characters
+    every turn and ``turns_remaining`` varied underneath a constant. *Green by accident of
+    payload size*, twice in this file, four hundred lines apart.
+
+    C6 REVIEW 1's kept probe
+    ``test_c6_review_probes.py::test_the_loop_makes_one_call_per_turn_and_the_window_stops_growing_on_a_REAL_payload``
+    already asserted this exact form and was green throughout.
     """
     settings = _settings()
     big = json.dumps({"payments": [{"id": f"pay_{i:04d}", "notes": "x" * 200} for i in range(12)]})
@@ -850,9 +883,15 @@ def test_the_windowed_context_stops_growing_which_is_what_the_window_is_FOR():
 
     assert per_turn[0] < per_turn[settings.verbatim_turns], "the window never filled up"
     steady = per_turn[settings.verbatim_turns + 1 :]
-    assert len(set(steady)) == 1, (
+    growth = [
+        (i, steady[i - 1], steady[i])
+        for i in range(1, len(steady))
+        if steady[i] > steady[i - 1]
+    ]
+    assert not growth, (
         f"the context is still growing after the window filled: {steady}. "
-        f"That is the spike's ~300K-token defect (INCIDENTS.md, CONTEXT.md §13.3)."
+        f"It grew at {growth}. That is the spike's ~300K-token defect "
+        f"(INCIDENTS.md, CONTEXT.md §13.3)."
     )
     # And the counterfactual: full history would have grown every single turn.
     grew = [len(r.attacker_text) + len(r.tool_result_text) for r in result.records]
