@@ -1384,3 +1384,100 @@ reads badly and cost nothing, which is exactly the shape hard rule 13 warns is u
 because a count that stops being published stops being a count.*
 
 ---
+
+## INC-25 — INC-08 RECURRED IN THE ONE PLACE IT COULD COST MONEY: the spend-free self-test, the last gate before the sweep spends a finite free tier, died with a traceback instead of printing its verdict
+
+**Date:** 2026-09-01 (measured by the architect on the operator's own machine; fixed the same day by
+ARCH BUILD `3af1c9d2`. The defect shipped with C4 BUILD `7904e0a2`'s `8a94fc6` on 2026-09-01 and was
+green in CI-equivalent conditions from the moment it landed.)
+
+**Event:** On the operator's console:
+
+```
+python -m whetstone_gate.world.selftest
+UnicodeEncodeError: 'charmap' codec can't encode characters in position 760-761: character maps to <undefined>
+```
+
+`src/whetstone_gate/world/selftest.py`'s `main()` ended in a bare `print(render(report))`. The
+`RECORDED` block prints each row's reason **verbatim out of `RAZORPAY_SEMANTICS.md`**, typography
+included — RS-56's *"(for example, Cash on Delivery, offline, BharatQR)"* carries the curly quotes,
+RS-57's carries `⚠`, RS-59's carries an em dash — and Windows' cp1252 console codec has no mapping
+for them. Position 760 is inside the `RECORDED` list, which is to say **the module raised before
+printing one line of the three numbers it exists to report.** Exit was non-zero with a traceback.
+
+**Action:** `from .._console import say`, and `main()` prints `say(render(report))`. That is INC-08's
+own fix applied at the boundary it was built for — `say` transliterates to ASCII **at the moment of
+printing** and flushes. `render()` is **not** touched, deliberately: it still returns the report's
+real text, so the six tests in `tests/test_c4_selftest.py` that assert on its return value are
+unaffected, and the flattening happens exactly once, on the way to the terminal. Committed in
+`ab6e5d4`; the module then ran to completion on the same console, printing `40 / 40`, `13 / 13`,
+`18 / 18`, all 18 `RECORDED` rows with their reasons, the 6 boundary-only `MUST-FIRE` rows, and
+`RESULT: PASS` at exit 0.
+
+**Expectation:** `CONTEXT.md` §13.5(7) and `PROCESS.md` §8 make this module the **last gate before
+any token is spent** — *"if the harness is broken, it fails for free."* A gate whose whole purpose is
+to tell an operator whether the harness is sound should, at minimum, be able to tell them anything at
+all. An operator running it at 03:00 before a sweep sees a traceback and **cannot distinguish a
+broken harness from a broken printer** — and the two demand opposite responses: stop and debug, or
+ignore and spend.
+
+**Missing:** ⚠️ **Any check that operator-facing output survives the operator's console encoding —
+which is word for word what INC-08's own `Missing` field said on 2026-08-30, unchanged and still
+true.** What this occurrence adds is the *reason the suite cannot supply it*: **pytest's `capsys`
+replaces `sys.stdout` with a UTF-8 buffer**, so `test_the_entry_point_returns_zero_when_green`
+calls `main()`, asserts `"RESULT: PASS" in capsys.readouterr().out`, and **passes on a machine where
+the real command dies.** The one test that exercises this entry point is structurally incapable of
+seeing the defect. A check that would have caught it is small and specific: encode
+`render(report)` to the **console's own codec** (`sys.stdout.encoding`, or `cp1252` pinned as this
+machine's, per `CONTEXT.md` §16's record of the toolchain) and assert it does not raise — the same
+shape as `_console.ascii_safe`'s own `.encode("ascii", "replace")`, asserted rather than trusted.
+
+**Missed:** ⚠️ **INC-08's `Systemic guardrail` PREDICTED THIS OCCURRENCE IN WRITING, in the file
+every session is required to read, and the prediction was read past.** Its exact words: *"Every print
+in `tasks.py` and in `check_roles.run()` now passes through one helper, so the boundary exists and is
+one line to apply. **But nothing forces a future session to use it.**"* Nothing did. ⚠️ **And the
+second half is an architect omission as much as a session one, which is said plainly rather than
+filed under the builder:** C4's prompt sanctioned a new operator-facing entry point and **did not
+carry the warning**, while the same prompt carried the CRLF prohibition in capitals for the tenth
+time. **The instruction that was repeated was the one with a `.gitattributes` guardrail behind it;
+the instruction with no guardrail behind it was the one omitted** — precisely backwards, and it is
+the transferable finding here. A third signal was on screen and unread: `PROCESS.md` §8 names this
+module as the pre-spend gate, so *"does it run on the operator's machine"* was its acceptance
+criterion and not a detail.
+
+**Diagnosis:** A new operator-facing entry point was written with a bare `print()` because
+`_console.say` is a convention with no mechanism behind it, and the only test that runs `main()` does
+so under `capsys`, whose UTF-8 buffer cannot reproduce the operator's cp1252 console — so the defect
+was invisible to the suite and visible only by running the command.
+
+**Fix:** `say(render(report))` in `main()`, plus the docstring recording why, in **`ab6e5d4`**.
+
+**Systemic guardrail:** ⚠️ **A REAL ONE IS AVAILABLE AND IT IS NAMED AT ITS TRUE SIZE, and it is
+NOT "remember to use `say`" — that is the wording INC-08 already tried and this entry is the
+evidence it failed.** *(1)* **A tripwire test over first-party source: no bare `print(` outside
+`_console.py`.** It is one AST walk, it is exactly the shape of the four scans
+`tests/test_c2_world.py` already runs over the world package, and it would have failed on `8a94fc6`
+the day it landed. As of this entry `src/whetstone_gate/world/selftest.py:1077` was the **only**
+bare `print` in `src/` and `docs/render/` — measured, not assumed — so the check would have gone
+green everywhere else on the first run, which is what makes it cheap now and expensive later.
+⚠️ **That sentence is a claim about this repository's state and it was MEASURED before it was
+written, because INC-24's own correction is that a `Missing` field carried from memory is INC-05's
+class.** An AST walk for `ast.Call` on the name `print`, over every `.py` under `src/` and
+`docs/render/` excluding `.venv` and `vendor`, returned **two** hits before `ab6e5d4` —
+`world/selftest.py:1077` and `_console.py:55` — and **one** after it: `_console.py:55`, which is
+`say`'s own `print` and is the single place the check would exempt. So the tripwire's allow-list is
+**one entry**, known by measurement, and it does not have to grow to make the suite green.
+*(2)* **An encodability assertion** on each operator-facing renderer, as the `Missing` field
+describes. ⚠️ **NEITHER IS CLAIMED AS LANDED**: both belong in a session holding
+`tests/test_repo_invariants.py` or the tripwire, and this session's fence contained neither. **What
+IS landed is the one-line fix and this entry.**
+
+*⚠️ Recorded by the session that fixed it, before its FINAL OUTPUT was printed, and NOT filed as
+"routed a print through a helper" — which is what it would have looked like in a report, and which
+is the shape hard rule 13 exists to forbid. The severity is stated plainly and it is not the
+slightest of this file's entries, unlike INC-08's: **INC-08 made a report ugly; this made the
+project's only pre-spend gate unreadable on the machine that runs it.** It cost no money only
+because it was found before the sweep, and it was found by an architect running the command rather
+than by anything in this repository.*
+
+---
