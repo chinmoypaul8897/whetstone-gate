@@ -6,6 +6,156 @@ not a record; this file is.
 
 ---
 
+## C6 — THE ATTACKER LOOP — **FIX** attempt 3 — 2026-09-02 — **ALL SIX SURVIVORS KILLED, AND THIS SESSION'S OWN MUTANTS FOUND FIVE MORE IN THE CODE IT HAD JUST WRITTEN**
+
+**SESSION-TOKEN:** `363a2e9f` · **NOT in the batch.** NIGHT RUN SESSION A, **TASK 2 of 2**.
+Row **43**, the **twenty-eighth** self-recorded row, registered **before this task's first commit**
+from a **re-counted** table — because a concurrent C13 REVIEW 3 session (`c09c385b`) holds
+`QUESTIONS.md` and an inherited count would have been wrong, which is `OF-67`'s finding applied
+rather than quoted. ⚠️ **This session holds two tokens, one per chunk**: `9c7c5973` on every C0
+commit, `363a2e9f` on every C6 commit, never crossed.
+
+**Pushed SHA:** see the FINAL OUTPUT in `docs/sessions/nightrun-a-1.txt`.
+**Verdict:** ⚠️ **NO TAG. Nothing is self-certified; a fresh adversarial review follows.**
+
+---
+
+### 1. What REVIEW 3 actually said, and what this session did **not** do
+
+**`REVIEW_C6_3` returned ZERO BLOCKERS.** All three of REVIEW 2's are closed and each was proved by
+reverting it and watching a named test go red. All four old survivors are dead. **Thirty-one of
+thirty-three pre-committed polarities held**, and one of the two misses was in the fix's favour.
+**The behaviour is right, and nothing that works was rewritten.**
+
+What failed C6 is **six non-equivalent mutant survivors, every one on the code FIX 2 itself wrote,
+four of them inside claim 4's blindness guard** — the guard standing behind *"the attacker never
+sees the policy, the holes, the attack list or any gate's reason"*, which is the claim the
+submission's headline number means anything only because of.
+
+### 2. The six, killed — and the mechanism, which matters more than the six
+
+| survivor | what was unpinned | the fixture that now pins it | re-run |
+|---|---|---|---|
+| **N14** | `value != generic` — **`Q-046`'s central assertion** | **3** refusal values extending §8.6's exact string with words carrying no arm, no clause, no verdict, no gate vocabulary | **KILLED** 4 failed |
+| **N12** | **LAYER 3**, the residue catch-all | **4** policy-word-free lines *added* to the summary via a new helper — an addition, which no label mutation can produce | **KILLED** 4 failed |
+| **N15** | LAYER 1's exemption **boundary** | **3** real `config/` ceilings in `STATE_LABEL`, **plus the other side**: a cap legitimately inside the state JSON that must **not** fire | **KILLED** 3 failed |
+| **N13** | `refusal_lines != 1`, the `> 1` half | summaries carrying **2, 3 and 5** denial lines, each asserting the printed count | **KILLED** 3 failed |
+| **N4** | `crossing()`'s `>` at exactly the target | a base **derived from `config/`** so `k = 8` lands on the target exactly, fired at **target−1, target, target+1** | **KILLED** 2 failed |
+| **N9** | the relative-import resolution `INC-43` added | **3** relative forms in the positive control, including a sibling import on a different arithmetic path | **KILLED** 2 failed |
+
+⚠️ **EVERY FIXTURE IS BUILT SO THE MUTATED ASSERTION IS THE *SOLE* KILLER, AND A NEW HELPER —
+`_sole_killer` — ASSERTS EXACTLY THAT.** That is the whole defect these four are: every leak the
+previous suite planted carried a cap value **and** a clause **and** an arm word, so two or three
+layers fired on each one and **no single layer was ever the thing that failed**. `assert findings` is
+satisfied by any layer; it cannot pin a layer.
+
+⚠️ **It immediately caught one of this session's own planted shapes.**
+`"STATE SO FAR [DENIED once]: "` is seen by LAYER 2's vocabulary (`denied`) **and** by the new
+surface scan (`DENIED`), so it pins neither, and `_sole_killer` rejected it. **That rejection is now
+an assertion rather than an anecdote** — which is also how self-mutant `SM-2` got killed.
+
+**TASK 2b's requirement — two further shapes of this session's own per blindness-guard survivor —
+is met**: N14 carries 3 values, N12 carries 4 lines, N15 carries 3 formattings **and both sides of
+its boundary**, N13 carries 3 counts. All caught.
+
+### 3. `OF-104` — the finding that reaches §10.1, closed in both copies
+
+The guard's own opening sentence is *"a denial leaks neither **which arm is running** nor which
+clause fired"*, and the regex encoding precisely that ran over the refusal **value** and over nothing
+else — while `B-2` had already established that the shape which occurs is a leak **in the label**.
+REVIEW 3 measured `"LAST TOOL REFUSAL (arm 2S): "` producing **0 findings from all four guards**, and
+the three such mutants that do die, die **only** on a byte-count fixture whose natural repair ships
+the arm differential green. **§10.1 forbids differential information across arms, so that makes arm 4
+VOID BY CONSTRUCTION with every test passing.**
+
+The regex now runs over the authored **surface** in **both copies, fixed independently**, and is
+fired at arm-in-label, clause-in-label and plural-arm shapes — copy 1 against a hand-built context,
+copy 2 against `run_episode`'s **real output**. Silent on the clean tree.
+
+### 4. ⚠️ THE 2c RULING, APPLIED TO MYSELF, AND IT FOUND FIVE
+
+> *"EVERY FIX SESSION RUNS MUTANTS ON THE CODE IT WROTE, NOT ONLY THE MUTANTS THE REVIEW NAMED …
+> From now on a fix session mutates its own new surface before handing off."*
+
+**Fourteen mutants, in a fresh OS temp clone with `whetstone_gate.__file__` printed. The FIRST run
+was 9 KILLED / 5 SURVIVED, and every survivor was on code this session had just written.**
+
+| id | what | first run | now |
+|---|---|---|---|
+| **N-M1b** | `OF-104`'s scan removed from **copy 2** | ⚠️ **SURVIVED** | **KILLED** 3 failed |
+| **SM-2** | `_sole_killer`'s exclusivity assertion weakened | ⚠️ **SURVIVED** | **KILLED** 1 failed |
+| **SM-6** | `crossing()`'s `k = 0` case removed | ⚠️ **SURVIVED** | **KILLED** 1 failed |
+| **SM-1** | `_with_extra_summary_line`'s AUTHORED origin filter dropped | SURVIVED | ⚪ **EQUIVALENT BY EXHIBIT** |
+| **SM-5** | `_with_extra_summary_line`'s `replaced == 1` disarmed | SURVIVED | ⚪ **EQUIVALENT BY CONSTRUCTION** |
+| **N-M1a**, **SM-3**, **SM-4** | copy 1's scan removed; the `arms?` alternative dropped; the N9 sibling client not planted | KILLED | KILLED |
+
+⚠️ **`N-M1b` IS THE UNCOMFORTABLE ONE AND IT IS THE POINT.** This session added the `OF-104` scan to
+both copies; **deleting it from copy 2 left all 99 tests green.** Not because the scan is wrong —
+because **copy 2 had never been fired at a leak at all.** It ran only over correct contexts, so it
+could only ever print *"no findings"*, which is verbatim the state `REVIEW_C6_2` measured for the
+import walk. **`N12`/`N14`'s class reappeared inside the fix for `N12`/`N14`'s class, and only a
+self-directed mutant could have found it** — no review had seen this code, and the review that named
+`OF-104` had by definition not seen its remedy. `OF-123`.
+
+**Equivalence, proved rather than asserted, and both were mutants this session should not have
+written** — `REVIEW_C6_3`'s own `N10` note is the precedent, and they are **recorded rather than
+deleted**, because a mutant table that drops its author's mistakes is not a record:
+
+* **SM-1 — BY EXHIBIT.** Enumerated across four history depths (3, 5, 15 and 15 parts): the number
+  of parts containing `STATE_LABEL` is **1 with the origin filter and 1 without it, every time**, so
+  the helper returns a byte-identical context either way.
+* **SM-5 — BY CONSTRUCTION.** Disarming an assertion that is true on every input any test supplies
+  cannot fail for any suite.
+
+**Final: 14 mutants · 12 KILLED · 2 EQUIVALENT · 0 non-equivalent survivors**, baseline **111
+passed** on the unmutated clone. ⚠️ **`docs/reviews/mutants/` is outside this fence**, so the full
+table is in `docs/sessions/nightrun-a-1.txt` and a `c6_mutants_4.md` is **owed to the next review**.
+
+### 5. `OF-110`'s C6 half, and the items that stay open
+
+**`OF-110` C6 half — CLOSED.** A source-text refusal scan now runs beside the AST walk over
+`src/whetstone_gate/attacker/`, **written separately from `check_roles.py`'s D4 and not imported
+from it**. Fired at **five** dynamic forms — the three `OF-110` named plus `sys.modules` and `exec`,
+which it did not — each asserting **both** that the AST walk stays silent *and* that the text scan
+fires. **C2's, C3's and C13's walkers are OWED to those chunks.**
+
+**Left open, each with its reason:** `OF-112` (`OF-82`'s fourth instance) lives in
+`tests/test_c6_review_probes.py` — **a review's own probe file, and `INC-30`/`INC-31` are exactly a
+fix session committing to one**; `OF-113` (`INC-42`'s overstated `Action`) is corrected **in prose
+here and in `INC-53`, not by rewriting another session's entry**, because `INCIDENTS.md` is
+append-only; `OF-114` is `REVIEW_C6_3`'s record of its own error and **a fix session does not close a
+review's self-record.**
+
+### 6. ⚠️ THIS SESSION'S OWN DEFECT, REPORTED RATHER THAN ABSORBED — `INC-54`
+
+The `363a2e9f` token paragraph asserted *"**Measured** after this append: 43 issued row(s) covering
+43 token(s)."* **`make check-roles` prints 42.** `_TOKEN_ROW` requires 8 hex and a `(C\d+|ARCH)`
+chunk cell, and the `WG-2026-08-30-CTX-13.4-A` row matches neither, so **43 data rows parse to 42
+issued tokens** — and the `n − 1` was already visible in this session's own output an hour earlier,
+where the `9c7c5973` paragraph records *41 of 42*.
+
+**The figure was DERIVED and formatted as a measurement**, one paragraph after this same session
+corrected somebody else's unmeasured claim, in a session whose entire subject is measured claims.
+`51f0624` carries the wrong figure in its message and **is not amended** — no history rewrite, the
+same ground `Q-080` option 1 was rejected on. The correction is in `QUESTIONS.md` with the arithmetic
+written out, here, and in the FINAL OUTPUT.
+
+### 7. Measured by this session, at each boundary
+
+| | before TASK 2 | after |
+|---|---|---|
+| C6 suite (`test_c6_attacker` + `test_c6_fix_probes` + `test_c6_review_probes`) | **77 passed** | ✅ **111 passed** (69 + 36 + 6) |
+| `make test` | 738 passed, 1 skipped, 2 deselected | ✅ **771 passed, 1 skipped, 2 deselected** |
+| `make check-roles` | 17 passed, 0 failed, 5 n/a, exit 0 | ✅ **unchanged** |
+| mutants on the C6 surface | 6 non-equivalent survivors | ✅ **14 run · 12 KILLED · 2 EQUIVALENT · 0 survivors** |
+| `make selftest` | RED on `camel_comparator.branch` | RED on `camel_comparator.branch` — **not this session's** |
+| `git status --porcelain tests/goldens/` | empty | **empty** |
+
+⚠️ **TOKEN SPEND: ZERO. NO PROVIDER MODEL CALL WAS MADE BY EITHER TASK.** Every model in every run
+here is a mock; `evals/` does not exist in this repository.
+
+---
+
 ## C0 — REPO, TOOLCHAIN, CANONICAL FILES — **FIX** attempt 2 — 2026-09-02 — ⚠️ **THE RED AT HEAD IS CLEARED, AND THE MOAT WAS MEASURED EVADABLE BY THREE SHAPES WHILE PRINTING `clean`**
 
 **SESSION-TOKEN:** `9c7c5973` · **NOT in the batch.** NIGHT RUN SESSION A, **TASK 1 of 2**.

@@ -1230,3 +1230,89 @@ the file, not inherited from a prompt — `OF-67`'s own finding.
 
 **No other session's line was touched by this append.** The `Swept:` check was run on the **STAGED
 SNAPSHOT** (`git diff --cached`), not the working tree.
+
+---
+
+## ⚠️ APPENDED BY NIGHT RUN SESSION A / C6 FIX 3 (`363a2e9f`), 2026-09-02 — `REVIEW_C6_3`'s SIX SURVIVORS CLOSED, OF-104…OF-111 DISPOSED, and OF-123 raised
+
+**APPEND-ONLY. No existing row was altered and no `Status` cell above this block was touched.**
+Dispositions are recorded **here, beneath the rows**, in the shape `OF-65` and `OF-78` were
+re-scoped. ⚠️ **The id is `OF-123` because this file was re-read immediately before the append**
+and the highest present was **`OF-122`**, landed by this same session's TASK 1 an hour earlier.
+
+⚠️ **EVERY CLOSURE BELOW IS PROVED BY A MUTANT RE-RUN SHOWING `KILLED`, IN A FRESH OS TEMP CLONE
+WITH `whetstone_gate.__file__` PRINTED**, not by the fix session's word. Baseline on the unmutated
+clone: **111 passed**. **14 mutants run · 12 KILLED · 2 EQUIVALENT.** The full table is in
+`docs/sessions/nightrun-a-1.txt`; ⚠️ **`docs/reviews/mutants/` is outside this session's fence**, so
+a `c6_mutants_4.md` is **owed to the next C6 review** and is named here rather than skipped.
+
+### The six non-equivalent survivors — all six CLOSED
+
+| id | mutant | how it is now killed | re-run |
+|---|---|---|---|
+| **OF-105** | `N14` — `value != generic` | **3** refusal values that extend §8.6's exact string with words carrying no arm, no clause, no verdict and **no gate vocabulary**, so the equality is the *only* assertion that can see them | **KILLED** — 4 failed |
+| **OF-106** | `N12` — LAYER 3, the residue catch-all | **4** policy-word-free lines added to the summary through a new `_with_extra_summary_line` helper — an *addition*, which no label mutation can produce | **KILLED** — 4 failed |
+| **OF-107** | `N15` — LAYER 1's exemption boundary | **3** real `config/` ceilings, in three formattings, planted inside `STATE_LABEL` — **plus the other side**, a cap legitimately inside the state JSON that must NOT fire | **KILLED** — 3 failed |
+| **OF-111** | `N13` — `refusal_lines != 1`, the `> 1` half | summaries carrying **2, 3 and 5** recognisable denial lines, each asserting the printed count | **KILLED** — 3 failed |
+| **OF-108** | `N4` — `crossing()`'s `>` at exactly the target | a base **derived from `config/`** (`target − 8 × per_read`) so `k = 8` lands exactly on the target, fired at **target−1, target, target+1** | **KILLED** — 2 failed |
+| **OF-109** | `N9` — the relative-import resolution | **3** relative forms added to the positive control, including a single-level sibling import that takes a different arithmetic path through `_imported_modules` | **KILLED** — 2 failed |
+
+⚠️ **THE MECHANISM, WHICH MATTERS MORE THAN THE SIX INSTANCES.** Every fixture is built so the
+mutated assertion is the **SOLE** killer, and a new helper — `_sole_killer` — **asserts exactly
+that**. That is the whole defect `N12`/`N13`/`N14`/`N15` are: the leaks the previous suite planted
+each carried a cap value **and** a clause **and** an arm word, so two or three layers fired on every
+one and **no single layer was ever the thing that failed**, which is what left each individually
+deletable with the suite green. ⚠️ **It caught one of this session's own planted shapes**:
+`"STATE SO FAR [DENIED once]: "` is seen by LAYER 2's vocabulary *and* by the new surface scan, so it
+pins neither — the rejection is now an assertion (`test_the_sole_killer_helper_REJECTS_…`) instead of
+an anecdote.
+
+### The other findings this review left open
+
+* **`OF-104` / M-1 — CLOSED, and it is the one that reaches the claim the submission rests on.**
+  The guard's own opening sentence is *"a denial leaks neither **which arm is running** nor which
+  clause fired"*, and the regex encoding it ran over the refusal **value** and nothing else. The
+  same regex now runs over the authored **surface** — **in both copies of the guard, fixed
+  independently** — and is fired at arm-in-label, clause-in-label and plural-arm shapes, in copy 1
+  against a hand-built context and in copy 2 against `run_episode`'s **real output**. Measured
+  silent on the clean tree. ⚠️ **Removing it from either copy is now a red test** (`N-M1a`: 5
+  failed; `N-M1b`: 3 failed), which was **not** true when this session first wrote it — see
+  `OF-123`.
+* **`OF-110` — C6's HALF CLOSED; the repository-wide half was closed earlier today at `OF-99`'s
+  address.** A **source-text refusal scan** now runs beside the AST walk over
+  `src/whetstone_gate/attacker/`, written **separately** from `check_roles.py`'s `D4` and
+  deliberately not imported from it — a probe that borrows the predicate it is checking cannot find
+  a defect in the predicate, and this is the package whose lanes `PROCESS.md` §8 reserves. Fired at
+  **five** dynamic forms — `importlib.import_module`, `__import__`, `getattr` on the package root,
+  **and `sys.modules` and `exec`, which `OF-110` did not name** — each case asserting **both** that
+  the AST walk stays silent (which is `OF-110`'s measurement, kept as an assertion so a future
+  change cannot quietly invalidate it) **and** that the text scan fires. Zero hits on the package as
+  it stands. ⚠️ **C2's, C3's and C13's walkers still carry the identical limit and are OWED to those
+  chunks**; every one of their files is outside this fence.
+* **`OF-112` — STAYS OPEN, and the reason is a rule rather than a preference.** `OF-82`'s fourth
+  instance lives in `tests/test_c6_review_probes.py`, which **is** inside this fence's
+  `tests/test_c6_*.py` — and it is **`REVIEW_C6_1`'s own probe file**. `INC-30` and `INC-31` are
+  exactly this: a fix session committing to a concurrent reviewer's probe file, and *"the guard that
+  polices reviewer probe files LIVES IN ONE, so the ruling that amends it cannot be applied without
+  committing the offence it defines."* **The FIX SESSION IS NOT THE RIGHT AUTHOR** of a change to a
+  review's own evidence, and REVIEW 3 left it for the same reason. **Not touched.**
+* **`OF-113` — STAYS OPEN, AND THE CORRECTION IS STATED HERE RATHER THAN MADE.** `INC-42`'s `Action`
+  field lists the caller's tool schemas among the pieces claim 4's guard **subtracts**; measured,
+  they are **scanned** (the guard subtracts only the §8.6 system prompt by identity, and locates the
+  mandated summary pieces without using them as split points). ⚠️ **`INCIDENTS.md` is APPEND-ONLY**
+  — `PROCESS.md` §2, `Q-033` — so an entry another session wrote is **not rewritten**; the
+  correction is recorded here and in `INC-53`, which is the same discipline `INC-47` established for
+  an overstated `Action`. **The count of overstated `Action` fields is now three** (`INC-47`,
+  `OF-113`, and this session's own `INC-54`), and `INC-47`'s diagnosis already says why: *`Fix:` is
+  bound to a commit and cannot be invented, `Action:` is bound to nothing.*
+* **`OF-114` — STAYS OPEN AND IS NOT C6's.** It is `REVIEW_C6_3`'s record of its own first
+  hard-rule-9 pass reporting five defects that did not exist. **A fix session does not close a
+  review's self-record**, and the entry is doing its job by standing.
+
+### New finding
+
+| id | area | severity | finding | refs | raised by | status | closed by |
+|---|---|---|---|---|---|---|---|
+| **OF-123** | **process**, C6 | **MEDIUM** | ⚠️ **THE FIX FOR `OF-104` WAS ITSELF UNPINNED IN ONE OF ITS TWO COPIES, AND ONLY A SELF-DIRECTED MUTANT FOUND IT — WHICH IS THE 2c RULING EARNING ITS KEEP ON THE FIRST SESSION BOUND BY IT.** This session added the surface-level arm/clause scan to **both** copies of claim 4's guard, then mutated its own work as the ruling requires. **Copy 1's removal killed 5 tests; copy 2's removal left ALL 99 GREEN** (`N-M1b`). The cause is not the scan: **copy 2 had never been fired at a leak at all** — `test_the_four_blindness_claims_hold_over_the_LOOPS_OWN_contexts` runs it only over *correct* contexts, so it could only ever report *"no findings"*, which is verbatim the state `REVIEW_C6_2` measured for the import walk (*"a walker that terminated at the package root looked identical to one that found nothing: both print `no findings`"*). ⚠️ **So `N12`/`N14`'s class reappeared INSIDE THE FIX FOR `N12`/`N14`'s CLASS, and nothing but a self-directed mutant could have found it** — no review had seen this code, and the review that named `OF-104` had by definition not seen its remedy. **CLOSED for this instance** by lifting copy 2's scan into `_loop_blindness_findings` and firing it at three leaky labels through `run_episode`'s real output. ⚠️ **WHAT IS NOT CLOSED IS THE CLASS**, and `INC-42`'s own field is the honest precedent: *"NONE THAT CLOSES THE CLASS — ACCEPTED, AND THE REASON IS THAT FOUR SESSIONS HAVE NOW TRIED."* **Six have now tried.** The narrower rule this session can offer, and does: ⚠️ **a guard that has only ever run over correct input is not a guard, and every new one lands with a fixture that makes it go red.** | `CLAUDE.md` hard rule 6; `PROCESS.md` §5.4; `Q-046`; `INC-42`, `INC-43`, `INC-53`; `OF-104` | **NIGHT RUN A / C6 FIX 3 (`363a2e9f`)** | ⚠️ **CLOSED for the instance by `f03d359`; the CLASS is OPEN and is re-declared rather than claimed shut** | `f03d359` (instance) |
+
+**No other session's line was touched by this append.** `Swept:` verified on the **STAGED SNAPSHOT**.
