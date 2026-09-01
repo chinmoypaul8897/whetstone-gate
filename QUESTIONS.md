@@ -5304,6 +5304,43 @@ this entry are **four instances of one cause**, and a `git worktree` per session
 the price of one command. **This is the cheapest structural finding available today and it is the
 one nobody has ruled on.**
 
+⚠️⚠️ **UPDATE, SAME SESSION, ONE HOUR LATER: IT MATERIALISED, IN THE DIRECTION THIS ENTRY DID NOT
+GUARD.** Everything above describes C13 BUILD 2 avoiding the hazard on its **own** commits. It then
+happened **the other way**, and it is recorded here with its SHA rather than left out because it is
+the more useful half.
+
+**What happened, measured.** C13 BUILD 2 wrote `Q-064`, `Q-065` (this file) and `OF-62`, `OF-63`
+(`docs/reviews/OPEN_FINDINGS.md`) into the shared working tree and had not yet committed them. The
+concurrent C7 BUILD 2 session (`7d84b383`) then committed **`2f702d9`** — *"docs: INC-34 and INC-35,
+Q-066..Q-069 and OF-64..OF-67"* — with `INCIDENTS.md`, `QUESTIONS.md` and
+`docs/reviews/OPEN_FINDINGS.md` as its pathspec. **Those pathspecs were correct for its own work and
+they swept this session's four uncommitted entries with them.** `2f702d9` carries
+`Session-Token: 7d84b383`; `Q-064`, `Q-065`, `OF-62` and `OF-63` were written by `3fb17baa`.
+
+**What was NOT damaged, checked rather than assumed:**
+  * **No content was lost or altered.** Both `Q-064` and `Q-065` occur exactly once, complete, with
+    their own `**Raised by:** C13 BUILD 2 (`3fb17baa`)` lines intact — so the entries' **own**
+    attribution is right, and only the **commit's** is wrong.
+  * **No counter collided.** C7 read the file *after* this session's entries were in it and
+    allocated `Q-066`…`Q-069` and `OF-64`…`OF-67` from there. **The habit that saved `Q-062` saved
+    this too**, and it is still a habit rather than a guardrail.
+  * **Neither session's prose was rewritten**, in either direction.
+
+**What IS damaged, stated plainly because this project's subject is provenance:** `git log -- QUESTIONS.md`
+now attributes four of this session's entries to another session's commit and another session's
+token. `make check-roles` cannot see it — the trailer is well-formed, the token is issued, and the
+role is right; the commit simply contains more than its message says. ⚠️ **A commit message that
+describes less than its diff is not a forgery and it is not nothing: it is the exact signal a
+reviewer uses to decide who verified what.**
+
+⚠️ **AND THE PART THAT UPGRADES THIS ENTRY FROM SPECULATION TO EVIDENCE.** The three options above
+are all written from the perspective of *the session doing the committing*. **Every one of them is
+useless to the session that is merely holding uncommitted work in a shared tree** — it cannot see
+the other session's `git commit`, cannot be warned by it, and cannot decline it. **There is no
+per-commit discipline that closes this**, which is why option 3's *"wait"* is not a remedy either.
+**The only remedy that works is structural: one working tree per session.** That was the larger
+question this entry asked and it now has a demonstration attached to it, at `2f702d9`.
+
 **RULING (architect, <date>):** *<pending>*
 
 ---
