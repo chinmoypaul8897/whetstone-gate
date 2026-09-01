@@ -1,0 +1,558 @@
+SESSION-TOKEN: c09c385b   CHUNK C13 - THE CaMeL COMPARATOR   ROLE: REVIEW   ATTEMPT 3
+
+PUSHED SHA: e57578180e9c20308e5ee3d5fdc384065617789e
+            - the journals commit, the last of this session's content commits.
+            verdict + artefacts: 290b26007cc41eb2fcf3d976350bdcc3beb8ee5a
+            phase-1 seal:        90abb2de9666d426799880ee8d381b479a4c0463
+            token row 41:        87a4aec8ddd2a095e37e3bb4e9839faab1d11ff7
+            !! THIS BLOCK IS ITSELF INSIDE A LATER COMMIT, so the pushed head is one
+               further than the SHA above: a commit cannot contain its own hash.
+
+=====================================================================
+VERDICT: FAIL
+  ZERO BLOCKERS. BOTH OF REVIEW 2's ARE CLOSED, each proved by REVERTING
+  IT IN A FRESH OS TEMP CLONE and watching a named test go red.
+  ALL SIX of REVIEW 2's mutant survivors are KILLED.
+  TWENTY pre-committed polarities, TWENTY held.
+  WHAT FAILS IT: FIVE NON-EQUIVALENT MUTANT SURVIVORS in the fix's OWN
+  NEW CODE, which no review had seen - four of them ONE defect, and all
+  five surviving the FULL SUITE, not merely the C13 file.
+TAG c13-pass: NOT CUT.
+=====================================================================
+
+THE SEAL, AND WHETHER EACH PRE-COMMITTED POLARITY HELD
+-----------------------------------------------------------------
+SEAL SHA: 90abb2de9666d426799880ee8d381b479a4c0463
+  docs/reviews/independent/c13_review3_criteria.md - what must be true, the
+  exact probe, the expected result, polarity pre-committed - PLUS the scoped
+  reimplementation, committed with it.
+
+TOKEN ROW WAS REGISTERED **BEFORE** THE SEAL: 87a4aec, then 90abb2d. That is the
+ordering OF-89's class broke on TWO CONSECUTIVE REVIEWS. 3605d31c was the first
+to reverse it; this session is the second, and check-roles E1 was NEVER red on
+this session. Row 41, counted FROM THE TABLE (40 data rows, lines 50-89) and
+cross-derived a second way: 40 less the 15 nobody self-recorded = 25 before this
+one, exactly the ordinal 91eb51c1 claimed. 26th self-recorded, 25th to carry a
+paragraph. Ordinals 11, 12 and 18 are asserted by no paragraph and were NOT
+closed here.
+
+NOT OPENED BEFORE THE SEAL COMMIT (declared so the seal is checkable): C13 FIX
+2's commits (no git show / git diff / git log -p), docs/sessions/c13-fix-2.txt,
+src/whetstone_gate/camel_comparator/, tests/test_c13_camel_comparator.py,
+config/lanes.yaml (TIGHTER than the ruling required - it IS B-3's changed
+surface), INCIDENTS.md INC-46..INC-50, and OPEN_FINDINGS.md at HEAD.
+OF-96..OF-103 were read AT 24e26e5 - REVIEW 2's own commit, BEFORE the
+disposition - which is the reading C6 REVIEW 3 took at 29f40e3.
+
+THREE LEAKS DECLARED IN THE SEAL ITSELF, because the prompt's own read order
+discloses part of the fix: Q-079's "what landed under it" (names the added key
+AND the test's name), Q-057's dated correction note (which IS B-4's remedy), and
+Q-079's note that camel_comparator.branch is unchanged. Every criterion is
+written as WHAT MUST BE TRUE, never as what was done - so B-4's criteria are not
+"was a note written", already visible, but "is every figure in it TRUE AT THE
+PIN", which is the part only a review can add.
+
+  sealed                                    expected            measured    held
+  P-B3-1  grep "model id is still served"   0                   0           YES
+  P-B3-2  both keys through the loader      both resolve        both        YES
+  P-B3-3  every S8.5.1 phrase in config     all 4 present       all 4       YES
+  P-B3-4  revert branch_a_condition         RED                 1f/97p      YES
+  P-B3-5  delete branch_b_condition         RED                 1f/97p      YES
+  P-B3-6a delete the diagnosis phrase       RED                 1f/97p      YES
+  P-B3-6b delete "it errored is not..."     RED                 1f/97p      YES
+  P-B3-6c delete "harness defect never"     RED                 1f/97p      YES
+  P-B3-6d delete "PROTOCOL.md before"       RED                 1f/97p      YES
+  P-B3-7  AMEND THE LAW ONLY                RED **AT THE LAW**  RED at law  YES
+  P-B3-8  law asserted before config        law first           confirmed   YES
+  OF-96   N11                               KILLED              KILLED      YES
+  OF-97   N13                               KILLED              KILLED      YES
+  OF-98   N8                                KILLED              KILLED      YES
+  OF-100                                    KILLED              KILLED      YES
+  OF-101  N14                               KILLED              KILLED      YES
+  OF-102  N6                                KILLED or equiv.    KILLED      YES
+  T-1     make selftest RED, for the reason RED on the sentinel 1f/1p/735d  YES
+  T-2/3/5/6 pins, goldens, evals/, v1.9     all clean           all clean   YES
+  C-ctl   the control                       GREEN               98p/0f      YES
+
+  TWENTY FOR TWENTY. The criteria were written before the fix was seen, so this
+  is a test and not a description.
+
+BLOCKER B-3 - CLOSED, WITH REVERT-GOES-RED PROOF
+-----------------------------------------------------------------
+config/lanes.yaml no longer contains "the model id is still served" ANYWHERE
+(grep -c = 0), and branch_b_condition is ADDED, so Branch B's trigger is a
+STATED CONDITION rather than the negation of another key - Q-079's option 1.
+Both keys resolve THROUGH THE LOADER.
+
+THE CORRECTION GOES RED EIGHT WAYS, each in a fresh OS temp clone with
+whetstone_gate.__file__ PRINTED and the mutation COMMITTED INSIDE THE CLONE:
+  - revert branch_a_condition to REVIEW 2's measured string      -> 1 failed
+  - delete branch_b_condition entirely                           -> 1 failed
+  - delete EACH of the four required phrases, INDIVIDUALLY        -> 4x 1 failed
+  - amend CONTEXT.md S8.5.1 ALONE, config/ untouched              -> 1 failed
+Control in every clone: 98 passed, 0 failed.
+
+THE ORDER OF ASSERTION - VERIFIED IN THE SOURCE, NOT TAKEN ON THE CLAIM.
+The test asserts, in this order:
+  1. every phrase occurs in CONTEXT.md S8.5.1, and the superseded trigger does
+     NOT occur there;
+  2. only THEN does it require anything of config/, read through the loader.
+Probed rather than read: amending S8.5.1 alone turns the suite red with
+
+  AssertionError: CONTEXT.md S8.5.1 no longer carries the diagnosis requirement
+  ('on a cause that has been diagnosed'). This test requires it of config/ ONLY
+  because the law states it; if the law moved, config/ is not the thing to
+  correct and this assertion is the one that must be read first.
+
+THAT IS THE RIGHT PLACE AND THE RIGHT MESSAGE. The fix's "neither side is
+transcribed" claim is TRUE, and this is the difference between a test and a copy.
+
+MY JUDGEMENT ON THE CLASS B PREDICATE (pre-committed standard J-1..J-4)
+-----------------------------------------------------------------
+SOUND IN ITS RATIONALE, NOT SCOPE CREEP, AND ONE LINE SHORT OF REALISED.
+
+  J-1 rationale sound IN THIS REPOSITORY?  YES, and it is this chunk's OWN.
+      REVIEW_13_1's BLOCKER B-2 was exactly "a property enforced only in a test
+      file is a property that holds until somebody adds a figure without running
+      the tests", and the accepted remedy was to make render_branch_b REFUSE.
+      A predicate in src/ is the remedy C13's own prior BLOCKER established.
+  J-3 did it widen the fence?  NO. MEASURED: invocation.py's import set is
+      BYTE-IDENTICAL before and after -
+      ['.', '..', '__future__', 'ast', 'dataclasses', 'pathlib', 're'].
+      No new dependency, nothing outside camel_comparator/.
+  J-2 inert?  PARTLY. It buys something real - the guard is FIRABLE AT A
+      CONSTRUCTED VALUE, so it is proved red WITHOUT config/ ever holding the
+      defective string (INC-11, INC-17), and the test uses that.
+  J-4 THE DECIDING QUESTION - does it make the property hold when the tests are
+      NOT run?  NOT YET. MEASURED: branch_conditions_are_stale's only caller
+      anywhere is tests/test_c13_camel_comparator.py:1099, and it is NOT in
+      camel_comparator.__all__. Both precedents it cites do better -
+      branch_value_problem <- branch_is_undecided (invocation.py:324, EXPORTED,
+      and what make selftest fires); assert_provenance <- render_branch_b
+      (branch_b.py:556-558, which is why deleting it is red).
+
+  SO: the Class B classification is CORRECT and the reasoning is CORRECT.
+  "RUN-1 can call it; CI is not the only reader" is a statement about
+  POSSIBILITY - today there is no reader but CI and the module does not export
+  it. Not creep; not yet realised. OF-118, one line to close.
+
+BLOCKER B-4 - CLOSED, EVERY FIGURE RE-DERIVED AT THE PIN BY THIS SESSION
+-----------------------------------------------------------------
+By ast over `git cat-file blob` at f083b6b396399d3b3c7f2ddaf613a5945eaf32d8.
+The vendored tree is READ, never imported.
+
+  replay_task                   spans 129-238                        OK
+  Assign statement span         (139, 146)  <- what the records cite  OK
+  Assign.value span             (140, 145)  <- what the artefact emits OK
+                                line 139 = 'trace_path = ('  line 146 = ')'
+                                BOTH OF-103 SPANS ARE TRUE.
+  the read                      :148  trace_path.read_text()          OK
+  the call site                 :305, inside query (287-315)          OK
+  replay_task's only Try        (185, 198); 148 is OUTSIDE it         OK
+  query's Try nodes             ZERO                                  OK
+    -> an UNHANDLED FileNotFoundError. IT CRASHES LOUDLY.
+  :321                          owned by replay_user_task (318-337)   OK
+  git grep replay_benchmark     EXACTLY ONE HIT: its own def at :347  OK
+    chain: replay_user_task <- replay_suite(:344) <- replay_benchmark(:356) <- 0
+    models.py:16 imports only PrivilegedLLMReplayer, UserInjectionTasksGetter.
+
+  Q-057's fact 4 is LEFT STANDING, and the correction note sits DIRECTLY BENEATH
+  IT, before the "So the run is two passes" paragraph - not at the end of the
+  entry, which matters because that entry's status is "BLOCKING RUN-1 if unread".
+
+  INC-39's Action is CORRECTED IN PLACE with its ORIGINAL WORDS LEFT STANDING,
+  and its load-bearing measurement REPRODUCES INDEPENDENTLY HERE:
+    fd8a67e9's commits, QUESTIONS.md numstat: ef4b8d5 = 1/0, f17709c = 214/0,
+    the other six untouched. TOTAL DELETIONS = 0. A correction to an existing
+    line is a deletion; there were none; so the claim of a fifth correction
+    could not have been true. The entry's argument is sound and its arithmetic
+    is right.
+  (One number without weight: the scan finds EIGHT FIX-1 commits, not the
+   "seven" REVIEW 2 and the entry both say - the eighth is 9152cca, the FINAL
+   OUTPUT commit. Nothing turns on it.)
+
+DOES ANY `Action` FIELD IN INC-46..INC-50 OVERSTATE? - NO
+-----------------------------------------------------------------
+INC-47's own finding, applied to this fix as the prompt asked. Checked claim by
+claim; the rule of decision was fixed in the seal with NO polarity pre-committed,
+deliberately, because this is the one answer that cannot be guessed.
+
+  INC-46  ruling before the edit (e2b4778 01:08:45 -> 778c8f2 01:10:31); key
+          narrowed; key added; a test reads both THROUGH THE LOADER; file still
+          parses; branch still TODO_C13_RUN1; make selftest still RED on it;
+          check-prereg NOT-YET-FROZEN exit 0.  ALL VERIFIED.   no overstatement
+  INC-47  note appended beneath fact 4; names replay_task / 140-145 / :148 /
+          :305 / :321-has-no-caller - ALL FIVE RE-DERIVED AT THE PIN ABOVE;
+          fact 4 not edited; INC-39 corrected in place.        no overstatement
+  INC-48  e2b4778 unamended; nothing reverted; 3605d31c's row present EXACTLY
+          ONCE; its paragraph WHOLE (40 lines, first and last intact); carried
+          in three places. One clause - "from the next commit onward this
+          session stopped using `git commit -- <paths>`" - is a claim about a
+          COMMAND, which git records the result of but not the form of; its
+          checkable consequence HOLDS: no FIX-2 commit after eb17627 carries
+          foreign content, every 3605d31c marker in those diffs being the
+          session's own prose ABOUT the sweep, checked line by line.
+                                                               no overstatement
+  INC-49  "NOTHING WAS FIXED, AND THAT IS THE ACTION" - measured: NO FIX-2
+          commit touches check_roles.py or test_repo_invariants.py;
+          E5_EXCEPTIONS still holds EXACTLY FOUR C0-era SHAs.   no overstatement
+  INC-50  "dfffba7 adds the mirror ... asserts that the reversal actually
+          happened" - read at HEAD: the fixture is split and re-joined,
+          assert mirrored.index('"/var/logs"') < mirrored.index('"logs"') pins
+          the reversal, reflected.root_literal == "logs" pins the outcome.
+                                                               no overstatement
+
+  ANSWER: NO. INC-47's class does not recur. TWO entries go FURTHER than the
+  format requires and name what they did NOT do - INC-49's Fix: is "NONE, AND
+  THE ABSENCE IS THE ENTRY", and INC-46 names camel_comparator.branch as
+  unchanged so it is not read as covered.
+
+THE SIX SURVIVORS, RE-RUN BY ME - ALL SIX KILLED
+-----------------------------------------------------------------
+Fresh OS temp clone; whetstone_gate.__file__ printed; each mutation COMMITTED
+INSIDE the clone (REVIEW 1 records that editing without committing produced
+three FALSE survivors); control run first and green in every clone.
+
+  whetstone_gate.__file__ = ...\scratchpad\mut\wg\src\whetstone_gate\__init__.py
+  CONTROL: 98 passed, 0 failed
+
+  OF-96  N11  delete the Windows disjunct   KILLED 1f/97p
+              test_BOTH_path_flavours_are_pinned_including_the_WINDOWS_half
+  OF-97  N13  add "glob" to the loud set    KILLED 1f/97p
+              test_crashes_loudly_is_pinned_in_its_FALSE_direction_too
+  OF-98  N8   len(live) != 1 -> < 1         KILLED 1f/97p
+              test_the_refusal_is_EXACTLY_ONE_reachable_and_not_merely_AT_LEAST_ONE
+  OF-100      restore setdefault (the defect direction; HEAD now keeps the LAST
+              definition, which is what Python binds)   KILLED 1f/97p
+              test_a_shadowed_module_function_resolves_to_the_definition_PYTHON_binds
+  OF-101 N14  fullmatch -> match            KILLED 4f/94p
+              test_the_figure_provenance_gate_goes_red_on_each_field_in_turn (+3)
+  OF-102 N6   drop the table key            KILLED 1f/97p
+              test_banking_rows_is_keyed_on_the_TABLE_and_not_saved_by_tuple_ORDER
+
+THE TWO FIXTURES THE FIX DECLARED WRONG - BOTH CORRECTIONS VERIFIED:
+  - the APPENDIX/table regex fixture that pinned nothing (OF-101). The old
+    parametrised case fired only the PLURAL "Tables 5-7", which `match` rejects
+    anyway. MEASURED INDEPENDENTLY by my reimplementation: of 28 table vectors,
+    SIX discriminate fullmatch from match, and the SINGULAR "Table 5-7" is one
+    of them while the plural is NOT. The added singular fixture is the right
+    one, and N14 now dies.
+  - INC-50, a test green by accident of its fixture. The mirror reverses the two
+    definitions AND ASSERTS THE REVERSAL HAPPENED, so it cannot degrade into a
+    copy of the case above it.
+
+AND I LOOKED FOR A THIRD INSTANCE OF THAT CLASS, AS THE PROMPT ASKED.
+IT EXISTS, AND IT IS IN THE FIX'S OWN NEW TEST - see the next section.
+THAT CLASS HAS NOW APPEARED FIVE TIMES IN THIS REPOSITORY.
+
+MY OWN NEW-SURFACE MUTANT TABLE - 16 RUN, 11 KILLED, 5 SURVIVED
+-----------------------------------------------------------------
+The prompt asks for a minimum of 8 on the ten new tests and the branch-condition
+predicate. NO REVIEW HAD SEEN ANY OF IT.
+
+  KILLED
+  N-A   SUPERSEDED_BRANCH_TRIGGER -> a string that never occurs   KILLED 1f/97p
+  N-F   the predicate stops refusing that trigger                 KILLED 1f/97p
+  N-G   a blank/non-string condition reads as a PASS              KILLED 1f/97p
+        (Q-079's ACTUAL HEAD state)
+  N-H   the branch_b half of the predicate never runs             KILLED 1f/97p
+  + the seven config/law probes above (P-B3-4/5/6a-d/7)           all KILLED
+
+  ** SURVIVORS - FIVE, EVERY ONE NON-EQUIVALENT BY EXHIBIT **
+  id     the weakening                          HEAD flags   MUTANT flags
+  N-B    "on a cause that has been diagnosed"        1            0
+         -> "cause"
+         exhibit: "THE RUN DOES NOT COMPLETE for some cause. ..."
+  N-C    "a harness defect is never branch b"        1            0
+         -> "harness"
+         exhibit: "... a harness defect is SOMETIMES Branch B ..."
+                  ** THE DIRECT INVERSION OF Q-057's RULING **
+  N-D    "protocol.md" -> "md"                       1            0
+         exhibit: "... recorded in CONTEXT.md before a branch is selected ..."
+  N-E    delete one whole BRANCH_B_REQUIREMENTS      1            0
+         entry;  exhibit as N-C
+  N-I2   require() -> lanes.data.get(..., "")   UndeterminedValue  4 content
+         exhibit: branch_b_condition := the sentinel TODO_C14_PENDING.
+         HEAD RETURNS THE LOADER'S REFUSAL; the mutant lets the sentinel flow in
+         AS A VALUE. Hard rule 9: "a missing value is a hard refusal, never a
+         silent fallback."
+
+  THEY SURVIVE THE WHOLE REPOSITORY, NOT ONLY THE C13 FILE.
+    N-B + N-C + N-D + N-I2 applied TOGETHER, full suite:
+        2 failed, 722 passed, 1 skipped
+    N-E alone, full suite:
+        2 failed, 722 passed, 1 skipped
+    Both failures in both runs are the two PRE-EXISTING reds (the deliberate
+    camel_comparator.branch sentinel, and Q-080/INC-49's E5). NOTHING KILLS THEM.
+
+  ONE DEFECT, NOT FIVE - and it is INC-50's class:
+    tests/test_c13_camel_comparator.py:1116-1121
+      assert len(undiagnosed) == len(invocation.BRANCH_B_REQUIREMENTS)
+      for what, _ in invocation.BRANCH_B_REQUIREMENTS:
+          assert any(what in problem for problem in undiagnosed)
+    BOTH compare the predicate's OUTPUT against the predicate's OWN INPUT LIST,
+    so NEITHER CAN FAIL when that list changes. The law-side check does not catch
+    it either: "cause", "harness" and "md" ALL OCCUR in S8.5.1. And the single
+    fixture "the run does not complete" carries none of the four phrases at ANY
+    strength, so it cannot separate a strong requirement from a weak one.
+
+  ONE MUTANT WITHDRAWN AS EQUIVALENT, AND IT IS MY ERROR, NOT THE FIX'S:
+    N-I (first form) was guarded by hasattr(lanes, "get"), and Config's surface
+    is ['data','has','name','path','require','sentinels'] - NO `get` - so the
+    expression falls through to require() and the mutation is a NO-OP. Replaced
+    by N-I2, which uses the real API. RECORDED RATHER THAN DELETED: dropping it
+    silently would have inflated the survivor count by one.
+
+  TALLY: 24 mutants across all three groups. 18 KILLED, 5 SURVIVED, 1 withdrawn
+  as equivalent-by-construction. docs/reviews/mutants/c13_mutants_3.md.
+
+THE SCOPED REIMPLEMENTATION - AGREEING
+-----------------------------------------------------------------
+docs/reviews/independent/c13_review3_reimpl.py. Stdlib only; asserts AT RUN TIME
+that whetstone_gate is NOT in sys.modules; parses config/lanes.yaml with ITS OWN
+minimal YAML reader rather than the project's loader, because the loader is src/.
+The requirements are DERIVED FROM CONTEXT.md S8.5.1 AT RUN TIME, never
+transcribed, so the file's expectations move with the law.
+
+  branch-condition predicate     8 / 8 hold
+  table/figure regex             28 / 28 vectors agree
+  appendix regex, BOTH readings  15 / 15 vectors agree
+  total vectors                  43  (README.md asks for >= 20)
+
+  ONE DIVERGENCE, AND IT IS THIS FILE'S, NOT THE PROJECT'S - DECLARED RATHER
+  THAN ABSORBED. The sealed form of the `run-completes` recogniser was
+  \brun\b[^.]{0,60}\bcomplet and it reported FAIL against a config reading
+  "IT RUNS: both passes ... complete inside the 90-minute box": \brun\b cannot
+  match RUNS. The recogniser was widened to \bruns?\b[^.]{0,80}\bcomplet, THE
+  SEALED ORIGINAL IS PRESERVED IN A COMMENT AT THE SITE, and the requirement it
+  recognises is unchanged. THE CONFIG MET B3-b ALL ALONG; MY PATTERN DID NOT.
+
+Q-080 / INC-49 - THE DECLARED STOP, JUDGED: STOPPING WAS RIGHT
+-----------------------------------------------------------------
+All three remedies are genuinely blocked as the entry claims, checked one by one:
+  1. amend c4d4460 - a HISTORY REWRITE, which CLAUDE.md S5 forbids "ever", with
+     no exception for an untagged tip. The entry NAMES the gap between the
+     rule's rationale and its wording and DECLINES TO CLOSE IT, which is hard
+     rule 1's own instruction.
+  2. E5_EXCEPTIONS - measured at FIX 2's own HEAD: EXACTLY FOUR SHAs, all C0-era
+     WG-2026-08-30-CTX-13.4-A commits, and the list's own comment forbids
+     extension without a ruling.
+  3. fix the parser - check_roles.py is named under NOT in FIX 2's fence, and
+     widening _TOKEN_TRAILER was declined by Q-014 (i), recorded verbatim as
+     "That stands and is not reopened."
+
+AND THE ARCHITECT HAS SINCE RULED, WHICH SETTLES IT RATHER THAN LEAVING IT TO
+JUDGEMENT: Q-080 is RULED **REMEDY 3**, and the ruling rejects 1 and 2 ON THE
+ENTRY'S OWN GROUNDS, nearly in its own words - "amending is a history rewrite,
+forbidden absolutely by CLAUDE.md S5 with no exception for an untagged tip; and
+E5_EXCEPTIONS is pinned at four by its own comment, whose four entries are C0-era
+commits with no prompt token to carry - a different thing from a session that had
+one and quoted it." It also holds that remedy 3 does NOT reopen Q-014 (i) - a
+determination only the architect could make, which is exactly why a fix session
+could not take it.
+
+IT IS NOT A REASON TO FAIL C13 AND IT IS NOT COUNTED AS ONE. NIGHT RUN SESSION A
+/ C0 FIX (9c7c5973) CLOSED IT DURING THIS REVIEW - commits 061dcd9, 28b6eec,
+ea3bd12 and 867b571 landed in this tree while Phase 2 ran. Measured after them:
+make check-roles = 17 passed, 0 failed, 5 n/a - OK. THE RED IS GONE.
+
+INC-48 - THE SWEPT CONTENT
+-----------------------------------------------------------------
+  3605d31c's token row present EXACTLY ONCE                grep -c = 1
+  its paragraph INTACT AND COMPLETE                        40 lines, heading
+    through "...carry **0 CR bytes**.", one occurrence of the heading
+  no counter collided IN THE TOKEN TABLE                   39 / 40 / 41, and
+    every predecessor's count reconciles against the table
+  recorded, NOT repaired by rewriting history              e2b4778 unamended,
+                                                           INC-48 exists
+  ** BUT A COUNTER DID COLLIDE ELSEWHERE - see OF-115. **
+
+STANDING PROPERTIES - ALL MEASURED BY THIS SESSION
+-----------------------------------------------------------------
+  make selftest  RED on camel_comparator.branch AND FOR THAT REASON:
+                 1 failed, 1 passed, 735 deselected; sole failure
+                 test_the_camel_branch_is_decided_before_any_camel_run on
+                 UndeterminedValue ... 'camel_comparator.branch' ...
+                 (sentinel 'TODO_C13_RUN1') - the loader REFUSING, not
+                 defaulting.
+  vendored trees CaMeL f083b6b3... / AgentDojo 928bbae8... / tau2 a2c02472...
+                 all three: rev-parse == pin, status --porcelain EMPTY,
+                 git diff 0 BYTES.
+  goldens        git status --porcelain tests/goldens/ = EMPTY.
+  evals/         ZERO evals/ paths in any of the 14 FIX-2 commits, and ZERO
+                 FILES UNDER evals/ AT ALL -> C13 spent nothing.
+  CONTEXT.md     still v1.9. Blob 8e820384afbb1de7de3892eb6b90a8e6dce1f378 is
+                 IDENTICAL at HEAD, at REVIEW 2's 24e26e5, and at the v1.9
+                 amendment 041abe4. 224,645 bytes; LF 2,361; CR 0; TAB 0;
+                 0x08 0; no other control byte. REVIEW 2's figures exactly.
+  check-prereg   NOT-YET-FROZEN (PROTOCOL.md does not exist), exit 0.
+                 git tag -l = c0-pass..c4-pass; prereg-v1 DOES NOT RESOLVE.
+  FIX-2 scope    nine paths, all inside its fence; no src/ outside
+                 camel_comparator/, no check_roles.py, no CONTEXT.md, no
+                 config/ beyond lanes.yaml.
+  THIS REVIEW    ZERO PROVIDER CALLS. CaMeL not run, not installed, not
+                 imported - parsed as a git blob. WHETHER THE MODEL ID IS STILL
+                 SERVED WAS **NOT** CHECKED: Branch A's condition, RUN-1's alone.
+
+SUITE COUNTS I MEASURED, EVERY FAILURE ATTRIBUTED BY FILE
+-----------------------------------------------------------------
+A concurrent Session A was editing this tree throughout, so every figure is the
+one measured and each run is named.
+
+  tests/test_c13_camel_comparator.py at HEAD          98 passed, 0 failed
+  the same file in my ISOLATED TEMP CLONE (the        98 passed, 0 failed
+    control every mutation verdict is taken against)
+  bare pytest at HEAD, BEFORE Session A's ea3bd12     3 failed, 721 passed,
+                                                      1 skipped
+      test_lanes_operator_placeholders.py::
+        test_the_camel_branch_is_decided_before_any_camel_run
+        -> DELIBERATE; deselected by make test.
+      test_repo_invariants.py::test_check_roles_exits_zero
+        -> Q-080/INC-49. SESSION A's. NOT C13's.
+      test_repo_invariants.py::test_the_object_store_and_the_working_tree_agree
+        -> **MINE**: my own uncommitted docs/reviews/independent/
+           c13_review3_reimpl.py. Cleared by committing it.
+  full suite in the temp clone, unmutated             2 failed, 722 passed,
+                                                      1 skipped
+  ** make test at HEAD, AFTER Session A's ea3bd12, RUN TWICE minutes apart:
+     1 failed, 737 passed, 1 skipped, 2 deselected - IDENTICAL BOTH TIMES.
+     The sole failure is test_the_object_store_and_the_working_tree_agree, on
+     THIS REVIEW'S OWN uncommitted artefact, and it clears with commit 290b260.
+     test_check_roles_exits_zero is GREEN; make check-roles = 17/0/5 OK. **
+
+  NO FAILURE IN ANY RUN IS C13's.
+
+FINDINGS - OF-115..OF-119, numbered FROM THE FILE at commit time
+-----------------------------------------------------------------
+  OF-115 MEDIUM  tests/test_c13_camel_comparator.py:1047 cites `OF-104` for
+                 Q-079. OF-104 AT HEAD IS C6 REVIEW 3's ARM-IDENTITY FINDING,
+                 written by 3605d31c in 2be75b1 at 02:16:52 - 55 MINUTES AFTER
+                 4be0b86 (01:21:36) put that number into a live file. And FIX
+                 2's own disposition says in terms "THIS SESSION OPENS NO NEW
+                 OF- ROW", so OF-104 was NEVER ALLOCATED to B-3, whose OF- home
+                 is OF-62. A forward reference to an unallocated number that
+                 another session has since taken - Q-063/INC-36's counter-
+                 collision class, in a SOURCE file, and the same shape as
+                 INC-39/B-1 inside the test written to close B-3.
+                 Remedy: cite OF-62 and Q-079, or no OF- number at all.
+  OF-116 MEDIUM  the four BRANCH_B_REQUIREMENTS phrases (N-B/C/D/E). Remedy:
+                 one WEAK-FORM fixture per requirement, asserted REJECTED; and
+                 len(BRANCH_B_REQUIREMENTS) == 4 against a LITERAL.
+  OF-117 MEDIUM  branch_conditions_are_stale's require() (N-I2). Remedy: one
+                 assertion on the sentinel case.
+  OF-118 MEDIUM  the Class B predicate has no non-test caller and is not in
+                 __all__. Remedy: export it and give it one non-test caller.
+  OF-119 LOW     the "law" window is S8.5.1 PLUS S8.5.2 - MEASURED 6,759 chars
+                 against S8.5.1's own 3,592, 88% wider - because "### 8.5.2"
+                 does not match the "## " prefix the test ends on, while the
+                 error message says S8.5.1. All four phrases DO live in S8.5.1
+                 today (checked individually), so it is LATENT, not live.
+                 Remedy: end the section at "### 8.5.2".
+
+CARRIED FORWARD AND EXPLICITLY **NOT** COUNTED AGAINST C13:
+  OF-99   the repository-wide superseded-string tripwire. Re-confirmed absent.
+          THE REPOSITORY'S; Session A is closing it.
+  Q-074 / OF-62's fifth site: tests/test_lanes_operator_placeholders.py:141
+          still says "a citation of Tables 5-7", still the only live-text site,
+          still PRINTED IN FULL by every make selftest. CONFIRMED UNTOUCHED by
+          any C13 FIX 2 commit - correctly: that file is outside the fence.
+  OF-103  ADDRESSED. Both spans re-derived at the pin and BOTH TRUE, and
+          Q-057's correction note now labels them statement-vs-expression.
+
+WHAT THE FIX GOT RIGHT - because a FAIL that lists only faults is not a review
+-----------------------------------------------------------------
+  * TWENTY pre-committed polarities, TWENTY held.
+  * The law is asserted before the config AND IT GOES RED AT THE LAW, with a
+    message that tells the reader config/ is not the thing to correct.
+  * Branch B's trigger is a STATED CONDITION, and each of its four phrases dies
+    INDIVIDUALLY.
+  * Every figure in Q-057's correction note is TRUE AT THE PIN, including the
+    Try-span arithmetic that turns a "silent zero" into a loud crash.
+  * INC-39's Action corrected IN PLACE with its original words standing, and its
+    zero-deletions measurement reproduces exactly. An entry that quietly
+    repaired its own false claim would have been INC-47's failure one turn
+    later - and it did not.
+  * NO Action field in INC-46..INC-50 overstates.
+  * TWO of its own fixtures declared wrong BY THE FIX ITSELF, one found by
+    re-reading a test it had just written (INC-50).
+  * The declared STOP was right on all three remedies, and the architect's
+    subsequent ruling rejects the two the entry rejected ON THE ENTRY'S OWN
+    GROUNDS.
+  * CONTEXT.md v1.9 byte-identical; evals/ empty; pins clean; make selftest
+    still red on the sentinel AND FOR THAT REASON.
+
+FOR THE FIX SESSION - THE SHORTEST PATH TO A PASS
+-----------------------------------------------------------------
+Nothing below touches config/, CONTEXT.md, a number or a figure. All of it is in
+tests/test_c13_camel_comparator.py except OF-118's one line.
+  1. OF-116  replace the single "the run does not complete" fixture with ONE
+             WEAK-FORM FIXTURE PER REQUIREMENT, each asserted REJECTED: a
+             condition containing "cause" but not "on a cause that has been
+             diagnosed"; one saying "a harness defect is SOMETIMES Branch B";
+             one citing CONTEXT.md where PROTOCOL.md belongs. And assert
+             len(BRANCH_B_REQUIREMENTS) == 4 against a LITERAL, so the list's
+             size is pinned by something outside itself.
+  2. OF-117  one assertion that a SENTINEL branch_b_condition produces an
+             UndeterminedValue-shaped refusal from branch_conditions_are_stale().
+  3. OF-118  export branch_conditions_are_stale and give it one non-test caller,
+             as branch_value_problem already has.
+  4. OF-115  cite OF-62 / Q-079, not OF-104.
+  5. OF-119  end the S8.5.1 window at "### 8.5.2".
+
+THE TAG - NOT CUT, AND WHY
+-----------------------------------------------------------------
+c13-pass IS NOT CUT. The PASS bar requires "every new-surface mutant killed or
+proven equivalent" and FIVE are neither - each non-equivalent BY EXHIBIT, each
+surviving the FULL SUITE, and four of them one nameable defect: two assertions
+that compare a list against itself and therefore CANNOT FAIL.
+
+I did not fail this to look rigorous, and the shape of the verdict is the
+evidence: ZERO BLOCKERS, both of REVIEW 2's CLOSED, all six survivors KILLED, and
+a section recording what the fix got right. Nor did I pass it because the project
+is behind schedule. C6 REVIEW 3, six hours earlier in this same repository,
+returned FAIL WITH ZERO BLOCKERS ON SIX NON-EQUIVALENT SURVIVORS in a fix's own
+new code - the same clause, the same shape of work. Five of the same class here
+cannot be a PASS.
+
+EVERY `Swept:` LINE THIS SESSION WROTE
+-----------------------------------------------------------------
+  87a4aec  Swept: nothing. git status --porcelain over the five shared journals
+           EMPTY immediately before `git add`; the STAGED SNAPSHOT read with
+           `git diff --cached -- QUESTIONS.md` = 46 insertions / 0 deletions,
+           all this session's own.
+  90abb2d  Swept: nothing. Journals empty before `git add`; the staged snapshot
+           is two NEW files and nothing else.
+  290b260  Swept: nothing. Journals empty before `git add`; the staged snapshot
+           is five paths, all this session's own. A concurrent Session A landed
+           four commits in this tree during Phase 2 and NONE of its work is in
+           this snapshot.
+  e575781  Swept: nothing. git status showed only this session's own three
+           modified files, and the STAGED SNAPSHOT is exactly those three.
+  THE GIT RULE AS CHANGED WAS FOLLOWED ON EVERY COMMIT: `git add -- <explicit
+  paths>` then a BARE `git commit`. `git commit -- <paths>` was NEVER used, and
+  `Swept:` was verified on the STAGED SNAPSHOT (git diff --cached), never on the
+  working tree (INC-48).
+
+WHAT I COULD NOT DO
+-----------------------------------------------------------------
+  1. I could not CLOSE any of the five survivors. A review session fixes
+     nothing, and src/ and tests/ are named under NOT in this fence in terms.
+     They are rows in OPEN_FINDINGS.md with named remedies instead.
+  2. I did not check whether gemini-2.0-flash-lite-001 is still served. That is
+     Branch A's condition and RUN-1's alone, and the prompt forbids it.
+  3. I could not write the mechanism OF-70/OF-78 still name - check_roles.py
+     counting the token table's rows itself. check_roles.py is outside this
+     fence in both directions; this is the THIRTEENTH consecutive session to
+     carry that total by hand and the FOURTH that could not have written the
+     mechanism under any reading of its role.
+  4. Q-074's fifth site and OF-99 remain open. Both are outside this fence and
+     both are the repository's.
+  5. My mutation clone's vendor/ is NTFS JUNCTIONS to the real trees rather
+     than copies - 250 MB, read-only to the suite, and verified read-only first
+     (test_a_real_edit_to_the_vendored_tree_breaks_the_triple copytree's to
+     tmp_path). Stated because it is a deviation from a pure copy.
+  6. INC-46..INC-48's `Action` claim about which git COMMAND FORM was used is
+     unverifiable in principle - git records the result, not the command. Its
+     checkable consequence holds and I say so rather than claiming more.
+
+END OF FINAL OUTPUT
