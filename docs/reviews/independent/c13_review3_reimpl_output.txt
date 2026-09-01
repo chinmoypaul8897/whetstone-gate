@@ -1,0 +1,170 @@
+==============================================================================================
+C13 REVIEW 3 — SCOPED REIMPLEMENTATION OF THE CHANGED SURFACE
+session c09c385b · imports nothing from src/ · stdlib only
+==============================================================================================
+repo                      : C:\Users\chinm\whetstone-gate
+whetstone_gate in modules : NONE   <-- must be NONE
+this file                 : C:\Users\chinm\whetstone-gate\docs\reviews\independent\c13_review3_reimpl.py
+
+CONTEXT.md version read   : v1.9
+config read (raw, not via the project loader): C:\Users\chinm\whetstone-gate\config\lanes.yaml
+
+==============================================================================================
+1. THE BRANCH-CONDITION PREDICATE — requirements DERIVED FROM CONTEXT.md §8.5.1,
+   then applied to config/lanes.yaml.  THE LAW IS ASSERTED FIRST; the config second.
+==============================================================================================
+§8.5.1 located: 3638 chars
+  derived Branch A requirements : ['run-completes']
+  derived Branch A prohibitions : ['the model id is still served']
+  derived Branch B requirements : ['diagnosed-cause', 'it-errored-is-not-a-cause', 'harness-defect-is-never-branch-b', 'protocol-md-before-the-branch']
+
+camel_comparator keys parsed  : ['branch', 'branch_a_condition', 'branch_b_action', 'branch_b_condition', 'model_string']
+
+  branch:
+      TODO_C13_RUN1
+  branch_a_condition:
+      IT RUNS: both passes of the two-pass protocol complete inside the 90-minute box, from the same working directory. Pass 1 is `--model google:gemini-2.0-flash-lite-001 --suites banking --run-attack`; pass 2 is the same command with --replay-with-policies, and it reads the logs/ tree pass 1 wrote. Publish the live table
+  branch_b_condition:
+      THE RUN DOES NOT COMPLETE, ON A CAUSE THAT HAS BEEN DIAGNOSED AND RECORDED IN PROTOCOL.md BEFORE A BRANCH IS SELECTED. 'It errored' is not a cause, and a harness defect is NEVER Branch B - a provider error on the suffixed string is a HARNESS DEFECT, because dispatch succeeds on substring containment and the suffixed string reaches genai.Client as a model id (Q-057). A pre-registration whose negative branch can be reached by our own bug measures nothing
+  branch_b_action:
+      ship as a citation of Table 2, Appendix B ('Full results tables'), the o3 High block, banking column of arXiv 2503.18813v2 - CaMeL 81.2% +/- 19.1 against Native Tool Calling API 62.5% +/- 23.7 - with the CONTEXT.md §8.5.1 reason verbatim. NOT Tables 5-7 (Appendix C, Claude 3.5 Sonnet, where CaMeL is BEHIND on banking); Table 7 remains §8.5.2's P2 citation, out of 949 attacks in total
+
+  [OK  ] A-present                                     branch_a_condition exists and is non-empty
+         evidence: 'IT RUNS: both passes of the two-pass protocol complete inside the 90-minute box, from the same working directory. Pass 1 is `--model google:gemini-2.0-flash-lite-001 --suites banking --run-attack`; p
+  [OK  ] B-present                                     branch_b_condition exists and is non-empty
+         evidence: "THE RUN DOES NOT COMPLETE, ON A CAUSE THAT HAS BEEN DIAGNOSED AND RECORDED IN PROTOCOL.md BEFORE A BRANCH IS SELECTED. 'It errored' is not a cause, and a harness defect is NEVER Branch B - a provider
+  [OK  ] A-forbids::the model id is still served       branch_a_condition does NOT contain 'the model id is still served'
+  [OK  ] A-requires::run-completes                     branch_a_condition carries run-completes
+         evidence: RUNS: both passes of the two-pass protocol complet
+  [OK  ] B-requires::diagnosed-cause                   branch_b_condition carries diagnosed-cause
+         evidence: CAUSE THAT HAS BEEN DIAGNOS
+  [OK  ] B-requires::it-errored-is-not-a-cause         branch_b_condition carries it-errored-is-not-a-cause
+         evidence: It errored' is not a cause
+  [OK  ] B-requires::harness-defect-is-never-branch-b  branch_b_condition carries harness-defect-is-never-branch-b
+         evidence: harness defect is NEVER Branch B
+  [OK  ] B-requires::protocol-md-before-the-branch     branch_b_condition carries protocol-md-before-the-branch
+         evidence: PROTOCOL.md BEFORE
+
+  branch-condition predicate: 8/8 hold, 0 fail
+
+==============================================================================================
+2. THE TWO PROVENANCE REGEXES — this reviewer's own, with ITS OWN vectors.
+   TABLE_NUMBER        = '(?:Table|Figure) \\d+'   (fullmatch)
+   APPENDIX_STRICT     = 'Appendix [A-Z]'   (fullmatch)
+   APPENDIX_WITH_TITLE = 'Appendix [A-Z](?: \\("[^"]+"\\))?'   (fullmatch)
+==============================================================================================
+
+  TABLE / FIGURE — 28 vectors
+    [OK ] ACCEPT  (expected ACCEPT)  'Table 2'
+           the headline pair's own citation, CONTEXT.md v1.9 §8.5.1
+    [OK ] ACCEPT  (expected ACCEPT)  'Table 4'
+           P2's premise, Appendix B
+    [OK ] ACCEPT  (expected ACCEPT)  'Table 7'
+           P2's retained citation, Appendix C
+    [OK ] ACCEPT  (expected ACCEPT)  'Figure 9'
+           Table 4's ceiling source
+    [OK ] ACCEPT  (expected ACCEPT)  'Figure 11'
+           Table 7's ceiling source
+    [OK ] ACCEPT  (expected ACCEPT)  'Table 10'
+           two digits must be accepted — nothing caps the number at one digit
+    [OK ] REJECT  (expected REJECT)  'Tables 5-7'
+           ⚠️ THE DEFECT ITSELF — ASCII hyphen, plural
+    [OK ] REJECT  (expected REJECT)  'Tables 5–7'
+           ⚠️ THE DEFECT ITSELF — en dash, plural
+    [OK ] REJECT  (expected REJECT)  'Tables 5—7'
+           ⚠️ THE DEFECT ITSELF — em dash, plural
+    [OK ] REJECT  (expected REJECT)  'Table 5-7'
+           ⚠️ OF-101's EXACT CASE — singular range; a `match` accepts this
+    [OK ] REJECT  (expected REJECT)  'Table 5–7'
+           singular range, en dash
+    [OK ] REJECT  (expected REJECT)  'Tables 5, 6 and 7'
+           the prose form of the same range
+    [OK ] REJECT  (expected REJECT)  'Tables 5 and 7'
+           two tables where one belongs
+    [OK ] REJECT  (expected REJECT)  'Table'
+           the word alone
+    [OK ] REJECT  (expected REJECT)  'Table '
+           trailing space, no number
+    [OK ] REJECT  (expected REJECT)  'Tables'
+           plural alone
+    [OK ] REJECT  (expected REJECT)  ''
+           empty — the field is missing
+    [OK ] REJECT  (expected REJECT)  '   '
+           whitespace only
+    [OK ] REJECT  (expected REJECT)  'table 2'
+           lower case — a label, not the paper's own
+    [OK ] REJECT  (expected REJECT)  'TABLE 2'
+           upper case
+    [OK ] REJECT  (expected REJECT)  'Table2'
+           no separator
+    [OK ] REJECT  (expected REJECT)  'Table 2 '
+           trailing space — fullmatch must reject; a strip() would accept
+    [OK ] REJECT  (expected REJECT)  ' Table 2'
+           leading space
+    [OK ] REJECT  (expected REJECT)  'Table 2, Appendix B'
+           two fields in one — the appendix belongs in its own field
+    [OK ] REJECT  (expected REJECT)  'Appendix B'
+           the wrong field's value
+    [OK ] REJECT  (expected REJECT)  'Table 2 of arXiv 2503.18813v2'
+           ⚠️ A URL TO A PAPER IS NOT A URL TO A TABLE — the ruling's own sentence, in field form
+    [OK ] REJECT  (expected REJECT)  'Table -1'
+           negative
+    [OK ] REJECT  (expected REJECT)  'Figure 11(b)'
+           a sub-figure is not the figure's own number
+    -> 28/28 agree with this reviewer's own expectation
+
+  APPENDIX — 15 vectors, BOTH readings computed
+    [OK ] strict=Y withTitle=Y  (expected Y/Y)  'Appendix B'
+           Tables 2 and 4
+    [OK ] strict=Y withTitle=Y  (expected Y/Y)  'Appendix C'
+           Tables 5, 6 and 7
+    [OK ] strict=Y withTitle=Y  (expected Y/Y)  'Appendix A'
+           a valid appendix this project does not cite
+    [OK ] strict=N withTitle=Y  (expected N/Y)  'Appendix B ("Full results tables")'
+           ⚠️ CONTEXT.md v1.9 writes it THIS way — the two readings differ here and only here
+    [OK ] strict=N withTitle=Y  (expected N/Y)  'Appendix C ("Baseline results")'
+           the same, for Appendix C
+    [OK ] strict=N withTitle=N  (expected N/N)  'Appendix'
+           the word alone
+    [OK ] strict=N withTitle=N  (expected N/N)  ''
+           empty — the field is missing
+    [OK ] strict=N withTitle=N  (expected N/N)  'appendix B'
+           lower case
+    [OK ] strict=N withTitle=N  (expected N/N)  'Appendix BB'
+           two letters
+    [OK ] strict=N withTitle=N  (expected N/N)  'Appendix 2'
+           a number where a letter belongs
+    [OK ] strict=N withTitle=N  (expected N/N)  'Appendices B-C'
+           ⚠️ THE RANGE SHAPE, one field over
+    [OK ] strict=N withTitle=N  (expected N/N)  'Appendix B, Appendix C'
+           two appendices in one field
+    [OK ] strict=N withTitle=N  (expected N/N)  'Appendix B '
+           trailing space
+    [OK ] strict=N withTitle=N  (expected N/N)  ' Appendix B'
+           leading space
+    [OK ] strict=N withTitle=N  (expected N/N)  'B'
+           the letter alone
+    -> 15/15 agree
+
+  TOTAL VECTORS: 43  (docs/reviews/README.md asks for >= 20)
+
+==============================================================================================
+3. OF-101 ISOLATED — which vectors DISCRIMINATE fullmatch from match?
+   A vector on which both behave the same cannot pin `fullmatch`.
+==============================================================================================
+    DISCRIMINATES: 'Table 5-7'   fullmatch=REJECT  match=ACCEPT
+    DISCRIMINATES: 'Table 5–7'   fullmatch=REJECT  match=ACCEPT
+    DISCRIMINATES: 'Table 2 '   fullmatch=REJECT  match=ACCEPT
+    DISCRIMINATES: 'Table 2, Appendix B'   fullmatch=REJECT  match=ACCEPT
+    DISCRIMINATES: 'Table 2 of arXiv 2503.18813v2'   fullmatch=REJECT  match=ACCEPT
+    DISCRIMINATES: 'Figure 11(b)'   fullmatch=REJECT  match=ACCEPT
+    -> 6 of 28 table vectors discriminate.
+
+    ⚠️ `Tables 5-7` (plural) is NOT among them: `match` rejects it too, because the
+       pattern requires the singular. That is exactly OF-101's point — the plural range
+       is the only shape the project's parametrised fixture was reported to fire, so it
+       cannot be the vector that pins `fullmatch`.
+
+==============================================================================================
+END
+==============================================================================================

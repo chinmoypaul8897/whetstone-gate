@@ -217,7 +217,14 @@ def derive_requirements(section: str) -> dict[str, list[str]]:
 # recognisers; they are intentionally phrase-level and case-insensitive on the connective words
 # only, because the law's own emphasis markers (**, ⚠️) must not be required in a YAML scalar.
 _RECOGNISERS: dict[str, re.Pattern[str]] = {
-    "run-completes": re.compile(r"\brun\b[^.]{0,60}\bcomplet", re.I),
+    # ⚠️ PHASE-2 CORRECTION, DECLARED: the Phase-1 form of this recogniser was
+    # r"\brun\b[^.]{0,60}\bcomplet" and it reported FAIL against a config reading
+    # "IT RUNS: both passes ... complete inside the 90-minute box".  The divergence is
+    # THIS FILE'S, not the config's: `\brun\b` cannot match "RUNS".  The sealed original
+    # is preserved in this comment so the correction is checkable against the seal
+    # (90abb2d) rather than silently absorbed.  Only the recogniser is widened; the
+    # requirement it recognises is unchanged and still derived from §8.5.1.
+    "run-completes": re.compile(r"\bruns?\b[^.]{0,80}\bcomplet", re.I),
     "diagnosed-cause": re.compile(r"\bcause\b[^.]{0,40}\bdiagnos", re.I),
     "it-errored-is-not-a-cause": re.compile(r"it errored[^.]{0,20}is not a cause", re.I),
     "harness-defect-is-never-branch-b": re.compile(r"harness defect is never branch\s*b", re.I),
@@ -502,7 +509,12 @@ def main(argv: list[str] | None = None) -> int:
     p(_rule())
 
     text = out.getvalue()
-    sys.stdout.write(text)
+    # ⚠️ The operator's console is cp1252 and three sessions' artefacts have died on it.
+    # The committed record is written as UTF-8 BYTES; stdout gets a transliterated copy.
+    dest = Path(__file__).with_name("c13_review3_reimpl_output.txt")
+    dest.write_bytes(text.encode("utf-8"))
+    sys.stdout.write(text.encode("ascii", "replace").decode("ascii"))
+    sys.stdout.write(f"\n[written as UTF-8 bytes to {dest}]\n")
     return 0
 
 
