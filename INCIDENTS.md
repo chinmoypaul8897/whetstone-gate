@@ -2397,3 +2397,101 @@ list and its results in `docs/sessions/c7-build-2.txt`, so the review starts fro
 rather than from zero. ⚠️ **What is explicitly NOT claimed: that running a harness once makes this
 class impossible.** It found two survivors on the first attempt in a file written by a session that
 had just read `INC-33`, which is evidence about the class rather than about this file.
+
+---
+
+## INC-36 — `git commit -- <paths>` is scope-limited by PATH and not by CONTENT, so this session's commit swept FOUR of a concurrent session's uncommitted entries under its own token — and the read that saved the numbering is the read that proved it was about to happen
+
+**Date:** 2026-09-01 (C7 BUILD 2 `7d84b383`. The sweep is `2f702d9`. **Found by the session that
+was swept**, C13 BUILD 2 (`3fb17baa`), which attached the SHA to its own `Q-063` at `e1d6397`
+within minutes; this entry is the swept-by session's own account, written on reading that commit.)
+
+**Event:** at `2f702d9` this session ran
+
+```
+git commit -F <msg> -- INCIDENTS.md QUESTIONS.md docs/reviews/OPEN_FINDINGS.md
+```
+
+Both sessions were appending to **the same two of those three files**. A pathspec limits a commit
+by **path**, and both sessions' work was inside those paths, so the commit took **the whole working
+copy of each file** — including C13 BUILD 2's four uncommitted entries. **Measured on the commit
+itself:**
+
+```
+   git show 2f702d9 -- QUESTIONS.md                 | grep '^+### Q-'
+     +### Q-064   <- C13 BUILD 2's, swept
+     +### Q-065   <- C13 BUILD 2's, swept
+     +### Q-066 … Q-069   this session's
+   git show 2f702d9 -- docs/reviews/OPEN_FINDINGS.md | OF-62, OF-63  <- C13 BUILD 2's, swept
+                                                     | OF-64 … OF-67   this session's
+```
+
+**Four entries written under `3fb17baa` are committed under `Session-Token: 7d84b383`.**
+
+**Action:** nothing is rewritten — history is never rewritten on this project, and a rewrite would
+destroy `probe-v1`, `prereg-v1` and every `cN-pass` tag. **What was checked rather than assumed:**
+each swept entry occurs **exactly once**, complete, and carries its own
+`**Raised by:** C13 BUILD 2 (`3fb17baa`)` line, **so the ENTRIES' attribution is right and only the
+COMMIT's is wrong**; no counter collided, because this session re-read the file **after** those
+entries were in it and allocated `Q-066`…`Q-069` and `OF-64`…`OF-67` from there; and neither
+session's prose was altered in either direction. ⚠️ **And one sentence this session had already
+written is FALSE and is corrected in place rather than deleted:** `PROGRESS.md` §8 said *"Every
+commit on both sides used `git commit -- <paths>` and neither session swept the other's files."*
+The first clause is true and the second is not.
+
+**Expectation:** `QUESTIONS.md` **Q-051**'s remedy, carried in this session's own prompt as a hard
+requirement — *"⚠️ EVERY COMMIT USES `git commit -- <explicit paths>`"* — is the answer this project
+adopted to `INCIDENTS.md` **INC-30**, where a fix session committed a concurrent review's files
+under its own token. It was believed to give isolation between concurrent sessions. ⚠️ **IT GIVES
+ISOLATION ONLY WHEN THE TWO SESSIONS HOLD DISJOINT FILES**, and this project had never tested it
+otherwise.
+
+**Missing:** a commit discipline scoped by **content** rather than by path — `git add -p`, or a
+staged-index protocol — and, above that, **one working tree per session**, which is the only thing
+that closes it. ⚠️ **AND, THE HALF THAT IS EASY TO MISS: nothing can warn the session being swept.**
+Every option `Q-063` lists is written from the perspective of the session *doing* the committing.
+The session merely *holding* uncommitted work cannot see the other's `git commit`, cannot be warned
+by it, and cannot decline it — so *"check `git status` first"* is not a remedy for the party that
+loses, and *"wait"* is not one either.
+
+**Missed:** ⚠️⚠️ **THE READ THAT SAVED THE NUMBERING IS THE READ THAT PROVED THE SWEEP WAS ABOUT TO
+HAPPEN, AND THIS SESSION MADE BOTH INFERENCES FROM ONE OBSERVATION AND ONLY DREW THE FIRST.**
+Minutes before `2f702d9`, this session re-read `QUESTIONS.md`, **saw `Q-064` and `Q-065` sitting in
+the working copy uncommitted**, correctly concluded *"the counter has moved, renumber to `Q-066`"*,
+wrote a paragraph calling it *"a real collision rather than a near-miss"* — **and then committed
+that same file by pathspec.** The observation *"another session's uncommitted lines are in this
+file"* is the premise of both conclusions. One was drawn and acted on; the other was not drawn at
+all.
+
+⚠️ **AND C7 BUILD 1's OWN REPORT CONTAINED THE CAVEAT, UNSTATED.** It wrote: *"every commit on both
+sides used `git commit -- <paths>` and NEITHER SESSION SWEPT THE OTHER'S FILES — audited commit by
+commit … That is Q-051's remedy and INC-30's lesson holding, on the first occasion two build
+sessions have actually overlapped in this tree."* **That was true, and it held because C7 BUILD 1
+and C13 BUILD 1 wrote to DISJOINT files** — `ledger/` against `camel_comparator/`. Build 1 did not
+say that was the reason, and this session read *"the remedy held"* as a general guarantee rather
+than as one observation on the easy case. **A remedy verified only where it cannot fail has not been
+verified.** ⚠️ **This session then reproduced INC-30's class in the first commit where the two
+sessions touched one file** — which is `INC-31`'s shape as well: *"the fence that authorised the
+amendment reproduced INC-28's class in the first fence written after that class was ruled."*
+
+**Diagnosis:** `git commit -- <paths>` commits the working-tree state of those paths, so it is
+scope-limited by **path** and not by **authorship**; when two sessions append to one file the
+pathspec provides no isolation whatever, and Q-051's remedy had only ever been exercised on the
+disjoint-file case where it cannot fail.
+
+**Fix:** `<this commit>` — this entry, plus the correction of the false sentence in `PROGRESS.md`
+§8, committed with a pathspec on `INCIDENTS.md` and `PROGRESS.md` after reading
+`git status --porcelain` immediately beforehand and finding the tree **clean**, so this commit
+sweeps nothing. ⚠️ **No history is rewritten and no content is restored, because none was lost** —
+the defect is in the commit's attribution, not in the file.
+
+**Systemic guardrail:** ⚠️ **NONE THAT THIS SESSION CAN LAND — ACCEPTED, and the reason is that the
+only remedy that works is structural and is not a build session's to install.** One working tree per
+concurrent session, which is what `Q-063` asks and now has two demonstrations attached: this one,
+and the four-way counter collision at `Q-066`…`Q-069`. ⚠️ **`make check-roles` CANNOT SEE THIS AND
+THAT IS WORTH STATING**: the trailer is well formed, the token is issued, the role is right, and
+the commit simply contains more than its message says — **E1–E3 pass on a commit whose diff nobody
+in it wrote.** ⚠️ **And what is explicitly NOT claimed: that "use a pathspec" is now sufficient.**
+It is necessary and it was followed, on every commit, by both sessions, and it did not prevent this.
+`PROCESS.md` §7a's honour-system caveat is the honest frame: **session identity is mechanised as far
+as it can be, and this is one of the places where it cannot be.**

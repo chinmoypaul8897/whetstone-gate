@@ -157,8 +157,22 @@ floor.** ⚠️ **A voluntary habit is not a guardrail** — `INC-33`'s own clos
 
 C13 BUILD 2 (`3fb17baa`) shared this working tree throughout, holding `CONTEXT.md`, `config/`,
 `src/whetstone_gate/camel_comparator/` and `tests/test_config_loader.py` while this session held
-`src/whetstone_gate/ledger/` and `tests/test_c7_ledger.py`. **Every commit on both sides used
-`git commit -- <paths>` and neither session swept the other's files.**
+`src/whetstone_gate/ledger/` and `tests/test_c7_ledger.py`.
+
+⚠️⚠️ **THIS PARAGRAPH SAID *"Every commit on both sides used `git commit -- <paths>` and neither
+session swept the other's files"* AND THE SECOND CLAUSE WAS FALSE. IT IS CORRECTED IN PLACE, NOT
+DELETED, BECAUSE THE FALSE VERSION IS THE FINDING.** The first clause is true — every commit on
+both sides used an explicit pathspec, which is `Q-051`'s remedy followed exactly. **The second is
+not: this session's commit `2f702d9` swept FOUR of the concurrent session's uncommitted entries —
+`Q-064`, `Q-065`, `OF-62`, `OF-63` — under `Session-Token: 7d84b383`.** `git commit -- <paths>` is
+scope-limited by **path**, not by authorship, and both sessions were appending to the same two
+files, so the pathspec gave **no isolation at all**. It was C13 BUILD 2 that found it, at `e1d6397`.
+**No content was lost or altered** — each swept entry occurs once, complete, with its own
+*"Raised by: C13 BUILD 2 (`3fb17baa`)"* line intact, so the ENTRIES' attribution is right and only
+the COMMIT's is wrong — and `make check-roles` cannot see it, because the trailer is well formed and
+the token is issued. **`INCIDENTS.md` `INC-36`**, including the sharpest part: the re-read that
+caught the counter collision three paragraphs below **is the same observation that proved this sweep
+was about to happen**, and this session drew one conclusion from it and not the other.
 
 ⚠️ **THE SHARED COUNTER COLLIDED FOR REAL THIS TIME.** These four questions were drafted as
 `Q-064`…`Q-067` and these four findings as `OF-62`…`OF-65`; C13 BUILD 2 landed `Q-063`, `Q-064`,
