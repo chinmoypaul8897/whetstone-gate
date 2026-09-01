@@ -2060,3 +2060,87 @@ against a fence being written from the wrong source. It is not; it is a guardrai
 growing quietly, which is a different and smaller thing.
 
 ---
+
+## INC-32 — the ledger verifier hashed a FIXED FIELD LIST instead of the entry, so a smuggled fourteenth key was invisible to it — and golden 5 has no case that would ever have caught it
+
+**Date:** 2026-09-01 (C7 BUILD `3a6e3d07`. Written **before** the package's first commit
+`6d9cd47`; the defective version was never committed and has no SHA of its own, which is stated
+here rather than dressed up — see `Fix`.)
+
+**Event:** The first version of
+`whetstone_gate.ledger.chain.verify` built each entry's digest input as
+`{name: stored[name] for name in CONTENT_FIELDS}` — the thirteen field names the schema knows.
+A test written in the same session added one extra key to a stored entry and asked what the
+verifier said:
+
+```
+added[1]["smuggled"] = 1
+assert chain.verify(added, ...).verdict == chain.DETECTED
+E       AssertionError: assert 'VALID' == 'DETECTED'
+```
+
+**A tampered ledger came back VALID.** Selecting a known field list DROPS an unknown key before
+the digest is taken, so an entry somebody had *added* a field to hashed to exactly the value it
+had before the field existed.
+
+**Action:** The body is now everything the entry carries **except** the two chain fields —
+`{name: value for name, value in stored.items() if name not in CHAIN_FIELDS}` — so an added key
+is inside the digest and the mismatch is arithmetic rather than a schema check. The test that
+found it is kept, and a sibling now covers the removed-key direction and the reordered and
+duplicated-row directions beside it. Re-run: `DETECTED`, and the whole 85-test file green.
+
+**Expectation:** `PROCESS.md` §5.1, on the ledger: *"Any mutation of a prior entry must be
+detectable."* Adding a field to an entry is a mutation of that entry. A verifier whose whole
+job is that one sentence returned `VALID` on it.
+
+**Missing:** ⚠️ **A golden case for the add-a-field mutation. Golden 5 has four cases — an
+intact chain, a broken link, one altered value, and one altered value with a stale stored hash
+— and every one of them CHANGES or BREAKS a field that already exists.** None ADDS a key and
+none REMOVES one, so **golden 5 was green against the defective verifier from the first run to
+the last** and would have shipped it. The oracle is right about what it covers and silent about
+this class, and that silence is the gap: a build session that had written only the tests golden
+5 implies would have had no reason to look here. Recorded so the architect can decide whether a
+fifth case belongs in a golden that is otherwise complete — noting that adding one now would be
+an **edit to a frozen-by-rule artefact** and is not this session's to make (hard rule 3).
+
+**Missed:** ⚠️ **THE GOLDEN'S OWN `hash_rule` FIELD SAYS IT, IN THE FILE THAT WAS OPEN ON
+SCREEN, AND IT WAS READ AS THE OPPOSITE OF WHAT IT SAYS.** *"the canonicalised entry EXCLUDES
+`prev_hash` and `hash`"* — **excludes those two, and by construction includes everything
+else.** It was read as *"includes the thirteen content fields"*, which is the same sentence only
+while the entry has exactly thirteen fields, and is the whole defect the moment it has
+fourteen. The rule was quoted **verbatim in the module's own docstring, three lines above the
+line that got it wrong**, and the docstring was written first. ⚠️ **And the same file already
+contained the correct reading applied to the WRITE side:** `LedgerEntry.body()` derives its
+field set from the dataclass rather than from a literal list, and `LedgerEntry.from_dict`
+refuses an unknown key outright — so the package was strict about extra fields on the way in and
+blind to them on the way back, in two methods thirty lines apart.
+
+**Diagnosis:** The verifier described the entry by a schema it already believed rather than by
+the bytes in front of it, and a tamper check that trusts its own schema cannot see a tamper that
+changes the schema. `PROCESS.md` §5.2's golden-5 lesson is that a verifier must **recompute from
+contents** — and "contents" means all of them, not the ones the reader expected to find.
+
+**Fix:** `6d9cd47` — `src/whetstone_gate/ledger/chain.py`, the `body` assignment in `verify`,
+with the reasoning in a comment beside it. ⚠️ **THE DEFECTIVE VERSION HAS NO COMMIT AND THAT IS
+SAID PLAINLY: it existed in the working tree for about twenty minutes and was fixed before the
+package was first committed**, so `6d9cd47` carries the corrected code and there is no
+before-and-after diff in this repository's history. What there IS, and it is the part that can
+be checked, is the failing assertion above and the kept test that produced it —
+`test_verify_detects_an_added_or_removed_field`, which fails against the pre-fix expression and
+passes against the committed one. **Measured both directions on golden 5 case A with one key
+added to entry 2, the two expressions run side by side in the same process:**
+
+```
+PRE-FIX   (select a known field list)      -> ('VALID', None)
+COMMITTED (exclude the two chain fields)   -> ('DETECTED', 2)
+```
+
+**Systemic guardrail:** **Yes, and it is the shape of the fix rather than a new test.** The
+digest input is now **derived by exclusion** — everything except two named fields — so there is
+no list to fall out of date and no way to add a field to the schema without adding it to the
+hash. The three kept tests (`test_the_digest_excludes_prev_hash_and_hash_and_includes_everything_else`,
+`test_verify_detects_an_added_or_removed_field`,
+`test_verify_detects_a_reordered_or_duplicated_row`) fire at the four mutation classes golden 5
+does not carry. ⚠️ **What is NOT claimed: that this closes the class.** The general defect is *a
+checker that reads input through the schema it expects*, and the only thing standing between
+this package and the next instance of it is that one expression is now written by exclusion.
