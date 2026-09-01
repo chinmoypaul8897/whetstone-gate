@@ -87,6 +87,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `8c49c4d3` | C13 | REVIEW | 2026-09-01 |
 | `3605d31c` | C6 | REVIEW | 2026-09-02 |
 | `91eb51c1` | C13 | FIX | 2026-09-02 |
+| `c09c385b` | C13 | REVIEW | 2026-09-02 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -582,6 +583,51 @@ TREE ONLY BECAUSE THIS SESSION'S OWN COMMIT SWEPT IT.** This session — **C13 F
 
 **No other session's line was touched by this append.** The row was added beneath `3605d31c`'s, the
 paragraph beneath `3605d31c`'s paragraph, and the file's bytes carry **0 CR bytes** after it.
+
+⚠️ **AND `c09c385b` IS THE TWENTY-SIXTH SELF-RECORDED ROW, IS ROW 41, AND IT IS REGISTERED BEFORE
+THIS SESSION'S PHASE-1 SEAL — WHICH IS THE ONE THING IN THIS PARAGRAPH THAT IS NEW.** This session —
+**C13 REVIEW, attempt 3**, 2026-09-02 — opened with `c09c385b`, and its prompt required the row
+**before** the seal in terms: *"REGISTER YOUR TOKEN ROW BEFORE THE SEAL. Sealing first has turned
+`check-roles` E1 red on TWO CONSECUTIVE REVIEWS. Number the row FROM THE TABLE; ordinals 11, 12 and
+18 are asserted by no paragraph and are NOT yours to close."*
+**Counted from the file, immediately before appending:**
+
+* **The table held 40 data rows** (lines 50–89), `91eb51c1` being the last. **40 before this one, so
+  this is row 41.** ⚠️ `3605d31c`'s paragraph states it counted 38 and made itself 39; `91eb51c1`'s
+  states it counted 39 and made itself 40; **both reconcile exactly against the table read here**,
+  and the chain is checked rather than assumed.
+* **This session is therefore the twenty-sixth self-recorded row and the twenty-fifth to carry a
+  paragraph**, the gap of exactly one still being `9c0c6734`'s uncounted row, named by `b450df0a`
+  and unchanged since. Cross-checked against the table rather than only against the predecessor:
+  40 data rows less the **15** rows nobody self-recorded — the nine-row `f57e216b` batch plus
+  `WG-2026-08-30-CTX-13.4-A`, `52f5307b`, `c9521aac`, `20cd5b79`, `da356dbb` and `debc97ae` — gives
+  **25 self-recorded before this one**, which is exactly the ordinal `91eb51c1` claimed. **The two
+  derivations agree.**
+* ⚠️ **THE SELF-RECORD COUNT IS RE-DERIVED FROM THE HEADINGS, NOT INHERITED.** The numbered
+  self-record headings in this section assert ordinals **5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 19,
+  20, 21, 22, 23, 24, 25** and this one at **26**. **Ordinals 11, 12 and 18 are still asserted by no
+  paragraph in this file**, and the three rows carrying none of their own are still `df238be6`,
+  `0852ea56` and `9c0c6734`. **They are NOT this session's to close** and are not closed here.
+* ⚠️ **THIS IS THE THIRTEENTH CONSECUTIVE SESSION TO CARRY THE TOTAL BY HAND**, and the **fourth**
+  that could not have written the mechanism under any reading of its fence: a review session
+  **fixes nothing**, and this prompt's scope fence names *"anything under `src/` or `tests/`"* under
+  **NOT** in terms. `5c4f8e11`'s owed mechanism — *"`check_roles.py` parses this table for E1 and
+  could count the rows outside the batch itself"* — is still owed. `OF-70` and `OF-78` both still
+  stand for it. ⚠️ **And it is now more than owed: `Q-080`/`INC-49` is a SECOND defect in the same
+  parser**, so `check_roles.py`'s handling of this table is being carried by hand at two points at
+  once.
+* ⚠️ **`OF-89`'s CLASS IS AVOIDED HERE RATHER THAN SURVIVED.** `8c49c4d3` sealed before its row and
+  turned `make test` red on two invariants; `91eb51c1` registered its row after four commits already
+  carried its trailer and was E1-red in between; `3605d31c` was the first to reverse the ordering.
+  **This session is the second, and the streak now stands at two.** The row is committed first and
+  the Phase-1 seal is the commit after it. As `3605d31c` recorded, this is the prompt telling the
+  session what its predecessors got wrong — **not** the mechanism `OF-70` still names, and it
+  carries the same limitation.
+
+**No other session's line was touched by this append.** `git status --porcelain` over the five shared
+journals was **empty** immediately before this commit — the only untracked path in the tree is
+`grep.exe.stackdump`, which belongs to no session and was not touched — and the file's bytes were
+re-verified after the append and carry **0 CR bytes**.
 
 ## ⚠️ THE TOKEN BATCH, 2026-08-31 — and this is what ends the collision class
 
