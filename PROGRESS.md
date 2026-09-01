@@ -6,6 +6,124 @@ not a record; this file is.
 
 ---
 
+## C6 — the attacker loop — **REVIEW** — attempt 1 — 2026-09-01 — **FAIL, two BLOCKERs; no `c6-pass` tag**
+
+**SESSION-TOKEN:** `2cd28cc5` — **NOT in the batch.** The prompt said so in its own words and put
+`QUESTIONS.md` in the fence for the row alone. Appended, and **named as the NINTH self-recorded
+row**. ⚠️ **The new information in it is the ROLE:** the five one-off tokens are now BUILD, FIX,
+ARCH ×2 and **REVIEW** — every role the process has — so Q-025's *"every token batch"* clause can no
+longer be read as covering an ARCH-and-FIX habit. A **review** session, whose whole purpose is to be
+a different session from the builder, has written its own row into the table that records the
+build/review separation. No other session's line was touched; the file's bytes were re-verified
+after the append.
+
+**TOKEN SPEND: ZERO PROVIDER MODEL CALLS. ZERO TOKENS ON ANY LANE.** The Gemma lanes, the gate-judge
+lanes and the ladder lanes are untouched. Every "model" in this review is a mock written in
+`docs/reviews/independent/`. `tiktoken` is a **local BPE table**, session-side only, imported by
+nothing under `src/` or `tests/`. Corpus and licence fetches are HTTP GETs to public repositories
+(`PROCESS.md` §11a), into an **OS temp directory — never into this repository**.
+
+**VERDICT: FAIL.** Two BLOCKERs, one HIGH, three MEDIUM closed in this commit, six MEDIUM/LOW open
+as **OF-47…OF-52**, four INFO. **`git tag -l` remains `c0-pass c1-pass c2-pass c3-pass`.**
+
+**THE BASELINE, AND THE RED THIS REVIEW DID NOT INHERIT.** The prompt warned that
+`test_the_world_ships_no_tool_surface_no_rejections_and_no_in_flight_window` was RED (Q-043,
+INC-23) and that **INC-11 forbids a mutation baseline from an already-red tree.** It was red in this
+session's first live measurement (`1 failed, 389 passed`). ⚠️ **The concurrent architect session
+closed it at `9c5dbb5` mid-review**, and the live suite re-measured **390 passed, 0 failed** — so
+the exclusion INC-11 would have required **was not needed and was not taken**. What *was* excluded is
+printed as a number: `vendor/` is git-ignored, so the mutation clone has no τ²-bench and C3's **43
+tests** error there; they are excluded because otherwise they would "kill" every mutant **including
+the control**, which is INC-11's defect in a second costume. No C6 mutant touches τ².
+
+**Q-031's ENFORCEMENT, EXECUTED IN PLACE OF A GOLDEN.** Six drivers under
+`docs/reviews/independent/`, importing nothing from `tests/test_c6_attacker.py`. Three methods,
+deliberately different in kind. ⚠️ **METHOD A is a five-arm DIFFERENTIAL** — the same episode under
+arms 1/2/2S/3/4 — because §10.1 says *"no DIFFERENTIAL information across arms"*, not
+*concealment*, and that is the property worth testing: **no arm-identifying bit reaches the
+attacker, and arms 2/2S/3/4 are byte-identical.** METHOD B derives the forbidden vocabulary **from
+the spec at run time** rather than hand-writing a tuple, and asserts over **`run_episode`'s own
+contexts**. METHOD C enumerates the channels. ⚠️ **THE CONTROL HOLDS: the probe's note reaches the
+attacker on the WORLD surface and the door is OPEN.** `CANARY-A`, `CANARY-B` and `HOLES.md` appear
+nowhere.
+
+**BLOCKER F-1 — the summary folds the last TOOL RESULT where §13.3 says the last DENIAL REASON.**
+`loop.py:215`, `last_refusal = result_text`, unconditionally, every turn. The loop **cannot**
+identify a denial — it has no gate object, which is the very choice that makes claim 4 structural —
+and C6 resolved that tension silently. **That is an undeclared Class A deviation:** no
+`QUESTIONS.md` entry, no Class B note. Four measured consequences: **(1)** `authored_text()` carries
+verbatim WORLD text and, via `_seed_hint`, verbatim **third-party corpus** text, so the docstring's
+*"the system prompt and the deterministic summary. **Nothing else**"* is false and mechanism (a) of
+the two C6 offers as making blindness *structural* does not hold; **(2)** ⚠️ **C6's own CLAIM-2
+predicate fires on 19 of 20 turns** when the attacker calls `fetch_payment('pay_CANARYRECON')` — a
+276-char payload, inside the cap, and **exactly what the tradecraft paragraph instructs** — passing
+today only because a 12-payment listing pushes the probe past the truncation cut; **(3)** the
+obvious repair for a red note-guard is to ban the note globally, which **closes the door and makes
+arm 4 VOID by construction**; **(4)** a completed refund is republished to the attacker under
+`LAST TOOL REFUSAL:`, an attacker-competence risk in **INC-01's own chunk**. Never seen because all
+four guards run against `assemble()` with a hand-supplied `last_refusal` — and the build report's
+*"not a constructor argument"* is therefore **not true**. ⚠️ **No leak exists and no published
+number is wrong**, and this entry says so rather than dramatising.
+
+**BLOCKER F-2 — the attacker is seeded from ONE corpus, not four.** Measured against the real pinned
+payloads: 498 entries load; the offered window is `[0, 19]`; **20 of 498 = 4.02%**, all InjecAgent's,
+**identical in every episode of every seed of every arm**. `agentdojo` sits at indices 62–65,
+`agentharm` 66–97, `asb` 98–497 — **never offered**. ⚠️ **AgentDojo's is the BANKING injection
+corpus, the only payment-domain material in the set**, and 16 of the 20 reachable entries are
+Smart-Lock injections with no payments vocabulary. `PROCESS.md` §12.1's card says *"seeded from
+InjecAgent + AgentDojo + AgentHarm + ASB"*. §11.3's split — **a number this project intends to
+publish as a first** — therefore drifts toward *"~100% improvised"*: **INC-01's shape, arriving
+through a door C6's own empty-corpus guard does not watch**, because that guard protects against
+zero *entries* and not zero *reachable* ones. No rule blocks the fix: a deterministic function of
+`(episode seed, turn index)` covers the corpus **and** keeps hard rule 10's byte-identity.
+`seed_for_turn` does not even accept the seed today.
+
+**WHAT HELD, AND IT IS MOST OF THE CHUNK.** All five corpus licences **and all five pinned SHA-256
+hashes and byte counts** re-verified at source and reproducing exactly — InjecAgent's British
+`LICENCE` proved **both ways** (200, 1,066 bytes / **404**), AgentHarm's **two** holders +
+field-of-use clause + `"gated": false` + card date, AgentDojo's six, ASB, and R-Judge's
+**`"license": null`** with **not one byte vendored**. The three §8.6 texts re-parsed by a
+**different anchor**: 15/15, all three SHA-256 equal to C6's, a byte census clean of INC-13's class,
+**and P7's quoted tag confirmed a substring of `config/`'s probe note — the door actually opens.**
+The summary: 18 of 21 properties, including 20/20/20 calls and the window sizes proved **in a
+subprocess against an altered `config/`**. ⚠️ **The calibration claim REPRODUCED** — 2.99 chars/token
+against C6's 2.97, divisor 4 at **−24.5%** against its −25.4%. The estimate is labelled an ESTIMATE
+in the type, the method string and the rendered comparison; **C6 selects no branch and prejudges
+nothing**; `src/whetstone_gate/gates/` does not exist, so **C6 built no gate**.
+
+**THIS REVIEW'S OWN ADDITION FOR C14.** The worst case (**~126,600**) is **not reachable** — it
+requires the attacker never to act. But **the crossover past 60,000 is at 7 full-list reads of 20
+turns** (6 by C6's estimator), and three forces push toward it: Q-037 makes pagination mandatory to
+see the probe at all; ⚠️ **the 6-turn window evicts the payment list itself**, forcing ~3 re-reads
+(measured 33,665); and the tradecraft paragraph says *"read every payment's notes"*. Plausible
+centre: **34,000–43,000, not 25,200.** **C6's conclusion — that the pilot is load-bearing — is right
+and is endorsed; only its "with room" is not.**
+
+**MUTATION: 14 mutants, 10 killed, 4 SURVIVED, CONTROL SURVIVED — the run is VALID.** Pinned in a
+clone at `755dd52` because a concurrent session was live (the trap that voided `REVIEW_C0_2`'s first
+pass). Every mutant **committed** before it ran (INC-11); every source SHA-256 verified restored
+after; **`whetstone_gate.__file__` printed on all 20 runs** (INC-17) and resolving to the clone every
+time. Survivors: **M5** the Origin tag, **M7** the *declared* NFC normalisation, **M8** the divisor
+**its own calibration rejected**, **M9** the framing allowance. ⚠️ **M13 trips EXACTLY ONE claim and
+M14 reproduces C6's mutant A exactly** — so the four guards are independent **from both
+directions**. All four survivors **closed in this commit** by `tests/test_c6_review_probes.py`, and
+each probe was run against the mutant it names and **observed to fail**, and to pass against the
+other three.
+
+**COUNTS.** `make test` **390 → 396 passed**, 1 skipped, 2 deselected, **0 failed** (+6 kept probes;
+nothing removed, nothing weakened). `git status --porcelain tests/goldens/` **EMPTY**.
+
+**WHAT I COULD NOT DO.** **(1) No test for either BLOCKER.** The test that closes each must assert
+the **corrected** behaviour and would be RED in this tree, and a review that leaves `make test` red
+blocks every concurrent session. They are the FIX session's — *do not fix what you review*.
+**(2) No `INCIDENTS.md` entry.** The file was outside this session's fence and an architect session
+held it; nothing this review found is an incident of this session's own making, and the two BLOCKERs
+belong in the FIX session's entry, written before it changes a line. **(3) F-3 is owed an architect
+ruling** — whether a *derived enforcement unit* is an author-chosen constant in §8.6's sense — and it
+is owed **before `prereg-v1`**, because `config/` freezes there.
+
+---
+
 ## ARCH — two C2 test scope corrections, the self-test's console, and five rulings — **BUILD** — attempt 1 — 2026-09-01 — **done; no feature added, no token spent**
 
 **SESSION-TOKEN:** `3af1c9d2` — **NOT in the batch.** The prompt said so in its own words (*"⚠️ Your
