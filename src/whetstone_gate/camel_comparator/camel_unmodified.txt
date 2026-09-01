@@ -1,0 +1,49 @@
+# CaMeL, UNMODIFIED - the empty-diff proof that IS C13's deliverable.
+#
+# PROCESS.md S12.1, C13 done-when:
+#   "No CaMeL source file is modified - a diff against the vendored SHA is empty
+#    and is committed as proof."
+#
+# CONTEXT.md S8.5's whole resolution is 'run CaMeL UNMODIFIED, on its home turf'.
+# A modified CaMeL would not be a comparison against CaMeL, so this file is the
+# evidence that the comparator is a comparison.
+#
+# THIS FILE IS REGENERATED, NOT STORED. tests/test_c13_camel_comparator.py re-runs
+# the three commands below against the live checkout and diffs the result against
+# these bytes. A committed diff that nothing re-derives is a screenshot.
+#
+# Package : camel-prompt-injection
+# Pin     : f083b6b396399d3b3c7f2ddaf613a5945eaf32d8
+# Fetched : 2026-09-01
+
+$ cd vendor/camel-prompt-injection
+
+$ git rev-parse HEAD
+f083b6b396399d3b3c7f2ddaf613a5945eaf32d8
+
+$ git status --porcelain
+(empty)
+
+$ git diff f083b6b396399d3b3c7f2ddaf613a5945eaf32d8
+(empty)
+
+# ------------------------------------------------------------------------------
+# THE MEASUREMENT, AND WHY IT CARRIES FOUR NUMBERS INSTEAD OF ONE.
+#
+# CONTEXT.md S8.5 states the interpreter at 100,476 bytes and 2,716 lines. Both
+# reproduce - FROM THE GIT BLOB. core.autocrlf is true on the operator's machine
+# and CaMeL ships no .gitattributes, so the working tree carries one CR per line.
+# A reviewer running `stat` on Windows sees a number the spec does not state and
+# is right to be suspicious; the arithmetic below is what resolves it.
+#
+#   file            : src/camel/interpreter/interpreter.py
+#   git blob bytes  : 100476   <- CONTEXT.md S8.5's figure
+#   lines           : 2716   <- CONTEXT.md S8.5's figure
+#   worktree bytes  : 103192
+#   CR bytes        : 2716
+#   blob + CR == worktree : True
+#
+#   tracked files       : 63
+#   tracked blob bytes  : 2174188
+# ------------------------------------------------------------------------------
+# END
