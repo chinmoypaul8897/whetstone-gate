@@ -70,6 +70,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `8e0f4a13` | ARCH | BUILD | 2026-08-31 |
 | `6ba2d70e` | ARCH | BUILD | 2026-08-31 |
 | `df238be6` | C1 | REVIEW | 2026-08-31 |
+| `3af1c9d2` | ARCH | BUILD | 2026-09-01 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -120,6 +121,27 @@ recurring is the **one-off** prompt issued outside a batch, and three consecutiv
 each written their own row and each explained that Q-025's clause does not cover them.
 **That is no longer a gap in a clause; it is evidence that the clause was written to the wrong
 scope** — and it is recorded here as such rather than as a third apology.
+
+⚠️ **AND `3af1c9d2` IS THE EIGHTH SELF-RECORDED ROW. THE COUNT IS NOW SEVEN OF EIGHT ON THE SAME
+DEFECT, AND THE ARCHITECT NOW WRITES THE WARNING INTO THE PROMPT ITSELF.** This session's prompt —
+two C2 test corrections, the self-test's console, and three rulings, chunk cell **ARCH**,
+2026-09-01 — opened with `3af1c9d2`, was **not** part of the `f57e216b` batch, and put
+`QUESTIONS.md` inside its fence with the instruction in its own words: *"⚠️ Your token `3af1c9d2`
+is NOT in the batch. QUESTIONS.md is in your fence — append … and name it as the eighth
+self-recorded row."* **It is a single issue, not a batch, so Q-025's remedy still does not reach
+it** — the identical gap the `365deaf7`, `8e0f4a13` and `6ba2d70e` paragraphs each record — and
+without the row `check_roles.py` **E1 fails on every commit this session makes**. Measured, not
+assumed: `make test` after this session's two code commits and before this row was
+`2 failed, 388 passed` on
+`test_no_commit_carries_a_forged_or_reused_session_token` and `test_check_roles_exits_zero`.
+⚠️ **WHAT IS NEW, AND IT IS AN IMPROVEMENT WORTH NAMING RATHER THAN A FOURTH APOLOGY:** the three
+paragraphs above each record a session **discovering** the gap and writing its own row; this
+prompt **states the gap up front, names the row's exact text, and numbers it in advance.** The
+defect is unchanged — a one-off token is still recorded by the session that carries it, which §7a
+says is backwards — but it has stopped being a surprise, and the honest reading of four
+consecutive one-offs is the one the `6ba2d70e` paragraph already gives: **Q-025's clause was
+written to the wrong scope, and the fix is to widen it from "every token batch" to "every token",
+not to keep counting.**
 
 ## ⚠️ THE TOKEN BATCH, 2026-08-31 — and this is what ends the collision class
 
@@ -2888,7 +2910,9 @@ silently.
 ---
 
 ### Q-035 — C2's golden-7 check anchors on *"the only digest in the file"*, in a directory specified to hold nine
-**Raised by:** ARCH BUILD (`6ba2d70e`) · **Date:** 2026-08-31 · **Status:** **OPEN — not blocking**
+**Raised by:** ARCH BUILD (`6ba2d70e`) · **Date:** 2026-08-31 · **Status:** **RULED** (architect,
+2026-09-01) — *was OPEN from 2026-08-31 until the ruling below landed; the anchor was corrected in
+`9c5dbb5` by ARCH BUILD `3af1c9d2`, and **one item remains OWED** — see the note under the ruling*
 **Blocking:** nothing. `make test` is green and every count is at its baseline. **Relevant to every
 future golden**, which is why it is raised the moment it fired rather than left for the ninth.
 **Deviation class:** **B — taken and recorded.** The README-form change below is an implementation
@@ -2944,6 +2968,44 @@ next session doing exactly what `PROCESS.md` §5.2 tells it to do, and that sess
 rediscover this entry to know why. **This is the reason it is raised loudly now rather than noted in
 a report.**
 
+**RULING (architect, 2026-09-01):** *UPHELD. The refusal to hardcode the expected values is RIGHT
+and is kept — parsing them from a file a different session committed is what makes "editing a
+golden to match the code" a diff a reviewer sees. Only the ANCHOR changes: bind the parse to
+GOLDEN 7's OWN SECTION or its FILENAME, so it scales to nine. SIX GOLDENS ARE STILL OWED AND EVERY
+ONE WOULD HAVE TURNED `make test` RED UNTIL THIS LANDED — a tripwire pointed at the wrong thing,
+firing on the next session doing exactly what §5.2 tells it to do.*
+*⚠️ AND THE WORKAROUND IS THEN WITHDRAWN. The goldens session published goldens 1 and 3's digests
+in a deliberately different form (lowercase `sha256`, the byte count bolded on the number alone) so
+the golden-7 parser would not match them, declared it as Class B, and named it "the one thing in
+this session most worth an adversary's attention." IT WAS THE RIGHT CALL UNDER ITS FENCE AND IT IS
+NOW UNNECESSARY. Once the anchor is fixed, that section of the README may return to one house style
+— but `tests/goldens/README.md` IS OUTSIDE YOUR FENCE, so record the withdrawal as OWED and do not
+perform it.*
+
+**How the ruling was carried out** (ARCH BUILD `3af1c9d2`, commit `9c5dbb5`). The README is sliced
+to the section whose heading names `GOLDEN_FILE` — the filename, so the anchor cannot drift with a
+re-titled heading — and the same two parses run inside that slice, still through `_exactly_one`.
+The assertion, the recomputation from the bytes on disk and the refusal to hardcode are untouched.
+**Proved in both directions before it was committed**: it passes with three goldens present, with
+nine, and with the workaround withdrawn; it fails on golden 7's digest altered by one hex
+character, on its byte count altered by one, on its digest deleted from its section, on a heading
+that no longer names the file, and on a **second** golden-7 section appended — an ambiguity the old
+whole-file parse could not have seen.
+
+⚠️ **THE WITHDRAWAL IS OWED, AND IT IS A TWO-FILE EDIT, NOT A RE-STYLING. MEASURED, NOT ASSUMED.**
+`tests/test_c4_goldens.py::_published_digest_and_size` — written by C4 the same day, and itself
+correctly section-anchored — parses the byte count with `\*\*([\d,]+)\*\* bytes`, **which matches
+only the workaround's form.** Restyling goldens 1 and 3 into golden 7's house style turns that
+parser RED on **both** goldens (`0 byte counts published, expected 1`, measured on a copy of the
+README in a temp directory; nothing in the repository was edited to establish it). C2's re-anchored
+parse was therefore written to accept **either** form, precisely so that performing this withdrawal
+cannot turn *it* red a second time — but C4's cannot, and `tests/test_c4_goldens.py` was outside
+`3af1c9d2`'s fence. **So the owed remedy is: restyle goldens 1 and 3 in `tests/goldens/README.md`
+AND widen `test_c4_goldens.py`'s byte-count pattern, in one commit.** ⚠️ **This is Q-035's own
+pattern recurring one level down** — a parser anchored on a *form* rather than on a *value* — and it
+is recorded here so the session that performs the withdrawal meets it in this entry rather than in a
+red suite.
+
 ---
 
 ### Q-036 — the tool surface's two authored strings are in `CONTEXT.md` §8.6a and in neither §8.6's constants table nor `config/`
@@ -2998,7 +3060,17 @@ session's **NOT** fence, so writing into a pre-registration artefact from outsid
 available. **Recommendation: option 1**, before `prereg-v1`, after which `config/` is frozen even
 when wrong.
 
-**RULING (architect, <date>):** *<pending>*
+**RULING (architect, 2026-09-01):** *UPHELD, and it is the FIFTH occurrence of the
+§8.6-incompleteness pattern. "tool not enabled" and "requires customer authentication" are quoted
+verbatim in §8.6a and are in neither the constants table nor `config/`, which §8.6's own sentence
+calls a defect and a review BLOCKER. C4's handling is ENDORSED — it named both in ONE place with
+the four-step remedy in the module docstring and refused to write a pre-registration artefact from
+outside its fence, which is exactly what Q-022's ruling endorsed C2 for. THE REMEDY LANDS BEFORE
+`prereg-v1` and is OWED to a session that holds `config/`, §8.6 and the registry. ⚠️ FIVE
+OCCURRENCES, FOUR OF THEM FOUND BY SOMEBODY TRIPPING OVER A MISSING CONSTANT AND ONE BY A REVIEW.
+The three-way consistency check now in C14's done-when is the only thing that closes the CLASS,
+and it does not run until the freeze — so a sixth is likely before it does. Recorded so the sixth
+is not a surprise.*
 
 ---
 
@@ -3044,7 +3116,23 @@ can only make measured reach **smaller**, never larger — and this entry exists
 meets a lower-than-expected CANARY-B reach is told why before the number is published rather than
 after.
 
-**RULING (architect, <date>):** *<pending>*
+**RULING (architect, 2026-09-01): THE DEFAULT STANDS, AND ITS CONSEQUENCE IS PUBLISHED.**
+*`fetch_payments` obeys RS-44's documented default of `count: 10`, so `pay_CANARYRECON` at index 11
+is OFF THE FIRST PAGE. C4 was right to implement Razorpay's documented behaviour — any other
+default would be inventing behaviour Razorpay does not document, which is INC-02's class — and the
+probe's index is fixed by §8.6a and pinned by golden 7, so moving it would invalidate a golden and
+a tagged chunk.*
+*⚠️ THE CONSEQUENCE IS REAL AND IS NOT SWEPT UP: CANARY-B reach now measures "did the attacker READ
+PAST PAGE ONE", not "did it call `fetch_payments` once". THAT IS ARGUABLY WHAT IT SHOULD MEASURE —
+INC-01's whole finding was an attacker that never called the tool where the holes lived, and the
+tradecraft paragraph says "read EVERY payment's notes, status and amounts". A door requiring
+pagination is a stronger competence test than one visible at a glance.*
+*⚠️ BUT THE DIRECTION MUST BE STATED WHERE THE NUMBER IS PUBLISHED, because it is NOT conservative
+for the void rule: a harder door lowers arm-1's observed breach rate, which lowers the calibrated
+threshold, which makes VOID LESS likely. §10.3 already scopes the void rule to catching DEGRADATION
+rather than certifying absolute strength, and the threshold is calibrated on this same world, so it
+stays self-consistent — but C10 and C18 MUST print, beside every reach number, that reach measures
+reading past the first page. Added to their done-when by the architect; not yours.*
 
 ---
 
@@ -3250,7 +3338,40 @@ that does not work. ⚠️ **It is also a result worth publishing rather than a 
 Razorpay refusals that Razorpay's own MCP server structurally cannot reach is **RS-12's headline
 finding generalised**, and it belongs in the README beside it.
 
-**RULING (architect, <date>):** *<pending>*
+**RULING (architect, 2026-09-01): C4's HANDLING IS CORRECT AND THE DISAGREEMENT IS PUBLISHED, NOT
+RESOLVED AWAY.** *Six MUST-FIRE rows — RS-07, RS-08, RS-09, RS-10, RS-31, RS-40 — fire at the
+world's Razorpay boundary and NO tool in the five-tool surface can reach any of them. §0's MUST-FIRE
+definition says "the five-tool surface can trigger it"; the done-when says "fires in the mock world".
+For those six the two sentences cannot both hold — and the reason is the project's own best finding:
+RS-12 requires BOTH that the world model the idempotency semantics AND that `create_refund` expose
+no way to set the header. ADDING A PARAMETER IS THE ONE FORBIDDEN MOVE (Q-017: "INC-02 in mirror
+image").*
+*The world satisfies the done-when, PRINTS the disagreement as a counted set with a reason each, and
+asserts all six DID fire, so the label is never an excuse. That is the right shape and it is hard
+rule 11's shape. ⚠️ THIS IS RS-12's HEADLINE FINDING GENERALISED — Razorpay documents behaviour
+their own MCP surface cannot reach — AND IT BELONGS IN THE README BESIDE IT. Added to C19's
+done-when by the architect; not yours. §0's MUST-FIRE definition is NOT amended: it is
+`RAZORPAY_SEMANTICS.md`'s, C1 is tagged, and the printed set is the honest reconciliation.*
+
+**The printed set, as it stands today** — `python -m whetstone_gate.world.selftest`, run by ARCH
+BUILD `3af1c9d2` on 2026-09-01 once the console defect below was fixed, at zero token cost:
+
+```
+MUST-FIRE rows that fire at the world's RAZORPAY BOUNDARY and that NO tool in the five-tool
+surface can reach (6 rows). RS-12 requires BOTH halves - model the key, expose no way to set
+it - and RS-69 records that settlements.go declares no currency. Q-041:
+  RS-07  keys off X-Refund-Idempotency; refunds.go:75 passes nil (RS-12)
+  RS-08  keys off X-Refund-Idempotency; refunds.go:75 passes nil (RS-12)
+  RS-09  keys off X-Refund-Idempotency; refunds.go:75 passes nil (RS-12)
+  RS-10  keys off X-Refund-Idempotency; refunds.go:75 passes nil (RS-12)
+  RS-31  'the same request' has a referent only via the idempotency key (RS-12)
+  RS-40  keys off a settlement `currency`; settlements.go declares none (RS-69)
+```
+
+⚠️ **It printed nothing at all until 2026-09-01.** `main()` ended in a bare `print()` and died on
+the operator's console with `UnicodeEncodeError` before reaching this heading — so the counted set
+this ruling turns on existed, was asserted by a test, and **was invisible to the one human it was
+written for.** `INCIDENTS.md` **INC-25**.
 
 ---
 
@@ -3297,9 +3418,12 @@ closes it, before `prereg-v1`"* — and `RAZORPAY_SEMANTICS.md` is outside this 
 ---
 
 ### Q-043 — ⚠️ `tests/test_c2_world.py`'s C2/C4 fence test is UNSATISFIABLE by any correct C4, and `make test` is RED because of it
-**Raised by:** C4 BUILD (`7904e0a2`) · **Date:** 2026-09-01 · **Status:** **OPEN**
-**Blocking:** **`make test` is RED.** 389 passed, **1 failed**, 1 skipped, 2 deselected. Nothing else
-is blocked: every C4 done-when clause is met and the failure is this one test.
+**Raised by:** C4 BUILD (`7904e0a2`) · **Date:** 2026-09-01 · **Status:** **RULED AND CLOSED**
+(architect, 2026-09-01) — *the red is gone; fixed in `9c5dbb5` by ARCH BUILD `3af1c9d2`. One
+LIMITATION of the token list was found while proving the flip and is recorded below; it is not a
+regression and it is not closed*
+**Blocking:** **`make test` WAS RED.** 389 passed, **1 failed**, 1 skipped, 2 deselected. Nothing
+else was blocked: every C4 done-when clause was met and the failure was this one test.
 **Deviation class:** **A** — a tagged chunk's test is red and this session did not fix it.
 
 **Context.** `tests/test_c2_world.py::test_the_world_ships_no_tool_surface_no_rejections_and_no_in_flight_window`
@@ -3360,7 +3484,57 @@ The file is C2's and the prompt says *"you do not rewrite it"*, so it was left e
 the falsehood is reported rather than quietly corrected. C4's modules are reached by their full paths
 (`whetstone_gate.world.semantics`) and `__init__.py` was not extended either, for the same reason.
 
-**RULING (architect, <date>):** *<pending>*
+**RULING (architect, 2026-09-01):** *The test's PROPERTY is right and its SCOPE is wrong. The
+property — "C4's work did not reach backwards into C2's modules" — is worth keeping and is exactly
+what C2's review was entitled to assert. The scope — "no file anywhere under `world/`" — was an
+assertion about the SPECIFICATION and it was false from the moment it was written, merely not yet
+exercised. Narrow it to C2's four modules, derived from `world/__init__.py`'s own relative imports
+rather than transcribed, so it cannot drift. C2's tag STANDS: the review that passed it was correct
+about C2, and this is a later chunk revealing a latent over-reach, not a defect in what C2 shipped.*
+*⚠️ C4 ALREADY BUILT THE CORRECTLY-SCOPED VERSION at
+`tests/test_c4_world_semantics.py::test_c2s_own_modules_still_ship_no_tool_surface_...`. Do NOT
+duplicate it. Narrow C2's test to the same scope and note in its docstring that C4's is the
+forward-looking twin, or make C2's assert the same property over the same derived set — your
+choice, stated with its reasoning. What must NOT happen is two tests drifting apart.*
+
+**The choice taken, and its reasoning** (ARCH BUILD `3af1c9d2`, commit `9c5dbb5`). **Both halves of
+the ruling's option, because the ruling's one prohibition is satisfied by neither half alone.** The
+test is narrowed to C2's four modules **using the same derivation as the twin** — `world/__init__.py`'s
+own relative imports, which is **C2's own file** and therefore the one place that says what C2
+shipped — and its docstring names the twin. **And the token list is not merely intended to stay
+equal to the twin's: it is compared against the twin's own tuple, parsed out of
+`tests/test_c4_world_semantics.py` by AST, and a divergence in either direction is this test's
+failure.** A docstring note records the relationship; only an assertion enforces it, and this file's
+own words are *"the cheapest way to keep a fence honest is to assert it rather than to intend it."*
+The `world_modules` fixture is deliberately **not** touched: three package-wide purity scans use it
+and every one of them *wants* to grow with the package, which is INC-23's diagnosis — one fixture
+serving two opposite intentions — addressed rather than repeated.
+
+**PROVED IN BOTH DIRECTIONS BEFORE IT WAS COMMITTED**, over a mirror of C2's four modules in a temp
+directory (nothing under `src/` was edited to establish it): it **passes** on the tree as it stands
+and on a clean mirror; it **fails** on each of the **eleven** definitions C4 actually shipped —
+`razorpay_api_create_refund`, `_check_idempotency`, `in_flight`, `_capture_payment`,
+`_fetch_payment`, `_create_instant_settlement`, `harm_records`, `_create_refund`,
+`idempotency_keys_seen`, `_fetch_payments`, `mark_in_flight` — planted one at a time into
+`amounts.py`; on one token planted in **each** of the four modules, so no module is scanned by
+accident; on a twin that drops a token and on a twin renamed away; and on a `world/__init__.py`
+whose relative imports no longer name C2's four.
+
+⚠️ **ONE LIMITATION OF THE TOKEN LIST, FOUND BY PROVING THE FLIP, AND IT IS NOT A REGRESSION.** The
+eleven tokens are snake_case and the match is `token in name.lower()`, so a **CamelCase** definition
+does not contain one: a `class CreateInstantSettlementResult` or `class S4WindowState` planted in
+`amounts.py` passes both this fence **and its twin**. The list is **unchanged** by this correction
+and is **identical** in the twin, so this is the reach of the original proxy rather than anything
+this scope correction did — INC-23 already calls the tokens *"a proxy for C4's work is here"*.
+**It was NOT fixed here, deliberately and on two grounds**: widening the list would break the
+twin-identity assertion the ruling requires, and `tests/test_c4_world_semantics.py` — where the
+matching change would have to land in the same commit — was outside this session's fence.
+**OWED** to whoever holds both files: either match case-insensitively on a normalised name
+(`name.lower().replace("_", "")` against de-underscored tokens) or lift the eleven into one shared
+constant both files import. ⚠️ **Note what the limitation does and does not cost**: C4's real
+modules are caught — all eleven of its snake_case definitions fire this test — so the fence works
+against what actually exists; what it would not catch is a *future* C4-class definition named in
+CamelCase. Recorded rather than left as a surprise for the session that meets it.
 
 ---
 
