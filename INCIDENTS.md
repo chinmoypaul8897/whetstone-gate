@@ -2144,3 +2144,84 @@ hash. The three kept tests (`test_the_digest_excludes_prev_hash_and_hash_and_inc
 does not carry. ⚠️ **What is NOT claimed: that this closes the class.** The general defect is *a
 checker that reads input through the schema it expects*, and the only thing standing between
 this package and the next instance of it is that one expression is now written by exclusion.
+
+## INC-33 — the ledger's READ path re-hashed whatever it was handed, so it laundered a tampered episode into a valid one — and it returned a happy object on all three of golden 5's tamper cases, including the CONTROL
+
+**Date:** 2026-09-01 (C7 BUILD `3a6e3d07`. Present in `6d9cd47`, the package's first commit;
+found the same session by an adversarial re-check of the chunk against golden 5 **from the read
+side**, which no test in `b8cd28c` had done. Fixed in `669d6af`.)
+
+**Event:** `store.read()` → `store.from_document()` → `chain.rebuild()` re-appended each stored
+row through `Ledger.append`, which **recomputes** every digest from the contents it is handed.
+`prev_hash` and `hash` were never read at all. So a **tampered** document produced a
+**perfectly self-consistent** ledger, and `chain.verify_ledger()` on the result could not
+return `DETECTED` **for any input whatever** — it was checking arithmetic `rebuild` had just
+performed. Measured against the golden this chunk exists to satisfy:
+
+```
+   golden 5 case     expected     verify(stored bytes)     store.from_document()
+   A  intact         VALID        VALID                    accepted   (correct)
+   B  CONTROL        DETECTED     DETECTED                 ACCEPTED   <- wrong
+   C  altered value  DETECTED     DETECTED                 ACCEPTED   <- wrong
+   D  altered prior  DETECTED     DETECTED                 ACCEPTED   <- wrong
+```
+
+Three further consequences, all measured: a document whose entries carried **no `hash` and no
+`prev_hash` at all** was accepted; `ledger_seq` was silently **renumbered by position**, which
+rewrites the de-duplication key §12.2's reporting rule 3 is computed on; and
+`store.write(new, store.read(tampered))` **laundered a tamper into a publishable episode**.
+
+**Action:** `rebuild` now runs `verify` against the **stored bytes first** and raises the new
+typed `TamperDetected` carrying the failing `ChainVerdict`; each re-appended entry is then
+required to be **identical to the row it came from**, which turns the round trip into a check
+instead of a tautology. `stored_entries` stopped coercing rows so a verifier can still report on
+a file rather than crash. Six kept tests were added, including one that asserts the intact case
+is still **accepted** — without it, "refuses B, C and D" would be satisfied by refusing
+everything.
+
+**Expectation:** `PROCESS.md` §5.1, on the ledger: *"Any mutation of a prior entry must be
+detectable."* The obviously-named read API detected none of them, and `PROCESS.md` §12.1's C8
+row builds the scorer on *"the local chain"* — a scorer written against `store.read()` would
+have had **zero** tamper detection and a `verify_ledger` that always said VALID.
+
+**Missing:** ⚠️ **A test that came at the golden from the READ side.** `b8cd28c` verified all
+four cases through `chain.verify` and reproduced case A through the **writer**, which is both
+directions of the *chain* and only one direction of the *package*: the golden was never once
+handed to `store.from_document`. The one round-trip assertion that existed,
+`assert chain.verify_ledger(reread).ok`, is the tautology itself — **a test that cannot fail on
+the property it names**, sitting in the review trail looking like assurance. Hard rule 6 forbids
+weakening a test; nothing forbids writing one that was never strong.
+
+**Missed:** ⚠️ **THE SESSION'S OWN DOCSTRINGS STATED THE CORRECT BEHAVIOUR AS THOUGH IT WERE
+IMPLEMENTED, IN THREE PLACES, AND EACH READS AS A CLAIM RATHER THAN AN INTENTION.**
+`store.read_document` said *"`read` rebuilds and **would raise** on a document a verifier is
+supposed to report on"* — it did not raise on B, C or D. `store.from_document` and
+`chain.rebuild` both said *"a document that round-trips unchanged is one whose contents really
+do produce its stored chain"* — a **true conditional whose antecedent nothing ever evaluated**,
+and the caller was handed no way to evaluate it. ⚠️ **And INC-32, written by this same session
+about this same file forty minutes earlier, is the identical root cause one function along:**
+*"a checker that reads input through the schema it expects"*. `rebuild` read input through
+`APPEND_FIELDS` and ignored the two fields that carry the evidence. **The diagnosis was already
+written down, by the same person, about the same module, and was not generalised.**
+
+**Diagnosis:** Rebuilding by re-appending makes the output valid **by construction**, so any
+check applied to the output is vacuous; the only place a stored chain can be checked is against
+the bytes as stored, before anything is recomputed. **Order, not arithmetic** — the hash rule
+was correct throughout and the verifier was already right.
+
+**Fix:** `669d6af` — `src/whetstone_gate/ledger/chain.py` (`TamperDetected`, `rebuild` verifies
+first and requires row-for-row identity) and `store.py` (`read`/`from_document`/`read_document`
+docstrings corrected to what the code does, `stored_entries` uncoerced). The three docstrings
+that asserted the unimplemented behaviour were **corrected rather than deleted**, so the diff
+shows what was claimed.
+
+**Systemic guardrail:** **Partial, and the honest split is worth more than the claim.**
+*Landed:* the golden is now driven from **both** sides — `test_the_read_path_REFUSES_every_tampered_golden_5_case`
+over B, C and D, with `test_the_read_path_accepts_the_intact_case_so_the_refusal_is_not_blanket`
+as its control — plus `test_the_round_trip_is_a_check_and_not_a_tautology` and
+`test_read_then_write_cannot_launder_a_tamper_into_a_publishable_episode`.
+*NOT landed, and it is the general form:* **nothing in this repository detects a test whose
+assertion cannot fail.** `assert chain.verify_ledger(reread).ok` passed for every input the
+function accepted, and no mutant, no scan and no review step is watching for that shape. Naming
+it is all this session can do; a mutation harness over `ledger/` would catch it, and that is a
+REVIEW deliverable (`PROCESS.md` §5.3's ≥8 mutants for a `full` chunk), not a build one.
