@@ -1551,7 +1551,7 @@ all of them, a Class A deviation recorded in no `QUESTIONS.md` entry, no Class B
 the build report. §8.6 dissolves the tension outright and nobody looked: the denial is **one authored
 constant string**, so equality against it needs no gate object and leaks no arm identity.
 
-**Fix:** `SEE-FIX-SHA-INC-26` — the loop folds only an exact match against the generic denial read
+**Fix:** **`17585ab`** (the loop, `context.py`'s `Origin.CORPUS`, `texts.generic_denial`, `data/generic_denial.txt`) and **`6d124f8`** (the probes) — the loop folds only an exact match against the generic denial read
 from `data/`; `_seed_hint` moves to `Origin.CORPUS`; `tests/test_c6_fix_probes.py` re-runs all four
 blindness claims over `run_episode`'s own contexts and pins the 19-of-20 case, shown RED before and
 GREEN after.
@@ -1629,7 +1629,7 @@ core logic"* — true, and irrelevant: a deterministic function of `(episode see
 across the whole corpus **and** keeps hard rule 10's byte-identity, and `seed_for_turn` did not
 accept the seed.
 
-**Fix:** `SEE-FIX-SHA-INC-27` — stratified selection across all four corpora with a seed-derived
+**Fix:** **`2911ad0`** (the stratified selection and the reachability guard) and **`6d124f8`** (the probes) — stratified selection across all four corpora with a seed-derived
 within-corpus index; `coverage_report()` refuses a selection that cannot reach every corpus
 `load_entries` loaded and prints offered-versus-loaded as a number (hard rule 11); probes assert that
 every corpus is offered in every episode, that two seeds differ, that one seed repeats, and that two
@@ -1698,7 +1698,7 @@ not picture produces a fence violation that is indistinguishable, from inside th
 creep. Two prior instances were each closed at the level of the individual file rather than at the
 level of the mechanism.
 
-**Fix:** `SEE-FIX-SHA-INC-28` — no behaviour change; the file was written, the reasoning recorded in
+**Fix:** **`0479f1a`** (Q-049 recorded) and **`17585ab`** (the file itself, `data/generic_denial.txt`) — no behaviour change; the file was written, the reasoning recorded in
 `QUESTIONS.md` Q-049, and the two out-of-fence consequences named as owed rather than quietly taken.
 
 **Systemic guardrail:** ⚠️ **None from this session, and the words are the honest ones: none —
@@ -1711,5 +1711,95 @@ only place the check can live, because the fence and the tasks exist only in the
 ⚠️ **Recorded as the THIRD occurrence rather than as this session's inconvenience**, per INC-21's own
 note that the under-reporting pressure is strongest exactly where a defect *"reads badly and cost
 nothing"*. This one cost nothing at all, and the count is the entire finding.
+
+---
+
+## INC-29 — a C6 test asserts a byte-constant context that no correct §13.3 summary can produce, and it was green only because the summary it measured was pinned at the truncation cap
+
+**Date:** 2026-09-01 (defect shipped with C6 BUILD `4377265b`, 2026-08-31; **exposed** — not
+introduced — by C6 FIX `7b99a85a`'s F-1 remedy the same day. It is the reason `make test` is
+**1 failed, 442 passed** at the end of that session.)
+
+**Event:** `tests/test_c6_attacker.py::test_the_windowed_context_stops_growing_which_is_what_the_window_is_FOR`
+went RED the moment the F-1 fix landed:
+
+```
+AssertionError: the context is still growing after the window filled:
+  [6038, 6038, 6038, 6038, 6037, 6037, 6037, 6037, 6037, 6037, 6037, 6037, 6037]
+assert 2 == 1  where 2 = len({6037, 6038})
+```
+
+⚠️ **The context does not grow. It falls by one token, once, and never rises.** The
+assertion is `len(set(steady)) == 1` — byte-constancy — where the test's own name, docstring
+and failure message all say *"stops growing"*.
+
+**Action:** Measured the cause rather than adjusting anything. Instrumented every
+:class:`ContextPart` of turns 10, 11 and 12 of the failing fixture:
+
+```
+turn 10   authored  deterministic summary   len=196  est=66
+turn 11   authored  deterministic summary   len=195  est=65      <- the whole delta
+          (every other part byte-identical: sys 706, schemas 16, 6x world 2810, 6x attacker)
+```
+
+The summary is one character shorter at turn 11 because `CONTEXT.md` §8.6's folded state
+carries **`turns_remaining`**, which counts `20 … 1`, and at turn 11 it goes from `10` to
+`9` — **two decimal digits to one**. `ceil(196/3) = 66` and `ceil(195/3) = 65`.
+
+**Expectation:** A test named *"the windowed context stops growing"* should assert that the
+context stops growing, which is the property `CONTEXT.md` §13.3 actually buys and the reason
+the window is mandatory. Instead it asserts a strictly stronger property — byte-constancy —
+that **§8.6 makes unachievable for any `turn_budget ≥ 10`**: a correct summary must carry
+`turns_remaining`, that field's decimal width must narrow somewhere in the run, and the
+width change is not ours to pad away without emitting `"09"` and changing §8.6's JSON shape.
+
+**Missing:** Any test that distinguishes *"the context stopped growing"* from *"the context
+is byte-identical"*. ⚠️ **One exists and it is green:** C6 REVIEW 1's own kept probe
+`tests/test_c6_review_probes.py::test_the_loop_makes_one_call_per_turn_and_the_window_stops_growing_on_a_REAL_payload`
+asserts `not [i for i in range(1, len(tail)) if tail[i] > tail[i-1]]` — **non-growth, the
+correct form** — and it passes on the fixed source. So the property is covered; what is red
+is the over-strict statement of it, and the review had already written the right one without
+remarking that C6's differed.
+
+**Missed:** ⚠️ **The reason this test was ever green is the reason INC-26 was ever green, and
+this session wrote INC-26 before it hit this.** Before the F-1 fix the loop folded the last
+**tool result** into the summary; in this fixture that result is a ~2,810-character
+twelve-payment listing, so the summary was **truncated to exactly `token_cap × divisor`
+characters on every turn** and its length could not vary. **`turns_remaining` was changing
+underneath a constant the whole time and the truncation cap hid it.** Both defects are the
+same sentence — *green by accident of payload size* — and the second was sitting four
+hundred lines from the first in the same file. This session had already written that phrase
+into `INCIDENTS.md` INC-26 and did not think to ask where else it applied; it found this by
+running the suite, not by looking.
+
+**Diagnosis:** The assertion states a property (byte-constancy) strictly stronger than the
+one its own docstring names (non-growth) and stronger than §8.6 permits, and it passed only
+because the value it measured was clamped by a truncation cap that the F-1 fix correctly
+removed — so a correct implementation of `CONTEXT.md` §13.3 cannot make it green. It is
+`INCIDENTS.md` **INC-23**'s shape exactly: *"a fence test written by C2 asserted the negation
+of `CONTEXT.md` §16, so `make test` goes RED the moment C4 lands, and no correct C4 can make
+it green."*
+
+**Fix:** ⚠️ **NOT FIXED BY THIS SESSION, DELIBERATELY, AND THERE IS NO SHA — this field says
+so rather than being left blank.** `tests/test_c6_attacker.py` is an **existing test file**
+and this session's scope fence names those under `NOT`. Two further reasons make that the
+right answer and not merely the obedient one: **(i)** hard rule 6 requires a test flip to be
+*provably meaningful — it fails on the old code*, and relaxing `len(set(steady)) == 1` to a
+non-growth check would **pass on the old code too**, which is precisely the shape a session
+must not apply to its own work; **(ii)** the identical situation, INC-23 / `QUESTIONS.md`
+Q-043, was resolved by an **architect** session (`3af1c9d2`) and not by the session that
+found it. Raised as `QUESTIONS.md` **Q-050** with the measurement above and the exact
+one-line remedy.
+
+**Systemic guardrail:** ⚠️ **None landed, and the honest words are: none — accepted, because
+the file it belongs in is fenced out of this session.** What is proposed, and what this
+session can evidence rather than assert: **an equality assertion over a derived size is
+almost always an over-statement of the property it is named for**, and this repository now
+has two instances of the same root cause — a value clamped by a cap, mistaken for a value
+that does not vary. The cheap general check is the one C6 REVIEW 1 already wrote by
+instinct: assert the **direction** (`no element exceeds its predecessor`), not the **set
+cardinality**. ⚠️ **What is NOT claimed:** nothing forces that, and this entry does not
+pretend a convention is a mechanism — INC-25's own conclusion about `_console.say` is that
+*"a convention with no mechanism behind it"* is exactly how a rule fails the sixth time.
 
 ---

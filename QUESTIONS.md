@@ -3821,6 +3821,90 @@ three are rather than living behind one bespoke test.
 
 ---
 
+### Q-050 — ⚠️ STOP: a C6 test asserts a byte-constant context that no correct §13.3 summary can produce, and `make test` is RED because of it
+**Raised by:** C6 FIX (`7b99a85a`) · **Date:** 2026-09-01 · **Status:** **OPEN — BLOCKING a
+green suite; nothing else in the fix is blocked** · **Class:** **A** on the test, **none** on
+the source — no source change is proposed here.
+**`INCIDENTS.md`:** **INC-29**.
+
+**Context.** `tests/test_c6_attacker.py::test_the_windowed_context_stops_growing_which_is_what_the_window_is_FOR`
+went RED when this session landed the F-1 remedy Q-046 ruled. **The context does not grow; it
+falls by one token, once.**
+
+```
+per-turn estimate, turns 7..19:
+  [6038, 6038, 6038, 6038, 6037, 6037, 6037, 6037, 6037, 6037, 6037, 6037, 6037]
+assert len(set(steady)) == 1   ->   2 == 1
+```
+
+**The cause, measured part by part rather than reasoned about:**
+
+```
+turn 10   authored  deterministic summary   len=196  est=66
+turn 11   authored  deterministic summary   len=195  est=65     <- the entire delta
+          every other part byte-identical (sys 706, schemas 16, 6x world 2810, 6x attacker)
+```
+
+`CONTEXT.md` §8.6's folded state carries **`turns_remaining`**, which counts `20 … 1`. At
+turn 11 it goes from `10` to `9` — **two decimal digits to one** — and `ceil(196/3) = 66`
+while `ceil(195/3) = 65`.
+
+⚠️ **SO THE ASSERTION IS UNSATISFIABLE BY ANY CORRECT IMPLEMENTATION, FOR ANY
+`turn_budget ≥ 10`.** §13.3 requires the summary to carry §8.6's folded state; §8.6's shape
+puts `turns_remaining` in it as an `int`; an int's decimal width must narrow somewhere in a
+20-turn run; and padding it would emit `"09"` and change §8.6's JSON shape. **There is no
+source change that makes this green and is also correct.**
+
+⚠️ **AND IT WAS ONLY EVER GREEN BY ACCIDENT OF PAYLOAD SIZE — THE SAME SENTENCE AS F-1.**
+Before the fix the loop folded the last **tool result** into the summary; in this fixture
+that is a ~2,810-character twelve-payment listing, so the summary was **truncated to exactly
+`token_cap × divisor` characters every turn** and could not vary. `turns_remaining` was
+changing underneath a constant the whole time, and the truncation cap hid it. `INCIDENTS.md`
+**INC-29** records that this is the second instance of F-1's own root cause, four hundred
+lines away in the same file.
+
+**The property is NOT uncovered while this is open.** C6 REVIEW 1's kept probe
+`tests/test_c6_review_probes.py::test_the_loop_makes_one_call_per_turn_and_the_window_stops_growing_on_a_REAL_payload`
+already asserts the correct form — *no element exceeds its predecessor* — and it is **green**
+on the fixed source. The review wrote the right statement of the property without remarking
+that C6's differed.
+
+**Options seen:**
+  1. ⚠️ **Relax the assertion to the property its own name states** — `len(set(steady)) == 1`
+     becomes *"no element exceeds its predecessor"*, citing Q-046. **One line.** This is what
+     the reviewer's probe already does. **Outside this session's fence:**
+     `tests/test_c6_attacker.py` is an **existing test file** and the fence names those under
+     `NOT`. ⚠️ **And hard rule 6 independently forbids this session from doing it:** a flip
+     must be *"provably meaningful (it fails on the old code)"*, and the relaxed assertion
+     **passes on the old code too**. A session relaxing an assertion over its own change is
+     the exact move rule 6 exists to prevent, whatever the merits.
+  2. **Pad `turns_remaining` to a fixed width.** Rejected: it changes §8.6's JSON shape, and
+     §8.6 is a pre-registration artefact whose shape arm 2S's prompt also depends on.
+  3. **Shorten `turn_budget` below 10.** Absurd — it is a §8.6 constant and the run's size.
+  4. **Leave the summary pinned at the truncation cap** so the constancy survives. That is
+     the defect F-1 exists to remove, and it would put world text back on the AUTHORED
+     surface. Rejected outright.
+  5. **Delete the test**, relying on the reviewer's probe. Rejected: hard rule 6, and the
+     test's *fixture* is good — it is the assertion that overstates.
+
+**Default taken:** ⚠️ **NONE — work stopped on this item and the red is REPORTED rather than
+worked around**, which is hard rule 1's instruction and `CLAUDE.md` §4's (*"STOP and report
+instead of working around it"*). Every other part of the fix landed.
+
+**Precedent, and it is exact.** `INCIDENTS.md` **INC-23** / `QUESTIONS.md` **Q-043**: *"a
+fence test written by C2 asserted the negation of `CONTEXT.md` §16, so `make test` goes RED
+the moment C4 lands, and no correct C4 can make it green."* That was raised by the session
+that hit it and **closed by an architect session (`3af1c9d2`) editing the test**, during C6's
+own review. This is the same situation and is offered for the same disposition.
+
+**What the architect is asked to rule:** whether option 1 stands, and which session applies
+it. The suite is **1 failed, 442 passed, 1 skipped, 2 deselected** until it does; the single
+failure is this one and its cause is measured above.
+
+**RULING (architect, <date>):** *<pending>*
+
+---
+
 ## Rulings carried in from before the repository existed
 
 These were made by the architect in `PROJECT_SPEC.md` before C0 and are **already binding**. They
