@@ -106,7 +106,7 @@ from .entry import (
     ARMS,
     CHAIN_FIELDS,
     CONTENT_FIELDS,
-    EXECUTED,
+    WIDENED_FIELDS,
     VERDICTS_BY_ARM,
     LedgerEntry,
     LedgerEntryError,
@@ -359,6 +359,7 @@ class Ledger:
         verdict: str,
         tool: str,
         target: str,
+        receipt: str | None,
         amount_paise: int | None,
         a_class: str | None,
         rejected_by_razorpay: bool,
@@ -380,6 +381,17 @@ class Ledger:
         argument would silently record every executed action as one that never happened, which
         is Q-062's own defect pointed the other way. Hard rule 9's *"a missing required value is
         a hard refusal, never a silent fallback"* is the same principle one layer down.
+
+        ⚠️ **``receipt`` IS REQUIRED AND HAS NO DEFAULT EITHER** (`QUESTIONS.md` **Q-066**), and
+        the reason is **not** the same as ``executed``'s, which is why it is stated separately
+        rather than folded in. ``executed`` has no defensible default because ``False`` is a
+        *claim*. ``receipt``'s natural default, ``None``, is a claim too — *"this call carried
+        no receipt"* — and it is the claim that makes `CONTEXT.md` §9.2's **S2** unfireable: a
+        caller who forgot the argument would write a ledger in which **every** refund omitted
+        its idempotency key, which is exactly the invisibility Q-066 exists to end, restored by
+        an omission instead of by a schema. **A default here would be Q-066's own defect
+        reintroduced inside Q-066's fix.** It is read from the call's arguments by
+        :func:`whetstone_gate.ledger.build.receipt_of` and never synthesised.
         """
         content = {
             "ledger_seq": len(self._entries) + 1,
@@ -388,6 +400,7 @@ class Ledger:
             "verdict": verdict,
             "tool": tool,
             "target": target,
+            "receipt": receipt,
             "amount_paise": amount_paise,
             "a_class": a_class,
             "rejected_by_razorpay": rejected_by_razorpay,
@@ -468,6 +481,12 @@ def verify(
     **B** and **C** off their golden seqs, and leaving **D** at ``DETECTED``/1, *the right
     verdict at the right seq for an entirely fabricated reason*. `INCIDENTS.md` **INC-34**.
 
+    ⚠️ **AND `QUESTIONS.md` Q-066 IS THE SECOND WIDENING, WHICH IS WHY THIS PARAGRAPH IS KEPT
+    RATHER THAN TREATED AS HISTORY.** ``receipt`` landed on the same day, against the same
+    golden, and this function needed **no change at all** to keep reproducing all four cases —
+    which is the property INC-34's fix bought and the only evidence that it was the right fix.
+    A schema-coupled verifier would have failed identically a second time; this one did not.
+
     ⚠️ **NOTHING IS WEAKENED BY REMOVING IT, AND THAT IS CHECKABLE RATHER THAN ASSERTED.** A
     missing content field changes the body, so the recomputed digest no longer matches the
     stored one and the entry is ``DETECTED`` **at its own seq** — which is strictly more useful
@@ -542,8 +561,13 @@ def verify(
         # ⚠️ EVERYTHING EXCEPT THE TWO CHAIN FIELDS IS HASHED, which is the golden's hash_rule
         # read literally — "the canonicalised entry EXCLUDES prev_hash and hash" excludes those
         # two and nothing else. Selecting CONTENT_FIELDS instead would silently DROP a
-        # smuggled fourteenth key from the digest and return VALID on an entry somebody had
-        # added a field to. `INCIDENTS.md` INC-32.
+        # SMUGGLED EXTRA key from the digest and return VALID on an entry somebody had added a
+        # field to. `INCIDENTS.md` INC-32.
+        # ⚠️ THIS COMMENT SAID "a smuggled FOURTEENTH key" UNTIL Q-066 MADE THE SCHEMA FIFTEEN,
+        # at which point the ordinal named the wrong key and the sentence quietly stopped being
+        # true. It is spelled without an ordinal now, because the property has nothing to do
+        # with how many fields the schema has — and a comment that has to be renumbered every
+        # time the schema moves is a comment that will eventually not be.
         body = {name: value for name, value in stored.items() if name not in CHAIN_FIELDS}
         try:
             recomputed = entry_digest(expected_prev, body, algorithm=algorithm)
@@ -635,13 +659,23 @@ def rebuild(
             # schema: golden 5's own twelve rows are that document.
             name = exc.args[0] if exc.args else "?"
             hint = ""
-            if name == EXECUTED:
+            # ⚠️ `KeyError` NAMES ONLY THE FIRST ABSENT FIELD, so the whole difference is
+            # recomputed here rather than inferred from that one name. This branch read
+            # `if name == EXECUTED:` until `QUESTIONS.md` Q-066 landed, and Q-066 put `receipt`
+            # EARLIER in APPEND_FIELDS than `executed` — so on golden 5, the exact document
+            # this hint exists for, the KeyError became 'receipt' and the hint SILENTLY STOPPED
+            # FIRING. That is `INCIDENTS.md` INC-34's class in its purest form: a message
+            # keyed to the schema it was written against, in the branch whose whole job is to
+            # explain a schema that has moved. It is now keyed to `WIDENED_FIELDS`.
+            absent = sorted(set(APPEND_FIELDS) - set(stored))
+            if absent and set(absent) <= set(WIDENED_FIELDS):
                 hint = (
-                    " ⚠️ The only field absent is 'executed', so this is a PRE-Q-062 document "
+                    f" ⚠️ The only fields absent are {absent}, so this is a PRE-Q-062 document "
                     "— tests/goldens/golden5_tamper.json is the one in this repository. Its "
                     "chain is INTACT and chain.verify says so; what it cannot do is become a "
                     "LedgerEntry of this schema. Golden 5B re-pins the writer under the "
-                    "14-field schema (QUESTIONS.md Q-062, RULED 2026-09-01)."
+                    "15-field schema (QUESTIONS.md Q-062 RULED and Q-066 GRANTED, both "
+                    "2026-09-01: 'executed' and 'receipt')."
                 )
             raise LedgerEntryError(
                 f"stored entry at position {position} lacks {name!r}. The chain verified — "

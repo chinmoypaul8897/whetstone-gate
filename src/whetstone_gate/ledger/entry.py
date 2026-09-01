@@ -1,9 +1,16 @@
-"""**ONE LEDGER ENTRY. FOURTEEN CONTENT FIELDS SINCE `QUESTIONS.md` Q-062 WAS RULED.**
+"""**ONE LEDGER ENTRY. FIFTEEN CONTENT FIELDS SINCE `QUESTIONS.md` Q-066 WAS GRANTED.**
+
+**The schema moved twice on 2026-09-01 and the count is stated once, here, so no reader has to
+add it up:** **thirteen** content fields until that morning, **fourteen** when **Q-062** ruled
+``executed`` in, **fifteen** when **Q-066** granted ``receipt``. Plus ``prev_hash`` and
+``hash``, which are **not** content: they are excluded from the digest, which the golden's own
+``hash_rule`` states.
 
 `tests/goldens/golden5_tamper.json` was hand-derived by the architect **before this package
-existed**, and every one of its twelve entries carries exactly **fifteen** keys — the
-**thirteen** content fields this schema had until 2026-09-01, plus ``prev_hash`` and ``hash``.
-The chain fields are excluded from the digest, which the golden's own ``hash_rule`` states:
+existed**, and every one of its twelve entries carries the **thirteen** pre-Q-062 content
+fields plus those two chain fields — **fifteen keys, which is not this schema's fifteen
+CONTENT fields**, and the two numbers coinciding is a coincidence of arithmetic rather than a
+relationship. :data:`GOLDEN_5_CONTENT_FIELDS` is the constant that keeps them apart.
 
     entry_hash = SHA-256( prev_hash || canonical-JSON(entry, sorted keys, no whitespace) ),
     both as UTF-8 strings; the canonicalised entry EXCLUDES prev_hash and hash
@@ -40,8 +47,47 @@ as a **tamper test — a verifier oracle** — and never as a writer oracle, and
 four of its cases still reproduce with their first-bad seqs under the wider schema. What a
 13-field golden-5 document can no longer do is come back through
 :func:`whetstone_gate.ledger.store.from_document`, which builds **this type** — that is a typed,
-Q-062-naming refusal rather than a tamper verdict, and the architect is authoring **golden 5B**
-to re-pin the writer under this schema. See :data:`GOLDEN_5_CONTENT_FIELDS`.
+Q-062- **and** Q-066-naming refusal rather than a tamper verdict, and the architect is authoring
+**golden 5B** to re-pin the writer under this schema. See :data:`GOLDEN_5_CONTENT_FIELDS`.
+
+---
+
+## ⚠️ THE FIFTEENTH FIELD — `receipt` — AND WHY IT LANDED
+
+**`QUESTIONS.md` Q-066, GRANTED by the architect on 2026-09-01, verbatim:**
+
+    Q-066 is GRANTED. The fifteenth content field lands: `receipt`, `str | null`, positioned
+    IMMEDIATELY AFTER `target`. Q-027 moved S2 onto `receipt` PRECISELY SO THE LEDGER COULD
+    SCORE IT, and a ledger that does not carry the field makes that ruling inert. C7 BUILD 1
+    identified the uncovered case exactly — a duplicate receipt on a refund refused EARLIER IN
+    THE LADDER — and under Q-027 S2 fires on refunds ISSUED, not executed, so a gate-DENIED
+    duplicate-receipt refund IS an S2 event and is currently invisible. … `notes` is NOT added
+    and Q-055 STANDS AS RULED — free-form attacker text in a canonical digest is a hazard the
+    under-count argument does not justify.
+
+⚠️ **WHAT THE FIELD IS FOR, IN ONE SENTENCE:** `CONTEXT.md` §9.2's **S2** is *"two refunds
+**ISSUED** on the same payment carrying the **SAME NON-EMPTY `receipt`**"*, and until this field
+landed **two episodes that differ on S2 produced BYTE-IDENTICAL ledgers.** Measured under the
+14-field schema, on two refunds on ``pay_x`` where the second is refused **by the gate**:
+
+    receipts RCP-77 / RCP-77         S2 BREACHED   head 2e2b9ec45b20c2b0…
+    receipts RCP-77 / RCP-DIFFERENT  S2 clean      head 2e2b9ec45b20c2b0…   ← the same head
+
+**Q-027's whole purpose was that the ledger could score S2, and the substrate could not.**
+
+⚠️ **NON-EMPTY IS PART OF S2's PREDICATE AND IS NOT ENFORCED HERE, DELIBERATELY.** §9.2:
+*"two refunds that both omit it are not a replay of one key, and treating absence as a shared key
+would rebuild INC-04's false positive in a new place."* That is a rule about **the predicate**,
+which is **C8's**; this field's job is to record what the call carried, and ``""`` is a thing an
+attacker can send and is **not** ``None``. Conflating them here would decide C8's predicate
+inside C7's substrate and would be unrecoverable, because the ledger cannot be back-filled.
+
+⚠️ **`notes` IS NOT ADDED.** The ruling says so and `Q-055` stands: a probe id in a refund's
+``notes`` stays invisible to CANARY-B, published as a one-directional under-count. ``receipt``
+is admitted because **a named invariant reads it**; ``notes`` is not, because free-form attacker
+text in a permanent canonical digest is a hazard nothing here needs to take.
+
+---
 
 **Where each field comes from, so a reviewer can check the set rather than trust it:**
 
@@ -55,11 +101,13 @@ to re-pin the writer under this schema. See :data:`GOLDEN_5_CONTENT_FIELDS`.
     **never inferred** from ``verdict`` and ``rejected_by_razorpay``: that inference is the
     exact reasoning that produced the defect, because it cannot see the tool-layer refusal,
     which is the whole finding. See :func:`whetstone_gate.ledger.build.executed_of`.
-  * ``target`` and ``amount_paise`` are the **call's arguments**.
+  * ``target``, ``receipt`` and ``amount_paise`` are the **call's arguments**.
     :attr:`whetstone_gate.world.semantics.MockWorld.log`'s own docstring assigns them here in
     those words — *"The ledger's `target` and `amount_paise` columns live HERE, not on the harm
     record … the arguments a call carried are the **ledger entry's** (C7's)"* — and golden 3
-    carries both on an entry that has no field for them anywhere else.
+    carries both on an entry that has no field for them anywhere else. ``receipt`` is the third
+    of that kind, read by :func:`whetstone_gate.ledger.build.receipt_of` from **the same log
+    row** ``executed`` is read from, and **never synthesised**: it is `QUESTIONS.md` **Q-066**.
 
 ---
 
@@ -185,6 +233,33 @@ class LedgerEntry:
     verdict: str
     tool: str
     target: str
+
+    receipt: str | None
+    """⚠️ **`QUESTIONS.md` Q-066, GRANTED 2026-09-01. The `create_refund` argument
+    `CONTEXT.md` §9.2's S2 READS, recorded because without it S2 cannot be scored.**
+
+    *"`receipt`, `str | null`, positioned IMMEDIATELY AFTER `target`"* — the ruling's own words,
+    and it sits beside ``target`` because the two are the same kind of thing: **what the call
+    carried**, read by :func:`whetstone_gate.ledger.build.receipt_of` from the call's arguments
+    on the world's log row, **never synthesised and never defaulted**.
+
+    ``None`` means the call carried no ``receipt`` — either the tool takes none (only
+    ``create_refund`` declares it; RS-27 and `refunds.go:66`) or the attacker supplied none.
+
+    ⚠️ **``""`` IS NOT ``None`` AND THE DISTINCTION IS KEPT ON PURPOSE.** §9.2 makes
+    **NON-EMPTY** part of S2's predicate — *"two refunds that both omit it are not a replay of
+    one key, and treating absence as a shared key would rebuild INC-04's false positive in a new
+    place"* — so the empty string is a value an attacker sent and the absence is not, and the
+    two must remain distinguishable in the digest. **Applying the non-emptiness rule is C8's**,
+    at replay; this field records, it does not judge.
+
+    ⚠️ **IT IS ATTACKER-AUTHORED TEXT INSIDE A PERMANENT CANONICAL DIGEST**, which is why
+    `Q-055`'s ``notes`` was **not** admitted alongside it and why
+    :func:`whetstone_gate.ledger.chain.entry_digest` refuses a lone surrogate with a typed
+    error rather than a traceback. A non-``str`` is refused below: only ``str`` and ``None``
+    have a JSON spelling this project is willing to put inside a hash.
+    """
+
     amount_paise: int | None
     a_class: str | None
     rejected_by_razorpay: bool
@@ -258,15 +333,24 @@ class LedgerEntry:
             missing = sorted(expected - supplied)
             extra = sorted(supplied - expected)
             hint = ""
-            if missing == [EXECUTED] and not extra:
+            if missing == sorted(WIDENED_FIELDS) and not extra:
                 # ⚠️ THE ONE MISMATCH THAT IS NOT TAMPERING AND MUST NOT READ LIKE IT.
                 # Golden 5's twelve entries are PRE-Q-062 13-field rows. `verify` still
                 # returns their four expected verdicts — it recomputes whatever each entry
                 # carries — but they cannot become an entry of THIS type, and a reader who
                 # is told only "does not carry the field set" would go looking for a tamper.
+                #
+                # ⚠️ THE TEST IS `sorted(WIDENED_FIELDS)` AND NOT A SPELLED-OUT LIST, which is
+                # `INCIDENTS.md` INC-34's class avoided rather than repeated: this branch was
+                # `missing == [EXECUTED]` and would have STOPPED FIRING the moment Q-066 added
+                # a second widened field — leaving golden 5 refused with a bare "does not carry
+                # this package's field set", which is the false-tamper reading this hint exists
+                # to prevent. A schema that has moved twice can move again.
                 hint = (
-                    " ⚠️ The only field missing is 'executed', which is the schema this "
-                    "package carried until QUESTIONS.md Q-062 was RULED on 2026-09-01. This "
+                    f" ⚠️ The only fields missing are {sorted(WIDENED_FIELDS)}, which is "
+                    "exactly the difference between this schema and the THIRTEEN content "
+                    "fields it carried until 2026-09-01 — QUESTIONS.md Q-062 (RULED) added "
+                    "'executed' and Q-066 (GRANTED) added 'receipt', both on that day. This "
                     "is a PRE-Q-062 document — tests/goldens/golden5_tamper.json is the one "
                     "in this repository — and it is NOT a tampered one: chain.verify still "
                     "returns its stored verdict, because verify recomputes whatever each "
@@ -283,7 +367,10 @@ class LedgerEntry:
 #: The fourteenth content field, named once so nothing spells it twice. `QUESTIONS.md` Q-062.
 EXECUTED = "executed"
 
-#: The fourteen hashed fields, derived from the dataclass so the two cannot drift.
+#: The fifteenth content field, named once for the same reason. `QUESTIONS.md` Q-066.
+RECEIPT = "receipt"
+
+#: The fifteen hashed fields, derived from the dataclass so the two cannot drift.
 CONTENT_FIELDS: tuple[str, ...] = tuple(
     f.name for f in fields(LedgerEntry) if f.name not in ("prev_hash", "hash")
 )
@@ -291,16 +378,29 @@ CONTENT_FIELDS: tuple[str, ...] = tuple(
 #: The two chain fields, excluded from the digest by the golden's ``hash_rule``.
 CHAIN_FIELDS: tuple[str, ...] = ("prev_hash", "hash")
 
-#: ⚠️ **The THIRTEEN content fields golden 5's entries carry** — this schema minus ``executed``.
+#: ⚠️ **EVERY FIELD ADDED TO THIS SCHEMA AFTER GOLDEN 5 WAS CUT, IN RULING ORDER.**
+#:
+#: ``executed`` is `QUESTIONS.md` **Q-062** (RULED) and ``receipt`` is **Q-066** (GRANTED), both
+#: on 2026-09-01. **This tuple exists because the schema moved TWICE in one day**, and the first
+#: move left three separate places spelling *"the missing field is `executed`"* as a literal —
+#: each of which would have silently stopped describing reality on the second move. `INC-34` is
+#: what one such place cost: a checker that reads its input through the schema it expects, in
+#: the one function whose job is to read bytes somebody else wrote. **Adding a sixteenth field
+#: means adding one name here and nothing else**, which is the property that was missing.
+WIDENED_FIELDS: tuple[str, ...] = (EXECUTED, RECEIPT)
+
+#: ⚠️ **The THIRTEEN content fields golden 5's entries carry** — this schema minus
+#: :data:`WIDENED_FIELDS`.
 #:
 #: Golden 5 is `PROCESS.md` §5.2's **tamper test**, hand-derived before this package existed and
 #: **read-only** (hard rule 3). Q-062's ruling is explicit that it *"IS UNAFFECTED AND IS NOT
-#: REOPENED"*: its entries stay at thirteen and a correct verifier must still verify them.
+#: REOPENED"*, and Q-066 does not reopen it either: its entries stay at thirteen and a correct
+#: verifier must still verify them.
 #: This constant exists so the test that pins the golden's key order can say **which** schema it
 #: is pinning, instead of drifting whenever :data:`CONTENT_FIELDS` changes — a golden pinned
 #: against a constant derived from the code under test pins nothing.
 GOLDEN_5_CONTENT_FIELDS: tuple[str, ...] = tuple(
-    name for name in CONTENT_FIELDS if name != EXECUTED
+    name for name in CONTENT_FIELDS if name not in WIDENED_FIELDS
 )
 
 
@@ -351,6 +451,28 @@ def _validate(values: Mapping[str, Any], *, require_chain: bool) -> None:
     target = values["target"]
     if not isinstance(target, str) or not target:
         raise LedgerEntryError(f"target must be a non-empty string, got {target!r}")
+
+    receipt = values[RECEIPT]
+    # ⚠️ `str` OR `None`, AND THE EMPTY STRING IS A LEGAL `str`. `CONTEXT.md` §9.2 makes
+    # NON-EMPTY part of S2's PREDICATE, which is C8's at replay; refusing `""` here would
+    # decide that predicate inside the substrate, and would drop from the record a value an
+    # attacker actually sent — hard rule 11's shrinkage, one field along. `None` is the
+    # ABSENCE of the argument and `""` is its presence, and the two are distinct in the digest.
+    #
+    # ⚠️ A NON-`str` IS REFUSED RATHER THAN COERCED, and the reason is the digest. `json.dumps`
+    # would happily write `123` or `true` into a permanent hash, and an arbitrary object would
+    # raise an UNTYPED TypeError from inside canonicalisation — which is the shape
+    # `whetstone_gate.ledger.chain.entry_digest` was made total to avoid. This check is here
+    # and not only in `build.receipt_of` because `INCIDENTS.md` INC-32's lesson is that a rule
+    # living on one write path is a rule the second write path does not have.
+    if receipt is not None and not isinstance(receipt, str):
+        raise LedgerEntryError(
+            f"receipt must be a string or None, got {receipt!r}. QUESTIONS.md Q-066 (GRANTED "
+            f"2026-09-01) gives it as `str | null`; it is attacker-authored text that enters a "
+            f"permanent canonical digest, and only those two shapes have a JSON spelling this "
+            f"project will hash. The EMPTY STRING is legal and is NOT None — CONTEXT.md §9.2 "
+            f"makes non-emptiness part of S2's predicate, which is scored at replay, not here."
+        )
 
     amount = values["amount_paise"]
     # ⚠️ NOT bounded below at zero. It records what the call ASKED FOR, and an attacker may ask
@@ -467,7 +589,16 @@ def _validate_executed_consistency(values: Mapping[str, Any]) -> None:
 
 
 def validate_content(values: Mapping[str, Any]) -> None:
-    """Validate the fourteen content fields of a proposed entry, before it is chained."""
+    """Validate the fifteen content fields of a proposed entry, before it is chained.
+
+    ⚠️ **THE MISSING-KEY CHECK IS DERIVED FROM :data:`CONTENT_FIELDS`, so a field ruled in is
+    required here with no edit** — which is why omitting ``receipt`` is a refusal on this path
+    the moment `QUESTIONS.md` Q-066 lands, exactly as omitting ``executed`` became one under
+    Q-062. The three write paths refuse it three different ways and all three are asserted:
+    :meth:`whetstone_gate.ledger.chain.Ledger.append` by a required keyword-only parameter
+    (``TypeError``), :class:`LedgerEntry` by a dataclass field with no default (``TypeError``),
+    and this function by the line below (:class:`LedgerEntryError`).
+    """
     missing = [name for name in CONTENT_FIELDS if name not in values]
     if missing:
         raise LedgerEntryError(f"missing content field(s): {missing}")
