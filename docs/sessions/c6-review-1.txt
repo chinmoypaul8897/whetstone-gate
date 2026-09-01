@@ -1,6 +1,8 @@
 SESSION-TOKEN: 2cd28cc5   CHUNK C6 - THE ATTACKER LOOP   ROLE: REVIEW   ATTEMPT 1
-PUSHED SHA: <recorded by the follow-up commit that edits this line, exactly as C1 FIX,
-            ARCH Q-029 and C6 BUILD each did - a commit cannot contain its own hash>
+PUSHED SHA: e8275444754a2659adf06d9d6db7869ee8ed4eca
+            (this block's own commit; the SHA is recorded by the follow-up commit that
+             edits this line, exactly as C1 FIX, ARCH Q-029 and C6 BUILD each did - a
+             commit cannot contain its own hash)
 
 =====================================================================
 VERDICT: FAIL
