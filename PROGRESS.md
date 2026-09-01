@@ -6,6 +6,207 @@ not a record; this file is.
 
 ---
 
+## C13 — THE CaMeL COMPARATOR — **REVIEW** attempt 1 — 2026-09-01 — 🚩 **FAIL, NO TAG** · but ⚠️ **`CONTEXT.md` v1.8 IS RIGHT and this review re-derived it from its own fetch**
+
+**SESSION-TOKEN:** `b450df0a` — **NOT in the batch.** Appended as
+`| `b450df0a` | C13 | REVIEW | 2026-09-01 |` and numbered **from the table**: 33 rows before it,
+so **row 34**. ⚠️ **The prose running total stops at the seventeenth (`3fb17baa`), because
+`9c0c6734` appended row 33 with no numbered paragraph — so the prose has DRIFTED from the table it
+counts, and a session trusting it is now off by one.** Recorded rather than continued (`OF-78`).
+⚠️ **E1 went red on this session, on schedule, and it is recorded rather than quietly avoided:**
+the Phase-1 seal was committed **before** the row, and
+`test_no_commit_carries_a_forged_or_reused_session_token` failed with
+`FORGED/UNISSUED: {'b450df0a': ['3964cd3']}`. `PROCESS.md` §5.4 — a gate that has never gone red is
+only decorative.
+
+---
+
+### 0. THE VERDICT, AND THE SENTENCE THAT MATTERS MORE THAN THE VERDICT
+
+**`FAIL`. `c13-pass` NOT CUT.** Two BLOCKERs, both about **a gate that does not guard what it says
+it guards**, and **neither about a number, a figure, or `CONTEXT.md` v1.8**.
+
+⚠️ **THE HIGHEST-VALUE ACT AVAILABLE TO THIS SESSION WAS TO OPEN THE PAPER ITSELF, AND IT DID.**
+`CONTEXT.md` was amended to **v1.8** on C13's reading of arXiv 2503.18813v2 — the law was changed
+on a third-party reading, in the one section a panelist is most likely to check, and **six false
+third-party claims have already reached this specification.** So this review fetched the paper on
+its own account — `https://arxiv.org/html/2503.18813v2`, HTTP **200**, **2026-09-01T12:42:31Z**,
+**2,554,718 bytes**, SHA-256 `b5cd7970e905f1504439c3eddb3855ab18d951d10bf806ec2f5f3baa02ca8a51`, a
+**third** independent fetch reproducing build 1's and build 2's byte for byte — wrote its own
+LaTeXML reader, and **resolved every table's appendix from the document's own `<section>` ids and
+appendix headings rather than from anybody's say-so**:
+
+| table | figure id | section | appendix |
+|---|---|---|---|
+| **2** | `A2.T2` | `A2` | **Appendix B — "Full results tables"** |
+| **4** | `A2.T4` | `A2` | **Appendix B** |
+| **5 / 6 / 7** | `A3.T5/T6/T7` | `A3` | **Appendix C — "Baseline results"** |
+
+`o3 High`: Native **84.5 % ± 7.2** Overall / **62.5 % ± 23.7** banking; CaMeL **77.3 % ± 8.3** /
+**81.2 % ± 19.1**; the paper's own Difference row **−7.2 % ± 1.1** / **+18.8 % ± 4.6**. Table 5
+banking undefended **81.25 % ± 19.12** vs CaMeL **75.00 % ± 21.22**; Table 6 **84.03 % ± 5.98** vs
+**70.83 % ± 7.42**; Table 7 CaMeL **0** in every suite, CaMeL-no-policies **1** Overall and **1**
+Banking. Base model of Tables 5-7 = **`Claude 3.5 Sonnet`**, established **three ways and never
+inside Appendix C** — §6.3's *"run with Claude 3.5 Sonnet"*, Figure 11's caption, and *"the
+defenses use a model (Claude 3.5 Sonnet)…"*.
+
+⚠️ **C13's READING IS CORRECT IN EVERY PARTICULAR. THE LAW IS RIGHT AND THE AMENDMENT WAS
+WARRANTED.** The likely mechanism `Q-058` records reproduces too: Table 5's **undefended**
+`81.25 ± 19.12` sits one hundredth from CaMeL's Table 2 `81.2 ± 19.1`.
+
+### 1. THE v1.8 AUDIT — every clause passes
+
+| assertion | result |
+|---|---|
+| version line right | ✅ title and `**Version:**` both `v1.8`; `2026-09-01, Q-057/Q-058` appended in the list's existing format |
+| **exactly the three sanctioned edits, nothing else moved** | ✅ 6 hunks, **+31 / −10**: hunks 1-3 = edit 1 (title, Version line, Amended entry); hunk 4 = §4's AgentDojo row; hunk 5 = §8.5.1's whole *Pre-declared decision* block; hunk 6 = §11.2's bullet. **No other section moved.** |
+| **no control byte other than LF** | ✅ byte-by-byte over all **215,473** bytes: `LF 2,339`, `CR 0`, `TAB 0`, **no `0x08`**, nothing else `< 0x20`, no `0x7f`. **INC-13 put a raw `0x08` in this exact file and it sat two days.** |
+| CR count unchanged | ✅ **0 → 0**; LF **2,318 → 2,339 = +21**, which is exactly `31 − 10` |
+| every §8.5 parser still resolves | ✅ all eight line-reference anchors, the interpreter size, the deny-by-default string, the gemini id, `max_tokens`, the 90-minute timebox, the Branch-B reason, P1/P2/P3 — the whole C13 file is **52 passed** |
+
+⚠️ **One thing is missing and it is NOT a C13 defect: v1.8 has no Change-log row.** C13 **declared
+it in the `2b376ee` commit message** — *"NOT DONE, AND DECLARED RATHER THAN SLIPPED IN … this
+session's fence permits three edits and no fourth. Raised."* That is correct conduct under hard
+rules 1 and 2. It is already `OF-63` and is **not duplicated under a second id**; it remains owed
+to the architect before `prereg-v1`, because the file's own Provenance block promises a reader can
+confirm the divergence *"is exactly the change log below and nothing else"* — a check the missing
+row breaks.
+
+### 2. PHASE 1 — SEALED AT `3964cd3` BEFORE ANYTHING SEALED WAS OPENED
+
+`docs/reviews/independent/c13_reimpl.py` — standalone, **imports nothing from `src/` and never
+imports the vendored trees** (importing CaMeL executes `models.py`, which imports three model
+clients). It **parses** them: `ast`, `git cat-file`, and a stdlib LaTeXML reader. **26 claims, 0
+unresolved.** With `c13_phase1_blind.md` (the raw findings) and `c13_reimpl_output.txt` (the
+committed output, `PROCESS.md` §9).
+
+Trees fetched **by this session into a fresh OS temp directory** — not the build's checkout:
+CaMeL `f083b6b3…` (clean, **0-byte** diff, 63 files, **2,174,188** blob bytes) and AgentDojo
+`928bbae8…` = `refs/tags/v0.1.34` (clean, **0-byte** diff, 25,082 files, **249,841,677** blob
+bytes, `runs/` = **99.16 %**). ⚠️ **All sizes from GIT BLOBS**: `interpreter.py` is **100,476**
+blob bytes / **2,716** lines and **103,192** on disk, and `100,476 + 2,716 = 103,192` exactly.
+
+**24 CLAIMS: 22 AGREE, 2 DIVERGE** (`c13_reimpl_diff.txt`). Everything reproduces — the pins and
+their **derivation from CaMeL's own `uv.lock`**, `base_url` = **0** over *all* file types not just
+`*.py`, the three-vs-two argument shapes with arity counted from the AST, the deny-by-default at
+`:96` proved **terminating** by `body[-1]` rather than asserted, the dispatch at **100-127** with
+its operator confirmed as **substring containment and not a prefix parse**, `+camel+secpol` emitted
+at 184/186/188 all inside the replay branch, `InjectionTask6`'s predicate at **331-338**, and every
+paper figure. **C13's newly-opened AgentDojo claim was re-verified here line by line and is
+exact**: `base_attacks.py:141-143` → `important_instructions_attacks.py:43` → the `{model}`
+jailbreak placeholder.
+
+⚠️ **AND PHASE 1 OPENED ONE THING NEITHER SIDE HAD: TABLE 4, APPENDIX B.** Banking, no-policies /
+with-policies: `Claude 4 Sonnet` 0/0 · `Claude 4 Sonnet*` 0/0 · **`Gemini 2.5 Flash` 0/0** ·
+**`Gemini 2.5 Pro` 0/0** · **`o3 High` 1/0** · **`o4 Mini High` 1/1**. **P2's shape holds on
+exactly TWO of the paper's seven configurations**; on `o4 Mini High` CaMeL *with* policies also
+fails one banking attack; and ⚠️ **on BOTH Gemini models the no-policies configuration records
+ZERO — so P2's published premise does not reproduce on the model family Branch A would actually
+run.** A Branch-A run blocking nothing on banking would be **consistent with the paper**. `OF-72`,
+due before C18 scores P1-P3.
+
+### 3. THE TWO BLOCKERS
+
+**B-1 — the RUN-1 same-working-directory claim cites DEAD CODE, and its failure mode is FALSE.**
+`replay_privileged_llm.py:321` is inside `replay_user_task`, called only by `replay_suite` (:344),
+called only by `replay_benchmark` (:356), **which has no caller anywhere in the tree and is never
+imported**. The live two-pass path is `main.py:67 → models.py:170/179 → PrivilegedLLMReplayer.query
+→ replay_task` (call at **:305**), whose trace path is built at **139-146** and read at **:148**.
+⚠️ **The derived statement is the opposite of the truth:** *"reads an empty tree and reports
+nothing rather than failing — a silent zero"* is the DEAD helper's `path.glob("*")`; the live path
+does `trace_path.read_text()` and raises an **UNHANDLED `FileNotFoundError`** —
+`PrivilegedLLMReplayer.query` has no `try/except` and AgentDojo's `run_task_with_pipeline` catches
+only `AbortAgentError`. **It crashes loudly.** ⚠️⚠️ **Mutation-tested, and the guards are
+ANTI-CORRELATED with the property: M15** (delete the three dead helpers — live behaviour
+**byte-identical**) → **both tests go RED**; **M16** (make the live path **absolute** — the
+requirement is destroyed) → **both stay GREEN**; **M17** (live replayer stops reading pass 1's logs
+at all) → **both stay GREEN**. One substring, `Path("logs") / pipeline_name`, occurring at exactly
+**321 and 341 — both dead** — because the live construction is split across lines.
+✅ **What is NOT wrong:** two passes, the token attribution, the flag derivation, the pipeline
+names, and **the same-cwd requirement itself, which is real**. **`CONTEXT.md` v1.8 §8.5.1 carries
+no line number and is correct as written.**
+
+**B-2 — Q-058's guardrail is a REFUSAL that no test binds.** `branch_b.py` states the standard:
+*"a property enforced only in a test file is a property that holds until somebody adds a figure
+without running the tests."* **Delete both `assert_provenance` calls from `render_branch_b` and the
+entire suite stays green.** `test_the_renderer_REFUSES_a_figure_with_incomplete_provenance` calls
+`assert_provenance` **directly and never calls the renderer**, though its docstring says the rule
+was *"moved into the renderer"*. The prompt's own standard: *"if it can be mutated and survive, the
+guardrail is decorative."* ⚠️ **The field checks themselves are strong — M2-M5, M6b, M7: six
+mutants, six kills, one per required field, and the `Tables 5-7` range case killed twice.**
+
+### 4. MUTANTS — **20 run: 16 killed, 2 proven equivalent, 3 survived**
+
+All on a **copy in a fresh OS temp directory**, proved isolated before one ran
+(`whetstone_gate.__file__` inside the temp tree); nothing in this repository or its `vendor/` was
+edited (INC-11, INC-17), and the temp CaMeL copy ends back at `f083b6b3…` with an empty `status`.
+⚠️ **One methodological finding worth keeping: C13's harness reads `git cat-file blob HEAD:<path>`
+and never the working tree — correct, and CRLF-proof — so the vendored-tree mutants had to be
+COMMITTED in the copy to count. A first attempt that only edited files produced three FALSE
+survivors, and reporting those would have been the review's own version of B-1.**
+The two equivalence proofs are explicit: **M6** (`fullmatch` still rejects `Tables 5-7` on the
+trailing `-7`, so widening the regex changes nothing — and **M6b**, the non-equivalent form, is
+killed twice) and **M12** (`require()` raises `UndeterminedValue` before the blank-string guard is
+reachable — equivalent **today**, and it stops being equivalent the moment RUN-1 writes the key,
+which is `OF-75`).
+
+### 5. STANDING PROPERTIES — all confirmed
+
+`make selftest` **RED on `camel_comparator.branch` and red FOR THAT REASON** — `1 failed, 1 passed,
+665 deselected`, on the loader **refusing** the `TODO_C13_RUN1` sentinel rather than defaulting.
+`vendor.agentdojo_sha` **still a sentinel**, and `config/protocol.yaml`'s only value change across
+all twelve C13 commits is `camel_sha`. **Both vendored trees clean at their pins, 0-byte diffs.**
+`git status --porcelain tests/goldens/` **EMPTY**. **ZERO PROVIDER CALLS AND ZERO TOKENS by C13** —
+no path under `evals/` in any of its commits — **and zero by this review**, which did not run
+CaMeL, did not install it, did not import it, and ⚠️ **did not check whether the model id is still
+served: that is Branch A's condition and RUN-1's alone.** Q-061's rewritten sentinel test **fired**
+three ways here.
+⚠️ **`Q-064`/`OF-62` independently confirmed** — all four surviving copies of the old citation are
+present, `prereg-v1` is **not yet cut** (tags are `c0-pass`…`c4-pass`), and nothing reads either
+`config/lanes.yaml` key. **That is C13's find and it is a genuine BLOCKER for C14, not for C13.**
+
+### 6. THE FOUR SWEPT ENTRIES — content intact, commit provenance damaged
+
+`2f702d9` carries `Session-Token: 7d84b383` and its subject names only *"INC-34 and INC-35,
+Q-066..Q-069 and OF-64..OF-67"* — yet `git log -S` shows it is the commit where **`Q-064`, `Q-065`,
+`OF-62` and `OF-63`** entered the files, all four written by `3fb17baa`. **Each occurs exactly
+once, complete, with its own `Raised by: C13 BUILD 2 (3fb17baa)` / chunk `C13` attribution intact;
+no counter collided** — C7 allocated `Q-066`…`Q-069` and `OF-64`…`OF-67` strictly above them —
+and `check-roles` exits **0**, because the trailer is well-formed and the token is issued. ⚠️ **The
+commit simply contains more than its message says, in the file whose whole function is to be the
+record of who ruled what, and `Q-063`'s remedy — one working tree per session — is still unruled.**
+This review is the **third consecutive session in this tree**: it committed only under explicit
+pathspecs and verified `git status --porcelain` over all four shared journals **EMPTY immediately
+before every commit**, so it **swept nothing and wrote no `Swept:` line**.
+
+### 7. WHAT C13 GOT RIGHT — recorded because a FAIL that lists only faults is not a review
+
+It found **both** Class-A specification defects itself, by opening the source rather than repeating
+it; stopped on both inside its fence; got them ruled; landed v1.8; found its own build-1 guardrail
+**one field short** and extended it; found **four surviving copies** of the corrected citation in
+artefacts outside its own fence, including `config/lanes.yaml:201`, which after `prereg-v1` would
+**outrank `CONTEXT.md`**; and **declared the one edit it could not make rather than slipping it
+in**. Neither side of its design transcribes anything — the spec side is *parsed out of
+`CONTEXT.md`*, the observed side *derived from the checkout with `ast`* — so there is no third copy
+to drift, and every parser asserts it matched **exactly once**. **The two BLOCKERs are what is left
+when work of that standard is checked at that standard.**
+
+### 8. FINDINGS
+
+**2 BLOCKER · 3 MEDIUM · 6 LOW.** `OF-71`…`OF-79` appended to `docs/reviews/OPEN_FINDINGS.md`, ids
+**counted from the file** because C7 BUILD 3 had already taken through `OF-70`. ⚠️ **The two
+BLOCKERs are deliberately NOT in `OPEN_FINDINGS.md`:** that file carries what a review could not
+close, and a BLOCKER is not carried, it is fixed. `docs/reviews/REVIEW_13_1.md` §6 names the
+shortest path back, and **none of it touches a number**.
+
+### 9. ARTEFACTS
+
+`docs/reviews/REVIEW_13_1.md` · `docs/reviews/independent/c13_reimpl.py` ·
+`c13_phase1_blind.md` · `c13_reimpl_output.txt` · `c13_reimpl_diff.txt` ·
+`docs/reviews/mutants/c13_mutants.md` · `docs/sessions/c13-review-1.txt`.
+
+---
+
 ## C7 — THE LEDGER — **BUILD** attempt 3 — 2026-09-01 — ⚖️ `Q-066` GRANTED and implemented · **S2 was INVISIBLE and now is not** · five rulings recorded · suite **GREEN** · **two incidents, neither shipped** · **27/27 mutants, audited** · ZERO provider calls
 
 **SESSION-TOKEN:** `9c0c6734` — **NOT in the batch.** Appended as
