@@ -3466,3 +3466,113 @@ records **only what a commit in this entry demonstrates**, and that anything els
 `Systemic guardrail:` as *not landed*. **In a submission whose thesis is that other people's
 self-reports are unsound, this is the most expensive kind of small error**, and it is recorded at
 full length for that reason and not because one line number was wrong.
+
+---
+
+## INC-48 — `git commit -- <paths>` swept a concurrent session's token row and 41-line self-record in the window BETWEEN the check that said 79/1 and the commit itself, and the commit's own `Swept:` line says "nothing" — INC-36's class, with the read-the-diff remedy in place and doing nothing
+
+**Date:** 2026-09-02 (C13 FIX 2, `91eb51c1`. The sweeping commit is this session's own, `e2b4778`.
+The swept work is the concurrent **C6 REVIEW 3** session's, `3605d31c`. Found by this session,
+immediately afterwards, by reading the numstat of a commit it had already made. Fix SHA recorded
+under **Fix**.)
+
+**Event:** this session's prompt named a concurrent C6 REVIEW 3 session (`3605d31c`) holding
+`docs/reviews/` and `docs/reviews/independent/`, and bound this session to a `Swept:` rule: *"before
+each journal commit run `git diff -- <those paths>`, READ IT, and if it carries an entry whose
+`Raised by:` token is not `91eb51c1`, COMMIT ANYWAY with a `Swept:` line naming it."* That check was
+run before every journal commit and was **empty every time** — correctly, because
+`3605d31c` was not writing to `docs/reviews/`. It was writing to **`QUESTIONS.md`**, which every
+review session must write to, because that is where the token row lives.
+**Measured, in this order:**
+
+| | |
+|---|---|
+| `QUESTIONS.md` at session start (`1f82c48`) | **6,664 lines** |
+| after this session's `Q-079` edit, `git diff --numstat` **run by this session immediately before committing** | **`79  1`**, file **6,742 lines** — `3605d31c`'s work **not present** |
+| `QUESTIONS.md` as committed at **`e2b4778`** | **6,791 lines**, numstat **`128  1`** |
+
+The extra **49 lines** are `3605d31c`'s: its **token row 39** (`| \`3605d31c\` | C6 | REVIEW |
+2026-09-02 |`) and its **41-line self-record paragraph**, committed under **this session's token**,
+`Session-Token: 91eb51c1`. ⚠️ **And `e2b4778`'s own message says `Swept: nothing`.** It was true
+when it was written and false when it was committed.
+
+**Action:** the sweep is recorded here rather than repaired by rewriting history — `e2b4778` is
+**not** amended and nothing is reverted, because no history rewrite is permitted on this project and
+because **`3605d31c`'s content is intact, complete and correct in the tree**; nothing was lost,
+altered or truncated, and its row is present exactly once. This session **verified** that: the row
+appears once, the paragraph is whole, and no other session's line was touched. The correction is
+carried in three places instead — this entry, a note in this session's own `PROGRESS.md` record, and
+the FINAL OUTPUT, which names `3605d31c` as swept and states which commit carries it. ⚠️ **And from
+the next commit onward this session stopped using `git commit -- <paths>` entirely**, switching to
+`git add -- <paths>` followed by `git commit` **with no pathspec**, with `git diff --cached
+--numstat` read as the check. **The mechanism was proved in a throwaway repository before it was
+adopted, not assumed** — see **Systemic guardrail**.
+⚠️ **One consequence is `3605d31c`'s and must reach it:** its paragraph states *"this row is
+committed **first**, and the Phase-1 seal is the commit after it"* — the ordering its prompt
+required, to avoid the `OF-89` failure that turned `make test` red for the previous two reviewers.
+**That ordering still holds** — the row is in the tree, before its seal — but the row is **not in a
+commit of its own**, so a later reader auditing `3605d31c`'s commits will not find it there. It is in
+`e2b4778`.
+
+**Expectation:** a `Swept:` line should describe the commit it is attached to. The rule exists
+precisely because `git commit -- <paths>` is scope-limited by **path** and not by **content**, and
+this session was given the rule, understood it, ran its check before every commit, and swept anyway.
+
+**Missing:** ⚠️ **the `Swept:` check was scoped to the paths the concurrent session was SAID to hold,
+not to the paths THIS session was about to commit.** The prompt named `docs/reviews/` and
+`docs/reviews/independent/`; the collision was in `QUESTIONS.md`. **Every session writes
+`QUESTIONS.md`** — the token row alone guarantees it — so it is the one file where a concurrent
+collision is close to certain, and it was the one file the check did not cover. The rule as written
+enumerates the *other* session's paths; the rule that would have worked enumerates *this* session's
+commit paths. ⚠️ **And nothing prints a warning:** `git commit -- <paths>` sweeps silently and
+reports only the total, so the sole evidence is a numstat a session has to think to re-read
+*afterwards*.
+
+**Missed:** ⚠️ **nothing was missed at the moment of the check, and that is the uncomfortable part —
+the signal did not exist yet.** This session ran `git diff --numstat QUESTIONS.md`, read **`79 1`**,
+and committed; the 49 lines arrived **between** those two commands. `INC-36`'s recorded remedy is
+*"the read that saved the numbering is the read that proved it was about to happen"* — a **read**,
+and a read has a window. **What was missed is one level up: that `INC-36`'s remedy is a check and not
+a lock**, and this repository has carried it as though it were a lock since 2026-09-01. The signal
+that *was* available and ignored: `e2b4778`'s own numstat printed **`128 1`** in this session's
+terminal at the moment it was made, against the **`79 1`** it had read seconds earlier, and the
+discrepancy was not looked at until three commits later.
+
+**Diagnosis:** `git commit -- <pathspec>` commits the **working tree** contents of those paths at
+commit time and deliberately ignores the index, so every byte any process writes to those paths
+between the check and the commit is swept in silently. The check and the commit read the tree at two
+different instants, and nothing holds it still in between.
+
+**Fix:** **`<pending — filled in by this session's own later commit>`** *(this entry is written and
+committed before that commit exists; the SHA is filled in afterwards rather than invented.)* No
+source change and no history rewrite: `e2b4778` stands, `3605d31c`'s content stands intact inside it,
+and the correction is this entry plus the `PROGRESS.md` note and the FINAL OUTPUT declaration.
+
+**Systemic guardrail:** ⚠️ **A REAL ONE, AND IT IS ONE WORD OF PROCEDURE — BUT IT IS `PROCESS.md`'s
+TO ADOPT AND NOT THIS FENCE'S TO WRITE.**
+**Stage, then commit the index.** `git add -- <paths>` fixes a snapshot; `git commit` **with no
+pathspec** commits **that snapshot**; `git diff --cached --numstat` checks the thing that will
+actually be committed rather than a thing that resembles it. A concurrent write landing after the
+`git add` is then simply **not in the commit**.
+**Demonstrated, in a throwaway repository, both directions, before being recommended:**
+
+```
+A   git diff --numstat j.md      -> 1 0        (the check)
+    <concurrent line lands>
+    git commit -- j.md           -> committed: mine / MY-EDIT / OTHER-SESSION-LINE   <-- SWEPT
+
+B   git add -- j.md
+    git diff --cached --numstat  -> 1 0        (the same check, taken on the INDEX)
+    <the same concurrent line lands, in the same window>
+    git commit                   -> committed: mine / MY-EDIT                        <-- NOT SWEPT
+```
+
+⚠️ **This does not make sweeping impossible** and is not offered as though it did: a concurrent write
+landing **before** the `git add` is still staged and still swept, so the `Swept:` rule and its read
+remain necessary. What it removes is the **check-to-commit window**, which is the window this
+incident fell through and the window `INC-36`'s remedy cannot see. **NOT landed:** `PROCESS.md` §7
+still specifies `git commit -- <paths>` for scoped commits, and changing it is the architect's; and
+no mechanism scopes the `Swept:` check to *the committing session's own paths* rather than to the
+other session's declared ones. Both are re-declared as owed rather than gestured at. ⚠️ **The count
+is two — `INC-36` and this — and the second happened to a session that had been handed `INC-36`'s
+rule in its own prompt and had run the check.**
