@@ -972,6 +972,52 @@ def test_a_chain_verified_under_the_wrong_genesis_is_detected(
     assert outcome.first_bad_ledger_seq == 1
 
 
+def test_a_truncated_tail_is_NOT_detected_and_that_is_a_stated_limitation(
+    golden: dict, spec: chain.ChainSpec
+) -> None:
+    """⚠️ **The limitation is asserted rather than hidden, because a claim this project cannot
+    support is worse than a gap it names.**
+
+    A hash chain anchors its **start**. Deleting entries from the **tail** leaves a shorter
+    chain that is internally perfect, and ``verify`` says ``VALID`` — correctly, since every
+    remaining entry does hash to its stored digest from the root the document names. Deletion
+    anywhere else, and any alteration, is detected; truncation is the one operation that is not,
+    and it is exactly the shape hard rule 11 is about.
+
+    **The remedy is not cryptographic**: it is an external commitment to each episode's head and
+    entry count, which is `PROCESS.md` §6a's own answer to a forgeable git timestamp — *witness
+    it outside this repository*. Recorded in `docs/reviews/OPEN_FINDINGS.md`.
+    """
+    case = next(c for c in golden["cases"] if c["case"] == "A")
+    truncated = [dict(e) for e in case["ledger"][:2]]
+    outcome = chain.verify(
+        truncated, genesis_hash=golden["genesis_hash"], algorithm=spec.algorithm
+    )
+    assert outcome.verdict == chain.VALID, (
+        "if this now DETECTS a truncated tail, the chain gained an end anchor and both this "
+        "test and chain.py's stated limitation must be rewritten to say so"
+    )
+    middle_removed = [dict(case["ledger"][0]), dict(case["ledger"][2])]
+    assert (
+        chain.verify(
+            middle_removed, genesis_hash=golden["genesis_hash"], algorithm=spec.algorithm
+        ).verdict
+        == chain.DETECTED
+    ), "deleting from the MIDDLE breaks the chain and must be detected"
+
+
+@pytest.mark.parametrize("junk", ["not-an-entry", 7, None, ["a", "b"]])
+def test_an_item_that_is_not_an_entry_is_an_answer_and_never_an_exception(
+    spec: chain.ChainSpec, junk: Any
+) -> None:
+    """A verifier reads a file somebody may have edited. ``dict("x")`` raises ``ValueError`` and
+    ``dict(7)`` ``TypeError``; either escaping would make a tampered ledger look like a crash in
+    the tool rather than a finding about the file."""
+    outcome = chain.verify([junk], genesis_hash="ROOT", algorithm=spec.algorithm)
+    assert outcome.verdict == chain.DETECTED
+    assert "not an entry" in outcome.reason
+
+
 def test_an_empty_ledger_is_valid_and_its_head_is_the_genesis(
     ledger: chain.Ledger, spec: chain.ChainSpec
 ) -> None:

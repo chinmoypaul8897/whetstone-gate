@@ -55,6 +55,26 @@ long-running process, and the episodes written afterwards would chain from a roo
 does not name — which is precisely the distinction the binding exists to make. So there is no
 module-level genesis constant here, and a test asserts that changing ``config/`` between two
 calls changes what the second one returns.
+
+---
+
+## ⚠️ WHAT THIS CHAIN DOES NOT DETECT, STATED BEFORE ANYBODY CLAIMS OTHERWISE
+
+**A hash chain anchors its START. Nothing here anchors its END.** Deleting entries from the
+**tail** of a stored ledger leaves a shorter chain that is internally perfect, and
+:func:`verify` returns ``VALID`` on it — correctly, because every entry still present really
+does hash to its stored digest from the root the document names. Deleting from the middle, or
+altering anything, breaks the chain and is detected; truncation is the one operation that does
+not, and it is exactly the operation `CLAUDE.md` hard rule 11 is about.
+
+`tests/test_c7_ledger.py::test_a_truncated_tail_is_NOT_detected_and_that_is_a_stated_limitation`
+asserts the limitation rather than hiding it, and it is recorded in
+`docs/reviews/OPEN_FINDINGS.md`. **The remedy is not cryptographic and is not this chunk's**: it
+is an external commitment to each episode's head — the same mechanism `PROCESS.md` §6a already
+builds for `config/`, where the answer to *"a git timestamp is forgeable"* was **witness it
+outside this repository**, not a better hash. Until something publishes an episode's head hash
+and entry count where the operator cannot quietly revise them, *"the ledger is tamper-evident"*
+means **tamper-evident against modification, and against deletion anywhere but the end.**
 """
 
 from __future__ import annotations
@@ -351,7 +371,20 @@ def verify(
 
     for raw in entries:
         position += 1
-        stored = raw.to_dict() if isinstance(raw, LedgerEntry) else dict(raw)
+        if isinstance(raw, LedgerEntry):
+            stored = raw.to_dict()
+        elif isinstance(raw, Mapping):
+            stored = dict(raw)
+        else:
+            # ⚠️ A verifier reads a file somebody may have edited, so "that is not an entry"
+            # is an ANSWER and never an exception. `dict("x")` raises ValueError, `dict(1)`
+            # TypeError, and either escaping would make a tampered ledger look like a crash.
+            return ChainVerdict(
+                DETECTED,
+                None,
+                f"the item at position {position} is not an entry at all "
+                f"({type(raw).__name__})",
+            )
 
         seq = stored.get("ledger_seq")
         label = seq if isinstance(seq, int) and not isinstance(seq, bool) else None
