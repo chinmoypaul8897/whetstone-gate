@@ -76,6 +76,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `0852ea56` | C4 | REVIEW | 2026-09-01 |
 | `5c4f8e11` | ARCH | BUILD | 2026-09-01 |
 | `3a6e3d07` | C7 | BUILD | 2026-09-01 |
+| `c2b7f419` | C13 | BUILD | 2026-09-01 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -265,6 +266,34 @@ is that the number arrives pre-committed to being wrong.
 reads *"every token batch"*, and the remedy the `6ba2d70e` paragraph named has now failed to be
 applied eight times running. The row was appended and **no other session's line was touched**;
 the file's bytes were re-verified after the append and carry **0 CR bytes**.
+
+⚠️ **AND `c2b7f419` IS THE FIFTEENTH SELF-RECORDED ROW. IT IS NUMBERED FROM THE TABLE, WHICH IS
+NOW THE ESTABLISHED PRACTICE RATHER THAN A CORRECTION.** This session's prompt — **C13 BUILD**,
+the CaMeL comparator, 2026-09-01 — opened with `c2b7f419`, was **not** part of the `f57e216b`
+batch, and stated the gap up front in its own words: *"⚠️ Your token `c2b7f419` is NOT in the
+batch. Append `| `c2b7f419` | C13 | BUILD | 2026-09-01 |` and NUMBER IT FROM THE FILE, not from
+this prompt — two prompts running have numbered that row wrong, and a reconciliation table sits
+in the token preamble."* **The fourteenth is `3a6e3d07`** (C7 BUILD), recorded in the paragraph
+immediately above by the session that carried it; this is the fifteenth.
+⚠️ **WHAT IS NEW, AND IT IS THE ONLY THING IN THIS PARAGRAPH WORTH READING: THE PROMPT STOPPED
+NUMBERING THE ROW AND TOLD THE SESSION TO COUNT.** The `7b99a85a` paragraph named the cost of the
+architect numbering in advance — *"numbering in advance is exactly the step that can now be wrong
+by one"* — and `5c4f8e11`'s reconciliation table found it had been wrong by **two**, with two
+eighths in the project's records. **The remedy actually applied is neither of the two the earlier
+paragraphs proposed.** They asked for Q-025's clause to be widened from *"every token batch"* to
+*"every token"*, which has now failed to be applied **nine times running**; what the architect did
+instead was **stop asserting the number and point at the reconciliation table**. That is a smaller
+fix than the one that was asked for and it removes the *recurring* error rather than the
+*underlying* one: the row is still self-recorded, §7a still says it should not be, and thirteen of
+fifteen are still the same defect. **But the count can now be cited**, which is the whole reason
+these paragraphs exist.
+⚠️ **THE MECHANISM `5c4f8e11` RECORDED AS OWED IS STILL OWED** — *"`check_roles.py` parses this
+table for E1 and could count the rows outside the batch itself"*. C13's fence names `src/` under
+**NOT** for everything but its own package, so this session could not write it either, and it is
+re-declared as **OWED** rather than gestured at. **A hand-maintained running total in prose has
+now been carried by four consecutive sessions and corrected twice.**
+The row was appended and **no other session's line was touched**; the file's bytes were
+re-verified after the append and carry **0 CR bytes**.
 
 ## ⚠️ THE TOKEN BATCH, 2026-08-31 — and this is what ends the collision class
 
@@ -4431,6 +4460,365 @@ it moves the calibration input if the attacker's free-text mentions of the probe
 the reason this is a question and not a finding.
 
 ---
+
+---
+
+### Q-056 — C13 is a `full` chunk with no golden, and its done-when is a decision and a proof
+**Raised by:** C13 BUILD (`c2b7f419`) · **Date:** 2026-09-01 · **Status:** **RULED** (carried
+forward from Q-016, Q-020 and Q-031; recorded here because a ruling that exists only in a chat
+does not exist) · **Class:** n/a — the C13 prompt states the ruling; this entry records it.
+**Blocking:** nothing — C13 was built under it.
+
+**Context.** Hard rule 3: *"A `full` chunk with no golden may not be built."* C13 is a `full`
+chunk. `PROCESS.md` §5.2 enumerates exactly nine goldens and assigns them to C2, C4, C7, C8,
+C9, C10, C11 and C18. **It assigns none to C13**, and it was written with C13 visible in the
+same plan.
+
+**RULING, as the C13 prompt states it:** *GOLDEN: NONE, AND THAT IS A RULING. §5.2's nine
+assign none to C13, whose done-when is a decision and a proof rather than a computed value —
+the shape Q-016 ruled for C1, Q-020 for C3 and Q-031 for C6.*
+
+**Why the three precedents reach this case, stated so the reasoning is checkable rather than
+cited.** Rule 3 exists because *"a test whose expected value was produced by the code it tests
+proves nothing."*
+
+* **Q-016 (C1):** C1 computes nothing; it transcribes a third party's published text, so its
+  expected values are external **by construction**.
+* **Q-020 (C3):** C3's golden is τ²-bench itself at the pinned SHA — Sierra's files, read from
+  an unmodified third-party checkout.
+* **Q-031 (C6):** C6's done-when is **entirely structural**; there is no expected *value* for a
+  golden to hold.
+
+**C13 is all three at once, which is why it needs none of the nine.** Its expected values are
+`CONTEXT.md` §8.5's own sentences and CaMeL's own source at a named SHA — external on both
+sides. Its done-when is *"the branch decision is made and recorded"* (a decision, and **not
+this session's** to make) and *"a diff against the vendored SHA is empty and is committed as
+proof"* (a proof, whose expected value is **emptiness**). A golden holding the empty string
+would be a fixture asserting nothing.
+
+**ENFORCEMENT IN ITS PLACE, and it is not optional.** The C13 prompt: *"C13's REVIEW must
+independently re-verify every third-party claim below at the pinned SHA."* That is Q-016's,
+Q-020's and Q-031's substitution applied — the review re-derives rather than re-runs.
+
+**BUILD SESSION'S NOTE, added to make the enforcement executable rather than aspirational.**
+The tests do not transcribe a single third-party number, line or string. Each claim's expected
+value is **parsed out of `CONTEXT.md` §8.5/§8.5.1/§8.5.2** and its observed value is **derived
+from the vendored checkout with `ast`**, so the two sides come from two places and neither is a
+copy living in a test file. ⚠️ **Each reference is located by the prose that INTRODUCES it,
+never by position or by span width** — §8.5 states two `security_policy.py` references that are
+**both six lines** (`77-82`, `44-49`) and §8.5.1 two `models.py` references that are **both
+one** (`:40`, `:67`), so anything picking *"the first"* or *"the six-line one"* would compare a
+claim against a **different claim's** expected value and still print green. Every parser asserts
+it matched **exactly once**. **8 of 8 claims reproduce at the pin.**
+
+---
+
+### Q-057 — ⚠️ CLASS A: `google:...+camel+secpol` is a PIPELINE NAME CaMeL emits, not a `--model` argument, and RUN-1 is a TWO-PASS protocol
+**Raised by:** C13 BUILD (`c2b7f419`) · **Date:** 2026-09-01 · **Status:** **OPEN — not
+blocking C13; BLOCKING RUN-1 if unread** · **Class:** **A** — it changes the command the
+operator executes, and RUN-1 is a single-shot 90-minute box.
+**`INCIDENTS.md`:** **OWED** — C13's fence names `INCIDENTS.md` under **NOT** (the concurrent
+C7 session `3a6e3d07` holds it). Declared in this session's FINAL OUTPUT.
+
+**Context.** `CONTEXT.md` §8.5.1, Branch A, verbatim: *"Invoke as
+`google:gemini-2.0-flash-lite-001+camel+secpol` against a free-tier Google key on AgentDojo
+banking."* `PROCESS.md` §12.1's C13 row repeats the string. **It cannot be passed as
+`--model`.**
+
+**Verified first-hand at `f083b6b3…`, 2026-09-01, four independent facts:**
+
+1. `models.py:51-53` builds `CAMEL_MODEL_NAMES` as `{model}{suffix}` over
+   `suffixes = ["", "+camel", "+camel+secpol", "+camel+secpol+strict"]`, and `models.py:67`
+   merges them into **AgentDojo's** `MODEL_NAMES`. Those suffixed strings exist so AgentDojo's
+   *"what model are you?"* injection tasks can resolve a **pipeline's** name. They are not
+   `--model` inputs.
+2. The name `...+camel+secpol` is **emitted by CaMeL** at `models.py:188`, and only on the
+   `replay_with_policies` branch.
+3. `main.py`'s own docstring for that flag: *"replay the run with the given model enforcing
+   security policies. **Note that the equivalent run (with same model and attack config) should
+   have already been run.**"*
+4. `replay_privileged_llm.py:321` reads
+   `Path("logs") / pipeline_name / suite_name / user_task_id / (attack_name or "none")` — **the
+   stored logs of the earlier `+camel` pass** — and `models.py:179` hands it the `+camel` name.
+
+**So the run is two passes**, and the first is the only one that spends tokens:
+
+```
+cd vendor/camel-prompt-injection
+python main.py --model google:gemini-2.0-flash-lite-001 --suites banking --run-attack
+python main.py --model google:gemini-2.0-flash-lite-001 --suites banking --run-attack --replay-with-policies
+```
+
+⚠️ **What passing the suffixed string as `--model` would actually do**, since *"it would just
+fail"* is not good enough for a pre-declared decision: `"google" in model` is true, so dispatch
+**succeeds**; `model.split(":")[1]` then yields `gemini-2.0-flash-lite-001+camel+secpol`, which
+is handed to `genai.Client` as a **model id**. The failure would be a provider-side error inside
+the 90-minute box, and — because §8.5.1's Branch B condition is *"the model id is no longer
+served"* — **it could be misread as Branch B.** That is the real cost: a harness defect
+presenting as the pre-registered negative result.
+
+**Options seen:**
+  1. **Correct §8.5.1's Branch A sentence** to name the two passes and describe
+     `...+camel+secpol` as the pipeline name CaMeL emits. Accurate; it edits a spec section
+     that is **not** in the frozen set and **not** yet tagged.
+  2. **Leave §8.5.1 and rely on the harness.** `camel_comparator.invocation` already builds
+     both passes and its module docstring states all four facts. But §8.5.1 is *the law*, and a
+     law that describes a command nobody can run is the kind of thing this project publishes
+     criticisms of.
+  3. **Record it as a published limitation** and change nothing.
+
+**Default taken:** ⚠️ **NONE — work stopped on the specification.** `CONTEXT.md` is outside
+C13's fence and hard rule 2 makes a Class A change the architect's. **What C13 did instead is
+forward-only and inside its fence:** the harness builds the correct two passes, names the
+`+camel` → `+camel+secpol` log dependency, marks which pass spends tokens, and
+`test_run1_is_two_passes_and_the_second_replays_the_first` asserts all four facts against the
+checkout — so the 90-minute box is not spent discovering this.
+
+⚠️ **AND THE GENERALISABLE PART, which is worth more than the instance: §8.5.1's sentence was
+right about everything it could check without running the tool, and wrong about the one thing it
+could not.** The provider dispatch, the `base_url` absence and the allowlisted model id all
+reproduce exactly. What did not reproduce is the **shape of the command**, which is the only
+claim in §8.5.1 that no amount of reading `models.py` establishes — it lives in `main.py`'s CLI
+and in the replayer's log path. **`PROCESS.md` §9's URL-and-date rule catches a fact read from
+the wrong page; it does not catch a fact nobody read a page for.**
+
+---
+
+### Q-058 — ⚠️ CLASS A: the *"Tables 5–7"* citation names the wrong table, and Branch B ships AS a citation
+**Raised by:** C13 BUILD (`c2b7f419`) · **Date:** 2026-09-01 · **Status:** **OPEN — not
+blocking C13; BLOCKING the Branch-B publication and `RESULTS.md`** · **Class:** **A** — it is
+the provenance of a published number.
+**`INCIDENTS.md`:** **OWED** (fence).
+
+**Context.** Three artefacts point the reader at Tables 5–7 of arXiv 2503.18813v2:
+
+* `CONTEXT.md` §8.5's Presentation bullet — the comparator table sits *"beside its published
+  **77-vs-84** — with the correction that … on banking alone CaMeL is ahead: 81.2% ± 19.1 vs
+  native 62.5% ± 23.7."*
+* `CONTEXT.md` §8.5.1's **Branch B** — *"Publish the comparator as a **citation of CaMeL's
+  published numbers** (Tables 5–7 of arXiv 2503.18813v2, Claude 3.5 Sonnet, banking column)."*
+* `PROCESS.md` §12.1's C13 done-when repeats *"a citation of Tables 5–7"*.
+
+**FETCHED AND READ FIRST-HAND, 2026-09-01.** `https://arxiv.org/html/2503.18813v2`, HTTP 200,
+2,554,718 bytes, SHA-256 `b5cd7970e905f1504439c3eddb3855ab18d951d10bf806ec2f5f3baa02ca8a51`.
+
+**✅ THE NUMBERS ARE RIGHT, AND THEY ARE RIGHT FOR THE MODEL §4 NAMES.** They are in **Table 2 —
+*"Utility results on the AgentDojo benchmark, covering different suites"* — Appendix B, *"Full
+results tables"***, in the `o3 High` block:
+
+| `o3 High` | Overall | banking |
+|---|---|---|
+| Native Tool Calling API | **84.5 % ± 7.2** | **62.5 % ± 23.7** |
+| CaMeL | **77.3 % ± 8.3** | **81.2 % ± 19.1** |
+| **Difference** (the paper's own row) | **−7.2 % ± 1.1** | **+18.8 % ± 4.6** |
+
+So §4's *"77% vs 84% … the all-suites Overall for `o3 High`"* and *"on banking alone it runs the
+other way"* are **both correct**, and the paper's own `Difference` row confirms the direction.
+**§4 is clean: it cites no table.**
+
+**❌ TABLES 5–7 ARE A DIFFERENT EXPERIMENT.** They are **Appendix C, *"Baseline results"***, a
+comparison of CaMeL against *other defenses* using **Claude 3.5 Sonnet** — stated in Figure 11's
+own caption: *"A comparison between CaMeL and other defenses in terms of utility and number of
+successful attacks when using Claude 3.5 Sonnet."* Their banking column:
+
+| | Table 5 (*Defenses utility*) | Table 6 (*…under attack*) |
+|---|---|---|
+| Undefended model | **81.25 % ± 19.12** | **84.03 % ± 5.98** |
+| CaMeL | **75.00 % ± 21.22** | **70.83 % ± 7.42** |
+
+⚠️ **In both, on banking, CaMeL is BEHIND the undefended model.** A Branch-B artefact reading
+*"cite Tables 5–7, banking column"* would point a panelist at a table stating **the opposite of
+the claim it is offered to support** — in a submission whose entire thesis is that other
+people's numbers are unsound. **This is the failure mode that would cost the most and it is
+found the cheapest way: by opening the cited table.**
+
+⚠️ **AND THE `81.25 ± 19.12` IN TABLE 5 IS THE UNDEFENDED MODEL'S** — one hundredth away from
+the `81.2 ± 19.1` §8.5 attributes to CaMeL. **That is very likely the mechanism of the error**,
+and it is recorded as the likely mechanism rather than asserted as the cause.
+
+**✅ ONE HALF OF THE CITATION IS RIGHT AND MUST BE KEPT.** §8.5.2's **P2** rests on *"the
+no-policies configuration fails it (1 successful attack, all of it in banking) and the
+with-policies configuration blocks it"* — and that **is Table 7** (*"Defenses: number of
+successful attacks"*), reproduced exactly: `CaMeL` scores **0** in Overall, Banking, Slack,
+Travel and Workspace; `CaMeL (no policies)` scores **1** Overall and **1** Banking, with **0**
+in the other three. **The range 5–7 is correct for P2 and wrong for the headline pair.**
+
+**Options seen:**
+  1. **Correct §8.5's and §8.5.1's citation** to *"Table 2 (Appendix B, `o3 High`)"* for the
+     utility pair and keep *"Table 7 (Appendix C, Claude 3.5 Sonnet)"* for P2's basis. Accurate,
+     and it is two references, not one — which is the honest shape, because the two claims come
+     from two experiments on two base models.
+  2. **Keep Tables 5–7 and change the claim** to the Claude 3.5 Sonnet numbers. ⚠️ **This
+     inverts §4's headline** — CaMeL would then be *behind* on banking — and §4 is quoted in the
+     README's Prior Art. Rejected on the merits, not on convenience: §4's numbers are the ones
+     that are actually in the paper for the model §4 names.
+  3. **Publish both tables side by side** and say what each measures.
+
+**Default taken:** ⚠️ **NONE ON THE SPECIFICATION — work stopped there.** **Inside the fence,
+C13 built option 3**: `src/whetstone_gate/camel_comparator/BRANCH_B.md` carries §8.5.1's reason
+**verbatim** and then shows **both** tables with what each actually says, every figure tagged
+with its table, appendix, base model, row, suite, URL, fetch date and the SHA-256 of the fetched
+HTML. `test_the_citation_correction_is_stated_with_both_tables_shown` asserts the direction from
+the carried figures rather than from prose, so the correction cannot rot into a sentence nobody
+checks.
+
+⚠️ **WHY THIS ONE MATTERS MORE THAN ITS SIZE SUGGESTS.** Every other false third-party claim
+this project has caught (INC-02, INC-05, the 59% figure, `receipt`, AgentHarm's holder) was a
+claim **we would have published**. This is a claim about **where a published number comes
+from**, in the artefact whose entire content **is** a citation. `PROCESS.md` §9's rule is *every
+third-party claim carries a URL and a date* — §8.5.1 carried both, and was still wrong, because
+**a URL to a paper is not a URL to a table.** That is the generalisable finding, and it is worth
+recording as a sharpening of §9 rather than as an instance of it.
+
+---
+
+### Q-059 — C13 vendored AgentDojo and measured it, and deliberately left `vendor.agentdojo_sha` a sentinel
+**Raised by:** C13 BUILD (`c2b7f419`) · **Date:** 2026-09-01 · **Status:** **OPEN — not
+blocking; a fence was obeyed and the measurement is recorded for C16** · **Class:** **B** —
+recording a pin outside `config/` is an implementation choice within the fence the prompt drew.
+
+**Context.** C13 must vendor AgentDojo — CaMeL's banking policies are typed on
+`BankingEnvironment` (`banking.py:17`) and the comparator cannot be read, let alone run, without
+it. But `config/protocol.yaml:vendor.agentdojo_sha` is **C16's** key, and the C13 prompt is
+explicit: *"LEAVE `vendor.agentdojo_sha` ALONE — it is C16's, and resolving another chunk's
+sentinel is exactly the silent scope creep the fences exist to stop."*
+
+⚠️ **This collides with `vendor/MANIFEST.md` §2's own rule:** *"The pin goes into
+`config/protocol.yaml` in the same commit as the checkout, so a checkout can never outlive its
+record."* For AgentDojo, C13 has a checkout and **no `config/` record**.
+
+**WHICH SHA, AND WHY IT IS NOT `main`.** `[VERIFIED HERE, 2026-09-01]` CaMeL's own
+`pyproject.toml` declares `agentdojo>=0.1.34`, and its **`uv.lock` resolves that to exactly
+`0.1.34` from PyPI** (`uv.lock:13-15`). `refs/tags/v0.1.34` is
+`928bbae820a89556b03de5cf818eb350cd6082d1`, and the checked-out tree's own `pyproject.toml:12`
+reads `version = "0.1.34"`. **The pin is therefore derived from the third party's own lockfile
+rather than chosen by a session.** `main` today is `089ed468cf3ed0322acc66b0211f26d9d90dbf60`
+(2026-06-02, *"Add openai-compatible provider for arbitrary OpenAI-compatible endpoints"*) — a
+much later tree. ⚠️ **Vendoring `main` and describing it as *"what CaMeL runs on"* would have
+been a sixth false third-party claim**, and the session nearly did it: `main` was fetched and
+measured first, and the lockfile was only read afterwards.
+
+**Options seen:**
+  1. **Resolve `vendor.agentdojo_sha` now.** Satisfies MANIFEST §2. **Rejected: it is C16's
+     key**, and the fence names it.
+  2. **Record the pin in `vendor/MANIFEST.md` §6 and leave the sentinel.** The checkout's record
+     exists, in a tracked file, in the same commit — just not in `config/`.
+  3. **Do not vendor AgentDojo at all.** Rejected: C13 cannot verify CaMeL's banking policies
+     or `InjectionTask6` without it, and both are C13 deliverables.
+
+**Default taken:** **option 2**, and it is Class B rather than Class A because the fence
+*instructed* it and nothing about a published number changes. **`vendor/MANIFEST.md` §6.1
+records the SHA, the derivation and `main`'s SHA for contrast; §6.5 states plainly what C13 did
+not do; and `test_c13_did_not_resolve_c16s_agentdojo_sentinel` asserts the sentinel is still
+there**, so the fence is checkable rather than promised.
+
+**What the architect is asked to note:** **C16 adopts `928bbae8…` or records why it differs**,
+and if it differs, ⚠️ **RUN-1 and AD-CMP would have run against two different AgentDojos** —
+which is a comparability question, not a bookkeeping one.
+
+---
+
+### Q-060 — `vendor/MANIFEST.md` §3 puts C13's empty-diff proof in `docs/evidence/`; C13's fence names only its own package
+**Raised by:** C13 BUILD (`c2b7f419`) · **Date:** 2026-09-01 · **Status:** **OPEN — not
+blocking; the artefact exists and is regenerated, only its path is in question** · **Class:**
+**C** — a location, changing no behaviour and no number.
+
+**Context.** `vendor/MANIFEST.md` §3, written by C0: *"C13 commits this output for CaMeL as
+`docs/evidence/camel_unmodified.txt`."* `PROCESS.md` §9 agrees in spirit — *"any claim from data
+ships its generating script **and** its committed output under `docs/evidence/` or `evals/`"*.
+**But the C13 prompt's scope fence lists `docs/` only as `docs/reviews/OPEN_FINDINGS.md`,
+`docs/sessions/` and `STATUS`/`PROGRESS`**, and says of the diff: *"Produce it, commit it under
+`src/whetstone_gate/camel_comparator/`."*
+
+**Options seen:**
+  1. **Follow the prompt.** The card is the most specific instruction and names the directory
+     explicitly. The proof lives beside the code that regenerates it, which is where a reader
+     looking for *"is this really unmodified?"* will already be.
+  2. **Follow MANIFEST §3** and write `docs/evidence/`. Out of fence.
+  3. **Write both.** Two copies of a proof is two things that can disagree — the precise defect
+     the regeneration test exists to prevent.
+
+**Default taken:** **option 1.** ⚠️ **The card is explicit and the fence forbids the
+alternative**, so this is not a case where work could be stopped without dropping the
+deliverable. `src/whetstone_gate/camel_comparator/camel_unmodified.txt` holds the triple, and
+`vendor/MANIFEST.md` §6.4 states the divergence in the file that carries the other path, so a
+reader of §3 is not left following a dead link.
+
+**What the architect is asked to rule:** whether the proof moves to `docs/evidence/` (and
+§9's *"under `docs/evidence/` or `evals/`"* is enforced), or MANIFEST §3's sentence is amended
+to the shipped path. **Either is one line; what is not acceptable is two copies.**
+
+---
+
+### Q-061 — ⚠️ STOP: `tests/test_config_loader.py` asserts the sentinel set by EQUALITY, so every chunk that resolves a sentinel turns it RED, and the file is outside every such chunk's fence
+**Raised by:** C13 BUILD (`c2b7f419`) · **Date:** 2026-09-01 · **Status:** **OPEN — BLOCKING a
+green suite; the remedy is one line in a file this session may not touch** · **Class:** **A** —
+it is a red test in the shipped suite and the remedy is a test edit.
+**`INCIDENTS.md`:** **OWED** (fence).
+
+**Context.** `tests/test_config_loader.py:187-196`:
+
+```python
+def test_protocol_sentinels_are_exactly_the_undecided_ones():
+    """The undetermined set is closed and named. Nothing drifts into it unnoticed."""
+    sentinels = dict(cfg.load("protocol").sentinels())
+    assert sentinels == {
+        "probe.void_threshold_breach_rate": "TODO_C14_CALIBRATION",
+        "n_decision.selected_branch": "TODO_C14_PILOT",
+        "n_decision.measured_tokens_per_episode": "TODO_C14_PILOT",
+        "vendor.agentdojo_sha": "TODO_C13_C16",
+        "vendor.camel_sha": "TODO_C13_C16",
+    }
+```
+
+C13's TASK 3 instructs, in the prompt's own words: *"write `vendor.camel_sha` into
+`config/protocol.yaml`, replacing the `TODO_C13_C16` sentinel."* Doing so removes one key from
+`sentinels()`, and the `==` fails. **Measured, not assumed:** `make test` is
+`3 failed, 576 passed, 1 skipped, 2 deselected`, and this is one of the three.
+
+⚠️ **THE TEST IS RIGHT ABOUT WHAT IT GUARDS AND WRONG IN ITS FORM, AND THAT DISTINCTION IS THE
+FINDING.** Its docstring is correct — *"nothing drifts into it unnoticed"* — and guarding
+against a **new** sentinel appearing is worth having. But `==` against a literal also guards
+against a sentinel **leaving**, and a sentinel leaving is **a chunk doing its job**. The set was
+designed to shrink to empty by `prereg-v1`; the assertion is written as though it were constant.
+
+⚠️ **AND IT IS NOT A C13 ACCIDENT — IT WILL FIRE FOUR MORE TIMES, ON SCHEDULE.** C14 resolves
+`probe.void_threshold_breach_rate`, `n_decision.selected_branch` and
+`n_decision.measured_tokens_per_episode`; C16 resolves `vendor.agentdojo_sha`. **Every one of
+those chunks has `tests/` scoped to its own new files and this existing file outside its fence**,
+so each will face the identical choice C13 faces now. ⚠️ **C14 is the freeze**, and a red suite
+on freeze night, discovered at 18:00, is the worst possible time to find this.
+
+**Options seen:**
+  1. **Do not resolve `vendor.camel_sha`.** Keeps the suite green. **Rejected: it disobeys
+     TASK 3**, and it would leave a vendored checkout with no `config/` record, which
+     `vendor/MANIFEST.md` §2 forbids in terms (*"a checkout can never outlive its record"*).
+  2. **Edit the assertion** to `sentinels.keys() <= {the five}` plus a check that every
+     remaining sentinel names an owner — guarding *drift in* while permitting *resolution out*,
+     which is what the docstring actually claims. ⚠️ **Outside C13's fence:
+     `tests/test_config_loader.py` is an EXISTING test file and the fence names those under
+     `NOT`.**
+  3. **Invert it**: assert the RESOLVED set grows monotonically, keyed by chunk, so a chunk
+     resolving its own key is expected and any other movement is a failure. Strictly better than
+     option 2 and strictly more work.
+
+**Default taken:** ⚠️ **NONE — work stopped on this item.** The red is **reported, not worked
+around** (`CLAUDE.md` §4, hard rule 1). The test was not edited, not skipped, not marked xfail
+and not renamed. **This is `Q-043`'s shape exactly** — *a test that was satisfiable only while a
+chunk did not exist, whose remedy is one line in a file this session may not touch* — and it is
+recorded the same way.
+
+**What the architect is asked to rule:** which of options 2 and 3 stands, and **which session
+applies it**, noting that **it should land before C14 rather than during it**: C14 trips this
+three times in one night, and C14's night is the freeze.
+
+⚠️ **AND THE SECOND-ORDER POINT, which is the reusable one:** this is the **third** test in this
+project written as an equality against a set that the plan requires to change — after
+`tests/test_c2_world.py`'s C2/C4 fence test (**Q-043**) and the reviewer-probe token guard
+(**Q-051**). All three are correct about the property and wrong about the tense. **A suite that
+encodes *"today's contents"* where it means *"nothing unexpected"* will go red on schedule, at
+the worst moment, every time** — and the cheap general remedy is to write these as
+**subset-plus-owner** assertions rather than equalities.
 
 ## Rulings carried in from before the repository existed
 

@@ -6,6 +6,173 @@ not a record; this file is.
 
 ---
 
+## C13 — THE CaMeL COMPARATOR — **BUILD** attempt 1 — 2026-09-01 — ✅ built, unreviewed · 8/8 third-party claims reproduce at the pin · **two Class A findings** · zero tokens
+
+**SESSION-TOKEN:** `c2b7f419` — **NOT in the batch.** Appended as
+`| `c2b7f419` | C13 | BUILD | 2026-09-01 |` and numbered **from the table** as the **fifteenth**
+self-recorded row; the fourteenth is `3a6e3d07` (C7 BUILD), recorded by the session that carried
+it. No other session's line was touched. ⚠️ **The prompt did not state a number this time — it
+told the session to count and pointed at the reconciliation table.** That is a smaller fix than
+the one the earlier paragraphs asked for (widening Q-025's clause from *"every token batch"* to
+*"every token"*, still unapplied after nine consecutive one-offs), and it removes the *recurring*
+error rather than the *underlying* one. **Thirteen of fifteen are still the same defect.**
+
+**Ran concurrently with C7 BUILD (`3a6e3d07`)**, which held `src/whetstone_gate/ledger/` and
+`INCIDENTS.md`. Every commit used `git commit -- <explicit paths>` (Q-051 part (i)); shared files
+were **appended to only**; no line of another session's was rewritten; C7 took Q-053/Q-054/Q-055
+while this session was drafting, so **this session's six entries were renumbered from the file to
+Q-056…Q-061 before anything was committed.**
+
+---
+
+### WHAT WAS BUILT
+
+`src/whetstone_gate/camel_comparator/` (Q-004: **under** the package, not beside it — §16's prose
+says `src/camel_comparator/` and the sibling reading collides `tau2` with the vendored benchmark).
+Six modules, two generated artefacts, 39 tests.
+
+**The design in one sentence: nothing in this package transcribes a third-party fact.** Every
+expected value is **parsed out of `CONTEXT.md` §8.5/§8.5.1/§8.5.2**; every observed value is
+**derived from the vendored checkout with `ast`**. That is Q-016's, Q-020's and Q-031's
+no-golden enforcement made executable, and it is why a `full` chunk with no golden is still
+checkable (**Q-056**).
+
+⚠️ **Each claim's reference is located by the prose that INTRODUCES it, never by position or span
+width.** §8.5 states two `security_policy.py` references that are **both six lines** (`77-82`,
+`44-49`) and §8.5.1 two `models.py` references that are **both one** (`:40`, `:67`). A first
+attempt picked by span width; it would have compared a claim against a **different claim's**
+expected value **and printed green**. Every parser asserts it matched **exactly once**, and the
+first run of the anchor check fired correctly — `_section("## 8.5 ")` already contains §8.5.1, so
+concatenating §8.5.1 doubled every anchor. **The check caught the session's own bug on its first
+execution**, which is the only real evidence that *"exactly once"* was the right form.
+
+### THE EMPTY DIFF — C13's DELIVERABLE
+
+CaMeL pinned at `f083b6b396399d3b3c7f2ddaf613a5945eaf32d8`; AgentDojo at
+`928bbae820a89556b03de5cf818eb350cd6082d1`. Verification triple **clean on both**.
+`camel_unmodified.txt` carries the output and
+`test_the_committed_empty_diff_proof_regenerates_byte_for_byte` re-runs all three commands
+against the live checkout and diffs **byte for byte** — *a committed diff that nothing re-derives
+is a screenshot.* ⚠️ **Proved able to go RED rather than assumed able:** the checkout is copied
+to a temp directory, one line is appended to `security_policy.py`, and both `status --porcelain`
+and `git diff <pin>` stop being empty. **Nothing in this repository was edited to establish it**
+(INC-11, INC-17).
+
+⚠️ **THE AgentDojo PIN IS `v0.1.34`, NOT `main`, AND THE SESSION NEARLY GOT THIS WRONG.** `main`
+was fetched and measured **first** (`089ed468…`, 36,860 files, 428.5 MB). Only then was CaMeL's
+`uv.lock` read: it resolves `agentdojo==0.1.34` exactly. **The pin is derived from the third
+party's own lockfile rather than chosen by a session** — and vendoring `main` while describing it
+as *"what CaMeL runs on"* would have been a **sixth** false third-party claim, in the chunk
+written to prevent exactly that. Recorded because the near-miss is the useful part.
+
+### 3a–3e, EACH RE-VERIFIED FIRST-HAND AT THE PIN — 8 of 8
+
+* **3a** `interpreter.py` = **100,476 bytes / 2,716 lines**, from the **git blob**. ⚠️ The working
+  tree here reads **103,192 bytes**: `core.autocrlf` is `true` and CaMeL ships no
+  `.gitattributes`, so there are **2,716 CR bytes** — and `100,476 + 2,716 == 103,192` **exactly**.
+  The identity is *asserted*, so a reviewer measuring naively is **told why** rather than left
+  suspicious. Every size and line number in this chunk comes from `git ls-tree -l` /
+  `git cat-file -s`, never from the working tree.
+* **3b** engine `check_policy(tool_name, kwargs, dependencies)` at **77-82** (THREE); per-tool
+  callback `(tool_name, kwargs)` at **44-49** (TWO); `interpreter.py:2050` passes **exactly
+  three**. Arity is counted **from the AST**, because §8.5 records that a previous draft had these
+  backwards and a regex can confirm a string appears but not that a call passes three arguments.
+* **3c** `security_policy.py:96` **ENDS** `check_policy` with the deny-by-default `Denied(...)`.
+  *"Last"* is the load-bearing word — a `Denied` merely *present* proves nothing — and it is
+  asserted, with a fixture proving the derivation notices a denial that is not last.
+* **3d** dispatch at **100-127**: `google` / `openai` / `anthropic`, else
+  `raise ValueError("Invalid model")`; gemini id at **:40**; `max_tokens` branch at **105-108**.
+  §8.5.1's *"the real gate is the DISPATCH, not the name list"* is **confirmed by mechanism**: the
+  name list is merged into **AgentDojo's** `MODEL_NAMES` at `models.py:67`, so it feeds the *"what
+  model are you?"* injection tasks and admits nothing. ⚠️ **One precision note:** the code is
+  `if "google" in model` — **substring containment**, not a prefix parse. The conclusion is
+  unchanged; §9 makes third-party claims exact, so it is measured and reported.
+* **`base_url`: ZERO hits**, re-run at the pin over `--include=*.py` **and** over every file. The
+  scan is proved to fire on a fixture, so green cannot mean *"globbed nothing"*.
+* **3e FETCHED** — `arxiv.org/html/2503.18813v2`, HTTP 200, 2,554,718 B, SHA-256
+  `b5cd7970…02ca8a51`, 2026-09-01. **Not `[UNFETCHED]`.**
+
+### ⚠️ TWO CLASS A FINDINGS — BOTH RAISED, NEITHER SILENTLY FIXED
+
+**Q-058 / OF-59 — the *"Tables 5–7"* citation names the wrong table, and Branch B ships AS a
+citation.** `81.2 % ± 19.1` / `62.5 % ± 23.7` and 77-vs-84 are **Table 2, Appendix B, `o3 High`**;
+the paper's own `Difference` row reads **+18.8 % ± 4.6** on banking, so §4's *"it runs the other
+way"* is **right**. **Tables 5–7 are Appendix C, Claude 3.5 Sonnet**, where CaMeL's banking is
+**BEHIND** the undefended model — 75.00 vs 81.25 without attack, 70.83 vs 84.03 under it.
+Published as written, Branch B would point a panelist at a table stating **the opposite of the
+claim it supports**, in a submission whose thesis is that other people's numbers are unsound.
+✅ **§4 is clean — it cites no table.** ✅ **Table 7 IS correctly cited: it is P2's basis** (CaMeL
+0 in every suite; CaMeL-no-policies **1, all of it banking**). **The range 5–7 is right for P2 and
+wrong for the headline pair.** ⚠️ And `81.25 ± 19.12` in Table 5 is the **undefended model's** —
+one hundredth from the figure §8.5 gives CaMeL, which is very likely the mechanism, recorded as
+likely rather than asserted as cause.
+
+**Q-057 / OF-60 — `...+camel+secpol` is a PIPELINE NAME CaMeL emits, not a `--model` argument.**
+`models.py:188` builds it, only on the `replay_with_policies` branch; `models.py:51-53`/`:67` put
+the suffixed strings into **AgentDojo's** `MODEL_NAMES` so injection tasks can resolve a
+pipeline. The run is **two passes**, the second carrying `--replay-with-policies`, which replays
+the first's stored `logs/` (`replay_privileged_llm.py:321`; `main.py`: *"the equivalent run …
+should have already been run"*). ⚠️ **The failure mode is worse than a crash:** `"google" in
+model` is true, so dispatch **succeeds** and the suffixed string reaches `genai.Client` as a
+**model id** — a provider error inside the 90-minute box that §8.5.1's own Branch B condition
+(*"the model id is no longer served"*) invites reading as **Branch B**. A harness defect
+presenting as the pre-registered negative result. Built correctly here so RUN-1 is not exposed.
+
+⚠️ **The generalisable half is worth more than either instance.** §8.5.1 was right about
+everything readable in `models.py` and wrong about the one claim that lives in `main.py`'s CLI and
+the replayer's log path. **`PROCESS.md` §9 catches a fact read from the wrong page; it does not
+catch a fact nobody read a page for** — and *"a URL to a paper is not a URL to a table."*
+
+### THE BRANCH — NOT DECIDED, AND `make selftest` STILL RED
+
+`camel_comparator.branch` is untouched at `TODO_C13_RUN1`; `make selftest` is
+`1 failed, 1 passed`, red **on that sentinel and for that reason**. RUN-1 decides it.
+`test_this_chunk_does_not_decide_the_branch` asserts the property **structurally** — no module in
+the package writes a file at all — so it does **not** invert when RUN-1 legitimately writes the
+value. **Branch B's artefact is complete now** (`BRANCH_B.md`), so taking it on the night is a
+**selection, not an authoring job under time pressure**; its reason is parsed **verbatim** from
+§8.5.1 and P1–P3 **verbatim** from §8.5.2, and every published figure carries table, appendix,
+base model, row, suite, URL, fetch date **and the SHA-256 of the fetched HTML**.
+
+**P1–P3's factual bases re-derived rather than repeated:** P1's denial string at `banking.py:64`;
+P3's string **is** the engine's deny-by-default; P2's `InjectionTask6` goal text and its
+`sum >= 30000 or not all <= 10000` predicate re-derived from AgentDojo at its pin; and **P2's
+REASON** — *"there is no aggregate symbol in the engine to name"* — proved two ways: **zero**
+relational operators on an amount anywhere in `security_policies/`, and `send_money_policy` is
+per-call and stateless.
+
+### THE TRIPWIRE FIRED ON THIS SESSION'S OWN SOURCE
+
+`2050` — CaMeL's call-site line — collides with a seed in §8.6's seed list. **The collision was a
+false positive; writing the number at all was not**, and the remedy was to **derive** it, never to
+exempt. No spec-stated or third-party number now appears in any of the package's data structures.
+
+### COUNTS, AND WHICH MOVEMENT IS WHOSE
+
+`make test` **450 → 576 passed, 3 failed, 1 skipped, 2 deselected**. `check-roles` **17 / 0 / 4,
+exit 0** — unmoved. `git status --porcelain tests/goldens/` **EMPTY**. **Zero provider calls, zero
+tokens.** Of the +126 passes, **39 are C13's** and the remaining **+87 are the concurrent C7
+session's**. Of the three reds, **two are C7's** and **one is this session's declared STOP**.
+
+🚩 **THE DECLARED STOP.** `tests/test_config_loader.py::test_protocol_sentinels_are_exactly_the_undecided_ones`
+asserts the sentinel set by `==` against a five-entry literal, so **resolving `vendor.camel_sha`
+as TASK 3 instructs necessarily turns it red** — and that file is an EXISTING test file this
+session's fence names under **NOT**. It was **not edited, not skipped, not xfailed, not renamed**.
+This is **Q-043's shape exactly**. ⚠️ **And it will fire four more times on schedule: C14 resolves
+three sentinels and C16 one — and C14 is the freeze.** **Q-061 / OF-58, due before C14.**
+⚠️ **Third instance of one class:** after Q-043 and Q-051, three tests now encode *"today's
+contents"* where they mean *"nothing unexpected"*. All three are right about the property and
+wrong about the tense.
+
+**SIX QUESTIONS RAISED, Q-056…Q-061**, three Class A. **THREE FINDINGS, OF-58…OF-60**, all
+MEDIUM, each with a named deadline in another chunk. **`INCIDENTS.md` entries are OWED** — the
+concurrent C7 session held that file and this session's fence named it under **NOT**; the entries
+owed are declared in the FINAL OUTPUT.
+
+🚩 **NO TAG. Nothing is self-certified — a fresh adversarial review follows.**
+
+---
+
 ## ARCH — two ruled test corrections, three rulings, and golden 5 — **BUILD** (chunk cell ARCH) — 2026-09-01 — ✅ both inherited reds cleared, `make test` GREEN, no feature added
 
 **SESSION-TOKEN:** `5c4f8e11` — **NOT in the batch.** Appended as
