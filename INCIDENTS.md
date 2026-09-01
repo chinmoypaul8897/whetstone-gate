@@ -2698,6 +2698,38 @@ the read as `read_text` versus `glob`, and reports whether the path is relative.
 prose is then asserted to contain the `file:line` the derivation produced, so a stale citation in
 the plan is a red test rather than a sentence nobody re-reads.
 
+> ⚠️ **CORRECTION TO THE `Action` FIELD ABOVE — appended 2026-09-02 by C13 FIX 2 (`91eb51c1`) under
+> C13 REVIEW 2's BLOCKER B-4. THE ORIGINAL WORDS ARE LEFT STANDING AND ARE NOT DELETED**, because
+> an entry that quietly repairs its own false claim is the failure this correction is about.
+>
+> **`Action` claimed FIVE sites and FOUR landed.** The four first-party sites in `src/` were
+> corrected. **`Q-057`'s fact 4 was NOT** — it still read `replay_privileged_llm.py:321` at HEAD on
+> 2026-09-02, with no correction note and no annotation. ⚠️ **And no fix commit deletes a line from
+> `QUESTIONS.md` at all**, measured across all seven of C13 FIX 1's commits with `git show
+> --numstat`: `ef4b8d5` is **+1 / −0**, `f17709c` is **+214 / −0**, the other five do not touch the
+> file, and **total deletions are ZERO**. A correction to an existing line is a deletion; there were
+> none, so the claim could not have been true. `docs/sessions/c13-fix-1.txt:91` and
+> `OPEN_FINDINGS.md`'s closure of `B-1` repeat it.
+> **Now closed:** `Q-057` carries a dated correction note directly beneath fact 4, naming
+> `replay_task`, the construction at **140-145**, the read at **`:148`** and the call at **`:305`**,
+> and stating that `:321` is inside `replay_user_task`, a function with no caller. `Q-057` itself is
+> **not** silently edited — it is the historical record of what `c2b7f419` found.
+>
+> ⚠️ **AND A LABELLING, NOT A CORRECTION, OF THE SPAN — `OF-103`.** *"path at **139-146**"* above,
+> and the same span in this entry's **Event** field, are **not wrong**: `139-146` is the
+> **assignment statement** `trace_path = ( … )` including its parentheses, while the artefact emits
+> **`140-145`**, the **expression** — the `Path("logs") / … ` chain — because
+> `invocation._log_path_construction` returns `node.value.lineno … node.value.end_lineno`. Measured
+> over the git blob at the pin: `ast.Assign` = `(139, 146)`, `Assign.value` = `(140, 145)`.
+> **Prefer `140-145` when citing the construction**, since that one is generated from the call graph
+> and cannot drift — which is this entry's own remedy. Nothing here is corrected because nothing
+> here is false; the two spans are labelled so a reader comparing this entry to the artefact is not
+> left with two numbers and no explanation.
+>
+> **The general finding — that an `Action:` field can overstate what was done, which is a THIRD
+> pressure hard rule 13's format does not catch — is `INC-47`.** It is recorded there rather than
+> here so this entry stays a record of what it was written about.
+
 **Expectation:** two tests are named for this property —
 `test_both_passes_share_one_working_directory_and_the_plan_says_why` and
 `test_run1_is_two_passes_and_the_second_replays_the_first`. A guard named for a property should die

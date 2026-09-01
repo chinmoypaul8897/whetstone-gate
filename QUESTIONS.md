@@ -4791,6 +4791,57 @@ banking."* `PROCESS.md` §12.1's C13 row repeats the string. **It cannot be pass
    `Path("logs") / pipeline_name / suite_name / user_task_id / (attack_name or "none")` — **the
    stored logs of the earlier `+camel` pass** — and `models.py:179` hands it the `+camel` name.
 
+> ⚠️ **CORRECTION TO FACT 4 — appended 2026-09-02 by C13 FIX 2 (`91eb51c1`), under C13 REVIEW 2's
+> BLOCKER B-4. FACT 4 ABOVE IS LEFT STANDING AND IS NOT EDITED**, because it is the historical
+> record of what `c2b7f419` found and overwriting it would destroy the evidence of the original
+> error while claiming to correct it. ⚠️ **THE CORRECTION IS HERE, DIRECTLY BENEATH THE LINE IT
+> CORRECTS, AND NOT AT THE END OF THE ENTRY** — this entry's own status is **"BLOCKING RUN-1 if
+> unread"**, `CLAUDE.md` §1 makes this file item **6** of every session's mandatory read order, and
+> RUN-1 is a single-shot 90-minute box.
+>
+> **`:321` IS NOT ON A CODE PATH.** At the pin `f083b6b3`, line 321 is inside **`replay_user_task`**,
+> which is called only by `replay_suite` (`:344`), which is called only by `replay_benchmark`
+> (`:356`) — and **`replay_benchmark` has no caller anywhere in the tree**; `models.py:16` imports
+> only `PrivilegedLLMReplayer` and `UserInjectionTasksGetter`. Fact 4 cited a real line, in the real
+> file, **in a function nothing calls**. `git grep replay_benchmark` returns one hit: its own `def`.
+>
+> **THE LIVE CONSTRUCTION, which is what fact 4 was reaching for:**
+>
+> | | at the pin `f083b6b3` |
+> |---|---|
+> | function | **`replay_task`** |
+> | the `Path("logs") / …` construction | **`replay_privileged_llm.py:140-145`** |
+> | the read | **`:148`** — `TaskResults.model_validate_json(trace_path.read_text())` |
+> | its call site | **`:305`**, from `PrivilegedLLMReplayer.query` |
+>
+> ⚠️ **AND THE FAILURE MODE FACT 4 IMPLIED IS ALSO WRONG, in the direction that matters to RUN-1.**
+> Both builds recorded that a pass 2 started from the wrong working directory *"reads an empty tree
+> and reports nothing rather than failing — a silent zero"*. **It does not.** `replay_task` spans
+> 129–238 and its only `try` is 185–198, catching `SecurityPolicyDeniedError`; **line 148 is not
+> inside it**. `PrivilegedLLMReplayer.query` spans 287–315 and contains **zero** `try` blocks.
+> AgentDojo's `run_task_with_pipeline` wraps `agent_pipeline.query(...)` in `except AbortAgentError`
+> **only**. → **an unhandled `FileNotFoundError`: IT CRASHES LOUDLY.** That is the *diagnosable*
+> failure, not the undiagnosable one. **RUN-1 can act on that sentence; it could not act on the old
+> one.** (`INCIDENTS.md` INC-39.)
+>
+> ⚠️ **`140-145` AND `139-146` ARE BOTH TRUE AND NEITHER IS WRONG — they name different AST nodes,
+> and that is `OF-103`.** `139-146` is the span of the **assignment statement**, `trace_path = ( … )`
+> including its parentheses; `140-145` is the span of the **expression**, the `Path("logs") / … `
+> chain itself. `invocation._log_path_construction` returns `node.value.lineno … node.value.end_lineno`,
+> so the artefact emits the **expression** span while `139-146` is what a human reading the statement
+> writes down. **Measured here over the git blob at the pin rather than inferred:** `ast.Assign` =
+> `(139, 146)`, `Assign.value` = `(140, 145)`; line 139 is `trace_path = (`, line 146 is the closing
+> `)`. ⚠️ **`140-145` is the citation to prefer**, because it is *generated from the call graph* and
+> therefore cannot drift — which is the whole of `INC-39`'s remedy. `INC-39` is **labelled**
+> accordingly rather than corrected, since nothing in it is false.
+>
+> **Why this correction exists at all, recorded rather than smoothed over:** `INC-39`'s `Action`
+> field said this had already been done here, and it had not — four first-party sites landed, this
+> fifth did not, and **three records asserted five**. `INCIDENTS.md` **INC-47** carries that as its
+> own entry, because an `Action:` field that overstates what was done is a **third** failure mode
+> hard rule 13's format does not catch: `Fix:` is bound to a commit and cannot be invented,
+> `Action:` is bound to nothing. (`docs/reviews/REVIEW_13_2.md` B-4; `INC-39`; `INC-47`.)
+
 **So the run is two passes**, and the first is the only one that spends tokens:
 
 ```
