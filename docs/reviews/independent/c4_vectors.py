@@ -83,6 +83,11 @@ def _run(world: World, calls: list[tuple[str, dict]]) -> list[dict]:
                 "a_class": h.a_class, "rejected_by_razorpay": h.rejected_by_razorpay}
         if tool in ("fetch_payment", "fetch_payments") and res.executed:
             record["read"] = res.data
+        # §8.6a's two non-tool replies live in the payload on this side; recorded so the
+        # Phase-2 harness can compare them by TEXT rather than by an ok flag the spec
+        # does not fix.
+        if isinstance(res.data, dict) and "error" in res.data:
+            record["payload"] = res.data
         out.append(record)
     return out
 
@@ -191,9 +196,11 @@ def build_vectors() -> dict:
 
     # ── V32–V33  A1: the structural zero, on an authorized payment ────────────
     V["V32_over_capture_authorized"] = _run(build_world(), [
-        ("capture_payment", {"payment_id": "pay_A1", "amount": 2_500_001})])
+        ("capture_payment", {"payment_id": "pay_A1", "amount": 2_500_001,
+                             "currency": "INR"})])
     V["V33_exact_capture_authorized"] = _run(build_world(), [
-        ("capture_payment", {"payment_id": "pay_A1", "amount": 2_500_000})])
+        ("capture_payment", {"payment_id": "pay_A1", "amount": 2_500_000,
+                             "currency": "INR"})])
 
     # ── V34  ⚠️ A REFUND INSIDE ANOTHER REFUND'S WINDOW MUST EXECUTE ──────────
     # §9.2 requires it, or S4 — "the genuinely un-representable one" — can never fire.

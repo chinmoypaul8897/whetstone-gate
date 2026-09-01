@@ -40,6 +40,25 @@ ATTACKER_SYS = "data/attacker_sys.txt"
 POLICY = "data/policy.txt"
 ARM3_SAFETY = "data/arm3_safety.txt"
 
+#: ⚠️ **`CONTEXT.md` §8.6's ONE generic denial string, and the reason it is a file.**
+#:
+#: `QUESTIONS.md` **Q-046** (architect, 2026-09-01, Class A) ruled that the loop *"IDENTIFIES A
+#: DENIAL BY EXACT STRING EQUALITY AGAINST THAT ONE AUTHORED CONSTANT, read from `data/` and never
+#: inlined."* §8.6 gives it as the message *"every gate returns on DENY (identical across arms,
+#: leaking no policy)"*, and an ``INDETERMINATE`` verdict returns the same string — which is
+#: precisely why equality against it tells the loop *that* a denial happened and nothing whatever
+#: about **which arm** or **which clause**. The structural argument for claim 4 is untouched: this
+#: package still has no gate object (`INCIDENTS.md` **INC-26**).
+#:
+#: ⚠️ **IT IS DELIBERATELY NOT IN ``spec_constants.AUTHORED_TEXTS``, AND THAT IS A RECORDED GAP,
+#: NOT AN OVERSIGHT — `QUESTIONS.md` **Q-049**.** That tuple was outside the fix session's fence,
+#: and C6's own ``test_the_authored_texts_are_exactly_the_three_the_registry_names`` asserts the
+#: tuple equals the three §8.6 fenced blocks. So the guarantee the tuple exists to give — *"a
+#: fourth authored text that no test compares to the spec"* — is supplied instead by
+#: ``tests/test_c6_fix_probes.py::test_the_generic_denial_file_is_character_identical_to_CONTEXT_MD``,
+#: which parses §8.6 and compares bytes. **The registry row is owed and is named in Q-049.**
+GENERIC_DENIAL = "data/generic_denial.txt"
+
 
 class AuthoredTextMissing(RuntimeError):
     """An authored text file is absent.
@@ -96,3 +115,39 @@ def load(rel_path: str) -> AuthoredText:
 def attacker_system_prompt() -> str:
     """The attacker's system prompt, verbatim from ``data/attacker_sys.txt``."""
     return load(ATTACKER_SYS).text
+
+
+@lru_cache(maxsize=None)
+def generic_denial() -> str:
+    """`CONTEXT.md` §8.6's generic denial string, **without its trailing newline**.
+
+    ⚠️ **A SEPARATE FUNCTION FROM :func:`load`, ON PURPOSE.** ``load`` refuses any path outside
+    ``spec_constants.AUTHORED_TEXTS``, and C6's
+    ``test_the_authored_texts_are_exactly_the_three_the_registry_names`` pins that tuple at exactly
+    the three §8.6 **fenced blocks**. Widening either would have meant editing a file this session
+    may not edit; see :data:`GENERIC_DENIAL` and `QUESTIONS.md` **Q-049**.
+
+    **The trailing newline is stripped, and exactly one is permitted.** The comparison this value
+    exists for is byte equality against a tool result (`QUESTIONS.md` **Q-046**), and a stray
+    newline would make that comparison silently never match — which would restore the *old*
+    behaviour (no denial ever folded) under a name that says the opposite. So the shape of the file
+    is a hard refusal rather than an assumption: exactly one line, terminated by exactly one ``\\n``.
+    """
+    path = repo_root() / GENERIC_DENIAL
+    if not path.is_file():
+        raise AuthoredTextMissing(
+            f"{path} does not exist. It carries CONTEXT.md section 8.6's ONE generic denial "
+            f"string, which QUESTIONS.md Q-046 makes the loop's only way to tell a denial from "
+            f"any other tool result. Without it the deterministic summary cannot implement "
+            f"section 13.3's 'last denial reason' at all, and there is no fallback: guessing the "
+            f"string would put an authored constant back in source, which is what Q-046 forbids."
+        )
+    text = path.read_bytes().decode("utf-8")
+    if text.count("\n") != 1 or not text.endswith("\n"):
+        raise AuthoredTextMissing(
+            f"{path} must hold exactly one line terminated by exactly one newline; it holds "
+            f"{text.count(chr(10))} newline(s). The value is compared for BYTE EQUALITY against a "
+            f"tool result, so any extra whitespace makes the comparison never match and silently "
+            f"restores the defect INCIDENTS.md INC-26 records."
+        )
+    return text[:-1]

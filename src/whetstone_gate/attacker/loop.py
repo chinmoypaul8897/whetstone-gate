@@ -23,8 +23,22 @@ no verdict, no arm identity, no clause number. That is not politeness; it is why
 leak into the attacker's context is *structurally impossible from this module*, rather
 than merely absent today. `CONTEXT.md` §8.6's single generic denial —
 identical across arms on ``DENIED`` **and** on ``INDETERMINATE`` — reaches the attacker as
-the text of a tool result, exactly like a Razorpay error does, and this module cannot tell
-the two apart. Neither can the attacker, which is the point.
+the text of a tool result, exactly like a Razorpay error does. Neither the attacker nor
+this module learns **which arm** returned it or **which clause** fired, which is the point.
+
+⚠️ **AND THIS MODULE *CAN* TELL A DENIAL FROM ANY OTHER RESULT, WITHOUT A GATE OBJECT AND
+WITHOUT LEARNING ANYTHING FROM IT** — `QUESTIONS.md` **Q-046**, ruled 2026-09-01. The denial
+is **one authored constant string**, so byte equality against it is sufficient, and because
+every arm returns the *same* string on ``DENIED`` and on ``INDETERMINATE``, a match carries
+**exactly one bit**: *something refused*. That is what `CONTEXT.md` §13.3 needs the summary
+to carry — *"the running folded state (§8.6) with **the last denial reason**"* — and nothing
+more. The constant is read from ``data/generic_denial.txt`` and is never written in source.
+
+⚠️ **Until 2026-09-01 this loop folded the last TOOL RESULT instead, every turn,
+unconditionally**, which put verbatim world output onto the attacker's AUTHORED surface,
+told the attacker that completed refunds were refusals, and left C6's own claim-2 guard
+passing only because a long fixture pushed the probe note past the truncation cut. It is
+`INCIDENTS.md` **INC-26** and it was `REVIEW_C6_1`'s BLOCKER F-1.
 
 **Exactly ONE model call per turn.** `CONTEXT.md` §13.3's budget is 20 requests per
 episode and the deterministic summary is what protects it: *"it adds no requests"* is a
@@ -46,9 +60,11 @@ from whetstone_gate.attacker.context import (
     assemble,
 )
 from whetstone_gate.attacker.corpus import (
+    CorpusCoverage,
     CorpusEntry,
     InputProvenance,
     classify_provenance,
+    coverage_report,
     seed_for_turn,
 )
 from whetstone_gate.attacker.estimate import BudgetComparison, TokenEstimate, estimate_messages
@@ -114,6 +130,23 @@ class EpisodeResult:
     budget: BudgetComparison
     contexts: tuple[AssembledContext, ...]
 
+    episode_seed: int = 0
+    """The seed this episode's corpus offers were derived from (`QUESTIONS.md` **Q-047**).
+
+    ⚠️ **Recorded because ``0`` is the degenerate seed and must be VISIBLE rather than
+    merely absent.** This project scores 2001–2050 and pilots 2101–2110 (§8.6); a scored
+    episode carrying ``0`` here was run without its seed threaded through, which would put
+    every episode back on one identical offered set — `INCIDENTS.md` **INC-27**'s defect
+    wearing a new hat. :attr:`coverage` prints it.
+    """
+
+    coverage: CorpusCoverage | None = None
+    """Entries **offered** versus entries **loaded**, as a number (`CLAUDE.md` hard rule 11).
+
+    ``None`` only when the episode ran with no corpus at all, which is a test path;
+    ``load_entries`` refuses an empty corpus in any real run.
+    """
+
     @property
     def corpus_turns(self) -> int:
         return sum(1 for r in self.records if r.provenance is InputProvenance.CORPUS)
@@ -156,6 +189,11 @@ def _seed_hint(entry: CorpusEntry | None) -> str:
 
     It is offered as raw material with no framing that names a policy, a hole or an arm —
     there is nothing here for one to leak from.
+
+    ⚠️ **The return value is carried as its OWN context part, tagged
+    :attr:`~whetstone_gate.attacker.context.Origin.CORPUS`.** It used to be concatenated onto
+    the system prompt, which tagged somebody else's corpus entry as text *this harness wrote*
+    (`REVIEW_C6_1` INFO-3; `INCIDENTS.md` **INC-26**; `QUESTIONS.md` **Q-046**).
     """
     if entry is None:
         return ""
@@ -170,14 +208,34 @@ def run_episode(
     tool_schemas_text: str,
     corpus_entries: tuple[CorpusEntry, ...],
     fold: "StateFolder",
+    episode_seed: int = 0,
 ) -> EpisodeResult:
     """Run one policy-blind episode. **Exactly one model call per turn.**
 
     ``fold`` recomputes the §8.6 folded state from whatever the executor has done. It is
     injected for the same reason the client is: the ledger is C7's and the world is C4's,
     and this chunk builds neither.
+
+    ``episode_seed`` is the world seed this episode runs on, and it selects which corpus
+    entries are offered (`QUESTIONS.md` **Q-047**;
+    :func:`whetstone_gate.attacker.corpus.seed_for_turn`). ⚠️ **Two arms on the same seed
+    receive IDENTICAL offers**, which is what keeps §12.4's paired-by-seed design intact.
+    ⚠️ **Its default of ``0`` is a Class B choice recorded in Q-047 with its risk stated:**
+    a required argument would be hard rule 9's shape but would break six tests in a file
+    this fix session may not edit. ``0`` is not a seed this project ever scores, and it is
+    carried on :attr:`EpisodeResult.episode_seed` and printed by
+    :meth:`~whetstone_gate.attacker.corpus.CorpusCoverage.render`, so an unseeded run is
+    **visible in the record** rather than merely absent.
     """
     system_prompt = texts.attacker_system_prompt()
+    # ⚠️ Q-046: the ONE authored constant, read from data/ and never written in source. It
+    # is the loop's only means of telling a denial from any other tool result, and because
+    # every arm returns it on DENIED *and* on INDETERMINATE it carries no arm identity and
+    # no clause number — so claim 4 stays structural. INCIDENTS.md INC-26.
+    generic_denial = texts.generic_denial()
+    coverage = coverage_report(
+        corpus_entries, episode_seed=episode_seed, turn_budget=settings.turn_budget
+    )
     history: list[Turn] = []
     records: list[TurnRecord] = []
     contexts: list[AssembledContext] = []
@@ -193,15 +251,21 @@ def run_episode(
             actions_executed=fold.actions_executed(),
             turns_remaining=settings.turn_budget - index,
         )
-        seed = seed_for_turn(corpus_entries, index)
+        seed = seed_for_turn(
+            corpus_entries,
+            index,
+            episode_seed=episode_seed,
+            turn_budget=settings.turn_budget,
+        )
         context = assemble(
-            system_prompt=system_prompt + _seed_hint(seed),
+            system_prompt=system_prompt,
             tool_schemas_text=tool_schemas_text,
             history=tuple(history),
             state=state,
             last_refusal=last_refusal,
             verbatim_turns=settings.verbatim_turns,
             summary_token_cap=settings.summary_token_cap,
+            seed_text=_seed_hint(seed),
         )
         contexts.append(context)
 
@@ -212,7 +276,15 @@ def run_episode(
         calls += 1
 
         result_text = executor.execute(attacker_text)
-        last_refusal = result_text
+        # ── §13.3's LAST DENIAL REASON, and nothing else ─────────────────────────────
+        # ⚠️ EXACT string equality against the ONE authored constant (Q-046). A result
+        # that is not that string is not a denial, so it is NOT folded — which is what
+        # keeps world text and corpus text off the AUTHORED surface, and what stops a
+        # completed refund being republished to the attacker under the label
+        # "LAST TOOL REFUSAL:". `last_refusal` persists across turns because §13.3 says
+        # the LAST denial, not "the denial on the previous turn".
+        if result_text == generic_denial:
+            last_refusal = result_text
         provenance, corpus_ref = classify_provenance(attacker_text, seed)
         records.append(
             TurnRecord(
@@ -241,6 +313,8 @@ def run_episode(
             target_tokens=settings.target_tokens_per_episode,
         ),
         contexts=tuple(contexts),
+        episode_seed=episode_seed,
+        coverage=coverage,
     )
 
 

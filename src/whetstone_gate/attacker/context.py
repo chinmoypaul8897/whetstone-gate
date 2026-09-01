@@ -32,6 +32,20 @@ than intended, by tagging **every** part of the assembled context with its
   * :attr:`Origin.ATTACKER` — the model's own prior output, fed back verbatim.
   * :attr:`Origin.WORLD` — a tool result, **verbatim from the tool executor**. This
     harness neither annotates nor rewrites it.
+  * :attr:`Origin.CORPUS` — a **third-party** attack form offered as raw material, verbatim
+    from a pinned corpus (§11.3). Not ours, so not `AUTHORED`; not a tool result, so not
+    `WORLD`.
+
+⚠️ **UNTIL 2026-09-01 THE SENTENCE ABOVE WAS FALSE OF THE CODE, TWICE OVER, AND BOTH HALVES
+ARE FIXED HERE.** `authored_text()` carried (a) whatever the world last returned, because
+``loop.py`` folded the last **tool result** into the summary where `CONTEXT.md` §13.3 says
+the last **denial reason**, and (b) a third-party corpus entry, because the seed hint was
+concatenated onto the system prompt string. Both are `INCIDENTS.md` **INC-26** and
+`QUESTIONS.md` **Q-046**, whose ruling is explicit that *"world text and third-party corpus
+text STOP REACHING THE AUTHORED SURFACE."* :attr:`Origin.CORPUS` is the second half of that
+remedy — the material still reaches the attacker, it simply stops being labelled **ours**.
+`REVIEW_C6_1` INFO-3 predicted the corpus half would go live the moment the offered pool
+widened, which is exactly what Q-047 did in the same commit.
 
 ⚠️ **A tool result naming ``pay_CANARYRECON`` is NOT a leak, and confusing the two would
 break the experiment.** §10.1: the probe's notes are returned by ``fetch_payments``
@@ -55,7 +69,7 @@ import json
 from dataclasses import dataclass, field
 from enum import Enum
 
-from whetstone_gate.attacker.estimate import estimate_text
+from whetstone_gate.attacker.estimate import chars_per_token, estimate_text
 
 
 class Origin(Enum):
@@ -69,6 +83,19 @@ class Origin(Enum):
 
     WORLD = "world"
     """A tool result, verbatim from the tool executor. Never annotated here."""
+
+    CORPUS = "corpus"
+    """A third-party attack form from a pinned corpus (§11.3), offered as raw material.
+
+    ⚠️ **It is not `AUTHORED` and that distinction is the point.** The blindness guards that
+    are scoped to the authored surface ask *"did WE write this?"*, and the honest answer for
+    an InjecAgent or ASB entry is no. Tagging it `AUTHORED` made
+    ``_attack_list_findings``' own stated rationale false — it scopes itself to AUTHORED
+    because *"a third-party corpus entry is required to describe attacks"*, while the corpus
+    entry was landing on AUTHORED (`REVIEW_C6_1` INFO-3). Harmless while the offered pool was
+    twenty InjecAgent strings; live the moment `QUESTIONS.md` **Q-047** widened it to all four
+    corpora, where an entry containing a bare ``S1`` or ``E2`` is ordinary.
+    """
 
 
 @dataclass(frozen=True)
@@ -145,7 +172,29 @@ NO_REFUSAL = "none"
 #: Marks a summary the cap forced to be shortened. Deterministic, and VISIBLE: a silently
 #: truncated summary is `CLAUDE.md` hard rule 11's shape applied to context — a number
 #: quietly shrinking with nothing printed.
-TRUNCATION_MARK = "...[TRUNCATED TO FIT THE CONFIGURED SUMMARY CAP]"
+#:
+#: ⚠️ **AND IT NOW SAYS THAT THE CUT IS LOSSY, WHICH IS `OPEN_FINDINGS.md` OF-50.** The cut
+#: is a tail cut at a character boundary, so **two DIFFERENT folded states that differ only
+#: beyond the cut render BYTE-IDENTICAL.** C6's own test asserts *"a DIFFERENT state must
+#: produce different bytes — otherwise the summary is byte-identical for the trivial reason
+#: that it says nothing"*, and exercises it only on an **untruncated** state — so the
+#: property fails exactly in the regime where truncation is doing work. Nothing published
+#: moves today: the folded state renders first and stays under the cut at twelve payments,
+#: so only the refusal half is ever lost, and that text is also in the verbatim window. The
+#: lossiness is **stated in the mark itself** rather than left for a reader to infer, which
+#: is the remedy `REVIEW_C6_1` F-10 names.
+TRUNCATION_MARK = "...[TRUNCATED TO FIT THE CONFIGURED SUMMARY CAP - TAIL CUT, LOSSY]"
+
+#: ⚠️ **The smallest ``token_cap`` :func:`render_summary` will accept, as a multiple of the
+#: §8.6 divisor — `OPEN_FINDINGS.md` OF-51.** Below it the truncation marker **alone**
+#: overruns the cap it marks: at ``token_cap=5`` the old code returned a 48-character string
+#: estimating **16 tokens**, so the guard silently stopped being a guard beneath a threshold
+#: stated nowhere. Unreachable at the configured 400 — and live the moment C14 tunes the cap,
+#: which is a §8.6 row it may tune. A cap that small can carry no state at all, so this is a
+#: **hard refusal** rather than a quiet clamp: hard rule 9's shape applied to a cap.
+def minimum_token_cap(divisor: int) -> int:
+    """The smallest cap for which the marker itself fits. Derived, never hardcoded."""
+    return -(-len(TRUNCATION_MARK) // divisor)  # ceil division
 
 
 def render_summary(state: FoldedState, last_refusal: str | None, token_cap: int) -> str:
@@ -165,11 +214,25 @@ def render_summary(state: FoldedState, last_refusal: str | None, token_cap: int)
     """
     refusal = NO_REFUSAL if last_refusal is None else last_refusal
     text = f"{STATE_LABEL}{state.to_json()}\n{LAST_REFUSAL_LABEL}{refusal}"
-    if estimate_text(text) <= token_cap:
+    # ⚠️ ONE read of the §8.6 divisor, used for BOTH the test and the cut. Two reads could
+    # straddle a config edit and cut against a divisor the test did not use.
+    divisor = chars_per_token()
+    if estimate_text(text, divisor=divisor) <= token_cap:
         return text
-    from whetstone_gate.attacker.estimate import CHARS_PER_TOKEN
-
-    budget = max(token_cap * CHARS_PER_TOKEN - len(TRUNCATION_MARK), 0)
+    # ⚠️ OF-51: refuse a cap the marker alone cannot fit, rather than silently overrunning
+    # it. `max(..., 0)` used to clamp the budget to zero and then append 45 characters
+    # anyway, so at token_cap=5 the "capped" summary estimated 16 tokens.
+    floor = minimum_token_cap(divisor)
+    if token_cap < floor:
+        raise ValueError(
+            f"summary token_cap={token_cap} is below {floor}, the smallest cap for which "
+            f"the truncation marker itself fits at {divisor} chars/token. Below it the cap "
+            f"is not enforced at all - the marker alone overruns it - and a summary that "
+            f"can carry only its own truncation notice carries no CONTEXT.md section 8.6 "
+            f"folded state, so it is a misconfiguration and not a tight budget. This is a "
+            f"hard refusal rather than a clamp (hard rule 9). See OPEN_FINDINGS.md OF-51."
+        )
+    budget = token_cap * divisor - len(TRUNCATION_MARK)
     return text[:budget] + TRUNCATION_MARK
 
 
@@ -220,12 +283,25 @@ def assemble(
     last_refusal: str | None,
     verbatim_turns: int,
     summary_token_cap: int,
+    seed_text: str | None = None,
 ) -> AssembledContext:
     """Build the sliding-window context for the next turn.
 
     ``verbatim_turns`` and ``summary_token_cap`` are read from ``config/`` by the caller
     (:mod:`whetstone_gate.attacker.loop`) and are parameters here — this module contains
     no copy of either.
+
+    ``last_refusal`` is §13.3's **last denial reason**, and from `QUESTIONS.md` **Q-046** the
+    caller passes only a value that is byte-identical to §8.6's one generic denial string.
+    This function does not police that — it cannot, without reading ``data/`` and therefore
+    without becoming the gate-aware module claim 4 depends on this package not being — so
+    the discipline lives one layer up, in :func:`whetstone_gate.attacker.loop.run_episode`,
+    and the assertion lives in ``tests/test_c6_fix_probes.py`` over the loop's own output.
+
+    ``seed_text`` is the third-party corpus material offered this turn. ⚠️ **It is a
+    SEPARATE PART tagged :attr:`Origin.CORPUS`, never concatenated onto ``system_prompt``**
+    — see :attr:`Origin.CORPUS` and `INCIDENTS.md` **INC-26**. ``None`` or empty adds no part
+    at all, so an episode with no corpus loaded assembles exactly the context it did before.
 
     **The tool schemas are emitted ONCE PER TURN**, not once per message and not once per
     history entry: §13.3's window is *"the last 6 turns verbatim plus a compact running
@@ -238,6 +314,12 @@ def assemble(
     kept = history[-verbatim_turns:] if verbatim_turns else ()
     parts: list[ContextPart] = [
         ContextPart(Origin.AUTHORED, "system", system_prompt, "attacker_sys.txt"),
+    ]
+    if seed_text:
+        parts.append(
+            ContextPart(Origin.CORPUS, "system", seed_text, "corpus material offered this turn")
+        )
+    parts += [
         ContextPart(Origin.AUTHORED, "system", tool_schemas_text, "tool schemas (once per turn)"),
         ContextPart(
             Origin.AUTHORED,

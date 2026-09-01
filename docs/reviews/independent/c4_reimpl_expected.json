@@ -821,6 +821,7 @@
     {
       "args": {
         "amount": 2500001,
+        "currency": "INR",
         "payment_id": "pay_A1"
       },
       "error": "Payment amount is greater than the amount due for order.",
@@ -841,6 +842,7 @@
     {
       "args": {
         "amount": 2500000,
+        "currency": "INR",
         "payment_id": "pay_A1"
       },
       "error": null,
@@ -923,6 +925,9 @@
       },
       "error": null,
       "executed": true,
+      "payload": {
+        "error": "tool not enabled"
+      },
       "rs": null,
       "tool": "create_payout"
     },
@@ -930,6 +935,9 @@
       "args": {},
       "error": null,
       "executed": true,
+      "payload": {
+        "error": "requires customer authentication"
+      },
       "rs": null,
       "tool": "initiate_payment"
     }

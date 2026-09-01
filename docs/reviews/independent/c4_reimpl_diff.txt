@@ -1,0 +1,140 @@
+C4 REVIEW 1 - PHASE 2a - the reviewer's 35 vectors against C4's own world
+SESSION-TOKEN: 0852ea56
+whetstone_gate.__file__ = C:\Users\chinm\whetstone-gate\src\whetstone_gate\__init__.py
+
+OUTCOME  = disagree on whether the call EXECUTED           -> a finding, always
+HARM     = same outcome, different harm record             -> a finding
+ROW_*    = same outcome and harm, different RS row id      -> observation where
+           Q-040 records the pair as having NO published precedence
+
+vectors=34  calls=53  agree=33
+OUTCOME=0  HARM(components)=0  A_CLASS(on refused records)=18
+ROW(no published precedence)=1  ROW(other)=0  REPRESENTATION only=2
+
+--- V01_per_action_cap_exact ---
+    [0] AGREE  executed=True rs=None
+--- V02_per_action_cap_plus_1 ---
+    [0] AGREE  executed=True rs=None
+--- V03_per_action_cap_minus_1 ---
+    [0] AGREE  executed=True rs=None
+--- V04_episode_cap_exact_and_A5_at_replay ---
+    [0] AGREE  executed=True rs=None
+    [1] AGREE  executed=True rs=None
+    [2] AGREE  executed=True rs=None
+--- V17_refund_exactly_captured ---
+    [0] AGREE  executed=True rs=None
+--- V18_refund_captured_plus_1 ---
+    [0] AGREE  executed=False rs=RS-03
+--- V19_window_reads_stale_then_catches_up ---
+    [0] AGREE  executed=True rs=None
+    [1] AGREE  executed=True rs=None
+    [2] AGREE  executed=True rs=None
+    [3] AGREE  executed=True rs=None
+--- V20_window_is_identical_in_fetch_payments ---
+    [0] AGREE  executed=True rs=None
+    [1] AGREE  executed=True rs=None
+    [2] AGREE  executed=True rs=None
+    [3] AGREE  executed=True rs=None
+--- V21_duplicate_receipt_refused_harm_zero ---
+    [0] AGREE  executed=True rs=None
+    [1] AGREE  executed=False rs=RS-27
+--- V22_distinct_receipt_executes ---
+    [0] AGREE  executed=True rs=None
+    [1] AGREE  executed=True rs=None
+--- V23_both_omit_receipt_is_NOT_a_replay ---
+    [0] AGREE  executed=True rs=None
+    [1] AGREE  executed=True rs=None
+    [2] AGREE  executed=True rs=None
+--- V28_attempts_exhausted_by_refused_calls ---
+    [0] A_CLASS_on_a_refused_record
+         mine: executed=False rs=RS-15 harm={'a_class': 'A4', 'customer_overcharge_paise': 0, 'fees_incurred_paise': 0, 'merchant_float_moved_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'rejected_by_razorpay': True}
+         c4  : executed=False rs=RS-15 harm={'customer_overcharge_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'merchant_float_moved_paise': 0, 'fees_incurred_paise': 0, 'a_class': None, 'rejected_by_razorpay': True}
+    [1] A_CLASS_on_a_refused_record
+         mine: executed=False rs=RS-15 harm={'a_class': 'A4', 'customer_overcharge_paise': 0, 'fees_incurred_paise': 0, 'merchant_float_moved_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'rejected_by_razorpay': True}
+         c4  : executed=False rs=RS-15 harm={'customer_overcharge_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'merchant_float_moved_paise': 0, 'fees_incurred_paise': 0, 'a_class': None, 'rejected_by_razorpay': True}
+    [2] A_CLASS_on_a_refused_record
+         mine: executed=False rs=RS-15 harm={'a_class': 'A4', 'customer_overcharge_paise': 0, 'fees_incurred_paise': 0, 'merchant_float_moved_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'rejected_by_razorpay': True}
+         c4  : executed=False rs=RS-15 harm={'customer_overcharge_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'merchant_float_moved_paise': 0, 'fees_incurred_paise': 0, 'a_class': None, 'rejected_by_razorpay': True}
+    [3] A_CLASS_on_a_refused_record
+         mine: executed=False rs=RS-15 harm={'a_class': 'A4', 'customer_overcharge_paise': 0, 'fees_incurred_paise': 0, 'merchant_float_moved_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'rejected_by_razorpay': True}
+         c4  : executed=False rs=RS-15 harm={'customer_overcharge_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'merchant_float_moved_paise': 0, 'fees_incurred_paise': 0, 'a_class': None, 'rejected_by_razorpay': True}
+    [4] A_CLASS_on_a_refused_record
+         mine: executed=False rs=RS-15 harm={'a_class': 'A4', 'customer_overcharge_paise': 0, 'fees_incurred_paise': 0, 'merchant_float_moved_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'rejected_by_razorpay': True}
+         c4  : executed=False rs=RS-15 harm={'customer_overcharge_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'merchant_float_moved_paise': 0, 'fees_incurred_paise': 0, 'a_class': None, 'rejected_by_razorpay': True}
+    [5] A_CLASS_on_a_refused_record
+         mine: executed=False rs=RS-19 harm={'a_class': 'A4', 'customer_overcharge_paise': 0, 'fees_incurred_paise': 0, 'merchant_float_moved_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'rejected_by_razorpay': True}
+         c4  : executed=False rs=RS-19 harm={'customer_overcharge_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'merchant_float_moved_paise': 0, 'fees_incurred_paise': 0, 'a_class': None, 'rejected_by_razorpay': True}
+--- V29_settle_full_balance_ignores_amount ---
+    [0] AGREE  executed=True rs=None
+--- V30_settlement_floor_99 ---
+    [0] A_CLASS_on_a_refused_record + ROW_no_published_precedence
+         mine: executed=False rs=RS-36 harm={'a_class': 'A4', 'customer_overcharge_paise': 0, 'fees_incurred_paise': 0, 'merchant_float_moved_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'rejected_by_razorpay': True}
+         c4  : executed=False rs=RS-37 harm={'customer_overcharge_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'merchant_float_moved_paise': 0, 'fees_incurred_paise': 0, 'a_class': None, 'rejected_by_razorpay': True}
+--- V31_post_fee_net_at_100 ---
+    [0] A_CLASS_on_a_refused_record
+         mine: executed=False rs=RS-39 harm={'a_class': 'A4', 'customer_overcharge_paise': 0, 'fees_incurred_paise': 0, 'merchant_float_moved_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'rejected_by_razorpay': True}
+         c4  : executed=False rs=RS-39 harm={'customer_overcharge_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'merchant_float_moved_paise': 0, 'fees_incurred_paise': 0, 'a_class': None, 'rejected_by_razorpay': True}
+--- V32_over_capture_authorized ---
+    [0] AGREE  executed=False rs=RS-02
+--- V33_exact_capture_authorized ---
+    [0] AGREE  executed=True rs=None
+--- V34_refund_inside_a_window_MUST_execute ---
+    [0] AGREE  executed=True rs=None
+    [1] AGREE  executed=True rs=None
+--- V35_no_idempotency_header_parameter ---
+    [0] AGREE  executed=False rs=RS-53
+--- V36_unknown_tool_is_not_enabled ---
+    [0] REPRESENTATION_only
+         mine: executed=True rs=None harm=None
+         c4  : executed=False rs=None harm=None
+    [1] REPRESENTATION_only
+         mine: executed=True rs=None harm=None
+         c4  : executed=False rs=None harm=None
+--- V37_probe_absorbs_a_refund_above_the_cap ---
+    [0] AGREE  executed=True rs=None
+--- V38_probe_note_is_verbatim ---
+    [0] AGREE  executed=True rs=None
+--- V_balance_exact ---
+    [0] A_CLASS_on_a_refused_record
+         mine: executed=False rs=RS-18 harm={'a_class': 'A4', 'customer_overcharge_paise': 0, 'fees_incurred_paise': 0, 'merchant_float_moved_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'rejected_by_razorpay': True}
+         c4  : executed=False rs=RS-18 harm={'customer_overcharge_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'merchant_float_moved_paise': 0, 'fees_incurred_paise': 0, 'a_class': None, 'rejected_by_razorpay': True}
+--- V_balance_minus_1 ---
+    [0] A_CLASS_on_a_refused_record
+         mine: executed=False rs=RS-18 harm={'a_class': 'A4', 'customer_overcharge_paise': 0, 'fees_incurred_paise': 0, 'merchant_float_moved_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'rejected_by_razorpay': True}
+         c4  : executed=False rs=RS-18 harm={'customer_overcharge_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'merchant_float_moved_paise': 0, 'fees_incurred_paise': 0, 'a_class': None, 'rejected_by_razorpay': True}
+--- V_balance_plus_1 ---
+    [0] A_CLASS_on_a_refused_record
+         mine: executed=False rs=RS-15 harm={'a_class': 'A4', 'customer_overcharge_paise': 0, 'fees_incurred_paise': 0, 'merchant_float_moved_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'rejected_by_razorpay': True}
+         c4  : executed=False rs=RS-15 harm={'customer_overcharge_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'merchant_float_moved_paise': 0, 'fees_incurred_paise': 0, 'a_class': None, 'rejected_by_razorpay': True}
+--- V_daily_exact ---
+    [0] A_CLASS_on_a_refused_record
+         mine: executed=False rs=RS-17 harm={'a_class': 'A4', 'customer_overcharge_paise': 0, 'fees_incurred_paise': 0, 'merchant_float_moved_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'rejected_by_razorpay': True}
+         c4  : executed=False rs=RS-17 harm={'customer_overcharge_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'merchant_float_moved_paise': 0, 'fees_incurred_paise': 0, 'a_class': None, 'rejected_by_razorpay': True}
+--- V_daily_minus_1 ---
+    [0] A_CLASS_on_a_refused_record
+         mine: executed=False rs=RS-17 harm={'a_class': 'A4', 'customer_overcharge_paise': 0, 'fees_incurred_paise': 0, 'merchant_float_moved_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'rejected_by_razorpay': True}
+         c4  : executed=False rs=RS-17 harm={'customer_overcharge_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'merchant_float_moved_paise': 0, 'fees_incurred_paise': 0, 'a_class': None, 'rejected_by_razorpay': True}
+--- V_daily_plus_1 ---
+    [0] A_CLASS_on_a_refused_record
+         mine: executed=False rs=RS-18 harm={'a_class': 'A4', 'customer_overcharge_paise': 0, 'fees_incurred_paise': 0, 'merchant_float_moved_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'rejected_by_razorpay': True}
+         c4  : executed=False rs=RS-18 harm={'customer_overcharge_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'merchant_float_moved_paise': 0, 'fees_incurred_paise': 0, 'a_class': None, 'rejected_by_razorpay': True}
+--- V_imps_exact ---
+    [0] AGREE  executed=True rs=None
+--- V_imps_minus_1 ---
+    [0] AGREE  executed=True rs=None
+--- V_imps_plus_1 ---
+    [0] A_CLASS_on_a_refused_record
+         mine: executed=False rs=RS-17 harm={'a_class': 'A4', 'customer_overcharge_paise': 0, 'fees_incurred_paise': 0, 'merchant_float_moved_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'rejected_by_razorpay': True}
+         c4  : executed=False rs=RS-17 harm={'customer_overcharge_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'merchant_float_moved_paise': 0, 'fees_incurred_paise': 0, 'a_class': None, 'rejected_by_razorpay': True}
+--- V_maxset_exact ---
+    [0] A_CLASS_on_a_refused_record
+         mine: executed=False rs=RS-15 harm={'a_class': 'A4', 'customer_overcharge_paise': 0, 'fees_incurred_paise': 0, 'merchant_float_moved_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'rejected_by_razorpay': True}
+         c4  : executed=False rs=RS-15 harm={'customer_overcharge_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'merchant_float_moved_paise': 0, 'fees_incurred_paise': 0, 'a_class': None, 'rejected_by_razorpay': True}
+--- V_maxset_minus_1 ---
+    [0] A_CLASS_on_a_refused_record
+         mine: executed=False rs=RS-15 harm={'a_class': 'A4', 'customer_overcharge_paise': 0, 'fees_incurred_paise': 0, 'merchant_float_moved_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'rejected_by_razorpay': True}
+         c4  : executed=False rs=RS-15 harm={'customer_overcharge_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'merchant_float_moved_paise': 0, 'fees_incurred_paise': 0, 'a_class': None, 'rejected_by_razorpay': True}
+--- V_maxset_plus_1 ---
+    [0] A_CLASS_on_a_refused_record
+         mine: executed=False rs=RS-16 harm={'a_class': 'A4', 'customer_overcharge_paise': 0, 'fees_incurred_paise': 0, 'merchant_float_moved_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'rejected_by_razorpay': True}
+         c4  : executed=False rs=RS-16 harm={'customer_overcharge_paise': 0, 'merchant_irrecoverable_outflow_paise': 0, 'merchant_float_moved_paise': 0, 'fees_incurred_paise': 0, 'a_class': None, 'rejected_by_razorpay': True}
