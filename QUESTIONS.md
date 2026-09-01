@@ -89,6 +89,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `91eb51c1` | C13 | FIX | 2026-09-02 |
 | `c09c385b` | C13 | REVIEW | 2026-09-02 |
 | `9c7c5973` | C0 | FIX | 2026-09-02 |
+| `363a2e9f` | C6 | FIX | 2026-09-02 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -668,6 +669,29 @@ registered immediately before that task's first commit**, which is the ordering 
 **No other session's line was touched by this append.** The `Swept:` check was run on the **STAGED
 SNAPSHOT** (`git diff --cached -- <paths>`), not the working tree, under the inverted git rule
 recorded at the head of this session's TASK 1 prompt and proved by C13 FIX 2 (`INC-48`).
+
+⚠️ **AND `363a2e9f` IS THE TWENTY-EIGHTH SELF-RECORDED ROW AND IS ROW 43. IT IS THE SAME SESSION'S
+SECOND TOKEN, AND THAT IS WHY IT IS A SEPARATE PARAGRAPH RATHER THAN A SECOND LINE IN THE ONE
+ABOVE.** NIGHT RUN SESSION A, **TASK 2 = C6 FIX 3**, 2026-09-02. Its prompt: *"TWO TOKENS, ONE PER
+CHUNK. Register EACH row in QUESTIONS.md before that task's first commit, numbered FROM THE TABLE.
+Never put 9c7c5973 on a C6 commit or 363a2e9f on a C0 commit."*
+⚠️ **THE TABLE WAS RE-COUNTED AT THIS MOMENT RATHER THAN CARRIED FORWARD FROM TASK 1**, because a
+concurrent **C13 REVIEW 3** session (`c09c385b`) holds this file and a row landing in between would
+have made an inherited count wrong — which is `OF-67`'s finding exactly. **Counted from the file
+immediately before appending: 42 data rows, `9c7c5973` last, so this is row 43.**
+
+* **This session is therefore the twenty-eighth self-recorded row and the twenty-seventh to carry a
+  paragraph**, the gap of exactly one still being `9c0c6734`'s uncounted row. Cross-derived a second
+  way: 42 data rows less the **15** nobody self-recorded gives **27 self-recorded before this one**,
+  which is exactly the ordinal `9c7c5973` claimed one paragraph above. **The two derivations agree.**
+* ⚠️ **ORDINALS 11, 12 AND 18 ARE STILL ASSERTED BY NO PARAGRAPH** (`df238be6`, `0852ea56`,
+  `9c0c6734`) and are **not this session's to close**, under either token.
+* ⚠️ **`make check-roles` E2 IS THE REASON THE TWO ROWS ARE SEPARATE AND MUST STAY SEPARATE.** E2
+  fails if a chunk's BUILD and REVIEW share a token and E3 fails if a token holds more than one
+  `(chunk, role)` pair. **One session holding two tokens is legal; one token holding two chunks is
+  not.** Measured after this append: **43 issued row(s) covering 43 token(s)**, E1/E2/E3 all clean.
+
+**No other session's line was touched by this append.** `Swept:` verified on the **STAGED SNAPSHOT**.
 
 ## ⚠️ THE TOKEN BATCH, 2026-08-31 — and this is what ends the collision class
 
