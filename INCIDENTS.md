@@ -3576,3 +3576,76 @@ no mechanism scopes the `Swept:` check to *the committing session's own paths* r
 other session's declared ones. Both are re-declared as owed rather than gestured at. ⚠️ **The count
 is two — `INC-36` and this — and the second happened to a session that had been handed `INC-36`'s
 rule in its own prompt and had run the check.**
+
+---
+
+## INC-49 — the guard that catches a typed token was defeated by a session QUOTING one correctly, in a commit about the token table: `make test` is RED at HEAD and this session broke it
+
+**Date:** 2026-09-02 (C13 FIX 2, `91eb51c1`. The commit is this session's own, `c4d4460`. Found by
+this session, by running `make test` after committing. Raised as `Q-080`. **Fix: NONE — see below.**)
+
+**Event:** `make test` at HEAD is **721 passed, 1 failed, 1 skipped, 2 deselected**. The single
+failure is `tests/test_repo_invariants.py::test_check_roles_exits_zero`, and it is **this session's**.
+`c4d4460` — the commit that registers this session's token row — carries **two** lines beginning
+`Session-Token:`. Line **37** is the real trailer, `Session-Token: 91eb51c1`, well formed. Line
+**22** is **prose**, a sentence recording that four earlier commits already carried the trailer,
+which happens to begin with the literal `Session-Token:` at column 0.
+`check_roles.py`'s strict `_TOKEN_TRAILER` matches line 37, so **E1, E2 and E3 all PASS** and the
+commit's role separation is not in doubt. `_TOKEN_TRAILER_ANY` matches **both**, line 22 fails the
+strict form, and **E5 FAILS** on it — so `make check-roles` exits non-zero and the invariant test
+that asserts it exits zero goes red.
+
+**Action:** ⚠️ **NOTHING WAS FIXED, AND THAT IS THE ACTION.** All three real remedies are the
+architect's, and this session took none of them: amending `c4d4460` is a **history rewrite**, which
+`CLAUDE.md` §5 forbids *"ever"*; adding it to `E5_EXCEPTIONS` is forbidden by that list's own comment
+(*"PINNED AT EXACTLY FOUR ENTRIES … not extended without an architect ruling"*); and fixing the
+parser edits `src/whetstone_gate/check_roles.py`, which this session's fence names under **NOT**,
+and re-opens **`Q-014` (i)**, whose ruling reads *"`_TOKEN_TRAILER` IS NOT WIDENED. That stands and
+is not reopened."* The stop is recorded as **`Q-080`** with all four options and their costs, and
+**the red is declared in this session's FINAL OUTPUT, attributed by file and by commit**, rather than
+left for the next reviewer to find and attribute.
+
+**Expectation:** a commit that carries a correct, well-formed `Session-Token:` trailer should pass the
+check that exists to verify session tokens. `c4d4460` does carry one. **E5 failed on a sentence about
+it.**
+
+**Missing:** ⚠️ **ANY NOTION OF WHERE A TRAILER LIVES.** Git defines trailers as the message's **last
+paragraph** and ships `git interpret-trailers` to read them; `check_roles.py` instead scans the whole
+body with a `MULTILINE` regex, so **column 0 is the only thing that makes a line a trailer.** Nothing
+distinguishes a trailer from a quotation of one, and nothing warns at commit time — the failure
+surfaces one `make test` later, attributed to a repository invariant rather than to the message that
+caused it.
+
+**Missed:** ⚠️ **THIS SESSION HAD ALREADY READ THE RULE IT BROKE, IN THE FILE IT BROKE IT IN.** The
+`## Session tokens` section states the trailer format, and this session quoted `Session-Token:` at
+column 0 **in the commit that registers its own row in that very table** — the single most likely
+place on the whole project for a session to write the string, and therefore the least surprising
+place for this to happen. ⚠️ **And the near-miss was already in the transcript:** four earlier commits
+this session made discuss tokens in their bodies and every one happened to keep the string
+mid-sentence or indented. Nothing made that a habit; it was luck, and the fifth ran out of it.
+
+**Diagnosis:** `_TOKEN_TRAILER_ANY` treats any line in the commit body starting at column 0 with
+`Session-Token:` as a trailer, so a session that correctly *explains* its token — which this project
+requires sessions to do — manufactures a second, malformed "trailer" out of prose. The guard is
+anchored on a string's position in a paragraph rather than on the paragraph's position in the
+message.
+
+**Fix:** ⚠️ **NONE, AND THE ABSENCE IS THE ENTRY.** `Q-080` is a declared **STOP**, not a deferral: no
+commit of this session fixes it, `make test` is red at HEAD, and this entry exists so that fact is on
+the record in the file that carries what broke, rather than only in a session report. **An entry
+whose `Fix` is "nothing was changed, and here is why nobody was allowed to" is worth more than a
+workaround** — and hard rule 13's own warning is against dramatising, not against reporting a stop.
+
+**Systemic guardrail:** ⚠️ **NONE LANDED, AND THE ONE THAT WOULD WORK IS NAMED RATHER THAN GESTURED
+AT.** Read the trailer block the way git defines it — the message's **last paragraph**, via
+`git interpret-trailers` or an equivalent tail parse — so a quoted `Session-Token:` line anywhere
+above it is prose and not a trailer. That is `Q-080` option 3, it removes the **class** rather than
+this instance, and it is `check_roles.py`'s to change, which is outside this fence and inside
+`Q-014`'s ruling. ⚠️ **The cheap interim convention, which costs nothing and is offered because the
+real fix needs a ruling:** never write `Session-Token:` at column 0 anywhere but the trailer —
+indent it, or write it inline. ⚠️ **And a second-order note, recorded because it is the uncomfortable
+one:** `E5`'s exception list is described in its own comment as the thing that makes E5 *"fail on any
+NEW malformed trailer, on any commit, from now on"*, and the first new malformed trailer since that
+comment was written was produced **by a session obeying every rule it knew about**. That is evidence
+about the parser, not about the session, and it is recorded here so the ruling on `Q-080` is made
+against it.

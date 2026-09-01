@@ -6880,3 +6880,86 @@ session's Phase 1 did **not** read, and they are the law this session's Phase 1 
   gate reason could contain** rather than from the fix's list. `REVIEW_C6_2`'s
   `independent/c6_reimpl.py` — the whole-loop reimplementation, 30 vectors, 41 property agreements —
   stands as the `full` chunk's reimplementation of record and is **not** superseded by this file.
+
+---
+
+## ⚠️ RAISED BY C13 FIX 2 (`91eb51c1`), 2026-09-02 — Q-080
+
+### Q-080 — ⚠️ **`make test` IS RED AND THIS SESSION BROKE IT.** A commit message that *quotes* a `Session-Token:` trailer is parsed by E5 as a malformed trailer, and the only two remedies are both the architect's
+**Raised by:** C13 FIX 2 (`91eb51c1`) · **Date:** 2026-09-02 · **Status:** ⚠️ **OPEN —
+BLOCKING a green `make test`; the tree is RED at HEAD and this entry is why** · **Class:** **A** —
+every remedy either rewrites history or extends a list the file itself says is not extended without
+a ruling.
+
+**What happened, measured.** This session's commit **`c4d4460`** (the token-row registration) carries
+**two** lines beginning `Session-Token:`:
+
+```
+line 22   Session-Token: 91eb51c1, so `make check-roles` was E1-red in between. That is OF-89's
+line 37   Session-Token: 91eb51c1
+```
+
+Line 37 is the real trailer and is well formed. **Line 22 is prose** — a sentence explaining that
+four earlier commits already carried the trailer — which happens to begin with the literal string
+`Session-Token:` at column 0.
+
+`check_roles.py:835` `_TOKEN_TRAILER` (strict, `^Session-Token:\s*([0-9a-fA-F]{8})\s*$`, `MULTILINE`)
+matches **line 37**, so **E1, E2 and E3 all PASS** — the commit is correctly tokened and nothing about
+role separation is in doubt. But `check_roles.py:841` `_TOKEN_TRAILER_ANY`
+(`^Session-Token:\s*(\S.*?)\s*$`, `MULTILINE`) matches **both**, and line 22 does not satisfy the
+strict form, so it is recorded as **malformed** and **E5 FAILS**:
+
+```
+[FAIL] E5 malformed Session-Token trailer
+       MALFORMED and NOT on the dated exception list: c4d4460 carries
+       "91eb51c1, so `make check-roles` was E1-red in between. That is OF-89's".
+```
+
+**Consequence, stated plainly:** `make check-roles` exits non-zero, so
+`tests/test_repo_invariants.py::test_check_roles_exits_zero` fails, so **`make test` is RED at HEAD**
+— **721 passed, 1 failed, 1 skipped, 2 deselected**. ⚠️ **The one failure is this session's own and
+nothing else is.**
+
+⚠️ **AND THE GENERALISABLE HALF, WHICH IS WORTH MORE THAN THE INSTANCE.** `_TOKEN_TRAILER_ANY` cannot
+distinguish **a trailer** from **a quotation of a trailer**. Any commit message that *writes about*
+tokens — which is exactly what a token-row commit, an `INC-36`-class sweep report, or any discussion
+of `check_roles` itself must do — trips E5 the moment a quoted line lands at column 0. **The guard
+that exists to catch a typed token is defeated by a session explaining tokens correctly.** This
+session hit it in a commit *about* the token table, which is the most likely place for it to happen
+and therefore the least surprising one.
+
+**Options seen:**
+  1. ⚠️ **Amend `c4d4460`** to indent or re-word line 22. **One line of prose, changes no content,
+     and the commit is UNPUSHED and UNTAGGED at the moment this is written.** Rejected as a *default*
+     because `CLAUDE.md` §5 says *"No history rewrite, **ever** — a rewrite would destroy
+     `probe-v1`, `prereg-v1` and every `cN-pass` tag."* The stated **rationale** does not apply to an
+     untagged, unpushed tip commit; the **rule as written** is absolute and admits no such reading.
+     **That gap is exactly what hard rule 1 says a session must not close on its own.**
+  2. **Add `c4d4460` to `E5_EXCEPTIONS`.** The file forbids it in terms: the list is *"PINNED AT
+     EXACTLY FOUR ENTRIES"* and *"is not extended without an architect ruling"*, and its own comment
+     says **"E5 FAILS on any NEW malformed trailer, on any commit, from now on."** ⚠️ Rejected on the
+     merits as well as by authority: the four existing entries are C0-era commits with **no prompt
+     token to carry**, which is a different thing entirely from a session that had one and quoted it.
+  3. **Fix the parser** so a trailer is read only from the commit message's **trailer block** (the
+     last paragraph), per `git interpret-trailers`, rather than by `MULTILINE` scan of the whole
+     body. ⚠️ This is the remedy that removes the class rather than the instance — but
+     `src/whetstone_gate/check_roles.py` is named under **NOT** in this session's fence, and
+     widening `_TOKEN_TRAILER` was already declined once, by **`Q-014` (i)**, whose ruling this file
+     records verbatim as *"`_TOKEN_TRAILER` IS NOT WIDENED. That stands and is not reopened."*
+     **A session that re-opened it unasked would be overturning a ruling.**
+  4. **Leave it red and publish the red.** Honest, and it is what this entry does in the meantime,
+     but it hands the next session a suite that fails for a reason unconnected to its work — the
+     precise confusion `OF-89` exists about.
+
+**Default taken:** ⚠️ **NONE — AND THE COMMIT IS NOT AMENDED.** All three real remedies are the
+architect's: two rewrite history, and the third re-opens a recorded ruling and edits a file this
+fence names under **NOT**. Nothing was edited and no workaround was built (hard rule 1). ⚠️ **The
+red is REPORTED as this session's own, in the FINAL OUTPUT, attributed by file and by commit**, and
+not left for a reviewer to discover and attribute.
+
+**What the architect is asked to rule:** which of options 1–3 lands, and by which session. ⚠️ **And
+option 3 is the one this entry is really for**: options 1 and 2 fix `c4d4460`, and option 3 fixes
+**every future commit message that quotes a trailer** — which, on a project whose sessions are
+required to write about their own tokens in their own commit messages, is not a hypothetical.
+
+**RULING (architect, \<date>):** *\<pending>*
