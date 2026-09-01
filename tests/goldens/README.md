@@ -48,21 +48,28 @@ Defined in full in `PROCESS.md` §5.2. Each is authored before its consuming chu
 
 ## Status
 
-**Three of nine authored. Golden 7 landed 2026-08-31; goldens 1 and 3 landed 2026-08-31, later the
-same day. Six are still owed.**
+**Four of nine authored. Golden 7 landed 2026-08-31; goldens 1 and 3 landed 2026-08-31, later the
+same day; golden 5 landed 2026-09-01. Five are still owed.**
 
 | # | File | State | Authored |
 |---|---|---|---|
 | **1** | `golden1_money.json` | ✅ **authored** | **2026-08-31**, by the **architect**, before any money code in `src/whetstone_gate/` exists |
 | **3** | `golden3_harm_vector.json` | ✅ **authored** | **2026-08-31**, by the **architect**, before the typed harm record exists |
+| **5** | `golden5_tamper.json` | ✅ **authored** | **2026-09-01**, by the **architect**, before `src/whetstone_gate/ledger/` exists |
 | **7** | `world_seed_2001.json` | ✅ **authored** | **2026-08-31**, by the **architect**, before `src/whetstone_gate/world/` exists |
-| 2 · 4 · 5 · 6 · 8 · 9 | — | ⏳ **owed** | each before its consuming chunk is built |
+| 2 · 4 · 6 · 8 · 9 | — | ⏳ **owed** | each before its consuming chunk is built |
 
 ⚠️ **C4 IS NOW UNBLOCKED.** `PROCESS.md` §12.1's C4 done-when reads *"Goldens 1 and 3 reproduce
 exactly"*, and hard rule 3 says **a `full` chunk with no golden may not be built.** C4 is a `full`
 chunk and both of its goldens now exist, hand-derived before the code that will consume them. **C4
 was the only chunk blocked on these two**; the six still owed block C7, C8, C9, C10, C11 and C18,
 which are unchanged.
+
+⚠️ **AND C7 IS NOW UNBLOCKED**, on the same sentence and for the same reason. `PROCESS.md` §12.1's
+C7 done-when opens *"golden 5 reproduces"*; C7 is a `full` chunk; golden 5 is the only golden it is
+blocked on, and it now exists — hand-derived by the architect **before `src/whetstone_gate/ledger/`
+exists**, which is the whole of what hard rule 3 asks. **C7 was the only chunk blocked on golden 5.**
+The five still owed block C8, C9, C10, C11 and C18, which are unchanged.
 
 ### Golden 1 — `golden1_money.json`
 
@@ -156,6 +163,74 @@ on its filename, so the check scales to nine. Until then **every golden added to
 either use the distinct form or break C2's test** — which is why this paragraph exists rather than a
 quiet re-styling.
 
+> ⚠️ **POSTSCRIPT, 2026-09-01 — THE REMEDY LANDED, AND THIS SECTION IS KEPT ANYWAY.** `Q-035` was
+> RULED and C2 took its own remedy in `9c5dbb5`: `tests/test_c2_world.py` now slices this README to
+> the section whose heading names `world_seed_2001.json` and parses only inside it, and it was
+> proved in both directions before it was committed — green with three goldens, with nine and with
+> the workaround withdrawn; red on a digest altered by one hex character, on a byte count altered by
+> one, on a digest deleted from its section, on a heading that no longer names the file, and on a
+> second golden-7 section appended. **So the sentence above — *"every golden added to this file must
+> either use the distinct form or break C2's test"* — stopped being true on 2026-09-01**, and
+> **golden 5 is the first golden published in golden 7's house style** because of it.
+>
+> **What did NOT change, and is still owed:** goldens 1 and 3 are **still in the workaround's form**
+> above. Restyling them is not a re-styling — `tests/test_c4_goldens.py::_published_digest_and_size`
+> parses the byte count with `\*\*([\d,]+)\*\* bytes`, **which matches only the workaround's form**,
+> so the withdrawal is a **two-file edit in one commit**: this README *and* that pattern. Q-035
+> records it as owed, and names it as *"Q-035's own pattern recurring one level down"* — a parser
+> anchored on a **form** rather than on a **value**. It is left owed here rather than half-done: a
+> session that restyled goldens 1 and 3 without the file it cannot reach would turn `make test` red
+> on two goldens to make a third look consistent.
+>
+> The paragraphs above are kept, unedited, because *"here is the defect, here is the workaround it
+> forced, here is the date the workaround stopped being necessary, and here is the part of it that
+> is still outstanding"* is a sequence a reviewer can check. A section rewritten to describe only
+> today's state would read as though the house style had never been broken.
+
+### Golden 5 — `golden5_tamper.json`
+
+**SHA-256 `cb707237d93cccc4520b6bf03f96799fb19f7191eb1be02ef4094b02642cc40b`** · **9,830 bytes**.
+
+⚠️ **AND IT IS PUBLISHED IN GOLDEN 7's HOUSE STYLE, WHICH IS A CHANGE OF DIRECTION FROM GOLDENS 1
+AND 3 AND IS DELIBERATE.** The section above explains why those two dodge golden 7's patterns:
+`QUESTIONS.md` **Q-035**, a parser anchored on *"the only digest in the file"*. **That anchor was
+corrected in `9c5dbb5`** — `tests/test_c2_world.py` now slices this README to the section whose
+heading names `world_seed_2001.json` before it reads anything — so a new golden no longer has to
+contort to keep golden 7's digest unique. **This one therefore uses the house style, and the
+withdrawal Q-035 records as owed for goldens 1 and 3 is untouched and still owed**: it is a two-file
+edit (`tests/goldens/README.md` **and** `tests/test_c4_goldens.py`'s byte-count pattern, in one
+commit) and `tests/test_c4_goldens.py` is outside the fence that placed this golden. **Measured, not
+assumed, and measured the same way Q-035 measured it** — on a copy of this README in a temp
+directory, adding this section in the house style leaves both of C4's parses at *one digest, one
+byte count*, because C4's helper is section-anchored too and reads only goldens 1 and 3.
+
+**One line:** the tamper test C7 must reproduce — **four cases over one hash-chained ledger**, one
+per tampering shape, each carrying the verdict a correct verifier must return and, where a chain is
+broken, the **hand-stated sequence number of the first entry at which it breaks**. One of the four
+is the control. It also carries the `entry_hash` rule itself, verbatim and in the exact form
+`CONTEXT.md` §16 fixes it, and the genesis root **named as a `config/` key loaded with no default**,
+so *"a missing `genesis_hash` is a hard refusal, never a silent fallback"* is checkable against the
+fixture rather than against a memory of hard rule 9.
+
+⚠️ **A control is in the fixture on purpose, and that is the part worth reading.** A verdict table
+in which every tampered case returns `DETECTED` cannot distinguish a verifier that detects tampering
+from one that has been wired to return `DETECTED` unconditionally — a fixture with no control grades
+a stuck needle as a pass. The cases are therefore built so the four verdicts, read together,
+separate a correct verifier from a **specific, plausible, wrong** one. **Which case does which is
+not published here**, and that is not an oversight: `PROCESS.md` §5.2 assigns this golden to C7, and
+C7's review is the one place in this repository where a review verdict is itself under test. A
+README that pre-chewed the discrimination would be answering the exam in the syllabus.
+
+⚠️ **THE SESSION THAT PLACED THIS FILE COMPUTED NO VALUE IN IT, AND MAY NOT.** Same discipline as
+goldens 1, 3 and 7, and it binds hardest here, because this fixture's every value is a **digest**:
+**no hash chain was implemented anywhere, not even to "check" the file** — `src/whetstone_gate/`
+carries no `ledger/` package at all on the commit that lands this. A golden verified by a
+reimplementation has stopped being independent, and a golden of digests verified by a
+reimplementation would be a tautology with a SHA in it. **The digest and the byte count above ARE
+the verification**, recorded as observed after a byte-for-byte copy — `cmp` clean against the
+architect's file, and `git hash-object` equal to `git hash-object --no-filters`
+(`631d6186949dcbea4bc3ca0903789ba1dc15c41c`), so nothing was rewritten on the way into the blob.
+
 ### Golden 7 — `world_seed_2001.json`
 
 **SHA-256 `649e54ca446e8308f5fcd69ebba56eda5faea8d58246be7277cdb8b42227dd2b`** · **4,879 bytes**.
@@ -210,6 +285,29 @@ Kept on the same ground, and the ground is now load-bearing twice rather than on
 moved 0 → 1 → 3 in a single day**, and a reader who can see each step can check the claim *"authored
 before the code that consumes it"* against the git log for each of the three. A table that only ever
 shows its latest state cannot be checked that way — it can only be believed.
+
+**And from goldens 1 and 3 landing until golden 5 landed the next day, it read:**
+
+> **Three of nine authored. Golden 7 landed 2026-08-31; goldens 1 and 3 landed 2026-08-31, later the
+> same day. Six are still owed.**
+>
+> | # | File | State | Authored |
+> |---|---|---|---|
+> | **1** | `golden1_money.json` | ✅ **authored** | **2026-08-31**, by the **architect**, before any money code in `src/whetstone_gate/` exists |
+> | **3** | `golden3_harm_vector.json` | ✅ **authored** | **2026-08-31**, by the **architect**, before the typed harm record exists |
+> | **7** | `world_seed_2001.json` | ✅ **authored** | **2026-08-31**, by the **architect**, before `src/whetstone_gate/world/` exists |
+> | 2 · 4 · 5 · 6 · 8 · 9 | — | ⏳ **owed** | each before its consuming chunk is built |
+>
+> …and its C4 paragraph closed *"the six still owed block C7, C8, C9, C10, C11 and C18, which are
+> unchanged."*
+
+⚠️ **That last clause is the reason this block is kept rather than the tidiness of keeping it.**
+The count is now **0 → 1 → 3 → 4**, across two days rather than one, and the sentence *"the six
+still owed block C7 …"* is a **dated, checkable prediction that this session's own row settles**:
+C7 was named as blocked while golden 5 was owed, and the paragraph above now names it unblocked.
+A reader can hold the two claims side by side and check the second against the git log of
+`golden5_tamper.json` — which is exactly what a Status section that silently rewrote itself would
+have made impossible.
 
 ---
 
