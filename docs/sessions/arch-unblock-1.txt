@@ -1,9 +1,13 @@
-PUSHED SHA: <DECLARED PLACEHOLDER - this block is committed BEFORE it is printed, so the
-             SHA of the commit that carries it cannot be inside it. Filled by the
-             immediately following commit, which says so in its message. This is the
-             same declared-placeholder move INC-23, INC-24 and the C4 BUILD block used;
-             hard rule 13's "an invented incident has no commit" cuts both ways, and an
-             invented SHA is worse than a named gap.>
+PUSHED SHA: 665cd68f0ee45e87b43cdf43e250c5365ba21c96
+            (e03971a..665cd68 main -> main, pushed 2026-09-01.)
+            This line held an explicit DECLARED PLACEHOLDER until 665cd68 existed and was
+            pushed, and it is filled by the commit immediately after it, which says so -
+            the same move the C4 BUILD block and INC-23/INC-24's Fix fields used. The SHA
+            of the commit that carries this block cannot be inside it, and an invented SHA
+            is worse than a named gap. THE COMMIT CARRYING THIS CORRECTION IS ITSELF
+            PUSHED AFTERWARDS, so the final pushed head of this session is one commit
+            later than the SHA on this line; both are stated rather than one being
+            silently presented as the other.
 
 SESSION: ARCH UNBLOCK - BUILD - attempt 1 - 2026-09-01
 SESSION-TOKEN: 3af1c9d2   (NOT in the batch; appended to QUESTIONS.md ## Session tokens
