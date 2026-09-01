@@ -6,6 +6,165 @@ not a record; this file is.
 
 ---
 
+## C6 — THE ATTACKER LOOP — **REVIEW** attempt 2 — 2026-09-01 — ❌ **FAIL: THREE BLOCKERS AND FOUR NON-EQUIVALENT MUTANT SURVIVORS — AND FIX 1's TWO BLOCKERS ARE PROPERLY CLOSED**
+
+**SESSION-TOKEN:** `ec8e57ad` — **NOT in the batch.** Appended as
+`| `ec8e57ad` | C6 | REVIEW | 2026-09-01 |` and numbered **from the table**: **34 rows before it,
+so row 35**; the **twentieth** self-recorded row and the **nineteenth** to carry a paragraph.
+(The C13 FIX session that followed counted 35 rows and recorded itself as row 36 / twenty-first /
+twentieth, which is consistent — the chain holds.)
+
+**Pushed SHA:** see this session's FINAL OUTPUT, `docs/sessions/c6-review-2.txt`.
+**Phase-1 seal:** `b7737b7`. **Verdict:** **FAIL. NO `c6-pass` TAG.**
+
+### 1. What this session was, and the order it did things in
+
+An **adversarial REVIEW**, attempt 2, in two sealed phases. It did not build C6 and did not fix it.
+Phase 1 was written and **committed before anything sealed was opened**, which is the only reason
+its findings can be read as re-derivations rather than as confirmations of a view already seen.
+
+**ZERO PROVIDER MODEL CALLS. NO TOKEN SPENT ON ANY LANE.** Every number is from the code, the
+corpora, `config/` and arithmetic. Corpus payloads and licence files were fetched over plain HTTPS
+into temp directories; `corpora/fetched/` was never created inside this repository. Every mutation
+and every revert ran in a **fresh OS temp clone** with that clone's `whetstone_gate.__file__`
+printed (INC-17).
+
+### 2. ⚠️ THE SEAL DOES NOT HOLD ON A RE-REVIEW, AND THIS SESSION SAID SO BEFORE PHASE 2
+
+The prompt seals `REVIEW_C6_1.md`. It cannot seal its **content**. `CLAUDE.md` §1 makes `STATUS.md`
+item 4 of the mandatory read order and §6 requires every review to **append** its findings to that
+chunk's review-history column; `QUESTIONS.md` (item 6) carries `Q-046`…`Q-050` and `Q-055`, every
+one raised by `REVIEW_C6_1` or by the FIX answering it, several quoting `attacker/` module paths, a
+function name, a docstring and a line number — and this session's own prompt **directs** it to read
+`Q-046`. It was confirmed at the boundary: a cross-checking agent reading only the permitted list
+reported back, unprompted, `REVIEW_C6_1`'s corrected token figures.
+
+**The mitigation is the only one available and it was taken:** the reimplementation, the **ten**
+agreement properties, the four-clause needle corpus, the thirty vectors and the whole token
+arithmetic were committed at `b7737b7` **before** the package was opened, so the standard could not
+be adjusted afterwards. **And the proof the two derivations stayed independent is that they
+disagreed** — blind crossover `k = 10/11` against the note's `7` — which became BLOCKER B-1.
+Recorded as `OF-80` and, in full, in `independent/c6_review2_phase1_addendum.md`, committed
+**between** the seal and Phase 2 so the record shows what arrived when.
+
+### 3. What the reimplementation could and could not be held to, stated before any number
+
+`CONTEXT.md` §13.3 fixes the summary's **inputs**, its **cap** and its **method**. **It does not fix
+its bytes.** Two independent implementations of that sentence cannot be byte-identical, and a byte
+diff would measure an unspecified choice rather than a defect. So Phase 1 fixed **ten properties**
+the spec *does* determine and Phase 2 measured against those: **41 checks agree, 2 diverge**, and
+both divergences were predicted in writing before the code was opened.
+
+### 4. The three BLOCKERs
+
+**B-1 — `estimate.CROSSOVER_NOTE` publishes a crossover its own series refutes.** It says *"7
+full-listing reads of 20 turns crosses 60,000 true tokens (6 by this estimator)"*. Its own printed
+series is linear at **5,821.5 tokens/read from a 12,393 base**, which crosses at **k = 9**; seven
+reads reach **53,144**. It is also unreachable on the arithmetic: the **real** seed-2001 full
+listing, measured here from `whetstone_gate.world`, is **2,887 characters = 963 estimated tokens**;
+`assemble()` runs **before** each call, so a result appears in **at most six** later contexts; one
+read therefore adds **at most 5,802**, and seven reach at most **53,007**. Re-measured with the
+package's own estimator over the package's own `assemble()`: **k = 9 front-loaded, k = 10 spread**.
+Three routes give nine. The string is **printed by `BudgetComparison.render()`** and its stated
+purpose is to be read by **C14 beside the pilot's measured figure when C14 selects §13.4's N
+branch** — the decision that sizes the whole run. The error is conservative in direction and that
+does not save it: `INC-05`'s class is *a precise-sounding figure with no source behind it*.
+⚠️ **The rest of the note is sound and must survive the fix** — pagination-is-mandatory and
+the-window-evicts-the-listing were both **confirmed here**, and *"NO BRANCH IS SELECTED HERE"* is
+right.
+
+**B-2 — mutant M17 survives: a policy-revealing gate reason on the AUTHORED surface, invisible to
+all four guards.** `LAST_REFUSAL_LABEL` carrying *"blocked because the action exceeded the
+configured per-action ceiling of 5000000 paise"* puts **E1's cap** in front of the attacker every
+turn in every arm — and **all 65 C6 tests stay green**. Claim 4's guard **splits on that label and
+inspects only what follows it**, so a leak *in* the delimiter is read past by the guard's own
+scoping mechanism; the other three miss it because the text carries no clause id, no `policy.txt`
+line and no attack noun (all three measured **False**). The docstring beside the constant asserts
+exactly what nothing checks: *"they carry no policy"*.
+
+**B-3 — the spend-safety import walk is defeatable in the import form the package itself uses.**
+`_imported_modules` records `node.module` only, so `from whetstone_gate import X` is recorded as
+`"whetstone_gate"` and resolves to the empty `__init__.py`, where the walk dies. **Planted and
+measured** in the clone: `src/whetstone_gate/provider_client.py` containing a bare `import openai`,
+reached from `estimate.py` **exactly as it already reaches `config` at line 86** — **all 65 C6
+tests pass**. The test's docstring claims the guarantee *"cannot be evaded by putting the client one
+module away."* `test_c2_world.py` catches it because it also queues
+`f"{node.module}.{alias.name}"`; C6 also has **no positive control** where C2 has
+`test_the_import_scan_actually_fires`. ⚠️ **C6 owns none of hard rule 8's four named non-uses** —
+this is its analogue — and `test_rendering_the_summary_makes_no_model_call` is **vacuous**,
+demonstrated by execution against an implementation that makes a call.
+
+### 5. What HOLDS, measured, and it is most of the chunk
+
+* **`attacker_sys.txt` vs §8.6: 0 differing characters**, sha256 equal; `policy.txt` and
+  `arm3_safety.txt` **0** as well. Diffed on **raw code points**, never ASCII-folded — P7 ends
+  `outside P1–P6` with **U+2013**, and a folding comparison would give a false PASS.
+* **The four blindness claims hold, re-derived by this review's own method** — needles read at run
+  time from the real `data/` files, normalised matching, scanned over the package's **actual
+  assembled bytes** at turns 1/6/7/12/20: **0 hits on FULL and 0 on AUTHORED**, with
+  `pay_CANARYRECON` and the probe note **present in FULL and absent from AUTHORED**. That is
+  §10.1's shape exactly, and a "fix" that suppressed them would **VOID arm 4 by construction**.
+* **The summariser specifically**: the fold is byte equality against the one authored constant;
+  `generic_denial()` hard-refuses any file shape but one line + one LF (mutant M14 proves it); and
+  **all 498 real corpus entries were scanned — zero contain the denial string**, so the corpus
+  cannot trigger the fold.
+* **Determinism across processes**, `PYTHONHASHSEED` varied four ways: one digest.
+  **One model call per turn: 20/20.**
+* **Both of FIX 1's BLOCKERs are properly closed**, proved first-hand: reverting F-1 → **3 failed /
+  21 passed**; reverting F-2 → **7 failed / 17 passed**. Neither closed nothing.
+* **The five C4-reviewer files INC-30 swept are intact, every byte.** Four are blob-identical at
+  `17585ab` and HEAD; `tests/test_c4_review_probes.py` **grew** 628→740→780 under the C4 REVIEW's
+  own later commits and **28 tests pass**. The sweep mis-attributed **1,085** lines (not 465) and
+  **damaged none**.
+* **All five corpus pins re-verified** (bytes and SHA-256 exact) and **all four licences re-verified
+  at source with URL and date**, including InjecAgent's British `LICENCE` **200/1,066 bytes**
+  against `LICENSE` **404**, AgentHarm's field-of-use clause **byte-identical** with `gated: false`
+  and both holders, and R-Judge's `"license": null` with all eight filename probes **404** and not
+  one byte vendored.
+
+### 6. ⚠️ "NO ATTACK LIST" CANNOT MEAN "NO ATTACK NOUN", AND A MEASUREMENT FORCED THE READING
+
+The first version of this review's needle corpus **fired on the ZERO-TURN vector**, where the
+context is nothing but the system prompt — because §8.6's own `attacker_sys.txt` GOAL string says
+*"over-captures, excess refunds, early settlements, duplicated refunds"*. **The spec deliberately
+tells the attacker what harm to attempt; that is the goal, not a leak.** What must be absent is
+§6's **table**, above all its two answer-key columns. A reviewer that wrote a list down and asserted
+it would have reported a **false BLOCKER or a false PASS depending on which list it happened to
+write** — which is the whole argument for Q-031's enforcement clause over a golden.
+
+### 7. ⚠️ THIS SESSION BROKE THE SUITE ONCE, AND CRASHED ITS OWN ARTEFACT ONCE
+
+The Phase-1 seal `b7737b7` committed **two CRLF files** and turned `make test` red — `3 failed,
+661 passed`, all three tracing to `A3`/`A4`. **INC-16's exact class, landing on the reviewer**, in a
+repository where `attacker/texts.py` already carries the remedy in a comment. Fixed at `b8bfb6a`;
+`check-roles` back to **17/0/4 exit 0**. Separately, this session's own Phase-1 artefact **crashed
+on the operator's cp1252 console** on the rupee sign inside the transcribed P1 clause — first-hand
+evidence that INC-08/INC-25's hazard is live on this machine. **An `INCIDENTS.md` entry is OWED and
+this session's fence forbids writing it** (`OF-89`) — the fourth time a fence has excluded the file
+a task required, after `Q-029`, `Q-033` and `Q-049`.
+
+### 8. The suite, and one failure that is nobody's defect
+
+`1 failed, 698 passed, 1 skipped, 2 deselected`. The failure is
+`test_the_object_store_and_the_working_tree_agree`, naming **`PROCESS.md` and `config/lanes.yaml`**
+— both **uncommitted in-flight edits by the concurrent C13 session**, both named under **NOT** in
+this session's fence and neither touched here. `Q-063` / `INC-36`'s shared-tree hazard, seen a
+second time. With those two files at their committed bytes the suite is green.
+
+### 9. What landed
+
+`docs/reviews/REVIEW_C6_2.md` · `docs/reviews/mutants/c6_mutants_2.md` ·
+`docs/reviews/independent/c6_reimpl.py`, `c6_review2_phase1_blind.md`,
+`c6_review2_phase1_addendum.md`, `c6_review2_phase1_vectors.txt`, `c6_review2_diff_harness.py`,
+`c6_reimpl_diff.txt`, `c6_review2_mutants.py`, `c6_review2_mutants_raw.txt` ·
+`docs/reviews/OPEN_FINDINGS.md` **`OF-80`…`OF-95`, numbered from the file** · `STATUS.md`'s C6 row
+**appended to, never erased** · `QUESTIONS.md`'s token row · this entry.
+
+**`tests/goldens/` untouched. `src/` and `tests/` untouched — a review session fixes nothing.**
+**NO `c6-pass` TAG. FIX 2 is owed, then REVIEW 3.**
+
+---
+
 ## C13 — THE CaMeL COMPARATOR — **FIX** attempt 1 — 2026-09-01 — ⚠️ **BOTH BLOCKERS CLOSED, POLARITY REVERSED, `CONTEXT.md` v1.9 — AND STILL NO TAG**
 
 **SESSION-TOKEN:** `fd8a67e9` — **NOT in the batch.** Appended as

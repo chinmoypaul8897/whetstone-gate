@@ -1,0 +1,34 @@
+============================================================================================
+C6 REVIEW 2 -- MUTATION TESTING -- SESSION-TOKEN ec8e57ad
+============================================================================================
+clone: C:\Users\chinm\AppData\Local\Temp\c6mut-3ianrytu\tree
+clone whetstone_gate.__file__ = C:\Users\chinm\AppData\Local\Temp\c6mut-3ianrytu\tree\src\whetstone_gate\__init__.py
+repo  whetstone_gate.__file__ = C:\Users\chinm\whetstone-gate\src\whetstone_gate\__init__.py
+
+BASELINE on the unmutated clone (-k c6): rc=0  failures=none
+  65 passed, 626 deselected in 27.84s
+
+id    property attacked                                                verdict  killed by
+--------------------------------------------------------------------------------------------
+M1    WINDOW SIZE: off-by-one, one extra turn kept verbatim            KILLED   test_the_window_keeps_exactly_the_configured_number_of_verbatim_turns
+M2    WINDOW SIZE: the window removed entirely - the spike's ~300K def KILLED   test_the_window_keeps_exactly_the_configured_number_of_verbatim_turns
+M3    SUMMARY BUDGET: the cap loosened by one token                    SURVIVOR -
+M4    DETERMINISM: the summariser stops sorting a set-like field       KILLED   test_identical_state_produces_byte_identical_summary_text
+M5    DETERMINISM: insertion order leaks into the summary bytes        KILLED   test_identical_state_produces_byte_identical_summary_text
+M6    BLINDNESS 1 (no policy string): a clause leaks onto the AUTHORED KILLED   test_the_attackers_context_contains_no_policy_string
+M7    BLINDNESS 2 (no hole): the door described AS a door on the autho KILLED   test_the_attackers_context_contains_no_hole
+M8    BLINDNESS 4 (no gate reason): a clause id appended to the denial KILLED   test_the_attackers_context_contains_no_attack_list
+M9    BLINDNESS 3 + Q-046: world text folded onto the AUTHORED surface KILLED   test_the_summary_folds_ONLY_the_generic_denial_and_never_a_tool_result
+M10   CORPUS SPLIT: the fixed 20-entry slice restored (REVIEW_C6_1's B KILLED   test_the_seed_rotation_is_deterministic
+M11   CORPUS SPLIT: case folding added, moving the published fraction  KILLED   test_the_splits_operational_definition_names_the_TWO_UNDECLARED_bias_classes
+M12   TOKEN COUNTER: ceil -> round, so the estimator under-counts      KILLED   test_the_estimator_uses_the_divisor_its_calibration_selected
+M13   TOKEN COUNTER: the per-message framing allowance dropped         KILLED   test_the_estimator_applies_its_per_message_framing_allowance
+M14   Q-046: the denial constant keeps its trailing newline, so byte e KILLED   test_the_generic_denial_file_is_character_identical_to_CONTEXT_MD
+M15   CORPUS SPLIT: the reachability refusal disarmed (INC-27's guard) KILLED   test_the_guard_now_watches_REACHABILITY_and_not_merely_EMPTINESS
+M16   BLINDNESS 3 (no attack list): S6's answer-key COLUMNS on the aut KILLED   test_the_attackers_context_contains_no_attack_list
+M17   BLINDNESS 4 (no gate reason): a POLICY-REVEALING reason, no atta SURVIVOR -
+M18   SUMMARY BUDGET: truncation RESERVES the denial instead of tail-c SURVIVOR -
+M19   SUMMARY BUDGET: cap TIGHTENED by one token (the other side of M3 SURVIVOR -
+
+TOTAL 19 mutants  |  KILLED 15  |  SURVIVORS 4 ['M3', 'M17', 'M18', 'M19']  |  ANCHOR ERRORS 0 
+clone removed.
