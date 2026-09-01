@@ -90,6 +90,13 @@ def _generic_denial(lines: list[str]) -> str:
     return found[0]
 
 
+#: The repository root, for the helpers pytest calls **outside** a fixture's reach.
+#: :func:`_denial_findings` reads `config/` and ``data/policy.txt`` for itself rather than
+#: taking transcribed needles, and it is called from three places (`INCIDENTS.md` INC-42).
+#: Same value as the ``repo_root`` fixture, by the same loader.
+_REPO_ROOT = cfg.repo_root()
+
+
 def _policy_clauses(repo_root: Path) -> list[str]:
     """The seven clause lines, from the file — which is itself compared to the spec."""
     text = repo_root.joinpath("data/policy.txt").read_bytes().decode("utf-8")
@@ -317,48 +324,179 @@ def test_the_attackers_context_contains_no_attack_list(repo_root):
 # ── CLAIM 4 — no gate denial reason ──────────────────────────────────────────────────
 
 
+#: ⚠️ **Gate vocabulary — words that describe a RULE rather than a FACT.** The folded state
+#: §13.3 mandates says what the attacker *did*; a policy-revealing reason says what it is not
+#: *allowed* to do, and these are the words that difference is made of.
+#:
+#: **Word-bounded on purpose.** ``\bcap\b`` must not fire on ``capture_payment``, which is one
+#: of the six real tool names and appears in every tool-schema string this project sends.
+_GATE_VOCABULARY = (
+    "cap", "caps", "ceiling", "ceilings", "limit", "limits", "exceed", "exceeds", "exceeded",
+    "policy", "policies", "clause", "clauses", "exemption", "exempt", "forbidden",
+    "prohibited", "budget", "threshold", "quota", "aggregate", "denied", "indeterminate",
+    "per-action", "per action", "per-episode", "per episode", "not permitted", "not allowed",
+    "blocked because", "refused because",
+)
+
+
+def _indian_grouped(digits: str) -> str:
+    """``5000000`` -> ``50,00,000``. The grouping an Indian payments harness would use."""
+    if len(digits) <= 3:
+        return digits
+    head, tail = digits[:-3], digits[-3:]
+    groups = []
+    while len(head) > 2:
+        head, group = head[:-2], head[-2:]
+        groups.insert(0, group)
+    if head:
+        groups.insert(0, head)
+    return ",".join(groups + [tail])
+
+
+def _policy_revealing_values(repo_root: Path) -> set[str]:
+    """Every money ceiling in `config/`, in the five formattings a leak could carry it in.
+
+    ⚠️ **MEASURED AGAINST `config/`, NEVER TRANSCRIBED.** `CONTEXT.md` §8.6's per-action cap
+    is ``money.per_action_cap_paise`` and its episode cap is ``money.episode_cap_paise``;
+    both are frozen rows. A guard holding its own copy of ``5000000`` would pass while the
+    constant drifted, which is `spec_constants.AUTHORED_TEXTS`' own stated defect one level
+    down.
+    """
+    protocol = cfg.load("protocol")
+    values: set[str] = set()
+    for key in ("money.per_action_cap_paise", "money.episode_cap_paise"):
+        paise = protocol.require(key)
+        for number in (paise, paise // 100):  # paise, and the same figure in rupees
+            digits = str(number)
+            values.update({digits, f"{number:,}", _indian_grouped(digits)})
+    assert len(values) >= 8, "the cap formattings collapsed - the fixture proves nothing"
+    return {v for v in values if len(v) >= 4}
+
+
 def _denial_findings(context: ctx.AssembledContext, generic: str) -> list[str]:
-    """The attacker may see the ONE generic string and nothing more.
+    """CLAIM 4's guard. **The attacker may see the ONE generic string and nothing more.**
 
     §8.6: identical across arms, returned on ``DENIED`` **and** on ``INDETERMINATE``, so a
     denial leaks neither which arm is running nor which clause fired.
 
-    ⚠️ **Scoped to the refusal FIELD, not to the whole message.** §13.3 requires the
-    summary to concatenate the folded state *with* the last denial reason, so a guard that
-    searched the summary for any text besides the denial would fire on the state the spec
-    puts there. The claim is about **what the denial itself carries**, and that is what is
-    read back out here.
+    ⚠️ **THIS GUARD USED TO SPLIT ON `LAST_REFUSAL_LABEL` AND INSPECT ONLY WHAT FOLLOWED IT,
+    AND A LEAK *IN* THE DELIMITER WAS READ PAST BY ITS OWN SCOPING — `INCIDENTS.md` INC-42 /
+    `REVIEW_C6_2` BLOCKER B-2.** Mutant **M17** put *"blocked because the action exceeded the
+    configured per-action ceiling of 5000000 paise"* **inside the label** — E1's cap, on the
+    authored surface, every turn, every arm — and **all 65 C6 tests stayed green**.
+
+    ⚠️ **The old docstring's objection was CORRECT and is what the fix is built around:** *"a
+    guard that searched the summary for any text besides the denial would fire on the state
+    the spec puts there."* So the answer is not to stop scanning; it is to **subtract what
+    §13.3 mandates and scan everything else, labels included**. Three layers:
+
+      1. **VALUES.** Every money ceiling in `config/`, in five formattings, anywhere on the
+         authored surface **except inside the folded state's own JSON** — where
+         ``episode_paise_moved`` may legitimately equal the cap.
+      2. **CLAUSES and VOCABULARY.** Every line of ``data/policy.txt``, and the words a rule
+         is made of, word-bounded, over the whole authored surface **minus the §8.6 system
+         prompt** — which is subtracted by identity because §8.6 fixes its bytes, another
+         test compares them character by character, and it legitimately says *"limits"*.
+      3. **RESIDUE, over the deterministic summary PART.** After subtracting every mandated
+         piece **located by identity against the module constants**, what is left of that
+         part must be whitespace. This catches authored text that carries no recognised
+         policy word at all. It is scoped to the summary because the summary is the only
+         authored text **this module composes**: the system prompt is §8.6's bytes and the
+         tool schemas are the caller's argument, and both are covered by layers 1–2 instead.
+
+    Layers 1–2 scan the labels; layer 3 subtracts them. That is deliberate and it is the
+    whole difference: a mutated label is caught by the scan, and an *addition* to the summary
+    is caught by the residue, so neither layer has to be the one that does both.
     """
-    findings = []
-    for part in context.parts:
-        values = []
-        if ctx.LAST_REFUSAL_LABEL in part.text:
-            values.append(part.text.split(ctx.LAST_REFUSAL_LABEL, 1)[1])
-        elif generic in part.text:
-            values.append(part.text)
-        for value in values:
-            value = value.strip()
-            if value == ctx.NO_REFUSAL:
-                continue
-            if value != generic:
-                findings.append(f"the denial the attacker sees is not the generic string: {value!r}")
-            for token in re.findall(
-                r"\barms?\s*[1-4]S?\b|\bP[1-7]\b|\bINDETERMINATE\b|\bDENIED\b", value, re.IGNORECASE
-            ):
-                findings.append(f"the denial carried {token!r}")
+    findings: list[str] = []
+    # ── the ONE authored part this package does not compose, subtracted BY IDENTITY ──────
+    scan = context.authored_text().replace(authored.attacker_system_prompt(), "\n")
+
+    # ── locate the mandated pieces. LOCATED by identity, never used as a split point. ────
+    summaries = [p.text for p in context.authored_parts() if ctx.STATE_LABEL in p.text]
+    assert len(summaries) == 1, (
+        f"expected exactly one deterministic summary on the AUTHORED surface, found "
+        f"{len(summaries)}. A parser that silently matches nothing turns green by finding "
+        f"nothing to compare."
+    )
+    state_json = ""
+    residue_parts = []
+    refusal_lines = 0
+    for line in summaries[0].split("\n"):
+        if line.startswith(ctx.STATE_LABEL):
+            body = line[len(ctx.STATE_LABEL) :]
+            mark_at = body.find(ctx.TRUNCATION_MARK)
+            state_json = body if mark_at < 0 else body[:mark_at]
+            residue_parts.append(line.replace(ctx.STATE_LABEL, "", 1).replace(state_json, "", 1))
+        elif line.startswith(ctx.LAST_REFUSAL_LABEL):
+            refusal_lines += 1
+            value = line[len(ctx.LAST_REFUSAL_LABEL) :].strip()
+            if value != ctx.NO_REFUSAL:
+                if value != generic:
+                    findings.append(
+                        f"the denial the attacker sees is not the generic string: {value!r}"
+                    )
+                for token in re.findall(
+                    r"\barms?\s*[1-4]S?\b|\bP[1-7]\b|\bINDETERMINATE\b|\bDENIED\b",
+                    value,
+                    re.IGNORECASE,
+                ):
+                    findings.append(f"the denial carried {token!r}")
+            residue_parts.append(line.replace(ctx.LAST_REFUSAL_LABEL, "", 1).replace(value, "", 1))
+        else:
+            residue_parts.append(line)
+
+    # ⚠️ **The parser asserts it matched, rather than turning green by finding nothing.**
+    # §13.3 mandates the denial line; a summary in which no line is recognisable as one is a
+    # finding in itself, not a clean scan — and it is exactly what a label mutated to span
+    # the two halves produces.
+    if refusal_lines != 1:
+        findings.append(
+            f"the summary carries {refusal_lines} recognisable last-denial line(s), not 1; "
+            f"CONTEXT.md section 13.3 mandates exactly one"
+        )
+
+    # ── LAYER 1 — the cap, in any formatting, anywhere but inside the state's own JSON ───
+    values_scan = scan.replace(state_json, "\n") if state_json else scan
+    for value in sorted(_policy_revealing_values(_REPO_ROOT)):
+        if value in values_scan:
+            findings.append(f"a config/ money ceiling reached the AUTHORED surface: {value!r}")
+
+    # ── LAYER 2 — policy clauses and the vocabulary a RULE is made of ────────────────────
+    for clause in _policy_clauses(_REPO_ROOT):
+        if clause.strip() and clause.strip() in scan:
+            findings.append(f"a policy.txt clause reached the AUTHORED surface: {clause[:40]!r}")
+    vocabulary_scan = re.sub(re.escape(ctx.TRUNCATION_MARK) + r"[^\n]*", " ", scan)
+    vocabulary_scan = vocabulary_scan.replace(generic, " ")
+    for word in _GATE_VOCABULARY:
+        if re.search(rf"\b{re.escape(word)}\b", vocabulary_scan, re.IGNORECASE):
+            findings.append(f"gate vocabulary {word!r} on the AUTHORED surface")
+
+    # ── LAYER 3 — nothing authored is left over that the spec did not mandate ────────────
+    residue = re.sub(re.escape(ctx.TRUNCATION_MARK) + r"[^\n]*", "", "\n".join(residue_parts))
+    if residue.strip():
+        findings.append(f"unexplained AUTHORED text the spec does not mandate: {residue.strip()!r}")
     return findings
 
 
 def test_the_attackers_context_contains_no_gate_denial_reason(repo_root):
-    """CLAIM 4 of 4 — and it asserts the denial is EXACTLY §8.6's one string."""
-    lines = _context_lines(repo_root)
-    generic = _generic_denial(lines)
+    """CLAIM 4 of 4 — and it asserts the denial is EXACTLY §8.6's one string.
+
+    ⚠️ **FIRED AT SEVEN LEAKS, FOUR OF WHICH THE PREVIOUS FORM OF THIS GUARD COULD NOT SEE.**
+    `INCIDENTS.md` **INC-42**. The four are the shapes `REVIEW_C6_2` BLOCKER B-2 names: a cap
+    value **inside the label** (mutant **M17** itself), the same cap in a **different
+    formatting**, a `policy.txt` sentence inside the **other** label, and a leak **spanning
+    the label boundary** — which a split-based guard cannot see by construction, because the
+    split consumes the half of the needle that precedes it.
+    """
+    generic = _generic_denial(_context_lines(repo_root))
     assert generic == "This action was blocked by policy."
 
     real = _real_context(repo_root)
     assert generic in real.full_text(), "the fixture no longer exercises a denial"
-    assert not _denial_findings(real, generic)
+    assert not _denial_findings(real, generic), _denial_findings(real, generic)
 
+    # ── the three the old guard already caught: a leak in the refusal VALUE ──────────────
     for leak in (
         f"{generic} (arm 2S)",
         f"{generic} Clause P1 was violated.",
@@ -366,6 +504,56 @@ def test_the_attackers_context_contains_no_gate_denial_reason(repo_root):
     ):
         leaky = _assemble(system_prompt=authored.attacker_system_prompt(), last_refusal=leak)
         assert _denial_findings(leaky, generic), f"the denial guard did not fire on {leak!r}"
+
+    # ── THE FOUR B-2 SHAPES. Each mutates a module constant, exactly as M17 did. ──────────
+    cap_paise = cfg.load("protocol").require("money.per_action_cap_paise")
+    policy_sentence = _policy_clauses(repo_root)[0].strip()
+    original_refusal, original_state = ctx.LAST_REFUSAL_LABEL, ctx.STATE_LABEL
+    shapes = {
+        # M17 VERBATIM: the cap as a bare integer inside the refusal label.
+        "M17 - the cap inside LAST_REFUSAL_LABEL": (
+            f"LAST TOOL REFUSAL (blocked because the action exceeded the configured "
+            f"per-action ceiling of {cap_paise} paise): ",
+            original_state,
+        ),
+        # A DIFFERENT FORMATTING: Indian grouping, in rupees, with no gate vocabulary at all.
+        "the same cap, Indian-grouped rupees": (
+            f"LAST TOOL REFUSAL (over {_indian_grouped(str(cap_paise // 100))}): ",
+            original_state,
+        ),
+        # THE OTHER LABEL: a policy.txt sentence inside STATE_LABEL, which the old guard
+        # never looked at at all.
+        "a policy.txt clause inside STATE_LABEL": (
+            original_refusal,
+            f"STATE SO FAR ({policy_sentence}): ",
+        ),
+        # SPANNING THE LABEL BOUNDARY: the leak sits ACROSS the boundary between the
+        # summary's two halves - after the state line, before the refusal label - so it
+        # belongs to NEITHER field. ⚠️ The old guard split on the whole (mutated) constant
+        # and got back EXACTLY the generic denial, so its one assertion passed: this is the
+        # shape a field-reading guard cannot see even in principle, because the leak is in
+        # no field.
+        "a leak spanning the label boundary": (
+            f"ACTIONS OVER {cap_paise:,} PAISE ARE REFUSED.\nLAST TOOL REFUSAL: ",
+            original_state,
+        ),
+    }
+    for name, (refusal_label, state_label) in shapes.items():
+        ctx.LAST_REFUSAL_LABEL, ctx.STATE_LABEL = refusal_label, state_label
+        try:
+            leaky = _assemble(
+                system_prompt=authored.attacker_system_prompt(), last_refusal=generic
+            )
+            found = _denial_findings(leaky, generic)
+        finally:
+            ctx.LAST_REFUSAL_LABEL, ctx.STATE_LABEL = original_refusal, original_state
+        assert found, (
+            f"CLAIM 4's guard did not fire on {name!r}. That is BLOCKER B-2: a "
+            f"policy-revealing gate reason on the AUTHORED surface, every turn, every arm, "
+            f"with all four blindness guards silent (INCIDENTS.md INC-42)."
+        )
+    # And the constants really are back, so a later test is not running against a mutant.
+    assert (ctx.LAST_REFUSAL_LABEL, ctx.STATE_LABEL) == (original_refusal, original_state)
 
 
 def test_the_loop_has_no_gate_object_at_all(repo_root):
@@ -552,6 +740,15 @@ class _MockExecutor:
 
 
 class _MockFolder:
+    """⚠️ **A CONSTANT fold, and it is now labelled one — `OPEN_FINDINGS.md` OF-82.**
+
+    Every method returns the same value on every turn, so **only ``turns_remaining`` varies**
+    in the summary this fold produces. That is fine for the tests that do not depend on the
+    fold, and it is **not** fine for a test whose name claims the context stops growing: it
+    holds the growing half constant and then measures non-growth. See :class:`_GrowingFolder`
+    and ``test_the_windowed_context_stays_BOUNDED_which_is_what_the_window_is_FOR``.
+    """
+
     def episode_paise_moved(self):
         return 0
 
@@ -568,7 +765,40 @@ class _MockFolder:
         return 0
 
 
-def _run(client=None, executor=None, entries=()):
+class _GrowingFolder:
+    """A fold that GROWS, which is what C7's ledger will hand this loop — `OF-82`.
+
+    One refund and one idempotency key per turn, which is A5 (salami slicing) by definition:
+    *many small refunds*. `REVIEW_C6_2` measured that under a realistic growing fold the
+    package's per-turn series **grows monotonically after the window fills** — growth at 11 of
+    12 steps — so the non-growth assertion this fixture replaces was *"green by accident of
+    the fixture"*, the **third** such instance in this one file after `INC-26` and `INC-29`.
+    """
+
+    def __init__(self):
+        self.turns = 0
+
+    def _step(self):
+        self.turns += 1
+
+    def episode_paise_moved(self):
+        self._step()
+        return 4000 * self.turns
+
+    def per_payment_refunded_paise(self):
+        return {f"pay_{i:014x}": 4000 for i in range(self.turns)}
+
+    def per_payment_captured_paise(self):
+        return {f"pay_{i:014x}": 8000 for i in range(min(self.turns, 12))}
+
+    def idempotency_keys_seen(self):
+        return tuple(f"idem-{i:06d}" for i in range(self.turns))
+
+    def actions_executed(self):
+        return self.turns
+
+
+def _run(client=None, executor=None, entries=(), fold=None):
     settings = _settings()
     return settings, attacker_loop.run_episode(
         client=client or _MockClient(),
@@ -576,7 +806,7 @@ def _run(client=None, executor=None, entries=()):
         settings=settings,
         tool_schemas_text="fetch_payments()",
         corpus_entries=entries,
-        fold=_MockFolder(),
+        fold=fold or _MockFolder(),
     )
 
 
@@ -593,12 +823,48 @@ def test_the_loop_makes_exactly_one_model_call_per_turn():
     assert len(result.records) == settings.turn_budget
 
 
-def test_rendering_the_summary_makes_no_model_call():
-    """The other half of the same claim: the summary is a template, not a request."""
+def test_the_summary_renderers_own_import_closure_holds_no_model_client(repo_root):
+    """The other half of the same claim: **the summary is a template, not a request.**
+
+    ⚠️ **THIS REPLACES `test_rendering_the_summary_makes_no_model_call`, WHICH WAS VACUOUS —
+    `OPEN_FINDINGS.md` OF-86.** That test built a mock client, called ``render_summary``
+    (which has never been handed a client), and asserted the mock's call count had not
+    changed. `REVIEW_C6_2` demonstrated by execution that **it passes against an
+    implementation that makes a model call**, because the call would not go through *that*
+    mock. It could not fail, and a test that cannot fail is worse than an absent one: it
+    reads as coverage.
+
+    ⚠️ **C6 owns none of hard rule 8's four named non-uses** — the rule names the probe, the
+    void rule, the world and the arm-4 kernel, and `CONTEXT.md` §14 does not name the
+    attacker either. **This is C6's analogue and it is held to the same standard**: the claim
+    is structural, so the assertion is structural, and it is **rooted at ``context.py``
+    specifically** rather than at the package, because the claim is about
+    ``render_summary``'s path and not about the package's average.
+
+    **It can fail**, and the same plant that proves
+    ``test_the_import_scan_ACTUALLY_FIRES_in_every_import_form`` proves it: a client one
+    module away, in the import form ``estimate.py:86`` itself uses, turns this red.
+    """
+    source_root = repo_root / "src"
+    renderer = source_root / "whetstone_gate/attacker/context.py"
+    assert "def render_summary" in renderer.read_bytes().decode("utf-8"), (
+        "render_summary no longer lives in context.py, so this test is rooted at the wrong "
+        "module and is measuring nothing (INCIDENTS.md INC-40's class)."
+    )
+    seen, findings = _first_party_import_closure([renderer], source_root=source_root)
+    assert not findings, (
+        "the module that renders the deterministic summary can reach a provider or the "
+        "network:\n  " + "\n  ".join(findings)
+    )
+    # And the walk really left context.py — otherwise "no findings" means "nothing looked".
+    assert len(seen) > 1, "the closure never left context.py; a walk of one file proves nothing"
+
+    # The number half of the same claim, kept where it can be seen beside the structural
+    # half: one model call per turn, counted against the mock, with render_summary running
+    # once per turn inside the same loop.
     client = _MockClient()
-    before = len(client.calls)
-    ctx.render_summary(_state(), None, _settings().summary_token_cap)
-    assert len(client.calls) == before
+    settings, result = _run(client=client)
+    assert result.model_calls == settings.turn_budget == len(result.contexts)
 
 
 def test_the_loop_runs_at_the_configured_temperature():
@@ -763,15 +1029,80 @@ _FORBIDDEN_IMPORTS = {
 }
 
 
-def _imported_modules(path: Path) -> set[str]:
+def _imported_modules(path: Path, *, source_root: Path) -> set[str]:
+    """Every module name this file could reach, in **every import form Python has**.
+
+    ⚠️ **IT USED TO RECORD ``node.module`` ALONE, AND THAT MADE THE WALK BELOW STOP AT THE
+    PACKAGE ROOT — `INCIDENTS.md` INC-43 / `REVIEW_C6_2` BLOCKER B-3.** ``ast.ImportFrom.module``
+    names the module a symbol is imported **from**, not the module the symbol **is**, so
+    ``from whetstone_gate import provider_client`` was recorded as the bare string
+    ``"whetstone_gate"`` — which resolves to the **empty** ``__init__.py``, where the walk
+    died. `REVIEW_C6_2` planted ``src/whetstone_gate/provider_client.py`` containing a bare
+    ``import openai``, reached it from ``estimate.py`` **exactly as ``estimate.py:86`` already
+    reaches `config`**, and watched all 65 C6 tests pass.
+
+    ⚠️ **AND THE FORM IS NOT CONTRIVED — IT IS THE ONE THIS PACKAGE USES.**
+    ``estimate.py:86`` is ``from whetstone_gate import config as cfg``, so
+    ``whetstone_gate.config`` was not reachable from ``render_summary``'s path at all; it
+    landed in the closure only by luck, via ``corpus.py`` and ``texts.py``, which happen to
+    use the dotted form. ``tests/test_c2_world.py`` has queued the alias since it was written.
+
+    **Relative imports are resolved too**, against ``path``'s own package. That is a second
+    form of the same blindness, found while fixing the first: this walk crosses into
+    first-party modules it does not own, and ``whetstone_gate.world.selftest`` reaches
+    ``_console`` as ``from .._console import say``.
+    """
     tree = ast.parse(path.read_bytes().decode("utf-8"))
+    package_parts = path.resolve().relative_to(source_root.resolve()).parts[:-1]
     found: set[str] = set()
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
-            found.update(a.name for a in node.names)
-        elif isinstance(node, ast.ImportFrom) and node.module:
-            found.add(node.module)
+            for alias in node.names:
+                found.add(alias.name)
+        elif isinstance(node, ast.ImportFrom):
+            if node.level:  # a relative import: resolve it against this file's package
+                base = package_parts[: len(package_parts) - (node.level - 1)]
+                prefix = ".".join(base + ((node.module,) if node.module else ()))
+            else:
+                prefix = node.module or ""
+            if not prefix:
+                continue
+            found.add(prefix)
+            # ⚠️ THE LINE B-3 WAS MISSING. `from X import Y` may name a MODULE Y, and if it
+            # does, X.Y is an edge of the import graph that X alone does not carry.
+            for alias in node.names:
+                found.add(f"{prefix}.{alias.name}")
     return found
+
+
+def _first_party_import_closure(
+    roots: list[Path], *, source_root: Path
+) -> tuple[set[str], list[str]]:
+    """Walk ``roots`` and every first-party module they transitively reach.
+
+    Returns ``(files visited, findings)``. Lifted out of the test so it can be **fired at a
+    synthetic tree** rather than only at this repository — which is how the positive control
+    below plants a client without planting one in `src/` (`INCIDENTS.md` INC-43).
+    """
+    seen: set[str] = set()
+    queue = list(roots)
+    findings: list[str] = []
+    while queue:
+        path = queue.pop()
+        key = str(path.resolve())
+        if key in seen:
+            continue
+        seen.add(key)
+        for module in _imported_modules(path, source_root=source_root):
+            root = module.split(".")[0]
+            if root in _FORBIDDEN_IMPORTS:
+                findings.append(f"{path.name} reaches {module!r}")
+            if root == "whetstone_gate":
+                candidate = source_root.joinpath(*module.split("."))
+                for target in (candidate.with_suffix(".py"), candidate / "__init__.py"):
+                    if target.is_file():
+                        queue.append(target)
+    return seen, findings
 
 
 def test_the_attacker_package_imports_no_model_client_and_no_network_library(repo_root):
@@ -781,31 +1112,82 @@ def test_the_attacker_package_imports_no_model_client_and_no_network_library(rep
 
     Walked over the package's own modules **and** its transitive first-party imports, so
     the guarantee cannot be evaded by putting the client one module away.
+
+    ⚠️ **THAT SENTENCE WAS FALSE UNTIL 2026-09-01 AND IS NOW BACKED BY A POSITIVE CONTROL** —
+    `INCIDENTS.md` **INC-43**. See :func:`_imported_modules` for what the walk missed and
+    ``test_the_import_scan_ACTUALLY_FIRES_in_every_import_form`` for the control.
     """
+    source_root = repo_root / "src"
     package = repo_root / "src/whetstone_gate/attacker"
-    seen: set[str] = set()
-    queue = sorted(package.rglob("*.py"))
-    findings = []
-    while queue:
-        path = queue.pop()
-        key = str(path.resolve())
-        if key in seen:
-            continue
-        seen.add(key)
-        for module in _imported_modules(path):
-            root = module.split(".")[0]
-            if root in _FORBIDDEN_IMPORTS:
-                findings.append(f"{path.name} imports {module!r}")
-            if root == "whetstone_gate":
-                parts = module.split(".")[1:]
-                candidate = repo_root.joinpath("src/whetstone_gate", *parts)
-                for target in (candidate.with_suffix(".py"), candidate / "__init__.py"):
-                    if target.is_file():
-                        queue.append(target)
+    own = sorted(package.rglob("*.py"))
+    seen, findings = _first_party_import_closure(own, source_root=source_root)
     assert not findings, (
         "the attacker package can reach a provider or the network:\n  " + "\n  ".join(findings)
     )
-    assert len(seen) > len(list(package.rglob("*.py"))), "the transitive walk never left the package"
+    assert len(seen) > len(own), "the transitive walk never left the package"
+
+    # ⚠️ **NAMED, not counted.** `len(seen) > len(own)` is satisfied by reaching ONE module
+    # outside the package, and `texts.py`'s dotted import of `config` satisfied it alone —
+    # so the old assertion could not tell "the walk left the package" from "the walk is
+    # complete". `whetstone_gate.config` is reached from `estimate.py:86` in the
+    # `from whetstone_gate import config` form and is the module B-3 measured as UNREACHABLE.
+    reached = {Path(p).name for p in seen}
+    assert "config.py" in reached, (
+        "whetstone_gate.config is not in the closure this walk reports. That is exactly the "
+        "state REVIEW_C6_2 measured for render_summary's path (INCIDENTS.md INC-43): the "
+        "walk terminates at the empty __init__.py instead of following `from whetstone_gate "
+        "import config`."
+    )
+
+
+def _plant_tree(root: Path, *, reach: str) -> Path:
+    """Build a synthetic `src/` holding a client one module away, reached by ``reach``.
+
+    Nothing is written inside this repository. `INCIDENTS.md` **INC-17**: a probe that plants
+    into the live tree is a probe that tests the wrong tree.
+    """
+    source_root = root / "src"
+    package = source_root / "whetstone_gate" / "attacker"
+    package.mkdir(parents=True)
+    (source_root / "whetstone_gate" / "__init__.py").write_bytes(b"")
+    (source_root / "whetstone_gate" / "provider_client.py").write_bytes(b"import openai\n")
+    (package / "__init__.py").write_bytes(b"")
+    (package / "estimate.py").write_bytes(f"{reach}\n".encode("utf-8"))
+    return source_root
+
+
+@pytest.mark.parametrize(
+    ("form", "reach"),
+    [
+        # ⚠️ THE FORM THE PACKAGE ITSELF USES, at estimate.py:86, and the one B-3 defeated.
+        ("from <pkg> import <module>", "from whetstone_gate import provider_client as _pc"),
+        ("from <pkg>.<module> import <name>", "from whetstone_gate.provider_client import x"),
+        ("import <pkg>.<module>", "import whetstone_gate.provider_client"),
+        # And the direct form, so the control covers the shallow case as well as the deep one.
+        ("import <client>", "import openai"),
+    ],
+)
+def test_the_import_scan_ACTUALLY_FIRES_in_every_import_form(tmp_path, form, reach):
+    """⚠️ **THE POSITIVE CONTROL C6 NEVER HAD — `INCIDENTS.md` INC-43.**
+
+    `tests/test_c2_world.py` has carried ``test_the_import_scan_actually_fires`` since C2,
+    citing *"a release gate that has never gone red is only decorative."* C6 copied C2's scan
+    and not C2's control, **which is precisely why a walker that terminated at the package
+    root looked identical to one that found nothing**: both print `no findings`.
+
+    Each case plants a client **one module away** in a synthetic tree under ``tmp_path`` and
+    reaches it in a different import form. All four must FIRE. The first is the form
+    `REVIEW_C6_2` used to defeat the old walker with all 65 tests green.
+    """
+    source_root = _plant_tree(tmp_path / form.replace("<", "").replace(">", "_"), reach=reach)
+    roots = sorted((source_root / "whetstone_gate" / "attacker").rglob("*.py"))
+    _seen, findings = _first_party_import_closure(roots, source_root=source_root)
+    assert findings, (
+        f"the import scan did NOT fire on a model client reached by {form!r} "
+        f"({reach!r}). A spend-safety gate that cannot go red is decorative "
+        f"(PROCESS.md section 5.4; tests/test_c2_world.py; INCIDENTS.md INC-43)."
+    )
+    assert any("openai" in f for f in findings), findings
 
 
 # ======================================================================================
@@ -898,8 +1280,101 @@ def test_the_windowed_context_stops_growing_which_is_what_the_window_is_FOR():
     assert sum(grew) > max(per_turn) * len(per_turn) / 4, "the fixture is too small to be evidence"
 
 
-def test_the_estimate_is_deterministic_and_pure():
+def test_the_windowed_context_stays_BOUNDED_which_is_what_the_window_is_FOR(repo_root):
+    """⚠️ **THE PROPERTY THAT IS TRUE OF THE REAL SYSTEM — `OPEN_FINDINGS.md` OF-82.**
+
+    The test above measures **non-growth**, and it can only do so because ``_MockFolder``
+    holds the folded state **constant**: only ``turns_remaining`` varies, and it varies
+    downward. `REVIEW_C6_2` re-measured it with a realistic growing fold and found the
+    per-turn series **grows monotonically after the window fills** — growth at **11 of 12**
+    steps — so the assertion above is **false of the real system**, and its docstring's
+    *"adding turns adds nothing"* is wrong. That is the **third** *"green by accident of the
+    fixture"* in this one file, after `INC-26` and `INC-29`.
+
+    ⚠️ **Nothing published moves, and that is why this is an addition and not a repair.** The
+    growth is **bounded by the summary cap**, so the spike's ~300K-token defect is not back.
+    **Boundedness is the property §13.3 actually buys**, and it is asserted here against a
+    bound **computed from `config/` and the fixture's own strings** rather than against a
+    number typed in — a bound that is merely "big enough" is satisfied by any implementation.
+
+    The test above is KEPT and is now explicitly the weaker one, with its fixture labelled:
+    `INC-35`'s pattern — a discriminating test beside a named-weaker one, rather than a
+    single test that quietly cannot discriminate.
+    """
+    settings = _settings()
+    big = json.dumps({"payments": [{"id": f"pay_{i:04d}", "notes": "x" * 200} for i in range(12)]})
+    schemas = "fetch_payments()"
+    _, result = _run(executor=_MockExecutor(reply=big), fold=_GrowingFolder())
+    per_turn = [r.context_estimate.tokens for r in result.records]
+
+    # ── the fixture really does grow, or this test is the accident it exists to replace ──
+    summaries = [
+        next(p.text for p in c.authored_parts() if ctx.STATE_LABEL in p.text)
+        for c in result.contexts
+    ]
+    assert len(set(len(s) for s in summaries)) > 1, (
+        "the folded state did not change size across the episode, so this fixture is the "
+        "constant one OF-82 is about and this test proves nothing."
+    )
+    assert len(summaries[-1]) > len(summaries[0]), "the fold shrank; the fixture is backwards"
+
+    # ── THE BOUND, derived rather than typed ────────────────────────────────────────────
+    divisor = est.chars_per_token()
+    framing = est.FRAMING_TOKENS_PER_MESSAGE
+    parts_per_turn = 3 + 2 * settings.verbatim_turns  # sys + schemas + summary + N x (a, w)
+    bound = (
+        est.estimate_text(authored.attacker_system_prompt(), divisor=divisor)
+        + est.estimate_text(schemas, divisor=divisor)
+        + settings.summary_token_cap
+        + settings.verbatim_turns
+        * (
+            est.estimate_text(max(r.attacker_text for r in result.records), divisor=divisor)
+            + est.estimate_text(big, divisor=divisor)
+        )
+        + parts_per_turn * framing
+    )
+    assert max(per_turn) <= bound, (
+        f"the per-turn context exceeded the bound the window is supposed to give it: "
+        f"max {max(per_turn)} > {bound}. per_turn={per_turn}"
+    )
+    # ⚠️ AND THE BOUND IS TIGHT ENOUGH TO BE EVIDENCE. A bound nothing could exceed is not a
+    # bound: the same episode WITHOUT a window would blow it, and that is the spike's defect.
+    unwindowed = est.estimate_messages(
+        tuple(t for c in result.contexts for t in c.texts())
+    ).tokens
+    assert unwindowed > bound * 3, (
+        "the fixture is too small for the bound to be evidence: full history would not "
+        "have exceeded it by a wide margin."
+    )
+    # ── and the thing that DOES the bounding: the summary never passes its §8.6 cap ──────
+    assert all(
+        est.estimate_text(s, divisor=divisor) <= settings.summary_token_cap for s in summaries
+    ), "the summary exceeded the §8.6 cap, which is the only thing bounding the growth"
+
+
+def test_the_estimate_repeats_exactly_and_reads_the_divisor_from_config(repo_root):
+    """⚠️ **RENAMED FROM `test_the_estimate_is_deterministic_and_pure` — `OF-91`.**
+
+    The old name promised **purity** — hard rule 8's word, meaning *no I/O, clock, network or
+    randomness* — while the body asserted same-process repeat-call equality and one edge
+    value. `REVIEW_C6_2` called it *"the sharper instance"* of two purity overclaims, because
+    **a green test name reads as a discharged obligation** in a way a self-glossing docstring
+    does not, and *a wrong name on a passing test is how BLOCKER B-2 survived*
+    (`INCIDENTS.md` INC-42, INC-40).
+
+    ⚠️ **The estimator is NOT pure and the reason is good:** :func:`estimate_text` calls
+    :func:`~whetstone_gate.attacker.estimate.chars_per_token`, which opens
+    ``config/protocol.yaml`` on every access, because `Q-048` made the divisor a §8.6 row and
+    `config.load` is deliberately uncached so a read cannot outlive an edit. So the name now
+    says what is asserted: **repeatability**, and **that the divisor comes from `config/`**.
+    """
     a = est.estimate_messages(("alpha", "beta"))
     b = est.estimate_messages(("alpha", "beta"))
     assert a == b
     assert est.estimate_text("") == 0
+
+    # The half the old name gestured at and never checked: the I/O is real, and it is the
+    # loader's. `estimate_text` with no divisor must agree with an explicit read.
+    divisor = cfg.load("protocol").require("attacker.chars_per_token")
+    assert est.chars_per_token() == divisor
+    assert est.estimate_text("x" * 100) == est.estimate_text("x" * 100, divisor=divisor)
