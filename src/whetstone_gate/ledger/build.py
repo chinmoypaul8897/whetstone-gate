@@ -48,6 +48,34 @@ with no raw-argument blob, and every one of them is inside the digest**, so a fo
 be added without invalidating the golden this chunk is built against. The gap is real, it is
 narrow, and it is raised as `QUESTIONS.md` **Q-055** rather than closed by inventing a field.
 
+## ⚠️⚠️ WHAT NO FIELD SAYS, AND THIS CHUNK STOPPED ON IT — `QUESTIONS.md` Q-062
+
+**NOTHING ON THE ENTRY SAYS WHETHER A CALL EXECUTED.** Three outcomes reach this module and
+only two of them are distinguishable:
+
+  * Razorpay refused it → ``rejected_by_razorpay`` is ``True``. Visible.
+  * The gate refused it → ``verdict`` is ``DENIED`` or ``INDETERMINATE``. Visible.
+  * **The MCP tool layer refused it** — a parameter the tool declares ``Required`` was not
+    supplied — → **no harm record**, so ``a_class`` ``None``, ``rejected_by_razorpay``
+    ``False``, four zeros. **Which is exactly what an EXECUTED, harmless money action looks
+    like**, because :func:`whetstone_gate.world.harm.no_harm` writes those same six values.
+
+**Measured, and it is not a near-miss:** a `capture_payment` that executed and moved ₹665.23,
+and a `capture_payment` refused by the tool layer for a missing ``currency``, produce entries
+identical in **all thirteen content fields** and carrying **the same digest**.
+`tests/test_c7_ledger.py::test_an_EXECUTED_capture_and_an_MCP_LAYER_REFUSAL_are_BYTE_IDENTICAL`
+keeps that measurement. The discriminator is ``currency``, and the schema has no field for it
+and no field for *"did this happen"*.
+
+**The information exists at the world boundary and is destroyed here** — ``harm is None``
+versus ``harm = no_harm(...)`` — and it cannot be preserved, because every content field is
+inside the digest and a fourteenth would change all twelve of golden 5's hashes (hard rule 3).
+So this is a **specification** gap surfaced at the chunk that first needs the field, not a
+choice this module made, and it is **raised rather than papered over**: `CONTEXT.md` §8.6a's
+*"productive action"* (*"any tool call the gate ALLOWED **that the world executed**"*) and E1,
+E2 and E3's *money moved* are not computable from these two entries. ⚠️ **CANARY-A and the void
+rule are NOT affected** — Q-062 works that through — and saying so is part of not overstating it.
+
 ## AND WHAT IS NOT COERCED
 
 An attacker may send anything as an argument. ``amount_paise`` is recorded **only** when the
@@ -65,7 +93,7 @@ from typing import Any, Callable, Iterable, Mapping, Sequence
 
 from ..world.harm import COMPONENTS, HarmRecord
 from .chain import Ledger
-from .entry import NO_TARGET, LedgerEntry
+from .entry import NO_TARGET, LedgerEntry, validate_content
 
 #: The argument every tool in the five-tool surface uses to name a payment. RS-52 and
 #: `refunds.go:20-21` — *"ID should have a `pay_` prefix."*
@@ -184,21 +212,27 @@ def append_log(
     that knows which attacker turn a call belongs to and what the gate said about it. They are
     callables rather than scalars so that a whole episode's log can be appended in one pass
     without this module inventing either value.
+
+    ⚠️ **ALL OR NOTHING: every row is validated BEFORE the first is appended.** A ledger is
+    append-only, so a refusal half way through a log would leave a **short** ledger that still
+    verifies — an episode silently missing its tail, which is hard rule 11's exact shape and
+    which `chain.verify` cannot see (a truncated tail is `VALID`; see :mod:`.chain`'s stated
+    limitation). Validating first means the caller gets the refusal with an untouched ledger.
     """
-    written: list[LedgerEntry] = []
+    proposed: list[dict[str, Any]] = []
     for row in log:
         _call_index, tool, arguments, result = row
-        written.append(
-            append_call(
-                ledger,
-                tool=tool,
-                arguments=arguments,
-                harm=getattr(result, "harm", None),
-                turn_index=turn_index_of(row),
-                verdict=verdict_of(row),
-            )
+        content = content_from_call(
+            tool=tool,
+            arguments=arguments,
+            harm=getattr(result, "harm", None),
+            turn_index=turn_index_of(row),
+            verdict=verdict_of(row),
         )
-    return tuple(written)
+        validate_content(dict(content, ledger_seq=1, arm=ledger.arm))
+        proposed.append(content)
+
+    return tuple(ledger.append(**content) for content in proposed)
 
 
 def entries_naming(entries: Sequence[LedgerEntry], payment_id: str) -> tuple[LedgerEntry, ...]:

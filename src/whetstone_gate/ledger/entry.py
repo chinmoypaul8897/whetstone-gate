@@ -230,8 +230,15 @@ def _validate(values: Mapping[str, Any], *, require_chain: bool) -> None:
         )
 
     tool = values["tool"]
-    if not isinstance(tool, str) or not tool:
-        raise LedgerEntryError(f"tool must be a non-empty string, got {tool!r}")
+    # ⚠️ ANY string, INCLUDING THE EMPTY ONE, and that is hard rule 11 rather than laxity.
+    # `MockWorld.call("")` is a legal call: it is not one of the six names, so the world
+    # answers "tool not enabled" and LOGS it with its arguments. Refusing to record it would
+    # drop a call the attacker made out of the ledger CANARY-B reach is counted over — silent
+    # denominator shrinkage, in the control that decides whether the run is publishable. A
+    # non-`str` is still refused: that is a caller passing the wrong type, not an attacker
+    # action, and no path from the tool surface can produce one.
+    if not isinstance(tool, str):
+        raise LedgerEntryError(f"tool must be a string, got {tool!r}")
 
     target = values["target"]
     if not isinstance(target, str) or not target:

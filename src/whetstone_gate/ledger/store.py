@@ -1,9 +1,21 @@
 """**THE THIN OUTER SHELL — the only module in this package that touches a filesystem.**
 
 Hard rule 8: *"Core logic takes data in and returns results — no I/O, clock, network, or
-randomness inside it. Side effects live in a thin outer shell."* :mod:`~whetstone_gate.ledger.entry`,
-:mod:`~whetstone_gate.ledger.chain` and :mod:`~whetstone_gate.ledger.build` are the core and open
-no file; this module is the shell and does nothing else.
+randomness inside it. Side effects live in a thin outer shell."* This module is that shell for
+**this package's own data** — the stored episode — and it does nothing else.
+
+⚠️ **SCOPE, STATED SO THE CLAIM IS NOT LARGER THAN THE CHECK, which is the shape
+`tests/test_c2_world.py` already uses for the world.** :mod:`~whetstone_gate.ledger.entry` and
+:mod:`~whetstone_gate.ledger.build` open nothing at all. :mod:`~whetstone_gate.ledger.chain`
+opens nothing **directly** and has exactly one indirect read:
+:func:`~whetstone_gate.ledger.chain.load_chain_spec` calls
+:func:`whetstone_gate.config.load`, which reads `config/protocol.yaml`. **That is the one
+loader, it is the project's outer shell for configuration, and reading it is what a shell is
+for** — hard rule 9 requires the genesis root to come from `config/` and nowhere else, so the
+read is not incidental, it is the rule. What would be a defect is a *core* function taking a
+path or writing a file, and none does. `tests/test_c7_ledger.py::test_only_the_shell_touches_a_filesystem`
+scans for the direct form and says in its own docstring that the indirect one is out of scope,
+rather than leaving a reader to infer a stronger claim than the scan supports.
 
 **Why the package ships a document shape at all.** `PROCESS.md` §12.1's C17 row: the replay
 renderer *"Reads `evals/episodes/` **only**"*, makes no network call and runs no model; hard
@@ -78,9 +90,15 @@ def to_document(ledger: Ledger) -> dict[str, Any]:
 def from_document(document: Mapping[str, Any]) -> Ledger:
     """Rebuild a :class:`~whetstone_gate.ledger.chain.Ledger` from a stored document. **Pure.**
 
-    Every digest is recomputed on the way in, through the same :meth:`Ledger.append` the
-    original run used, so a document that round-trips unchanged is one whose contents really do
-    produce its stored chain.
+    ⚠️ **THE STORED CHAIN IS VERIFIED FIRST AND A TAMPERED DOCUMENT IS A REFUSAL**
+    (:class:`~whetstone_gate.ledger.chain.TamperDetected`), not a happy object. See
+    :func:`whetstone_gate.ledger.chain.rebuild` and `INCIDENTS.md` **INC-33** for what this
+    function used to do instead, which was to launder every mutation it was handed.
+
+    ``genesis_hash`` and ``hash_algorithm`` come from the **document**, which is what lets a
+    pre-freeze episode still verify after C14 moves `config/`'s root. They are not trusted
+    blindly: entry 1's ``prev_hash`` must equal the stated root and every digest must recompute
+    under the stated algorithm, so a document that names the wrong root or algorithm fails.
     """
     missing = [key for key in DOCUMENT_KEYS if key not in document]
     if missing:
@@ -90,10 +108,19 @@ def from_document(document: Mapping[str, Any]) -> Ledger:
         raise LedgerStoreError(
             f"{LEDGER_KEY!r} must be a list of entries, got {type(entries).__name__}"
         )
+    seed = document["seed"]
+    if not isinstance(seed, int) or isinstance(seed, bool):
+        # ⚠️ The seed is the input that REGENERATES the world the replay scores against, and it
+        # is the one document key no digest covers (see this module's docstring). Its type is
+        # checked here because "banana" would otherwise be written straight back out.
+        raise LedgerStoreError(
+            f"stored ledger carries seed={seed!r}, which is not a seed. It is the input that "
+            f"regenerates the world every later number is scored against."
+        )
     spec = ChainSpec(
         genesis_hash=document["genesis_hash"], algorithm=document["hash_algorithm"]
     )
-    return rebuild(entries, spec=spec, seed=document["seed"], arm=document["arm"])
+    return rebuild(entries, spec=spec, seed=seed, arm=document["arm"])
 
 
 def render(ledger: Ledger) -> str:
@@ -130,7 +157,12 @@ def write(path: Path, ledger: Ledger) -> bool:
 
 
 def read(path: Path) -> Ledger:
-    """Read a stored ledger back, recomputing every digest through :func:`from_document`."""
+    """Read a stored ledger back. **Raises on a document whose chain does not verify.**
+
+    Use :func:`read_document` + :func:`stored_entries` +
+    :func:`whetstone_gate.ledger.chain.verify` when what is wanted is a *verdict* about a file
+    rather than a ledger built from it.
+    """
     with path.open("r", encoding="utf-8") as handle:
         document = json.load(handle)
     if not isinstance(document, dict):
@@ -139,11 +171,13 @@ def read(path: Path) -> Ledger:
 
 
 def read_document(path: Path) -> dict[str, Any]:
-    """The raw document, **without** recomputing anything.
+    """The raw document, **without** rebuilding anything.
 
-    This is what a verifier wants: :func:`whetstone_gate.ledger.chain.verify` must be handed the
-    bytes as they are stored, tampering included. :func:`read` rebuilds and would raise on a
-    document a verifier is supposed to report on.
+    This is what a **reporting** verifier wants: it must be handed the bytes as they are
+    stored, tampering included, so it can say *where* the chain broke.
+    :func:`read` **raises** :class:`~whetstone_gate.ledger.chain.TamperDetected` on such a
+    document, which is right for a caller that wants a ledger and wrong for one that wants a
+    verdict — so both paths exist and each says which it is.
     """
     with path.open("r", encoding="utf-8") as handle:
         document = json.load(handle)
@@ -152,9 +186,16 @@ def read_document(path: Path) -> dict[str, Any]:
     return document
 
 
-def stored_entries(document: Mapping[str, Any]) -> list[dict[str, Any]]:
-    """The entry mappings of a raw document, for :func:`whetstone_gate.ledger.chain.verify`."""
+def stored_entries(document: Mapping[str, Any]) -> list[Any]:
+    """The entry rows of a raw document, for :func:`whetstone_gate.ledger.chain.verify`.
+
+    ⚠️ **The rows are handed over UNCOERCED.** ``dict(row)`` on a row that is a string or an
+    integer raises, and this function sits on the exact path a verifier uses to report on a
+    file somebody may have edited — so coercing here would turn *"that is not an entry"* from
+    a verdict into a traceback, which is the thing
+    :func:`whetstone_gate.ledger.chain.verify` was made total to avoid.
+    """
     entries = document.get(LEDGER_KEY)
     if not isinstance(entries, list):
         raise LedgerStoreError(f"{LEDGER_KEY!r} is not a list of entries")
-    return [dict(entry) for entry in entries]
+    return list(entries)

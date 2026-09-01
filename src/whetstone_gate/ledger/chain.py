@@ -60,21 +60,38 @@ calls changes what the second one returns.
 
 ## ⚠️ WHAT THIS CHAIN DOES NOT DETECT, STATED BEFORE ANYBODY CLAIMS OTHERWISE
 
-**A hash chain anchors its START. Nothing here anchors its END.** Deleting entries from the
-**tail** of a stored ledger leaves a shorter chain that is internally perfect, and
-:func:`verify` returns ``VALID`` on it — correctly, because every entry still present really
-does hash to its stored digest from the root the document names. Deleting from the middle, or
-altering anything, breaks the chain and is detected; truncation is the one operation that does
-not, and it is exactly the operation `CLAUDE.md` hard rule 11 is about.
+**A hash chain anchors its START. Nothing here anchors its END.** What :func:`verify` detects is
+a **STALE DIGEST** — an entry whose stored ``hash`` no longer matches its contents, or whose
+stored ``prev_hash`` no longer matches where the chain has reached. Every mutation that leaves
+such a digest behind is caught, which is all four of golden 5's cases and every alteration,
+insertion or deletion **in the middle** of a chain.
+
+⚠️ **What is NOT caught is any edit that leaves NO stale digest, and there are exactly two
+shapes of it.** Both are the same fact — *nothing commits to the end of the chain* — and this
+paragraph states them rather than letting the stronger sentence stand:
+
+  1. **Truncation.** Dropping entries from the tail leaves a shorter chain that is internally
+     perfect, and :func:`verify` returns ``VALID`` — correctly, because every entry still
+     present really does hash to its stored digest from the root the document names.
+  2. **A RE-DERIVED SUFFIX.** Altering entry *k* and then recomputing the digests of *k*
+     onward produces a chain that also verifies. ⚠️ **So "any alteration is detected" would be
+     FALSE and is not claimed here**: what is detected is an alteration that is not followed
+     through, which is what a careless edit looks like and is not what a determined one does.
 
 `tests/test_c7_ledger.py::test_a_truncated_tail_is_NOT_detected_and_that_is_a_stated_limitation`
-asserts the limitation rather than hiding it, and it is recorded in
-`docs/reviews/OPEN_FINDINGS.md`. **The remedy is not cryptographic and is not this chunk's**: it
-is an external commitment to each episode's head — the same mechanism `PROCESS.md` §6a already
-builds for `config/`, where the answer to *"a git timestamp is forgeable"* was **witness it
-outside this repository**, not a better hash. Until something publishes an episode's head hash
-and entry count where the operator cannot quietly revise them, *"the ledger is tamper-evident"*
-means **tamper-evident against modification, and against deletion anywhere but the end.**
+and `…::test_a_re_derived_suffix_is_NOT_detected_and_that_is_the_same_limitation` assert both
+shapes rather than hiding them, and they are recorded in `docs/reviews/OPEN_FINDINGS.md`.
+**The remedy is not cryptographic and is not this chunk's**: it is an external commitment to
+each episode's head hash and entry count — the same mechanism `PROCESS.md` §6a already builds
+for `config/`, where the answer to *"a git timestamp is forgeable"* was **witness it outside
+this repository**, not a better hash. Until something publishes those where the operator cannot
+quietly revise them, *"the ledger is tamper-evident"* means **evident against an edit that
+leaves a stale digest, and against nothing else** — and the README must not say more.
+
+⚠️ **What the chain DOES buy, stated so the limitation is not read as "it buys nothing":** the
+genesis binding means a pre-freeze episode cannot be presented as a scored one without
+re-deriving **every** digest in it, and the four render fields and four harm components are
+inside those digests. The bar is not "impossible"; it is "no longer a text edit".
 """
 
 from __future__ import annotations
@@ -109,6 +126,24 @@ class ChainConfigError(ChainError):
 
 class NotCanonicalisable(ChainError):
     """A value reached the digest that canonical JSON cannot represent deterministically."""
+
+
+class TamperDetected(ChainError):
+    """A stored chain did not verify. Carries the :class:`ChainVerdict` that says where.
+
+    ⚠️ **This exists because a rebuild that silently re-chains is worse than no rebuild at
+    all.** `INCIDENTS.md` **INC-33**: the read path used to re-append stored rows through
+    :meth:`Ledger.append`, which recomputes every digest — so it returned a **self-consistent**
+    ledger for a **tampered** document, and `verify_ledger` on the result could not fail. The
+    read path now verifies the stored bytes first and raises this instead.
+    """
+
+    def __init__(self, verdict: "ChainVerdict") -> None:
+        super().__init__(
+            f"the stored chain does not verify at ledger_seq "
+            f"{verdict.first_bad_ledger_seq}: {verdict.reason}"
+        )
+        self.verdict = verdict
 
 
 @dataclass(frozen=True)
@@ -169,18 +204,16 @@ def canonical_json(body: Mapping[str, Any]) -> str:
     field that can carry attacker-authored text is ``target``: an attacker may call
     ``fetch_payment`` with any string it likes as ``payment_id``.
 
-    ⚠️ **A float is refused rather than serialised.** ``json`` writes ``repr``-shaped floats,
-    so a binary float in an entry would put a platform-dependent string inside a digest that
-    is supposed to be identical everywhere — and `PROCESS.md` §5.1 forbids one on the money
-    path in the first place. ``allow_nan=False`` closes the same door for the three values
-    that have no JSON spelling at all.
+    ⚠️ **A float is refused rather than serialised, at ANY depth.** ``json`` writes
+    ``repr``-shaped floats, so a binary float in an entry would put a platform-dependent string
+    inside a digest that is supposed to be identical everywhere — and `PROCESS.md` §5.1 forbids
+    one on the money path in the first place. The scan **recurses into lists and mappings**: a
+    top-level-only check would have let a float inside a container through while a test named
+    *"a float anywhere in an entry"* passed, which is a claim larger than its check.
+    ``allow_nan=False`` is kept as the second door, for the three values that have no JSON
+    spelling at all.
     """
-    for name, value in body.items():
-        if isinstance(value, float):
-            raise NotCanonicalisable(
-                f"{name}={value!r} is a binary float. PROCESS.md §5.1: money is integer paise "
-                f"end to end, and a float's JSON spelling is not portable enough to hash."
-            )
+    _refuse_floats(body, path="entry")
     return json.dumps(
         dict(body),
         sort_keys=True,
@@ -190,14 +223,44 @@ def canonical_json(body: Mapping[str, Any]) -> str:
     )
 
 
+def _refuse_floats(value: Any, *, path: str) -> None:
+    """Walk ``value`` and refuse the first binary float, naming where it was found."""
+    if isinstance(value, float):
+        raise NotCanonicalisable(
+            f"{path} = {value!r} is a binary float. PROCESS.md §5.1: money is integer paise "
+            f"end to end, and a float's JSON spelling is not portable enough to hash."
+        )
+    if isinstance(value, Mapping):
+        for key, child in value.items():
+            _refuse_floats(child, path=f"{path}.{key}")
+    elif isinstance(value, (list, tuple)):
+        for index, child in enumerate(value):
+            _refuse_floats(child, path=f"{path}[{index}]")
+
+
 def entry_digest(prev_hash: str, body: Mapping[str, Any], *, algorithm: str) -> str:
     """``SHA-256( prev_hash ‖ canonical-JSON(body) )``, both operands UTF-8 strings.
 
     The concatenation is of the **strings**, then encoded once — which is what golden 5's
     ``hash_rule`` says and what reproduces its twelve digests.
+
+    ⚠️ **Text that is not encodable as UTF-8 is a typed refusal, not a traceback.** ``target``
+    carries an attacker-authored ``payment_id``, and a JSON decoder will hand back a **lone
+    surrogate** for ``"\\ud800"`` — which ``str.encode("utf-8")`` raises ``UnicodeEncodeError``
+    on. An untyped error there would take down the episode *and* the verifier reading it, and
+    would look like a crash rather than a finding. It is refused with the reason instead, so
+    hard rule 11's *"every dropped episode is counted, categorised"* has something to count.
     """
     digest = hashlib.new(algorithm)
-    digest.update((prev_hash + canonical_json(body)).encode("utf-8"))
+    try:
+        payload = (prev_hash + canonical_json(body)).encode("utf-8")
+    except UnicodeEncodeError as exc:
+        raise NotCanonicalisable(
+            f"an entry carries text that is not encodable as UTF-8 ({exc}). The hash rule's "
+            f"operands are UTF-8 strings; a lone surrogate is not one, and it is refused here "
+            f"rather than escaping as an untyped error."
+        ) from exc
+    digest.update(payload)
     return digest.hexdigest()
 
 
@@ -468,16 +531,26 @@ APPEND_FIELDS: tuple[str, ...] = tuple(
 def rebuild(
     entries: Sequence[Mapping[str, Any]], *, spec: ChainSpec, seed: int, arm: str
 ) -> Ledger:
-    """Rebuild a :class:`Ledger` by **re-appending** stored entries through :meth:`append`.
+    """Rebuild a :class:`Ledger` from stored entries. **Verifies the stored chain FIRST.**
 
-    Every digest is recomputed on the way in, so a document that survives this round trip
-    unchanged is one whose contents really do produce its stored chain. Used by the store's
-    read path and by the determinism test; it is not a shortcut around :func:`verify`, it is
-    the same arithmetic reached from the write side.
+    ⚠️ **THE ORDER IS THE WHOLE OF IT, AND GETTING IT WRONG IS `INCIDENTS.md` INC-33.** This
+    function used to go straight to :meth:`Ledger.append`, which **recomputes** every digest
+    from the contents it is handed. Re-appending a *tampered* document therefore produced a
+    ledger that was perfectly self-consistent — a laundered tamper — and
+    :func:`verify_ledger` on the result could not return ``DETECTED`` **for any input at
+    all**, because it was checking arithmetic this function had just performed. Measured: the
+    read path accepted golden 5's cases **B, C and D** — the three the golden was hand-derived
+    to catch, including the CONTROL — and called all three ``VALID``.
 
-    Refuses a stored entry whose ``arm`` disagrees with the episode's — the read-side half of
-    the guard :class:`Ledger`'s docstring describes.
+    So: :func:`verify` runs against the **stored bytes**, and a failure is
+    :class:`TamperDetected` rather than a happy object. Only then are the rows re-appended,
+    and each produced entry is required to be **identical to the row it came from** — which
+    turns the round trip into a check instead of a tautology.
     """
+    outcome = verify(entries, genesis_hash=spec.genesis_hash, algorithm=spec.algorithm)
+    if not outcome.ok:
+        raise TamperDetected(outcome)
+
     ledger = Ledger(spec=spec, seed=seed, arm=arm)
     for position, raw in enumerate(entries, start=1):
         stored = dict(raw)
@@ -486,5 +559,23 @@ def rebuild(
                 f"stored entry at position {position} carries arm {stored.get('arm')!r} in a "
                 f"ledger whose episode ran arm {arm!r}. One episode is one arm (CONTEXT.md §8)."
             )
-        ledger.append(**{name: stored[name] for name in APPEND_FIELDS})
+        try:
+            produced = ledger.append(**{name: stored[name] for name in APPEND_FIELDS})
+        except KeyError as exc:
+            # verify() has already refused a document missing a content field, so reaching
+            # here means the two disagree about the field set. That is a defect in this
+            # module, not in the document, and it is raised as one rather than as a KeyError.
+            raise ChainError(
+                f"stored entry at position {position} lacks {exc} after verify() accepted it; "
+                f"verify and rebuild disagree about the content set"
+            ) from exc
+        if produced.to_dict() != stored:
+            raise TamperDetected(
+                ChainVerdict(
+                    DETECTED,
+                    stored.get("ledger_seq"),
+                    f"the entry rebuilt at position {position} is not the row that was "
+                    f"stored; the document does not reproduce itself",
+                )
+            )
     return ledger
