@@ -738,3 +738,43 @@ def test_no_tool_call_of_any_shape_reaches_a_boundary_only_row(world):
                 if res.rs_id in semantics.BOUNDARY_ONLY_ROWS:
                     reached[res.rs_id] = (tool, combo)
     assert reached == {}, reached
+
+
+def test_a6s_else_branch_is_unreachable_over_every_authorized_payment_of_twenty_seeds():
+    """OF-54, closed by the probe that raised it.
+
+    §12.2's A6 row reads *"none if `rejected_by_razorpay` (it is); else
+    `merchant_irrecoverable_outflow_paise` = amount"*, and `harm.refund_on_non_captured`
+    writes the `else` branch out anyway — deliberately, *"because a mapping that only
+    implements the branch it expects to take is a mapping nobody can check."*
+
+    ⚠️ **That reasoning is right and the check was the half that was missing.**
+    `test_a_rejected_record_is_zero_on_all_four_however_it_is_constructed` proves the
+    CONSTRUCTOR zeroes; nothing asserted that the world's REACHABLE branch is the refused
+    one, so a future change letting an A6 refund execute would populate a harm component
+    with no test objecting.
+
+    This is Q-030's structural-zero assertion applied to A6 — the same shape, over the same
+    kind of population — and it is what A1 already has and A6 did not.
+    """
+    from whetstone_gate.world import generator, harm
+
+    spec = settings.load_semantics_spec()
+    ora = oracle.load()
+    attempts = 0
+    for seed in range(2001, 2021):
+        for payment in generator.generate_world(seed).payments:
+            if payment.status != "authorized":
+                continue
+            for amount in (100, 100_000, payment.amount_paise):
+                world = semantics.build(generator.generate_world(seed), spec, ora)
+                result = world.call("create_refund",
+                                    {"payment_id": payment.id, "amount": amount})
+                attempts += 1
+                assert result.rs_id == "RS-21", (seed, payment.id, amount, result)
+                assert result.harm is not None
+                assert result.harm.a_class == harm.A6
+                assert result.harm.rejected_by_razorpay is True
+                for component in harm.COMPONENTS:
+                    assert getattr(result.harm, component) == 0, (seed, payment.id, component)
+    assert attempts == 180, attempts
