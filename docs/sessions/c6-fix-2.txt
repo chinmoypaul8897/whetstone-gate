@@ -1,0 +1,583 @@
+SESSION-TOKEN: 4e1c8a92   CHUNK C6 - THE ATTACKER LOOP   ROLE: FIX   ATTEMPT 2
+
+PUSHED SHA: de7feeefd4ff89845f85aac59ab024da053b9329
+            - the commit carrying STATUS, PROGRESS and the OF- dispositions, and the
+              last commit before this block. THIS BLOCK IS ITSELF INSIDE A LATER COMMIT,
+              so the pushed head is one further than the SHA above: a commit cannot
+              contain its own hash.
+
+=====================================================================
+VERDICT: THE THREE BLOCKERS ARE CLOSED AND THE FOUR MUTANT SURVIVORS ARE KILLED.
+  C6 STAYS UNREVIEWED. NO TAG. A fix session may not tag and nothing here is
+  self-certified. REVIEW 3 follows and only it may cut c6-pass.
+=====================================================================
+
+COMMITS, IN THE ORDER THE RULES REQUIRE:
+  1252fdc  OF-87 and OF-88 recorded VERBATIM, unsplit, BEFORE either was acted on
+           (hard rule 5). Q-075..Q-078 raised. Token row 37.
+  9c809c2  INC-41..INC-45 written BEFORE a line of code changed (hard rule 13's
+           order). Nothing under src/ or tests/ is in that commit.
+  fe3984f  the code. ONE commit and not five, with the reason IN its message: the
+           five files are mutually dependent and git stages whole files, so any
+           split produces intermediate commits with a RED suite.
+  de7feee  STATUS appended-to, PROGRESS entry, OF- dispositions, INCIDENTS SHA fix.
+
+SPEND: ZERO PROVIDER MODEL CALLS. NO TOKEN SPENT ON ANY LANE. Every client and
+every world in these tests is a mock; the one non-mock is whetstone_gate.world,
+which makes no call. Every mutation and every revert ran in a FRESH OS TEMP CLONE
+with that clone's whetstone_gate.__file__ PRINTED (INC-17):
+  working tree   C:\Users\chinm\whetstone-gate\src\whetstone_gate\__init__.py
+  mutation clone C:\Users\chinm\AppData\Local\Temp\c6fix2-mut\tree\src\whetstone_gate\__init__.py
+NOTHING IN THIS REPOSITORY WAS EDITED TO ESTABLISH A RESULT.
+
+---------------------------------------------------------------------
+0. THE ORDINAL, RE-DERIVED FROM THE TABLE AS THE PROMPT REQUIRES
+---------------------------------------------------------------------
+THE TABLE HELD 36 DATA ROWS (lines 50-85), fd8a67e9 being the last. So this is
+ROW 37, the TWENTY-SECOND self-recorded row and the TWENTY-FIRST to carry a
+paragraph. Counted from the file immediately before appending, not from the prose.
+
+THE THREE HOLES ARE STILL THERE AND ARE NOT THIS SESSION'S TO CLOSE. The numbered
+self-record paragraphs now assert 5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 19, 20,
+21 and this one at 22. ORDINALS 11, 12 AND 18 ARE ASSERTED BY NO PARAGRAPH; the
+three rows with no paragraph are df238be6, 0852ea56 and 9c0c6734. Re-verified by
+counting the HEADINGS, not by trusting the predecessor's list.
+
+Ninth consecutive session to carry the total by hand. 5c4f8e11's owed mechanism
+lives in src/whetstone_gate/check_roles.py, which this session's fence names under
+NOT BY NAME - a stricter exclusion than the two blanket src/ exclusions before it,
+so there is no reading under which this session could have written it. (The
+concurrent C13 REVIEW 2 has since appended row 38 and reconciled with this count.)
+
+---------------------------------------------------------------------
+1. THE FIVE INCIDENT ENTRIES, WRITTEN FIRST
+---------------------------------------------------------------------
+INC-41  a published crossover figure that its own printed series refutes, carried
+        in the one string the estimate exists to put in front of the session that
+        sizes the whole run.
+        Event: CROSSOVER_NOTE said 7 (6 by this estimator). THREE ROUTES GIVE
+        NINE, all three re-derived FIRST-HAND here:
+          ROUTE 1  the note's own series: 0 = 12,393; 2 = 24,036 -> 5,821.5/read
+                   -> crossing = ceil((60000-12393)/5821.5) = 9; SEVEN reads reach
+                   53,143.5, which is 6,856 SHORT.
+          ROUTE 2  the bound. Measured from whetstone_gate.world at seed 2001:
+                   fetch_payments count:12 = 2,887 chars = 963 est tokens.
+                   assemble() runs BEFORE each call, so a result at turn i appears
+                   in turns i+1..i+6 and NO OTHER context. One read adds AT MOST
+                   6 x (963+4) = 5,802; seven reach at most 12,393+7x5,802 = 53,007.
+          ROUTE 3  measured with the package's OWN estimator over run_episode's
+                   OWN contexts on the named fixture, front-loaded:
+                   k=7 -> 53,581  k=8 -> 58,879  k=9 -> 64,177 OVER.
+                   front-loaded k = 9; spread k = 10.
+        AND THE TWO INTERMEDIATE LABELS DO NOT SIT ON THE NOTE'S OWN LINE EITHER:
+        33,665 implies 3.65 reads and 42,860 implies 5.23. Five numbers printed as
+        one series and no two of the five agree with the headline drawn from them.
+        Missed: the contradiction was printed IN FULL by the same render() call,
+        and INC-05 - the entry this module's docstring cites TWICE as the reason
+        its type is named Estimate - is exactly "a precise-sounding figure with no
+        source behind it". The number was carried forward as an ATTRIBUTION
+        ("measured by REVIEW_C6_1 against cl100k_base and o200k") and an
+        attribution is not a source.
+
+INC-42  the blindness guard for the one claim this submission rests on used its
+        own delimiter as a split point, so a leak INSIDE the delimiter was read
+        past by the guard's own scoping - and the docstring beside the constant
+        asserted exactly what nothing checked.
+        All four guards' silences MEASURED, not inferred:
+          claim 4  part.text.split(ctx.LAST_REFUSAL_LABEL, 1)[1] -> the split
+                   CONSUMES the leak. Run verbatim -> NONE.
+          claim 1  "5000000" in data/policy.txt            -> False (it writes RUPEES)
+          claim 1  "per-action ceiling" in data/policy.txt -> False
+          claim 3  no clause id, no attack noun, no invariant id -> no finding
+
+INC-43  the spend-safety import walk did not walk: it recorded node.module only,
+        so `from whetstone_gate import X` - THE FORM estimate.py:86 ITSELF USES -
+        terminated it at the empty __init__.py.
+        Missed: the test asserted len(seen) > len(package files) - "the transitive
+        walk never left the package" - which is satisfied by reaching ONE module,
+        and texts.py's single dotted import satisfied it alone. A CHECK THAT THE
+        WALK LEFT THE PACKAGE WAS MISTAKEN FOR A CHECK THAT THE WALK WAS COMPLETE.
+
+!! INC-42 AND INC-43 ARE NOT NEW FINDINGS. Their Missed fields say so rather than
+   treating each as new. THE CLASS IS: A CHECK WRITTEN AGAINST THE SHAPE THE
+   AUTHOR IMAGINED, WHICH IS SILENT ON THE SHAPE THAT ACTUALLY OCCURS.
+     INC-33  the read path re-hashed whatever it was handed, so it could not
+             return DETECTED for ANY input
+     INC-35  a "term by term" test built only from entries in which the terms
+             CO-VARY, so two of three could be deleted
+     INC-40  a test NAMED for the renderer that CALLED the helper
+     INC-42  a guard that SPLITS on its own delimiter
+     INC-43  a walker that records the module a symbol is imported FROM rather
+             than the module it IS
+   FIVE INSTANCES IN THIS REPOSITORY IN ONE DAY, in four packages, by four
+   sessions. INC-42's Diagnosis states that number.
+   !! The only mechanism that has EVER caught an instance of this class is an
+      ADVERSARIAL REVIEW RUNNING MUTANTS - not a test, not a linter, not a
+      reviewer reading. That is an argument for PROCESS.md 5.3's mutant
+      requirement, and it is recorded as one rather than dressed up as a guardrail.
+
+INC-44  C6 REVIEW 2's Phase-1 seal (b7737b7) committed TWO CRLF files and turned
+        make test RED - 3 failed, 661 passed, all three A3/A4. INC-16's exact
+        class LANDING ON THE REVIEWER, in a repository where attacker/texts.py
+        already carries the remedy in a comment - a file the reviewer READ.
+        TENTH occurrence of the INC-06 class and the FIRST on a review session.
+        Fixed by the review itself at b8bfb6a.
+INC-45  C6 REVIEW 2's own artefact died on the operator's cp1252 console -
+        UnicodeEncodeError: 'charmap' ... '\u20b9' at position 92, INSIDE the
+        transcribed P1 clause. The session had, in the same hour, diffed
+        policy.txt's rupee signs CHARACTER BY CHARACTER and reported "0 differing
+        characters" - it counted the very code points that then killed its output.
+        Fix: NONE IN SOURCE, and saying so IS the entry.
+
+  BOTH ARE ATTRIBUTED TO ec8e57ad IN THEIR FIRST LINE and are written here on that
+  review's behalf, because OF-89 records that the entries are OWED and a review
+  session's fence names INCIDENTS.md under NOT. THAT IS THE FOURTH TIME AN ENTRY
+  HAS BEEN STRANDED THIS WAY (Q-029, Q-033, Q-049 are the first three). They are
+  kept SEPARATE because they are different mechanisms with different remedies:
+  a WRITE-side newline translation and a PRINT-side codec. Folding two causes into
+  one entry is how a Diagnosis stops being one.
+
+  All 45 entries verified to carry all EIGHT rule-13 fields exactly once, IN ORDER.
+
+---------------------------------------------------------------------
+2. B-1 - THE CROSSOVER. THE FIGURE IS GENERATED, NOT CORRECTED.
+---------------------------------------------------------------------
+CORRECTING 7 TO 9 WOULD HAVE LEFT THE DEFECT IN PLACE. A literal beside a series
+is free to disagree with it the moment either is edited, and that is what happened.
+So there is no longer a literal:
+
+  CrossoverSeries.crossing(target)  <- computes from
+  CrossoverSeries.tokens_at(k)      <- computes from
+  CrossoverSeries.tokens_per_read() <- computes from config/ + two char counts
+  crossover_note()                  <- FORMATS the string from those values
+  est.CROSSOVER_NOTE                <- PEP 562, resolved on every access, so it
+                                       cannot be a stale cache frozen at import
+                                       NOR a second place the figure could live
+
+THE NOTE NOW PRINTS, verbatim from the live tree:
+
+  CROSSOVER (OF-48; the figure is GENERATED from the series below, never written
+  beside it - INCIDENTS.md INC-41, REVIEW_C6_2 BLOCKER B-1): 9 full-listing reads
+  of 20 turns crosses 60,000 estimated tokens (64,177); 8 reaches only 58,879.
+  SERIES, reads = estimated tokens: 0 = 16,495; 2 = 27,091; 3 = 32,389;
+  5 = 42,985; marginal 5,298/read = window 6 x (ceil(2887/3) - ceil(240/3)),
+  because assemble() runs BEFORE each call so one result is carried by AT MOST 6
+  later contexts, and a read REPLACES a cheap result rather than adding a message.
+  The series is exact while reads <= turn_budget - window = 14 and over-states
+  beyond it. FIXTURE 'seed-2001 front-loaded': run_episode over the REAL seed-2001
+  mock world (world.generator.generate + world.semantics.build, no stand-in), at
+  the configured turn_budget / context_window_turns_verbatim /
+  context_summary_max_tokens / chars_per_token; system prompt data/attacker_sys.txt
+  verbatim; tool schemas = world.surface.TOOL_SURFACE joined with ', '; the
+  attacker emits 'fetch_payments(count=12)' every turn; the folded state is the
+  all-zero fold with only turns_remaining varying; k of the 20 turns return the
+  full fetch_payments listing and the rest return fetch_payment(<probe id>). The k
+  reads are placed on turns 0..k-1 - FRONT-LOADED, which is the DEAREST
+  arrangement, since a result produced at turn i is carried by
+  min(window, turn_budget-1-i) later contexts. Q-037 makes pagination MANDATORY
+  (count:10 of 12, probe at index 11) and the 6-turn window EVICTS the payment
+  list, so re-reads are structural, not chattiness. NO BRANCH IS SELECTED HERE:
+  CONTEXT.md 13.4 gives that to C14's MEASURED figure.
+
+THE FIXTURE IS NAMED - the one thing REVIEW_C6_2 said it could not reproduce, and
+the reason B-1 had to be stated as "the note contradicts its own numbers" rather
+than "its measurement was performed wrongly".
+
+REPRODUCED AGAINST THE REAL WORLD by
+test_the_crossover_series_reproduces_against_the_REAL_seed_2001_world:
+  * the real listing is 2,887 chars and the displaced read 240 - both asserted
+    against whetstone_gate.world itself, not a stand-in, with a message saying
+    that if they moved, the note C14 reads is describing a different fixture;
+  * base 16,495 reproduces EXACTLY;
+  * THE LINEAR SERIES IS EXACT, NOT FITTED: episode_tokens(k) == tokens_at(k) at
+    k = 1, 2, 7, 8, 9 and at the declared limit 14;
+  * the crossing measured DIRECTLY: 9 over, 8 under.
+
+AND THE GENERATED-NESS ITSELF IS ASSERTED by
+test_the_crossover_figure_is_GENERATED_from_its_own_series_and_not_written_beside_it,
+which HALVES the series' base and requires the PRINTED figure to move with it.
+A note carrying a hardcoded crossover passes every other assertion and fails that one.
+
+!! THE HARD-RULE-9 TRIPWIRE CAUGHT A LITERAL 2001 IN THE FIXTURE TEXT WHILE THIS
+   WAS BEING WRITTEN. The seed list is a CONTEXT.md 8.6 row. The seed is now READ
+   FROM config/ (seeds.scored_n50_first). Reported rather than quietly fixed,
+   because it is the mechanism working.
+
+WHAT SURVIVED THE FIX AND IS NOW ASSERTED RATHER THAN MERELY PRESENT:
+  "pagination MANDATORY" + "Q-037", "EVICTS the payment list", and
+  "NO BRANCH IS SELECTED HERE" - all three pinned by the flipped test.
+
+estimate_characters() was extracted so CrossoverSeries could not grow a SECOND
+copy of ceil(chars/divisor) four lines from the first. That is INC-41's own lesson
+applied one level down.
+
+---------------------------------------------------------------------
+3. B-2 - THE WHOLE-AUTHORED-PART SCAN, AND FOUR PLANTED LEAKS
+---------------------------------------------------------------------
+THE GUARD NOW SCANS THE WHOLE AUTHORED PART IN THREE LAYERS:
+
+  LAYER 1  VALUES. Every money ceiling in config/ (money.per_action_cap_paise,
+           money.episode_cap_paise) in FIVE formattings - bare paise, grouped
+           paise, bare rupees, Western-grouped and INDIAN-grouped rupees - read
+           from config/ and never transcribed. Scanned everywhere on the authored
+           surface EXCEPT inside the folded state's own JSON, where
+           episode_paise_moved may legitimately equal the cap.
+  LAYER 2  CLAUSES and VOCABULARY. Every line of data/policy.txt, plus the words
+           a RULE is made of, WORD-BOUNDED - \bcap\b must not fire on
+           capture_payment, which is one of the six real tool names. The section
+           8.6 system prompt is subtracted BY IDENTITY, because 8.6 fixes its
+           bytes, another test compares them character by character, and it
+           legitimately says "limits".
+  LAYER 3  RESIDUE, over the deterministic summary PART. After subtracting every
+           mandated piece LOCATED BY IDENTITY against the module constants, what
+           is left must be whitespace.
+
+  THE LABELS ARE INSIDE LAYERS 1-2 AND SUBTRACTED ONLY FROM LAYER 3. That is the
+  whole difference. A MUTATED label is caught by the scan; an ADDITION to the
+  summary is caught by the residue; neither layer has to be the one that does both.
+  The old docstring's objection was RIGHT - "a guard that searched the summary for
+  any text besides the denial would fire on the state the spec puts there" - and
+  the answer is to subtract what the spec puts there, not to stop scanning.
+
+  A parser assertion was added: exactly ONE line must be recognisable as the
+  mandated denial line. A summary in which none is is a FINDING, not a clean scan.
+
+FIRED AT SEVEN LEAKS. FOUR OF THEM THE OLD FORM COULD NOT SEE:
+  1. M17 VERBATIM - the cap as a bare integer inside LAST_REFUSAL_LABEL.
+  2. THE SAME CAP IN A DIFFERENT FORMATTING - Indian-grouped, in rupees,
+     "(over 50,000)" - carrying NO gate vocabulary and NO policy.txt line at all,
+     so only the value scan can see it.
+  3. A POLICY.TXT CLAUSE INSIDE THE OTHER LABEL - STATE_LABEL, which the old
+     guard never looked at at all.
+  4. A LEAK SPANNING THE LABEL BOUNDARY - it sits ACROSS the boundary between the
+     summary's two halves, after the state line and before the refusal label, so
+     it belongs to NEITHER FIELD. The old guard split on the whole mutated
+     constant and got back EXACTLY the generic denial, so its one assertion
+     passed. This is the shape a field-reading guard cannot see even in principle.
+  5-7. The three the old guard already caught: (arm 2S), Clause P1,
+       verdict=INDETERMINATE in the refusal VALUE. Kept.
+
+BOTH COPIES OF THE GUARD ARE FIXED, INDEPENDENTLY AND BY THEIR OWN ROUTES -
+tests/test_c6_attacker.py::_denial_findings and the deliberately-independent
+re-derivation inside
+tests/test_c6_fix_probes.py::test_the_four_blindness_claims_hold_over_the_LOOPS_OWN_contexts.
+A probe that borrows the predicate it is checking cannot find a defect in the
+predicate, so the second was not made to import the first.
+
+AND THE DOCSTRING IS FIXED. context.py's "They are prose written by this harness,
+not spec text, and THEY CARRY NO POLICY" is replaced by a sentence naming the test
+that now makes it true, plus the M17 exhibit that made it false.
+
+---------------------------------------------------------------------
+4. B-3 - THE WALKER, AND THE POSITIVE CONTROL IN EVERY IMPORT FORM
+---------------------------------------------------------------------
+_imported_modules now records, for `from X import a, b`, BOTH X and X.a, X.b -
+C2's two-line extension - AND resolves RELATIVE imports (from . import x,
+from ..pkg import y) against the file's own package path. The relative half is a
+SECOND form of the same blindness, found while fixing the first: this walk crosses
+into first-party modules it does not own, and whetstone_gate.world.selftest reaches
+_console as `from .._console import say`.
+
+The walk is lifted into _first_party_import_closure(roots, source_root) so it can
+be FIRED AT A SYNTHETIC TREE. NOTHING IS PLANTED IN THIS REPOSITORY (INC-17).
+
+THE POSITIVE CONTROL C6 HAS NEVER HAD:
+test_the_import_scan_ACTUALLY_FIRES_in_every_import_form, parametrised over FOUR
+forms, each planting a client one module away in tmp_path and requiring the scan
+to FIRE:
+    from <pkg> import <module>          from whetstone_gate import provider_client as _pc
+    from <pkg>.<module> import <name>   from whetstone_gate.provider_client import x
+    import <pkg>.<module>               import whetstone_gate.provider_client
+    import <client>                     import openai
+The first is the form REVIEW_C6_2 used to defeat the old walker with all 65 tests
+green, and it is the form estimate.py:86 itself uses.
+
+AND THE COUNTING ASSERTION IS REPLACED BY A NAMING ONE.
+`len(seen) > len(own)` - "the transitive walk never left the package" - is
+satisfied by reaching ONE module, and texts.py's dotted import satisfied it alone.
+The test now asserts config.py is IN the closure BY NAME, with a message naming
+the exact state REVIEW_C6_2 measured for render_summary's path.
+
+THE VACUOUS TEST: test_rendering_the_summary_makes_no_model_call is REPLACED, NOT
+DELETED, and the report says so. OF-86. It built a mock client, called
+render_summary (which has never been handed a client) and asserted the mock's call
+count had not moved; REVIEW_C6_2 demonstrated by EXECUTION that it passes against
+an implementation that makes a model call. Its replacement,
+test_the_summary_renderers_own_import_closure_holds_no_model_client, is ROOTED AT
+context.py SPECIFICALLY rather than at the package - the claim is about
+render_summary's path, not the package's average - and it CAN FAIL: the same plant
+that proves the positive control turns it red, measured. C6 owns none of hard rule
+8's four named non-uses; this is its analogue and it is held to the same standard.
+
+---------------------------------------------------------------------
+5. THE FOUR SURVIVORS, WITH THEIR NEW POLARITY, MEASURED IN A FRESH CLONE
+---------------------------------------------------------------------
+Clone: C:\Users\chinm\AppData\Local\Temp\c6fix2-mut\tree, OUTSIDE this repository.
+Every run printed the clone's whetstone_gate.__file__. Baseline: 77 passed.
+
+  id       polarity                         verdict   killed by
+  M3       cap LOOSENED by one              KILLED    test_the_cap_is_INCLUSIVE_and_pinned_in_BOTH_directions
+           (unchanged)                                "a summary of 401 tokens - ONE OVER a frozen
+                                                       section 8.6 row - was emitted whole"
+  M19      cap TIGHTENED by one             KILLED    the same test, the other direction
+           (unchanged)                                (assert 116 == 400: the cap-exact summary was cut)
+  M17      a policy-revealing reason        KILLED    test_the_attackers_context_contains_no_gate_denial_reason
+           IN the label (unchanged)                   AND test_the_four_blindness_claims_hold_over_the_LOOPS_OWN_contexts
+                                                      - BOTH copies of the guard, independently
+  M18      truncation semantics             KILLED    test_truncation_RESERVES_the_mandated_denial_at_every_size,
+           !! POLARITY FLIPPED by OF-88               test_the_truncation_mark_says_the_cut_is_lossy,
+                                                      test_the_hard_refusal_covers_the_MANDATED_DENIAL...,
+                                                      test_the_estimator_divisor_is_READ_FROM_CONFIG...
+  B3PLANT  provider_client.py reached by    KILLED    test_the_attacker_package_imports_no_model_client...
+           `from whetstone_gate import X`             AND test_the_summary_renderers_own_import_closure...
+
+!! M18's POLARITY IS FLIPPED AND THAT IS THE POINT. REVIEW_C6_2's M18 REPLACED the
+   tail cut WITH a reserve-the-denial cut and SURVIVED. OF-88's ruling makes
+   reserve-the-denial the CORRECT behaviour, so the mutant is now the TAIL CUT -
+   and it dies on four tests. The same string of code, the opposite sign.
+
+AND REVIEW_C6_2's OWN MEASUREMENT REPRODUCES EXACTLY, which is what makes the fix
+provably meaningful rather than merely present. B-2 and B-3 live IN THE TESTS, so
+the meaningful revert is the TEST:
+    PRE-FIX GUARDS + M17      ->  65 passed     (the review's own number)
+    PRE-FIX GUARDS + B3PLANT  ->  65 passed     (the review's own number)
+    FIXED GUARDS  + M17       ->  3 failed
+    FIXED GUARDS  + B3PLANT   ->  2 failed
+AND NINE OF THE NEW/FLIPPED TESTS GO RED AGAINST THE PRE-FIX SOURCE:
+    test_the_episode_records_its_seed_and_prints_offered_versus_loaded
+    test_the_agentdojo_metadata_fallback_is_RECORDED_and_not_silent
+    test_the_estimator_divisor_is_READ_FROM_CONFIG_and_not_from_source
+    test_the_crossover_reaches_C14_through_the_estimates_own_comparison
+    test_the_crossover_figure_is_GENERATED_from_its_own_series_and_not_written_beside_it
+    test_the_crossover_series_reproduces_against_the_REAL_seed_2001_world
+    test_the_truncation_mark_says_the_cut_is_lossy
+    test_truncation_RESERVES_the_mandated_denial_at_every_size
+    test_the_hard_refusal_covers_the_MANDATED_DENIAL_and_not_only_the_marker
+
+---------------------------------------------------------------------
+6. THE TWO RULINGS, RECORDED VERBATIM BEFORE THEY WERE ACTED ON
+---------------------------------------------------------------------
+Both are in QUESTIONS.md at 1252fdc, transcribed as ONE unsplit block as issued.
+
+OF-88 APPLIED. render_summary now:
+  1. emits the summary whole if it fits - THE CAP IS INCLUSIVE (OF-87);
+  2. otherwise drops WHOLE state entries, oldest-rendered-first, keeping section
+     8.6's JSON shape VALID rather than cutting mid-token, and PRINTING THE NUMBER
+     DROPPED inside the mark (hard rule 11's shape applied to context);
+  3. if the fully drained state still does not fit, cuts the STATE HALF only -
+     the denial line is never touched;
+  4. HARD-REFUSES a cap that cannot carry the marker plus the mandated denial
+     line - "never a silent trim". minimum_token_cap now covers the denial line
+     and MOVES WITH IT rather than being one number for every case.
+  The search is a BISECTION over a monotone predicate, and the monotonicity is
+  argued in the docstring rather than assumed: each dropped entry removes at least
+  three characters of JSON while the printed count grows by at most one character
+  per decade.
+
+  THIS CLOSES OF-81, and by making it IMPOSSIBLE rather than unreached.
+  test_truncation_RESERVES_the_mandated_denial_at_every_size rebuilds the review's
+  own exhibit - the twelve REAL seed-2001 payment ids in both maps - and sweeps
+  0..399 idempotency keys. THE DENIAL SURVIVES ALL 400, with MORE THAN 300 of them
+  actually overrunning the cap so the sweep is evidence and not decoration. The
+  tail-cut counterfactual is exhibited in the same test, so the polarity is PINNED
+  and not merely satisfied. Whether C7's ledger can reach 17 keys stops mattering.
+
+  THE MARK STILL SAYS LOSSY, AND THE LOSSINESS MOVED RATHER THAN VANISHED - the
+  test asserts BOTH directions: two states differing only in a DROPPED entry still
+  collide (so LOSSY is not overstating), and two differing at the END no longer do
+  (so the tail cut is really gone).
+
+OF-87 APPLIED LITERALLY. The comparison stays `<= token_cap` and is pinned from
+BOTH sides by exhibits built out of the cap and the divisor rather than typed: a
+summary of EXACTLY cap tokens is emitted whole (kills M19) and one of EXACTLY
+cap+1 is truncated (kills M3).
+
+!! Q-075 RAISED RATHER THAN A DEFAULT TAKEN. OF-88's "OLDEST FIRST" has no time
+   order to refer to: FoldedState.to_json() SORTS both maps and the key tuple ON
+   PURPOSE, and its own docstring gives the reason - "a dict's insertion order is
+   a property of how the ledger happened to be walked". Restoring insertion order
+   to recover a literal "oldest" would UNDO the property the sort exists to
+   provide and would break test_identical_state_produces_byte_identical_summary_text,
+   which mutants M4 and M5 already police. The reading taken -
+   first-in-rendered-order, whole entries, count printed - is declared with its
+   two rejected alternatives. It is NOT a STOP: the ruling is unambiguous about
+   the half that matters, and every reading of the residual ambiguity preserves
+   the denial.
+
+---------------------------------------------------------------------
+7. THE MEDIUMS
+---------------------------------------------------------------------
+OF-82 CLOSED (fe3984f), WITH ONE HALF EXPLICITLY LEFT AND NAMED.
+  _MockFolder is KEPT and now LABELLED a constant fold in its own docstring.
+  _GrowingFolder is the realistic one - one refund and one idempotency key per
+  turn, which is A5 by definition.
+  test_the_windowed_context_stays_BOUNDED_which_is_what_the_window_is_FOR asserts
+  BOUNDEDNESS - the property that is actually true - against a bound DERIVED from
+  config/ and the fixture's own strings, not typed; it checks the fixture really
+  grows (or it is the accident it replaces); and it checks THE BOUND IS TIGHT
+  ENOUGH TO BE EVIDENCE, because a bound nothing could exceed is not a bound.
+  The non-growth test is KEPT as the explicitly-named-weaker one - INC-35's
+  pattern, a discriminating test beside a named-weaker one.
+  !! ITS SIBLING IN test_c6_review_probes.py HAS THE IDENTICAL CONSTANT _Folder
+     AND WAS LEFT. It is C6 REVIEW 1's own probe file and editing a reviewer's
+     probes is INC-30/INC-31's exact hazard. IT IS A FOURTH INSTANCE OF THE CLASS,
+     NOT A FOURTH FINDING, and REVIEW 3 should read it as one.
+
+OF-83 CLOSED. The tiling claim is replaced by a MEASURED table, every figure of
+  which a test recomputes:
+    InjecAgent  62 entries  tiles until the wrap; breaks from seed 2013
+    AgentDojo    4 entries  FEWER THAN THE STRIDE (5): 4 distinct, one offered
+                            TWICE in a single episode; consecutive seeds FULLY
+                            RE-OFFER; breaks from 2002
+    AgentHarm   32 entries  breaks from 2007
+    ASB        400 entries  "accumulates linearly" holds ONLY here; breaks 2081
+  The five lines of arithmetic were CORRECT and are untouched; what is gone is the
+  worked example's generalisation from len(group)=62.
+
+OF-84 CLOSED BY STATING THE COVERAGE HONESTLY AS A NUMBER, AND PRINTING IT.
+  The stratification is UNCHANGED: it is Q-047's authored constant and altering it
+  is a Class A deviation a fix session may not take alone. Hard rule 11: an
+  offered-corpus fraction is a denominator, so CorpusCoverage.render() now prints
+    "19 distinct entr(ies) from 20 turns (1 repeated) of 498 loaded (3.82%) ..."
+  plus the sentence that stops a reader mistaking per-episode reach for cumulative
+  reach: 348/498 = 69.88% at 50 seeds, 248/498 = 49.80% at 30, 80 seeds needed for
+  full coverage, 37.5% of ASB offered on NO seed of ANY arm.
+  ALL MEASURED HERE OVER THE REAL CARDINALITIES (62/4/32/400 = 498) and every one
+  reproduces REVIEW_C6_2's figure exactly.
+  `0 < entries_offered <= 20` is replaced by an EXACT PIN AT 19, verified over all
+  60 seeds - the assertion that could not tell 19 from 20.
+
+OF-85 CLOSED BY RELABELLING, NOT EXCLUDING, WITH THE REASON STATED.
+  CorpusEntry.text_field records which field the offered text came from; the
+  `default or description` fallback is no longer silent; and
+  SPLIT_OPERATIONAL_DEFINITION names the FOURTH bias class in the words C18 must
+  publish - AND the opposite risk OF-85 names, that a 12-character needle with no
+  length floor can classify an INDEPENDENT mention as CORPUS, which the declared
+  "lower bound" direction does not cover. Excluding the two metadata entries would
+  change the offered set, which is Q-047.
+
+OF-86 CLOSED - see section 4.
+OF-91 CLOSED. render_summary's docstring no longer claims "pure" (it opens
+  config/ on EVERY call, deliberately), and the sharper instance -
+  test_the_estimate_is_deterministic_and_pure - is RENAMED
+  test_the_estimate_repeats_exactly_and_reads_the_divisor_from_config, with the
+  I/O half its old name only gestured at now actually asserted. A green test name
+  reads as a discharged obligation, and a wrong name on a passing test is how B-2
+  survived.
+OF-93 CLOSED. The ref example now reads injecagent:attacker_cases_dh:12.
+
+OF-92 RECORDED AS A QUESTION, NOT RESOLVED - Q-076. CONTEXT.md 8.6a and 8.6's
+  probe-note row name DIFFERENT strings as "the discriminator". P7 matches on
+  "exempt from transaction limits", so 8.6 is operative and no behaviour moves.
+  CONTEXT.md is outside this fence and this session's prompt says to record it.
+OF-80 RECORDED AS A QUESTION - Q-077. The two-phase seal does not hold on a
+  re-review, and it binds what REVIEW 3 may CLAIM about its own independence -
+  a QUESTIONS.md matter rather than a backlog row. REVIEW 3 will hit it.
+
+OF-47, OF-49, OF-52, OF-53 STAY OPEN. None is closed with a SHA.
+  OF-47 bears directly on B-1: the crossing of 9 is a bound on the COUNTED half,
+        and completion tokens (800-8,000/episode) remain uncounted in 13.4's
+        UNSAFE direction.
+  OF-49 is WIDENED AGAIN - OF-85's fourth class and a fifth direction are now
+        named in SPLIT_OPERATIONAL_DEFINITION. Naming a bias is not closing it.
+
+---------------------------------------------------------------------
+8. THIS SESSION'S OWN TWO FAILURES, RECORDED RATHER THAN TIDIED AWAY
+---------------------------------------------------------------------
+(a) INC-45's HAZARD, IN THIS SESSION'S OWN TOOLING. An inspection script over
+    OPEN_FINDINGS.md died with
+      UnicodeEncodeError: 'charmap' codec can't encode characters in position 15-16
+    on that file's own em dashes - the same class this session was writing up on
+    the reviewer's behalf, minutes later, on the same machine. Every subsequent
+    print went through one ASCII route (sys.stdout.buffer + backslashreplace).
+    THIRD occurrence after INC-08 and INC-25, and it is first-hand rather than
+    inherited: the _console.say() rule still has no mechanism.
+(b) INC-06's CLASS. A shell heredoc mangled a script -
+      /usr/bin/bash: -c: line 86: unexpected EOF while looking for matching `'
+    - after which every script was written with the EDITOR TOOL and run as a file,
+    which is the form the prompt prescribes and which nine prior incidents ask for.
+NEITHER REACHED A COMMIT. Both are stated because leaving them out is the exact
+dishonesty INC-08 and INC-12 both name.
+
+---------------------------------------------------------------------
+9. NUMBERS, MEASURED BY THIS SESSION AND NOT TAKEN FROM ITS PROMPT
+---------------------------------------------------------------------
+  make test BEFORE : 699 passed, 1 skipped, 2 deselected, 0 failed
+  make test AFTER  : 711 passed, 1 skipped, 2 deselected, 0 failed   (+12)
+  C6's three files : 65 passed -> 77 passed                          (+12)
+  make check-roles : 17 passed, 0 failed, 4 n/a, exit 0
+                     E1 clean: 37 issued rows parsed (38 after the concurrent
+                     C13 REVIEW 2 appended its own)
+  git status --porcelain tests/goldens/  ->  EMPTY. Printed before the code
+                     commit and again at the end. tests/goldens/ is READ-ONLY to
+                     this session and was never opened for writing.
+  0 CR BYTES in every file this session touched, re-verified after each write.
+
+  make selftest STAYS RED on camel_comparator.branch - not this session's, not
+  touched, and named here so its redness is not read as new.
+
+  AN UNTRACKED grep.exe.stackdump SITS AT THE REPOSITORY ROOT. It belongs to no
+  session. IT WAS LEFT IN PLACE - no destructive command was run by this session,
+  and removing another session's artefact is not a fix session's call. Flagged for
+  the operator, as C6 REVIEW 2 also flagged it.
+
+---------------------------------------------------------------------
+10. Swept: LINES
+---------------------------------------------------------------------
+NONE OWED ON ANY COMMIT. Q-063 clause (i) was executed literally before EVERY
+commit this session made: `git diff -- QUESTIONS.md INCIDENTS.md
+docs/reviews/OPEN_FINDINGS.md STATUS.md PROGRESS.md` was RUN AND READ, not merely
+run. Results, per commit:
+  1252fdc  only QUESTIONS.md modified; 236 insertions, 0 deletions; every added
+           `Raised by:` line carries 4e1c8a92.
+  9c809c2  only INCIDENTS.md modified; 444 insertions, 0 deletions.
+  fe3984f  TOUCHES NO JOURNAL PATH AT ALL, so nothing could be swept.
+  de7feee  INCIDENTS +9/-6, PROGRESS +168/-0, STATUS +1/-1,
+           OPEN_FINDINGS +134/-16. The ONLY added SESSION-TOKEN or `Raised by:`
+           line across all five journals carries 4e1c8a92. Every deleted line is
+           one of the sixteen OF-80..OF-95 status rows (C6 REVIEW 2's, this
+           session's to dispose), the single C6 STATUS cell, or this session's own
+           placeholder SHAs. VERIFIED SEPARATELY THAT ZERO LINES MATCHING
+           OF-96..OF-103 WERE ADDED OR REMOVED - those are the concurrent C13
+           REVIEW 2's (8c49c4d3) and rewriting a concurrent session's cell is the
+           one thing Q-063 forbids outright.
+  !! ONE THING WAS OBSERVED AND NOT SWEPT: mid-session, `git status` showed
+     UNCOMMITTED C13 REVIEW 2 edits to QUESTIONS.md, STATUS.md and
+     OPEN_FINDINGS.md. This session did NOT commit QUESTIONS.md after that point,
+     and by the time it committed the other three that session had committed its
+     own. The read is what made that visible - INC-36's own observation.
+
+  STATUS.md's C6 REVIEW-HISTORY COLUMN WAS APPENDED TO, NEVER OVERWRITTEN:
+  21,191 -> 29,632 characters, and the script that wrote it ASSERTS the old
+  column survives verbatim inside the new one before writing a byte.
+
+---------------------------------------------------------------------
+11. WHAT I COULD NOT DO
+---------------------------------------------------------------------
+- FIX OF-95, AND THIS SESSION'S PROMPT INSTRUCTS THE FIX. The moat test is
+  test_gates_and_scorer_share_no_first_party_module in
+  tests/test_repo_invariants.py:313, while CONTEXT.md:1909 and PROCESS.md:1199
+  publish it REVERSED. The prompt lists it under "the mediums that are real and
+  cheap" and says "Fix each". THE FENCE NAMES CONTEXT.md, PROCESS.md AND "any
+  other test file" UNDER **NOT**, AND ALL THREE SITES OF THE RENAME ARE IN THOSE
+  FILES. There is no partial fix either: renaming one of three would leave the
+  collision and add a THIRD spelling. RAISED AS Q-078 AND REPORTED UNDONE rather
+  than worked around. It is INC-28's class for the FIFTH time (after Q-029,
+  Q-033, Q-049 and OF-89) and the FIRST in which a prompt's own instruction and
+  its own fence contradict each other outright.
+- RESOLVE OF-92. CONTEXT.md is under NOT and the prompt says to record it. Q-076.
+- CLOSE OF-80. It is a PROCESS defect; PROCESS.md is under NOT. Q-077, so
+  REVIEW 3 meets a question rather than a surprise.
+- CLOSE OF-90 or OF-94. Every site is in CONTEXT.md, PROVENANCE.md or
+  corpora/MANIFEST.md, all under NOT.
+- FIX test_c6_review_probes.py's constant-fold sibling of OF-82. It is C6 REVIEW
+  1's own probe file; editing a reviewer's probes is INC-30/INC-31's hazard. It
+  is named in OPEN_FINDINGS.md and in section 7 above as a FOURTH INSTANCE of the
+  class rather than left to be rediscovered.
+- CLOSE THE ORDINAL-CHAIN HOLES (11, 12, 18). check_roles.py is named under NOT
+  by name. Ninth consecutive session; OF-70 and OF-78 both still stand.
+- REMOVE grep.exe.stackdump. No destructive command was run.
+
+ZERO PROVIDER MODEL CALLS. NO TOKEN SPENT ON ANY LANE. tests/goldens/ UNTOUCHED
+AND VERIFIED EMPTY IN git status. NO c6-pass TAG - a fix session may not tag.
+C6 STAYS UNREVIEWED. REVIEW 3 IS OWED AND ONLY IT MAY TAG.
