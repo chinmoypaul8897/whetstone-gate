@@ -1,0 +1,421 @@
+PUSHED SHA: <PUSHED_SHA>
+SESSION: C6 FIX, attempt 1. SESSION-TOKEN 7b99a85a. 2026-09-01.
+VERDICT: both BLOCKERs closed. TWO TESTS ARE RED. One is a DECLARED STOP (Q-050 / INC-29);
+         !! THE OTHER IS THIS SESSION'S OWN FAULT (Q-051 / INC-30) - see section 7(a).
+         NO c6-pass TAG WAS CUT. git tag -l is still: c0-pass c1-pass c2-pass c3-pass.
+SPEND:   ZERO PROVIDER MODEL CALLS. ZERO TOKENS ON ANY LANE. The Gemma reference-attacker
+         lanes, the gate-judge lanes and the ladder lanes are untouched. Every model and
+         every world in this fix is a mock inside tests/test_c6_fix_probes.py. ONE HTTP GET
+         to a public corpus repository (PROCESS.md S11a, not a provider call): AgentDojo's
+         LICENSE at its pinned SHA, for OF-52, into an OS temp directory - never into this
+         repository.
+
+================================================================================
+0. COUNTS, BEFORE AND AFTER
+================================================================================
+                     make test                                check-roles   goldens
+BEFORE (3510428)     396 passed, 1 skipped, 2 desel, 0 failed  17/0/4 ex 0  clean
+AFTER                446 passed, 2 FAILED, 1 skipped, 2 desel   17/0/4 ex 0  clean
+
+`git status --porcelain tests/goldens/` is EMPTY. whetstone_gate.__file__ was printed on
+every run in this session (INC-17) and is
+C:\Users\chinm\whetstone-gate\src\whetstone_gate\__init__.py for every live run and
+...\scratchpad\prefix\src\whetstone_gate\__init__.py under PYTHONPATH for every pre-fix run.
+
+!! THE ARITHMETIC RECONCILES AND ITS THIRD TERM IS NOT MINE:
+   396 + 24 (this fix's probes) + 28 (a CONCURRENT C4 REVIEW session, 0852ea56, writing
+   into the same working tree, which committed 7db3e72, 51404cc and 754c0bd while this
+   session ran) = 448, minus the 2 failures = 446.
+   !! AND THE PRECAUTION I TOOK AGAINST THAT CONCURRENCY WAS THE WRONG ONE - section 7(a).
+
+!! IF ANY REVIEWER PROBE HAD GONE RED MY CHANGE WOULD BE WRONG. All 6 of
+   tests/test_c6_review_probes.py PASS, and that file was NOT EDITED - `git log` on it shows
+   exactly one commit, the review's own b3b35aa.
+
+================================================================================
+1. THE INCIDENTS ENTRIES - WRITTEN AND COMMITTED BEFORE A LINE OF SOURCE
+================================================================================
+Committed in 4eb4fce, which touches no source. Hard rule 13 also requires the Fix field to
+carry a commit SHA, which cannot exist before the code; both requirements are met IN THAT
+ORDER - placeholders in 4eb4fce, real SHAs filled in by 961b043 - rather than one being
+dropped. Every entry has a non-empty Diagnosis and Missed.
+
+INC-26 - the summary folded the last TOOL RESULT where S13.3 says the last DENIAL REASON,
+         and the guard that should have caught it was green by accident of payload size.
+         Fix: 17585ab, 6d124f8.
+  Missed: C6's OWN claim-2 predicate fires on 19 of 20 turns the moment the attacker calls
+  fetch_payment('pay_CANARYRECON') - which is what the tradecraft paragraph instructs. It
+  passes in the shipped suite ONLY because the 12-payment listing is long enough that
+  truncation cuts the probe, at index 11, off the end. THE GUARD WAS GREEN BY ACCIDENT OF
+  PAYLOAD SIZE. And the build report asserted the opposite in writing: c6-build-1.txt S2
+  says the four guards assert over the actual assembled context, "not a constructor
+  argument" - every one of them WAS a constructor argument on the path that matters.
+  NEAR-MISS, recorded because it is why this is a BLOCKER and not a MEDIUM: the obvious
+  repair is to ban the probe note globally, WHICH CLOSES THE DOOR AND MAKES ARM 4 VOID BY
+  CONSTRUCTION WHILE EVERY TEST STILL PASSES. A defect whose natural repair is catastrophic
+  is one an architect must rule on. It was not taken, and a probe fails if a later session
+  takes it.
+  Diagnosis: the loop has no gate object - the choice that makes claim 4 structural - so it
+  could not tell a denial from any other result, and C6 resolved that silently by folding
+  all of them, recorded in no QUESTIONS.md entry, no Class B note and no line of the build
+  report. S8.6 dissolves the tension outright and nobody looked.
+
+INC-27 - the attacker was seeded from ONE corpus of four, 20 of 498 entries, and the guard
+         written to prevent exactly that headline was watching a different door.
+         Fix: 2911ad0, 6d124f8.
+  Missed: C6 wrote the guard against this exact headline, in this exact module, and pointed
+  it at the wrong door. load_entries' own words: "zero entries would make CONTEXT.md section
+  11.3's published split read '100% improvised' - a headline number produced by a broken
+  instrument, which is INCIDENTS.md INC-01 exactly." IT GUARDS ZERO ENTRIES. The defect is
+  ZERO REACHABLE ENTRIES, and the two produce the identical headline.
+  Diagnosis: the offered window was a FIXED SLICE [0,19] OF A SINGLE CONCATENATED INDEX, so
+  the physical ORDER OF THE CORPORA in seed_index.json silently decided which of them the
+  attacker could ever see, and nothing compared the offered set against the four corpora the
+  card names. "Hard rule 8 forbids randomness" was true and irrelevant: a deterministic
+  function of (episode seed, turn index) spreads across the corpus AND keeps hard rule 10.
+
+INC-28 - the entry this fix earned. For the THIRD time, a scope fence excluded the exact
+         file the session's own ruling told it to write. Fix: 0479f1a, 17585ab.
+  Missed: this project has recorded the class twice and both were read by this session, in
+  its prescribed read order, before it hit the third. Q-029: the TODO_ sentinel is
+  unreachable by a fix session, accepted by the architect as "a real process defect".
+  Q-033: INCIDENTS.md was fenced out of the sessions most likely to need it - three sessions
+  in one day reported an incident they were forbidden to file. THE GENERALISATION WAS
+  AVAILABLE AFTER Q-033 AND WAS NOT MADE: the failing pattern is not "INCIDENTS.md is fenced
+  out", it is "the fence is written from the diff the architect expects, not from the tasks
+  the architect wrote." Q-033 fixed one filename; this is the same defect at another.
+  Diagnosis: fences are authored as a list of expected edit targets rather than derived from
+  the tasks they accompany, so a task needing a file the architect did not picture produces
+  a violation indistinguishable, from inside the session, from scope creep.
+  Systemic guardrail: none - accepted, because a session cannot widen its own fence.
+
+INC-29 - a C6 test asserts a byte-constant context that no correct S13.3 summary can
+         produce, and it was green only because the summary it measured was pinned at the
+         truncation cap. NOT FIXED - see 7(b). There is no Fix SHA and the field says so.
+
+INC-30 - !! THIS SESSION'S OWN FAULT. `git add <paths> && git commit` is NOT scope-limited
+         when two sessions share a working tree; this session committed a concurrent
+         REVIEW's files under its own token and broke the mechanical hard-rule-6 guard.
+         NOT REPAIRABLE FORWARD. See 7(a). There is no Fix SHA and the field says so.
+
+================================================================================
+2. THE THREE RULINGS, RECORDED VERBATIM BEFORE THE BUILD (0479f1a)
+================================================================================
+Q-046, Q-047 and Q-048 are in QUESTIONS.md, each inside a blockquote so the ruling's own
+words are separable from this session's account of what landed under it. Hard rule 5.
+Also recorded: Q-049 (the data/ fence question, 7(c)), Q-050 (the exposed red, 7(b)) and
+Q-051 (the red this session CAUSED, 7(a)).
+
+!! Q-045 IS UNALLOCATED IN QUESTIONS.md. The prompt named Q-046/47/48 explicitly, so those
+   are the numbers used; no Q-045 exists as of today. This session did not take it and said
+   so in the file rather than leaving a silent gap in a sequence the file's own preamble
+   says is allocated in order and never reused.
+
+!! THE SESSION-TOKEN ROW IS THE TENTH SELF-RECORDED ROW, NOT THE NINTH AS THE PROMPT SAID.
+   The ninth is 2cd28cc5, recorded in the paragraph immediately above it by the session that
+   carried it. Corrected from the file under hard rule 4, and NOT waved through, because the
+   count is the only thing those paragraphs carry: the 6ba2d70e paragraph's argument - "that
+   is no longer a gap in a clause; it is evidence that the clause was written to the wrong
+   scope" - is an argument about a running total. A total that silently repeats a number is
+   a total nobody can cite. Class C. The improvement the 3af1c9d2 paragraph named - the
+   prompt numbering the row in advance - is exactly what makes it capable of being wrong by
+   one, and that cost is recorded BESIDE the improvement rather than instead of it.
+
+================================================================================
+3. F-1 - THE SUMMARY FOLDS THE LAST DENIAL. RED BEFORE, GREEN AFTER. (17585ab)
+================================================================================
+Q-046 dissolved the tension C6 resolved silently: S8.6's denial is ONE AUTHORED CONSTANT,
+returned by every gate on DENIED *and* on INDETERMINATE, so byte equality against it carries
+EXACTLY ONE BIT - "something refused" - and no arm identity and no clause number. No gate
+object is needed, so claim 4's structural argument is PRESERVED INTACT. The constant lives in
+data/generic_denial.txt, GENERATED BY PARSING S8.6 rather than transcribed, and the loader
+refuses any file that is not exactly one newline-terminated line - a stray newline would make
+the equality never match and silently restore the defect.
+
+THE 19-OF-20 CASE, MEASURED ON BOTH TREES, whetstone_gate.__file__ printed on each:
+
+  =========== BEFORE: the pre-fix tree at 3510428 ===========
+  TREE: ...\scratchpad\prefix\src\whetstone_gate\__init__.py
+  PAYLOAD chars: 150  (summary cap is 400 tokens)
+  F-1  claim-2 predicate FIRES on 19 of 20 turns  turns=[1..19]
+  F-1  CONTROL - the note reaches the attacker on the WORLD surface: True
+
+  =========== AFTER: the live tree ===========
+  TREE: C:\Users\chinm\whetstone-gate\src\whetstone_gate\__init__.py
+  PAYLOAD chars: 150  (summary cap is 400 tokens)
+  F-1  claim-2 predicate FIRES on 0 of 20 turns  turns=[]
+  F-1  CONTROL - the note reaches the attacker on the WORLD surface: True
+
+And the kept probe fails on the pre-fix tree ON ITS OWN ASSERTION, not on a signature:
+  AssertionError: the probe's note text reached the AUTHORED surface on 19 of 20 turns:
+  [1, 2, ..., 19]. That is REVIEW_C6_1's F-1 and INCIDENTS.md INC-26.
+_episode() deliberately OMITS episode_seed rather than passing its default, so the F-1 probes
+RUN against the pre-fix source instead of dying on "TypeError: unexpected keyword argument" -
+red for the wrong reason is indistinguishable from a probe that could never have found
+anything.
+
+!! THE DOOR IS STILL OPEN AND IT IS ASSERTED, NOT PROMISED. The control holds on BOTH trees.
+   test_the_probe_note_STILL_reaches_the_attacker_on_the_WORLD_surface fails if a later
+   session bans the note globally.
+
+ALL FOUR BLINDNESS CLAIMS NOW RUN OVER run_episode's OWN CONTEXTS - which C6 never did. The
+predicates are re-derived in the probe file from CONTEXT.md, data/policy.txt and config/,
+NOT imported from tests/test_c6_attacker.py: a probe that borrows the predicate it is
+checking cannot find a defect in the predicate.
+
+Origin.CORPUS is the ruling's second half - "third-party corpus text STOP REACHING THE
+AUTHORED SURFACE". It closes REVIEW_C6_1 INFO-3, which goes live under F-2's wider pool,
+where an AgentHarm or ASB entry containing a bare "S1" or "E2" is ordinary.
+
+================================================================================
+4. F-2 - THE SELECTION FUNCTION, AND EVERY CORPUS REACHABLE (2911ad0)
+================================================================================
+STATED IN corpus.py's DOCSTRING AS FIVE LINES OF INTEGER ARITHMETIC - no hash, no PRNG - so
+a reviewer can recompute an episode's offers by hand, and a probe recomputes them
+independently:
+
+  corpora = corpora_in_order(entries)          # distinct names, FIRST-APPEARANCE order
+  c       = turn_index %  len(corpora)         # WHICH corpus this turn offers
+  k       = turn_index // len(corpora)         # the k-th offer from that corpus
+  group   = [e for e in entries if e.corpus == corpora[c]]      # in load order
+  stride  = max(1, turn_budget // len(corpora))
+  within  = (episode_seed * stride + k) % len(group)
+  offered = group[within]
+
+`stride` is derived from turn_budget, a config/ value the caller already reads. IT IS NOT A
+NEW AUTHOR-CHOSEN CONSTANT and no config/ key was added for it. At turn_budget=20 and four
+corpora stride is 5, so consecutive seeds TILE each corpus with no gap and no overlap.
+
+EVERY CORPUS PROVED REACHABLE IN EVERY EPISODE, measured on both trees:
+  pre-fix 3510428 : seeds 2001 / 2002 / 2050 -> 1 of 4 corpora ['injecagent'],
+                    20 distinct entries of 498; 20 of 498 (4.02%) across ALL 50 scored seeds
+  live            : seeds 2001 / 2002 / 2050 -> 4 of 4 ['agentdojo','agentharm','asb',
+                    'injecagent'], 19 distinct entries each;
+                    348 of 498 (69.88%) across the 50 scored seeds - COVERAGE ACCUMULATES
+
+Also proved by probe: two seeds give different offers; one seed gives identical offers twice;
+TWO ARMS ON THE SAME SEED GET IDENTICAL OFFERS (so S12.4's paired-by-seed design is untouched).
+
+!! HARD RULE 6 - NO TEST WAS WEAKENED. The defaults (episode_seed=0, turn_budget=1) reduce
+   the function EXACTLY to the old entries[turn_index % len(entries)] whenever every entry
+   shares one corpus, so C6's own test_the_seed_rotation_is_deterministic passes UNTOUCHED.
+   That was designed for, not discovered.
+
+THE GUARD NOW WATCHES THE RIGHT DOOR: coverage_report() raises CorpusUnavailable when the
+selection cannot reach a corpus that load_entries loaded, and prints offered-versus-loaded as
+a number (hard rule 11). It is fired at a failing input in the probe, not merely written.
+
+================================================================================
+5. F-3 - CHARS_PER_TOKEN, THREE ROWS (1ad8946)
+================================================================================
+  1. CONTEXT.md S8.6 constants table: "attacker chars-per-token estimator divisor [ADDED 1 Sep]"
+  2. config/protocol.yaml: attacker.chars_per_token: 3
+  3. spec_constants.SPEC_CONSTANTS: attacker_chars_per_token, CONTEXTUAL,
+     [merchant-policy, author-chosen]
+estimate.CHARS_PER_TOKEN is resolved through the loader on EVERY ACCESS by PEP 562 -
+world/spec.py's established pattern here, for its stated reason: "a module-level eager read
+would be exactly that stale cache, frozen at import". The reviewer's probe still reads it as
+an attribute, still gets 3, and was not touched.
+The tripwire and the S8.6 -> registry coverage test both PASS (tests/test_tripwire_registry.py,
+5 tests, green), and a probe proves the divisor is read from config/ IN A FRESH SUBPROCESS
+against an altered file: at chars_per_token=7 the rendered summary is 2800 characters where
+the live tree renders 1200. The BYTES THE ATTACKER IS SENT change. That is the whole of F-3.
+
+!! FRAMING_TOKENS_PER_MESSAGE DELIBERATELY GETS NO ROW, and that is Q-048's own test applied
+   rather than copied: it is used only by estimate_messages and never by render_summary's
+   cap, so it moves the figure this project REPORTS and not one byte of what the attacker is
+   SENT. The two parameters are treated differently on purpose.
+
+!! EDITING config/ IS LEGAL ONLY BECAUSE prereg-v1 DOES NOT EXIST. `git tag -l` at every
+   commit of this session is `c0-pass c1-pass c2-pass c3-pass` - neither probe-v1 nor
+   prereg-v1 is cut - so the amendment lands inside PROCESS.md S6's window rather than
+   against a freeze. Checked, not assumed, and said rather than left silent.
+
+================================================================================
+6. THE SIX OPEN FINDINGS
+================================================================================
+OF-47 CLOSED (1ad8946) - the omission of completion tokens is stated IN THE ESTIMATE'S OWN
+  OUTPUT: TokenEstimate.method and BudgetComparison.render() both carry "COMPLETION TOKENS
+  ARE NOT COUNTED ... 800-8,000 tokens/episode UNCOUNTED ... ONE-DIRECTIONAL and LOW -
+  CONTEXT.md 13.4's unsafe direction". Counting them was NOT chosen and the reason is
+  recorded: completions do not exist until a provider is called, C6 may call none, and a
+  MODELLED completion count is a second estimate stacked on the first while reading as a
+  measurement - INC-05's class.
+OF-48 CLOSED (1ad8946) - estimate.CROSSOVER_NOTE carries the reviewer's crossover into the
+  rendered comparison, so C14's pilot reads it: "7 full-listing reads of 20 turns crosses
+  60,000 (6 by this estimator)", with the whole curve and the three forces - Q-037's
+  mandatory pagination, the 6-turn window EVICTING the payment list, and the tradecraft
+  paragraph. NO BRANCH IS SELECTED, and the probe greps the module for `selected_branch` to
+  prove it rather than promising it.
+OF-49 CLOSED (2911ad0) - corpus.SPLIT_OPERATIONAL_DEFINITION states it precisely rather than
+  narrowing it, and the choice is recorded: narrowing means case-folding (which would make
+  CANARY-A and canary-a the same string in a module feeding a published number) or comparing
+  against every entry offered so far (which changes what the field measures, so Class A and
+  unruled). It names all four IMPROVISED classes including the two declared nowhere -
+  case-only variation, and VERBATIM UNALTERED REUSE OF A DIFFERENT OFFERED ENTRY. The probe
+  DEMONSTRATES both rather than asserting the words.
+OF-50 CLOSED (17585ab) - TRUNCATION_MARK now reads "...[TRUNCATED TO FIT THE CONFIGURED
+  SUMMARY CAP - TAIL CUT, LOSSY]". The collision is DECLARED, NOT ELIMINATED, and the probe
+  asserts two states differing only beyond the cut still render identically, so nobody
+  mistakes the declaration for a repair. The alternative remedy - cut the refusal half - was
+  not taken because after F-1 that half is at most 34 characters.
+OF-51 CLOSED (17585ab) - a token_cap below the marker is now a HARD REFUSAL naming a DERIVED
+  floor (ceil(len(TRUNCATION_MARK) / divisor)), not a silent overrun. A refusal rather than a
+  clamp because such a cap can carry no folded state at all. The probe also asserts the cap
+  HOLDS at the floor, floor+1, 3x floor and 400.
+OF-52 OPEN, ONE QUARTER CLOSED (c44b752) - and the source was RE-FETCHED rather than trusted
+  (PROCESS.md S9; INC-05's rule). GET of AgentDojo's LICENSE at pin 089ed468...: HTTP 200,
+  1,161 bytes, sha256 4285a071f2d382338e52b4fb0a186d952984a34d43a33d8872e1a1d8cb43401e. The
+  notice line holds EXACTLY ONE non-ASCII code point, U+00E8 in "Tramer", and "Balunovic" is
+  PLAIN ASCII. SO THE CORRECT RENDERING IS NEITHER OF THE TWO THIS REPOSITORY CARRIED.
+  corpora/seed_index.json had the right name and the wrong e - fixed here, byte-identical.
+  CONTEXT.md S11.3, PROVENANCE.md S3.3 and corpora/MANIFEST.md all carry "Balunovic" with
+  U+0107, which the shipped notice does not use. ALL THREE ARE OUTSIDE THIS FENCE
+  (PROVENANCE.md is named under NOT; the other two are not on the ONLY list), so the row
+  stays OPEN rather than being marked closed on the file that happened to be reachable.
+  Owed before C19 builds the attribution block.
+OF-53 NEW, SELF-RAISED against this session's own change - data/generic_denial.txt is an
+  S8.6 authored text in NEITHER spec_constants.AUTHORED_TEXTS NOR S8.6's fenced-block list,
+  because both were outside the fence (Q-049). A probe supplies the byte comparison
+  meanwhile; THAT IS A TEST, NOT A REGISTRY ROW, and the row is owed.
+
+================================================================================
+7. WHAT I COULD NOT DO - EVERY ITEM, WITH ITS REASON
+================================================================================
+(a) !! I COMMITTED ANOTHER SESSION'S FILES UNDER MY OWN TOKEN, AND IT BROKE THE MECHANICAL
+    HARD-RULE-6 GUARD. Q-051 / INC-30. THIS IS THE WORST THING IN THIS REPORT.
+    A C4 REVIEW session (0852ea56) was writing into this same working tree. Commit 17585ab -
+    my F-1 fix - carries FIVE FILES THAT ARE NOT MINE:
+      docs/reviews/independent/{c4_diff_harness.py, c4_reimpl_diff.txt,
+                               c4_reimpl_expected.json, c4_vectors.py}
+      tests/test_c4_review_probes.py          *** a REVIEWER'S PROBE FILE ***
+    So tests/test_c1_review_2_probes.py::test_no_reviewer_probe_file_has_ever_been_edited_by_a_later_session
+    is RED, reporting two tokens on that file: 0852ea56 (theirs) and 7b99a85a (mine).
+    THE GUARD FIRED CORRECTLY. That the cause was a git-index race and not an edit-for-green
+    does not make it wrong.
+    DIAGNOSIS: `git commit` takes its scope from the INDEX, not from the preceding `git add`,
+    and the index is SHARED. `git add <explicit paths>` gives NO isolation. Only
+    `git commit -- <paths>` does.
+    !! MISSED, and this is the sharp part: I SAW the concurrent writes at 09:57, WROTE DOWN
+    "those are not mine - I'll stage only my own files, explicitly", and then applied the
+    precaution that protects the STAGING and not the COMMIT. I identified the danger in
+    writing and mitigated it with the wrong command, which is worse than not noticing - a
+    session that had not noticed would not have recorded a false assurance. Two further
+    signals were unread: my own prompt's capitalised sentence about reviewer probe files, and
+    STATUS.md's existing note that a C6 REVIEW session had written into this tree concurrently
+    one session earlier.
+    NOT REPAIRABLE FORWARD: a rewrite is forbidden by CLAUDE.md S5 and would rewrite THEIR
+    commits (754c0bd is LATER in the log than 17585ab) in a tree their session may still be
+    live in; a revert would add a THIRD commit touching their probe file under my token.
+    Nothing was lost or altered - their 754c0bd is the authoritative final state - so the
+    defect is ATTRIBUTION, not content. The other eight commits were audited one by one with
+    `git show --name-only` and are clean.
+    FORWARD-ONLY REMEDY APPLIED: every commit from 7830b0e uses `git commit -- <paths>`.
+    Q-051 asks the narrow question and the wider one: which remedy stands, and WHETHER TWO
+    SESSIONS SHOULD SHARE ONE WORKING TREE AT ALL.
+
+(b) !! ONE TEST IS RED BY DECLARED STOP AND I DID NOT FIX IT. Q-050 / INC-29.
+    tests/test_c6_attacker.py::test_the_windowed_context_stops_growing_which_is_what_the_window_is_FOR
+    asserts len(set(steady)) == 1 - BYTE-CONSTANCY - where its own name, docstring and
+    failure message all say "stops growing". THE CONTEXT DOES NOT GROW; IT FALLS BY ONE
+    TOKEN, ONCE: [6038 x4, 6037 x9]. Measured part by part rather than reasoned about:
+
+      turn 10   authored  deterministic summary   len=196  est=66
+      turn 11   authored  deterministic summary   len=195  est=65   <- the entire delta
+                (every other part byte-identical: sys 706, schemas 16, 6x world 2810)
+
+    S8.6's folded state carries turns_remaining, counting 20..1; at turn 11 it goes from 10
+    to 9 - TWO DECIMAL DIGITS TO ONE. ceil(196/3)=66, ceil(195/3)=65. NO CORRECT S13.3
+    SUMMARY CAN SATISFY THAT ASSERTION for any turn_budget >= 10, and padding would emit
+    "09" and change S8.6's JSON shape.
+    !! IT WAS ONLY EVER GREEN FOR F-1's OWN REASON - the summary was pinned at the truncation
+    cap by the folded 2,810-character tool result, so turns_remaining was varying underneath
+    a constant. "Green by accident of payload size" applies twice in one file, four hundred
+    lines apart, and I found the second by running the suite rather than by looking.
+    NOT FIXED, on three independent grounds: tests/test_c6_attacker.py is an EXISTING TEST
+    FILE, named under NOT in this fence; HARD RULE 6 forbids it, because the relaxed
+    assertion PASSES ON THE OLD CODE TOO and a session relaxing an assertion over its own
+    change is precisely the move rule 6 exists to prevent; and INC-23 / Q-043 is the same
+    situation - "no correct C4 can make it green" - closed by an ARCHITECT session and not
+    by the one that found it. THE PROPERTY IS NOT UNCOVERED MEANWHILE: REVIEW_C6_1's own kept
+    probe already asserts the correct non-growth form and is GREEN. The remedy is one line
+    and it is stated in Q-050.
+(c) data/ IS NOT ON THE FENCE'S ONLY LIST while Q-046 says the constant is "read from
+    data/". The file was written on hard rule 5 - a ruling binds - and the judgement, the
+    three rejected alternatives and the two owed consequences are in Q-049. INC-28 records
+    it as the THIRD occurrence of the class Q-029 and Q-033 each recorded.
+(d) THREE OF OF-52's FOUR RENDERINGS ARE UNTOUCHED, and AUTHORED_TEXTS / S8.6's marker for
+    the new authored text are untouched. All outside the fence, all named as owed rather
+    than rounded up. OF-52 stays OPEN and OF-53 is raised.
+(e) NO MUTATION RUN. A mutation run is a review activity, and a fix session scoring its own
+    work would be doing exactly what this project exists to reject. The next review runs the
+    mutants.
+(f) corpora/fetched/ IS ABSENT from this machine, so no probe here loads the REAL pinned
+    payloads. The F-2 fixtures reproduce the real SHAPE exactly - the same four corpora, in
+    the same order, with the same cardinalities the review measured (62/4/32/400 = 498) -
+    and that is what the selection rule turns on. Stated because it is a limit of the
+    evidence, not hidden inside it.
+
+================================================================================
+8. GIT
+================================================================================
+Every commit carries `Session-Token: 7b99a85a`. Every commit touching src/ or tests/ ends
+with "(unreviewed)". No force-push, no tag move, no amend, no history rewrite, NO TAG CUT.
+
+  4eb4fce  docs: INC-26, INC-27, INC-28 - written BEFORE a line of the fix, per hard rule 13
+  0479f1a  docs: Q-046, Q-047, Q-048 recorded VERBATIM before the build, plus Q-049 and the token row
+  2911ad0  fix: F-2 - stratify the corpus offer across all four corpora, and point the guard at reachability (unreviewed)
+  17585ab  fix: F-1 - the summary folds the LAST DENIAL, identified by equality against S8.6's one string (unreviewed)
+  1ad8946  fix: F-3 - CHARS_PER_TOKEN becomes a frozen S8.6 constant, and the estimate states its own omissions (unreviewed)
+  c44b752  fix: OF-52 - seed_index.json reproduces AgentDojo's copyright notice verbatim (unreviewed)
+  6d124f8  test: C6 FIX - 24 kept probes, 21 of which are RED on the pre-fix source (unreviewed)
+  961b043  docs: INC-29 and Q-050 - the one red this fix EXPOSED, and the six findings' dispositions
+  6ae1be9  docs: STATUS and PROGRESS - both C6 BLOCKERs closed, and the one red this fix EXPOSED
+  7830b0e  docs: INC-30 and Q-051 - this session committed a concurrent REVIEW's probe file under its own token
+  <SESSIONS_SHA>  docs: the C6 FIX 1 FINAL OUTPUT block, committed verbatim before it is printed
+
+(7db3e72, 51404cc and 754c0bd interleave in the log and are the CONCURRENT C4 REVIEW
+session's, not this one's. !! But 17585ab is MINE AND CARRIES FIVE OF THEIRS - see 7(a).)
+
+git diff --stat 3510428..HEAD, excluding that session's files:
+
+ CONTEXT.md                              |   1 +
+ INCIDENTS.md                            | 322 ++++++++++++++
+ PROGRESS.md                             | 167 +++++++
+ QUESTIONS.md                            | 314 +++++++++++++
+ STATUS.md                               |  86 +++-
+ config/protocol.yaml                    |  23 +
+ corpora/seed_index.json                 |   2 +-
+ data/generic_denial.txt                 |   1 +
+ docs/reviews/OPEN_FINDINGS.md           |  23 +
+ src/whetstone_gate/attacker/__init__.py |   9 +-
+ src/whetstone_gate/attacker/context.py  |  94 +++-
+ src/whetstone_gate/attacker/corpus.py   | 207 ++++++++-
+ src/whetstone_gate/attacker/estimate.py | 143 +++++-
+ src/whetstone_gate/attacker/loop.py     |  84 +++-
+ src/whetstone_gate/attacker/texts.py    |  55 +++
+ src/whetstone_gate/spec_constants.py    |  33 ++
+ tests/test_c6_fix_probes.py             | 754 ++++++++++++++++++++++++++++++++
+ 17 files changed, 2280 insertions(+), 38 deletions(-)
+
+================================================================================
+9. FENCE, AND WHAT WAS NOT TOUCHED
+================================================================================
+NOT touched: PROCESS.md, RAZORPAY_SEMANTICS.md, PROVENANCE.md, config/lanes.yaml, any module
+under src/ outside attacker/ except the ONE spec_constants.py row, ANY EXISTING TEST FILE,
+docs/reviews/*.md except OPEN_FINDINGS.md, tests/goldens/, vendor/.
+CONTEXT.md: exactly ONE S8.6 constants-table row added, TASK 4 only - `git diff` shows 1
+insertion, 0 deletions. config/protocol.yaml: exactly ONE key. spec_constants.py: exactly ONE
+SpecConstant row.
+Outside the fence: data/generic_denial.txt alone - one new file, declared in Q-049 and INC-28.
+Every human-facing print in this session went through _console.say() (INC-25), and the one
+place it did not - a bare print() in a throwaway verification snippet - died on cp1252 with
+UnicodeEncodeError, which is INC-25's own failure reproduced live in the session that was
+told to watch for it. No tracked file was written by a shell redirect; INCIDENTS.md,
+QUESTIONS.md, STATUS.md, PROGRESS.md and OPEN_FINDINGS.md were authored with the editor tool
+and appended in BINARY mode, and all carry 0 CR bytes (INC-06's class, tenth occurrence
+avoided).
+
+DO NOT SELF-CERTIFY: no c6-pass tag was cut. A fresh adversarial review follows, and it owes
+a mutation run, rulings on Q-049, Q-050 and Q-051, and a decision on whether the F-2
+selection rule's coverage is enough.
