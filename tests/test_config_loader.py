@@ -184,16 +184,111 @@ def test_genesis_hash_is_pre_freeze_and_is_never_absent():
     assert cfg.load("protocol").require("ledger.genesis_hash") == "PRE-FREEZE"
 
 
-def test_protocol_sentinels_are_exactly_the_undecided_ones():
-    """The undetermined set is closed and named. Nothing drifts into it unnoticed."""
+#: ⚠️ **THE KNOWN-UNDECIDED SET, AND IT IS A CEILING RATHER THAN A SNAPSHOT.**
+#:
+#: Every key here is a value the plan says somebody will supply, with the chunk or actor
+#: that supplies it. The set is designed to **shrink to empty by `prereg-v1`**, so the
+#: invariant is *"nothing NEW drifts in and nothing unowned appears"*, never *"these are
+#: today's contents"*. `QUESTIONS.md` **Q-061**.
+KNOWN_UNDECIDED: dict[str, str] = {
+    "probe.void_threshold_breach_rate": "TODO_C14_CALIBRATION",
+    "n_decision.selected_branch": "TODO_C14_PILOT",
+    "n_decision.measured_tokens_per_episode": "TODO_C14_PILOT",
+    "vendor.agentdojo_sha": "TODO_C13_C16",
+    "vendor.camel_sha": "TODO_C13_C16",
+}
+
+#: Keys whose sentinel is still **expected to be there**, by name, because leaving them is
+#: another chunk's fence rather than an oversight. ⚠️ `vendor.agentdojo_sha` is **C16's**;
+#: C13 vendored AgentDojo, measured it, and deliberately did not resolve it (`Q-059`). A
+#: subset assertion alone would let it be resolved early and silently.
+STILL_OWED_BY_ANOTHER_CHUNK = ("vendor.agentdojo_sha",)
+
+
+def test_protocol_sentinels_are_a_shrinking_subset_of_the_known_undecided_ones():
+    """⚠️ **Q-061, RULED 2026-09-01: the equality was the defect, not the resolved key.**
+
+    *"An equality assertion over a set that SHRINKS by design fails once per chunk for the
+    rest of the project and trains every session to expect a red it did not cause."*
+
+    The old form asserted ``sentinels == {the five}``, which also forbade a sentinel
+    **leaving** — and a sentinel leaving is **a chunk doing its job**. It went red the
+    moment C13 resolved ``vendor.camel_sha`` exactly as its card instructed, and it was
+    scheduled to go red four more times: C14 resolves three, C16 resolves the fourth, and
+    **C14 is the freeze**.
+
+    What is asserted instead is the invariant the old docstring actually claimed, in three
+    clauses that are all true today and stay true as the set empties:
+
+      1. **no NEW key** drifts into the undetermined set — the ceiling is closed;
+      2. **every remaining sentinel is OWNED**, naming the chunk or actor that resolves it;
+      3. a key that IS still a sentinel carries **the sentinel the plan assigned it**, so a
+         key cannot quietly change hands.
+
+    ⚠️ Plus one thing a subset assertion cannot say on its own: the keys another chunk still
+    owns are asserted **present by name**, so resolving one early is a failure rather than a
+    silent shrink. `PROCESS.md` §5.4 — and this is fired at three fixtures below.
+    """
     sentinels = dict(cfg.load("protocol").sentinels())
-    assert sentinels == {
-        "probe.void_threshold_breach_rate": "TODO_C14_CALIBRATION",
-        "n_decision.selected_branch": "TODO_C14_PILOT",
-        "n_decision.measured_tokens_per_episode": "TODO_C14_PILOT",
-        "vendor.agentdojo_sha": "TODO_C13_C16",
-        "vendor.camel_sha": "TODO_C13_C16",
-    }
+
+    drifted_in = sorted(set(sentinels) - set(KNOWN_UNDECIDED))
+    assert drifted_in == [], (
+        f"{drifted_in} became undetermined and nobody planned it. The undetermined set is "
+        f"a CEILING: it may shrink as chunks resolve their keys, and it may never grow."
+    )
+    for dotted, sentinel in sentinels.items():
+        assert sentinel == KNOWN_UNDECIDED[dotted], (
+            f"{dotted} carries {sentinel!r}, but the plan assigns it "
+            f"{KNOWN_UNDECIDED[dotted]!r}. A key changing owner is not a chunk doing its job."
+        )
+        assert sentinel in cfg._SENTINEL_OWNERS, f"{dotted}'s sentinel has no recorded owner"
+
+    for dotted in STILL_OWED_BY_ANOTHER_CHUNK:
+        assert dotted in sentinels, (
+            f"{dotted} is no longer a sentinel. It belongs to another chunk, and resolving "
+            f"another chunk's key is the silent scope creep the fences exist to stop "
+            f"(QUESTIONS.md Q-059)."
+        )
+
+
+@pytest.mark.parametrize(
+    ("yaml_text", "expect_in_message"),
+    [
+        # (1) A NEW key drifts into the undetermined set with nobody's name on it.
+        ("vendor:\n  something_new_sha: TODO_NOBODY\n", "nobody planned it"),
+        # (2) A KNOWN key quietly changes owner.
+        ("vendor:\n  agentdojo_sha: TODO_C14_PILOT\n", "changing owner"),
+        # (3) Another chunk's key is resolved early - the shrink a subset check would allow.
+        ("vendor:\n  agentdojo_sha: 928bbae820a89556b03de5cf818eb350cd6082d1\n", "another chunk"),
+    ],
+    ids=["a-NEW-unowned-sentinel", "a-key-changing-owner", "another-chunks-key-resolved-early"],
+)
+def test_the_sentinel_invariant_actually_goes_red(tmp_path, monkeypatch, yaml_text, expect_in_message):
+    """⚠️ **`PROCESS.md` §5.4: a gate that has never gone red is only decorative.**
+
+    Three fixtures, in an OS temp directory — **nothing in `config/` is touched**, and the
+    ruling is explicit that `config/` is not to be touched. Each drives one way the
+    invariant can be violated, and each is asserted to fail **and to say which**.
+
+    ⚠️ The third is the one a plain ``sentinels.keys() <= {the five}`` would have let
+    through: it does not add a sentinel, it **removes** one that belongs to C16.
+    """
+    (tmp_path / "protocol.yaml").write_text(yaml_text, encoding="utf-8")
+    monkeypatch.setenv("WHETSTONE_CONFIG_DIR", str(tmp_path))
+    sentinels = dict(cfg.load("protocol").sentinels())
+
+    problems: list[str] = []
+    for dotted in sorted(set(sentinels) - set(KNOWN_UNDECIDED)):
+        problems.append(f"{dotted} became undetermined and nobody planned it")
+    for dotted, sentinel in sentinels.items():
+        if dotted in KNOWN_UNDECIDED and sentinel != KNOWN_UNDECIDED[dotted]:
+            problems.append(f"{dotted} is a key changing owner: {sentinel!r}")
+    for dotted in STILL_OWED_BY_ANOTHER_CHUNK:
+        if dotted not in sentinels:
+            problems.append(f"{dotted} belongs to another chunk and is no longer a sentinel")
+
+    assert problems, f"the invariant accepted {yaml_text!r} - it is decorative"
+    assert any(expect_in_message in problem for problem in problems), problems
 
 
 def test_every_sentinel_in_config_names_who_resolves_it():
