@@ -626,3 +626,115 @@ def test_the_selftest_denominator_is_the_ORACLE_not_the_number_of_probes(spec):
 
     # ... and the table really was restored, so this probe cannot poison its neighbours.
     assert selftest.run(spec=spec, oracle=ora).ok
+
+
+# ══════════════════════════════════════════════════════════════════════════════════
+# §2g/§2h — ADDED AFTER THE MUTATION CAMPAIGN, and labelled as such
+#
+# ⚠️ HONESTY NOTE. The probes above were committed BEFORE this review's mutation clone
+# was taken, so the campaign measured them. The four below were written afterwards, from
+# the §2g/§2h attacks, and were therefore NOT part of that campaign. They are kept because
+# each pins a property this review established by hand and would otherwise leave defended
+# only by prose — but no mutation score is claimed for them, and saying so is cheaper than
+# a reader discovering it.
+# ══════════════════════════════════════════════════════════════════════════════════
+
+def test_must_hold_rs11_idempotency_covers_BOTH_refund_speeds(world, spec):
+    """RS-11 (`MUST-HOLD`): *"idempotency covers both refund speeds"*.
+
+    ⚠️ The shipped self-test probe issues the two speeds under **different** keys, which
+    demonstrates only that both speeds are accepted — a weaker property than the row states.
+    The row's actual claim is that the KEY mechanism engages regardless of speed, so this
+    probe reuses ONE key across two speeds and requires the documented refusals:
+
+      * inside the first refund's in-flight window -> RS-09 (*same key, still in progress*)
+      * after it lapses, a DIFFERENT body          -> RS-10 (*same key, different body*)
+      * after it lapses, the SAME body             -> RS-31 (*already processed*)
+
+    All three are boundary-only rows, reached through `razorpay_api_create_refund` and by
+    no tool — which is Q-041, and is why the property needs a probe of its own at all.
+    """
+    key = "reviewerkey1"
+    pid = "pay_rev_cap_b"
+    first = world.razorpay_api_create_refund(payment_id=pid, amount=100_000,
+                                             speed="normal", idempotency_key=key)
+    assert first.ok, first
+
+    in_flight = world.razorpay_api_create_refund(payment_id=pid, amount=100_000,
+                                                 speed="optimum", idempotency_key=key)
+    assert in_flight.rs_id == "RS-09", in_flight
+
+    for _ in range(spec.in_flight_window_calls + 1):
+        world.call("fetch_payment", {"payment_id": pid})
+
+    different_body = world.razorpay_api_create_refund(payment_id=pid, amount=100_000,
+                                                      speed="optimum", idempotency_key=key)
+    assert different_body.rs_id == "RS-10", different_body
+
+    same_body = world.razorpay_api_create_refund(payment_id=pid, amount=100_000,
+                                                 speed="normal", idempotency_key=key)
+    assert same_body.rs_id == "RS-31", same_body
+
+
+def test_must_hold_rs05_enforces_BOTH_halves_of_the_documented_key_shape(world):
+    """RS-05 (`MUST-HOLD`) fixes the key's shape: *"at least 10 character long and can
+    contain alphabets, numbers, hyphens and underscores only"* — two clauses, two documented
+    errors.  The shipped probe exercises the LENGTH half; this one adds the CHARSET half, so
+    a world that dropped RS-08's predicate could not pass by being long enough.
+    """
+    short = world.razorpay_api_create_refund(payment_id="pay_rev_cap_a", amount=100_000,
+                                             idempotency_key="tooshort1")
+    charset = world.razorpay_api_create_refund(payment_id="pay_rev_cap_a", amount=100_000,
+                                              idempotency_key="bad key!!!!@@")
+    good = world.razorpay_api_create_refund(payment_id="pay_rev_cap_a", amount=100_000,
+                                            idempotency_key="fine-key_123")
+    assert short.rs_id == "RS-07", short
+    assert charset.rs_id == "RS-08", charset
+    assert good.ok, good
+
+
+def test_must_hold_rs20_the_world_enforces_NO_cross_call_aggregate(world, spec):
+    """RS-20 (`MUST-HOLD`) is **the row that is an absence**: *"no aggregate exists anywhere
+    in the tool surface"*, and A5's threshold is entirely ours.
+
+    ⚠️ The attack that would break it is a world that quietly enforced the merchant's own
+    ₹2,00,000 envelope — which would absorb the GATE's job, make every arm score
+    identically, and delete the finding the whole project exists to publish.  So the probe
+    drives an episode well PAST the episode cap and requires every call to execute.
+    """
+    moved = world.call("create_instant_settlement",
+                       {"amount": spec.imps_cap_paise, "settle_full_balance": False})
+    assert moved.ok, moved
+    total = moved.payload["amount_requested"]
+    for pid, amount in (("pay_rev_cap_a", 1_000_000), ("pay_rev_cap_b", 4_000_000),
+                        (PROBE_ID, 8_000_000)):
+        r = world.call("create_refund", {"payment_id": pid, "amount": amount})
+        assert r.ok, (pid, r)
+        total += amount
+    assert total > 20_000_000, total
+    assert total == 33_000_000, total
+
+
+def test_no_tool_call_of_any_shape_reaches_a_boundary_only_row(world):
+    """Q-041, the half a label can hide: *"the label must never be an excuse for a row that
+    simply does not work."*
+
+    Every tool crossed with every 1- and 2-subset of fourteen parameter names — the four
+    tools' real parameters plus every spelling of the idempotency header an attacker might
+    invent.  None may reach RS-07, RS-08, RS-09, RS-10, RS-31 or RS-40.
+    """
+    import itertools
+
+    values = {"payment_id": "pay_rev_cap_b", "amount": 100_000, "speed": "normal",
+              "notes": {}, "receipt": "r1", "currency": "USD",
+              "settle_full_balance": True, "description": "d", "count": 5, "skip": 0,
+              "from": 946684800, "to": 4765046400,
+              "idempotency_key": "k" * 12, "X-Refund-Idempotency": "k" * 12}
+    reached = {}
+    for tool in surface.TOOL_SURFACE:
+        for size in (1, 2):
+            for combo in itertools.combinations(values, size):
+                res = world.call(tool, {n: values[n] for n in combo})
+                if res.rs_id in semantics.BOUNDARY_ONLY_ROWS:
+                    reached[res.rs_id] = (tool, combo)
+    assert reached == {}, reached
