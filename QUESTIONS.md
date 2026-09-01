@@ -86,6 +86,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `4e1c8a92` | C6 | FIX | 2026-09-01 |
 | `8c49c4d3` | C13 | REVIEW | 2026-09-01 |
 | `3605d31c` | C6 | REVIEW | 2026-09-02 |
+| `91eb51c1` | C13 | FIX | 2026-09-02 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -542,6 +543,45 @@ The row was appended and **no other session's line was touched**; `git status --
 five shared journals was **empty** immediately before this commit (the only untracked path in the
 tree is `grep.exe.stackdump`, which belongs to no session and was not touched); and the file's bytes
 were re-verified after the append and carry **0 CR bytes**.
+
+⚠️ **AND `91eb51c1` IS THE TWENTY-FIFTH SELF-RECORDED ROW, IS ROW 40, AND THE ROW ABOVE IT IS IN THE
+TREE ONLY BECAUSE THIS SESSION'S OWN COMMIT SWEPT IT.** This session — **C13 FIX, attempt 2**,
+2026-09-02 — opened with `91eb51c1`, and its prompt required the row to be *"NUMBERED FROM THE TABLE
+… re-derive yours and state the row count you found."*
+**Counted from the file, immediately before appending:**
+
+* **The table held 39 data rows** (lines 48–88), `3605d31c` being the last. **39 before this one, so
+  this is row 40.** ⚠️ `8c49c4d3`'s paragraph states it counted 37 and made itself 38; `3605d31c`'s
+  states it counted 38 and made itself 39; **both reconcile exactly**, and the chain is checked
+  rather than assumed.
+* ⚠️ **BUT ROW 39 IS NOT IN A COMMIT OF `3605d31c`'s. IT IS IN `e2b4778`, WHICH IS THIS SESSION'S.**
+  `git commit -- QUESTIONS.md` is scope-limited by **path** and not by **content**, and
+  `3605d31c`'s row and its 41-line paragraph landed in the working tree **between** this session's
+  `git diff --numstat` check (which read **`79 1`**) and the commit itself (which recorded
+  **`128 1`**). ⚠️ **`e2b4778`'s own message therefore says `Swept: nothing`, and that is false.**
+  It is recorded as **`INCIDENTS.md` INC-48**, not corrected by rewriting history: `e2b4778` is not
+  amended, nothing is reverted, and **`3605d31c`'s content is intact, complete and present exactly
+  once**. ⚠️ **The consequence that belongs to `3605d31c` and not to this session:** its paragraph
+  above says *"this row is committed **first**, and the Phase-1 seal is the commit after it"* — the
+  **ordering still holds**, the row does precede the seal in the tree, but a reader auditing
+  `3605d31c`'s own commits will not find the row among them.
+* ⚠️ **THE SELF-RECORD COUNT IS RE-DERIVED FROM THE HEADINGS, NOT INHERITED.** The numbered
+  self-record headings in this section assert ordinals **5, 6, 7, 8, 9, 10, 13, 14, 15, 16, 17, 19,
+  20, 21, 22, 23, 24** and this one at **25**. **Ordinals 11, 12 and 18 are still asserted by no
+  paragraph**, and the three rows carrying none of their own are still `df238be6`, `0852ea56` and
+  `9c0c6734`. **They are not this session's to close** and are not closed here.
+* ⚠️ **THIS IS THE TWELFTH CONSECUTIVE SESSION TO CARRY THE TOTAL BY HAND.** `5c4f8e11`'s owed
+  mechanism — *"`check_roles.py` parses this table for E1 and could count the rows outside the batch
+  itself"* — is still owed; `OF-70` and `OF-78` both still stand for it. `check_roles.py` is outside
+  this session's fence, which names it under **NOT** in terms.
+* ⚠️ **AND THE ORDERING FAULT `OF-89` NAMES LANDED ON THIS SESSION TOO, in its own way.** This row is
+  registered **after** four commits already carried `Session-Token: 91eb51c1`, so `make check-roles`
+  was E1-red in between — the same window `8c49c4d3` and `3605d31c` were both told to avoid. The
+  honest ordering is **register the row, then commit**; this session, like `8c49c4d3`, did it the
+  other way and says so rather than presenting a green suite as though the window never existed.
+
+**No other session's line was touched by this append.** The row was added beneath `3605d31c`'s, the
+paragraph beneath `3605d31c`'s paragraph, and the file's bytes carry **0 CR bytes** after it.
 
 ## ⚠️ THE TOKEN BATCH, 2026-08-31 — and this is what ends the collision class
 
