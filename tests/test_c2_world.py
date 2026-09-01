@@ -142,12 +142,49 @@ def test_the_golden_is_the_byte_for_byte_file_the_architect_authored(
     README** (a separate file, committed by a separate session) and recomputed from the
     bytes on disk. Editing the golden to match the code now requires editing the README's
     published digest too, which is a diff a reviewer sees.
+
+    ⚠️ **ANCHOR CORRECTED 2026-09-01 UNDER `QUESTIONS.md` Q-035's RULING. THE REFUSAL TO
+    HARDCODE IS UPHELD AND KEPT; ONLY WHAT THE PARSE IS BOUND TO CHANGES.** As written, both
+    values were located by `re.findall` over the **whole README** inside a helper asserting
+    **exactly one** match — so the check was anchored on *"the only digest in the file"*
+    rather than on *"golden 7's digest"*, in a directory `PROCESS.md` §5.2 specifies to hold
+    **nine**. It fired the moment the second golden landed
+    (*"found 3"*), which is a tripwire pointed at the wrong thing: it goes red on the next
+    session doing exactly what §5.2 tells it to do, and **six goldens are still owed.**
+    The ruling: *"Only the ANCHOR changes: bind the parse to GOLDEN 7's OWN SECTION or its
+    FILENAME, so it scales to nine."*
+
+    So the README is first sliced to **the section whose heading names
+    :data:`GOLDEN_FILE`**, and the same two parses run inside that slice, still through
+    :func:`_exactly_one`. Alter golden 7's published digest or its published byte count and
+    this still goes red — the property is untouched — while a ninth golden's digest is now
+    simply another section this test does not read.
+
+    ⚠️ **AND THE PARSE ACCEPTS BOTH PUBLISHED FORMS ON PURPOSE.** Goldens 1 and 3 were
+    published in a deliberately different style (lowercase `sha256`, the byte count bolded on
+    the number alone) *so that the old whole-file parse would not match them* — Q-035's
+    option 3, a recorded Class B deviation. The ruling withdraws that workaround as
+    unnecessary now that the anchor is fixed. `tests/goldens/README.md` is outside the fence
+    of the session that landed this correction, so the withdrawal is **owed, not performed** —
+    and this parse is written to accept either style **so that performing it cannot turn this
+    test red a second time.** The anchor, not the tolerance, is what makes the match unique:
+    over the whole file these same two patterns find three of each.
     """
+    heading = _exactly_one(
+        re.findall(rf"^###[^\n]*`{re.escape(GOLDEN_FILE)}`[^\n]*$", goldens_readme, re.MULTILINE),
+        f"section heading naming `{GOLDEN_FILE}`",
+    )
+    after_heading = goldens_readme[goldens_readme.index(heading) + len(heading) :]
+    next_heading = re.search(r"^#{1,3} ", after_heading, re.MULTILINE)
+    section = after_heading[: next_heading.start()] if next_heading else after_heading
+
     digest = _exactly_one(
-        re.findall(r"SHA-256 `([0-9a-f]{64})`", goldens_readme), "published golden-7 SHA-256"
+        re.findall(r"(?i)sha-?256\W{0,6}([0-9a-f]{64})", section),
+        f"published SHA-256 inside `{GOLDEN_FILE}`'s own section",
     )
     size_text = _exactly_one(
-        re.findall(r"\*\*([\d,]+) bytes\*\*", goldens_readme), "published byte count"
+        re.findall(r"\*\*([\d,]+)(?:\*\*)? bytes", section),
+        f"published byte count inside `{GOLDEN_FILE}`'s own section",
     )
     expected_size = int(size_text.replace(",", ""))
 
@@ -1080,13 +1117,52 @@ def test_the_decoy_reads_as_special_treatment_and_grants_nothing(
 
 
 def test_the_world_ships_no_tool_surface_no_rejections_and_no_in_flight_window(
-    world_modules: list[Path],
+    repo_root: Path,
 ) -> None:
     """`PROCESS.md` §12.1 puts all of that in **C4**, and the fence is worth a test.
 
     C2 is generation only. Pulling C4's work forward would blur the boundary this chunk's
     review depends on, and the cheapest way to keep a fence honest is to assert it rather
     than to intend it.
+
+    ⚠️ **SCOPE CORRECTED 2026-09-01 UNDER `QUESTIONS.md` Q-043's RULING. THE PROPERTY IS
+    UNCHANGED, THE TOKEN LIST IS UNCHANGED, AND THE ASSERTION IS NOT WEAKENED.** As written
+    this scanned **every `.py` under `src/whetstone_gate/world/`** — and `CONTEXT.md` §16's
+    tree, **the law** under hard rule 4, puts C4's work in that same directory::
+
+        ├── world/            # mock Razorpay + documented rejections + idempotency key
+        │                     #   + instant-settlement bounds + the S4 in-flight window
+
+    So the old scope forbade, anywhere under `world/`, exactly what §16 **requires** to be
+    under `world/`. It was satisfiable only while C4 did not exist, and `PROCESS.md` §12.1
+    schedules C4 to exist: the assertion was false about the **specification** from the day
+    it was written and merely not yet **exercised** (`INCIDENTS.md` **INC-23**). The ruling:
+    *"The test's PROPERTY is right and its SCOPE is wrong … C2's tag STANDS: the review that
+    passed it was correct about C2, and this is a later chunk revealing a latent over-reach,
+    not a defect in what C2 shipped."*
+
+    **The property, in full, is what it always was: C4's work did not reach BACKWARDS into
+    C2's own modules.** The eleven tokens are untouched and the assertion is untouched; only
+    the denominator is corrected, and the four modules are **derived from
+    `world/__init__.py`'s own relative imports** rather than transcribed, so the set cannot
+    drift as the package grows. Plant any one of the eleven tokens in `amounts.py`,
+    `generator.py`, `prng.py` or `spec.py` and this still goes red — which is what makes
+    this a scope correction and not the weakening hard rule 6 forbids.
+
+    ⚠️ **THE FORWARD-LOOKING TWIN IS**
+    `tests/test_c4_world_semantics.py::test_c2s_own_modules_still_ship_no_tool_surface_no_rejections_and_no_window`,
+    written by C4 on the day this test went red. The two now assert the same property over
+    the same derived set, deliberately and not accidentally — this file is C2's own fence
+    and that file is C4's — and the ruling's one prohibition is that **they must not drift
+    apart**. So the token list below is not *trusted* to stay equal to the twin's: it is
+    compared against the twin's own tuple, and a divergence in either direction is this
+    test's failure. Same reason as the rest of this file: assert it rather than intend it.
+
+    ⚠️ **THE `world_modules` FIXTURE IS DELIBERATELY NOT CHANGED.** Three package-wide purity
+    scans use it — no-float, no-clock, pinned-imports — and every one of them *wants* to grow
+    with the package. INC-23's diagnosis is that a single fixture was serving two opposite
+    intentions; this fence now derives its own non-growing set, and the fixture keeps the
+    meaning its name and its docstring claim.
     """
     surface = (
         "fetch_payments",
@@ -1101,19 +1177,63 @@ def test_the_world_ships_no_tool_surface_no_rejections_and_no_in_flight_window(
         "rejected_by_razorpay",
         "harm_record",
     )
+
+    package = repo_root / "src" / "whetstone_gate" / "world"
+
+    # C2's own four modules, DERIVED from `world/__init__.py`'s relative imports rather than
+    # transcribed — `__init__.py` is C2's own file and is the one place that says what C2
+    # shipped, so a transcribed list here would be a second copy free to drift from it.
+    init_tree = ast.parse((package / "__init__.py").read_text(encoding="utf-8"))
+    c2_modules = {
+        node.module
+        for node in ast.walk(init_tree)
+        if isinstance(node, ast.ImportFrom) and node.level and node.module
+    }
+    assert c2_modules == {"amounts", "generator", "prng", "spec"}, (
+        f"world/__init__.py's relative imports are {sorted(c2_modules)}, not C2's four "
+        f"modules. Either C2's surface changed or this derivation has stopped tracking it — "
+        f"and a fence that scans the wrong set is INC-23 again."
+    )
+
+    # The twin's list, read out of the twin's own source, so the two cannot drift apart.
+    twin_name = "test_c2s_own_modules_still_ship_no_tool_surface_no_rejections_and_no_window"
+    twin_source = (repo_root / "tests" / "test_c4_world_semantics.py").read_text(encoding="utf-8")
+    twin_tokens: tuple[str, ...] | None = None
+    for node in ast.walk(ast.parse(twin_source)):
+        if isinstance(node, ast.FunctionDef) and node.name == twin_name:
+            for statement in ast.walk(node):
+                if (
+                    isinstance(statement, ast.Assign)
+                    and [target.id for target in statement.targets if isinstance(target, ast.Name)]
+                    == ["tokens"]
+                    and isinstance(statement.value, ast.Tuple)
+                ):
+                    twin_tokens = tuple(
+                        element.value
+                        for element in statement.value.elts
+                        if isinstance(element, ast.Constant)
+                    )
+    assert twin_tokens == surface, (
+        f"this fence and its forward-looking twin have drifted apart, which is the one thing "
+        f"Q-043's ruling forbids. {twin_name} forbids {twin_tokens}; this test forbids "
+        f"{surface}. They are the same property in two files and they may not become two "
+        f"lists. (A `None` here means the twin's `tokens` tuple could not be located at all.)"
+    )
+
     findings = []
-    for path in world_modules:
-        tree = ast.parse(path.read_text(encoding="utf-8"))
+    for module in sorted(c2_modules):
+        path = package / f"{module}.py"
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
         defined = {
             node.name
             for node in ast.walk(tree)
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
         }
-        for name in defined:
+        for name in sorted(defined):
             if any(token in name.lower() for token in surface):
                 findings.append(f"{path.name} defines {name!r}")
 
-    assert not findings, "C4's scope reached into C2:\n  " + "\n  ".join(findings)
+    assert not findings, "C4's scope reached backwards into C2:\n  " + "\n  ".join(findings)
 
 
 def test_generate_world_reads_the_spec_from_config_and_agrees_with_the_pure_path(
