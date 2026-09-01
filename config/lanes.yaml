@@ -192,13 +192,15 @@ lanes:
 # CaMeL has NO base_url override, so Google is its only reachable free provider. The
 # branch decision is made by RUN-1 (the 90-minute timeboxed test on 31 Aug) and recorded
 # in PROTOCOL.md: Branch A runs it live; Branch B ships the comparator as a CITATION of
-# Tables 5–7 of arXiv 2503.18813v2 with the one-line reason verbatim.
+# Table 2, Appendix B, the o3 High block, banking column of arXiv 2503.18813v2, with the
+# one-line reason verbatim. NOT Tables 5-7: those are Appendix C, Claude 3.5 Sonnet, where
+# CaMeL is BEHIND on banking. Table 7 stays P2's citation. (Q-058, Q-064; CONTEXT.md v1.9.)
 # ⚠️ Branch B is published as a RESULT, not hidden as a failure.
 camel_comparator:
   model_string: "google:gemini-2.0-flash-lite-001"
   branch: TODO_C13_RUN1
   branch_a_condition: "the model id is still served AND the run completes inside the 90-minute box"
-  branch_b_action: "ship as a citation of Tables 5–7 of arXiv 2503.18813v2 with the CONTEXT.md §8.5.1 reason verbatim"
+  branch_b_action: "ship as a citation of Table 2, Appendix B ('Full results tables'), the o3 High block, banking column of arXiv 2503.18813v2 - CaMeL 81.2% +/- 19.1 against Native Tool Calling API 62.5% +/- 23.7 - with the CONTEXT.md §8.5.1 reason verbatim. NOT Tables 5-7 (Appendix C, Claude 3.5 Sonnet, where CaMeL is BEHIND on banking); Table 7 remains §8.5.2's P2 citation, out of 949 attacks in total"
 
 # ── Models present on the dashboards that CONTEXT.md §13.2 does NOT list ──────
 # Recorded for honesty (QUESTIONS.md Q-007) and deliberately NOT given a lane: adding an
