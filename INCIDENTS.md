@@ -2667,3 +2667,142 @@ to a snapshot of the thing it describes* — and `WIDENED_FIELDS` only helps for
 Both of today's were caught by an adversarial sweep a build prompt ordered by hand, not by anything
 in this repository, which is the same sentence `INC-34` and `INC-35` both end on and it is still
 true.
+
+---
+
+## INC-39 — the citation that justifies RUN-1's same-working-directory requirement names a line inside a function with NO CALLER, and the two tests guarding it DIED when dead code was deleted and LIVED when the requirement was destroyed
+
+**Date:** 2026-09-01 (C13 FIX 1, `fd8a67e9`. The citation is C13 BUILD 1's, `c2b7f419`, carried
+forward unchanged by C13 BUILD 2, `3fb17baa`. Found by **C13 REVIEW 1**, `b450df0a`, which traced
+the call graph rather than the line. Fix SHA recorded in the follow-up commit named under **Fix**,
+because hard rule 13 requires this entry to exist **before** a line of code changes.)
+
+**Event:** `camel_comparator/invocation.py` told the operator, in its module docstring, in
+`Run1Plan.same_working_directory`'s docstring, in that field's **runtime value**, and in pass 2's
+`Invocation.purpose`, that pass 2 reads pass 1's logs at `replay_privileged_llm.py:321`, and that a
+pass 2 started from the wrong working directory *"reads an empty tree and reports nothing rather
+than failing — a silent zero inside a single-shot 90-minute box."* `QUESTIONS.md` **Q-057**'s
+recorded fact 4 says the same. **Both halves are wrong.** At the pin `f083b6b3`, `:321` is inside
+`replay_user_task`, which is called only by `replay_suite` (`:344`), which is called only by
+`replay_benchmark` (`:356`) — and **`replay_benchmark` has no caller anywhere in the tree.**
+`models.py:16` imports only `PrivilegedLLMReplayer` and `UserInjectionTasksGetter`. The live path is
+`replay_task`, path at **139-146**, read at **:148** by `trace_path.read_text()`, called at **:305**
+from `PrivilegedLLMReplayer.query`.
+
+**Action:** the citation is corrected to `replay_task` 139-146 / read `:148` / called `:305` at all
+four first-party sites and in `Q-057`'s fact 4; the failure mode is corrected to an **unhandled
+`FileNotFoundError`**; and — the part that matters — the two guards are re-bound. A new pure
+derivation, `invocation.live_log_path_from_source`, locates the path **by `ast`** inside the
+function that `PrivilegedLLMReplayer.query` actually calls, proves that call site exists, reports
+the read as `read_text` versus `glob`, and reports whether the path is relative. The plan's own
+prose is then asserted to contain the `file:line` the derivation produced, so a stale citation in
+the plan is a red test rather than a sentence nobody re-reads.
+
+**Expectation:** two tests are named for this property —
+`test_both_passes_share_one_working_directory_and_the_plan_says_why` and
+`test_run1_is_two_passes_and_the_second_replays_the_first`. A guard named for a property should die
+when the property dies and survive when it does not. These did the opposite, measured by
+`C13 REVIEW 1`'s mutants: **M15** (delete the three dead helpers — live behaviour byte-identical)
+turned **both RED**; **M16** (make the live path absolute — the requirement destroyed) and **M17**
+(the live replayer stops reading pass 1's logs) left **both GREEN**.
+
+**Missing:** ⚠️ **A REACHABILITY CHECK ON A CITED `file:line`.** This repository has a rule that a
+third-party claim carries a URL and a date, and a rule that a published figure carries its table,
+appendix, base model and row. It has **nothing that asks whether the line a citation names is on a
+code path.** Both builds derived the flag spellings from an AST and then cited the log path by
+eye — and the AST was already in the room.
+
+**Missed:** ⚠️ **C13'S OWN GOVERNING RULE, WHICH C13 AUTHORED AND THE ARCHITECT ADOPTED, ELEVEN
+HOURS EARLIER, IN THE ARTEFACT BUILT TO ENFORCE IT.** `Q-058`'s ruling: *"`PROCESS.md` §9's
+URL-and-date rule catches a fact read from the WRONG page. It does not catch a fact NOBODY READ A
+PAGE FOR. A URL to a paper is not a URL to a table."* Build 1 opened the page — it read
+`replay_privileged_llm.py` and quoted a real line that really is in the file. **Neither build asked
+whether the function containing it is ever called.** A line in an unreachable helper is not a line
+on the code path; that is the same class one level in, and the session that found it in somebody
+else's paper reproduced it in its own source on the same day. The signal was there and free:
+`git grep replay_benchmark` returns one hit, its own `def`.
+
+**Diagnosis:** both tests asserted on the literal substring `'Path("logs") / pipeline_name'`, which
+occurs at **exactly two lines in the file, 321 and 341, both inside functions with no caller**,
+while the live construction at 139-146 is split one path segment per line and therefore never
+matches it. The guard was bound to the only text that satisfied it, which happened to be dead code,
+so it was **anti-correlated** with the property it named.
+
+**Fix:** `<SHA-FIX-B1>` (filled in by the follow-up commit `<SHA-FILL>`; this entry was written and
+committed first, as hard rule 13 requires). `invocation.live_log_path_from_source` /
+`live_log_path`; the four corrected citations; the corrected failure mode; and
+`test_the_live_log_path_is_located_by_ast_and_proved_reachable`. Mutants re-run: **M15 SURVIVES**
+(the derivation never looks at the dead helpers), **M16 KILLED** (`is_relative` goes false),
+**M17 KILLED** (the `replay_task` call site is gone, so the derivation refuses).
+
+**Systemic guardrail:** ⚠️ **PARTIAL, AND THE UNLANDED HALF IS NAMED RATHER THAN IMPLIED.**
+**Landed:** for this citation the class is now impossible — the line is derived from the call graph
+rather than typed, the reachability of its enclosing function is an assertion, and the plan's prose
+is checked against the derivation, so the three ways this failed (wrong line, wrong failure mode,
+guard bound to dead code) are each a red test. **NOT landed:** nothing in this repository detects
+the general class — *a cited `file:line` whose enclosing function has no caller* — anywhere else,
+and there are other hand-cited third-party line numbers in `CONTEXT.md` §8.5 and §8.5.1. Those are
+checked by `claims.verify_all_claims`, which derives each span by `ast` and diffs it against the
+spec, so they are bound by construction and by a different mechanism; **the gap is for any citation
+that is prose only.** ⚠️ **And what is explicitly NOT claimed: that reachability was checked for
+CaMeL's whole tree.** It is checked for the one function pass 2's correctness depends on.
+
+---
+
+## INC-40 — the guardrail a ruling installed was a REFUSAL, its test was NAMED for the renderer, and it called the helper — so deleting both refusals from the renderer left the whole suite green
+
+**Date:** 2026-09-01 (C13 FIX 1, `fd8a67e9`. The test is C13 BUILD 2's, `3fb17baa`, written under
+`Q-058`'s ruling. Found by **C13 REVIEW 1**, `b450df0a`, mutant **M8b**. Fix SHA recorded in the
+follow-up commit named under **Fix**.)
+
+**Event:** `branch_b.py` states the standard it must meet, in its own header: *"**A REFUSAL, NOT AN
+ASSERTION.** … a property enforced only in a test file is a property that holds until somebody adds
+a figure without running the tests."* The refusal exists — `render_branch_b` opens with
+`assert_provenance(HEADLINE_FIGURES)` and `assert_provenance(CITED_TABLE_FIGURES)`. **Mutant M8b
+deletes both lines and the entire suite stays green, `rc=0`, no test fails.** The test named for it,
+`test_the_renderer_REFUSES_a_figure_with_incomplete_provenance`, never calls the renderer: it calls
+`branch_b.assert_provenance` directly, twice.
+
+**Action:** a parametrized test now calls **`render_branch_b` itself** with each required field
+knocked out of `HEADLINE_FIGURES` and, separately, out of `CITED_TABLE_FIGURES`, and asserts the
+renderer raises `BranchBError` and names the field — so each of the two `assert_provenance` calls
+is bound by its own cases and deleting either one alone goes red. The field checks themselves were
+**not** rewritten: six mutants, six kills, one per field, and the range case killed twice. Only the
+binding was missing.
+
+**Expectation:** the difference between a refusal and an assertion is whether it holds **outside
+pytest**. The docstring claims that difference was made; the test proves only that a helper raises
+when called, which is the assertion it claims to have replaced.
+
+**Missing:** ⚠️ **A CHECK THAT A NAMED CALLER ACTUALLY CALLS WHAT ITS TEST NAME CLAIMS.** Nothing
+here compares a test's name against the function it exercises, and nothing asserts that a
+module-level refusal is reachable from the entry point that is supposed to perform it.
+
+**Missed:** ⚠️ **THE TEST WAS NAMED FOR THE RENDERER AND CALLED THE HELPER, AND THE NAME IS IN
+SCREAMING CAPS.** `test_the_renderer_REFUSES_…` — the word `renderer` is in the identifier and
+`render_branch_b` appears nowhere in the body. **A test whose name claims a binding it does not
+exercise is `INC-33`'s tautology wearing a different hat, and `INC-33` is in this repository
+already**, written the same day: a check that validated against whatever it was handed and returned
+a happy object on every tamper case including the control. ⚠️ **Nearer still is `INC-35`** — *"a
+test named 'term by term' could not discriminate two of the three terms, and the proof that it
+could not was written by the same session, in the same module"* — which is this defect exactly,
+one file over, and was already in the file when this test was written.
+
+**Diagnosis:** the ruling's guardrail was moved into the renderer as a refusal, and the test that
+was supposed to prove the move was written against the helper the refusal delegates to, so it
+passed identically before and after the move and could not distinguish the two designs it exists to
+distinguish.
+
+**Fix:** `<SHA-FIX-B2>` (filled in by the follow-up commit `<SHA-FILL>`; this entry was written and
+committed first). `test_the_RENDERER_refuses_each_incomplete_figure_in_turn`, parametrized over
+both figure tuples × each required field. Mutants: deleting `assert_provenance(HEADLINE_FIGURES)`
+alone → RED; deleting `assert_provenance(CITED_TABLE_FIGURES)` alone → RED; deleting both (M8b) →
+RED.
+
+**Systemic guardrail:** **none — accepted, because** the general form (*a test named for a caller
+that exercises only its callee*) needs a name-to-call-graph check over the whole suite, which is
+`tests/` infrastructure this session's fence names under **NOT**, and inventing a narrow version
+here would be a mechanism that guards one test and reads like one that guards the class. What is
+landed is the specific binding and the mutation evidence that it fires. ⚠️ **The class is
+therefore still open, and it has now produced `INC-35`, `INC-33` and this entry** — recorded so the
+fourth occurrence is read as a pattern rather than as bad luck.
