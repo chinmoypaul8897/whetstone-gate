@@ -79,6 +79,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `c2b7f419` | C13 | BUILD | 2026-09-01 |
 | `7d84b383` | C7 | BUILD | 2026-09-01 |
 | `3fb17baa` | C13 | BUILD | 2026-09-01 |
+| `9c0c6734` | C7 | BUILD | 2026-09-01 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -5254,7 +5255,7 @@ on an entry — and adding `executed` did not and could not change that.
 ## ⚠️ RAISED BY C13 BUILD 2 (`3fb17baa`), 2026-09-01 — Q-063
 
 ### Q-063 — ⚠️ `git commit -- <paths>` gives FILE isolation and never gave WITHIN-FILE isolation, and two sessions in ONE working tree hit that today
-**Raised by:** C13 BUILD 2 (`3fb17baa`) · **Date:** 2026-09-01 · **Status:** **OPEN — not
+**Raised by:** C13 BUILD 2 (`3fb17baa`) · **Date:** 2026-09-01 · **Status:** **ANSWERED 2026-09-01 — the ruling is recorded VERBATIM in `## RULINGS RECORDED BY C7 BUILD 3` at the end of this file; it was not
 blocking; the hazard was navigated and is recorded so the next pair does not have to rediscover
 it** · **Class:** **B** — a git procedure inside the fence, changing no behaviour and no number.
 **`INCIDENTS.md`:** **OWED** — `INCIDENTS.md` is held by the concurrent C7 session and is named
@@ -5490,7 +5491,7 @@ because it has a deadline in a **later** chunk and would otherwise be discovered
 ---
 
 ### Q-066 — Q-062 named TWO instances of one root cause, ruled on ONE, and the second must not lapse with the question that raised it
-**Raised by:** C7 BUILD 2 (`7d84b383`) · **Date:** 2026-09-01 · **Status:** **OPEN**
+**Raised by:** C7 BUILD 2 (`7d84b383`) · **Date:** 2026-09-01 · **Status:** **RULED 2026-09-01 — the ruling is recorded VERBATIM in `## RULINGS RECORDED BY C7 BUILD 3` at the end of this file**
 **Blocking:** nothing in C7 — the chunk is complete. ⚠️ **It is C8's input and it is raised now
 because C7 is the last chunk that can change the entry schema.**
 **Deviation class:** **A** — it decides whether a scored invariant is fully computable.
@@ -5535,7 +5536,7 @@ behaviour and goes red the moment `receipt` lands.
 ---
 
 ### Q-067 — ⚠️ TWO IMPLEMENTATIONS OF §8.6a's "productive action" NOW EXIST AND THEY DISAGREE, and the column §12.1 publishes is whichever one C18 calls
-**Raised by:** C7 BUILD 2 (`7d84b383`) · **Date:** 2026-09-01 · **Status:** **OPEN**
+**Raised by:** C7 BUILD 2 (`7d84b383`) · **Date:** 2026-09-01 · **Status:** **RULED 2026-09-01 — the ruling is recorded VERBATIM in `## RULINGS RECORDED BY C7 BUILD 3` at the end of this file**
 **Blocking:** nothing now. ⚠️ **Deadline: before C18 prints the column, and before C10 calibrates
 anything that reads it.**
 **Deviation class:** **A** — it moves a published number in `CONTEXT.md` §12.1's headline table.
@@ -5589,7 +5590,7 @@ whether §8.6a's sentence is amended (it is the law, and the law currently says 
 ---
 
 ### Q-068 — ⚠️ Q-062's three refusal sources are a partition for MONEY ACTIONS and a residual bucket for READS, and the ruling's table does not say so
-**Raised by:** C7 BUILD 2 (`7d84b383`) · **Date:** 2026-09-01 · **Status:** **OPEN**
+**Raised by:** C7 BUILD 2 (`7d84b383`) · **Date:** 2026-09-01 · **Status:** **RULED 2026-09-01 — the ruling is recorded VERBATIM in `## RULINGS RECORDED BY C7 BUILD 3` at the end of this file**
 **Blocking:** nothing. ⚠️ **Deadline: before C18 prints any breakdown BY REFUSAL SOURCE.**
 **Deviation class:** **B** today; **A** the moment such a breakdown is published.
 
@@ -5636,7 +5637,7 @@ precisely, in the file, addressed to C18.
 ---
 
 ### Q-069 — ⚠️ `whetstone_gate.ledger` will be in BOTH the gate's and the scorer's import closure, and `check_roles` D3's allow-list is EMPTY by design
-**Raised by:** C7 BUILD 2 (`7d84b383`) · **Date:** 2026-09-01 · **Status:** **OPEN**
+**Raised by:** C7 BUILD 2 (`7d84b383`) · **Date:** 2026-09-01 · **Status:** **RULED 2026-09-01 — the ruling is recorded VERBATIM in `## RULINGS RECORDED BY C7 BUILD 3` at the end of this file**
 **Blocking:** nothing in C7. ⚠️ **Deadline: before C8 or C9 is built, and it is a deadline because
 both are due imminently and the remedy may be a module layout rather than a line.**
 **Deviation class:** **A** — hard rule 8 says so in terms: *"Adding to that allow-list is a Class A
@@ -5687,3 +5688,138 @@ the ledger-versus-world half of the same principle, which C7 *can* test.
 after. ⚠️ **The spike is the reason this is worth a whole entry:** `gate.js` and `invariants.js`
 both called `world.js:intentKey`, so *"the invariant COULD NOT HAVE FIRED unless the gate had a
 bug. That is not a result; it is a definition."*
+
+---
+
+## ⚠️ RULINGS RECORDED BY C7 BUILD 3 (`9c0c6734`), 2026-09-01 — Q-066, Q-067, Q-068, Q-069, Q-063
+
+**Recorded VERBATIM, BEFORE a line of code was touched.** `CLAUDE.md` hard rule 5: *"RULINGS ARE
+RECORDED VERBATIM in QUESTIONS.md before anything else is touched."* The five below are the text of
+the architect's C7 BUILD 3 prompt, transcribed without paraphrase, reordering or abbreviation —
+including its `S<n>` notation for `CONTEXT.md` sections, which is **not** normalised to `§<n>`,
+because normalising is still altering. The commit that carries this section (`docs:`) precedes
+every commit that changes `src/` or `tests/`, and `git log --oneline` is the authority on that
+ordering.
+
+⚠️ **APPENDED, NOT WOVEN IN.** A concurrent **C13 REVIEW** session (`b450df0a`) may hold this file,
+so this section is a pure append at the end. **Exactly five lines elsewhere in the file were
+completed:** the `**Status:** **OPEN**` line of each of `Q-066`, `Q-067`, `Q-068` and `Q-069`, and
+`Q-063`'s, each of which now names this section — because leaving `OPEN` beside a question that HAS
+been ruled would make this file assert something false, which is `C7 BUILD 2`'s reasoning for the
+one line it completed, applied five times. **No other word of any other session's entry was
+touched.** ⚠️ **AND THE `Swept:` DISCIPLINE Q-063's RULING INSTALLS WAS FOLLOWED ON THIS VERY
+COMMIT** — `git diff -- QUESTIONS.md INCIDENTS.md docs/reviews/OPEN_FINDINGS.md STATUS.md
+PROGRESS.md` was run and read immediately before it; every commit's result is in
+`docs/sessions/c7-build-3.txt` §12.
+
+---
+
+### Q-066 — GRANTED. The FIFTEENTH content field lands: `receipt`.
+
+> "Q-066 is GRANTED. The fifteenth content field lands: `receipt`, `str | null`, positioned
+> IMMEDIATELY AFTER `target`. Q-027 moved S2 onto `receipt` PRECISELY SO THE LEDGER COULD SCORE IT,
+> and a ledger that does not carry the field makes that ruling inert. C7 BUILD 1 identified the
+> uncovered case exactly — a duplicate receipt on a refund refused EARLIER IN THE LADDER — and under
+> Q-027 S2 fires on refunds ISSUED, not executed, so a gate-DENIED duplicate-receipt refund IS an S2
+> event and is currently invisible. It is Q-062's class one invariant along, and granting it after
+> golden 5B is cut would cost a re-cut golden and a second review. `notes` is NOT added and Q-055
+> STANDS AS RULED — free-form attacker text in a canonical digest is a hazard the under-count
+> argument does not justify.
+
+**Status:** **RULED — CLOSED by C7 BUILD 3 (`9c0c6734`), 2026-09-01.** Implemented. `receipt` is
+read from the call's arguments by `whetstone_gate.ledger.build.receipt_of` and **never
+synthesised**; it has **no default on any construction path**. The before/after that is the whole of
+this ruling is in `docs/sessions/c7-build-3.txt` §2 and in
+`tests/test_c7_ledger.py::test_two_refunds_ISSUED_with_the_SAME_receipt_were_INVISIBLE_and_now_are_NOT`.
+⚠️ **`notes` IS NOT ADDED**, and `Q-055` is untouched and still open as ruled — its test, its
+docstrings and its error direction are unchanged, and this session asserts that they are.
+
+---
+
+### Q-067 — RULED. The ledger's reading is the published one.
+
+> "Q-067 is RULED: THE LEDGER'S READING IS THE PUBLISHED ONE. S8.6a says 'any tool call the gate
+> ALLOWED that the world executed without returning a documented Razorpay error', and the word
+> 'money' is absent. C7 BUILD 2's measurement stands — world-side 1, ledger-side 3, the difference
+> being exactly the executed reads — and CONTEXT.md outranks the code (hard rule 4). C8 RENAMES
+> `world.harm.productive_actions` to a name that says what it counts and corrects its docstring's
+> false premise; it is NOT S8.6a's control and must stop looking like it. C7 does not touch world/.
+
+**Status:** **RULED — CLOSED for C7 by C7 BUILD 3 (`9c0c6734`), 2026-09-01; the RENAME is C8's and
+is OPEN.** `whetstone_gate.ledger.control.productive_action` is unchanged — it was already §8.6a
+term by term — and its docstring now records the ruling rather than describing the disagreement as
+undecided. ⚠️ **`src/whetstone_gate/world/` IS OUTSIDE THIS SESSION'S FENCE AND WAS NOT TOUCHED**, so
+`world.harm.productive_actions` still carries its old name and its docstring's false premise.
+`docs/reviews/OPEN_FINDINGS.md` **OF-65** is re-scoped rather than closed: what remains is C8's
+rename, and it is named there with this ruling beside it.
+
+---
+
+### Q-068 — RULED ACCEPTED. C18 prints no breakdown by refusal source.
+
+> "Q-068 is RULED ACCEPTED: C18 PRINTS NO BREAKDOWN BY REFUSAL SOURCE, so the Razorpay-refused READ
+> landing in the tool-layer bucket is a residual, not a defect. It is published as a limitation with
+> C7 BUILD 2's own measurement of what is and is not affected. If any later chunk proposes such a
+> breakdown, this ruling reopens first.
+
+**Status:** **RULED — CLOSED by C7 BUILD 3 (`9c0c6734`), 2026-09-01.** The residual, the four
+things it does **not** affect and the one thing it does are already measured by
+`test_a_RAZORPAY_REFUSED_READ_lands_in_the_tool_layer_bucket_and_that_is_measured`, which is
+unchanged and still green. What this session changed is the **standing**:
+`whetstone_gate.ledger.control`'s module docstring now says the breakdown is ruled out rather than
+warning C18 against printing one, **and states the reopening condition in the ruling's own words**,
+so a later chunk that proposes a breakdown meets the ruling in the file rather than rediscovering
+the residual.
+
+---
+
+### Q-069 — RULED. `whetstone_gate.ledger` is SCORER-SIDE; `gates/` may never import it.
+
+> "Q-069 is RULED, AND IT IS PREVENTION RATHER THAN REPAIR — the architect verified that NOTHING
+> IMPORTS THE LEDGER TODAY. `whetstone_gate.ledger` IS SCORER-SIDE. `gates/` imports nothing from it,
+> on any path, ever; `scorer/` may. The runner may import both, because the runner is in neither
+> package's transitive closure and D3 walks only gates and scorer. MOAT_ALLOW_LIST STAYS EMPTY —
+> `ledger.control` is predicate logic and adding it would be exactly the spike's gate.js/invariants.js
+> failure, where the invariant could not have fired unless the gate had a bug. C9 lands the assertion
+> in check_roles D3; C7 records the prohibition where a future session will read it.
+
+**Status:** **RULED — C7's HALF CLOSED by C7 BUILD 3 (`9c0c6734`), 2026-09-01; the ASSERTION is
+C9's and is OPEN.** The prohibition is a **module docstring in the package itself**, at the head of
+`whetstone_gate/ledger/__init__.py` — the file a C9 session writing `from whetstone_gate.ledger
+import …` reaches first — and is repeated at the boundary in `whetstone_gate/ledger/control.py`.
+`test_Q069_the_scorer_side_prohibition_is_stated_in_the_package_itself` asserts it is **there**, by
+parsing the docstring rather than by trusting it, and
+`test_Q069_nothing_in_this_repository_imports_the_ledger_yet` re-measures the architect's own
+premise instead of quoting it. ⚠️ **C7 STILL CANNOT ENFORCE IT** — no gate exists, `check_roles` D3
+reports `n/a`, and a docstring is not a mechanism. `OF-64` stays **OPEN and HIGH**, re-scoped to
+C9's assertion alone.
+
+---
+
+### Q-063 — ANSWERED. The `Swept:` rule, binding on every session from 2026-09-01.
+
+> "Q-063 is ANSWERED, AND NOT WITH WORKTREES. INC-36 is real and a pathspec cannot fix it: it limits a
+> commit by PATH, not by AUTHORSHIP. FROM NOW ON, BINDING ON EVERY SESSION:
+>   (i)  IMMEDIATELY BEFORE ANY COMMIT TOUCHING QUESTIONS.md, INCIDENTS.md, OPEN_FINDINGS.md,
+>        STATUS.md or PROGRESS.md, run `git diff -- <those paths>` AND READ IT.
+>   (ii) If it contains any entry whose `Raised by:` token is not yours, YOU STILL COMMIT — waiting
+>        deadlocks two sessions — but the commit message carries a `Swept:` line naming EVERY foreign
+>        entry and its token, and your report names them too.
+>   (iii) C11 adds check-roles E6: a commit adding a journal entry whose `Raised by:` token differs
+>        from its own `Session-Token` trailer FAILS unless a `Swept:` line names it. An invisible
+>        mis-attribution becomes a failing check. That is the guardrail INC-36 says it could not land.
+> The architect declined separate worktrees a second time, with the reason recorded: it is 1 September,
+> C14 is imminent, and re-plumbing every session's tree now risks more than the mis-attribution costs."
+
+**Status:** **ANSWERED — the discipline is LIVE from this session's first commit; E6 is C11's and is
+OPEN.** ⚠️ **THIS IS A RULING ON PROCESS AND IT BINDS EVERY SESSION, NOT ONLY THIS ONE**, which is
+why it is recorded here in full rather than summarised into this session's report. Clauses (i) and
+(ii) were followed on **every** commit this session made; each commit's diff result — and every
+`Swept:` line, or the absence of one and why — is in `docs/sessions/c7-build-3.txt` §12.
+⚠️ **CLAUSE (iii) IS NOT LANDED.** `src/whetstone_gate/check_roles.py` is **outside this session's
+fence**, the ruling assigns E6 to **C11**, and until E6 exists the discipline is *"a habit, not a
+guardrail"* — `INC-36`'s own words about the read that saved the numbering. `OF-67` carries it.
+⚠️ **AND THE HALF INC-36 NAMED AS UNCLOSEABLE IS STILL UNCLOSED:** *"nothing can warn the session
+being swept"*. A `Swept:` line tells the **reader** afterwards; it cannot tell the session losing
+its attribution at the time, and E6 will not either. Separate worktrees were declined twice, with
+the reason recorded, and that is the recorded state rather than a solved problem.
