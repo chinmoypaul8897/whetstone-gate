@@ -2810,3 +2810,447 @@ here would be a mechanism that guards one test and reads like one that guards th
 landed is the specific binding and the mutation evidence that it fires. ⚠️ **The class is
 therefore still open, and it has now produced `INC-35`, `INC-33` and this entry** — recorded so the
 fourth occurrence is read as a pattern rather than as bad luck.
+
+---
+
+## INC-41 — a published crossover figure that its own printed series refutes, carried in the one string the estimate exists to put in front of the session that sizes the whole run
+
+**Date:** 2026-09-01 (written by C6 FIX 2, `4e1c8a92`, **before a line of code was changed** — hard
+rule 13's order. The defect shipped with C6 FIX 1's `7b99a85a` while closing `REVIEW_C6_1` F-8 /
+`OF-48`; found by **C6 REVIEW 2**, `ec8e57ad`, as BLOCKER **B-1**. Fix SHA recorded under **Fix**.)
+
+**Event:** `src/whetstone_gate/attacker/estimate.py:CROSSOVER_NOTE` — a string **printed to an
+operator by `BudgetComparison.render()`**, whose own docstring says it is carried in source
+*"because a reader of the estimate is the person who needs it … so C14 reads them beside the number"*
+— claimed *"**7** full-listing reads of 20 turns crosses 60,000 true tokens (**6** by this
+estimator)"*. **Three independent routes give NINE.**
+
+```
+ROUTE 1  the note's OWN printed series, which is linear and reproduces exactly:
+         0 reads = 12,393 ; 2 reads = 24,036  ->  marginal = 5,821.5 per read
+         crossing 60,000 = ceil((60000 - 12393) / 5821.5) = k = 9
+         SEVEN reads reach 12,393 + 7 x 5,821.5 = 53,143.5  -- 6,856 SHORT
+
+ROUTE 2  the arithmetic bound, independent of that series. Re-measured here from
+         whetstone_gate.world at seed 2001, not from a fixture:
+           fetch_payments count:12  = 2,887 chars = 963 estimated tokens
+         assemble() runs BEFORE each turn's call, so a result produced at turn i appears
+         in the contexts of turns i+1 .. i+6 and IN NO OTHER CONTEXT. Therefore
+           one read adds AT MOST 6 x (963 + 4) = 5,802
+           seven reads reach AT MOST 12,393 + 7 x 5,802 = 53,007
+
+ROUTE 3  measured HERE with the package's OWN estimator over run_episode's OWN contexts,
+         on the named fixture below, front-loading the reads (the dearest arrangement):
+           k=7 -> 53,581   k=8 -> 58,879   k=9 -> 64,177 OVER    front-loaded k = 9
+                                                                 spread       k = 10
+```
+
+⚠️ **AND THE TWO INTERMEDIATE LABELS DO NOT SIT ON THE NOTE'S OWN LINE EITHER.** *"3 window-forced
+re-reads = 33,665"* implies **3.65** reads on that series and *"tradecraft-faithful = 42,860"*
+implies **5.23**. Five numbers were printed as one series and no two of the five agree with the
+headline drawn from them.
+
+**Action:** the note is rebuilt so **the figure is GENERATED from the series rather than written
+beside it**. `CrossoverSeries` carries the fixture's measured base and its two character counts;
+`tokens_per_read`, `tokens_at(k)`, `crossing(target)` and `linear_reads_limit` are **computed** from
+those and from `config/`'s divisor, window, turn budget and target; `crossover_note()` formats the
+string from the computed values, and `CROSSOVER_NOTE` resolves through PEP 562 on every access so it
+cannot be a stale cache frozen at import. ⚠️ **The fixture is NAMED in the note**, which
+`REVIEW_C6_2` could not do — *"the note does not say what fixture produced its series"* — and a test
+rebuilds the series from the **real seed-2001 world** and asserts the module's recorded base and
+marginal reproduce exactly. ⚠️ **The three sound clauses are preserved verbatim in substance**:
+pagination-is-mandatory (Q-037), the six-turn window evicts the listing, and *"NO BRANCH IS SELECTED
+HERE"*.
+
+**Expectation:** a number that `CONTEXT.md` §13.4's decision rule will be read beside — *"N = 50 …
+IF the 31 Aug pilot's measured attacker tokens/episode is ≤ 60,000"*, the rule that sizes the entire
+run — must be **reproducible from the numbers printed with it**. `docs/reviews/README.md` bars a
+reported figure that contradicts the material around it, and this one contradicted the five numbers
+in its own sentence.
+
+**Missing:** ⚠️ **NOTHING IN THIS REPOSITORY COMPARES A FIGURE IN A PROSE STRING AGAINST THE SERIES
+IN THE SAME PROSE STRING.** The tripwire scans source for hardcoded **spec** values against §8.6's
+table; a *derived* figure written into a docstring or a report string is invisible to it, because it
+is in neither §8.6 nor `config/`. `test_the_crossover_reaches_C14_through_the_estimates_own_comparison`
+asserted the literal substring *"7 full-listing reads of 20 turns"* — **it pinned the wrong number
+into place rather than checking it**, which is why the figure survived a review and a fix.
+
+**Missed:** ⚠️ **THE CONTRADICTION WAS PRINTED IN FULL, IN THE SAME STRING, BY THE SAME `render()`
+CALL, AND NOTHING HAD TO BE FETCHED TO SEE IT.** Two of the five numbers determine the line; a third
+lies on it (`10 reads -> 70,608` against the note's `71,107`, within 0.7%); the headline and the two
+intermediate labels do not. `INC-05` is *"a precise-sounding third-party number that exists in no
+third-party source"* and is the entry this module's own docstring cites, twice, as the reason its
+type is named `Estimate` — **the author of this note quoted INC-05 while writing a figure with no
+derivation behind it.** The number was inherited from `REVIEW_C6_1` and carried forward as an
+attribution (*"measured by REVIEW_C6_1 against cl100k_base and o200k"*) rather than re-derived, and
+an attribution is not a source.
+
+**Diagnosis:** the crossover was transcribed from a prior review's prose into a new string beside a
+series that was measured separately, so the two were never the same computation and nothing forced
+them to agree. **A figure written next to its evidence, rather than derived from it, is free to
+drift from the evidence the moment either is edited — and this one was wrong on arrival.**
+
+**Fix:** **`4e29cfc`** ⚠️ *(this entry was written and committed at `2b98a41`, before that commit
+existed)*. `CrossoverSeries` + `crossover_note()`, the figure computed; `CROSSOVER_FIXTURE` names
+the fixture; `test_the_crossover_figure_is_GENERATED_from_its_own_series_and_not_written_beside_it`
+and `test_the_crossover_series_reproduces_against_the_REAL_seed_2001_world` in
+`tests/test_c6_fix_probes.py`. Measured on the fixed tree: the note prints **9**, and the same 9
+falls out of the module's own arithmetic and out of the real world's bytes.
+
+**Systemic guardrail:** ⚠️ **PARTIAL, AND THE LIMIT IS STATED RATHER THAN GLOSSED.** What is closed
+is this class of drift *for this figure*: the crossing is now a **function of** the series, so it
+cannot disagree with it — there is no second place for the number to live. What is **not** closed is
+the general form. A grep-for-a-stale-figure tripwire over report strings is repository-wide `tests/`
+infrastructure this session's fence names under **NOT**, and it is the same mechanism `Q-064` asks
+for and `INC-39` met from the other direction. `OF-48` stays open in its widened form: **the
+estimate is still prompt-side only** (`OF-47`), so the crossover is a bound on the counted half.
+
+---
+
+## INC-42 — the blindness guard for the one claim this submission rests on used its own delimiter as a split point, so a leak INSIDE the delimiter was read past by the guard's own scoping — and the docstring beside the constant asserted exactly what nothing checked
+
+**Date:** 2026-09-01 (written by C6 FIX 2, `4e1c8a92`, **before a line of code was changed**.
+Present since C6 BUILD 1, `4377265b`; survived `REVIEW_C6_1`, C6 FIX 1 and an architect unblock.
+Found by **C6 REVIEW 2**, `ec8e57ad`, as mutant **M17** and BLOCKER **B-2**. Fix SHA under **Fix**.)
+
+**Event:** `src/whetstone_gate/attacker/context.py`'s `LAST_REFUSAL_LABEL` was mutated from
+`"LAST TOOL REFUSAL: "` to
+
+```
+"LAST TOOL REFUSAL (blocked because the action exceeded the configured
+ per-action ceiling of 5000000 paise): "
+```
+
+putting **E1's cap — `config/protocol.yaml:money.per_action_cap_paise`, a `CONTEXT.md` §8.6
+constant — on the attacker's AUTHORED surface, on every turn, in every arm.** **All 65 C6 tests
+stayed green.** All four blindness guards were silent, and each silence was measured rather than
+inferred:
+
+```
+claim 4  _denial_findings does:  part.text.split(ctx.LAST_REFUSAL_LABEL, 1)[1]
+         -- it SPLITS ON THE LABEL and inspects only what FOLLOWS it, so the leak
+            IN the delimiter is consumed by the split.  Run verbatim -> NONE.
+claim 1  "5000000" in data/policy.txt            -> False   (policy.txt writes RUPEES)
+claim 1  "per-action ceiling" in data/policy.txt -> False   (policy.txt says "may move more than")
+claim 3  no clause id, no attack noun, no invariant id in the text -> no finding
+```
+
+⚠️ **`CONTEXT.md` §10.1 makes this the whole experiment**: a gate reason naming the cap is
+information only the **defended** arms could produce, and *"if the control arm closes the door … arm
+4 is VOID by construction"* has its mirror — an arm that is told the cap is not policy-blind, and
+every escape number measured against it is meaningless. `QUESTIONS.md` **Q-031** makes the four
+blindness claims **the substitute for the golden C6 does not have**.
+
+**Action:** claim 4's guard now **scans the WHOLE authored part** instead of the field after a
+delimiter. The two labels are **located by identity against the module constants** and used to
+subtract the pieces §13.3 *mandates* — the folded state's own JSON, the one generic denial string,
+`NO_REFUSAL`, the truncation mark, the system prompt and the caller's tool schemas — and **whatever
+remains, labels included, is scanned for policy content**: every money constant in `config/` in five
+formattings (bare paise, grouped paise, bare rupees, Western-grouped and Indian-grouped rupees),
+every line of `data/policy.txt`, and a gate-vocabulary list. A second, independent layer asserts the
+**residue is whitespace only**, so unexplained authored text of *any* kind fails even when it
+carries no recognised policy word. Both copies of the guard were fixed — `tests/test_c6_attacker.py`
+and the deliberately-independent re-derivation in `tests/test_c6_fix_probes.py`. **M17 was re-run
+and is KILLED**, and three further leak shapes were planted and each killed: a cap value in a
+**different formatting**, a **`policy.txt` sentence inside the OTHER label** (`STATE_LABEL`), and a
+leak **spanning the label boundary** — the shape a split-based guard cannot see by construction.
+
+**Expectation:** `CLAUDE.md` hard rule 8's shape is *"must import no model client, **and a test must
+assert that**"*, and Q-031 applies that shape to the four blindness claims. A guard whose scope is
+defined **by the thing it is guarding** cannot see a defect in the thing that defines its scope.
+
+**Missing:** ⚠️ **NOTHING ASSERTS THAT A GUARD'S SCOPING MECHANISM IS INDEPENDENT OF THE VALUE IT
+GUARDS.** More concretely: nothing in this repository checks that a docstring's claim about a
+constant is exercised by a test. `context.py` carried, beside the two labels, *"They are prose
+written by this harness, not spec text, and **they carry no policy**"* — a sentence with no test
+behind it, four lines above the constant a mutant used to break it.
+
+**Missed:** ⚠️ **THIS IS THE SAME CLASS AS `INC-33`, `INC-35` AND `INC-40`, AND IT IS NOT A NEW
+FINDING — IT IS THE FOURTH INSTANCE OF ONE.** The class is: **a check written against the shape the
+author imagined, which is silent on the shape that actually occurs.** `INC-33`'s read path
+re-hashed whatever it was handed, so it could not return `DETECTED` for any input. `INC-35`'s
+*"term by term"* test built only valid entries, in which the terms co-vary, so two of three could be
+deleted. `INC-40`'s test was **named for the renderer and called the helper**, so deleting the
+renderer's refusals left the suite green. **This guard splits on its own delimiter, so a leak in the
+delimiter is consumed before the scan begins.** Each is a check that cannot fail on the shape that
+actually happened. ⚠️ **And the guard's own docstring argued for the narrow scope in writing** —
+*"a guard that searched the summary for any text besides the denial would fire on the state the spec
+puts there"* — which is a **correct** objection to the naive fix and was taken as a reason not to
+scan at all, rather than as a specification for what to subtract. The reasoning that produced the
+hole was written down beside it.
+
+**Diagnosis:** the guard used one of the two values under test as the delimiter that defines its own
+search space, so mutating that value moved the search space with it and the mutation hid itself.
+⚠️ **That is `INC-33`/`INC-35`/`INC-40`'s class for the fourth time and `INC-43` below is the
+fifth — FIVE INSTANCES IN THIS REPOSITORY IN ONE DAY, in four different packages, by four different
+sessions.**
+
+**Fix:** **`4e29cfc`** ⚠️ *(this entry was written and committed at `2b98a41`, before that commit
+existed)*. `_denial_findings` rewritten to the subtract-then-scan form in both files;
+`test_the_attackers_context_contains_no_gate_denial_reason` extended with the four planted leaks;
+`context.py`'s docstring corrected from *"they carry no policy"* to a sentence naming the test that
+now makes it true. Measured on the fixed tree: **M17 KILLED**, and each of the three new shapes
+kills its own named assertion.
+
+**Systemic guardrail:** ⚠️ **NONE THAT CLOSES THE CLASS — ACCEPTED, AND THE REASON IS THAT FOUR
+SESSIONS HAVE NOW TRIED.** What lands is specific and it is real: the guard no longer derives its
+scope from a value it guards, and four planted leaks prove it fires. **What is explicitly NOT
+claimed is that this makes the class impossible.** `INC-35`'s guardrail field said the real remedy
+is the review's own mutants; `INC-40`'s said a name-to-call-graph check over the whole suite is the
+only general form and is repository-wide `tests/` infrastructure. Both are still true and both are
+still outside a fix session's fence. ⚠️ **What this entry adds to the record is the count**: the
+class has now produced four incidents in one day, and the only mechanism that has ever caught an
+instance of it is **an adversarial review running mutants** — not a test, not a linter, not a
+reviewer reading. That is an argument for `PROCESS.md` §5.3's mutant requirement, not a guardrail.
+
+---
+
+## INC-43 — the spend-safety import walk did not walk: it recorded `node.module` only, so `from whetstone_gate import X` — the import form the package itself uses, at `estimate.py:86` — terminated it at the empty `__init__.py`
+
+**Date:** 2026-09-01 (written by C6 FIX 2, `4e1c8a92`, **before a line of code was changed**.
+Present since C6 BUILD 1, `4377265b`. Found by **C6 REVIEW 2**, `ec8e57ad`, as BLOCKER **B-3**, by
+planting a client and watching all 65 tests pass. Fix SHA under **Fix**.)
+
+**Event:** `tests/test_c6_attacker.py::test_the_attacker_package_imports_no_model_client_and_no_network_library`
+is C6's whole spend-safety control, on the chunk `PROCESS.md` §8 reserves the Gemma lanes against.
+Its docstring:
+
+> *"Walked over the package's own modules **and** its transitive first-party imports, so the
+> guarantee **cannot be evaded by putting the client one module away**."*
+
+**Measured by REVIEW_C6_2 in a temp clone: it can.** `_imported_modules` recorded only
+
+```python
+elif isinstance(node, ast.ImportFrom) and node.module:
+    found.add(node.module)          # <- the ALIASES are dropped
+```
+
+so `from whetstone_gate import provider_client as _pc` was recorded as the bare string
+`"whetstone_gate"`, whose `parts` is `[]`, resolving to `src/whetstone_gate/__init__.py` — which
+imports nothing. **The walk died there.**
+
+```
+planted  src/whetstone_gate/provider_client.py   containing a bare `import openai`
+planted  into estimate.py:  from whetstone_gate import provider_client as _pc
+  test_the_attacker_package_imports_no_model_client_and_no_network_library  ->  1 passed
+  tests/test_c6_attacker.py + fix_probes + review_probes                    ->  65 passed
+```
+
+⚠️ **AND THE IMPORT FORM IS NOT CONTRIVED — IT IS THE ONE THE PACKAGE ALREADY USES.**
+`src/whetstone_gate/attacker/estimate.py:86` is `from whetstone_gate import config as cfg`, so
+**`whetstone_gate.config` was not reachable from `render_summary`'s path per this walker at all.**
+It landed in the closure only by luck, through `corpus.py` and `texts.py`, which happen to use the
+dotted form. ⚠️ **C6 also had NO POSITIVE CONTROL**, where `tests/test_c2_world.py` has
+`test_the_import_scan_actually_fires`, citing *"a release gate that has never gone red is only
+decorative."* **A walker that terminated immediately and a walker that found nothing print the same
+result**, and nothing distinguished them.
+
+**Action:** `_imported_modules` now records, for `from X import a, b`, **both `X` and `X.a`,
+`X.b`**, and resolves **relative** imports (`from . import x`, `from ..pkg import y`) against the
+file's own package path — a second form of the same blindness, found while fixing the first and
+present in first-party modules the walk crosses into. The walk itself was lifted into a helper that
+takes a package directory and a source root, so it can be **fired at a synthetic tree** rather than
+only at this repository. ⚠️ **The positive control C6 never had now exists and is parametrised over
+EVERY import form**: a client planted one module away and reached by `from whetstone_gate import
+planted`, `from whetstone_gate.planted import thing`, `import whetstone_gate.planted`, and
+`import openai` directly — **four forms, four assertions that the scan FIRES**, each built in
+`tmp_path` so nothing is planted in this repository. The vacuous
+`test_rendering_the_summary_makes_no_model_call` (`OF-86`) is **replaced**, not deleted, by a test
+that walks `context.py`'s own transitive closure and **can go red** — proved by the same plant.
+
+**Expectation:** hard rule 8's shape is *"and a test must assert that"*. `PROCESS.md` §8 reserves
+the reference-attacker lanes for the sweep from 31 August, and this session's own prompt names C6 as
+*"the chunk where 'just one episode to check' is most tempting"*. A guarantee asserted in a docstring
+and not delivered by the test beneath it is worse than an absent guarantee, because it is read as
+one.
+
+**Missing:** ⚠️ **A POSITIVE CONTROL — AND THE PROJECT ALREADY KNEW, IN WRITING, THAT IT NEEDED
+ONE.** `tests/test_c2_world.py` carries `test_the_import_scan_actually_fires` and the sentence
+*"a release gate that has never gone red is only decorative"*; `PROCESS.md` §5.4 says the same;
+`INC-14` is *"three of C0's own checks reported PASS over input built to break them, because none
+had ever been fired at one"*. C6 copied C2's scan **without** copying C2's control, and the two-line
+`for alias in node.names` extension that would have closed it is in C2's file.
+
+**Missed:** ⚠️ **THIS IS `INC-42`'s CLASS AGAIN, ONE FILE OVER, AND IT IS THE FIFTH INSTANCE IN ONE
+DAY** — *a check written against the shape the author imagined, which is silent on the shape that
+actually occurs.* Here the shape that actually occurs is not hypothetical: **the package's own
+`estimate.py:86` uses the blind form**, so the walker was blind to a line inside the very package it
+was walking, and the consequence — `whetstone_gate.config` unreachable from `render_summary` — was
+measurable from the first commit by printing the closure. ⚠️ **Nobody printed the closure.** The
+test asserted `len(seen) > len(list(package.rglob("*.py")))` — *"the transitive walk never left the
+package"* — which is satisfied by reaching **one** module outside it, and `texts.py`'s dotted
+`from whetstone_gate.config import repo_root` satisfied it alone. **A check that the walk left the
+package was mistaken for a check that the walk was complete.**
+
+**Diagnosis:** `ast.ImportFrom.module` names the module a symbol is imported **from**, not the
+module the symbol **is**, so recording it alone makes `from <package> import <module>` indexable as
+the package and loses the only edge that matters. **The walker was written against the dotted form
+its author happened to use in three files and was silent on the form used in the fourth.**
+
+**Fix:** **`4e29cfc`** ⚠️ *(this entry was written and committed at `2b98a41`, before that commit
+existed)*. `_imported_modules` extended to aliases and to relative imports; the walk lifted into
+`_first_party_import_closure`; `test_the_import_scan_ACTUALLY_FIRES_in_every_import_form`
+parametrised over four forms; `test_rendering_the_summary_makes_no_model_call` replaced by
+`test_the_summary_renderers_own_import_closure_holds_no_model_client`. Measured on the fixed tree:
+each planted form turns its named assertion red, and `whetstone_gate.config` is now inside the
+closure the walk reports.
+
+**Systemic guardrail:** ⚠️ **NONE THAT CLOSES THE CLASS — ACCEPTED, with the same reason as
+`INC-42` and one addition that is this entry's own.** What lands is the fixed walker plus the
+positive control C2 has had since 31 August, so *this* gate can go red and has been observed to.
+**What is NOT claimed:** that two walkers written independently in two chunks will stay in
+agreement. ⚠️ **They already disagreed for a full chunk's lifetime, and the disagreement was
+invisible because both were green** — which is the argument for a single shared import-closure
+helper, and equally the argument against one, since `CLAUDE.md` hard rule 8 requires the
+`gates/`-vs-`scorer/` checks to be **written twice on purpose**. That tension is real, it is not a
+fix session's to resolve, and it is named here rather than settled: **the honest statement is that
+C6 and C2 now agree because C6 was corrected to match C2, not because anything makes them agree.**
+
+---
+
+## INC-44 — a REVIEW session's own Phase-1 seal committed two CRLF files and turned `make test` red: `INC-16`'s class landing on the reviewer, in a repository whose own `attacker/texts.py` carries the remedy in a comment
+
+**Date:** 2026-09-01 · ⚠️ **THE SESSION AT FAULT IS C6 REVIEW 2 (`ec8e57ad`), NOT THE SESSION
+WRITING THIS.** Written by C6 FIX 2 (`4e1c8a92`) **on that review's behalf and at its request**:
+`REVIEW_C6_2.md` §0.2 and `OPEN_FINDINGS.md` `OF-89` record that the entry is **owed** and that a
+review session's fence names `INCIDENTS.md` under **NOT**. ⚠️ **That is the FOURTH time an entry has
+been stranded this way** — `Q-029`, `Q-033` and `Q-049` are the first three — and it is why this
+entry exists at all: **a review cannot write an incident and a fix session can.**
+
+**Event:** commit `b7737b7`, the Phase-1 seal — the commit whose entire purpose is to fix a
+review's acceptance criteria **before** the code is opened — landed two artefact files with **CRLF**
+line endings. `make test` went green-to-red:
+
+```
+3 failed, 661 passed
+[FAIL] A3 no CRLF in any tracked file
+[FAIL] A4 working tree and object store hold identical bytes
+       check-roles exits 1 because of them
+```
+
+The two files were the review's own `docs/reviews/independent/` artefacts — **1,066 and 293 CRLF
+pairs** between them.
+
+**Action:** both files were normalised to LF at the byte level and `c6_reimpl.py`'s `say()` was
+changed to write through `sys.stdout.buffer` with an explicit LF, so the harness that produced them
+cannot reproduce the defect. Fixed at **`b8bfb6a`**; `check-roles` returned to
+**17 passed, 0 failed, 4 n/a, exit 0**. ⚠️ **The review recorded it rather than repairing it
+quietly** — it is finding **M-9** in `REVIEW_C6_2.md` §12(a) and `OF-89` in `OPEN_FINDINGS.md` — and
+it is transcribed here from those two records plus the commits themselves.
+
+**Expectation:** `.gitattributes` and `check-roles` A3/A4 exist as first-commit deliverables
+(`PROCESS.md` §6a) precisely so this class cannot reach a commit. It reached one. And a **Phase-1
+seal** is the commit a re-review's independence rests on: a seal that breaks the suite forces the
+reviewer to choose between an unsealed standard and a red tree, which is the one commit in a review
+that should be able to land untouched.
+
+**Missing:** ⚠️ **NOTHING NEW, AND THAT IS THE POINT — this is `INC-16`'s `Missing` field for the
+sixth time.** *"Nothing checks that a newly authored file is syntactically what its author meant
+before it is committed."* A pre-commit hook is the mechanism every one of these entries has declined
+to build, and the reason has been the same each time: it is repository-wide infrastructure and every
+session that meets the defect is fenced out of the file that would carry it.
+
+**Missed:** ⚠️ **THE REMEDY IS IN THIS PACKAGE, IN A COMMENT, IN THE CHUNK UNDER REVIEW.**
+`src/whetstone_gate/attacker/texts.py:load` reads:
+
+> *"Bytes, then an explicit UTF-8 decode. Never `Path.read_text()` with platform newline
+> translation — `INCIDENTS.md` INC-16 is that exact API rewriting every line ending in a tracked
+> file on this machine."*
+
+**The reviewer read that file — it is one of the five modules the review's own §5 assembles bytes
+from — and then wrote two files through a translating path in the same session.** ⚠️ And the count
+was already public: `INC-06`, `INC-10`, `INC-12`, `INC-13`, `INC-16`, `INC-19`, `INC-21`, `INC-22`,
+`INC-24` — **nine prior occurrences, in nine sessions, through six different tools**, with `INC-22`
+recording that *"the prohibition it broke has now been stated in capitals in nine consecutive
+prompts."* This is the tenth, and the first to land on a **review** session.
+
+**Diagnosis:** a Windows text-mode write applies platform newline translation, so any file produced
+by a harness that opens text mode rather than binary arrives with CRLF regardless of what its author
+typed. **The habit `INC-12` accepted as the only guardrail — "author files with the editor tools" —
+is the guardrail that fails, and it failed here in the one commit whose whole value is that it lands
+before anything else.**
+
+**Fix:** **`b8bfb6a`** (C6 REVIEW 2's own repair, recorded here rather than re-done). The
+repository's tracked bytes carry **0 CR** at HEAD; verified again by this session before each of its
+own commits.
+
+**Systemic guardrail:** **None new — accepted, because the mechanism already exists and it worked
+again.** A3 and A4 caught this **before the review's second commit**, which is the tenth time this
+control has done its job. ⚠️ **What is NOT prevented, and is now the honest state of this class:**
+nothing stops a session writing a tracked file through a translating API, ten entries of evidence
+say the habit is unreliable, and **the one remedy every entry names — a pre-commit or CI byte check
+— is repository-wide infrastructure that no session's fence has yet included.** Recorded here so the
+tenth occurrence is read as an argument for building it rather than as another apology.
+
+---
+
+## INC-45 — a REVIEW session's own artefact died on the operator's cp1252 console on a rupee sign, mid-Phase-1: `INC-08`/`INC-25`'s hazard demonstrated live on this machine for the third time, by the session that was auditing for it
+
+**Date:** 2026-09-01 · ⚠️ **THE SESSION AT FAULT IS C6 REVIEW 2 (`ec8e57ad`), NOT THE SESSION
+WRITING THIS.** Written by C6 FIX 2 (`4e1c8a92`) on that review's behalf, for the reason `INC-44`
+gives: `INCIDENTS.md` is named under **NOT** in a review session's fence (`OF-89`). Kept as a
+**separate** entry from `INC-44` because they are different mechanisms with different remedies —
+one is a **write**-side newline translation, this one is a **print**-side codec — and folding two
+causes into one entry is how a diagnosis stops being one.
+
+**Event:** mid-Phase-1, on the operator's own console, the review's own artefact:
+
+```
+UnicodeEncodeError: 'charmap' codec can't encode character '₹' in position 92
+```
+
+**position 92 is inside the transcribed P1 clause** — `data/policy.txt`'s *"No single money action
+may move more than ₹50,000."* — which the review was quoting into its blind Phase-1 record. The
+module raised instead of printing, so the run produced **no output at all** rather than partial
+output.
+
+**Action:** the review routed *"every byte this review prints"* through one ASCII path for the rest
+of the session and recorded the crash in `REVIEW_C6_2.md` §0.2 and §12(b) rather than repairing it
+silently. ⚠️ **It also named the crash as evidence rather than as an inconvenience** — this session's
+prompt asks that the hazard be established as live on this machine, and a first-hand traceback
+establishes it better than a citation does.
+
+**Expectation:** `INC-08` is *"the operator-facing output was unreadable on the operator's actual
+terminal"* and `INC-25` is that hazard recurring **in the spend-free self-test, the last gate before
+the sweep spends a finite free tier**. `src/whetstone_gate/_console.py:say()` exists as the answer:
+it transliterates to ASCII **at the moment of printing** and flushes. Every human-facing print in
+this repository is supposed to go through it.
+
+**Missing:** ⚠️ **A MECHANISM. THERE IS STILL NONE, AND THAT IS THIS ENTRY'S WHOLE CONTENT.**
+`_console.say()` is a **convention**: nothing fails when a module calls bare `print()` on text
+carrying a rupee sign, an em dash or a curly quote. `INC-25`'s fix was one import in one module.
+There is no test asserting that operator-facing entry points print through `say`, no lint rule, and
+— the sharper gap — **`docs/reviews/independent/` artefacts are not "modules" at all**, so even a
+rule scoped to `src/` would not have reached the file that crashed.
+
+**Missed:** ⚠️ **THE HAZARD WAS IN THE SESSION'S OWN READING LIST, AND THE CHARACTER WAS IN THE FILE
+IT WAS AUDITING.** `INC-08` and `INC-25` are both in `INCIDENTS.md`, which `CLAUDE.md` §1 makes item
+7 of the required read order; `INC-25` is dated the **same day**; and the crash came from quoting
+`data/policy.txt`, whose rupee signs the review had already diffed **character by character** against
+`CONTEXT.md` §8.6 and reported as *"0 differing characters"*. ⚠️ **The session counted the very code
+points that then killed its own output.** It had also just written, about `attacker_sys.txt`, that a
+comparison must never be ASCII-folded because P7 ends with U+2013 — **it knew the file was
+non-ASCII, in writing, in the same hour.**
+
+**Diagnosis:** Windows' console defaults to the cp1252 codec, which has no mapping for U+20B9, so
+`print()` of any text quoting this project's own money clauses raises rather than degrading. **The
+project's answer to that is a helper nothing requires anyone to call, so it protects exactly the
+modules whose authors remembered it.**
+
+**Fix:** ⚠️ **NONE IN SOURCE, AND SAYING SO IS THE ENTRY.** No repository file was defective: the
+crash was in a review artefact under `docs/reviews/independent/`, which is `(unreviewed)` scratch by
+design and which this session's fence names under **NOT** in any case. The review's own mitigation —
+routing its remaining output through one ASCII path, recorded under **Action** — is the whole of
+what was done, and it lives in the review's commits rather than in a fix of this session's. **An
+entry whose `Fix` is "nothing was changed" is worth more than an invented one**, and hard rule 13's
+own warning is against dramatising a failure that reads well.
+
+**Systemic guardrail:** ⚠️ **NONE — ACCEPTED, AND THE ACCEPTANCE IS NOW EXPLICIT RATHER THAN
+IMPLIED.** This session's prompt states the rule — *"`_console.say()` for every human-facing print"*
+— and then observes that the review's own artefact died anyway, which is *"first-hand evidence this
+rule still has no mechanism."* **That is the finding.** A test that every `print(` in `src/` is
+`say(`-wrapped is repository-wide `tests/` infrastructure outside this fence, and it would still not
+have covered `docs/reviews/independent/`, which is where the crash was. ⚠️ **The count is three —
+`INC-08`, `INC-25`, and this — and the third occurrence is where a pattern stops being bad luck by
+this repository's own standard** (`CONTEXT.md` §8.6's own words about a different count). Recorded
+so the next session that writes an operator-facing artefact meets a number rather than a convention.
