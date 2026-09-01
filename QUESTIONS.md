@@ -80,6 +80,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `7d84b383` | C7 | BUILD | 2026-09-01 |
 | `3fb17baa` | C13 | BUILD | 2026-09-01 |
 | `9c0c6734` | C7 | BUILD | 2026-09-01 |
+| `b450df0a` | C13 | REVIEW | 2026-09-01 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -347,6 +348,35 @@ QUESTIONS.md` would have swept it into this session's commit under this session'
 not, and how that was avoided is recorded in `Q-063` rather than left to be inferred from a diff.
 The row was appended and **no other session's line was touched**; the file's bytes were re-verified
 after the append and carry **0 CR bytes**.
+
+⚠️ **AND `b450df0a` IS THE NINETEENTH SELF-RECORDED ROW — NOT THE EIGHTEENTH, AND THE
+DIFFERENCE IS ITSELF THE FINDING.** This session's prompt — **C13 REVIEW, attempt 1**, 2026-09-01 —
+opened with `b450df0a` and said, in its own words: *"Append your token row to `QUESTIONS.md`,
+NUMBERED FROM THE FILE."* **Counted from the file rather than from the prose:** the table holds
+**33** rows before this one (32 of them 8-hex; the thirty-third is `WG-2026-08-30-CTX-13.4-A`, the
+one-off `Q-014 (iv)` exception), so this is **row 34**. ⚠️ **But the prose's running total
+stops at the SEVENTEENTH (`3fb17baa`), because `9c0c6734` — C7 BUILD 3 — appended row 33 WITH NO
+NUMBERED PARAGRAPH.** It is a real self-recorded row and it is uncounted, so the next session that
+trusts the prose total instead of the table will be **off by one**. **This session is the
+nineteenth self-recorded row and the eighteenth to carry a paragraph**, and it says so rather than
+continuing a total that has silently diverged from the thing it counts.
+⚠️ **THAT IS THE MECHANISM `5c4f8e11` ASKED FOR, FAILING IN THE PREDICTED WAY, FOR THE FIFTH
+CONSECUTIVE SESSION** — *"`check_roles.py` parses this table for E1 and could count the rows outside
+the batch itself"*. Six consecutive sessions have now carried the total by hand and it has been
+corrected twice and has now **drifted without being corrected**. This session's fence names
+`src/` and `tests/` under **NOT** in their entirety, so `check_roles.py` is outside it and this
+session could not write the mechanism either. **A hand-maintained running total in prose is now
+demonstrably wrong, not merely fragile**, and `OF-70` carries it.
+⚠️ **AND E1 IS WHY THE ROW EXISTS AT ALL, MEASURED RATHER THAN ASSERTED.** This session
+committed its Phase-1 seal (`3964cd3`) **before** writing this row, and
+`tests/test_repo_invariants.py::test_no_commit_carries_a_forged_or_reused_session_token` went red
+exactly as designed — `FORGED/UNISSUED: {'b450df0a': ['3964cd3']}`. **The gate went red on this
+session, on schedule, for the right reason**, which is worth more than an unbroken green
+(`PROCESS.md` §5.4). It is recorded here rather than quietly avoided by writing the row first.
+The row was appended and **no other session's line was touched**; `git status --porcelain` over the
+four shared journals was **empty immediately before the commit**, so nothing foreign was swept
+(`INC-36`, `Q-063`); and the file's bytes were re-verified after the append and carry **0 CR
+bytes**.
 
 ## ⚠️ THE TOKEN BATCH, 2026-08-31 — and this is what ends the collision class
 
