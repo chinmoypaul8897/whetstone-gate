@@ -77,6 +77,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `5c4f8e11` | ARCH | BUILD | 2026-09-01 |
 | `3a6e3d07` | C7 | BUILD | 2026-09-01 |
 | `c2b7f419` | C13 | BUILD | 2026-09-01 |
+| `7d84b383` | C7 | BUILD | 2026-09-01 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -294,6 +295,28 @@ re-declared as **OWED** rather than gestured at. **A hand-maintained running tot
 now been carried by four consecutive sessions and corrected twice.**
 The row was appended and **no other session's line was touched**; the file's bytes were
 re-verified after the append and carry **0 CR bytes**.
+
+⚠️ **AND `7d84b383` IS THE SIXTEENTH SELF-RECORDED ROW. IT IS COUNTED FROM THE TABLE, AND THE
+ONLY THING WORTH READING IN THIS PARAGRAPH IS THAT THE COUNT WAS RIGHT WITHOUT A CORRECTION FOR THE
+SECOND TIME RUNNING.** This session's prompt — **C7 BUILD, attempt 2**, the Q-062 ruling,
+2026-09-01 — opened with `7d84b383` and said, in its own words: *"Append your token row and
+NUMBER IT FROM THE FILE, not from this prompt."* **The fifteenth is `c2b7f419`** (C13 BUILD), in the
+paragraph immediately above; **the fourteenth is `3a6e3d07`** (C7 BUILD 1), in the one above that.
+This is the sixteenth. **Counted, not asserted**, from the reconciliation table `5c4f8e11` built.
+⚠️ **WHAT IS NOT NEW, AND SAYING SO IS THE POINT OF THESE PARAGRAPHS.** It is a single
+issue, not a batch, so Q-025's clause — *"every token batch names the token of the session that
+lands it"* — still does not reach it; that widening has now failed to be applied **ten times
+running**. Without the row `check_roles.py` **E1 fails on every commit this session makes**
+(`FORGED/UNISSUED`), so the choice is the same one fourteen sessions before it faced: a self-recorded
+row, or a red `make check-roles`. **Fourteen of sixteen are still the same defect.**
+⚠️ **AND THE MECHANISM IS STILL OWED, FOR THE THIRD CONSECUTIVE SESSION** — `5c4f8e11`'s
+*"`check_roles.py` parses this table for E1 and could count the rows outside the batch itself"*. This
+session's fence names `src/` for its own package only and `check_roles.py` is outside it, so this
+session could not write it either. **A hand-maintained running total in prose has now been carried by
+five consecutive sessions and corrected twice**, and re-declaring it as OWED is not the same as
+closing it.
+The row was appended and **no other session's line was touched**; the file's bytes were re-verified
+after the append and carry **0 CR bytes**.
 
 ## ⚠️ THE TOKEN BATCH, 2026-08-31 — and this is what ends the collision class
 
