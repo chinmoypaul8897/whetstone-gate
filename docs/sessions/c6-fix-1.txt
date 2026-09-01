@@ -1,7 +1,9 @@
-PUSHED SHA: 9a20fc5  (9a20fc5303a63aefe79ba0160b1d79bbff9df0fc)
-            The FINAL OUTPUT block itself is the LAST-BUT-ONE commit; this line and
-            the <SESSIONS_SHA> line below were filled in by the FOLLOWING commit,
-            because neither SHA can exist inside the object it names.
+PUSHED SHA: 1cb3df5  (1cb3df53d882b7ff7c3c772a1c3d4279c4e6affc)
+            !! THIS LINE IS ITSELF INSIDE A COMMIT, so the pushed head is ONE FURTHER than
+            any SHA that can be written here. The regress is inherent and it STOPS AT ONE:
+            the substantive work ends at ae95b8c; 9a20fc5, 1cb3df5 and the commit carrying
+            this paragraph are bookkeeping that touch docs/sessions/c6-fix-1.txt ALONE.
+            `git log --oneline -1 main` is the authority; the delta is this file's own line.
 SESSION: C6 FIX, attempt 1. SESSION-TOKEN 7b99a85a. 2026-09-01.
 VERDICT: both BLOCKERs closed. TWO TESTS ARE RED. One is a DECLARED STOP (Q-050 / INC-29);
          !! THE OTHER IS THIS SESSION'S OWN FAULT (Q-051 / INC-30) - see section 7(a).
