@@ -6,6 +6,214 @@ not a record; this file is.
 
 ---
 
+## C7 — THE LEDGER — **BUILD** attempt 2 — 2026-09-01 — ⚖️ `Q-062` RULED and implemented · the two digests now **DIFFER** · suite **GREEN** · **two incidents, neither shipped** · ZERO provider calls
+
+**SESSION-TOKEN:** `7d84b383` — **NOT in the batch.** Appended as
+`| `7d84b383` | C7 | BUILD | 2026-09-01 |` and numbered **from the table** as the **sixteenth**
+self-recorded row. The prompt did not number it; it said *"NUMBER IT FROM THE FILE, not from this
+prompt."* **The count was right without a correction for the second time running.** Fourteen of
+sixteen are still the same defect, Q-025's clause still reads *"every token batch"*, and the
+counting mechanism `5c4f8e11` recorded as OWED is **still owed** — `check_roles.py` is outside this
+fence too.
+
+**Ran concurrently with C13 BUILD 2 (`3fb17baa`) in ONE working tree.** See §8.
+
+**Token spend: ZERO.** No provider model call, no network of any kind, no lane touched, on any
+model, at any point. **A ledger is a hash chain over data already in hand**, which is the prompt's
+own sentence and remains true.
+
+**NOT A FIX SESSION, and the distinction is the whole shape of this one.** C7 BUILD 1 (`3a6e3d07`)
+**stopped correctly under hard rule 1**, took no default, and made the gap impossible to lose by
+leaving a kept test that would go red the moment it closed. **It did.** Nothing build 1 did was
+undone; one test it wrote beyond the specification **retires**, and its retirement is itself a
+measurement.
+
+---
+
+### 1. The ruling, recorded verbatim BEFORE a line was touched (`6988cf6`)
+
+Hard rule 5. Q-062's ruling and the three that came with it — **Q-053 RULED CONFIRMED**,
+**Q-054 RULED**, **Q-055 RULED ACCEPTED AND PUBLISHED AS A LIMITATION** — are transcribed with no
+word altered, in a **pure append** at the end of `QUESTIONS.md`, because a concurrent session held
+the file. ⚠️ **Exactly one line elsewhere was completed:** `Q-062`'s own
+`**RULING (architect, <date>):** *<pending>*` placeholder, **because leaving `<pending>` beside a
+question that HAS been ruled would make the file assert something false.** `Q-053`, `Q-054` and
+`Q-055` carry no such placeholder and were not touched at all. `git log --oneline` is the authority
+on the ordering: this commit precedes every `src/` and `tests/` commit of the session.
+
+### 2. ⚠️⚠️ THE MEASUREMENT THAT IS THE PROOF
+
+Build 1's own fixture, re-run with the field present. Seed 2001,
+`capture_payment(payment_id=pay_b286441b6b440c, amount=66523)`, with and without the `currency`
+parameter RS-34 declares `Required`:
+
+```
+  BUILD 1, 13 content fields   BOTH ENTRIES   3c54446376764d88ea82c17ea56b31716ed1fdf1de9a77536f4ba55ab09cd16b
+  BUILD 2, executed = true     EXECUTED       978622193cdde3bb6eb5a9afeefe1af3bff6493c32a2d41d2e113bdb9bd01d10
+  BUILD 2, executed = false    TOOL REFUSED   abdfaca7a10d5f9c265c69dbf5a0b009c23f43626a20fc4c28fbe5e37768df64
+```
+
+They differ in **exactly one content field**, which is asserted rather than assumed, and the
+13-field digest is asserted to be **neither** of the two new ones — so *"the hashes moved"* is a
+comparison and not a re-run. The ruling's sentence: *"A ledger in which an action that happened and
+an action that never happened are the same bytes is not a ledger."*
+
+### 3. Where `executed` is read from — and the inference that is forbidden
+
+**`whetstone_gate.world.results.ToolResult.ok`**, off the log row, in `build.executed_of`. Its own
+docstring, in the world, already said the thing Q-062 asked for: *"True only if the world executed
+the call. **A refusal of either kind is False.**"* It is a non-default field on a frozen dataclass
+constructed at eight sites, all in `semantics.py`, all passing `ok=` explicitly.
+
+⚠️ **The value is NEVER inferred from `verdict` and `rejected_by_razorpay`, and there are two
+reasons, not one.** That inference cannot see the tool-layer refusal, which is the whole finding —
+and a ledger that re-implemented the world's admission logic to decide what the world did would
+make the two **agree by construction**, which is `gate.js`/`invariants.js` one package along.
+`test_the_ledger_package_never_infers_executed_from_the_two_fields_beside_it` is an **AST walk** for
+the forbidden derivation, and
+`test_executed_is_read_from_the_worlds_own_ToolResult_ok_for_every_row` drives six shapes through
+the real world and **computes the discredited inference beside the truth**, asserting it is wrong on
+exactly four of the six rows.
+
+⚠️ **A log row whose result carries no `ok` is a REFUSAL, not a `False`.** Elsewhere in `build` a
+missing attribute is a legitimate absence (`harm` is genuinely `None` for a read); here `False` is a
+**claim** that the world did not perform the call.
+
+### 4. The four consistency assertions — three are refusals at the write
+
+| | assertion | test |
+|---|---|---|
+| 1 | `executed` ⇒ `verdict == ALLOWED` | `test_ASSERTION_1_executed_true_implies_verdict_ALLOWED` |
+| 2 | `executed` ⇒ `rejected_by_razorpay` false | `test_ASSERTION_2_…` + `…_holds_in_the_WORLD_and_not_only_in_the_validator` |
+| 3 | **any non-zero harm component ⇒ `executed`** | `test_ASSERTION_3_…` (per component) + `…_holds_in_the_WORLD_…` |
+| 4 | `executed` false + `ALLOWED` + not rejected ⇒ the tool layer refused it | `test_a_tool_layer_refusal_is_a_DIFFERENT_ROW_from_an_executed_harmless_action` |
+
+⚠️ **Three are ENFORCED and not merely asserted**, on all three construction paths — `append`,
+`validate_content` and `LedgerEntry.__post_init__` — because a rule living on one write path is a
+rule the second write path does not have, which is `INC-32`'s shape. **Assertion 3 is the one that
+is an integrity check rather than a restatement**, and it is the one that catches the original
+defect from the other side: *money cannot move on a call that did not happen.* **The fourth is a
+classification, not a constraint**, and its row is **driven** — twice, once synthetically and once
+through the real world.
+
+### 5. The control, derived — and a divergence nobody had measured
+
+`ledger/control.py`. `productive_action` quotes §8.6a **verbatim** and derives it **term by term**,
+against the definition **parsed out of `CONTEXT.md`** rather than transcribed into the test — so an
+amendment to §8.6a fails the test instead of silently passing against a stale copy. It reproduces
+**golden 3's hand-computed `productive_actions` of 3**, on entries 1, 3 and 4, which is the one
+oracle this derivation has and is not this session's.
+
+⚠️ **AND IT DISAGREES WITH `world.harm.productive_actions`.** That function counts **harm records**
+— §12.2 writes one only for a **money action** — and this one counts **entries**, because §8.6a says
+*"any tool call"* and the word *money* is absent. **Measured on a four-call episode: world-side 1,
+ledger-side 3, the difference exactly the executed reads.** ⚠️ **Neither golden can see it**: golden
+3's ledger is five money actions and both return 3, and `tests/test_c4_goldens.py` pins one to that
+figure while this session's test pins the other to the same. §12.1 **publishes** the column. `Q-067`
+and `OF-65`, due before C18.
+
+⚠️ **And the reduction is stated as what it is.** Under the consistency rules the three terms
+collapse to `executed` alone over every writable entry, proved exhaustively over 240 combinations.
+**The three terms stay in the code**: §8.6a is the law, and a one-field implementation would quietly
+report a different number if a rule were ever relaxed.
+
+### 6. The retirement, in place, with its trace
+
+`test_the_writer_reproduces_golden_5_case_a_byte_for_byte` **RETIRES**, replaced by ~40 lines of
+comment naming `Q-062`, golden 5B, and why `PROCESS.md` §5.2 never asked for it — golden 5 is *"The
+tamper test"*, a **verifier** oracle, and the writer clause was build 1's own addition beyond the
+specification. ⚠️ **A deletion with no trace is how a property quietly stops being one**, so the
+retirement is itself a kept test (`test_the_writer_cannot_reproduce_a_13_field_golden`), the flip
+is **provably meaningful in both directions** as hard rule 6 requires, and what replaces the
+property is named — including that **golden 5B is the real replacement** and that the round trip
+this session can assert is **weaker**, because bytes this package produced are not an independent
+oracle. That is said plainly rather than presented as equivalent.
+
+### 7. ⚠️⚠️ TWO INCIDENTS, BOTH THIS SESSION'S OWN, NEITHER SHIPPED
+
+**`INC-34` — the chain verifier required THIS package's content schema.** Measured with the gate
+restored: golden 5 case **A** `VALID`/`null` → `DETECTED`/1; **B** 2 → 1; **C** 2 → 1; and **D**
+`DETECTED`/1 — *the right verdict at the right seq for an entirely fabricated reason.* **D is §5.4's
+seeded-defect case**, so a done-when asserting only `(verdict, first_bad_seq)` shows three red and
+one **false pass** on the most load-bearing case in the project. **Missed:** `INC-32`'s own fix
+comment, **seven lines below the defect**, saying `CONTENT_FIELDS` is the wrong list to read an
+entry through — the defect and its own diagnosis shipped in the same commit. **Third instance of
+the class `INC-33` named** and recorded as not-generalised.
+
+**`INC-35` — a test named *"term by term"* could not discriminate two of the three terms.** Mutants
+**M8** (delete the `verdict == ALLOWED` term) and **M9** (delete the `not rejected_by_razorpay`
+term) **SURVIVED**: 142 passed. **Missed:** the docstring of the function under test, written by this
+session in the same hour, proving the terms co-vary on every writable entry — **and this session's
+own exhaustive reduction proof forty lines away.** `INC-33`'s `Missed` field verbatim, one incident
+later, in the tests rather than the source. Fixed with a stand-in object that violates the
+consistency rules on purpose, because **no writable entry can vary one term alone**.
+
+⚠️ **A 17-MUTANT HARNESS WAS RUN AND ALL 17 ARE NOW KILLED.** `PROCESS.md` §5.3 makes ≥8 mutants a
+**review** deliverable; this build session ran one because `INC-33`'s guardrail said it was owed.
+**The list and its results are in `docs/sessions/c7-build-2.txt` so the review starts from a known
+floor.** ⚠️ **A voluntary habit is not a guardrail** — `INC-33`'s own closing sentence, still true.
+
+### 8. The concurrency, and what it cost this time
+
+C13 BUILD 2 (`3fb17baa`) shared this working tree throughout, holding `CONTEXT.md`, `config/`,
+`src/whetstone_gate/camel_comparator/` and `tests/test_config_loader.py` while this session held
+`src/whetstone_gate/ledger/` and `tests/test_c7_ledger.py`. **Every commit on both sides used
+`git commit -- <paths>` and neither session swept the other's files.**
+
+⚠️ **THE SHARED COUNTER COLLIDED FOR REAL THIS TIME.** These four questions were drafted as
+`Q-064`…`Q-067` and these four findings as `OF-62`…`OF-65`; C13 BUILD 2 landed `Q-063`, `Q-064`,
+`Q-065`, `OF-62` and `OF-63` mid-draft, and the re-read before the append found it. They were
+renumbered from the file to **`Q-066`…`Q-069`** and **`OF-64`…`OF-67`**, with every internal
+cross-reference. **Fourth consecutive instance of `ARCH UNBLOCK 2`'s class, and the first where the
+drafted numbers were ALREADY TAKEN rather than merely at risk.** Caught, again, by a session
+re-reading a file it had already read. `OF-67`.
+
+### 9. Before / after, and every count attributed
+
+```
+  make test    BEFORE  596 passed,  1 FAILED, 1 skipped, 2 deselected   (clean tree, 7a53c9b)
+               AFTER   648 passed,  0 failed, 1 skipped, 2 deselected
+  check-roles  BEFORE  17 passed, 0 failed, 4 n/a, exit 0
+               AFTER   17 passed, 0 failed, 4 n/a, exit 0   (unchanged)
+
+  the +52 and the -1, attributed by file:
+    tests/test_c7_ledger.py                108 -> 143   +35   THIS SESSION
+    tests/test_c13_camel_comparator.py }    57 ->  73   +17   C13 BUILD 2 (3fb17baa),
+    tests/test_config_loader.py       }   (56 passed, 1 failed -> 73 passed, 0 failed)
+    everything else                        432 -> 432    0    untouched
+```
+
+⚠️ **The one red at baseline —
+`test_config_loader.py::test_protocol_sentinels_are_exactly_the_undecided_ones` — went GREEN, and
+it is NOT this session's.** It is `Q-061`/`OF-58`, closed by C13 BUILD 2 at `28555a6`. `config/` and
+that file are outside this fence in both directions and were not touched. **Stated so the green is
+not silently absorbed**, exactly as C13 BUILD 2 named this session's +35 in its own entry.
+
+`git status --porcelain tests/goldens/` → **EMPTY**.
+`whetstone_gate.__file__` = `C:\Users\chinm\whetstone-gate\src\whetstone_gate\__init__.py`.
+**0 CR bytes** in every file this session wrote, counted as bytes.
+
+### 10. What I could not do
+
+1. **Write golden 5B.** `tests/goldens/` is read-only to a build session (hard rule 3), and the
+   prompt says the architect is authoring it. The writer property is asserted meanwhile by a round
+   trip that is **named as weaker**.
+2. **Close `Q-066`** — a fifteenth field for `receipt` is Class A. Q-062's own option 1 said
+   *"and probably `receipt: str | null`"* and the ruling took the first half; **if it is ever
+   granted it should be granted before golden 5B is cut.**
+3. **Close `Q-067`, `Q-068`, `Q-069`** — the productive-action divergence, the fourth refusal shape,
+   and the D3 moat exposure are all later chunks' or the architect's.
+4. **Fix `world/harm.py`'s `productive_actions`**, or its docstring's premise (*"a harm record
+   exists for exactly the money actions the gate allowed"* — it exists for the ones that **reached
+   Razorpay**), or `semantics.py`'s log docstring, which now names two of the three ledger columns
+   the log owns. **All outside this fence.**
+5. **Run mutants across the whole package** rather than a hand-picked 17, and **make the harness
+   run automatically**. §5.3 makes it a review deliverable and `INC-35`'s guardrail says *none —
+   accepted* rather than claiming otherwise.
+6. **A mechanism for the shared counters.** Fourth instance; still prose-only; `OF-67`.
+
+---
+
 ## C13 — THE CaMeL COMPARATOR — **BUILD** attempt 2 — 2026-09-01 — ⚖️ two Class A rulings landed · `CONTEXT.md` **v1.8** · suite **GREEN** · **one HIGH finding stopped on, due before `prereg-v1`** · ZERO provider calls
 
 **SESSION-TOKEN:** `3fb17baa` — **NOT in the batch.** Appended as
