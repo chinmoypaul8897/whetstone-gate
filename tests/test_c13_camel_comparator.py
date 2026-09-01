@@ -1352,7 +1352,7 @@ def test_the_renderer_REFUSES_a_figure_with_incomplete_provenance():
 
 
 @pytest.mark.parametrize(
-    "tuple_name", ["HEADLINE_FIGURES", "CITED_TABLE_FIGURES"]
+    "tuple_name", ["HEADLINE_FIGURES", "CITED_TABLE_FIGURES", "TABLE_4_BANKING_FIGURES"]
 )
 @pytest.mark.parametrize(
     ("overrides", "expect_in_message"),
@@ -1468,6 +1468,160 @@ def test_the_citation_correction_is_stated_with_both_tables_shown():
             "P2 says the one CaMeL-no-policies failure is ALL of it in banking; a non-zero "
             "in another suite would falsify that half of the prediction's basis."
         )
+
+
+def test_every_published_COUNT_carries_its_ceiling_and_the_ceilings_source():
+    """⚠️ **OF-76, CLOSED AS A GATE. A count without its denominator is not a result.**
+
+    `BRANCH_B.md` published `CaMeL 0 +/- 0.0` and `CaMeL (no policies) 1 +/- 0.0` with **no
+    denominator**, in a submission that asks every other entrant whether its `0/N` carries
+    its `N`. Hard rule 11, and `PROCESS.md` §5.3's personas 1 and 3.
+
+    ⚠️ **AND THE PART THAT IS NOT BOOKKEEPING: the ceiling has TWO SOURCES for TWO TABLES,
+    and neither table prints it.** `949` occurs exactly twice in the paper — Figure 9's
+    caption, whose own text ties it to **Table 4**, and Figure 11's, whose sub-captions tie
+    it to **Table 5 and Table 7**. Attributing Table 4's ceiling to Figure 11, the caption
+    that is easier to find, would be `Q-058`'s own defect one level smaller.
+    """
+    every = (
+        branch_b.HEADLINE_FIGURES
+        + branch_b.CITED_TABLE_FIGURES
+        + branch_b.TABLE_4_BANKING_FIGURES
+    )
+    counts = [f for f in every if f.is_a_count]
+    percentages = [f for f in every if not f.is_a_count]
+    assert counts and percentages, "both kinds must be present or this proves nothing"
+
+    for figure in counts:
+        assert figure.ceiling == branch_b.COUNT_CEILING
+        assert "949" in figure.ceiling
+        assert figure.ceiling_source.strip()
+        assert figure.provenance_failures() == []
+
+    # ⚠️ Each table's ceiling is attributed to the caption that actually governs it.
+    for figure in counts:
+        expected = (
+            branch_b.CEILING_SOURCE_F9
+            if figure.table == "Table 4"
+            else branch_b.CEILING_SOURCE_F11
+        )
+        assert figure.ceiling_source == expected, (
+            f"{figure.table}'s ceiling is attributed to the wrong caption. Table 4's comes "
+            f"from Figure 9 and Table 7's from Figure 11; they are different experiments."
+        )
+        assert "NOT in Table" in figure.ceiling_source, (
+            "neither table prints the total, and the figure must say so"
+        )
+
+    # A percentage needs no ceiling, and must not be required to invent one.
+    for figure in percentages:
+        assert figure.provenance_failures() == []
+
+
+@pytest.mark.parametrize(
+    ("overrides", "expect"),
+    [
+        ({"ceiling": ""}, "carries no ceiling"),
+        ({"ceiling_source": ""}, "stated with no source"),
+    ],
+    ids=["no-ceiling", "no-ceiling-source"],
+)
+def test_the_ceiling_gate_goes_red_on_a_count_missing_it(overrides, expect):
+    """⚠️ Proved able to fire, on a real published count with one field knocked out."""
+    good = branch_b.TABLE_4_BANKING_FIGURES[0]
+    assert good.is_a_count and good.provenance_failures() == []
+
+    bad = dataclasses.replace(good, **overrides)
+    problems = bad.provenance_failures()
+    assert any(expect in problem for problem in problems), (
+        f"the ceiling gate accepted {overrides!r} — it is decorative: {problems}"
+    )
+    # ⚠️ And a PERCENTAGE with the same field blank is still clean: the rule is about
+    # counts, and a gate that fired on everything would be no gate at all.
+    percentage = dataclasses.replace(branch_b.HEADLINE_FIGURES[0], **overrides)
+    assert not percentage.is_a_count
+    assert percentage.provenance_failures() == []
+
+
+def test_table_4_is_published_IN_FULL_and_P2s_shape_is_COUNTED_not_asserted():
+    """⚠️ **M-2, CLOSED. The table no session opened until `REVIEW_13_1`.**
+
+    Table 4 is the same measurement as Table 7 over **six** base models. It is published in
+    full — including the four blocks that do **not** support this project's claim — because
+    a table quoted only where it agrees is the move this submission exists to criticise.
+
+    ⚠️ **And *"exactly two of seven"* is DERIVED from the carried figures**, so it moves
+    with them instead of becoming a sentence that contradicts the rows above it.
+    """
+    figures = branch_b.TABLE_4_BANKING_FIGURES
+    models = []
+    for figure in figures:
+        if figure.base_model not in models:
+            models.append(figure.base_model)
+    assert models == [
+        "Claude 4 Sonnet",
+        "Claude 4 Sonnet*",
+        "Gemini 2.5 Flash",
+        "Gemini 2.5 Pro",
+        "o3 High",
+        "o4 Mini High",
+    ], "all six of Table 4's base-model blocks are published, not a selection"
+    for figure in figures:
+        assert figure.table == "Table 4"
+        assert figure.appendix.startswith("Appendix B"), "Table 4 is Appendix B, not C"
+        assert figure.suite == "banking"
+
+    # ⚠️ THE FINDING ITSELF: Branch A's family records ZERO without policies.
+    for gemini in ("Gemini 2.5 Flash", "Gemini 2.5 Pro"):
+        rows = branch_b.banking_rows(figures, "Table 4", gemini)
+        assert rows["CaMeL (no policies)"].startswith("0")
+        assert rows["CaMeL"].startswith("0")
+        assert branch_b.p2_holds_for(figures, "Table 4", gemini) is False, (
+            "P2's premise is ABSENT on the model family Branch A runs, which is why "
+            "CONTEXT.md v1.9 pre-registers the non-reproduction"
+        )
+    assert branch_b.BRANCH_A_MODEL_FAMILY in "Gemini 2.5 Flash"
+
+    # o3 High holds; o4 Mini High does NOT, because CaMeL WITH policies also fails one.
+    assert branch_b.p2_holds_for(figures, "Table 4", "o3 High") is True
+    assert branch_b.p2_holds_for(figures, "Table 4", "o4 Mini High") is False
+    assert branch_b.banking_rows(figures, "Table 4", "o4 Mini High")["CaMeL"].startswith("1")
+
+    # Table 7's Claude 3.5 Sonnet holds — so it is two of seven, counted.
+    assert branch_b.p2_holds_for(branch_b.CITED_TABLE_FIGURES, "Table 7", "Claude 3.5 Sonnet") is True
+    holds = [
+        branch_b.p2_holds_for(figures, "Table 4", model) for model in models
+    ] + [branch_b.p2_holds_for(branch_b.CITED_TABLE_FIGURES, "Table 7", "Claude 3.5 Sonnet")]
+    assert holds.count(True) == 2 and len(holds) == 7, (
+        "P2's shape holds on exactly two of the paper's seven published configurations"
+    )
+
+    # ⚠️ banking_rows must key on TABLE and SUITE, not on the base model alone. Table 7's
+    # base model carries five suites across three tables, and a looser key silently keeps
+    # only the last of them — which is how the count first came out as one instead of two.
+    t7 = branch_b.banking_rows(branch_b.CITED_TABLE_FIGURES, "Table 7", "Claude 3.5 Sonnet")
+    assert t7["CaMeL (no policies)"].startswith("1"), "Banking, not Workspace"
+    assert branch_b.banking_rows(branch_b.CITED_TABLE_FIGURES, "Table 5", "Claude 3.5 Sonnet")
+
+
+def test_the_artefact_publishes_table_4_and_the_C18_caveat():
+    """⚠️ The amendment has to reach **C18**, which scores P1–P3, or a run consistent with
+    the paper gets scored as a failure of the thing being measured."""
+    artefact = (vendor.proof_path().parent / "BRANCH_B.md").read_text(encoding="utf-8")
+    for required in (
+        "Table 4",
+        "Appendix B, Full results tables",
+        "Gemini 2.5 Flash",
+        "Gemini 2.5 Pro",
+        "o4 Mini High",
+        "949 attacks in total",
+        "C18 SCORES P1",
+        "does not reproduce on the model family Branch A would use",
+        "P2's shape holds on exactly 2 of the 7 published configurations",
+    ):
+        assert required in artefact, f"the Branch-B artefact is missing {required!r}"
+    # Both ceiling legends are present and distinguishable.
+    assert "Figure 9's caption" in artefact and "Figure 11's caption" in artefact
 
 
 def test_zero_is_printed_as_a_number_never_as_silence():
