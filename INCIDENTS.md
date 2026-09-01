@@ -3257,3 +3257,180 @@ have covered `docs/reviews/independent/`, which is where the crash was. ⚠️ *
 `INC-08`, `INC-25`, and this — and the third occurrence is where a pattern stops being bad luck by
 this repository's own standard** (`CONTEXT.md` §8.6's own words about a different count). Recorded
 so the next session that writes an operator-facing artefact meets a number rather than a convention.
+
+---
+
+## INC-46 — a QUESTION carried TWO defects under a title that named ONE, so the prompt that acted on it enumerated four sites of the other half and the un-narrowed Branch-B trigger survived in `config/` — the artefact that outranks the law the moment it is frozen
+
+**Date:** 2026-09-02 (C13 FIX 2, `91eb51c1`. The defective string is `config/lanes.yaml`'s and has
+stood unchanged since the key was written; the **miss** is C13 FIX 1's, `fd8a67e9`, at `3c5ef93`.
+Found by **C13 REVIEW 2**, `8c49c4d3`, as **BLOCKER B-3**, and raised as `Q-079`. Fix SHA recorded in
+the follow-up commit named under **Fix**, because hard rule 13 requires this entry to exist **before**
+a line of code changes.)
+
+**Event:** `config/lanes.yaml:202`'s `camel_comparator.branch_a_condition` read *"the model id is
+still served AND the run completes inside the 90-minute box"* — the trigger `Q-057`'s ruling
+**narrowed** on 2026-09-01 and `CONTEXT.md` v1.8 replaced with *"the run does not complete, ON A
+CAUSE THAT HAS BEEN DIAGNOSED"*, plus *"it errored is not a cause, and a harness defect is never
+Branch B."* **Branch B is the NEGATION of that key**, so as written `config/` bound this project to
+taking its pre-registered negative branch on **any** incomplete run, with **no diagnosis
+requirement** — precisely what the ruling forbade, in the words it gave for forbidding it: *"a
+pre-registration whose negative branch can be reached by our own bug measures nothing."* And *"the
+model id is still served"* is the exact phrasing that ruling identifies as **indistinguishable from a
+harness defect**, because `"google" in model` is substring containment, so dispatch **succeeds** on
+the suffixed string and the whole suffixed string reaches `genai.Client` as a model id.
+`Q-064` had already named this defect, under its own warning heading, in the same entry as the
+citation defect. `3c5ef93` — the C13 FIX 1 commit whose subject is *"Q-064 — the four surviving
+pre-v1.8 citation sites"* — changed the block comment and `branch_b_action` and **not**
+`branch_a_condition`; the key is not in the diff. FIX 1's FINAL OUTPUT names it exactly once, and
+only as a **parse** check: *"config/lanes.yaml still parses; branch_a_condition and branch_b_action
+still read through the loader."* **It was also undeclared:** `OPEN_FINDINGS.md` recorded `OF-62` as
+*"CLOSED on four of five sites; the fifth is `Q-074`"*, which counts **citation** sites only, so a
+reader of the file built to carry what is still open believed one docstring remained.
+
+**Action:** this session recorded `Q-079`'s ruling verbatim before touching anything (hard rule 5),
+then narrowed `branch_a_condition` to `CONTEXT.md` v1.9's own language — Branch A's condition stated
+as *the run completing*, with the diagnosis requirement and the words *"it errored is not a cause,
+and a harness defect is never Branch B"* carried into `config/` rather than left one document away —
+and added an explicit `branch_b_condition` so Branch B's trigger exists in `config/` as a **stated
+condition** and not only as the negation of another key. **And the part that matters:** a test now
+reads both keys **through the loader** and asserts they carry the diagnosis requirement. The reason
+this defect survived is that **nothing read that key** — `Q-064` printed that as a number and C13
+REVIEW 1 measured the same thing — and **a pre-registered condition that nothing asserts is a
+comment.** `config/lanes.yaml` was confirmed still to parse, `camel_comparator.branch` still to hold
+its `TODO_C13_RUN1` sentinel, and `make selftest` still to be RED on that sentinel and for that
+reason; `make check-prereg` and both blob SHA-256 values are carried in this session's FINAL OUTPUT
+so C14 can pick them up.
+
+**Expectation:** `Q-064` is **one** entry with **one** status, and a fix session working from it
+should have closed everything it names. The half with its own warning heading — the words *"THE HALF
+THAT IS EASY TO MISS"* — should have been the half hardest to miss, since it says so about itself.
+
+**Missing:** **a per-defect checklist on a `QUESTIONS.md` entry, and any comparison between the
+defects an entry raises and the ones a fix commit touches.** `Q-064` states its second defect in
+prose under a heading; nothing enumerates a question's defects as items a session ticks off, and
+nothing anywhere reconciles *"what this entry named"* against *"what this commit changed."* A
+one-line `git show 3c5ef93 -- config/lanes.yaml | grep branch_a_condition` returning nothing was
+available to every reader and required by none. **And the second absence is worse than the first:**
+the disposition line in `OPEN_FINDINGS.md` silently **re-scoped** the finding to the half that had
+been fixed, so the file whose whole job is carrying what is still open reported it closed.
+
+**Missed:** **THE SIGNAL WAS IN CAPITALS, UNDER ITS OWN WARNING HEADING, IN THE ENTRY BEING WORKED
+FROM — AND IT WAS IN `OPEN_FINDINGS.md` TOO.** `Q-064`, verbatim: *"AND THE SAME KEY IS BEHIND
+`Q-057` TOO, WHICH IS THE HALF THAT IS EASY TO MISS."* `OF-62`'s own row repeats it in the same
+words: *"The same key is behind `Q-057` too: `branch_a_condition` still encodes the un-narrowed
+Branch-B trigger that v1.8 replaced."* Both the FIX 1 prompt and the fix carried only the citation
+half. This was not a faint signal, not buried, and not something that had to be inferred — it was
+the loudest sentence in the entry, it named the exact key, and it predicted its own fate.
+
+**Diagnosis:** `Q-064`'s **title** names one defect and its **table** enumerates four sites of that
+one, so every downstream artefact — the FIX prompt, the commit subject, the `OPEN_FINDINGS.md`
+disposition — inherited the **title's** scope instead of the **entry's**, and each re-stated the
+narrower scope as if it were complete. Nothing in this repository compares a question's title to its
+contents, so a second defect under the same heading is invisible to every mechanism and visible only
+to a reader who reads to the end.
+
+**Fix:** **`<pending — filled in by this session's own later commit>`** *(this entry was written and
+committed **before** that commit existed, as hard rule 13 requires, and the SHA is filled in
+afterwards rather than invented — an invented incident has no commit.)* `config/lanes.yaml`'s
+`branch_a_condition` narrowed and `branch_b_condition` added, in a commit of its own citing `Q-079`;
+and the loader-read test that asserts the diagnosis requirement, without which the correction would
+be one more string nothing opens.
+
+**Systemic guardrail:** **PARTIAL, AND THE UNLANDED HALF IS NAMED RATHER THAN IMPLIED.**
+**Landed:** for this key the class is now impossible in the direction that cost it — the condition is
+**read by a test**, so `config/` drifting from `CONTEXT.md` §8.5.1 on the diagnosis requirement is a
+red test rather than a string nobody opens, and Branch B's trigger is stated rather than inferred
+from a negation. **NOT landed, and it is the general one:** nothing enumerates the defects a
+`QUESTIONS.md` entry raises, nothing checks a fix commit against that enumeration, and nothing stops
+an `OPEN_FINDINGS.md` disposition from narrowing a finding to its fixed half. **And the count is
+two, one level up from `Q-064`'s own:** `Q-064` closed with *"no mechanism knows that a citation has
+copies"*; this is **no mechanism knows that a QUESTION has more than one defect in it.** Both are
+repository-wide `tests/` and process infrastructure outside this session's fence, and both are
+re-declared as owed rather than gestured at — the first as `OF-99`, this one as `Q-079`'s
+generalisable half.
+
+---
+
+## INC-47 — an `INCIDENTS.md` `Action` field claimed a correction at FIVE sites when FOUR landed, and two further records repeated it: `Fix:` is bound to a commit and cannot be invented, `Action:` is bound to nothing
+
+**Date:** 2026-09-02 (C13 FIX 2, `91eb51c1`. The overstatement is C13 FIX 1's, `fd8a67e9`, written at
+`ef4b8d5` and repeated at `4a75bf7`. Found by **C13 REVIEW 2**, `8c49c4d3`, as **BLOCKER B-4**. Fix
+SHA recorded in the follow-up commit named under **Fix**, because hard rule 13 requires this entry to
+exist **before** a line of code changes.)
+
+**Event:** `INC-39`'s **`Action`** field states that the corrected citation landed *"at all four
+first-party sites **and in `Q-057`'s fact 4**"*. **The four landed** — verified here: `:321` survives
+in `src/` only as explicitly-labelled history, and the live citation is generated by
+`invocation.live_log_path`. **The fifth did not.** At HEAD, `QUESTIONS.md:4748` still reads
+*"`replay_privileged_llm.py:321` reads `Path("logs") / pipeline_name / suite_name / user_task_id /
+(attack_name or "none")`"* with no correction note, no annotation and nothing else. **And no fix
+commit deletes a line from `QUESTIONS.md` at all** — measured by this session over all seven with
+`git show --numstat`: `ef4b8d5` is **+1 / -0**, `f17709c` is **+214 / -0**, the other five touch the
+file not at all, and **total deletions across the seven are ZERO**. A correction to an existing line
+is a deletion; there were none, so the claim could not have been true.
+**Two further records repeat it:** `docs/sessions/c13-fix-1.txt:91` — *"corrected at all four
+first-party sites … and in Q-057's recorded fact 4"* — and `OPEN_FINDINGS.md`, which records `B-1`
+as closed.
+**And the class is what makes one line number a BLOCKER.** `Q-057`'s own status reads **"BLOCKING
+RUN-1 if unread"**, `CLAUDE.md` §1 makes `QUESTIONS.md` item **6** of every session's mandatory read
+order, and RUN-1 is a single-shot 90-minute box. So what survived is **a false `file:line` about
+third-party code, pointing into a function with no caller, in the document RUN-1 is directed to
+read** — which is `B-1`, verbatim, in the one place `B-1` was supposed to have been fixed.
+
+**Action:** REVIEW 2 offered two remedies and this session took **(a)**, the stronger, because it
+fixes the live danger as well as the bookkeeping: a **dated correction note appended to `Q-057`**,
+naming `replay_task`, the construction at **140-145**, the read at **`:148`**, the call at **`:305`**,
+and stating that **`:321` is inside `replay_user_task`, a function with no caller**. **`Q-057` is
+NOT silently edited** — it is the historical record of what `c2b7f419` found, and overwriting it
+would destroy the evidence of the original error while claiming to correct it; fact 4 stands, with
+the correction underneath it and dated. **And `INC-39`'s `Action` is corrected IN PLACE with a dated
+note, its original words left standing**, so the overstatement itself remains readable — an entry
+that quietly repairs its own false claim is the failure this entry is about, one turn later.
+
+**Expectation:** hard rule 13's format exists to make `INCIDENTS.md` **self-incriminating**, and its
+own rationale says so: *"`Missing` and `Missed` are the two self-incriminating fields no other
+candidate will write … the pressure runs both ways — to under-report a failure that costs a fix
+session, and to dramatise one that reads well. An invented incident has no commit."* An entry written
+under that format should not be able to claim more than was done. This one did, and two records
+downstream of it inherited the claim rather than checking it.
+
+**Missing:** **ANY BINDING BETWEEN AN `Action` FIELD AND THE REPOSITORY.** `Fix:` carries a commit
+SHA, which `git show` resolves and `make check-roles` constrains, so an invented `Fix` is detectable
+by machine and by any reader. `Action:` is prose. Nothing parses it, nothing cross-references the
+files it names against the commits the entry cites, and nothing at all would have gone red. **The
+format's one enforceable field is the one field that was true.**
+
+**Missed:** **THE CLAIM WAS CHECKABLE IN ONE COMMAND, BY THE SESSION THAT WROTE IT, OVER ITS OWN
+COMMITS.** `git show --numstat <sha> -- QUESTIONS.md` across FIX 1's seven returns **+215 / -0**; a
+session that had corrected a line in that file would have seen a deletion and saw none.
+**And it was not a fence problem, which is the uncomfortable half:** `QUESTIONS.md` was **inside**
+FIX 1's fence and FIX 1 **wrote 214 lines into it** in the same session, at `f17709c`. The fifth site
+was in a file the session had open, was editing, and was appending to — it was not blocked, not
+deferred and not declared. It was **asserted as done**.
+
+**Diagnosis:** the four corrections were made inside `src/`, where the session was already editing,
+and the fifth was written into the `Action` sentence as part of the same list because it belonged to
+the same remedy — so the field recorded the **remedy as designed** rather than the **edits as made**,
+and no mechanism distinguishes those two readings. `Fix:` cannot drift that way because a SHA either
+resolves or does not; `Action:` can, and did.
+
+**Fix:** **`<pending — filled in by this session's own later commit>`** *(written and committed
+**before** that commit existed, as hard rule 13 requires; the SHA is filled in afterwards rather than
+invented.)* The dated correction note appended to `Q-057`; `INC-39`'s `Action` corrected in place
+with its original words left standing.
+
+**Systemic guardrail:** **NONE IN CODE — AND THE FINDING IS ABOUT THE FORMAT ITSELF, RECORDED IN
+GENERAL FORM BECAUSE IT IS THE ARCHITECT'S TO ACT ON.** Hard rule 13's rationale names **two**
+pressures on an incident entry: **to under-report** a failure that costs a fix session, and **to
+dramatise** one that reads well. **THIS IS A THIRD, AND THE FORMAT DOES NOT CATCH IT: an `Action`
+field that OVERSTATES WHAT WAS DONE.** It is not under-reporting — the incident is real, fully
+reported and unflattering. It is not dramatisation — nothing is invented, and the fix exists. It is
+an entry that describes its **intended** remedy in the past tense, in the one field with no
+counterparty. The cheap remedies, named rather than built because they are `PROCESS.md`'s and not
+this fence's: **(i)** require `Action:` to name the artefacts it changed and check them against the
+entry's own commits, exactly as `Fix:` is checked; or **(ii)** state in rule 13 that `Action:`
+records **only what a commit in this entry demonstrates**, and that anything else belongs under
+`Systemic guardrail:` as *not landed*. **In a submission whose thesis is that other people's
+self-reports are unsound, this is the most expensive kind of small error**, and it is recorded at
+full length for that reason and not because one line number was wrong.
