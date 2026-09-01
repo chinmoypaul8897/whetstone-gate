@@ -81,6 +81,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `3fb17baa` | C13 | BUILD | 2026-09-01 |
 | `9c0c6734` | C7 | BUILD | 2026-09-01 |
 | `b450df0a` | C13 | REVIEW | 2026-09-01 |
+| `ec8e57ad` | C6 | REVIEW | 2026-09-01 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -376,6 +377,33 @@ session, on schedule, for the right reason**, which is worth more than an unbrok
 The row was appended and **no other session's line was touched**; `git status --porcelain` over the
 four shared journals was **empty immediately before the commit**, so nothing foreign was swept
 (`INC-36`, `Q-063`); and the file's bytes were re-verified after the append and carry **0 CR
+bytes**.
+
+⚠️ **AND `ec8e57ad` IS THE TWENTIETH SELF-RECORDED ROW AND THE NINETEENTH TO CARRY A PARAGRAPH.
+IT IS COUNTED FROM THE TABLE, AND THE ONLY NEW THING IN IT IS THAT THE PREDECESSOR'S CORRECTION
+HELD.** This session's prompt — **C6 REVIEW, attempt 2**, 2026-09-01 — opened with `ec8e57ad` and
+said, in its own words: *"Append your token row to `QUESTIONS.md`, NUMBERED FROM THE FILE."*
+**Counted from the file:** the table held **34** rows before this one, so this is **row 35**.
+`b450df0a` — the row immediately above, and the session still running concurrently with this one —
+established that the prose total had **drifted** rather than merely been fragile, because
+`9c0c6734` (C7 BUILD 3) appended row 33 with no numbered paragraph, and it therefore separated two
+counts that had been treated as one: **self-recorded rows** and **rows carrying a paragraph**.
+**That separation is verified here rather than inherited.** Re-counted from the table: no row has
+been appended between `b450df0a` and this one, so `b450df0a`'s nineteen-and-eighteen becomes
+**twenty and nineteen**, and the two numbers now differ by exactly the one uncounted row it named.
+⚠️ **THE MECHANISM `5c4f8e11` RECORDED AS OWED IS STILL OWED, AND THIS IS THE SEVENTH
+CONSECUTIVE SESSION TO CARRY THE TOTAL BY HAND** — *"`check_roles.py` parses this table for E1 and
+could count the rows outside the batch itself."* This session is a **REVIEW** session: `CLAUDE.md`
+§6 and this prompt both say a review session **fixes nothing**, and `src/` and `tests/` are named
+under **NOT** in its fence, so it could not write the mechanism either — and, unlike the six build
+and fix sessions before it, **it could not have written it under any reading of its role.** That is
+worth one line because it changes what the repeated "still owed" means: the sessions that keep
+meeting this defect are structurally the sessions least able to close it. `OF-70` carries it.
+**What has NOT changed: eighteen of twenty are still the same defect**, and Q-025's clause still
+reads *"every token batch"*, which no single issue has ever fallen under.
+The row was appended and **no other session's line was touched**; `git status --porcelain` over the
+four shared journals was checked immediately before the commit and the result is recorded in this
+session's `Swept:` line; and the file's bytes were re-verified after the append and carry **0 CR
 bytes**.
 
 ## ⚠️ THE TOKEN BATCH, 2026-08-31 — and this is what ends the collision class
