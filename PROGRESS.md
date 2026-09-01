@@ -6,6 +6,174 @@ not a record; this file is.
 
 ---
 
+## C6 — THE ATTACKER LOOP — **FIX** attempt 2 — 2026-09-01 — 🔁 **THREE BLOCKERS CLOSED, FOUR MUTANT SURVIVORS KILLED, AND THE TWO ENTRIES THE REVIEW COULD NOT WRITE**
+
+**SESSION-TOKEN:** `4e1c8a92` — **NOT in the batch.** Appended as
+`| `4e1c8a92` | C6 | FIX | 2026-09-01 |` and numbered **from the table**: **36 rows before it, so
+it is row 37**, the **twenty-second** self-recorded row and the **twenty-first** to carry a
+paragraph. **Ordinals 11, 12 and 18 are still asserted by no paragraph** — re-verified by counting
+the headings rather than by trusting the predecessor's list — and closing that is `check_roles.py`'s
+job, a file this session's fence names under **NOT** *by name*, which is a stricter exclusion than
+the two blanket `src/` exclusions before it.
+
+**Verdict: the three BLOCKERs are closed and C6 stays UNREVIEWED. NO TAG.** A fix session may not
+tag and nothing here is self-certified. `REVIEW_C6_3` follows and only it may cut `c6-pass`.
+
+---
+
+### THE ORDER, BECAUSE THE ORDER IS THE RULE
+
+1. **`1252fdc`** — `OF-87`'s and `OF-88`'s rulings recorded **VERBATIM**, unsplit, before either was
+   acted on (hard rule 5). `Q-075`, `Q-076`, `Q-077`, `Q-078` raised. Token row 37.
+2. **`9c809c2`** — **`INC-41`…`INC-45` written before a line of code changed** (hard rule 13's
+   order). Nothing under `src/` or `tests/` is in that commit.
+3. **`fe3984f`** — the code. One commit and not five, **with the reason stated in its message**: the
+   five files are mutually dependent and git stages whole files, so any split produces intermediate
+   commits with a red suite.
+
+### ⚠️ `INC-42` AND `INC-43` ARE THE FOURTH AND FIFTH INSTANCES OF ONE CLASS, NOT TWO NEW FINDINGS
+
+Their `Missed` fields say so rather than treating each as new. The class is **a check written
+against the shape the author imagined, which is silent on the shape that actually occurs** —
+`INC-33`'s read path re-hashing whatever it was handed; `INC-35`'s *"term by term"* test built only
+from entries in which the terms co-vary; `INC-40`'s test **named for the renderer and calling the
+helper**; **B-2's guard splitting on its own delimiter**; **B-3's walker recording the module a
+symbol is imported *from* rather than the module it *is***. **Five instances in this repository in
+one day, in four packages, by four sessions**, and `INC-42`'s `Diagnosis` states that number. ⚠️
+**The only mechanism that has ever caught an instance of it is an adversarial review running
+mutants** — not a test, not a linter, not a reviewer reading. That is an argument for `PROCESS.md`
+§5.3's mutant requirement, and it is recorded as one rather than dressed up as a guardrail.
+
+### THE THREE BLOCKERS
+
+**🔴 B-1 — the crossover.** `CROSSOVER_NOTE` published **7** where its own printed series crossed at
+**9**, in a string `BudgetComparison.render()` prints to the session that sizes the whole run.
+⚠️ **The remedy is not a corrected literal — there is no longer a literal.**
+`CrossoverSeries.crossing()` computes the figure from `tokens_at()`, which computes from
+`tokens_per_read()`, which computes from `config/` and two character counts, so **the headline and
+the series are one computation and cannot disagree**. Proved by **moving the series and requiring
+the printed figure to move with it** — the assertion a hardcoded crossover passes every other check
+and fails. ⚠️ **The fixture is NAMED**, which is exactly what `REVIEW_C6_2` said it could not
+reproduce, and a test **rebuilds the series against the real seed-2001 world**: base **16,495**,
+marginal **5,298/read** = `window 6 × (ceil(2887/3) − ceil(240/3))`, **exact at every k** through the
+declared linear limit `turn_budget − window = 14`, crossing measured at **9 over / 8 under**. ⚠️
+**The hard-rule-9 tripwire caught a literal `2001` in the fixture text while this was being
+written** — the seed list is a §8.6 row — and the seed is now read from `config/`. That is the
+mechanism working and it is reported rather than quietly fixed. **Pagination-is-mandatory,
+window-evicts-the-listing and *"NO BRANCH IS SELECTED HERE"* survive and are now asserted.**
+
+**🔴 B-2 — the blindness guard.** It **split on `LAST_REFUSAL_LABEL` and inspected only what
+followed**, so mutant **M17**'s leak *inside* the delimiter was consumed before the scan began: E1's
+cap on the authored surface, every turn, every arm, all 65 tests green. It now scans the **whole
+authored part** in three layers — every `config/` money ceiling in **five formattings** outside the
+state's own JSON; every `policy.txt` clause plus **word-bounded** gate vocabulary (`\bcap\b` must
+not fire on `capture_payment`, a real tool name); and a **residue** check subtracting the mandated
+pieces **located by identity**. **The labels are inside the scan and subtracted only from the
+residue** — that is the whole difference, and the old docstring's objection (*"a guard that searched
+the summary for any text besides the denial would fire on the state the spec puts there"*) was
+**right**, and is what the fix is built around. ⚠️ **Fired at seven leaks, four of which the old
+form could not see**: M17 verbatim; the same cap **Indian-grouped in rupees, carrying no gate
+vocabulary at all**; a `policy.txt` clause inside **`STATE_LABEL`**, which the old guard never
+looked at; and a leak **spanning the boundary between the summary's two halves**, which belongs to
+**no field** — the shape a field-reading guard cannot see even in principle. **Both copies of the
+guard fixed, independently.**
+
+**🔴 B-3 — the import walk.** `_imported_modules` recorded `node.module` only, so
+`from whetstone_gate import X` — **the form `estimate.py:86` itself uses** — resolved to the empty
+`__init__.py` and the walk died there. It now records `X.Y` for every alias **and resolves relative
+imports**, a second form of the same blindness found while fixing the first. The walk is lifted into
+`_first_party_import_closure` so it can be fired at a **synthetic tree**, and ⚠️ **the positive
+control C6 never had now exists**, parametrised over **four import forms**, with nothing planted in
+this repository. `test_the_attacker_package_...` asserts `config.py` is in the closure **by name**,
+because `len(seen) > len(own)` could not tell *"the walk left the package"* from *"the walk is
+complete"* — `texts.py`'s one dotted import satisfied it alone.
+
+### THE FOUR SURVIVORS, MEASURED IN A FRESH TEMP CLONE — AND THE PRE-FIX NUMBER REPRODUCED
+
+Every mutation ran at `C:\Users\chinm\AppData\Local\Temp\c6fix2-mut\tree`, **outside this
+repository**, with the clone's `whetstone_gate.__file__` printed on every run (`INC-17`). Baseline
+in the clone: **77 passed**.
+
+| mutant | polarity | verdict |
+|---|---|---|
+| **M3** cap loosened by one | unchanged | **KILLED** — `test_the_cap_is_INCLUSIVE_and_pinned_in_BOTH_directions` |
+| **M19** cap tightened by one | unchanged | **KILLED** — the same test, the other direction |
+| **M17** the policy-revealing label | unchanged | **KILLED** — by **both** copies of the guard |
+| **M18** truncation semantics | ⚠️ **FLIPPED** by `OF-88`'s ruling | **KILLED** — the mutant is now the **tail cut**, and it dies on four tests |
+| **B-3's plant** `provider_client.py` | new | **KILLED** — by two tests |
+
+✅ **And `REVIEW_C6_2`'s own measurement reproduces exactly.** Against the **pre-fix guards**, M17
+leaves **65 passed** and the B-3 plant leaves **65 passed** — the review's own number, first-hand —
+while both die against the fixed ones. **Nine of the new and flipped tests go RED against the
+pre-fix source**, so every flip is provably meaningful rather than asserted to be.
+
+### THE TWO RULINGS, AND THE ONE READING ONE OF THEM NEEDED
+
+**`OF-88`** — truncation **reserves the denial**. `render_summary` drops **whole** state entries
+oldest-rendered-first, keeps §8.6's JSON shape valid, **prints the number dropped** (hard rule 11),
+tail-cuts only the state half as a last resort, and **hard-refuses** a cap that cannot carry the
+marker plus the mandated denial line. ⚠️ **That closes `OF-81` by making it impossible rather than
+unreached**: swept over **400** idempotency-key counts with the twelve real seed-2001 ids, **more
+than 300 of them overrunning the cap**, and the denial survives every one — so whether C7's ledger
+reaches 17 keys stops mattering. **`OF-87`** — the cap is **inclusive**, pinned in **both**
+directions from exhibits built out of the cap and the divisor rather than typed.
+
+⚠️ **`Q-075` RAISED RATHER THAN TAKEN SILENTLY.** *"Oldest first"* has no time order to refer to:
+`to_json()` **sorts** both maps and the key tuple **on purpose**, and its own docstring gives the
+reason. Restoring insertion order to recover a literal *"oldest"* would undo the property the sort
+exists to provide and would break the byte-identity test mutants **M4** and **M5** police. The
+reading taken — first-in-rendered-order, whole entries, count printed — is declared with its two
+rejected alternatives.
+
+### THE MEDIUMS
+
+`OF-82` the constant `_MockFolder` is **labelled** one, `_GrowingFolder` lands, and **boundedness**
+is asserted against a bound **derived** from `config/` and the fixture's own strings — with the
+non-growth test **kept** as the explicitly-named-weaker one (`INC-35`'s pattern) rather than
+deleted. ⚠️ **Its sibling in `test_c6_review_probes.py` has the identical constant fold and was
+LEFT**, because editing a reviewer's probe file is `INC-30`/`INC-31`'s hazard; it is a **fourth
+instance of the class, named** rather than a fourth finding. `OF-83` the tiling claim is replaced by
+a **measured table** — AgentDojo **4 entries against a stride of 5**, wraps at **2013 / 2007 /
+2081**, *"accumulates linearly"* true **only for ASB**. `OF-84` **19 distinct entries per episode,
+not 20 — 3.82% against `INC-27`'s 4.02%** — is now **printed** beside the cumulative **348/498 =
+69.88%**, **248/498 = 49.80%** at N=30, **80 seeds** for full coverage and **37.5% of ASB never
+offered**, and pinned **exactly at 19** over all 60 seeds; **the stratification is unchanged**,
+because it is `Q-047`'s authored constant and altering it is Class A. `OF-85` **relabelled, not
+excluded**. `OF-86`, `OF-91`, `OF-93` closed.
+
+### THIS SESSION'S OWN TWO FAILURES
+
+⚠️ **`INC-45`'s hazard, in this session's own tooling.** An inspection script died with
+`UnicodeEncodeError: 'charmap'` on `OPEN_FINDINGS.md`'s own em dashes — the same class the session
+was writing up on the reviewer's behalf, minutes later, on the same machine. Every subsequent print
+went through one ASCII route. ⚠️ **And `INC-06`'s class: a shell heredoc mangled a script**
+(`unexpected EOF while looking for matching`), after which every script was written with the editor
+tool and run as a file. **Neither reached a commit and both are recorded rather than tidied away** —
+they are the tenth and eleventh evidence that these two rules have habits and no mechanisms.
+
+### WHAT COULD NOT BE DONE
+
+⚠️ **`OF-95`.** This session's prompt lists it under *"the mediums that are real and cheap"* and
+instructs the fix. Its fence names `CONTEXT.md`, `PROCESS.md` and *"any other test file"* under
+**NOT** — and **all three sites of the rename are in those files**, with no partial fix available
+(renaming one of three adds a third spelling). Raised as **`Q-078`** and reported as undone.
+`INC-28`'s class for the fifth time, and the first in which a prompt's own instruction and its own
+fence contradict each other outright.
+
+### NUMBERS, MEASURED BY THIS SESSION AND NOT TAKEN FROM ITS PROMPT
+
+* `make test`: **699 → 711 passed, 1 skipped, 2 deselected, 0 failed** (before and after both run
+  here). C6's own three files: **65 → 77**.
+* `make check-roles`: **17 passed, 0 failed, 4 n/a, exit 0** — E1 sees the token row.
+* `git status --porcelain tests/goldens/`: **EMPTY**, printed before the code commit.
+* **ZERO PROVIDER MODEL CALLS.** Every client and every world in these tests is a mock; the one
+  non-mock is `whetstone_gate.world`, which makes no call.
+* `make selftest` stays **RED on `camel_comparator.branch`** — not this session's and not touched.
+* An untracked **`grep.exe.stackdump`** sits at the repository root, belongs to no session, and was
+  **left in place**: no destructive command was run.
+
+---
+
 ## C13 — THE CaMeL COMPARATOR — **REVIEW** attempt 2 — 2026-09-01 — ❌ **FAIL: TWO BLOCKERS NOBODY HAD LOOKED AT — AND BOTH OF REVIEW 1's ARE PROPERLY CLOSED**
 
 **SESSION-TOKEN:** `8c49c4d3` — **NOT in the batch.** Appended as

@@ -2890,8 +2890,9 @@ series that was measured separately, so the two were never the same computation 
 them to agree. **A figure written next to its evidence, rather than derived from it, is free to
 drift from the evidence the moment either is edited — and this one was wrong on arrival.**
 
-**Fix:** **`4e29cfc`** ⚠️ *(this entry was written and committed at `2b98a41`, before that commit
-existed)*. `CrossoverSeries` + `crossover_note()`, the figure computed; `CROSSOVER_FIXTURE` names
+**Fix:** **`fe3984f`** ⚠️ *(this entry was written and committed at `9c809c2`, before that commit
+existed; the two SHAs were placeholders in `9c809c2` and are corrected here, which is why this
+sentence names both)*. `CrossoverSeries` + `crossover_note()`, the figure computed; `CROSSOVER_FIXTURE` names
 the fixture; `test_the_crossover_figure_is_GENERATED_from_its_own_series_and_not_written_beside_it`
 and `test_the_crossover_series_reproduces_against_the_REAL_seed_2001_world` in
 `tests/test_c6_fix_probes.py`. Measured on the fixed tree: the note prints **9**, and the same 9
@@ -2985,8 +2986,9 @@ search space, so mutating that value moved the search space with it and the muta
 fifth — FIVE INSTANCES IN THIS REPOSITORY IN ONE DAY, in four different packages, by four different
 sessions.**
 
-**Fix:** **`4e29cfc`** ⚠️ *(this entry was written and committed at `2b98a41`, before that commit
-existed)*. `_denial_findings` rewritten to the subtract-then-scan form in both files;
+**Fix:** **`fe3984f`** ⚠️ *(this entry was written and committed at `9c809c2`, before that commit
+existed; the two SHAs were placeholders in `9c809c2` and are corrected here, which is why this
+sentence names both)*. `_denial_findings` rewritten to the subtract-then-scan form in both files;
 `test_the_attackers_context_contains_no_gate_denial_reason` extended with the four planted leaks;
 `context.py`'s docstring corrected from *"they carry no policy"* to a sentence naming the test that
 now makes it true. Measured on the fixed tree: **M17 KILLED**, and each of the three new shapes
@@ -3087,8 +3089,9 @@ module the symbol **is**, so recording it alone makes `from <package> import <mo
 the package and loses the only edge that matters. **The walker was written against the dotted form
 its author happened to use in three files and was silent on the form used in the fourth.**
 
-**Fix:** **`4e29cfc`** ⚠️ *(this entry was written and committed at `2b98a41`, before that commit
-existed)*. `_imported_modules` extended to aliases and to relative imports; the walk lifted into
+**Fix:** **`fe3984f`** ⚠️ *(this entry was written and committed at `9c809c2`, before that commit
+existed; the two SHAs were placeholders in `9c809c2` and are corrected here, which is why this
+sentence names both)*. `_imported_modules` extended to aliases and to relative imports; the walk lifted into
 `_first_party_import_closure`; `test_the_import_scan_ACTUALLY_FIRES_in_every_import_form`
 parametrised over four forms; `test_rendering_the_summary_makes_no_model_call` replaced by
 `test_the_summary_renderers_own_import_closure_holds_no_model_client`. Measured on the fixed tree:
