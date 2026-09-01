@@ -78,6 +78,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `3a6e3d07` | C7 | BUILD | 2026-09-01 |
 | `c2b7f419` | C13 | BUILD | 2026-09-01 |
 | `7d84b383` | C7 | BUILD | 2026-09-01 |
+| `3fb17baa` | C13 | BUILD | 2026-09-01 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -315,6 +316,34 @@ session's fence names `src/` for its own package only and `check_roles.py` is ou
 session could not write it either. **A hand-maintained running total in prose has now been carried by
 five consecutive sessions and corrected twice**, and re-declaring it as OWED is not the same as
 closing it.
+The row was appended and **no other session's line was touched**; the file's bytes were re-verified
+after the append and carry **0 CR bytes**.
+
+⚠️ **AND `3fb17baa` IS THE SEVENTEENTH SELF-RECORDED ROW. IT IS COUNTED FROM THE TABLE, AND THE
+COUNT WAS RIGHT WITHOUT A CORRECTION FOR THE THIRD TIME RUNNING.** This session's prompt — **C13
+BUILD, attempt 2**, landing the `Q-057`/`Q-058` rulings and the `CONTEXT.md` v1.8 amendment they
+force, 2026-09-01 — opened with `3fb17baa` and said, in its own words: *"Append your token row and
+NUMBER IT FROM THE FILE. Build 1 collided on the Q-/OF- counters with C7; RE-READ BOTH FILES
+IMMEDIATELY BEFORE EACH COMMIT and renumber from the file, exactly as build 1 did."* **The
+sixteenth is `7d84b383`** (C7 BUILD 2), in the paragraph immediately above; **the fifteenth is
+`c2b7f419`** (C13 BUILD 1), in the one above that. This is the seventeenth, **counted from the
+table** `5c4f8e11` built and **re-counted immediately before the commit**, with the concurrent C7
+session's row already in place when the count was taken.
+⚠️ **WHAT IS NOT NEW, AND SAYING SO IS THE WHOLE FUNCTION OF THESE PARAGRAPHS.** It is a single
+issue, not a batch, so Q-025's clause — *"every token batch names the token of the session that
+lands it"* — still does not reach it; that widening has now failed to be applied **eleven times
+running**. Without the row `check_roles.py` **E1 fails on every commit this session makes**
+(`FORGED/UNISSUED`). **Fifteen of seventeen are still the same defect.**
+⚠️ **AND THE MECHANISM IS STILL OWED, FOR THE FOURTH CONSECUTIVE SESSION** — `5c4f8e11`'s
+*"`check_roles.py` parses this table for E1 and could count the rows outside the batch itself"*.
+This session's fence names `src/` under **NOT** for every package but `camel_comparator/`, and
+`check_roles.py` is outside it, so this session could not write it either. **A hand-maintained
+running total in prose has now been carried by six consecutive sessions and corrected twice.**
+⚠️ **ONE THING IS NEW AND IT IS A CONCURRENCY FINDING, NOT A COUNTING ONE — see `Q-063`:** the
+C7 BUILD 2 session (`7d84b383`) is running **in this same working tree**, and its uncommitted
+`QUESTIONS.md` edit was present in the working copy while this row was written. `git commit --
+QUESTIONS.md` would have swept it into this session's commit under this session's token. It did
+not, and how that was avoided is recorded in `Q-063` rather than left to be inferred from a diff.
 The row was appended and **no other session's line was touched**; the file's bytes were re-verified
 after the append and carry **0 CR bytes**.
 
@@ -4607,10 +4636,45 @@ claim in §8.5.1 that no amount of reading `models.py` establishes — it lives 
 and in the replayer's log path. **`PROCESS.md` §9's URL-and-date rule catches a fact read from
 the wrong page; it does not catch a fact nobody read a page for.**
 
+**RULING (architect, 2026-09-01), recorded verbatim (hard rule 5).** ⚠️ *The ruling arrived as ONE
+quoted block covering `Q-057` and `Q-058` together. It is split across the two entries it rules, at
+the sentence where it changes subject, and **no word is altered**. The unsplit block is carried once
+in `docs/sessions/c13-build-2.txt`. Two `\"` sequences in the delivered text were transport escapes
+around* `"google"` *and are recorded as the plain quotation marks they stand for; nothing else was
+touched.*
+
+> *Q-057 is RULED. The run is TWO PASSES. `+camel+secpol` is a PIPELINE name CaMeL EMITS at
+> models.py:188, not a `--model` argument, and CONTEXT.md S8.5.1's Branch A invocation is wrong.
+> THE REASON THIS IS CLASS A RATHER THAN A TYPO IS BUILD 1'S OWN MECHANISM: `"google" in model` is
+> TRUE for the suffixed string, so DISPATCH SUCCEEDS and the whole suffixed string reaches
+> genai.Client AS A MODEL ID. The resulting provider-side error is INDISTINGUISHABLE from Branch B's
+> own trigger, so a harness defect would have presented as the pre-registered negative result. A
+> pre-registration whose negative branch can be reached by our own bug measures nothing.
+> CONSEQUENTLY BRANCH B'S TRIGGER IS NARROWED: Branch B is taken only on a cause that has been
+> DIAGNOSED and recorded, and 'it errored' is not a cause.*
+
+**What landed under it (`3fb17baa`).** `CONTEXT.md` is amended to **v1.8** and §8.5.1's whole
+*"Pre-declared decision"* block is replaced. Branch A now states **two passes**, the
+**same-working-directory** requirement (pass 2 reads the `logs/` tree pass 1 wrote), and the
+*dispatch-succeeds* hazard in the ruling's own terms. **Branch B's trigger is narrowed in the law
+itself** — *"the run does not complete, ON A CAUSE THAT HAS BEEN DIAGNOSED"*, with *"it errored is
+not a cause, and a harness defect is never Branch B"* written into §8.5.1 rather than left in a
+session report, and RUN-1 required to record the diagnosed cause in `PROTOCOL.md` **before** it
+selects a branch.
+`src/whetstone_gate/camel_comparator/invocation.py` already built both passes correctly at build 1;
+what changes here is that the **specification now says what the harness does**, so
+`test_run1_is_two_passes_and_the_second_replays_the_first` checks the law instead of contradicting
+it.
+⚠️ **One thing the ruling does NOT license, stated so it is not read into it:** it does not say the
+argv was ever executed. It was not — **zero provider calls in build 1 and build 2** — and RUN-1's
+first action is still `python main.py --help`, which spends nothing.
+
 ---
 
 ### Q-058 — ⚠️ CLASS A: the *"Tables 5–7"* citation names the wrong table, and Branch B ships AS a citation
-**Raised by:** C13 BUILD (`c2b7f419`) · **Date:** 2026-09-01 · **Status:** **OPEN — not
+**Raised by:** C13 BUILD (`c2b7f419`) · **Date:** 2026-09-01 · **Status:** ⚠️ **RULED**
+(architect, 2026-09-01; recorded verbatim by **C13 BUILD 2**, `3fb17baa`) — *the status line as
+`c2b7f419` wrote it, kept rather than overwritten:* **OPEN — not
 blocking C13; BLOCKING the Branch-B publication and `RESULTS.md`** · **Class:** **A** — it is
 the provenance of a published number.
 **`INCIDENTS.md`:** **OWED** (fence).
@@ -4695,6 +4759,56 @@ third-party claim carries a URL and a date* — §8.5.1 carried both, and was st
 **a URL to a paper is not a URL to a table.** That is the generalisable finding, and it is worth
 recording as a sharpening of §9 rather than as an instance of it.
 
+**RULING (architect, 2026-09-01), recorded verbatim (hard rule 5).** ⚠️ *The second half of the
+single block recorded under `Q-057` above, split at the sentence where it changes subject. No word
+is altered.*
+
+> *Q-058 is RULED. C13 BUILD 1 IS CORRECT AND THE SPECIFICATION IS WRONG. CONTEXT.md S8.5.1's
+> Branch B cites Tables 5-7 of arXiv 2503.18813v2 for the headline CaMeL/native banking pair. Those
+> tables are APPENDIX C, `Claude 3.5 Sonnet`, CaMeL against OTHER DEFENCES, and on `banking` they
+> show CaMeL BEHIND the undefended model - 75.00 +/- 21.22 against 81.25 +/- 19.12 utility (Table 5)
+> and 70.83 +/- 7.42 against 84.03 +/- 5.98 under attack (Table 6). The figures the project actually
+> publishes are TABLE 2, APPENDIX B, the `o3 High` block. Published as written, Branch B would point
+> a panelist at a table stating the opposite of the claim it is offered to support, in a submission
+> whose thesis is that other people's numbers are unsound. It is the highest-cost error yet found
+> here and it was found by opening the cited table. CONTEXT.md is amended to v1.8. S4 is CLEAN and is
+> not touched except as TASK 1c specifies - it cites no table and its numbers are correct.
+> TABLES 5-7 ARE RETAINED where they are RIGHT: Table 7 is P2's citation and C13 verified it exactly.*
+>
+> *AND THE RULE THIS CHANGES, WHICH OUTLIVES THE INSTANCE: PROCESS.md S9's URL-and-date rule catches a
+> fact read from the WRONG page. It does not catch a fact NOBODY READ A PAGE FOR. A URL to a paper is
+> not a URL to a table. FROM NOW ON, EVERY PUBLISHED THIRD-PARTY FIGURE CARRIES THE TABLE OR FIGURE
+> NUMBER, ITS APPENDIX, ITS BASE MODEL AND ITS ROW - not merely the paper's URL. C13's own
+> test_every_published_figure_carries_url_date_and_digest is EXTENDED to assert those four, and that
+> extension is the guardrail. Build 1 already built it one field short of catching its own finding.*
+
+**What landed under it (`3fb17baa`).**
+
+1. **`CONTEXT.md` v1.8, §8.5.1's Branch B** now names *"Table 2, Appendix B (\"Full results
+   tables\"), the `o3 High` block, `banking` column: CaMeL 81.2% ± 19.1 against Native Tool Calling
+   API 62.5% ± 23.7, the paper's own Difference row +18.8% ± 4.6"*, and carries an explicit
+   ⚠️ **NOT Tables 5–7** clause that states what those tables are, what they say on `banking`, and
+   that **Table 7 remains §8.5.2's P2 citation**. The likely mechanism the ruling names — Table 5's
+   *undefended* `81.25 ± 19.12` sitting one hundredth from CaMeL's Table 2 `81.2 ± 19.1` — is
+   recorded in the law as a likely mechanism, not asserted as the cause.
+2. **The two other `Tables 5–7` sites** (§4's AgentDojo row, §11.2's published-numbers bullet) were
+   read in their own sentences. **Neither supports a utility figure** — §4's utility pair lives one
+   row up, in the **CaMeL** row, which cites no table and is clean exactly as the ruling says.
+   Both citations support the **injection-count** claim that immediately follows them, so under the
+   ruling both **STAY**, with **Table 7 named explicitly** and Tables 5–7 identified as Appendix C /
+   `Claude 3.5 Sonnet`. Before-and-after for both is quoted in `docs/sessions/c13-build-2.txt`.
+3. ⚠️ **THE GUARDRAIL, WHICH IS THE POINT.**
+   `test_every_published_figure_carries_url_date_and_digest` is extended from *"these fields are
+   non-empty"* to the four the ruling names, **format-checked**:
+   `PublishedFigure.provenance_failures()` requires a `Table N`/`Figure N` number, an
+   `Appendix <A–Z>`, a base model and a row — and `render_branch_b` **refuses to render** a figure
+   that fails it, so the check is a gate and not only an assertion. **It is then fired at four
+   fixtures, one missing each field in turn**, and at a fifth carrying a bare paper URL with no
+   table — the exact shape of the defect this ruling is about. Build 1's version asserted the four
+   were truthy and was never fired at any of them; **truthiness would not have caught a figure
+   labelled `Table 5` that belongs to `Table 2`**, which is why the fifth fixture asserts the
+   renderer refuses a `Tables 5-7`-shaped range rather than a single table.
+
 ---
 
 ### Q-059 — C13 vendored AgentDojo and measured it, and deliberately left `vendor.agentdojo_sha` a sentinel
@@ -4776,7 +4890,9 @@ to the shipped path. **Either is one line; what is not acceptable is two copies.
 ---
 
 ### Q-061 — ⚠️ STOP: `tests/test_config_loader.py` asserts the sentinel set by EQUALITY, so every chunk that resolves a sentinel turns it RED, and the file is outside every such chunk's fence
-**Raised by:** C13 BUILD (`c2b7f419`) · **Date:** 2026-09-01 · **Status:** **OPEN — BLOCKING a
+**Raised by:** C13 BUILD (`c2b7f419`) · **Date:** 2026-09-01 · **Status:** ⚠️ **RULED**
+(architect, 2026-09-01; recorded verbatim by **C13 BUILD 2**, `3fb17baa`, which also applied it) —
+*the status line as `c2b7f419` wrote it, kept rather than overwritten:* **OPEN — BLOCKING a
 green suite; the remedy is one line in a file this session may not touch** · **Class:** **A** —
 it is a red test in the shipped suite and the remedy is a test edit.
 **`INCIDENTS.md`:** **OWED** (fence).
@@ -4844,6 +4960,42 @@ project written as an equality against a set that the plan requires to change �
 encodes *"today's contents"* where it means *"nothing unexpected"* will go red on schedule, at
 the worst moment, every time** — and the cheap general remedy is to write these as
 **subset-plus-owner** assertions rather than equalities.
+
+**RULING (architect, 2026-09-01), recorded verbatim (hard rule 5).** ⚠️ *Delivered in C13 BUILD 2's
+prompt as TASK 4 and recorded here before the assertion was touched. It is `Q-061`'s option 2,
+with the fence moved rather than the test worked around.*
+
+> *tests/test_config_loader.py::test_protocol_sentinels_are_exactly_the_undecided_ones is RED
+> because build 1 correctly resolved `vendor.camel_sha`. RULED: THE TEST IS WRONG, THE CONFIG IS
+> RIGHT, AND config/ IS NOT TO BE TOUCHED. An equality assertion over a set that SHRINKS by design
+> fails once per chunk for the rest of the project and trains every session to expect a red it did
+> not cause. REWRITE THE ASSERTION so it states the invariant that is actually true and will stay
+> true: every remaining sentinel is one of the KNOWN-UNDECIDED values, each named with the chunk or
+> actor that resolves it, and NO NEW sentinel appears that nobody owns. Then FIRE IT at a fixture
+> carrying an unowned sentinel and assert it goes red - S5.4, a gate that has never gone red is only
+> decorative. ⚠️ `vendor.agentdojo_sha` STAYS a sentinel. It is C16's and build 1 was right to leave
+> it.*
+
+**What landed under it (`3fb17baa`).** The equality is gone and the invariant is stated in three
+clauses that are all true today and stay true as the set shrinks to empty at `prereg-v1`:
+**(i)** every remaining `protocol.yaml` sentinel key is drawn from the **known-undecided five**, so
+a *new* key drifting in is still caught — which is what the original docstring actually claimed;
+**(ii)** every remaining sentinel **value** has an owner in `config._SENTINEL_OWNERS` naming the
+chunk or actor that resolves it; **(iii)** the set only ever **shrinks** — resolution out is a chunk
+doing its job and is expected, drift in is a failure.
+⚠️ **`vendor.agentdojo_sha` is asserted to be STILL PRESENT**, by name, as the ruling requires: it is
+C16's, and a subset assertion alone would have let it be resolved early and silently.
+⚠️ **AND IT IS FIRED, THREE WAYS** (`PROCESS.md` §5.4 — *a gate that has never gone red is only
+decorative*): an **unowned** sentinel, an **unknown key** carrying a known sentinel, and a sentinel
+**re-appearing** on a key already resolved. Build 1 measured this red as one of `make test`'s
+failures; it is closed here and the count moves from `1 failed / 596 passed` to `0 failed`.
+⚠️ **What this does NOT close:** the *class*. C14 resolves three sentinels and C16 one, and this
+ruling fixes **one test in one file**. The general remedy `Q-043`, `Q-051` and this entry all name —
+*write these as subset-plus-owner assertions rather than equalities, everywhere* — is **not applied
+project-wide here** and remains open. C13's fence names every other existing test file under
+**NOT**.
+
+---
 
 ### Q-062 — ⚠️ STOP: nothing on a ledger entry says whether a call EXECUTED, and the schema golden 5 closes has no room for a field that would
 **Raised by:** C7 BUILD (`3a6e3d07`) · **Date:** 2026-09-01 · **Status:** **OPEN — STOP declared
@@ -5096,3 +5248,60 @@ touch either row**: neither truncation nor a re-derived suffix leaves a stale di
 the body a digest is taken over changes nothing about what *anchors the end of a chain*. `OF-61`'s
 `seed` is still covered by no digest for the same reason it was before — it is on the document, not
 on an entry — and adding `executed` did not and could not change that.
+
+---
+
+## ⚠️ RAISED BY C13 BUILD 2 (`3fb17baa`), 2026-09-01 — Q-063
+
+### Q-063 — ⚠️ `git commit -- <paths>` gives FILE isolation and never gave WITHIN-FILE isolation, and two sessions in ONE working tree hit that today
+**Raised by:** C13 BUILD 2 (`3fb17baa`) · **Date:** 2026-09-01 · **Status:** **OPEN — not
+blocking; the hazard was navigated and is recorded so the next pair does not have to rediscover
+it** · **Class:** **B** — a git procedure inside the fence, changing no behaviour and no number.
+**`INCIDENTS.md`:** **OWED** — `INCIDENTS.md` is held by the concurrent C7 session and is named
+under **NOT** in this session's fence. Declared in this session's FINAL OUTPUT.
+
+**Context.** `Q-051`'s binding remedy is *"every commit uses `git commit -- <explicit paths>`"*, and
+its own ruling already qualifies it: *"the add is the part that never gave isolation, and the
+pathspec on the commit is the part that does."* ⚠️ **`git commit -- <paths>` commits the WORKING
+TREE state of those paths and ignores the index for them.** That is exactly the property that gives
+file-level isolation, and it is exactly the property that removes within-file isolation.
+
+**MEASURED, not hypothesised, 2026-09-01.** C13 BUILD 2 and C7 BUILD 2 (`7d84b383`) ran
+**concurrently in the same working directory** — not two clones, not two worktrees, **one tree**.
+At the moment this session was ready to commit its `QUESTIONS.md` work, `git diff QUESTIONS.md`
+carried **two authors' changes**:
+
+* this session's — the `Q-057`, `Q-058` and `Q-061` rulings, the token row, this entry;
+* **C7 BUILD 2's, uncommitted** — one hunk at `Q-062`, replacing `**RULING (architect, <date>):**
+  *<pending>*` with the recorded ruling.
+
+`git commit -- QUESTIONS.md` would have committed **both**, under **this session's token**, with a
+message describing only this session's half. Nothing would have been lost and nothing would look
+wrong in the file; what would be wrong is the **record of who wrote what**, in the file whose whole
+function is to be that record — and `make check-roles`' token trailer would then attest a line the
+token's session did not write.
+
+**Options seen:**
+  1. **Commit the whole file anyway** and note it. Rejected: it silently attributes another
+     session's line to this token, in a project whose thesis is provenance.
+  2. **Stage only this session's hunks** (`git apply --cached` over a filtered patch) and commit
+     from the **index**, with no pathspec. Correct on provenance; ⚠️ it is a **literal deviation
+     from `Q-051`'s wording**, because the commit carries no pathspec.
+  3. **Wait for the other session to commit**, then use the pathspec. Correct and free when it
+     happens; unbounded when it does not, and neither session can make the other commit.
+
+**Default taken:** ⚠️ **option 3 where it was available, option 2 where it was not, and which one
+each commit used is stated in this session's FINAL OUTPUT commit by commit** — so the deviation is
+checkable rather than described. Where option 2 was used the staged hunks were diffed against the
+working tree afterwards to confirm the other session's hunk was still uncommitted and untouched.
+
+**What the architect is asked to rule:** whether `Q-051`'s remedy is amended to read *"`git commit
+-- <paths>`, or a commit from an index staged with only this session's hunks when another session
+holds uncommitted changes in a shared file — and the FINAL OUTPUT says which"*, and — the larger
+question — ⚠️ **whether two concurrent sessions may share one working tree at all.** `INC-30`'s
+shared-tree hazard, `ARCH UNBLOCK 2`'s counter-collision class, `Q-062`'s renumbering near-miss and
+this entry are **four instances of one cause**, and a `git worktree` per session removes all four at
+the price of one command. **This is the cheapest structural finding available today and it is the
+one nobody has ruled on.**
+
+**RULING (architect, <date>):** *<pending>*
