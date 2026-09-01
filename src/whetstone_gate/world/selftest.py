@@ -48,6 +48,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from .. import config as cfg
+from .._console import say
 from . import bounds, generator, money, oracle as oracle_module, semantics, surface
 from .generator import STATUS_AUTHORIZED, STATUS_CAPTURED
 from .oracle import MUST_FIRE, MUST_HOLD, RECORDED, Oracle
@@ -1072,9 +1073,21 @@ def _flatten(text: str) -> str:
 
 
 def main() -> int:
-    """``python -m whetstone_gate.world.selftest``. Exit 0 on PASS, 1 on FAIL."""
+    """``python -m whetstone_gate.world.selftest``. Exit 0 on PASS, 1 on FAIL.
+
+    ⚠️ **PRINTED THROUGH :func:`whetstone_gate._console.say`, WHICH IS `INCIDENTS.md`
+    INC-08's FIX, AND THIS ENTRY POINT DID NOT USE IT.** A bare ``print`` here raised
+    ``UnicodeEncodeError: 'charmap' codec can't encode characters in position 760-761`` on
+    the operator's own console — the `RECORDED` rows carry their reasons verbatim out of
+    `RAZORPAY_SEMANTICS.md`, typography and all — so **the last gate before the sweep spends
+    a finite free tier exited with a traceback instead of its verdict**, and an operator
+    could not tell a broken harness from a broken printer. `INCIDENTS.md` **INC-25**.
+
+    ``say`` transliterates **at the moment of printing**, so :func:`render` keeps returning
+    the report's real text and the tests that assert on it are unaffected. It also flushes.
+    """
     report = run()
-    print(render(report))
+    say(render(report))
     return 0 if report.ok else 1
 
 
