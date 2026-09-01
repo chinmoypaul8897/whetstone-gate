@@ -95,6 +95,14 @@ def from_document(document: Mapping[str, Any]) -> Ledger:
     :func:`whetstone_gate.ledger.chain.rebuild` and `INCIDENTS.md` **INC-33** for what this
     function used to do instead, which was to launder every mutation it was handed.
 
+    ⚠️ **AND A DOCUMENT WHOSE CHAIN IS PERFECT BUT WHOSE ENTRIES PRE-DATE `QUESTIONS.md` Q-062
+    IS A DIFFERENT REFUSAL** — :class:`~whetstone_gate.ledger.entry.LedgerEntryError`, naming
+    the schema. `tests/goldens/golden5_tamper.json` is exactly such a document: thirteen content
+    fields, an intact chain, and :func:`whetstone_gate.ledger.chain.verify` still returns its
+    four stored verdicts. **The two refusals are kept apart on purpose**: calling an untampered
+    document tampered would put a false accusation in front of a reviewer verifying a published
+    episode, which is the audience `PROCESS.md` §6a.3 exists for.
+
     ``genesis_hash`` and ``hash_algorithm`` come from the **document**, which is what lets a
     pre-freeze episode still verify after C14 moves `config/`'s root. They are not trusted
     blindly: entry 1's ``prev_hash`` must equal the stated root and every digest must recompute

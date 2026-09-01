@@ -106,10 +106,15 @@ from .entry import (
     ARMS,
     CHAIN_FIELDS,
     CONTENT_FIELDS,
+    EXECUTED,
     VERDICTS_BY_ARM,
     LedgerEntry,
+    LedgerEntryError,
     validate_content,
 )
+
+#: The one content key :func:`verify` needs, because a verdict has to name a row.
+LEDGER_SEQ = "ledger_seq"
 
 #: The verifier's two verdicts. Golden 5's own words, in its ``expected_verdict`` field.
 VALID = "VALID"
@@ -195,14 +200,21 @@ def canonical_json(body: Mapping[str, Any]) -> str:
 
     ``sort_keys=True`` is *sorted keys*; ``separators=(",", ":")`` is *no whitespace*.
 
-    ⚠️ **``ensure_ascii=False``, and it is a decision rather than a default.** §16 and golden
-    5's ``hash_rule`` both say the operands are **UTF-8 strings**, and escaping a non-ASCII
-    character to ``\\uXXXX`` would be to hash a re-encoding of the entry rather than the entry.
-    It is also RFC 8785's reading. **Golden 5 cannot discriminate the two** — every byte of it
-    is ASCII, on which the two agree exactly — so the choice is recorded as a **Class B**
-    deviation with its reasoning here and raised in `QUESTIONS.md` **Q-053**, because the one
-    field that can carry attacker-authored text is ``target``: an attacker may call
-    ``fetch_payment`` with any string it likes as ``payment_id``.
+    ⚠️ **``ensure_ascii=False``, AND IT IS NOW A RULING RATHER THAN A CLASS B CHOICE.**
+    `QUESTIONS.md` **Q-053, RULED CONFIRMED by the architect on 2026-09-01**, verbatim:
+
+        Q-053 RULED CONFIRMED: `ensure_ascii=False`. UTF-8, per S16, golden 5's hash_rule and
+        RFC 8785. C7's derivation was correct; it is now a ruling rather than a Class B choice.
+
+    The derivation the ruling confirms: §16 and golden 5's ``hash_rule`` both say the operands
+    are **UTF-8 strings**, and escaping a non-ASCII character to ``\\uXXXX`` would be to hash a
+    re-encoding of the entry rather than the entry. **Golden 5 cannot discriminate the two** —
+    every byte of it is ASCII, on which they agree exactly — so the ruling settles what no
+    fixture could, and **no digest moves**, which is the whole content of *confirmed*. It is not
+    academic: the one field that can carry attacker-authored text is ``target``, and an attacker
+    may call ``fetch_payment`` with any string it likes as ``payment_id``, so the two readings
+    differ on **reachable input** and a reviewer re-verifying a published ledger with their own
+    JSON writer is exactly the audience `PROCESS.md` §6a.3 is written for.
 
     ⚠️ **A float is refused rather than serialised, at ANY depth.** ``json`` writes
     ``repr``-shaped floats, so a binary float in an entry would put a platform-dependent string
@@ -350,6 +362,7 @@ class Ledger:
         amount_paise: int | None,
         a_class: str | None,
         rejected_by_razorpay: bool,
+        executed: bool,
         customer_overcharge_paise: int,
         merchant_irrecoverable_outflow_paise: int,
         merchant_float_moved_paise: int,
@@ -360,6 +373,13 @@ class Ledger:
         ``ledger_seq`` is **this ledger's own** dense 1-based position and is not a caller's to
         supply — see :mod:`whetstone_gate.ledger`'s docstring for why it cannot be the world's
         write counter once a ``DENIED`` entry exists, and `QUESTIONS.md` **Q-054**.
+
+        ⚠️ **``executed`` IS REQUIRED AND HAS NO DEFAULT** (`QUESTIONS.md` **Q-062**). A default
+        of ``False`` would be the cheap answer and it is the wrong one: ``False`` is a *value
+        with a meaning* — *"the world did not perform this"* — so a caller who forgot the
+        argument would silently record every executed action as one that never happened, which
+        is Q-062's own defect pointed the other way. Hard rule 9's *"a missing required value is
+        a hard refusal, never a silent fallback"* is the same principle one layer down.
         """
         content = {
             "ledger_seq": len(self._entries) + 1,
@@ -371,6 +391,7 @@ class Ledger:
             "amount_paise": amount_paise,
             "a_class": a_class,
             "rejected_by_razorpay": rejected_by_razorpay,
+            "executed": executed,
             "customer_overcharge_paise": customer_overcharge_paise,
             "merchant_irrecoverable_outflow_paise": merchant_irrecoverable_outflow_paise,
             "merchant_float_moved_paise": merchant_float_moved_paise,
@@ -427,6 +448,37 @@ def verify(
     non-integer or absent ``ledger_seq`` is itself a detection. A tampered ledger is not
     trusted to number its own rows, but it is the row's own claim that names where a reader
     should look.
+
+    ---
+
+    ## ⚠️ THIS FUNCTION KNOWS NOTHING ABOUT THE CONTENT SCHEMA, AND THAT IS THE FIX FOR THE
+    ## CLASS `INCIDENTS.md` INC-32 AND INC-34 BOTH BELONG TO
+
+    It requires exactly three keys — ``ledger_seq``, ``prev_hash`` and ``hash`` — because those
+    three are what a **chain** is made of: a row number to report, a link, and a digest. It does
+    **not** require :data:`whetstone_gate.ledger.entry.CONTENT_FIELDS`, and it hashes **whatever
+    else the entry carries**.
+
+    **Why, and it is Q-062's ruling that forces it rather than a taste for tolerance:** golden
+    5's twelve entries are **pre-Q-062 13-field rows**, and the ruling is explicit that *"all
+    four cases must still reproduce with their first-bad seqs, because verify() recomputes
+    whatever each entry carries."* A `missing` gate selecting through ``CONTENT_FIELDS`` fired
+    at **position 1 of every case** the moment ``executed`` landed — before the link check,
+    before the recomputation — turning case **A** from ``VALID`` into ``DETECTED`` at 1, moving
+    **B** and **C** off their golden seqs, and leaving **D** at ``DETECTED``/1, *the right
+    verdict at the right seq for an entirely fabricated reason*. `INCIDENTS.md` **INC-34**.
+
+    ⚠️ **NOTHING IS WEAKENED BY REMOVING IT, AND THAT IS CHECKABLE RATHER THAN ASSERTED.** A
+    missing content field changes the body, so the recomputed digest no longer matches the
+    stored one and the entry is ``DETECTED`` **at its own seq** — which is strictly more useful
+    than a schema complaint at position 1, and is what
+    ``test_verify_detects_an_added_or_removed_field`` measures. **The schema is not unchecked;
+    it is checked in the two places that build the typed object** —
+    :meth:`whetstone_gate.ledger.entry.LedgerEntry.from_dict` and
+    :func:`whetstone_gate.ledger.entry.validate_content` — so *"the chain is intact"* and *"this
+    is an entry of this project's schema"* are two answers, given separately, by the two
+    functions that can actually answer them. A verifier that conflates them can only say
+    ``DETECTED``, and it says it about the wrong thing.
     """
     expected_prev = genesis_hash
     seen: set[int] = set()
@@ -452,13 +504,18 @@ def verify(
         seq = stored.get("ledger_seq")
         label = seq if isinstance(seq, int) and not isinstance(seq, bool) else None
 
-        missing = [name for name in (*CONTENT_FIELDS, *CHAIN_FIELDS) if name not in stored]
+        # ⚠️ EXACTLY THE THREE KEYS A CHAIN IS MADE OF, AND NOT THE CONTENT SCHEMA. See this
+        # function's docstring and `INCIDENTS.md` INC-34: requiring CONTENT_FIELDS here made
+        # this verifier disagree with golden 5 the moment the schema widened, which is the
+        # `INC-32` class — a checker reading its input through the schema it expects — in the
+        # one function whose whole job is to read somebody else's bytes as they are.
+        missing = [name for name in (LEDGER_SEQ, *CHAIN_FIELDS) if name not in stored]
         if missing:
             return ChainVerdict(
                 DETECTED,
                 label,
-                f"entry at position {position} is missing field(s) {missing}: the digest is "
-                f"taken over the content set and an absent field is a changed entry",
+                f"entry at position {position} is missing field(s) {missing}: a chain needs a "
+                f"row number, a link and a digest, and this row does not carry all three",
             )
 
         if label is None:
@@ -546,6 +603,14 @@ def rebuild(
     :class:`TamperDetected` rather than a happy object. Only then are the rows re-appended,
     and each produced entry is required to be **identical to the row it came from** — which
     turns the round trip into a check instead of a tautology.
+
+    ⚠️ **TWO REFUSALS, AND CONFLATING THEM WOULD BE A WORSE DEFECT THAN THE ONE INC-33 FIXED.**
+    Since `QUESTIONS.md` **Q-062** this function can also be handed a document whose chain is
+    **perfect** and whose entries are **pre-Q-062 13-field rows** — golden 5 is exactly that.
+    That is a :class:`~whetstone_gate.ledger.entry.LedgerEntryError` naming the schema, **not**
+    a :class:`TamperDetected`: calling an untampered document tampered would put a false
+    accusation in front of a reviewer verifying a published episode, and calling a tampered one
+    a schema mismatch would launder it. :func:`verify` has already run and its verdict stands.
     """
     outcome = verify(entries, genesis_hash=spec.genesis_hash, algorithm=spec.algorithm)
     if not outcome.ok:
@@ -562,12 +627,26 @@ def rebuild(
         try:
             produced = ledger.append(**{name: stored[name] for name in APPEND_FIELDS})
         except KeyError as exc:
-            # verify() has already refused a document missing a content field, so reaching
-            # here means the two disagree about the field set. That is a defect in this
-            # module, not in the document, and it is raised as one rather than as a KeyError.
-            raise ChainError(
-                f"stored entry at position {position} lacks {exc} after verify() accepted it; "
-                f"verify and rebuild disagree about the content set"
+            # ⚠️ REACHABLE, AND ITS PREVIOUS TEXT WAS FALSE. Until `QUESTIONS.md` Q-062 this
+            # branch said "verify and rebuild disagree about the content set … a defect in
+            # this module, not in the document" — true only while verify() enforced the
+            # content schema, which INC-34 records it must not. `verify` now answers about
+            # the CHAIN, so a document can verify perfectly and still not be an entry of this
+            # schema: golden 5's own twelve rows are that document.
+            name = exc.args[0] if exc.args else "?"
+            hint = ""
+            if name == EXECUTED:
+                hint = (
+                    " ⚠️ The only field absent is 'executed', so this is a PRE-Q-062 document "
+                    "— tests/goldens/golden5_tamper.json is the one in this repository. Its "
+                    "chain is INTACT and chain.verify says so; what it cannot do is become a "
+                    "LedgerEntry of this schema. Golden 5B re-pins the writer under the "
+                    "14-field schema (QUESTIONS.md Q-062, RULED 2026-09-01)."
+                )
+            raise LedgerEntryError(
+                f"stored entry at position {position} lacks {name!r}. The chain verified — "
+                f"verify() recomputes whatever each entry carries and asks nothing about the "
+                f"content schema — but this row is not an entry this package can build.{hint}"
             ) from exc
         if produced.to_dict() != stored:
             raise TamperDetected(

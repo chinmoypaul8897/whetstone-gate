@@ -1,19 +1,47 @@
-"""**ONE LEDGER ENTRY, AND THE FIELD SET IS GOLDEN 5's — NOT THIS MODULE'S.**
+"""**ONE LEDGER ENTRY. FOURTEEN CONTENT FIELDS SINCE `QUESTIONS.md` Q-062 WAS RULED.**
 
 `tests/goldens/golden5_tamper.json` was hand-derived by the architect **before this package
-existed**, and every one of its twelve entries carries exactly these fifteen keys. Thirteen of
-them are **content** and are hashed; ``prev_hash`` and ``hash`` are the chain and are excluded
-from the digest, which the golden's own ``hash_rule`` states:
+existed**, and every one of its twelve entries carries exactly **fifteen** keys — the
+**thirteen** content fields this schema had until 2026-09-01, plus ``prev_hash`` and ``hash``.
+The chain fields are excluded from the digest, which the golden's own ``hash_rule`` states:
 
     entry_hash = SHA-256( prev_hash || canonical-JSON(entry, sorted keys, no whitespace) ),
     both as UTF-8 strings; the canonicalised entry EXCLUDES prev_hash and hash
 
-⚠️ **THE FIELD SET IS THEREFORE CLOSED, AND THAT IS A CONSEQUENCE RATHER THAN A PREFERENCE.**
-Every content field is inside the digest, so **adding a fourteenth would change every hash in
-golden 5** and this package could no longer reproduce a single one of them. Hard rule 3 makes
-the golden the oracle and forbids editing it, so the schema is settled by arithmetic, not by
-taste. A later chunk that needs a field it cannot find here needs an **architect ruling**, not
-an extra key — and the ruling would have to say what happens to golden 5.
+---
+
+## ⚠️ THE FOURTEENTH FIELD — `executed` — AND WHY IT LANDED
+
+**`QUESTIONS.md` Q-062, RULED by the architect on 2026-09-01, verbatim:**
+
+    Q-062 is RULED: the fourteenth content field LANDS. `executed`, boolean, non-null on every
+    entry, positioned IMMEDIATELY AFTER `rejected_by_razorpay`. … A ledger in which an action
+    that happened and an action that never happened are the same bytes is not a ledger.
+
+    DEFINITION, and it is the ruling's operative half: `executed` is TRUE if and only if the
+    world ACTUALLY PERFORMED the action against mock Razorpay state. It is therefore FALSE for
+    all three refusal sources, which become jointly derivable for the first time:
+        gate refused        -> executed false, verdict DENIED or INDETERMINATE
+        Razorpay refused    -> executed false, rejected_by_razorpay true
+        TOOL LAYER refused  -> executed false, verdict ALLOWED, rejected_by_razorpay false
+                               <- the row that was previously indistinguishable from success
+
+⚠️ **C7 BUILD 1 STOPPED HERE UNDER HARD RULE 1 AND DID NOT TAKE A DEFAULT, AND THAT IS WHY THIS
+PARAGRAPH EXISTS RATHER THAN A SILENT FOURTEENTH KEY.** Its measurement is what decided the
+ruling: two `capture_payment` entries on seed 2001, one that moved ₹665.23 and one the MCP tool
+layer refused, **identical in all thirteen content fields and carrying the same digest**
+`3c54446376764d88ea82c17ea56b31716ed1fdf1de9a77536f4ba55ab09cd16b`. Under this schema they
+differ, and `tests/test_c7_ledger.py::test_an_EXECUTED_capture_and_an_MCP_LAYER_REFUSAL_NOW_DIFFER`
+prints both digests beside build 1's identical pair.
+
+⚠️ **GOLDEN 5 IS NOT REOPENED AND ITS ENTRIES STAY AT THIRTEEN.** `PROCESS.md` §5.2 specifies it
+as a **tamper test — a verifier oracle** — and never as a writer oracle, and
+:func:`whetstone_gate.ledger.chain.verify` **recomputes whatever each entry carries**, so all
+four of its cases still reproduce with their first-bad seqs under the wider schema. What a
+13-field golden-5 document can no longer do is come back through
+:func:`whetstone_gate.ledger.store.from_document`, which builds **this type** — that is a typed,
+Q-062-naming refusal rather than a tamper verdict, and the architect is authoring **golden 5B**
+to re-pin the writer under this schema. See :data:`GOLDEN_5_CONTENT_FIELDS`.
 
 **Where each field comes from, so a reviewer can check the set rather than trust it:**
 
@@ -21,6 +49,12 @@ an extra key — and the ruling would have to say what happens to golden 5.
     components** are `CONTEXT.md` §12.2's typed harm record, field for field.
   * ``turn_index``, ``arm`` and ``verdict`` are `PROCESS.md` §12.1's C7 row, which requires
     them by name *"so the §18 replay renderer is buildable from `evals/episodes/` alone"*.
+  * ``executed`` is **`QUESTIONS.md` Q-062's ruling**, read from
+    :attr:`whetstone_gate.world.results.ToolResult.ok` on the world's own log row — *"True
+    only if the world executed the call. A refusal of either kind is False."* ⚠️ It is
+    **never inferred** from ``verdict`` and ``rejected_by_razorpay``: that inference is the
+    exact reasoning that produced the defect, because it cannot see the tool-layer refusal,
+    which is the whole finding. See :func:`whetstone_gate.ledger.build.executed_of`.
   * ``target`` and ``amount_paise`` are the **call's arguments**.
     :attr:`whetstone_gate.world.semantics.MockWorld.log`'s own docstring assigns them here in
     those words — *"The ledger's `target` and `amount_paise` columns live HERE, not on the harm
@@ -127,6 +161,25 @@ class LedgerEntry:
     """
 
     ledger_seq: int
+    """This ledger's own dense 1-based row number.
+
+    ⚠️ **`QUESTIONS.md` Q-054, RULED 2026-09-01: `ledger_seq` (the ledger's row) and C4's world
+    write-counter are SEPARATE SPACES and NO CHUNK MAY JOIN THEM ON THAT KEY.**
+
+    :class:`whetstone_gate.world.harm.HarmRecord` carries a field of the same name and the same
+    type, numbered by a counter that advances only on **writes that reached Razorpay**. This
+    ledger holds **one entry per call** — reads, the stub, unknown tools, MCP-layer refusals and
+    calls the gate **denied**, none of which the world numbers. C7 BUILD 1 measured the
+    divergence on its own fixture: **harm records [1, 2] against ledger entries [1, 2, 3]**.
+
+    The two coincide exactly when every call in an episode is an executed write, which is true
+    of golden 3 and of golden 5 case A — **so neither golden discriminates them**, and a join
+    would succeed silently on a short episode and mis-attribute silently on a real one. The
+    prohibition is written here, on the field, because that is where C8, C10, C17 and C18 will
+    look. It is §12.2's reporting rule 3 — *"De-duplicate by `ledger_seq`"* — that makes this
+    number load-bearing, and that rule is about **this** object.
+    """
+
     turn_index: int
     arm: str
     verdict: str
@@ -135,6 +188,31 @@ class LedgerEntry:
     amount_paise: int | None
     a_class: str | None
     rejected_by_razorpay: bool
+    """§12.2: *"a documented Razorpay error fired"* — **not** *"the call failed"*.
+
+    ⚠️ **It is written from a HARM RECORD, and a harm record exists only for a MONEY ACTION**, so
+    a **read** that Razorpay refused (RS-44, RS-45, RS-52, RS-53) carries ``False`` here. See
+    :func:`whetstone_gate.ledger.control.refusal_source`, which measures that and says so.
+    """
+
+    executed: bool
+    """⚠️ **`QUESTIONS.md` Q-062, RULED 2026-09-01. TRUE if and only if the world ACTUALLY
+    PERFORMED the action against mock Razorpay state.**
+
+    Read from :attr:`whetstone_gate.world.results.ToolResult.ok` on the world's own log row —
+    whose own docstring is *"True only if the world executed the call. A refusal of either kind
+    is False."* — and **never inferred** from the two fields above it.
+
+    ⚠️ **A SUCCESSFUL READ CARRIES ``True``, AND THAT IS STATED HERE BECAUSE THE RULING DOES NOT
+    STATE IT.** ``fetch_payments`` and ``fetch_payment`` mutate nothing; the world still
+    *performed* them, they are not one of the ruling's three refusal sources, and
+    `CONTEXT.md` §8.6a's *"productive action"* says *"any tool call … that the world executed"* —
+    **any tool call**, not *any money action*. So the count of ``executed`` entries is **not**
+    the count of executed *writes*, and anything that wants the latter must also read ``tool``.
+    :func:`whetstone_gate.ledger.control.productive_action` and
+    `docs/reviews/OPEN_FINDINGS.md` carry the measured consequence.
+    """
+
     customer_overcharge_paise: int
     merchant_irrecoverable_outflow_paise: int
     merchant_float_moved_paise: int
@@ -179,21 +257,51 @@ class LedgerEntry:
         if supplied != expected:
             missing = sorted(expected - supplied)
             extra = sorted(supplied - expected)
+            hint = ""
+            if missing == [EXECUTED] and not extra:
+                # ⚠️ THE ONE MISMATCH THAT IS NOT TAMPERING AND MUST NOT READ LIKE IT.
+                # Golden 5's twelve entries are PRE-Q-062 13-field rows. `verify` still
+                # returns their four expected verdicts — it recomputes whatever each entry
+                # carries — but they cannot become an entry of THIS type, and a reader who
+                # is told only "does not carry the field set" would go looking for a tamper.
+                hint = (
+                    " ⚠️ The only field missing is 'executed', which is the schema this "
+                    "package carried until QUESTIONS.md Q-062 was RULED on 2026-09-01. This "
+                    "is a PRE-Q-062 document — tests/goldens/golden5_tamper.json is the one "
+                    "in this repository — and it is NOT a tampered one: chain.verify still "
+                    "returns its stored verdict, because verify recomputes whatever each "
+                    "entry carries. Golden 5B re-pins the writer under this schema."
+                )
             raise LedgerEntryError(
-                f"a stored entry does not carry golden 5's field set: missing={missing}, "
+                f"a stored entry does not carry this package's field set: missing={missing}, "
                 f"unexpected={extra}. The set is closed because every content field is inside "
-                f"the digest (see this module's docstring)."
+                f"the digest (see this module's docstring).{hint}"
             )
         return cls(**{name: raw[name] for name in expected})
 
 
-#: The thirteen hashed fields, derived from the dataclass so the two cannot drift.
+#: The fourteenth content field, named once so nothing spells it twice. `QUESTIONS.md` Q-062.
+EXECUTED = "executed"
+
+#: The fourteen hashed fields, derived from the dataclass so the two cannot drift.
 CONTENT_FIELDS: tuple[str, ...] = tuple(
     f.name for f in fields(LedgerEntry) if f.name not in ("prev_hash", "hash")
 )
 
 #: The two chain fields, excluded from the digest by the golden's ``hash_rule``.
 CHAIN_FIELDS: tuple[str, ...] = ("prev_hash", "hash")
+
+#: ⚠️ **The THIRTEEN content fields golden 5's entries carry** — this schema minus ``executed``.
+#:
+#: Golden 5 is `PROCESS.md` §5.2's **tamper test**, hand-derived before this package existed and
+#: **read-only** (hard rule 3). Q-062's ruling is explicit that it *"IS UNAFFECTED AND IS NOT
+#: REOPENED"*: its entries stay at thirteen and a correct verifier must still verify them.
+#: This constant exists so the test that pins the golden's key order can say **which** schema it
+#: is pinning, instead of drifting whenever :data:`CONTENT_FIELDS` changes — a golden pinned
+#: against a constant derived from the code under test pins nothing.
+GOLDEN_5_CONTENT_FIELDS: tuple[str, ...] = tuple(
+    name for name in CONTENT_FIELDS if name != EXECUTED
+)
 
 
 def _is_int(value: Any) -> bool:
@@ -267,6 +375,19 @@ def _validate(values: Mapping[str, Any], *, require_chain: bool) -> None:
             f"'a documented Razorpay error fired', which is a fact and not a count."
         )
 
+    executed = values[EXECUTED]
+    if not isinstance(executed, bool):
+        # ⚠️ NON-NULL ON EVERY ENTRY, in the ruling's own words, and `None` is refused here
+        # rather than treated as "unknown". A tri-state would reintroduce exactly the
+        # ambiguity Q-062 exists to remove: a reader would have to guess what an unknown
+        # meant, and the guess available to them is the discredited inference from
+        # `verdict` and `rejected_by_razorpay`.
+        raise LedgerEntryError(
+            f"executed must be a bool, got {executed!r}. QUESTIONS.md Q-062 (RULED "
+            f"2026-09-01): 'boolean, non-null on every entry'. It is read from the world's "
+            f"ToolResult.ok and is never inferred."
+        )
+
     # ⚠️ THE FOUR ARE VALIDATED SEPARATELY AND ARE NEVER ADDED TOGETHER. §12.2's reporting
     # rule 1. There is no total() in this package and there must never be one.
     for component in COMPONENTS:
@@ -276,6 +397,8 @@ def _validate(values: Mapping[str, Any], *, require_chain: bool) -> None:
                 f"{component} must be an integer >= 0 paise, got {value!r}"
             )
 
+    _validate_executed_consistency(values)
+
     if require_chain:
         for name in CHAIN_FIELDS:
             value = values[name]
@@ -283,15 +406,75 @@ def _validate(values: Mapping[str, Any], *, require_chain: bool) -> None:
                 raise LedgerEntryError(f"{name} must be a non-empty string, got {value!r}")
 
 
+def _validate_executed_consistency(values: Mapping[str, Any]) -> None:
+    """⚠️ **THREE OF `QUESTIONS.md` Q-062's FOUR CONSISTENCY ASSERTIONS, ENFORCED AT WRITE.**
+
+    The fourth is not a constraint but a **classification** — ``executed`` false with
+    ``verdict`` ``ALLOWED`` and ``rejected_by_razorpay`` false is the row the tool layer
+    refused — and it lives in :func:`whetstone_gate.ledger.control.refusal_source`.
+
+    ⚠️ **THEY ARE ENFORCED AND NOT MERELY ASSERTED IN A TEST, AND THE REASON IS THE THIRD ONE.**
+    A test says *"the entries we happened to build satisfy this"*; a refusal says *"an entry
+    that does not cannot be written"*. Q-062's whole finding is that the ledger accepted two
+    different histories as the same bytes, and a rule that is only a test is a rule the next
+    write path does not have — which is `INCIDENTS.md` **INC-32**'s shape exactly.
+
+    **1. ``executed`` ⇒ ``verdict`` is ``ALLOWED``.** A call the gate refused never reached the
+    world, so the world cannot have performed it. `CONTEXT.md` §9.3: *"`INDETERMINATE` blocks
+    exactly as hard as `DENIED`"*, so both are refusals here.
+
+    **2. ``executed`` ⇒ ``rejected_by_razorpay`` is ``False``.** Structural in the world and
+    checked here anyway: every ``harm.rejected(...)`` construction sits inside an
+    ``except RazorpayRefusal`` branch whose only exit is ``_refused``, which hardcodes
+    ``ok=False``; every ``ok=True`` site passes ``rejected=False`` as a literal.
+
+    **3. ⚠️ ANY NON-ZERO HARM COMPONENT ⇒ ``executed``. MONEY CANNOT MOVE ON A CALL THAT DID NOT
+    HAPPEN.** This is the one that is an **integrity check** rather than a restatement of the
+    ruling's table, and it is the one that would have caught the original defect **from the
+    other side**: it constrains the four numbers §12.2 publishes against the field that says
+    whether the action occurred, so a ledger cannot carry harm attributed to a call the world
+    never made. In the world it holds because :func:`whetstone_gate.world.harm._record` zeroes
+    all four components whenever ``rejected`` — *"THIS `if` IS INC-03, IN ONE PLACE"* — and
+    because a harm record with a non-zero component is only ever produced on a success path.
+    **Here it holds because an entry that violates it is not writable.**
+    """
+    executed = values[EXECUTED]
+    verdict = values["verdict"]
+    rejected = values["rejected_by_razorpay"]
+
+    if executed and verdict != ALLOWED:
+        raise LedgerEntryError(
+            f"executed=True with verdict={verdict!r}: a call the gate refused never reached "
+            f"the world, so the world cannot have performed it. QUESTIONS.md Q-062: "
+            f"'gate refused -> executed false, verdict DENIED or INDETERMINATE'."
+        )
+
+    if executed and rejected:
+        raise LedgerEntryError(
+            "executed=True with rejected_by_razorpay=True: QUESTIONS.md Q-062 gives "
+            "'Razorpay refused -> executed false, rejected_by_razorpay true'. A documented "
+            "Razorpay error fired means the world did not perform the action."
+        )
+
+    if not executed:
+        moved = [c for c in COMPONENTS if values[c] != 0]
+        if moved:
+            raise LedgerEntryError(
+                f"executed=False with non-zero harm {sorted(moved)}: money cannot move on a "
+                f"call that did not happen. CONTEXT.md §12.2 zeroes all four components for "
+                f"an action the world did not perform, and this entry claims otherwise."
+            )
+
+
 def validate_content(values: Mapping[str, Any]) -> None:
-    """Validate the thirteen content fields of a proposed entry, before it is chained."""
+    """Validate the fourteen content fields of a proposed entry, before it is chained."""
     missing = [name for name in CONTENT_FIELDS if name not in values]
     if missing:
         raise LedgerEntryError(f"missing content field(s): {missing}")
     extra = [name for name in values if name not in CONTENT_FIELDS]
     if extra:
         raise LedgerEntryError(
-            f"unexpected field(s) {extra}: golden 5 fixes the content set at "
+            f"unexpected field(s) {extra}: the content set is "
             f"{list(CONTENT_FIELDS)} and every one of them is inside the digest."
         )
     _validate(values, require_chain=False)
