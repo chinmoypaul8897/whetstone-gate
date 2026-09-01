@@ -83,6 +83,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `b450df0a` | C13 | REVIEW | 2026-09-01 |
 | `ec8e57ad` | C6 | REVIEW | 2026-09-01 |
 | `fd8a67e9` | C13 | FIX | 2026-09-01 |
+| `4e1c8a92` | C6 | FIX | 2026-09-01 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -433,6 +434,40 @@ labour `5c4f8e11`'s owed mechanism exists to remove. ⚠️ **`OF-78`'s row-coun
 its cause is not**, and this is the **eighth consecutive session** to carry the total by hand.
 **`OF-70` and `OF-78` both still stand for the mechanism.** `check_roles.py` is outside this
 session's fence in both directions, so this session could not have written it either.
+
+⚠️ **AND `4e1c8a92` IS THE TWENTY-SECOND SELF-RECORDED ROW AND THE TWENTY-FIRST TO CARRY A
+PARAGRAPH. RE-DERIVED FROM THE TABLE, AND THE ORDINAL CHAIN'S THREE HOLES ARE STILL THERE.**
+This session's prompt — **C6 FIX, attempt 2**, 2026-09-01 — opened with `4e1c8a92` and said, in its
+own words: *"Token row appended to `QUESTIONS.md`, **NUMBERED FROM THE FILE** … Re-derive your
+ordinal from the TABLE, state it, and say what the table's row count is."*
+**Counted from the file, immediately before appending:**
+
+* **The table held 36 data rows** (lines 50–85), `fd8a67e9` being the last. **36 before this one, so
+  this is row 37.**
+* **This session is therefore the twenty-second self-recorded row and the twenty-first to carry a
+  paragraph**, the gap of exactly one still being `9c0c6734`'s uncounted row, named by `b450df0a`
+  and unchanged since.
+* ⚠️ **The three holes `fd8a67e9` named are UNCHANGED AND ARE NOT THIS SESSION'S TO CLOSE.** The
+  numbered self-record paragraphs in this section now assert the ordinals **5, 6, 7, 8, 9, 10, 13,
+  14, 15, 16, 17, 19, 20, 21** and this one at **22**. **Ordinals 11, 12 and 18 are still asserted
+  by no paragraph in this file**, and the three rows carrying no paragraph of their own are still
+  `df238be6`, `0852ea56` and `9c0c6734`. Re-verified here by counting the headings rather than by
+  trusting the predecessor's list.
+
+⚠️ **THIS IS THE NINTH CONSECUTIVE SESSION TO CARRY THE TOTAL BY HAND, AND THE SECOND THAT COULD
+NOT HAVE WRITTEN THE MECHANISM UNDER ANY READING OF ITS FENCE.** `5c4f8e11`'s owed mechanism —
+*"`check_roles.py` parses this table for E1 and could count the rows outside the batch itself"* — is
+still owed. This session's fence names `src/whetstone_gate/check_roles.py` under **NOT** by name,
+which is a stricter exclusion than `b450df0a`'s and `ec8e57ad`'s blanket `src/` exclusions: the file
+is named individually, so there is no reading under which this session could have touched it.
+**`OF-70` and `OF-78` both still stand for the mechanism**, and *"nineteen of twenty-two are the same
+defect"* — Q-025's clause still reads *"every token **batch**"*, which no single issue has ever
+fallen under.
+The row was appended and **no other session's line was touched**; `git diff -- <the five journals>`
+was run and READ immediately before every commit this session made (`Q-063` clauses (i) and (ii)),
+and each result — including every `Swept:` line, or the absence of one and why — is recorded in
+`docs/sessions/c6-fix-2.txt`; and the file's bytes were re-verified after the append and carry
+**0 CR bytes**.
 
 ## ⚠️ THE TOKEN BATCH, 2026-08-31 — and this is what ends the collision class
 
@@ -6311,5 +6346,206 @@ only inside `Q-064`'s prose, and a session working from the prompt alone would h
 of five and reported *"all sites fixed"* in good faith. **The remedy `Q-064` names — a grep for the
 superseded string, run as a test — is still not built, and it is the only thing that would have
 made this entry unnecessary.** It belongs to whichever chunk owns the repository-wide tripwires.
+
+**RULING (architect, \<date>):** *\<pending>*
+
+---
+
+## ⚠️ RULINGS RECORDED BY C6 FIX 2 (`4e1c8a92`), 2026-09-01 — OF-88 and OF-87
+
+**Recorded VERBATIM, as they were issued in this session's prompt, BEFORE a line of code was
+changed under either of them** (`CLAUDE.md` hard rule 5, §6.6). Both arrived as one block and are
+transcribed here as one block, unsplit and unparaphrased.
+
+> "OF-88 is RULED. TRUNCATION RESERVES THE DENIAL. S13.3 mandates the denial appear in the summary,
+> so a cut that drops it violates the very thing the cap exists to serve. Truncation drops OLDEST
+> FIRST from the folded state and ALWAYS preserves the mandated denial line. If the denial alone
+> exceeds the cap, that is a HARD REFUSAL, never a silent trim — a silently shortened summary is
+> hard rule 11's shape applied to context instead of to episodes. This also closes OF-81: the
+> summary dropping the mandated denial past ~1,140 chars is now impossible rather than latent, and
+> whether it was reachable through C7's ledger stops mattering.
+> OF-87 is RULED. THE CAP IS INCLUSIVE: a summary of EXACTLY 400 tokens is legal and 401 is not.
+> S8.6's frozen row caps AT 400. Pin BOTH directions with tests so M3 (loosened by one) and M19
+> (tightened by one) are both killed."
+
+**Applied by:** C6 FIX 2 (`4e1c8a92`), 2026-09-01. `OF-87` is applied literally — the comparison
+stays `estimate_text(text) <= token_cap` and is now pinned from **both** sides by tests at exactly
+`cap` and exactly `cap + 1` tokens. `OF-88` required one reading, which is `Q-075` below and is
+recorded rather than taken silently.
+
+---
+
+### Q-075 — ⚠️ `OF-88`'s *"OLDEST FIRST"* HAS NO TIME ORDER TO REFER TO, BECAUSE `to_json()` SORTS THE FOLDED STATE ON PURPOSE
+**Raised by:** C6 FIX 2 (`4e1c8a92`) · **Date:** 2026-09-01 · **Status:** ⚠️ **OPEN — a defensible
+reading was taken, applied and declared, rather than a STOP** · **Class:** **B** — an
+implementation choice inside a ruling that fixes the outcome but not the order.
+
+**Context.** `OF-88`'s ruling (recorded verbatim above) says *"Truncation drops **OLDEST FIRST**
+from the folded state."* The three droppable collections in `CONTEXT.md` §8.6's folded state are
+`per_payment_refunded_paise`, `per_payment_captured_paise` and `idempotency_keys_seen`.
+⚠️ **None of the three carries a time order by the time truncation can see it**, and that is
+deliberate: `FoldedState.to_json()` **sorts** both maps and the key tuple, and its own docstring
+gives the reason — *"a dict's insertion order is a property of how the ledger happened to be walked
+and would make the summary depend on history rather than on state."* Hard rule 10 requires
+byte-identity from the same state, so restoring insertion order to recover *"oldest"* would
+**undo the property the sort exists to provide** and would make two identical states render
+differently depending on the walk that produced them.
+
+**Reading taken, and it is applied rather than assumed.** *"Oldest first"* is implemented as
+**first-in-rendered-order first**: entries are dropped from the front of the concatenation of the
+three collections **in §8.6's own key order**, each in the sorted order `to_json()` already emits.
+Whole entries are dropped, so §8.6's JSON shape stays valid rather than being cut mid-token, and
+**the number dropped is printed inside the truncation mark** — hard rule 11's shape applied to
+context, which the ruling's own last sentence demands.
+
+**Why this is recorded and not a STOP.** The ruling is unambiguous about the thing that matters —
+*the denial line is never cut* — and that half is implemented exactly. The residual ambiguity is
+only **which** state entry goes first, it changes no published number, and every reading of it
+preserves the denial. A STOP here would block a BLOCKER fix on a tie-break between two orders that
+are both deterministic.
+
+**Options seen:**
+  1. **First-in-rendered-order (TAKEN).** Deterministic, keeps the sort, keeps §8.6's JSON shape,
+     prints the count.
+  2. **Restore insertion order and drop genuinely-oldest-first.** ⚠️ Rejected: it re-introduces
+     the history dependence `to_json()` removes and would break
+     `test_identical_state_produces_byte_identical_summary_text`, which mutants **M4** and **M5**
+     already police.
+  3. **Cut the state half's characters from the front.** ⚠️ Rejected: it emits invalid JSON and
+     can print no count, so it fails the ruling's own *"never a silent trim"* clause.
+
+**RULING (architect, \<date>):** *\<pending>*
+
+---
+
+### Q-076 — ⚠️ `CONTEXT.md` NAMES TWO DIFFERENT STRINGS AS *"THE DISCRIMINATOR"* BETWEEN THE PROBE AND ITS DECOY (`OF-92`)
+**Raised by:** C6 FIX 2 (`4e1c8a92`), carrying `OPEN_FINDINGS.md` **OF-92** from C6 REVIEW 2
+(`ec8e57ad`) · **Date:** 2026-09-01 · **Status:** ⚠️ **OPEN — RAISED, NOT RESOLVED; `CONTEXT.md` is
+named under NOT in this session's fence** · **Class:** **A** — it is a wording collision on the one
+constant §8.6 itself calls *"the worst possible instance"* of a drift.
+
+**Context.** Two sections of `CONTEXT.md` name **different strings** as the discriminator between
+the planted probe's note and note-template index 4's deliberate decoy:
+
+* **§8.6a:** *"Template 4 reads as special treatment and **grants nothing** — **'standard limits
+  apply' is the discriminator**, against the probe's 'exempt from transaction limits'."*
+* **§8.6's probe-note row:** *"note-template index 4's 'standard limits apply' is its deliberate
+  near-neighbour; **the discriminator is 'exempt'**."*
+
+**What is NOT at risk, stated first so the entry is not read as louder than it is.** Clause **P7**
+matches on *"exempt from transaction limits"* and **CANARY-A**'s predicate depends on it, so §8.6's
+reading is the operative one and **no behaviour and no published number moves either way.** C6
+REVIEW 2 verified first-hand that the door opens and that the probe note reaches the attacker on
+the WORLD surface.
+
+**Why it is raised anyway, under hard rule 1.** §8.6's own probe-note row calls a drifted copy of
+this note *"the worst possible instance"* — because P7 matches on it, CANARY-A depends on it, and a
+drift *"would close the door and make arm 4 VOID BY CONSTRUCTION while every test still passed."* A
+section that names two different strings for the same discriminator is a drift that has already
+happened in the prose, on exactly that note.
+
+**Why this session did not resolve it.** `CONTEXT.md` is named under **NOT** in this session's
+fence, in terms. Hard rule 4 makes `CONTEXT.md` the law and hard rule 1 makes an ambiguity a STOP
+and a question — which is what this is. **It is not C6's**: C6 neither reads nor writes the
+discriminator, and REVIEW 2 says so explicitly (*"a C2/C14 item, not C6's"*).
+
+**Options seen:**
+  1. **C14 resolves it while cutting `prereg-v1`**, alongside §8.6's three-way consistency check —
+     the natural place, because that is when `config/` is hashed and the note is compared three
+     ways.
+  2. **An ARCH session corrects §8.6a's sentence to §8.6's reading**, since P7 makes §8.6
+     operative.
+  3. **Leave both.** ⚠️ Rejected on §8.6's own words about this note.
+
+**Default taken:** ⚠️ **NONE. RAISED AND NOT EDITED.**
+
+**RULING (architect, \<date>):** *\<pending>*
+
+---
+
+### Q-077 — ⚠️ THE TWO-PHASE REVIEW SEAL DOES NOT HOLD ON A RE-REVIEW, AND `REVIEW 3` WILL MEET IT NEXT (`OF-80`)
+**Raised by:** C6 FIX 2 (`4e1c8a92`), carrying `OPEN_FINDINGS.md` **OF-80** from C6 REVIEW 2
+(`ec8e57ad`) · **Date:** 2026-09-01 · **Status:** ⚠️ **OPEN — a PROCESS defect, recorded for the
+architect before `REVIEW_C6_3` runs** · **Class:** **A** — it decides what a review session may
+claim about its own independence.
+
+**Context.** `PROCESS.md` §10 template 2 seals `REVIEW_<N>_1.md` from a re-review's Phase 1. **It
+cannot seal that review's CONTENT, because two files Phase 1 is REQUIRED to read carry it:**
+
+* **`STATUS.md`** is item 4 of `CLAUDE.md` §1's read order, and §6 requires **every** review to
+  **append** its findings to that chunk's review-history column — which is never erased. C6's row
+  now carries `REVIEW_C6_1`'s two BLOCKERs, `REVIEW_C6_2`'s three, and this fix's answers to them.
+* **`QUESTIONS.md`** is item 6, and `Q-046`…`Q-050`, `Q-055`, `Q-075` and the `OF-87`/`OF-88`
+  rulings above were every one of them raised by a `REVIEW_C6_*` or by the FIX answering it —
+  several quoting `attacker/` module paths, function names, a docstring and a line number.
+  `REVIEW_C6_2`'s own prompt **directed** it to read `Q-046`; this session's prompt directs it to
+  read four.
+
+**Confirmed at the boundary by REVIEW 2**, which recorded that a cross-checking agent reading only
+the permitted list reported back, unprompted, `REVIEW_C6_1`'s corrected token figures and its
+five-arm differential method.
+
+⚠️ **WHY IT IS RAISED BY THE FIX SESSION AND NOT LEFT IN `OF-80`.** A finding in
+`OPEN_FINDINGS.md` is a row a chunk owner reads. **This one binds the NEXT session to run** —
+`REVIEW_C6_3` — and it binds what that session may **claim**, which is a `QUESTIONS.md` matter and
+not a backlog one. A reviewer asserting a blindness it did not have would be doing precisely the
+thing this project exists to criticise in other people's work, and `REVIEW_C6_2` said so and then
+declared its own leak rather than claiming the seal held.
+
+**Options seen:**
+  1. **A re-review seals its OWN standard first and declares the leak** — what `REVIEW_C6_2` did,
+     and it worked: the proof the two derivations stayed independent is that they **disagreed**
+     (blind crossover `k = 10/11` against the note's `7`), and resolving that disagreement is
+     BLOCKER B-1.
+  2. **`PROCESS.md` §10 template 2 gains a clause requiring the declaration** rather than leaving
+     each reviewer to volunteer it.
+  3. **Claim the seal holds.** ⚠️ Rejected on the measurement above.
+
+**Default taken:** ⚠️ **NONE — `PROCESS.md` is named under NOT in this session's fence.** Recorded
+so `REVIEW_C6_3` meets a question rather than a surprise.
+
+**RULING (architect, \<date>):** *\<pending>*
+
+---
+
+### Q-078 — ⚠️ `OF-95`'s ONE-WORD FIX IS UNREACHABLE FROM EVERY FENCE THAT HAS MET IT, AND IT IS THE MOAT
+**Raised by:** C6 FIX 2 (`4e1c8a92`), carrying `OPEN_FINDINGS.md` **OF-95** from C6 REVIEW 2
+(`ec8e57ad`) · **Date:** 2026-09-01 · **Status:** ⚠️ **OPEN — this session's prompt instructs the
+fix and its fence forbids every file the fix could touch** · **Class:** **C** — cosmetic in
+substance, and it is `CLAUDE.md` hard rule 8's *"whole moat"*.
+
+**Context.** The test is `test_gates_and_scorer_share_no_first_party_module`, in
+`tests/test_repo_invariants.py:313`. `CONTEXT.md:1909` and `PROCESS.md:1199` both publish it as
+`test_scorer_and_gates_share_no_first_party_module`. **The two names are reversed**, and hard rule 8
+calls that one line *"the whole moat"* — so it is the name a panelist greps for and does not find.
+The test itself is correct: verified by `REVIEW_C6_2` to **SKIP with a stated reason** rather than
+pass while `gates/` and `scorer/` do not exist.
+
+⚠️ **THE FIX IS ONE WORD AND THIS SESSION COULD NOT MAKE IT, IN ANY OF THE THREE PLACES IT COULD
+BE MADE.** This session's prompt lists `OF-95` under *"the mediums that are real and cheap"* and
+says *"Fix each; a wrong name on a passing test is how B-2 survived."* Its scope fence names, under
+**NOT**: `CONTEXT.md`, `PROCESS.md`, and *"any other test file"* — and `tests/test_repo_invariants.py`
+is another test file, the ONLY files in the fence being `tests/test_c6_*.py`. **All three sites of a
+three-site rename are outside the fence, so there is no partial fix available either**: renaming one
+of the three would leave the collision and add a third spelling.
+
+**Why it is a `QUESTIONS.md` entry and not only an `OPEN_FINDINGS.md` row.** This is
+`INC-28`'s class — *"for the third time, a scope fence excluded the exact file the session's own
+ruling told it to write"* — arriving for the **fifth** time by this project's own count (`Q-029`,
+`Q-033`, `Q-049`, `OF-89`), and the **first** time where the fence and the **prompt's own
+instruction** contradict each other outright rather than the fence merely being narrow. That is a
+process fact the architect decides, not a fix session.
+
+**Options seen:**
+  1. **Rename the test to `CONTEXT.md`'s published spelling** — one word in
+     `tests/test_repo_invariants.py`, leaving the two frozen-side artefacts untouched. Cheapest,
+     and it makes the published name true.
+  2. **Correct `CONTEXT.md` §16 and `PROCESS.md` §12.1's C8 row to the tree's spelling** — two
+     words, but `CONTEXT.md` is the law and §16 is not a frozen artefact.
+  3. **C8 does it while building `gates/`**, since C8 is the chunk that makes the test stop
+     skipping.
+
+**Default taken:** ⚠️ **NONE. NOT EDITED, AND REPORTED AS UNDONE IN THIS SESSION'S FINAL OUTPUT**
+rather than worked around or quietly dropped.
 
 **RULING (architect, \<date>):** *\<pending>*
