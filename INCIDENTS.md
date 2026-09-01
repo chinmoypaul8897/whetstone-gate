@@ -1791,6 +1791,23 @@ Q-043, was resolved by an **architect** session (`3af1c9d2`) and not by the sess
 found it. Raised as `QUESTIONS.md` **Q-050** with the measurement above and the exact
 one-line remedy.
 
+> ⚠️ **CLOSED 2026-09-01 by ARCH BUILD (`5c4f8e11`) in `5a515ac`, and this paragraph is APPENDED
+> rather than replacing the one above, which was true when it was written.** Q-050 was RULED
+> (*"THE ASSERTION IS CORRECTED TO NON-GROWTH"*) and the correction is one line:
+> `len(set(steady)) == 1` becomes *no element exceeds its predecessor*. **The ruling required the
+> difference to be SHOWN and not claimed, and it was, on a clone in a temp directory with
+> `PYTHONPATH` set to the clone's own `src/` so the numbers provably came from there (INC-17):**
+> the summary is 196 characters while `turns_remaining` is `20 … 10` and 195 once it is `9`, and
+> that single character is **the only change in the entire twenty-turn run** — turn 12 by 1-indexed
+> turn, turn 11 by the 0-indexed record numbering this entry uses above. **Both indexings describe
+> the same event and the discrepancy is stated rather than left for a reader to trip over.**
+> **And the flip was proved in the other direction, which is the half that makes it a correction:**
+> a one-line mutant removing the window entirely (`kept = history`) turns the NEW assertion RED at
+> every step — `[6991, 7944, … 18426]`. So the property the test is named for is still enforced.
+> ⚠️ **This entry's `Systemic guardrail` field is UNCHANGED and still says none landed**, because
+> none did: *assert the direction, not the set cardinality* remains a convention with no mechanism
+> behind it, and INC-25's own conclusion about exactly that is why it is not upgraded here.
+
 **Systemic guardrail:** ⚠️ **None landed, and the honest words are: none — accepted, because
 the file it belongs in is fenced out of this session.** What is proposed, and what this
 session can evidence rather than assert: **an equality assertion over a derived size is
@@ -1899,6 +1916,27 @@ is forward-only: every subsequent commit used `git commit -- <paths>`.** The red
 raised as `QUESTIONS.md` **Q-051** for the architect, whose own docstring already contemplates
 being *"updated citing"* a legitimate cause.
 
+> ⚠️ **RULED AND DISPOSED 2026-09-01, BY ARCH BUILD (`5c4f8e11`) IN `b3bd415` — AND `17585ab` IS
+> STILL NOT REPAIRED, WHICH IS THE RULING'S OWN ANSWER AND NOT A SHORTFALL.** Q-051 has three
+> parts: **(i)** binding from now, *every commit in every session is `git commit -- <explicit
+> paths>`* — followed here without exception, including for the one new file, which was
+> `git add`-ed first because a pathspec commit cannot reach an untracked path (**the `add` is the
+> part that never gave isolation; the pathspec on the `commit` is the part that does**).
+> **(ii)** `17585ab` is **not** repaired forward and this session's refusal to "fix" it either way
+> is **ENDORSED**: the defect is attribution, not content, and `754c0bd` is the authoritative
+> state. **(iii)** separate `git worktree`s are named as **the correct answer** and **declined
+> under time pressure with the reason recorded**, so a later reader sees a decision rather than an
+> oversight. ⚠️ **The hazard is therefore still live**, and this session's own answer to it was a
+> habit and not a mechanism: it ran alone, and checked `git log --oneline -3` and `git status
+> --porcelain` before its first edit (tree clean, last commit 22 minutes old). **The guard is green
+> again** — one SHA-keyed exception, pinned at one entry, proved still to fire on any NEW
+> reviewer-probe edit including one by `7b99a85a` on the same file. **This entry's `Missing` field
+> stays OPEN:** nothing yet compares a commit's file list against the session's fence, and that
+> check still belongs in `check_roles.py`. ⚠️ **And applying the ruling raised a NEW entry rather
+> than closing cleanly — `INC-31`:** the guard being amended lives inside a reviewer's probe file,
+> so the amendment is itself the offence the guard defines, and no SHA-keyed exception can name its
+> own commit's SHA.
+
 **Systemic guardrail:** ⚠️ **NONE LANDED, and one is genuinely available and is named at its
 true size rather than gestured at.** *(1)* **The one-line habit that removes the whole class:
 `git commit -- <paths>` instead of `git add <paths> && git commit`.** That is a convention, and
@@ -1922,5 +1960,103 @@ time it cost anything.
 under the failure rather than under the concurrency: the other session did nothing wrong, the
 shared tree is a standing condition this project already knew about, and the wrong command was
 this session's own choice made after it had written down the risk in its own words.*
+
+---
+
+## INC-31 — the guard that polices reviewer probe files LIVES IN ONE, so the ruling that amends it cannot be applied without committing the offence it defines; and the fence that authorised the amendment reproduced INC-28's class in the first fence written after that class was ruled
+
+**Date:** 2026-09-01 (found by ARCH BUILD `5c4f8e11` while applying `QUESTIONS.md` **Q-051**'s
+ruling, before any commit — the working tree was measured on a clone rather than discovered in a
+red suite here.)
+
+**Event:** Q-051's ruling directs that
+`tests/test_c1_review_2_probes.py`'s reviewer-probe guard gain a dated exception naming exactly
+commit `17585ab`, pinned at exactly one entry. **`tests/test_c1_review_2_probes.py` is itself a
+reviewer's probe file** — the guard globs `tests/test_c*_review*_probes.py`, which matches it, and
+its three existing commits all carry `df238be6` — so the session applying the ruling adds a fourth
+commit under `5c4f8e11` and the guard fires on its own file. Measured on a clone in a temp
+directory, with the remedy's second list neutered:
+
+```
+a reviewer's probe file has been touched by MORE THAN ONE SESSION.
+  tests/test_c1_review_2_probes.py: {
+    '5c4f8e11': ["4657b9d test: … the guard's own amendment"],
+    'df238be6': ['f681c08 …', '086e469 …', 'e7104a0 …']
+  }
+```
+
+⚠️ **And no SHA-keyed entry can cover it.** The exception Q-051 specifies is keyed by SHA precisely
+so it cannot become an amnesty — but the SHA of the commit that lands the exception does not exist
+when the exception is written, and a follow-up commit adding it is itself a new unexcepted commit
+on the same file. **The regress does not terminate.**
+
+**Action:** Measured it on a clone before touching anything here — `git clone --no-hardlinks` into a
+fresh OS temp directory, `PYTHONPATH` set to the clone's own `src/` and `cfg.repo_root()` printed to
+prove the measurement came from the clone (INC-17's lesson; the first attempt at this measurement
+**passed for the wrong reason**, because the installed package resolved `repo_root()` back to this
+repository and the guard walked the wrong git log). Then took a named default — a **second** pinned
+list, `GUARD_AMENDMENT_SESSIONS`, keyed by `(path, token)`, holding exactly one entry, asserting
+that its path is the file the guard is defined in — and recorded it as `QUESTIONS.md` **Q-052**
+with the three rejected alternatives and the reason each was rejected. Both lists are pinned at one
+entry by their own tests, and the guard was proved still to fire on a new commit by the excepted
+session, and on a new commit on a different reviewer probe file.
+
+**Expectation:** A ruling that an existing guard be amended should be applicable by the session it
+is given to, without that session committing the offence the guard defines. That is true of every
+other guard in this repository — `check_roles.E5_EXCEPTIONS` lives in `src/`, `NULL_IS_A_VALUE` in
+`config.py`, `TRIPWIRE_SELF_EXCLUSION` in `spec_constants.py`, **and none of those files is in the
+class its own list polices.** This one is, and nothing recorded that before the ruling was written.
+
+**Missing:** Anything that tells a fence-writer which files are **self-referential** — files whose
+own guard forbids editing them. The guard's docstring contemplates being *"updated citing"* a
+legitimate cause, so the situation was foreseen in prose; **what was not foreseen is that the
+update itself is the forbidden act**, and no test, no `check-roles` rule and no line of
+`PROCESS.md` says so. ⚠️ A cheap check exists and is one line of the guard's own walk: **a
+reviewer-probe file that contains the guard is the one file it can never police**, and a test
+asserting `__file__` is in the glob would have made that visible the day the guard was written.
+It is **not written here** — it belongs beside the guard, and writing it would be a third mechanism
+added to a file this session is already amending under a ruling that named one.
+
+**Missed:** ⚠️ **The class was ruled the same morning, in `QUESTIONS.md` Q-049, and this session's
+fence is the first one written after that ruling.** Q-049 adopts, in the architect's own words,
+*"the fence is written from the diff the architect expects, not from the tasks the architect
+wrote"*, and the remedy that *"a fence is derived from the task list, not from a guess at the
+diff."* The fence for this session names `tests/test_c1_review_2_probes.py (ONE exception list)` —
+the expected **diff** — where the **task** is *"amend a guard that forbids exactly this edit."*
+**Q-029, Q-033, INC-28 and this are four instances of one class, and the fourth landed in the fence
+written immediately after the third was ruled.** ⚠️ **A second signal was on screen and was read
+correctly only halfway:** this session's own prompt says *"this session touches files a reviewer may
+hold"* and required `git log`/`git status` to be checked before starting — which was done, and the
+tree was clean and alone. **That precaution is about concurrency; the hazard here is
+self-reference, and the two look alike enough that checking the first reads as having checked the
+second.** That is INC-30's own shape — *a mitigation aimed one layer off* — arriving in the session
+that was reading INC-30 in its prescribed order.
+
+**Diagnosis:** The guard's scope is defined by a glob over reviewer probe files and the guard lives
+inside one, so it polices its own source; combined with a SHA key chosen (correctly) to prevent an
+amnesty, that makes the amendment unrepresentable in the mechanism's own terms, and the fence
+authorising the amendment did not model the conflict because it was derived from the expected diff
+rather than from the task.
+
+**Fix:** `GUARD_AMENDMENT_SESSIONS` in `tests/test_c1_review_2_probes.py`, pinned at exactly one
+entry by `test_the_guard_amendment_list_is_exactly_this_session_on_this_file`, landed in
+**`b3bd415`** together with Q-051's own `FOREIGN_TOKEN_COMMIT_EXCEPTIONS`. ⚠️ **It is narrower than
+the alternative it replaces and wider than the list beside it, and both halves are stated:** a
+`TRIPWIRE_SELF_EXCLUSION`-shaped self-exclusion would have dropped this file from the guard for
+**every** session forever; this admits **one** named session on **one** named file on **one** named
+date, and every other session is still policed on it. But a token can be re-used by that session on
+that file where a SHA cannot, **so it is not the same guarantee as the list it sits beside**, and
+`QUESTIONS.md` Q-052 asks the architect to rule on it rather than treating a default as a decision.
+
+**Systemic guardrail:** ⚠️ **NONE LANDED FOR THE FENCE CLASS, and that is the fourth time, so the
+honest words are the ones Q-049's ruling already supplies rather than a new promise.** The remedy
+is the architect's — *derive the fence from the task list* — and it is a change to how prompts are
+written, which no test in this repository can enforce. **What IS landed is narrower and real:** the
+two exception lists are each pinned at exactly one entry, each pin asserts the **key shape** and not
+merely the count (`FOREIGN_TOKEN_COMMIT_EXCEPTIONS` requires a 40-hex SHA, `GUARD_AMENDMENT_SESSIONS`
+requires the path to be the guard's own file), and both were proved to fire — a second entry added
+in a throwaway copy turns the pin red. **What is NOT claimed:** that pinning a list is a guardrail
+against a fence being written from the wrong source. It is not; it is a guardrail against the list
+growing quietly, which is a different and smaller thing.
 
 ---
