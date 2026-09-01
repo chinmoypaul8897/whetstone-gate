@@ -2495,3 +2495,175 @@ in it wrote.** ⚠️ **And what is explicitly NOT claimed: that "use a pathspec
 It is necessary and it was followed, on every commit, by both sessions, and it did not prevent this.
 `PROCESS.md` §7a's honour-system caveat is the honest frame: **session identity is mechanised as far
 as it can be, and this is one of the places where it cannot be.**
+
+---
+
+## INC-37 — the moat test that forbids re-implementing Razorpay's ladder was SILENT on the two shapes a re-implementation actually has, and it was found because it FLAGGED A CITATION instead
+
+**Date:** 2026-09-01 (C7 BUILD 3 `9c0c6734`. The scanner is C7 BUILD 1's, present in every C7
+commit since; found while landing `QUESTIONS.md` Q-066, by the scanner rejecting a docstring
+this session had just written. Fixed in `2ba7cc4`.)
+
+**Event:** `test_the_ledger_reimplements_no_admission_rule_of_the_worlds` is the mechanical form
+of hard rule 8 available to a chunk that builds no gate: the ledger must name no
+`RAZORPAY_SEMANTICS.md` row id **in code**, because a ledger that re-implemented the world's
+admission logic would make the two agree by construction. It classified code like this:
+
+```
+line = source[: match.start()].count("\n") + 1
+code = source.splitlines()[line - 1].strip()
+if not code.startswith(("#", "*", '"', "'")) and "RS-" in code and "=" in code:
+```
+
+— a guess at what is code from **the first character of the line**, plus a requirement that the
+line contain an `=`. **Measured, by driving five shapes through the shipped scanner:**
+
+```
+   shape                                                       scanner said
+   raise RazorpayRefusal("RS-27", 0)      admission logic       SILENT
+   return REFUSALS["RS-28"]               admission logic       SILENT
+   code = "RS-27"                         admission logic       flagged
+   a DOCSTRING line citing RS-27 that contains `==`             FLAGGED
+   a COMMENT line citing RS-27 that contains `==`               silent
+```
+
+⚠️ **THE TWO SHAPES A SESSION WOULD ACTUALLY WRITE IF IT RE-IMPLEMENTED THE REFUND LADDER ARE
+THE TWO IT COULD NOT SEE**, because neither carries an `=`. `semantics.py`'s own ladder is
+fourteen consecutive `raise RazorpayRefusal("RS-nn", …)` statements, so the copy this test exists
+to forbid is *precisely* the form it was blind to. What it did catch was a **citation** — this
+package saying which documented row it is **not** deciding, which is wanted and is the reason the
+exemption exists at all.
+
+**Action:** the scan now classifies by **position, not by prefix**. `ast` gives the exact span of
+every docstring, `tokenize` the exact span of every comment, and a row id anywhere else — **including
+inside an ordinary string literal, which is exactly how `raise RazorpayRefusal("RS-27")` spells
+it** — is code. A new `test_the_admission_scanner_actually_fires` drives **eight** shapes through
+it, three code and five prose, so *"this scanner works"* is a measurement rather than an intention.
+
+**Expectation:** `PROCESS.md` §12.1's C8 row and hard rule 8 require the gate and the scorer to
+share no predicate, and `CONTEXT.md` §7's spike lesson is the reason: *"the invariant COULD NOT
+HAVE FIRED unless the gate had a bug. That is not a result; it is a definition."* A test standing
+in for that rule one package early must be able to detect the thing it forbids. This one reported
+green on a package that could have contained two of the three forbidden shapes.
+
+**Missing:** ⚠️ **A SELF-TEST ON THE SCANNER, WHICH THIS FILE ALREADY KNEW TO ASK FOR.**
+`tests/test_c7_ledger.py` has carried `test_the_purity_scanners_actually_fire` since C7 BUILD 1 —
+it plants a clock read and a float in a temporary file and asserts the float/clock scanners catch
+them — **and the admission scanner, forty lines away in the same file, had no such test.** The
+habit existed, was written down, was named, and was applied to two of the three scanners.
+
+**Missed:** ⚠️ **THE SCANNER'S OWN COMMENT STATES THE RULE IT FAILS TO IMPLEMENT, AND IT IS ON THE
+LINE ABOVE THE DEFECT.** It reads *"A row id in a DOCSTRING or comment is a citation and is
+wanted; one in code would be this package deciding what Razorpay does."* **That is the correct
+specification, in the correct words, immediately above a line that tests neither "docstring" nor
+"comment" nor "code" but "does this line start with a quote and contain an equals sign."** ⚠️ **And
+it is `INC-33`'s and `INC-34`'s class for the fourth time** — *"a checker that reads its input
+through the schema it expects"* — here a checker that reads its input through **the shape it
+imagines code has**. `INC-34`'s Systemic guardrail recorded the generalisation as **NOT landed**;
+this is the instance that generalisation would have caught.
+
+**Diagnosis:** the scanner answered *"is this line code?"* with a lexical guess about the line's
+first character and punctuation, when Python's own parser can answer it exactly; and because the
+guess was written to exempt citations, every test of it exercised the exemption rather than the
+prohibition. **A predicate validated only on the inputs it is meant to pass has not been validated.**
+
+**Fix:** `2ba7cc4`. `_docstring_and_comment_spans` (ast + tokenize) and `_row_ids_in_code`; the
+old heuristic is preserved verbatim in the test's docstring beside the measured table above, so
+the replacement cannot be read as a tidy-up. Mutant **M26** restores the heuristic and is killed
+by both the scanner and its new self-test.
+
+**Systemic guardrail:** ⚠️ **PARTIAL, AND SPLIT HONESTLY. Landed:** every scanner in this file now
+has a test that makes it fire — the two that had one, plus this one — and the new self-test carries
+the two *silent* shapes as named cases, so a future session cannot re-weaken it to a line-prefix
+check without deleting a test that says why. **NOT landed:** nothing requires a *new* scanner to
+ship with a self-test, and this defect survived two builds and one architect read because nothing
+looks for that. ⚠️ **Two of the three shapes below were also found only because this session's own
+prose tripped the scanner** — had the docstring not happened to contain an `==`, the blindness
+would have shipped into C7's review unexamined, and the review reads the tests, not the mutants.
+
+---
+
+## INC-38 — both messages that exist to explain a SCHEMA THAT MOVED were keyed to the schema they were written against, so the second move switched one of them off in silence
+
+**Date:** 2026-09-01 (C7 BUILD 3 `9c0c6734`. The branches are C7 BUILD 2's, `3d78c82`; found while
+landing `QUESTIONS.md` Q-066, **before either could be committed under the widened schema**, by the
+five-dimension sweep the build prompt ordered. Fixed in `d9c9633`.)
+
+**Event:** two code paths refuse a stored document that is **untampered but pre-Q-062**, and both
+carry a hint whose entire purpose is to stop a reviewer reading that refusal as tampering. Both
+were keyed to the literal `executed`:
+
+```
+entry.LedgerEntry.from_dict    if missing == [EXECUTED] and not extra:
+chain.rebuild                  if name == EXECUTED:
+```
+
+`QUESTIONS.md` **Q-066** added `receipt` as a **second** widened field on the same day. **Measured
+on golden 5 case A, the only such document in the repository, with the pre-fix branches restored:**
+
+```
+   path                     KeyError / missing names      hint fires?
+   from_dict                ['executed', 'receipt']       NO  - the list is no longer == [EXECUTED]
+   chain.rebuild            'receipt'                     NO  - `receipt` sorts EARLIER than
+                                                               `executed` in APPEND_FIELDS, so the
+                                                               KeyError does not even NAME `executed`
+```
+
+**So golden 5 — a hand-derived, intact, architect-authored oracle whose chain `verify` still calls
+`VALID` — would have been refused with a bare *"a stored entry does not carry this package's field
+set"* and no explanation at all.** `store.from_document`'s own docstring says why that matters:
+*"calling an untampered document tampered would put a false accusation in front of a reviewer
+verifying a published episode, which is the audience `PROCESS.md` §6a.3 exists for."*
+
+**Action:** both branches now recompute the **whole** difference and key on
+`entry.WIDENED_FIELDS` — a new tuple `(executed, receipt)` that is the single place a widened
+field is named. `chain.rebuild` no longer infers the difference from the one name `KeyError`
+happens to carry. Three tests pin it: golden 5's refusal must name `executed`, `receipt`, `Q-062`,
+`Q-066` **and** the words `PRE-Q-062 document`; and a row missing only **one** of the two must
+**not** get the hint, because no such document has ever existed and telling a reviewer otherwise
+would be a false reassurance rather than a missing one.
+
+**Expectation:** `INC-34` is the entry for exactly this class, it was written by the previous
+session about these same files, and its **Action** paragraph states the principle: *"so 'the chain
+is intact' and 'this is an entry of this project's schema' are now two answers given separately by
+the two functions that can actually answer them."* The two functions answer separately and
+correctly; it is their **explanations** that were welded to a schema snapshot.
+
+**Missing:** ⚠️ **A SECOND SCHEMA MOVE TO TEST THE FIRST ONE'S FIX AGAINST.** Every test of these
+hints was written when `executed` was the only widened field, so `[EXECUTED]` and *"the widened
+set"* were **the same value**, and no fixture could distinguish a branch keyed to one from a branch
+keyed to the other. This is `INC-34`'s **Missing** field one turn on: that entry asked for *"a
+golden case whose entries do not carry this package's field set"*, and got one; what was still
+absent is a **second** such case, differing from the first.
+
+**Missed:** ⚠️ **`INC-34`'s OWN DIAGNOSIS, ABOUT THESE TWO FUNCTIONS, IN THIS REPOSITORY, WRITTEN
+THE SAME DAY:** *"Deriving `CONTENT_FIELDS` from the dataclass made the coupling automatic and
+therefore silent."* The remedy it drew from that was to stop `verify` reading through the schema —
+and `verify` **needed no change today and reproduced all four golden-5 cases untouched**, which is
+the fix working. ⚠️ **But the same session then wrote two NEW branches that hardcoded a field name
+as a literal, which is the identical coupling made MANUAL instead of automatic, and therefore
+*even quieter*: a derived constant at least changes when the schema does.** The entry naming the
+class and the code reproducing it are the same commit, `3d78c82`, for the second time — `INC-34`'s
+**Missed** field records the first.
+
+**Diagnosis:** a message that explains *"your document is missing the field this schema added"*
+must be computed from the difference between the two schemas, and both were instead written
+against the difference **as it stood on the day they were authored**, which is a constant that
+silently stops being the difference. The second widening was eleven hours after the first.
+
+**Fix:** `d9c9633`. `entry.WIDENED_FIELDS`; both branches keyed to it; `chain.rebuild` computes
+`sorted(set(APPEND_FIELDS) - set(stored))` rather than trusting `KeyError`'s single name. Mutants
+**M23** and **M24** restore the two literals and are killed by
+`test_an_entry_rebuilt_from_a_document_refuses_an_unknown_or_missing_field` and
+`test_a_13_field_golden_5_VERIFIES_and_is_still_refused_by_the_READ_path` respectively.
+
+**Systemic guardrail:** ⚠️ **PARTIAL, AND THE HONEST HALF IS THE SECOND ONE. Landed:** there is now
+**one** place a widened field is named — `WIDENED_FIELDS` — and a sixteenth field is one entry in
+one tuple rather than an edit in three files; `test_golden_5_carries_the_THIRTEEN_pre_Q062_fields_and_this_package_carries_fifteen`
+asserts that tuple equals the difference it independently derives from the golden, so the two
+cannot drift apart silently. **NOT landed:** nothing detects the general class — *a message keyed
+to a snapshot of the thing it describes* — and `WIDENED_FIELDS` only helps for fields added
+**after** golden 5. ⚠️ **And what is explicitly NOT claimed: that this makes a third widening safe.**
+Both of today's were caught by an adversarial sweep a build prompt ordered by hand, not by anything
+in this repository, which is the same sentence `INC-34` and `INC-35` both end on and it is still
+true.
