@@ -6,6 +6,272 @@ not a record; this file is.
 
 ---
 
+## C7 — THE LEDGER — **BUILD** attempt 3 — 2026-09-01 — ⚖️ `Q-066` GRANTED and implemented · **S2 was INVISIBLE and now is not** · five rulings recorded · suite **GREEN** · **two incidents, neither shipped** · **27/27 mutants, audited** · ZERO provider calls
+
+**SESSION-TOKEN:** `9c0c6734` — **NOT in the batch.** Appended as
+`| `9c0c6734` | C7 | BUILD | 2026-09-01 |` and numbered **from the table**, which is where the
+count has to come from: a concurrent **C13 REVIEW 1** session (`b450df0a`) added its own row today
+and **that row is not this session's to write**, so it is not written here. ⚠️ **The prose running
+total elsewhere in `QUESTIONS.md` has drifted, which C13 REVIEW 1's own commit `2b19031` says
+rather than continues** — and the counting mechanism `5c4f8e11` recorded as OWED is **still owed**
+for the sixth consecutive session; `check_roles.py` is outside this fence too.
+
+**Ran concurrently with C13 REVIEW 1 (`b450df0a`) in ONE working tree.** See §8.
+
+**Token spend: ZERO.** No provider model call, no network of any kind, no lane touched, on any
+model, at any point.
+
+---
+
+### 1. THE FIVE RULINGS, RECORDED VERBATIM BEFORE A LINE MOVED — `c05483c`
+
+Hard rule 5. `Q-066`, `Q-067`, `Q-068`, `Q-069` and `Q-063`, transcribed with no word, number or
+notation altered — **including the architect's `S<n>` form for `CONTEXT.md` sections, which is NOT
+normalised to `§<n>`, because normalising is still altering.** `git log --oneline` is the
+authority: `c05483c` precedes every commit this session made to `src/` or `tests/`.
+
+**Exactly five lines elsewhere in `QUESTIONS.md` were completed** — the `Status: OPEN` line of each
+ruled question — because leaving `OPEN` beside a question that HAS been ruled makes the file assert
+something false. That is `C7 BUILD 2`'s reasoning for the one line **it** completed, applied five
+times, and **no other word of any other session's entry was touched.**
+
+⚠️ **The token row and the rulings are ONE commit rather than two**, because both edits were
+already in the working tree and `git add -p` is unavailable here — so a pathspec cannot separate
+two hunks of one file. **That is `INC-36`'s own mechanism seen from the other side**, and it is
+said here rather than left for a reader to notice the missing commit.
+
+---
+
+### 2. ⚠️ THE MEASUREMENT THAT IS THE PROOF — S2 WAS INVISIBLE
+
+Taken against the tree at **`7787e96`**, **before a line of this session's code existed.** Two
+episodes, each two refunds on `pay_x`, the second **refused BY THE GATE** — which under `Q-027` is
+an **S2 event**, because S2 fires on refunds **ISSUED**, not executed:
+
+```
+  BUILD 2, 14 content fields
+      X  receipts RCP-77 / RCP-77          S2 BREACHED
+      Y  receipts RCP-77 / RCP-DIFFERENT   S2 clean
+      both entry digests IDENTICAL; both heads
+      2e2b9ec45b20c2b069bc9855fa6f69eaa10588a2e9a36698e255fb541edb934d
+
+  BUILD 3, 15 content fields
+      X  head 2b67ce3b6eb25b40c68592d91f69a0209ca9fa15e1d68161c33e2ee733c0513a
+      Y  head 7009596f2c45b215afe75ff28883db2a0f1324eae610120b4d2b889e5eb9e95b
+      fields differing on entry 2: ['receipt'] and therefore ['hash'] — EXACTLY ONE
+      entry 1 is 42ed287c16fe5ad7… in BOTH — the control, so the difference measured
+      is the one this claims and not a shifted chain
+```
+
+**An episode that breaches a scored invariant and one that does not were the same bytes.**
+`Q-027` moved S2 onto `receipt` **precisely so the ledger could score it**, and the substrate
+could not. The pre-Q-066 head is now **pinned in the test**, recomputed from the fifteen-field body
+minus `receipt`, so the "before" is arithmetic a reviewer can re-run rather than a story.
+
+**AND `Q-066`'s OWN UNCOVERED CASE, DRIVEN THROUGH THE REAL WORLD.** `semantics.py`'s refund ladder
+puts **RS-28** (below minimum) **before RS-27** (duplicate receipt) — deliberately, and its own
+docstring says why — so a duplicate `receipt` on a below-minimum refund **never reaches the row
+that stamps `a_class` A3**. Measured: both refusals RS-28, both `a_class: null`, bodies differing
+**only** in `receipt`; strip `receipt` and the duplicate is indistinguishable from the control
+again. **The partial recovery `Q-062` recorded covers the RS-27 path and nothing before it.**
+
+---
+
+### 3. WHERE `receipt` IS READ FROM
+
+`build.receipt_of(arguments)` reads the call's own **`receipt` argument** — one of
+`create_refund`'s five real parameters, forwarded by `refunds.go:66` — off **the same log row
+`executed` is read from**, so an entry's `receipt`, `target` and `executed` are three facts about
+**one** call. **There is no `receipt=` parameter on `content_from_call` or `append_call`**, for
+exactly that reason: a caller who could pass one could pass a receipt the call did not carry.
+
+**NO DEFAULT ON ANY CONSTRUCTION PATH, and the reason is NOT `executed`'s** — stated separately in
+the code rather than folded in. `executed` has no defensible default because `False` is a claim.
+`receipt`'s natural default `None` is **also** a claim — *"this call carried no receipt"* — and it
+is **the claim that makes S2 unfireable**: a caller who forgot the argument would write a ledger in
+which every refund omitted its key, **restoring Q-066's defect by omission inside Q-066's fix.**
+Three paths refuse it three ways and all three are asserted (`INC-32`'s lesson).
+
+⚠️ **`""` IS NOT `None`.** §9.2 makes **non-emptiness** part of S2's **predicate**, which is C8's at
+replay; collapsing them in the substrate would decide C8's predicate by serialisation and would be
+**unrecoverable**, because a ledger cannot be back-filled. Asserted through the store round trip in
+all three shapes. **`notes` is NOT added and `Q-055` stands untouched**, as the ruling requires.
+
+---
+
+### 4. THE FOUR HOSTILE STRINGS — each DRIVEN, each with what happened
+
+| shape | what happened |
+|---|---|
+| a **lone surrogate** `"\ud800"` | typed **`NotCanonicalisable`**, not a traceback; **ledger and head untouched** |
+| **non-ASCII** `RCP-₹-Ω-日本` | **encoded, not escaped** (`Q-053`) — **asserted BY DIGEST** against an independently spelled `ensure_ascii=False` body, **with the escaping variant computed beside it and shown to DIFFER**, so it is a measurement of which rule is in force |
+| the **empty string** | accepted, **and NOT `None`** — a **different digest**, which is what keeps §9.2's non-emptiness clause meaningful |
+| **65,536 chars** | accepted, hashed, verifies, round-trips — a digest is fixed-width |
+
+Nine non-`str` shapes are refused at the write. ⚠️ **The asymmetry against `receipt_of` is
+deliberate and is recorded with the loss it buys:** an attacker's non-`str` becomes `None` there
+(dropping the entry would shrink a denominator — hard rule 11), so **an integer `77` sent twice is
+not scored as S2. It can only UNDER-count**, never over-count, and the world bounds it — RS-27
+compares values, not types, so the gap is confined to refunds the gate denied or the ladder refused
+earlier.
+
+---
+
+### 5. ALL FOUR GOLDEN-5 CASES REPRODUCE, AND `verify` NEEDED NO CHANGE
+
+```
+  case  description                              expected          produced
+  A     intact chain                             VALID    / null   VALID    / null   OK
+  B     CONTROL, the link broken outright        DETECTED / 2      DETECTED / 2      OK
+  C     entry 2's amount altered, hash stale     DETECTED / 2      DETECTED / 2      OK
+  D     entry 1's CONTENTS altered, hash intact  DETECTED / 1      DETECTED / 1      OK
+
+  git status --porcelain tests/goldens/   ->  EMPTY
+```
+
+⚠️ **`chain.verify` needed no change for the SECOND widening, and that is the point.** It is the
+property `INC-34`'s fix bought and **the only evidence that fix was the right one** — a
+schema-coupled verifier would have failed identically a second time. Golden 5 stays at **thirteen**;
+the package writes **fifteen**; `GOLDEN_5_CONTENT_FIELDS` keeps them apart and the asserted
+difference is now the **exact set** `{executed, receipt}` **with both positions checked**.
+
+---
+
+### 6. THE 27-MUTANT HARNESS — AND WHY 27/27 IS REPORTABLE
+
+Build 2's **seventeen re-run** plus **ten new** for `receipt`. **All 27 killed.**
+
+⚠️ **A CLEAN SWEEP IS EXACTLY THE RESULT THAT SHOULD BE DISTRUSTED, so the harness was audited
+before the number was reported.** Build 2 had two survivors on its first attempt; this one had
+none, which is either better tests or a broken harness. **Three no-op CONTROL mutants were run to
+find out, and two SURVIVED** — so the harness can still produce a survivor and 27/27 is a
+measurement. ⚠️ **The third control was killed, and it was a BAD CONTROL rather than a finding:**
+rewording the `receipt` refusal **message** fails nine assertions, because this codebase pins
+refusal messages deliberately and has since C7 BUILD 1. **It is recorded as a mis-designed control
+rather than dressed up as a discovery** — and the test was **not** loosened to make it pass, which
+would have been changing a test so a mutant survives.
+
+**Every new mutant is killed by a test that MEANS it**, named rather than counted: M18 by the
+no-default test, M19 by the type refusal, M20 by the position assertion, M21/M22 by the provenance
+test, M23/M24 by the two schema-hint tests, M25 by the golden-5 field-set test, M26 by both the
+scanner and its new self-test, M27 by all three `receipt` tests. ⚠️ **M12 is a shallow kill** (98
+failures — broad breakage rather than a test that means it), and that is said rather than counted
+as a strong one.
+
+---
+
+### 7. WHAT THE SECOND WIDENING BROKE — the five-dimension sweep
+
+| surface | what was found |
+|---|---|
+| `entry.from_dict` | hint keyed to `missing == [EXECUTED]` — **would have stopped firing**. `INC-38` |
+| `chain.rebuild` | hint keyed to `name == EXECUTED`; `receipt` sorts **earlier**, so the `KeyError` no longer names `executed` at all. **`INC-38`, and the worse half** |
+| `entry._validate` | hand-enumerates by key name and **would never have looked at `receipt`** — the prompt said to check it first, and it was the defect it was predicted to be. Explicit `str`-or-`None` check landed |
+| `chain.verify` | **no change needed.** All four golden-5 cases reproduce |
+| `chain.verify`'s INC-32 comment | said *"a smuggled **fourteenth** key"* — the ordinal named the wrong key. Respelled without one |
+| `build.entries_naming` | said *"the **fourteenth** field is available to C10"*; now names both, and states that `Q-066` moved `Q-055`'s under-count in **neither** direction |
+| `store.from_document` | its refusal named `Q-062` alone; now names both fields |
+| `tests` — the `_content` fixture, the golden-5 field-set test, the writer test, the round trip, the `append_call` TypeError test, the golden-3 derivation | each updated, and the golden-5 test **strengthened** to an exact two-element set with both positions |
+| the admission scanner | **`INC-37`** — found because this session's own prose tripped it |
+| **outside the package** | **nothing imports `whetstone_gate.ledger`**, re-measured rather than quoted, and now a kept test |
+
+---
+
+### 8. RUNNING CONCURRENTLY, AND THE `Swept:` RULE'S FIRST LIVE USE
+
+`Q-063` was **answered today** and its discipline was live from this session's **first** commit.
+Clause (i)'s diff was run and read immediately before **every** commit touching a journal; every
+result is in `docs/sessions/c7-build-3.txt` §12. ⚠️ **NOTHING WAS SWEPT** — every entry heading in
+every journal diff is this session's, and every added `Raised by:` line carries `9c0c6734`.
+
+⚠️ **AND THE RULE'S OWN CLAUSE (iii) FIRED ON THIS SESSION'S FIRST COMMIT — `Q-072`.** `c05483c`
+swept nothing, and produced **five** added `Raised by:` lines carrying foreign tokens: the **status
+lines** of the five ruled questions. **Not one is an entry.** A line-based E6 would fail a commit
+that did exactly what the process wants, and the only way to pass would be a `Swept:` line naming
+five entries that were not swept — **training sessions to write false `Swept:` lines, in the one
+field whose whole value is that it is true.** This session followed the ruling **as written** and
+labelled its declaration `Swept-adjacent`, **a word the ruling does not contain**, which is itself
+the symptom. The fix is named in `Q-072`: key E6 on **entry headings**, which is what `INC-36`
+actually describes.
+
+---
+
+### 9. ⚠️ IS THE SCHEMA CLOSED? — the question the prompt asked, answered
+
+**Every published quantity was worked against the fifteen fields. Fourteen of sixteen are
+computable from entries alone.** E1, E2, E3, S2, S2-amt, S4, the four harm components, CANARY-A,
+CANARY-B, productive actions, blocked actions per arm, the turn-indexed escape curve and §18's
+render fields.
+
+⚠️ **S1 and S3 are NOT, and no sixteenth field can fix them — `Q-071`, `OF-69`.** Both need the
+world's **initial** state: §8.6a makes **eight** payments `captured` and **three** `authorized`
+**positionally, before the episode starts**, so those amounts belong to no call and can hang on no
+entry. The stored `seed` regenerates them — **but `Q-062` rejected *"replay the world from the
+seed"* in terms**, and the DATA-versus-SEMANTICS distinction that would permit it **has never been
+drawn**. Offered as a reading; **not taken as a default.**
+
+**So: for everything an entry can carry, the schema is CLOSED.** The one thing this session would
+have the architect look at before cutting golden 5B is not a field — it is **`Q-070`**: golden 3
+carries its receipts in a **prose note**, so its own `s2_note` now asserts an answer its rows
+cannot produce.
+
+---
+
+### 10. BEFORE / AFTER, EVERY COUNT ATTRIBUTED
+
+```
+  make test    BEFORE  648 passed, 0 failed, 1 skipped, 2 deselected  (clean, 7787e96)
+               AFTER   664 passed, 0 failed, 1 skipped, 2 deselected
+  check-roles  BEFORE  17 passed, 0 failed, 4 n/a, exit 0
+               AFTER   17 passed, 0 failed, 4 n/a, exit 0   (unchanged)
+
+  the +16, attributed by file:
+    tests/test_c7_ledger.py    143 -> 159   +16   THIS SESSION
+    everything else            505 -> 505     0   untouched
+```
+
+⚠️ **NO TEST OF ANY OTHER CHUNK MOVED**, and the concurrent C13 REVIEW 1 session (`b450df0a`)
+contributed **no** test-count change in this window — its two commits are a sealed phase-1 artefact
+and a token row. **Named rather than absorbed**, as this project requires in both directions.
+
+```
+  git status --porcelain tests/goldens/   ->  EMPTY
+  whetstone_gate.__file__ = C:\Users\chinm\whetstone-gate\src\whetstone_gate\__init__.py
+  0 CR BYTES in every file this session wrote, counted as BYTES
+```
+
+---
+
+### 11. WHAT I COULD NOT DO
+
+1. **Write golden 5B, or add a `receipt` column to golden 3.** `tests/goldens/` is **read-only** to
+   a build session (hard rule 3). `Q-070`/`OF-68` is the request, and it is **HIGH**.
+2. **Close `Q-070`, `Q-071` or `Q-072`.** All three are raised, measured, and none is this
+   session's to rule.
+3. **Rename `world.harm.productive_actions`** or correct its docstring's false premise — `Q-067`
+   assigns it to **C8** and `src/whetstone_gate/world/` is outside this fence.
+4. **Land `check_roles` D3's moat assertion (`Q-069`) or E6 (`Q-063` (iii)).** C9's and C11's
+   respectively; `check_roles.py` is outside this fence. **A docstring is not a mechanism** and this
+   session does not claim otherwise.
+5. **Make the mutation harness run automatically.** §5.3 makes it a **review** deliverable. The
+   27-mutant list, its ten new entries and the **control audit** are left in the session file so
+   C7's review starts from a known floor.
+6. **Close `INC-36` structurally, or `OF-67`'s counter.** One tree per session is the operator's;
+   `Q-063` declined worktrees a second time with the reason recorded. **Sixth consecutive session
+   allocating from a counter it does not hold.**
+7. ⚠️ **`PROCESS.md` §5.4's seeded defect: this prompt, like build 1's and build 2's, contains
+   none.** C7 BUILD 1 reported this to the architect through `docs/sessions/` rather than
+   `QUESTIONS.md`, and gave the reason — that file is item 6 of every session's read order,
+   **including C7 REVIEW's**. **The same channel is used here for the same reason** and the item is
+   in `docs/sessions/c7-build-3.txt` §13.
+
+---
+
+**VERDICT: BUILT, UNREVIEWED. NO TAG WAS CUT.** Nothing here is self-certified and a fresh
+adversarial review follows.
+
+---
+
 ## C7 — THE LEDGER — **BUILD** attempt 2 — 2026-09-01 — ⚖️ `Q-062` RULED and implemented · the two digests now **DIFFER** · suite **GREEN** · **two incidents, neither shipped** · ZERO provider calls
 
 **SESSION-TOKEN:** `7d84b383` — **NOT in the batch.** Appended as
