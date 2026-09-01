@@ -23,54 +23,81 @@
   `_supported_model_names` is a lookup table merged into AgentDojo's `MODEL_NAMES`
   at `models.py:67` to answer injection tasks' *"what model are you?"*.
 
-## 2. ⚠️ THE CITATION — corrected, with both tables shown
+## 2. ⚠️ THE CITATION — **Table 2, Appendix B, `o3 High`** — with both table sets shown
 
-**`CONTEXT.md` §8.5.1 says to cite *Tables 5–7*. The headline banking pair is not in
-them.** Both halves are shown here so a reader can check the correction rather than
-take it. See `QUESTIONS.md` **Q-058**.
+**This is what `CONTEXT.md` v1.8 §8.5.1 now specifies**, and §2b below is the
+citation it replaced. Both are printed because *the project publishes the number
+that goes the wrong way*: dropping the tables that embarrass the claim is the exact
+move this submission exists to criticise. See `QUESTIONS.md` **Q-058**.
 
 Source: *Defeating Prompt Injections by Design*, arXiv **2503.18813v2** — https://arxiv.org/abs/2503.18813v2
 Read from https://arxiv.org/html/2503.18813v2 on **2026-09-01** (HTTP 200, 2,554,718 bytes), SHA-256 `b5cd7970e905f1504439c3eddb3855ab18d951d10bf806ec2f5f3baa02ca8a51`.
+⚠️ **Fetched twice, by two sessions, and the byte count and digest reproduced
+exactly.** A URL and a date identify a *request*; the digest identifies the
+*response* (`PROCESS.md` §9, `INCIDENTS.md` **INC-05**).
 
-### 2a. The figures `CONTEXT.md` §4 and §8.5 actually quote — **Table 2, Appendix B**
+### 2a. ⚠️ THE HEADLINE PAIR — **Table 2, Appendix B ("Full results tables"), `o3 High`**
 
-| Table | Base model | Row | Suite | Value |
-|---|---|---|---|---|
-| Table 2 | o3 High | CaMeL | Overall | **77.3% +/- 8.3** |
-| Table 2 | o3 High | Native Tool Calling API | Overall | **84.5% +/- 7.2** |
-| Table 2 | o3 High | CaMeL | banking | **81.2% +/- 19.1** |
-| Table 2 | o3 High | Native Tool Calling API | banking | **62.5% +/- 23.7** |
-| Table 2 | o3 High | Difference | banking | **+18.8% +/- 4.6** |
-| Table 2 | o3 High | Difference | Overall | **-7.2% +/- 1.1** |
+| Table | Appendix | Base model | Row | Suite | Value |
+|---|---|---|---|---|---|
+| Table 2 | Appendix B, Full results tables | o3 High [1] | CaMeL | Overall | **77.3% +/- 8.3** |
+| Table 2 | Appendix B, Full results tables | o3 High [1] | Native Tool Calling API | Overall | **84.5% +/- 7.2** |
+| Table 2 | Appendix B, Full results tables | o3 High [1] | CaMeL | banking | **81.2% +/- 19.1** |
+| Table 2 | Appendix B, Full results tables | o3 High [1] | Native Tool Calling API | banking | **62.5% +/- 23.7** |
+| Table 2 | Appendix B, Full results tables | o3 High [1] | Difference | banking | **+18.8% +/- 4.6** |
+| Table 2 | Appendix B, Full results tables | o3 High [1] | Difference | Overall | **-7.2% +/- 1.1** |
 
-✅ **Every number §4 states is correct, and correct for the model §4 names (`o3
-High`).** On banking CaMeL is **ahead** by the paper's own `Difference` row,
-**+18.8 % ± 4.6** — which is what §4's *"on banking alone it runs the other way"*
-asserts. Only the **table attribution** is wrong.
+**Where the base model is asserted** — ⚠️ *not always in the table:*
+1. stated in the table's own Model column
+
+✅ **Every number `CONTEXT.md` §4 and §8.5 state is correct, and correct for the
+model §4 names (`o3 High`).** On `banking` CaMeL is **ahead** by the paper's own
+`Difference` row, **+18.8 % ± 4.6** — which is what §4's *"on banking alone it runs
+the other way"* asserts. Only the **table attribution** was ever wrong, and it is
+corrected in the law rather than only here.
 
 ### 2b. What **Tables 5–7** actually say — **Appendix C, Claude 3.5 Sonnet**
 
-| Table | Base model | Row | Suite | Value |
-|---|---|---|---|---|
-| Table 5 | Claude 3.5 Sonnet | CaMeL | Banking | **75.00% +/- 21.22** |
-| Table 5 | Claude 3.5 Sonnet | Undefended model | Banking | **81.25% +/- 19.12** |
-| Table 6 | Claude 3.5 Sonnet | CaMeL | Banking | **70.83% +/- 7.42** |
-| Table 6 | Claude 3.5 Sonnet | Undefended model | Banking | **84.03% +/- 5.98** |
-| Table 7 | Claude 3.5 Sonnet | CaMeL | Overall | **0 +/- 0.0** |
-| Table 7 | Claude 3.5 Sonnet | CaMeL | Banking | **0 +/- 0.0** |
-| Table 7 | Claude 3.5 Sonnet | CaMeL (no policies) | Overall | **1 +/- 0.0** |
-| Table 7 | Claude 3.5 Sonnet | CaMeL (no policies) | Banking | **1 +/- 0.0** |
-| Table 7 | Claude 3.5 Sonnet | CaMeL (no policies) | Slack | **0 +/- 0.0** |
-| Table 7 | Claude 3.5 Sonnet | CaMeL (no policies) | Travel | **0 +/- 0.0** |
-| Table 7 | Claude 3.5 Sonnet | CaMeL (no policies) | Workspace | **0 +/- 0.0** |
+⚠️ **These were §8.5.1's citation until v1.8 and they are NOT the headline pair.**
+They are a different experiment: CaMeL against *other defences*, on a different base
+model. They are shown in full, including the two rows that run against this
+project's own claim.
 
-⚠️ In Tables 5 and 6's banking column CaMeL is **behind** the undefended model. A
-Branch-B artefact citing *"Tables 5–7, banking column"* would point a panelist at a
-table showing the opposite of the claim it is offered to support.
+| Table | Appendix | Base model | Row | Suite | Value |
+|---|---|---|---|---|---|
+| Table 5 | Appendix C, Baseline results | Claude 3.5 Sonnet [1] | CaMeL | Banking | **75.00% +/- 21.22** |
+| Table 5 | Appendix C, Baseline results | Claude 3.5 Sonnet [1] | Undefended model | Banking | **81.25% +/- 19.12** |
+| Table 6 | Appendix C, Baseline results | Claude 3.5 Sonnet [2] | CaMeL | Banking | **70.83% +/- 7.42** |
+| Table 6 | Appendix C, Baseline results | Claude 3.5 Sonnet [2] | Undefended model | Banking | **84.03% +/- 5.98** |
+| Table 7 | Appendix C, Baseline results | Claude 3.5 Sonnet [1] | CaMeL | Overall | **0 +/- 0.0** |
+| Table 7 | Appendix C, Baseline results | Claude 3.5 Sonnet [1] | CaMeL | Banking | **0 +/- 0.0** |
+| Table 7 | Appendix C, Baseline results | Claude 3.5 Sonnet [1] | CaMeL (no policies) | Overall | **1 +/- 0.0** |
+| Table 7 | Appendix C, Baseline results | Claude 3.5 Sonnet [1] | CaMeL (no policies) | Banking | **1 +/- 0.0** |
+| Table 7 | Appendix C, Baseline results | Claude 3.5 Sonnet [1] | CaMeL (no policies) | Slack | **0 +/- 0.0** |
+| Table 7 | Appendix C, Baseline results | Claude 3.5 Sonnet [1] | CaMeL (no policies) | Travel | **0 +/- 0.0** |
+| Table 7 | Appendix C, Baseline results | Claude 3.5 Sonnet [1] | CaMeL (no policies) | Workspace | **0 +/- 0.0** |
 
-✅ **Table 7 IS correctly cited, and it is P2's basis:** CaMeL blocks every attack in
-every suite (0), while **CaMeL (no policies) fails exactly one — and all of it is in
-banking.** That is `CONTEXT.md` §8.5.2's P2, reproduced exactly.
+**Where the base model is asserted** — ⚠️ *not always in the table:*
+1. NOT in Appendix C, which names no model: Figure 11's caption ("...when using Claude 3.5 Sonnet") and S6.3 ("run with Claude 3.5 Sonnet")
+2. NOT in Appendix C, which names no model: Figure 18's caption ("...utility under attack for defenses. Full results in Table 6") over S6.3's "run with Claude 3.5 Sonnet"
+
+⚠️ In Tables 5 and 6's banking column CaMeL is **behind** the undefended model —
+75.00 vs 81.25 and 70.83 vs 84.03. A Branch-B artefact citing *"Tables 5–7, banking
+column"* would point a panelist at a table showing the opposite of the claim it is
+offered to support.
+⚠️ **The likely mechanism, recorded as likely and not asserted as the cause:** Table
+5's **undefended** banking utility **81.25 % ± 19.12** sits one hundredth from
+CaMeL's Table 2 banking **81.2 % ± 19.1**.
+⚠️ **And Appendix C names no base model anywhere.** `Claude 3.5 Sonnet` comes from
+§6.3 and Figure 11's caption, which is why every row above is footnoted with **where
+its base model is asserted** rather than carrying an unsourced model name. A base
+model taken from a different section of the paper than the table is the same shape of
+claim Q-058 exists to stop — one level smaller, and in our own artefact.
+
+✅ **Table 7 IS correctly cited, and it is P2's basis, and it is RETAINED:** CaMeL
+blocks every attack in every suite (0), while **CaMeL (no policies) fails exactly
+one — and all of it is in banking.** That is `CONTEXT.md` §8.5.2's P2, reproduced
+exactly.
 
 ## 3. What this comparator does and does not claim
 

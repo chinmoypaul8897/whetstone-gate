@@ -90,15 +90,23 @@ def main() -> int:
         f"{plan.injection_task} is A5)")
     say(f"  timebox    : {plan.timebox_minutes} minutes")
     say(f"  logs       : {plan.log_root}")
-    say("  ! S8.5.1's `...+camel+secpol` is a PIPELINE NAME CaMeL emits, not a --model")
-    say("    argument. The run is TWO PASSES. See QUESTIONS.md Q-057.")
-    for step in plan.passes:
+    say("  ! `...+camel+secpol` is a PIPELINE NAME CaMeL emits, not a --model argument.")
+    say("    The run is TWO PASSES. CONTEXT.md v1.8 S8.5.1 now says so; QUESTIONS.md Q-057.")
+    say(f"  ! {plan.same_working_directory}")
+    say("  ! FLAG SPELLINGS ARE DERIVED from main.py's signature (cyclopts kebab-cases each")
+    say("    parameter name), NOT transcribed. The argv below has NEVER been executed, which")
+    say("    is why step 0 is `--help` and why step 0 is RUN-1's first action.")
+    for step in [plan.preflight, *plan.passes]:
         say("")
         say(f"    {step.label}   [spends tokens: {step.spends_tokens}]")
         say(f"      cd {step.cwd}")
         say(f"      {step.command()}")
-        say(f"      -> logs/{step.produces_pipeline_name}/")
-        say(f"      requires env var NAME(S) (never a value): {', '.join(step.env_var_names)}")
+        say(f"      purpose: {step.purpose}")
+        if step.produces_pipeline_name:
+            say(f"      -> logs/{step.produces_pipeline_name}/")
+        # ! Printed as a NUMBER, never as silence: a step that needs no key says so.
+        say(f"      env var NAME(S) required (never a value): "
+            f"{', '.join(step.env_var_names) or 'NONE - 0 keys'}")
 
     _rule("5. THE BRANCH - NOT DECIDED HERE")
     if plan.branch_is_decided:
