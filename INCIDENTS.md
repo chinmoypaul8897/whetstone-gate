@@ -3362,7 +3362,7 @@ narrower scope as if it were complete. Nothing in this repository compares a que
 contents, so a second defect under the same heading is invisible to every mechanism and visible only
 to a reader who reads to the end.
 
-**Fix:** **`<pending — filled in by this session's own later commit>`** *(this entry was written and
+**Fix:** **`778c8f2`** (the `config/` edit, its own commit, citing `Q-079`) and **`4be0b86`** (the loader-read test, without which the correction is a comment) *(this entry was written and
 committed **before** that commit existed, as hard rule 13 requires, and the SHA is filled in
 afterwards rather than invented — an invented incident has no commit.)* `config/lanes.yaml`'s
 `branch_a_condition` narrowed and `branch_b_condition` added, in a commit of its own citing `Q-079`;
@@ -3447,7 +3447,7 @@ the same remedy — so the field recorded the **remedy as designed** rather than
 and no mechanism distinguishes those two readings. `Fix:` cannot drift that way because a SHA either
 resolves or does not; `Action:` can, and did.
 
-**Fix:** **`<pending — filled in by this session's own later commit>`** *(written and committed
+**Fix:** **`0beb8ee`** *(written and committed
 **before** that commit existed, as hard rule 13 requires; the SHA is filled in afterwards rather than
 invented.)* The dated correction note appended to `Q-057`; `INC-39`'s `Action` corrected in place
 with its original words left standing.
@@ -3543,7 +3543,7 @@ commit time and deliberately ignores the index, so every byte any process writes
 between the check and the commit is swept in silently. The check and the commit read the tree at two
 different instants, and nothing holds it still in between.
 
-**Fix:** **`<pending — filled in by this session's own later commit>`** *(this entry is written and
+**Fix:** **`eb17627`** (this entry) and **`c0511ff`** (the `PROGRESS.md` record and the `STATUS.md` row). ⚠️ **No source change and no history rewrite** *(this entry is written and
 committed before that commit exists; the SHA is filled in afterwards rather than invented.)* No
 source change and no history rewrite: `e2b4778` stands, `3605d31c`'s content stands intact inside it,
 and the correction is this entry plus the `PROGRESS.md` note and the FINAL OUTPUT declaration.
@@ -3649,3 +3649,76 @@ NEW malformed trailer, on any commit, from now on"*, and the first new malformed
 comment was written was produced **by a session obeying every rule it knew about**. That is evidence
 about the parser, not about the session, and it is recorded here so the ruling on `Q-080` is made
 against it.
+
+---
+
+## INC-50 — a test written to CLOSE a mutation survivor was itself GREEN BY ACCIDENT OF ITS FIXTURE: one definition order cannot separate "keep the last" from "keep whichever is absolute", and an oracle mutant survived the whole C13 file
+
+**Date:** 2026-09-02 (C13 FIX 2, `91eb51c1`. The defective test is this session's own, landed at
+`b07365f`. Found by an **independent adversarial check of this session's own landed commit**, run
+while the session was still open. Fixed at `dfffba7`.)
+
+**Event:** `OF-100` records that `_named_functions` kept the **first** module-level definition where
+Python binds the **last**. This session fixed it (`setdefault` → assignment) and wrote
+`test_a_shadowed_module_function_resolves_to_the_definition_PYTHON_binds` to pin it, firing a fixture
+with `replay_task` defined twice — **relative first, absolute second** — and asserting the derivation
+reports `/var/logs`. The mutant it was written for (**first-wins**) dies on it, so the test looked
+sufficient and the commit said so. ⚠️ **It is not sufficient.** In that one order, *"keep the LAST
+definition"* — what Python does, and what the fix implements — and *"keep whichever definition is
+ABSOLUTE"* give the **same answer**, so the test cannot tell those two rules apart. **Measured:** an
+**ORACLE-2** mutant, replacing the module half with *"keep the definition containing `/var/logs`"* —
+a rule that is neither last-wins nor first-wins — **SURVIVED THE ENTIRE C13 FILE at `b07365f`**:
+98 passed, nothing red.
+
+**Action:** `dfffba7` adds **the mirror** — the same fixture with the two definitions **reversed**,
+asserting the derivation now reports the **relative** root, because that is the one Python binds in
+that order. The mirror is built by splitting and re-joining the existing fixture and **asserts that
+the reversal actually happened** (the absolute literal must precede the relative one), so it cannot
+silently degrade into a second copy of the case above it. Re-measured in the fresh OS temp sandbox:
+**ORACLE-2 KILLED**, **first-wins still KILLED**, control **98 passed**. `OF-100`'s disposition in
+`OPEN_FINDINGS.md` names both commits and states that the first test was insufficient, rather than
+recording a clean single-commit closure.
+
+**Expectation:** a test written specifically to close a surviving mutant should pin **the property**,
+not one instance of it. The whole finding `OF-100` records is *"the derivation follows a rule other
+than the one Python follows"* — so a fixture that cannot distinguish rules is the wrong shape for it,
+whatever it does to the one mutant that was named.
+
+**Missing:** ⚠️ **ANY REQUIREMENT THAT A KILLING TEST BE FIRED AT MORE THAN THE NAMED MUTANT.** The
+review's mutant list is a list of *known* wrong implementations; a test that kills every item on it
+can still admit a wrong implementation nobody listed. Nothing in this repository asks *"what OTHER
+rule would also pass this fixture?"* — and for a two-valued discriminator the answer is mechanical:
+**vary the discriminating input and see whether the verdict moves.** Also missing: any check that a
+new test's fixture **varies** the variable the test is named for; the fixture here holds definition
+**order** constant while claiming to test which definition wins.
+
+**Missed:** ⚠️ **THE REPOSITORY HAS RECORDED THIS EXACT CLASS THREE TIMES AND THIS SESSION HAD READ
+ALL THREE.** `INC-26` and `INC-29` are *"green by accident of the fixture"* four hundred lines apart
+in one file; `OF-82`'s own words are *"green because its fixture holds the folded state constant —
+the third instance in this one file"*, and its remedy was **to vary the thing being held constant**.
+That is precisely the remedy needed here, it was on the page, and it was applied to nothing. ⚠️ **And
+the sharper miss:** this session wrote `OF-102`'s test **order-independently on purpose** — reversing
+the tuple because *"no accident of ordering can satisfy it"* — and then, in the same commit, wrote
+`OF-100`'s test with a single fixed order. **The right instinct was used once and not carried across
+the file.**
+
+**Diagnosis:** the test was written against **the mutant** rather than against **the property**, so
+its fixture only had to make first-wins fail — and one definition order does that while leaving every
+other wrong rule that happens to agree with last-wins on that order undetected. A discriminator
+tested at a single point measures the point, not the discrimination.
+
+**Fix:** **`dfffba7`** — the mirror, with the reversal asserted; and `OPEN_FINDINGS.md`'s `OF-100`
+row and disposition amended to name both commits and to say the first was insufficient rather than
+reading as a clean closure.
+
+**Systemic guardrail:** ⚠️ **NONE IN CODE, AND THE HONEST STATEMENT IS THAT THE MECHANISM THAT
+CAUGHT THIS WAS NOT A MECHANISM.** It was an **independent adversarial check run against this
+session's own already-landed commit** — which found in minutes what the session's own mutation run,
+seven mutants and a control, could not, because that run fired exactly the mutants the review had
+named. **The cheap, general convention, named rather than built because `PROCESS.md` is outside this
+fence:** *when a test pins a rule that chooses between two candidates, fire it at BOTH orderings* —
+the same move `OF-102`'s test already makes and `OF-100`'s did not, and the same move `OF-82`'s
+remedy already required. ⚠️ **The count is four — `INC-26`, `INC-29`, `OF-82` and this — and the
+fourth happened inside a test written to close a mutation survivor, by the session closing it, in
+the same commit as another test that got it right.** That is not bad luck; it is the absence of a
+rule, and it is recorded so the ruling is made against a number.
