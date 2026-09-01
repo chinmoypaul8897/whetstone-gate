@@ -2225,3 +2225,175 @@ assertion cannot fail.** `assert chain.verify_ledger(reread).ok` passed for ever
 function accepted, and no mutant, no scan and no review step is watching for that shape. Naming
 it is all this session can do; a mutation harness over `ledger/` would catch it, and that is a
 REVIEW deliverable (`PROCESS.md` §5.3's ≥8 mutants for a `full` chunk), not a build one.
+
+---
+
+## INC-34 — the chain verifier required THIS package's content schema, so widening the schema made it disagree with the golden it must reproduce — and on the one case it still got right, it got it right for a fabricated reason
+
+**Date:** 2026-09-01 (C7 BUILD 2 `7d84b383`. Present in `6d9cd47` and every C7 commit after it;
+found **before it could be committed under the widened schema**, by the adversarial re-read
+`QUESTIONS.md` Q-062's build prompt ordered — *"Every read path, every validator and every test
+that enumerates fields is now suspect; go and look at each one before you claim green."* Fixed in
+`3d78c82`.)
+
+**Event:** `chain.verify` opened each row with
+
+```
+missing = [name for name in (*CONTENT_FIELDS, *CHAIN_FIELDS) if name not in stored]
+if missing: return ChainVerdict(DETECTED, label, "... is missing field(s) ...")
+```
+
+`CONTENT_FIELDS` is derived from the `LedgerEntry` dataclass, so the moment Q-062's ruling added
+`executed` to that dataclass the list contained it, and **every one of golden 5's twelve 13-field
+entries failed that gate at position 1** — before the `ledger_seq` check, before the link check,
+before the recomputation. **Measured on the committed golden, with the gate restored:**
+
+```
+   golden 5 case   expected            PRE-FIX produced      reason given
+   A  intact       VALID    / null     DETECTED / 1   WRONG  missing field(s) ['executed']
+   B  CONTROL      DETECTED / 2        DETECTED / 1   WRONG  missing field(s) ['executed']
+   C  altered      DETECTED / 2        DETECTED / 1   WRONG  missing field(s) ['executed']
+   D  altered prior DETECTED / 1       DETECTED / 1   "ok"   missing field(s) ['executed']
+```
+
+⚠️ **CASE D IS THE DANGEROUS ROW AND IT IS WHY THIS IS AN INCIDENT RATHER THAN A ONE-LINE FIX.**
+It returns **the right verdict at the right `ledger_seq`** — and for a reason that has nothing to
+do with what case D exists to catch. Case D is `PROCESS.md` §5.2's *named* mutation and §5.4's
+seeded defect: *an entry whose stored `prev_hash` still matches the previous entry's stored `hash`
+while that previous entry's contents have been altered.* Under the defect the verifier never
+reached the recomputation that catches it; it stopped at a schema complaint and happened to name
+the same row. **A test asserting only `(verdict, first_bad_ledger_seq)` — which is exactly what
+C7's done-when asserts — shows three red and one green, and the one green is a FALSE PASS on the
+project's most load-bearing golden case.**
+
+**Action:** `verify` now requires exactly the three keys a **chain** is made of — `ledger_seq`,
+`prev_hash`, `hash` — and hashes **whatever else the row carries**, which is the ruling's own
+*"verify() recomputes whatever each entry carries."* The schema check did not disappear: it moved
+to the two functions that build the typed object, `LedgerEntry.from_dict` and `validate_content`,
+so *"the chain is intact"* and *"this is an entry of this project's schema"* are now two answers
+given separately by the two functions that can actually answer them. `chain.rebuild`'s
+`KeyError` branch — whose message asserted *"That is a defect in this module, not in the
+document"* — was **false** the moment `verify` stopped enforcing the schema, and now raises a
+typed `LedgerEntryError` naming Q-062 and golden 5B.
+
+**Expectation:** Q-062's ruling states it as a fact: *"all four cases must still reproduce with
+their first-bad seqs, because verify() recomputes whatever each entry carries."* It does not,
+and did not, unless this line changes — the ruling described the verifier the project **needed**
+and the repository contained a different one.
+
+**Missing:** ⚠️ **A GOLDEN CASE WHOSE ENTRIES DO NOT CARRY THIS PACKAGE'S FIELD SET.** Golden 5's
+four cases are all 13-field rows, so before the ruling *every* case agreed with `CONTENT_FIELDS`
+by construction and the gate was invisible. It is `INC-32`'s **Missing** field one turn on — that
+entry recorded *"a golden case for the ADD-A-FIELD mutation"* as absent; what was also absent is a
+case for **a legitimately different schema**, which is not a mutation at all. Nothing distinguishes
+those two until a schema actually moves, and a schema moved exactly once in this project's life.
+
+**Missed:** ⚠️ **THE FIX FOR `INC-32`, TWO LINES BELOW THE DEFECT, IN A COMMENT THIS SESSION READ
+BEFORE IT EDITED THE FILE.** The body computation reads
+
+```
+# ⚠️ EVERYTHING EXCEPT THE TWO CHAIN FIELDS IS HASHED, which is the golden's hash_rule read
+# literally — "the canonicalised entry EXCLUDES prev_hash and hash" excludes those two and
+# nothing else. Selecting CONTENT_FIELDS instead would silently DROP a smuggled fourteenth
+# key from the digest ... `INCIDENTS.md` INC-32.
+```
+
+**INC-32 is the entry for `CONTENT_FIELDS` being the wrong list to read an entry through, the
+comment says so in those words, and the gate that made the same mistake is seven lines above it —
+added by the same session, in the same commit, as part of the same fix.** The defect and its own
+diagnosis shipped together. ⚠️ **And `INC-33`'s `Missed` field already named this as the general
+form** — *"a checker that reads its input through the schema it expects"* — and its `Systemic
+guardrail` recorded the generalisation as **not landed**. This is the third instance.
+
+**Diagnosis:** `verify`'s job is to read bytes somebody else wrote and say whether the chain is
+intact; it was given a second job — enforcing this package's schema — and the two have different
+correct answers the moment the schema changes. Deriving `CONTENT_FIELDS` from the dataclass made
+the coupling automatic and therefore silent.
+
+**Fix:** `3d78c82`. `verify` requires `(ledger_seq, prev_hash, hash)` only; `rebuild`'s message
+corrected; `test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq` unchanged and green,
+and `test_a_13_field_golden_5_VERIFIES_and_is_still_refused_by_the_READ_path` asserts both halves
+of the line. Measured both directions in one process, above and in `f1dc885`'s mutation run:
+restoring the gate turns case A red immediately.
+
+**Systemic guardrail:** ⚠️ **PARTIAL, AND SPLIT HONESTLY.** **Landed:** a mutation harness was run
+over this chunk — seventeen mutants, including this exact one (M7) — and it kills it; and
+`test_a_13_field_golden_5_VERIFIES_and_is_still_refused_by_the_READ_path` pins the separation of
+the two answers, so a future session cannot re-couple them without rewriting a test that says why.
+**NOT landed:** nothing in this repository *requires* that harness to run, and nothing detects the
+general class — a checker reading its input through the schema it expects — before a schema moves.
+`PROCESS.md` §5.3 makes ≥8 mutants a **review** deliverable for a `full` chunk, and this build
+session ran one voluntarily because `INC-33`'s guardrail said it was owed. **A voluntary habit is
+not a guardrail, which is the same sentence INC-33 ended on, and it is still true.**
+
+---
+
+## INC-35 — a test named "term by term" could not discriminate two of the three terms, and the proof that it could not was written by the same session, in the same module, in the docstring of the function under test
+
+**Date:** 2026-09-01 (C7 BUILD 2 `7d84b383`. Written in this session's own first draft of
+`tests/test_c7_ledger.py`; **found before that draft was committed**, by the mutation run
+`INC-33`'s Systemic guardrail recorded as owed. Fixed in `f1dc885`.)
+
+**Event:** `CONTEXT.md` §8.6a's *"productive action"* is a conjunction of three terms — *the gate
+ALLOWED*, *the world executed*, *without returning a documented Razorpay error*. The first draft
+of `test_productive_action_term_by_term_on_one_entry_per_clause` built **four real
+`LedgerEntry` objects** and asserted the answer on each. A mutation run over
+`ledger/control.py` measured what it actually caught:
+
+```
+   mutant                                                       result
+   M8  delete the `entry.verdict == ALLOWED` term               SURVIVED - 142 passed
+   M9  delete the `not entry.rejected_by_razorpay` term         SURVIVED - 142 passed
+   M13 delete the `entry.executed` term                         killed
+```
+
+**Two of the three terms could be deleted from the published definition and the whole suite stayed
+green**, including the test whose name is *"term by term"*.
+
+**Action:** the discriminating half now runs against `_NotAWritableEntry`, a three-attribute
+stand-in that violates Q-062's consistency rules on purpose, so each clause can be varied **alone**.
+The real-entry version is kept as a separate, explicitly-named-weaker test
+(`test_productive_action_on_REAL_entries_and_the_count_over_a_ledger`) whose docstring states that
+it cannot show each term is load-bearing and names the test that does. M8 and M9 are now killed.
+
+**Expectation:** hard rule 3's principle — *"A test whose expected value was produced by the code
+it tests proves nothing"* — generalises to a test whose inputs cannot separate the cases it claims
+to separate. §12.1 publishes **Productive actions/episode** as a column beside every escape number
+and §8 makes it mandatory; a definition silently reduced to one of its three clauses would keep
+that column's name and change its value.
+
+**Missing:** a mutation harness in the loop rather than beside it. This one was run by hand, on one
+file, because a previous incident asked for it; nothing invoked it, nothing recorded which mutants
+were tried, and a session that did not choose to run it would have committed the green test.
+
+**Missed:** ⚠️ **THE DOCSTRING OF THE FUNCTION UNDER TEST, WRITTEN BY THIS SESSION, IN THE SAME
+HOUR, SAYS EXACTLY WHY THE TEST CANNOT WORK.** `control.productive_action` carries:
+
+> ⚠️ **AND IT REDUCES TO `executed` ALONE — WHICH IS A THEOREM ABOUT Q-062's CONSISTENCY RULES,
+> NOT THE DEFINITION.** … over the space of **writable** entries clauses 2 and 4 are implied by
+> clause 3.
+
+**And this session also wrote `test_productive_action_reduces_to_executed_over_every_writable_entry`,
+which PROVES that reduction exhaustively over all 240 combinations — and then wrote a term-by-term
+test out of writable entries anyway.** The proof that the terms co-vary and the test that assumed
+they did not are forty lines apart in the same file, by the same author, in the same session.
+⚠️ **This is `INC-33`'s `Missed` field verbatim, one incident later:** *"the diagnosis was already
+written down, by the same session, about the same module, and was not generalised."* Q-062's own
+build prompt quoted that sentence back at this session as a warning. It arrived anyway, in the
+tests rather than in the source.
+
+**Diagnosis:** the consistency rules Q-062 requires make the three terms co-vary on every entry the
+package can write, so a test built from valid entries is structurally incapable of isolating them —
+and "build only valid objects" is otherwise such good practice that its cost here was invisible.
+
+**Fix:** `f1dc885`. `_NotAWritableEntry` plus the split into a discriminating test and a
+named-weaker one; M8 and M9 killed, verified by re-running the harness.
+
+**Systemic guardrail:** ⚠️ **NONE — ACCEPTED, because the real remedy is a review deliverable and
+saying otherwise would overstate what landed.** `PROCESS.md` §5.3 makes ≥8 mutants a **review**
+requirement for a `full` chunk, and C7's review will run its own against code it did not write,
+which is the version that counts. What this build session can leave behind is the seventeen-mutant
+list and its results in `docs/sessions/c7-build-2.txt`, so the review starts from a known floor
+rather than from zero. ⚠️ **What is explicitly NOT claimed: that running a harness once makes this
+class impossible.** It found two survivors on the first attempt in a file written by a session that
+had just read `INC-33`, which is evidence about the class rather than about this file.

@@ -511,3 +511,73 @@ have actually overlapped in this tree since it was written.
 
 **Nothing else in this file was touched.** `OF-01`…`OF-60` are exactly as their raising sessions
 left them, including both `OF-53`s.
+
+---
+
+## ⚠️ APPENDED BY C13 BUILD 2 (`3fb17baa`), 2026-09-01 — two findings, and three rows CLOSED
+
+**APPEND-ONLY, AND STRICTLY SO: not one existing row was altered, including the three this session
+CLOSES.** `OF-58`, `OF-59` and `OF-60` still read exactly as `c2b7f419` wrote them; their closures
+are recorded in prose **below** the new rows rather than by editing their `Status` cells, because a
+concurrent C7 session holds this file and rewriting another session's line is the one thing the
+concurrency rule forbids outright. ⚠️ **The cost is stated rather than hidden: a reader scanning
+only the `Status` column sees three rows still marked OPEN.** **Ids counted from the file
+immediately before this commit**, with the concurrent session's `OF-61` already in place: C13
+BUILD 2's ids start at **OF-62**.
+
+| ID | Chunk | Severity | Finding | Spec citation | Raised by | Status | Closed by (SHA) |
+|---|---|---|---|---|---|---|---|
+| **OF-62** | C13 | ⚠️ **HIGH** | ⚠️ **`Q-058` IS CORRECTED IN `CONTEXT.md` v1.8 AND FOUR OTHER ARTEFACTS STILL CARRY THE OLD CITATION — AND TWO OF THEM ARE IN `config/`, WHICH OUTRANKS `CONTEXT.md` ONCE FROZEN.** Measured by `grep -rn "Tables 5"` **after** the amendment landed: **(1)** `config/lanes.yaml:201`, `camel_comparator.branch_b_action` = *"ship as a citation of **Tables 5–7** … with the CONTEXT.md §8.5.1 reason verbatim"*; **(2)** `config/lanes.yaml:195`, the comment above it; **(3)** `PROCESS.md` §12.1's C13 done-when; **(4)** `PROCESS.md` §14's degradation rung 6. Plus `tests/test_lanes_operator_placeholders.py:141`'s docstring. ⚠️ **Rows 1–2 are different in KIND:** `config/` is a pre-registration artefact and hard rule 4 says a **frozen** one **outranks `CONTEXT.md`**. That clause is dormant today — `git rev-parse --verify prereg-v1` still fails, checked not assumed — and goes live the moment **C14 cuts the tag tonight**, at which point the project is formally bound to the citation `Q-058` ruled wrong. ⚠️ **The same key is behind `Q-057` too:** `branch_a_condition` still encodes the **un-narrowed** Branch-B trigger that v1.8 replaced with *"a cause that has been DIAGNOSED"*. **Nothing reads either key** — `grep` returns one hit, the definition — which is precisely why no test fails on it and why a **human** reads it at C14. **C13 BUILD 2 STOPPED on all four**: every one is outside its fence, which names `config/` and `PROCESS.md` under **NOT** in terms. ⚠️ **The generalisable half:** the ruling governs *how a figure is cited* and says nothing about *how many copies of a citation exist*; four survived the correction in three file classes because **no mechanism knows a citation has copies**. `BRANCH_B.md` parses its citation from source; nothing else does. **A grep for the superseded string, run as a test, catches all four in one line.** `Q-064`. | `CLAUDE.md` hard rule 4; hard rule 1; `CONTEXT.md` §15.0, §8.5.1; `PROCESS.md` §9, §12.1, §14 | **C13 BUILD 2 (`3fb17baa`)** | ⚠️ **OPEN — DUE BEFORE `prereg-v1`. It is legal today and illegal tomorrow** | — |
+| **OF-63** | C13 | LOW | **`CONTEXT.md` v1.8 has no row in `CONTEXT.md`'s own Change log**, which states that *"every change to this file is a numbered row here, authored by the architect and by nobody else"* and carries rows for v1.1–v1.7. Two architect instructions collide: that clause, and this session's *"THREE EDITS. NOTHING ELSE IN THE FILE MOVES"*. The session took the reading both point at and **did not write the row**. The amendment is otherwise fully recorded — the version line carries `2026-09-01, Q-057/Q-058`, `QUESTIONS.md` carries both rulings verbatim, and `2b376ee` states all three edits with CR counts before and after — so nothing is lost; what is missing is the row **where the file itself directs a reader to look**, and a reader trusting the Change log would conclude the file is still v1.7. **One line, and the only part of this amendment a session could not write.** `Q-065`. | `CONTEXT.md` Change log; `PROCESS.md` §2; `CLAUDE.md` hard rule 2 | **C13 BUILD 2 (`3fb17baa`)** | **OPEN** | — |
+
+### Three rows CLOSED by this session, stated here because a status that is only in a commit message is not a status
+
+* **`OF-58` — CLOSED** by `28555a6`. `Q-061` ruled the **test** wrong and `config/` right, and the
+  equality is gone. What replaced it is the invariant that survives the set shrinking to empty at
+  `prereg-v1`: no NEW key drifts in, every remaining sentinel is OWNED, no key changes hands, and
+  another chunk's key is asserted **still present by name**. Fired at three fixtures in `tmp_path`.
+  ⚠️ **What is NOT closed is the CLASS** this row's last sentence names — `Q-043`, `Q-051` and
+  `Q-061` are three tests written as equalities over sets the plan requires to change, and only one
+  of the three is fixed here. The other two are in files C13's fence names under **NOT**.
+* **`OF-59` — CLOSED** by `2b376ee` (the law) and `ef61362` (the artefact). `CONTEXT.md` is v1.8 and
+  §8.5.1 cites **Table 2, Appendix B, `o3 High`**; `BRANCH_B.md` publishes that pair as the headline
+  and **still prints Tables 5–7 in full**, including the four rows where CaMeL is *behind* the
+  undefended model, because the project publishes the number that goes the wrong way. Table 7 is
+  **retained** as P2's citation. ⚠️ **The residue is `OF-62` above** — four copies of the old
+  citation outlived the correction.
+* **`OF-60` — CLOSED** by `2b376ee`. §8.5.1's Branch A now states the **two passes**, the
+  same-working-directory requirement, and the *dispatch-succeeds* hazard; Branch B's trigger is
+  narrowed to a **diagnosed** cause. The harness was already correct; the law now agrees with it,
+  and `cli_flags()` makes *"the flag spellings are derived from `main.py`'s signature"* a parsed
+  property rather than a sentence in a report.
+
+**Nothing else in this file was touched.** `OF-01`…`OF-61` are exactly as their raising sessions
+left them, including both `OF-53`s and `OF-56`'s reservation.
+
+---
+
+## ⚠️ APPENDED BY C7 BUILD 2 (`7d84b383`), 2026-09-01 — OF-64…OF-67, each with an owner and a deadline
+
+**APPEND-ONLY. No existing row was altered.** ⚠️ **The ids are `OF-64`…`OF-67` because the
+concurrent C13 BUILD 2 session (`3fb17baa`) landed `OF-62` and `OF-63` while this session was
+building, and this file was re-read immediately before the append.** That is the shared-counter
+class for the **fourth** consecutive time — see `Q-066`…`Q-069`'s preamble, where the same re-read
+caught a **live collision** in `QUESTIONS.md` rather than a near-miss: this session's four entries
+were drafted as `Q-064`…`Q-067` and both of the first two numbers were already taken. **The
+guardrail is still missing and `OF-67` is the row for it.**
+
+⚠️ **These are raised by a BUILD session, which is unusual and is said plainly**, as C13's own
+append says of its three. `PROCESS.md` §11 gives this file to reviews. All four are carried here
+anyway because each has a **deadline in another chunk** and would otherwise live only in
+`QUESTIONS.md`, which `CONTEXT.md` §20 does not require to be empty before submission — and this
+file is what C19's done-when reads.
+
+| ID | Chunk | Severity | Finding | Spec citation | Raised by | Status | Closed by (SHA) |
+|---|---|---|---|---|---|---|---|
+| **OF-64** | C8, C9 | **HIGH** | ⚠️ **`whetstone_gate.ledger` will be in BOTH the gate's and the scorer's transitive import closure, and `check_roles` **D3**'s `MOAT_ALLOW_LIST` is `frozenset()` — pinned empty by `tests/test_c0_fix_probes.py`.** C8's card builds the scorer on *"the local chain"*; C9's golden 9 is *"one hand-built **ledger prefix** plus one candidate action"* and §8.6a's **arm 2S** folded state is *"recomputed from the ledger before every gate call"*. **So both read `LedgerEntry`, and `ledger/__init__.py` re-exports every module in the package**, so importing the root pulls `chain`, `entry`, `build`, `store` and `control` in together — D3 resolves `from whetstone_gate.ledger import X` to `whetstone_gate.ledger`, making **the package** the shared module. ⚠️ **NOT created by Q-062 — C7 BUILD 1 shipped the package and the exposure — but SHARPENED by it**, because `ledger.control` is unambiguously *predicate logic* and hard rule 8's allow-list is *"pure value types … that **carry no predicate logic**"*. **`whetstone_gate.ledger` can never qualify as written.** What C7 could do it did: `control.py` is a separate module rather than methods on `LedgerEntry`, its docstring states the boundary and says C7 **cannot test it** because no gate exists, and `test_the_ledger_reimplements_no_admission_rule_of_the_worlds` asserts the half C7 *can* test. **The remedy is a module layout, not a line**, and `Q-015` already refused the cheap option (allow-listing a package *"would make D3 permanently blind"*). `Q-069`. | hard rule 8; `PROCESS.md` §12.1 C8/C9 rows; `CONTEXT.md` §7, §8.6a; `Q-015` | **C7 BUILD 2 (`7d84b383`)** | ⚠️ **OPEN — DUE BEFORE C8 AND C9 ARE BUILT**, and both are imminent | — |
+| **OF-65** | C10, C18 | **MEDIUM** | ⚠️ **Two implementations of `CONTEXT.md` §8.6a's ONE "productive action" definition now exist and they disagree by exactly the number of executed reads.** `world.harm.productive_actions` counts **harm records** — §12.2 writes one only for a **money action** — and `ledger.control.productive_actions` counts **entries**, one per call, because §8.6a says *"any tool call"* and the word *money* is absent. **Measured on a four-call episode: world-side 1, ledger-side 3.** ⚠️ **NEITHER GOLDEN DISCRIMINATES THEM** — golden 3's ledger is five money actions and both return its hand-computed **3**, and `tests/test_c4_goldens.py` and `test_productive_action_reproduces_GOLDEN_3s_count_of_three` each pin one implementation to that same figure. **§12.1 publishes this as a column beside every escape number and §8 makes it MANDATORY alongside every result**, so which reading ships changes a published number. C7 implemented §8.6a **verbatim, term by term** (hard rule 4: `CONTEXT.md` outranks the code), measured the divergence in `test_the_two_productive_action_counts_diverge_on_reads`, and did **not** narrow the specification to match the existing code or edit that code, which is outside its fence. `Q-067`. | `CONTEXT.md` §8, §8.6a, §12.1; hard rule 4 | **C7 BUILD 2 (`7d84b383`)** | ⚠️ **OPEN — DUE BEFORE C18 PRINTS THE COLUMN**, and before C10 calibrates anything reading it | — |
+| **OF-66** | C8, C18 | **LOW** | **Two gaps `Q-062`'s ruling left open, kept alive here because a gap recorded only inside a question now marked CLOSED is a gap nobody re-reads.** ⚠️ **(a) `receipt` is on no entry** — Q-062 named it as *"a second instance of the same root cause"* and its own option 1 read *"`executed: bool`, **and probably `receipt: str | null`**"*; the ruling took the first half. `Q-027` moved S2 to **ISSUE** precisely so the ledger could score it, so the uncovered case — a duplicate `receipt` on a refund the world refuses **earlier in its ladder**, where no `a_class` A3 is assigned — is that ruling's own purpose not reaching the substrate. **If a fifteenth field is ever granted it should be granted BEFORE golden 5B is cut**, not after. `Q-066`. ⚠️ **(b) the three refusal sources are a partition for MONEY ACTIONS and a residual bucket for READS**: a `fetch_payment` Razorpay refuses (RS-52) writes no harm record, so `rejected_by_razorpay` is `false` and the entry is byte-identical to a tool-layer refusal. **Measured, driven through the real world.** The control, the four harm components, CANARY-A and CANARY-B are all **unaffected** and each is asserted; a published **breakdown by refusal source** would over-attribute to the tool layer. `Q-068`. | `CONTEXT.md` §9.2 (S2), §10.1, §12.2; `Q-027`; `Q-062` | **C7 BUILD 2 (`7d84b383`)** | **OPEN** — (a) due before C8 scores S2; (b) due only if C18 prints a source breakdown | — |
+| **OF-67** | process | **MEDIUM** | ⚠️ **THE SHARED `Q-`/`OF-`/`INC-` COUNTER HAS NO MECHANISM, AND THIS IS ITS FOURTH CONSECUTIVE INSTANCE — THE FIRST IN WHICH THE DRAFTED NUMBERS WERE ALREADY TAKEN RATHER THAN MERELY AT RISK.** `ARCH UNBLOCK 2`'s words: *"two sessions allocating from one counter neither of them holds … INC-30's shared-tree hazard in a dress that needs no git index at all."* The tally: the **first** cost the two duplicate `OF-53` rows; the **second** (`Q-062`, drafted `Q-056`) and **third** (`OF-61`, drafted `OF-58`) were near-misses; **this one** — C7 BUILD 2's four entries drafted as `Q-064`…`Q-067`, with `Q-064` and `Q-065` landed by C13 BUILD 2 mid-draft — was a **live collision**, and these very rows were drafted as `OF-62`/`OF-63`, which C13 also took. **Every one was caught by the same non-mechanism: a session re-reading a file it had already read.** ⚠️ **A related mechanism is separately owed and has now been carried in prose by FIVE consecutive sessions**: `5c4f8e11`'s *"`check_roles.py` parses this table for E1 and could count the rows outside the batch itself"*, for the `## Session tokens` self-recorded-row count. **Neither is this chunk's to write** — `check_roles.py` is outside every recent fence — and both are re-declared as OWED rather than gestured at. **Four instances is a rate, not an anecdote.** | `PROCESS.md` §7a, §11; `INCIDENTS.md` INC-30; `Q-051`; `Q-062`; `OF-61` | **C7 BUILD 2 (`7d84b383`)** | ⚠️ **OPEN — no owner and no deadline, which is the finding** | — |
+
+⚠️ **NOTHING ELSE IN THIS FILE WAS TOUCHED.** `OF-01`…`OF-63` are exactly as their raising
+sessions left them, including both `OF-53`s and the reserved `OF-56`.
