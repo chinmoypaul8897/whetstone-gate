@@ -452,6 +452,62 @@ def test_p6_every_money_key_obeys_paise_equals_rupees_times_one_hundred():
 # ── the evidence this review's own claims rest on, kept executable ────────────────────
 
 
+#: ⚠️ **THE ONE COMMIT THAT MAY CARRY A FOREIGN TOKEN ON A REVIEWER'S PROBE FILE.**
+#:
+#: Keyed by ``(path, full 40-hex SHA)`` and **never by token**, and the difference is the
+#: whole point. A token-keyed entry would let *every* commit that session ever makes on that
+#: file through — that is an **amnesty**. A SHA-keyed entry admits exactly one commit that
+#: already exists and can never admit a second: a new edit produces a new SHA, which is not
+#: on this list, and the guard below fires. Full SHAs, never abbreviations, for the reason
+#: ``check_roles.E5_EXCEPTIONS`` states: an abbreviation can collide.
+#:
+#: Pinned at exactly one entry by
+#: :func:`test_the_foreign_token_exception_list_is_exactly_the_one_INC_30_commit`, the same
+#: instrument as ``E5_EXCEPTIONS`` (pinned at 4), ``NULL_IS_A_VALUE`` (2) and
+#: ``TRIPWIRE_SELF_EXCLUSION`` (1): widening it must require editing an assertion a review
+#: will see.
+FOREIGN_TOKEN_COMMIT_EXCEPTIONS: dict[tuple[str, str], str] = {
+    ("tests/test_c4_review_probes.py", "17585ab09c5517c9f1af8cac30481fa8fa349e75"): (
+        "2026-09-01 — QUESTIONS.md Q-051 RULED, INCIDENTS.md INC-30. A C4 REVIEW session "
+        "(0852ea56) was writing into the same working tree while C6 FIX (7b99a85a) ran, and "
+        "`git commit` takes its scope from the shared INDEX, not from the preceding "
+        "`git add` — so 17585ab swept up five files that were not its own, this one among "
+        "them. The defect is ATTRIBUTION, not content: nothing was lost or altered and "
+        "0852ea56's own 754c0bd, three minutes later, is the authoritative state. Not "
+        "repaired forward — a rewrite is forbidden by CLAUDE.md §5 and would rewrite ANOTHER "
+        "session's commits, and a revert would add a THIRD commit touching this file under "
+        "the wrong token. The ruling's binding remedy is forward-only and is a habit, not a "
+        "waiver: every commit in every session is now `git commit -- <explicit paths>`."
+    ),
+}
+
+#: ⚠️ **A GUARD CANNOT POLICE THE FILE IT IS DEFINED IN, AND THIS SAYS SO OUT LOUD RATHER
+#: THAN LEAVING IT UNSTATED.**
+#:
+#: This module *is* a reviewer's probe file, so the session that lands the exception above
+#: necessarily commits to it under its own token — and the SHA that would except that commit
+#: **does not exist when the exception naming it must be written**. Keying it by SHA is
+#: therefore not merely undesirable here, it is impossible: the regress does not terminate.
+#: So this second list is keyed by ``(path, token)``, and it is a strictly narrower thing
+#: than the self-exclusion it replaces: ``TRIPWIRE_SELF_EXCLUSION``'s shape would drop this
+#: file from the guard's scope **permanently and for every session**, whereas this admits
+#: one named session on one named file on one named date and leaves every other session
+#: still policed on it.
+#:
+#: ⚠️ **This list is the architect's to widen, not a session's.** It is pinned at exactly one
+#: entry by :func:`test_the_guard_amendment_list_is_exactly_this_session_on_this_file`, and
+#: `QUESTIONS.md` **Q-052** records that it was introduced by a default this session took —
+#: the fence that authorised the exception did not anticipate that applying it modifies a
+#: reviewer's probe file — with the three options seen and the reason this one was chosen.
+GUARD_AMENDMENT_SESSIONS: dict[tuple[str, str], str] = {
+    ("tests/test_c1_review_2_probes.py", "5c4f8e11"): (
+        "2026-09-01 — the ARCH BUILD session that applied QUESTIONS.md Q-051's ruling. It "
+        "could not add the exception above without committing to the file the guard lives "
+        "in, and no SHA-keyed entry can cover its own commit. QUESTIONS.md Q-052."
+    ),
+}
+
+
 def test_no_reviewer_probe_file_has_ever_been_edited_by_a_later_session(repo_root):
     """⚠️ **HARD RULE 6, MADE MECHANICAL.**
 
@@ -482,6 +538,17 @@ def test_no_reviewer_probe_file_has_ever_been_edited_by_a_later_session(repo_roo
     partition probe. When that happens the edit is made by *a review session*, deliberately,
     and this assertion is updated citing it. What it forbids is a **fix** session doing it
     quietly to get green.
+
+    ⚠️ **AND ONE SUCH REASON HAS NOW ARISEN, SO THE DOCSTRING ABOVE IS NO LONGER
+    HYPOTHETICAL.** ``QUESTIONS.md`` **Q-051** / ``INCIDENTS.md`` **INC-30**: a git-index race
+    between two sessions sharing one working tree put C6 FIX's token on **one** commit of
+    ``tests/test_c4_review_probes.py``. The exception is
+    :data:`FOREIGN_TOKEN_COMMIT_EXCEPTIONS`, it names that **one 40-hex SHA** and no token,
+    and it is pinned at one entry. ⚠️ **It is an exception and not an amnesty, and the
+    difference is mechanical rather than asserted:** a *new* commit on that file — under
+    ``7b99a85a`` or any other foreign token — has a SHA that is not on the list, so this
+    assertion still fires. ``tests/test_c1_review_2_probes.py`` proves that in both
+    directions.
     """
     probes = sorted(repo_root.glob("tests/test_c*_review*_probes.py"))
     assert len(probes) >= 5, f"only {len(probes)} reviewer probe files found: {probes}"
@@ -490,7 +557,7 @@ def test_no_reviewer_probe_file_has_ever_been_edited_by_a_later_session(repo_roo
     for path in probes:
         rel = path.relative_to(repo_root).as_posix()
         out = subprocess.run(
-            ["git", "log", "--format=%h%x00%s%x00%b%x01", "--", rel],
+            ["git", "log", "--format=%H%x00%s%x00%b%x01", "--", rel],
             cwd=repo_root,
             capture_output=True,
             text=True,
@@ -503,9 +570,16 @@ def test_no_reviewer_probe_file_has_ever_been_edited_by_a_later_session(repo_roo
                 continue
             sha, subject, body = (entry.strip().split("\x00") + ["", ""])[:3]
             found = re.search(r"^Session-Token:\s*([0-9a-f]{8})\s*$", body, re.M)
-            tokens.setdefault(found.group(1) if found else "(none)", []).append(
-                f"{sha} {subject[:60]}"
-            )
+            token = found.group(1) if found else "(none)"
+            # ⚠️ Two pinned lists, and NEITHER is keyed the way the other is. The first names
+            # a SHA, so it can never admit a second commit; the second names a session on the
+            # one file no SHA-keyed entry could ever cover — the file this guard is defined
+            # in. Both are pinned at exactly one entry by the two tests below.
+            if (rel, sha) in FOREIGN_TOKEN_COMMIT_EXCEPTIONS:
+                continue
+            if (rel, token) in GUARD_AMENDMENT_SESSIONS:
+                continue
+            tokens.setdefault(token, []).append(f"{sha[:7]} {subject[:60]}")
         if len(tokens) > 1:
             offenders[rel] = tokens
 
@@ -515,3 +589,62 @@ def test_no_reviewer_probe_file_has_ever_been_edited_by_a_later_session(repo_roo
         "Session-Token trailer is what distinguishes it from the review refining its own "
         "work:\n  " + "\n  ".join(f"{k}: {v}" for k, v in offenders.items())
     )
+
+
+def test_the_foreign_token_exception_list_is_exactly_the_one_INC_30_commit():
+    """⚠️ **An exception list is where a check dies quietly. This one is pinned at ONE.**
+
+    Same instrument, and the same reason, as ``check_roles.E5_EXCEPTIONS`` (pinned at 4),
+    ``cfg.NULL_IS_A_VALUE`` (2) and ``TRIPWIRE_SELF_EXCLUSION`` (1): widening it must require
+    editing an assertion a review will see, so it cannot grow into an amnesty by accretion.
+
+    ⚠️ **The key shape is asserted, not just the count.** A 40-hex SHA admits one commit that
+    already exists; a token would admit every commit that session ever makes on that file,
+    which is the amnesty this list must not become. ``Q-051``'s ruling is quoted in the
+    entry's own reason string, and it is asserted to be there — an exception that states no
+    ruling is an assertion someone edited.
+    """
+    assert len(FOREIGN_TOKEN_COMMIT_EXCEPTIONS) == 1, (
+        f"the reviewer-probe exception list holds {len(FOREIGN_TOKEN_COMMIT_EXCEPTIONS)} "
+        f"entries, not 1. Adding one is an architect ruling in QUESTIONS.md, not a code "
+        f"change."
+    )
+    assert set(FOREIGN_TOKEN_COMMIT_EXCEPTIONS) == {
+        ("tests/test_c4_review_probes.py", "17585ab09c5517c9f1af8cac30481fa8fa349e75")
+    }
+    for (rel, sha), reason in FOREIGN_TOKEN_COMMIT_EXCEPTIONS.items():
+        assert re.fullmatch(r"[0-9a-f]{40}", sha), (
+            f"{rel} is excepted by {sha!r}, which is not a full 40-hex SHA. An abbreviation "
+            f"can collide, and a TOKEN would be an amnesty rather than an exception."
+        )
+        assert "Q-051" in reason and "INC-30" in reason, (
+            f"{sha[:7]}'s exception cites no ruling: {reason!r}"
+        )
+        assert "2026-09-01" in reason, f"{sha[:7]}'s exception is undated: {reason!r}"
+
+
+def test_the_guard_amendment_list_is_exactly_this_session_on_this_file():
+    """⚠️ **The narrower half of a self-reference this guard cannot escape, pinned at ONE.**
+
+    A guard living inside a reviewer's probe file cannot be amended without a later session
+    committing to that file, and no SHA-keyed exception can name its own commit's SHA. So
+    this second list is keyed by ``(path, token)`` — and it is deliberately **not** the
+    ``TRIPWIRE_SELF_EXCLUSION`` shape, which would drop this file from the guard's scope for
+    every session forever. One session, one file, one date. Every other session is still
+    policed on this file, and this test is what makes widening it visible.
+
+    `QUESTIONS.md` **Q-052** records the default and the options seen.
+    """
+    assert len(GUARD_AMENDMENT_SESSIONS) == 1, (
+        f"the guard-amendment list holds {len(GUARD_AMENDMENT_SESSIONS)} entries, not 1. It "
+        f"is the architect's to widen, in QUESTIONS.md, and never a session's."
+    )
+    assert set(GUARD_AMENDMENT_SESSIONS) == {("tests/test_c1_review_2_probes.py", "5c4f8e11")}
+    for (rel, token), reason in GUARD_AMENDMENT_SESSIONS.items():
+        assert rel == "tests/test_c1_review_2_probes.py", (
+            f"this list may only ever name the file the guard is DEFINED in; {rel} is not it, "
+            f"and excusing any other file here is the amnesty FOREIGN_TOKEN_COMMIT_EXCEPTIONS "
+            f"exists to refuse."
+        )
+        assert re.fullmatch(r"[0-9a-f]{8}", token)
+        assert "Q-052" in reason and "2026-09-01" in reason
