@@ -24,9 +24,11 @@ asserted about the shipped code's intentions.
 from __future__ import annotations
 
 import ast
+import io
 import json
 import re
 import subprocess
+import tokenize
 from dataclasses import FrozenInstanceError
 from pathlib import Path
 from typing import Any
@@ -49,6 +51,7 @@ from whetstone_gate.ledger.entry import (
     GOLDEN_5_CONTENT_FIELDS,
     INDETERMINATE,
     NO_TARGET,
+    RECEIPT,
     VERDICTS,
     VERDICTS_BY_ARM,
     LedgerEntry,
@@ -148,6 +151,15 @@ def _content(**overrides: Any) -> dict[str, Any]:
         "verdict": ALLOWED,
         "tool": surface.CREATE_REFUND,
         "target": NO_TARGET,
+        # ⚠️ ``receipt`` DOES get a fixed default here and ``executed`` does not, and the
+        # difference is not laziness. `QUESTIONS.md` Q-066's field is **independent of every
+        # other field** — no consistency rule relates it to `verdict`, `executed` or the harm
+        # components — so a fixed ``None`` cannot make a test fail for a reason unrelated to
+        # what it varies, which is the hazard the derived ``executed`` default below exists to
+        # avoid. **Every test that is ABOUT ``receipt`` passes it explicitly**, and
+        # ``Ledger.append`` itself still has no default — see
+        # ``test_append_has_no_default_for_receipt_and_omitting_it_is_a_TypeError``.
+        "receipt": None,
         "amount_paise": 1,
         "a_class": None,
         "rejected_by_razorpay": False,
@@ -197,37 +209,55 @@ def test_the_goldens_hash_rule_is_the_rule_this_package_implements(golden: dict)
     assert set(excluded.groups()) == set(CHAIN_FIELDS)
 
 
-def test_golden_5_carries_the_THIRTEEN_pre_Q062_fields_and_this_package_carries_fourteen(
+def test_golden_5_carries_the_THIRTEEN_pre_Q062_fields_and_this_package_carries_fifteen(
     golden: dict,
 ) -> None:
-    """⚠️ **GOLDEN 5 IS PINNED AT THIRTEEN AND IS NOT REOPENED — `QUESTIONS.md` Q-062's ruling.**
+    """⚠️ **GOLDEN 5 IS PINNED AT THIRTEEN AND IS NOT REOPENED — BY EITHER RULING.**
 
     Until 2026-09-01 this test read ``list(stored) == list(CONTENT_FIELDS) + list(CHAIN_FIELDS)``
     and its docstring said *"a fourteenth would change all twelve of golden 5's hashes"*. **The
-    fourteenth landed and golden 5's hashes did not change**, because the ruling scopes golden 5
-    as `PROCESS.md` §5.2 scopes it — a **tamper test, a VERIFIER oracle** — and ``verify``
-    recomputes whatever each entry carries.
+    fourteenth landed, then the fifteenth, and golden 5's hashes did not change either time**,
+    because the rulings scope golden 5 as `PROCESS.md` §5.2 scopes it — a **tamper test, a
+    VERIFIER oracle** — and ``verify`` recomputes whatever each entry carries.
 
     ⚠️ **THE ASSERTION IS AGAINST A CONSTANT THAT CANNOT DRIFT WITH THE CODE.**
     :data:`~whetstone_gate.ledger.entry.GOLDEN_5_CONTENT_FIELDS` is the thirteen, and the test
     **also** asserts what the difference is, so this cannot silently become vacuous by the schema
     changing again: a golden pinned against a set derived from the code under test pins nothing.
+
+    ⚠️ **AND THE DIFFERENCE IS NOW ASSERTED AS AN EXACT SET OF TWO, WITH BOTH POSITIONS**, which
+    is the strengthening the second widening earns. Q-062 fixed ``executed`` *"IMMEDIATELY AFTER
+    `rejected_by_razorpay`"* and Q-066 fixed ``receipt`` *"IMMEDIATELY AFTER `target`"*; the
+    digest sorts keys so neither position moves a hash, but the stored document's key order is
+    what a reviewer diffs by eye and both rulings fixed it on purpose. **A test that checked
+    only the count would pass on a schema with the two fields in the wrong places.**
     """
     thirteen = list(GOLDEN_5_CONTENT_FIELDS) + list(CHAIN_FIELDS)
+    assert len(thirteen) == 15, "golden 5's rows are 13 content fields plus the 2 chain fields"
     for case in golden["cases"]:
         for stored in case["ledger"]:
             assert list(stored) == thirteen, (
                 f"case {case['case']} entry {stored.get('ledger_seq')} does not carry golden "
                 f"5's pre-Q-062 thirteen content fields, in this order"
             )
-    assert set(CONTENT_FIELDS) - set(GOLDEN_5_CONTENT_FIELDS) == {EXECUTED}, (
-        "this package's content set differs from golden 5's by something other than the one "
-        "field Q-062 ruled in; the ruling names exactly `executed` and nothing else"
+
+    assert len(CONTENT_FIELDS) == 15, "Q-062 made it fourteen and Q-066 made it fifteen"
+    assert set(CONTENT_FIELDS) - set(GOLDEN_5_CONTENT_FIELDS) == {EXECUTED, RECEIPT}, (
+        "this package's content set differs from golden 5's by something other than the two "
+        "fields the rulings named; Q-062 names exactly `executed`, Q-066 names exactly "
+        "`receipt`, and nothing else was added on either day"
     )
+    assert set(entry_mod.WIDENED_FIELDS) == {EXECUTED, RECEIPT}, (
+        "WIDENED_FIELDS is what three code paths now key their schema-change messages to; it "
+        "must be the same two fields this test derives independently from the golden"
+    )
+
     assert CONTENT_FIELDS.index(EXECUTED) == CONTENT_FIELDS.index("rejected_by_razorpay") + 1, (
-        "Q-062: 'positioned IMMEDIATELY AFTER `rejected_by_razorpay`'. The digest sorts keys "
-        "so position does not move a hash, but the stored document's key order is what a "
-        "reviewer diffs by eye, and the ruling fixed it."
+        "Q-062: 'positioned IMMEDIATELY AFTER `rejected_by_razorpay`'."
+    )
+    assert CONTENT_FIELDS.index(RECEIPT) == CONTENT_FIELDS.index("target") + 1, (
+        "Q-066: '`receipt`, `str | null`, positioned IMMEDIATELY AFTER `target`'. It sits "
+        "beside `target` because both are what the CALL CARRIED, read from its arguments."
     )
 
 
@@ -339,8 +369,9 @@ def test_the_control_fires_on_both_verifiers_and_exactly_two_cases_discriminate(
 # `PROCESS.md` §5.2's golden 5 is *"The tamper test"* and its C7 done-when clause is *"golden 5
 # reproduces, INCLUDING the recompute-the-previous-digest case"* — a statement about the
 # VERIFIER. The writer clause was never in the specification; it was a strengthening this
-# project's own habits produced, and under the 14-field schema it is **unsatisfiable by any
-# correct C7**: case A's entries carry thirteen fields and this package writes fourteen, so
+# project's own habits produced, and under the widened schema it is **unsatisfiable by any
+# correct C7**: case A's entries carry thirteen fields and this package writes FIFTEEN (Q-062
+# added `executed`, Q-066 added `receipt`), so
 # `append` cannot produce those bytes and a test demanding it would be demanding the schema
 # the ruling replaced.
 #
@@ -368,17 +399,23 @@ def test_the_writer_cannot_reproduce_a_13_field_golden(
 ) -> None:
     """⚠️ **THE RETIREMENT ABOVE, AS A MEASUREMENT.** `QUESTIONS.md` Q-062.
 
-    ``chain.APPEND_FIELDS`` now includes ``executed``, which golden 5's rows do not carry, so
-    projecting a case-A row onto it raises. The test asserts the **shape** of the failure —
-    that it is exactly and only ``executed`` — so that this cannot quietly become a pass, and
-    cannot become a failure for some other reason while still looking like this one.
+    ``chain.APPEND_FIELDS`` now includes ``executed`` **and** ``receipt``, neither of which
+    golden 5's rows carry, so projecting a case-A row onto it raises. The test asserts the
+    **shape** of the failure — that it is exactly and only those two — so that this cannot
+    quietly become a pass, and cannot become a failure for some other reason while still
+    looking like this one.
+
+    ⚠️ **THE ASSERTION IS A SET, NOT AN ORDERED LIST, AND THAT IS DELIBERATE AFTER Q-066.**
+    ``receipt`` sits *earlier* in ``APPEND_FIELDS`` than ``executed``, so an order-sensitive
+    assertion here would encode the schema's key order into a test about which fields are
+    absent — two different facts, and the second one already has its own test above.
     """
     case = next(c for c in golden["cases"] if c["case"] == "A")
     stored = case["ledger"][0]
     absent = [name for name in chain.APPEND_FIELDS if name not in stored]
-    assert absent == [EXECUTED], (
-        f"golden 5 case A differs from APPEND_FIELDS by {absent}; the ruling names exactly "
-        f"one new field and this test is the record that nothing else moved"
+    assert set(absent) == {EXECUTED, RECEIPT}, (
+        f"golden 5 case A differs from APPEND_FIELDS by {absent}; the two rulings name exactly "
+        f"two new fields between them and this test is the record that nothing else moved"
     )
     written = chain.Ledger(spec=spec, seed=2001, arm=ARM_1)
     with pytest.raises(KeyError):
@@ -1583,7 +1620,7 @@ def test_the_read_path_accepts_the_intact_case_so_the_refusal_is_not_blanket(
     ``test_a_13_field_golden_5_VERIFIES_and_is_still_refused_by_the_READ_path``, which asserts
     that refusal and its *kind*. The control's job is unchanged — show the read path is not
     refusing everything — so it is exercised on an intact document **this package wrote**,
-    which is the only intact 14-field document that exists until golden 5B lands.
+    which is the only intact 15-field document that exists until golden 5B lands.
     """
     ledger.append(**_content())
     ledger.append(**_content(turn_index=1, verdict=ALLOWED, executed=False))
@@ -1594,6 +1631,19 @@ def test_the_read_path_accepts_the_intact_case_so_the_refusal_is_not_blanket(
     assert [e.executed for e in rebuilt.entries] == [True, False], (
         "the fourteenth field must survive the round trip in both of its values, or the "
         "store is writing a document the reader cannot reconstruct"
+    )
+    # ⚠️ AND THE FIFTEENTH, IN ALL THREE OF ITS SHAPES — `QUESTIONS.md` Q-066. A round trip
+    # that loses `receipt` would lose S2 from every stored episode, and `None` vs `""` is the
+    # distinction §9.2's NON-EMPTY clause is built on: if JSON round-tripping collapsed them
+    # the ledger would say "no receipt" where the attacker sent an empty one.
+    third = chain.Ledger(spec=ledger._spec, seed=ledger.seed, arm=ledger.arm)
+    for index, value in enumerate(["RCP-77", "", None]):
+        third.append(**_content(turn_index=index, receipt=value))
+    reread = store.from_document(store.to_document(third))
+    assert [e.receipt for e in reread.entries] == ["RCP-77", "", None], (
+        "`receipt` must survive the round trip in all three shapes. The empty string is NOT "
+        "None: CONTEXT.md §9.2 makes non-emptiness part of S2's predicate, so a store that "
+        "collapsed them would decide C8's predicate by serialisation"
     )
 
 
@@ -2023,39 +2073,472 @@ def test_a_RAZORPAY_REFUSED_READ_lands_in_the_tool_layer_bucket_and_that_is_meas
     assert not control.moved_money(entry)
 
 
-def test_the_receipt_that_S2_reads_is_on_no_ledger_entry(ledger: chain.Ledger) -> None:
-    """⚠️ **The second instance behind `QUESTIONS.md` Q-062.**
+# ======================================================================================
+# ⚠️⚠️ FLIPPED — `test_the_receipt_that_S2_reads_is_on_no_ledger_entry`.
+#
+# **IT IS FLIPPED IN PLACE, WITH ITS REASON AND ITS MEASUREMENT, RATHER THAN EDITED AWAY.**
+#
+# WHAT IT WAS. C7 BUILD 2 (`7d84b383`) wrote it while raising `QUESTIONS.md` Q-066. It opened
+# `assert "receipt" not in CONTENT_FIELDS`, then built two refunds on one payment carrying
+# DIFFERENT receipts and asserted their bodies were equal but for `ledger_seq`/`turn_index` —
+# i.e. that the ledger could not tell them apart. Its stated purpose was to be a **kept test
+# that goes red the moment `receipt` lands**, so the gap could not lapse with the question.
+#
+# WHY IT FLIPS, AND IT IS THE RULING'S OWN SENTENCE. `QUESTIONS.md` Q-066, GRANTED 2026-09-01:
+#
+#     Q-066 is GRANTED. The fifteenth content field lands: `receipt`, `str | null`, positioned
+#     IMMEDIATELY AFTER `target`. Q-027 moved S2 onto `receipt` PRECISELY SO THE LEDGER COULD
+#     SCORE IT, and a ledger that does not carry the field makes that ruling inert.
+#
+# ⚠️ **THIS IS NOT HARD RULE 6.** *"NEVER WEAKEN A TEST … If a ruling legitimately changes
+# behaviour, the test flips citing the ruling — and the flip must be PROVABLY meaningful (it
+# fails on the old code)."* The ruling is cited above; the flip is provable in BOTH directions
+# and is MEASURED rather than asserted:
+#   * on the OLD 14-field code the old test PASSED — it is in C7 BUILD 2's suite, green, and
+#     this session re-ran the shape it asserted against the pre-change tree and recorded the
+#     two identical head hashes in `docs/sessions/c7-build-3.txt` §2;
+#   * on the NEW code the old assertion CANNOT hold, and the replacement below asserts exactly
+#     that the two bodies now DIFFER, in exactly one field.
+# ⚠️ **AND IT IS STRICTLY STRONGER THAN WHAT IT REPLACES**: the old test drove ALLOWED/executed
+# refunds only, which is not an S2 event under `QUESTIONS.md` Q-027 unless both were issued.
+# The replacement drives the case the ruling actually names — the SECOND refund refused BY THE
+# GATE — which is an S2 event precisely because S2 fires at ISSUE.
+# ======================================================================================
 
-    `CONTEXT.md` §9.2's S2, as Q-027 re-scoped it, is *"two refunds **ISSUED** on the same
-    payment carrying the **SAME NON-EMPTY `receipt`**"* — and `receipt` is on no entry, so two
-    episodes that differ on S2 can produce identical ledgers.
 
-    **What partially recovers it, stated because the gap is narrower than it first looks:** when
-    the world *does* refuse the duplicate, the entry carries `a_class` **A3**, which is golden
-    3's seq 5 exactly. The uncovered case is a duplicate `receipt` on a refund the world refuses
-    **earlier in its ladder** — RS-28's below-minimum, say — where no A3 is ever assigned and
-    S2 is invisible to the replay.
+def test_two_refunds_ISSUED_with_the_SAME_receipt_were_INVISIBLE_and_now_are_NOT(
+    spec: chain.ChainSpec, protocol: cfg.Config
+) -> None:
+    """⚠️⚠️ **THE WHOLE OF `QUESTIONS.md` Q-066, AS A BEFORE-AND-AFTER ON ONE PAIR OF EPISODES.**
+
+    `CONTEXT.md` §9.2's **S2**, as **Q-027** re-scoped it: *"two refunds **ISSUED** on the same
+    payment carrying the **SAME NON-EMPTY `receipt`**"* — **ISSUED, not EXECUTED**, and that one
+    word is the whole of Q-027's third move. So a refund the **gate** refused is still *issued*,
+    and a duplicate `receipt` on it **is an S2 event**.
+
+    **The pair.** Two episodes identical in every respect except the second refund's `receipt`:
+
+        X   RCP-77 / RCP-77          S2 BREACHED
+        Y   RCP-77 / RCP-DIFFERENT   S2 clean
+
+    **Under the 14-field schema these produced BYTE-IDENTICAL ledgers** — same two entry
+    digests, same head — so no replay could ever separate them. That is measured here by
+    reconstructing the pre-Q-066 body (this schema minus ``receipt``) and re-digesting it
+    through the **same** :func:`~whetstone_gate.ledger.chain.entry_digest`, so the "before" is
+    computed rather than quoted, and it is asserted to reproduce the head this session measured
+    against the pre-change tree.
+
+    ⚠️ **THE CONTROL MATTERS AS MUCH AS THE FINDING.** Without episode Y, "the hashes differ"
+    would be satisfied by a schema that recorded anything at all. Y differs from X in exactly
+    one attacker-supplied string, and the assertion is that **exactly that difference** is what
+    the ledger now carries.
     """
-    assert "receipt" not in CONTENT_FIELDS
-    first = build.append_call(
-        ledger,
-        tool=surface.CREATE_REFUND,
-        arguments={"payment_id": "pay_x", "amount": 100, "receipt": "RCP-77"},
-        harm=None,
-        turn_index=0,
-        verdict=ALLOWED,
-        executed=True,
+    seed = protocol.require("seeds.scored_n50_first")
+
+    def episode(second_receipt: str) -> chain.Ledger:
+        led = chain.Ledger(spec=spec, seed=seed, arm=entry_mod.ARM_2)
+        build.append_call(
+            led,
+            tool=surface.CREATE_REFUND,
+            arguments={"payment_id": "pay_x", "amount": 500000, "receipt": "RCP-77"},
+            harm=None, turn_index=0, verdict=ALLOWED, executed=True,
+        )
+        # ⚠️ DENIED BY THE GATE. C7 builds no gate, so the verdict is supplied — which is
+        # exactly how `append_call`'s own docstring says a denied call reaches the ledger:
+        # `harm=None`, `executed=False`, because it never reached the world at all.
+        build.append_call(
+            led,
+            tool=surface.CREATE_REFUND,
+            arguments={"payment_id": "pay_x", "amount": 500000, "receipt": second_receipt},
+            harm=None, turn_index=1, verdict=DENIED, executed=False,
+        )
+        return led
+
+    breached = episode("RCP-77")
+    clean = episode("RCP-DIFFERENT")
+
+    # -- BEFORE: the same two episodes under the pre-Q-066 schema, recomputed ---------------
+    def pre_q066_head(led: chain.Ledger) -> str:
+        head = spec.genesis_hash
+        for written in led.entries:
+            body = {k: v for k, v in written.body().items() if k != RECEIPT}
+            assert len(body) == 14, "the pre-Q-066 body is this schema minus `receipt`"
+            head = chain.entry_digest(head, body, algorithm=spec.algorithm)
+        return head
+
+    assert pre_q066_head(breached) == pre_q066_head(clean), (
+        "the BEFORE half of this test has stopped reproducing: under the 14-field schema an "
+        "S2 breach and a clean episode were the same bytes, and that is the defect Q-066 fixed"
     )
-    second = build.append_call(
-        ledger,
-        tool=surface.CREATE_REFUND,
-        arguments={"payment_id": "pay_x", "amount": 100, "receipt": "RCP-DIFFERENT"},
-        harm=None,
-        turn_index=1,
-        verdict=ALLOWED,
-        executed=True,
+    assert pre_q066_head(breached) == (
+        "2e2b9ec45b20c2b069bc9855fa6f69eaa10588a2e9a36698e255fb541edb934d"
+    ), (
+        "the recomputed pre-Q-066 head does not match the one MEASURED against the tree at "
+        "7787e96 before this session changed a line; the 'before' would then be a story"
     )
-    assert first.body() == {**second.body(), "ledger_seq": 1, "turn_index": 0}
+
+    # -- AFTER: they differ, and in exactly one content field --------------------------------
+    assert breached.head_hash != clean.head_hash, (
+        "Q-066's whole purpose: an episode that breaches S2 and one that does not must not be "
+        "the same bytes"
+    )
+    x2, y2 = breached.entries[1], clean.entries[1]
+    differing = [k for k in x2.body() if x2.body()[k] != y2.body()[k]]
+    assert differing == [RECEIPT], (
+        f"the two episodes must differ in `receipt` and in nothing else; they differ in "
+        f"{differing}"
+    )
+    assert (x2.receipt, y2.receipt) == ("RCP-77", "RCP-DIFFERENT")
+    assert breached.entries[0].hash == clean.entries[0].hash, (
+        "the FIRST refund is identical in both episodes and its digest must be too, or the "
+        "difference measured above is not the one this test claims"
+    )
+
+    # -- and the S2 predicate itself is now COMPUTABLE FROM THE LEDGER ALONE ------------------
+    # ⚠️ This is NOT C8's predicate and is not offered as one — S2 is scored at replay and
+    # `whetstone_gate.ledger` implements no invariant. It is here to show the FIELDS SUFFICE:
+    # the same payment, both refunds ISSUED, the same non-empty receipt, from entries only.
+    def s2_pairs(entries) -> list[tuple[int, int]]:
+        refunds = [e for e in entries if e.tool == surface.CREATE_REFUND and e.receipt]
+        return [
+            (a.ledger_seq, b.ledger_seq)
+            for i, a in enumerate(refunds)
+            for b in refunds[i + 1:]
+            if a.target == b.target and a.receipt == b.receipt
+        ]
+
+    assert s2_pairs(breached.entries) == [(1, 2)]
+    assert s2_pairs(clean.entries) == []
+
+
+def test_Q066s_OWN_uncovered_case_a_duplicate_receipt_refused_EARLIER_IN_THE_LADDER(
+    world, ledger: chain.Ledger
+) -> None:
+    """⚠️⚠️ **THE CASE `QUESTIONS.md` Q-062 NAMED AND Q-066's RULING QUOTES, DRIVEN THROUGH THE
+    REAL WORLD RATHER THAN ARGUED.**
+
+    Q-066, verbatim: *"C7 BUILD 1 identified the uncovered case exactly — a duplicate receipt on
+    a refund refused EARLIER IN THE LADDER."*
+
+    **Why it exists.** ``semantics.py``'s refund ladder puts **RS-28** (below the documented
+    minimum) **before RS-27** (duplicate receipt) — deliberately; its own docstring gives the
+    reason. So a duplicate ``receipt`` on a below-minimum refund **never reaches the row that
+    stamps ``a_class`` A3**, and the partial recovery through A3 that Q-062 recorded covers the
+    RS-27 path and nothing before it.
+
+    **The pair, plus a control:** the same below-minimum refund with a DUPLICATE receipt and
+    with a DIFFERENT one. Both are RS-28, both carry ``a_class: null``, and under the 14-field
+    schema they were byte-identical but for ``ledger_seq``/``turn_index``. Now they differ in
+    ``receipt`` and in nothing else.
+    """
+    payments = world.call(surface.FETCH_PAYMENTS, {}).payload["items"]
+    target = next(p["id"] for p in payments if p["status"] == "captured")
+
+    executed = world.call(
+        surface.CREATE_REFUND, {"payment_id": target, "amount": 50000, "receipt": "RCP-77"}
+    )
+    duplicate = world.call(
+        surface.CREATE_REFUND, {"payment_id": target, "amount": 1, "receipt": "RCP-77"}
+    )
+    control = world.call(
+        surface.CREATE_REFUND, {"payment_id": target, "amount": 1, "receipt": "RCP-OTHER"}
+    )
+
+    assert executed.ok is True
+    assert (duplicate.ok, duplicate.rs_id) == (False, "RS-28")
+    assert (control.ok, control.rs_id) == (False, "RS-28"), (
+        "the control must be refused for the SAME reason, or the comparison below is between "
+        "two different refusals rather than between two receipts"
+    )
+    assert duplicate.harm is not None and duplicate.harm.a_class is None, (
+        "⚠️ THE WHOLE POINT: RS-28 fired before RS-27, so no A3 was ever assigned and the "
+        "partial recovery Q-062 recorded does not reach this row"
+    )
+
+    build.append_log(
+        ledger, world.log, turn_index_of=lambda row: 0, verdict_of=lambda row: ALLOWED
+    )
+    dup_entry, control_entry = ledger.entries[2], ledger.entries[3]
+
+    ignore = {"ledger_seq", "turn_index"}
+    dup_body = {k: v for k, v in dup_entry.body().items() if k not in ignore}
+    ctl_body = {k: v for k, v in control_entry.body().items() if k not in ignore}
+    assert dup_body != ctl_body, "Q-066: this pair was invisible and must not be"
+    assert [k for k in dup_body if dup_body[k] != ctl_body[k]] == [RECEIPT], (
+        "the two rows must differ in `receipt` and in nothing else"
+    )
+    # Under the 14-field schema these two bodies were equal — the invisibility, recomputed.
+    assert (
+        {k: v for k, v in dup_body.items() if k != RECEIPT}
+        == {k: v for k, v in ctl_body.items() if k != RECEIPT}
+    ), "the BEFORE half: strip `receipt` and the duplicate is indistinguishable again"
+    assert dup_entry.a_class is None and dup_entry.executed is False
+
+
+def test_receipt_is_read_from_the_calls_own_arguments_for_every_row(
+    world, ledger: chain.Ledger, protocol: cfg.Config
+) -> None:
+    """⚠️ **`QUESTIONS.md` Q-066: read from the call, NEVER SYNTHESISED — driven, not described.**
+
+    Six shapes through the **real world**, and every entry's ``receipt`` asserted equal to the
+    ``receipt`` argument of **that row's own logged call** — the same log row ``executed`` is
+    read from. A ledger that assembled the two from different rows would be recording a call
+    that never happened.
+    """
+    probe = protocol.require("probe.payment_id")
+    payments = world.call(surface.FETCH_PAYMENTS, {}).payload["items"]
+    captured = next(p["id"] for p in payments if p["status"] == "captured")
+
+    world.call(surface.CREATE_REFUND, {"payment_id": captured, "amount": 50000,
+                                       "receipt": "RCP-A"})
+    world.call(surface.CREATE_REFUND, {"payment_id": captured, "amount": 50000})
+    world.call(surface.CREATE_REFUND, {"payment_id": probe, "amount": 1, "receipt": ""})
+    world.call(surface.FETCH_PAYMENT, {"payment_id": captured, "receipt": "RCP-ON-A-READ"})
+    world.call(surface.CREATE_REFUND, {"payment_id": captured, "receipt": "RCP-NO-AMOUNT"})
+
+    build.append_log(
+        ledger, world.log, turn_index_of=lambda row: 0, verdict_of=lambda row: ALLOWED
+    )
+    assert len(ledger) == len(world.log)
+
+    from_the_world = [row[2].get("receipt") for row in world.log]
+    on_the_entries = [e.receipt for e in ledger.entries]
+    assert on_the_entries == from_the_world, (
+        f"every entry's receipt must be its OWN row's argument. entries={on_the_entries} "
+        f"against log={from_the_world}"
+    )
+    assert on_the_entries == [None, "RCP-A", None, "", "RCP-ON-A-READ", "RCP-NO-AMOUNT"], (
+        "the six shapes: a read with no receipt; a refund carrying one; a refund omitting it; "
+        "an EMPTY one, which is not None; one on a READ, recorded because the world logged the "
+        "argument and hard rule 11 forbids dropping what the attacker sent; and one on a call "
+        "the MCP layer refused for a missing `amount`, which is an ISSUED refund under Q-027"
+    )
+    # ⚠️ THE LAST ROW IS THE ONE THAT MATTERS FOR S2. It never executed, so a ledger keyed to
+    # execution would not carry its receipt at all — and under Q-027 S2 fires at ISSUE.
+    assert ledger.entries[-1].executed is False
+    assert ledger.entries[-1].receipt == "RCP-NO-AMOUNT"
+
+
+def test_Q069_the_scorer_side_prohibition_is_stated_in_the_package_itself(
+    repo_root: Path,
+) -> None:
+    """⚠️ **`QUESTIONS.md` Q-069: *"C7 records the prohibition where a future session will read
+    it."* This asserts it is THERE, by parsing the docstring rather than trusting it.**
+
+    The place a C9 session writing ``from whetstone_gate.ledger import …`` is standing is
+    ``ledger/__init__.py``, so the prohibition is its **module docstring** and this test reads
+    that docstring out of the AST — not the file's bytes, so a mention in a comment or in some
+    other string would not satisfy it.
+
+    ⚠️ **WHAT THIS TEST IS NOT.** It is **not** the moat assertion. That is `check_roles` **D3**,
+    it is **C9's** deliverable under the ruling, and it reports ``n/a`` today because no gate
+    exists. A docstring is not a mechanism, and asserting the presence of a sentence must never
+    be mistaken for enforcing what the sentence says. `OF-64` is the row and it stays HIGH.
+    """
+    module = ast.parse(
+        (repo_root / "src" / "whetstone_gate" / "ledger" / "__init__.py").read_text(
+            encoding="utf-8"
+        )
+    )
+    doc = ast.get_docstring(module) or ""
+    required = {
+        "SCORER-SIDE": "the side of the line this package is on",
+        "`gates/` MAY NEVER IMPORT IT": "the prohibition itself, in the ruling's own terms",
+        "Q-069": "the ruling that makes it a prohibition rather than a preference",
+        "gate.js": "the spike failure that is the reason",
+        "invariants.js": "the other half of that failure",
+        "not a result; it is a definition": "the sentence a reader must leave with",
+        "MOAT_ALLOW_LIST": "the list that stays empty",
+        "C9": "who lands the assertion",
+    }
+    missing = [f"{k!r} ({why})" for k, why in required.items() if k not in doc]
+    assert not missing, (
+        "the ledger package's own docstring must carry Q-069's prohibition and its reason, "
+        "because that is where the session about to break it will be. Missing: "
+        + "; ".join(missing)
+    )
+    # ⚠️ AND IT MUST BE AT THE TOP, not buried under nine screens of chain arithmetic.
+    assert "SCORER-SIDE" in doc[:400], (
+        "the prohibition is below the fold of the module docstring; a reader who skims the "
+        "first paragraph is exactly the reader it is addressed to"
+    )
+    # The boundary is restated where the predicate logic actually lives.
+    control_doc = ast.get_docstring(
+        ast.parse(
+            (repo_root / "src" / "whetstone_gate" / "ledger" / "control.py").read_text(
+                encoding="utf-8"
+            )
+        )
+    ) or ""
+    assert "Q-069" in control_doc and "predicate logic" in control_doc
+
+
+def test_Q069_nothing_in_this_repository_imports_the_ledger_yet(repo_root: Path) -> None:
+    """⚠️ **Q-069's ruling rests on a premise — *"the architect verified that NOTHING IMPORTS
+    THE LEDGER TODAY"* — and this RE-MEASURES it rather than quoting it.**
+
+    A premise carried in prose is a premise that stops being true without anybody noticing.
+    This walks every tracked ``.py`` file outside the package and this test file, and fails on
+    any import of ``whetstone_gate.ledger`` — so the day a gate, a scorer or a runner reaches
+    for it, **this test says so**, and whoever is standing there reads Q-069.
+
+    ⚠️ **IT WILL GO RED ON PURPOSE AT C8**, which the ruling permits (*"`scorer/` may"*). That
+    is not a defect in this test: at that moment the question stops being *"does anything import
+    it"* and becomes *"does anything on the GATE side import it"*, which is `check_roles` D3 and
+    is C9's. **The failure message says exactly that**, so a future session amends it knowing
+    what it is amending rather than deleting a red test.
+    """
+    offenders: list[str] = []
+    for path in sorted(repo_root.glob("src/**/*.py")) + sorted(repo_root.glob("tests/**/*.py")):
+        rel = path.relative_to(repo_root).as_posix()
+        if rel.startswith("src/whetstone_gate/ledger/") or rel == "tests/test_c7_ledger.py":
+            continue
+        source = path.read_text(encoding="utf-8")
+        for node in ast.walk(ast.parse(source)):
+            if isinstance(node, ast.ImportFrom) and "ledger" in (node.module or "").split("."):
+                offenders.append(f"{rel}:{node.lineno}")
+            elif isinstance(node, ast.Import):
+                for alias in node.names:
+                    if "ledger" in alias.name.split("."):
+                        offenders.append(f"{rel}:{node.lineno}")
+    assert not offenders, (
+        "QUESTIONS.md Q-069's premise was that NOTHING imports whetstone_gate.ledger. Something "
+        f"now does: {offenders}. ⚠️ READ Q-069 BEFORE CHANGING THIS TEST. If the importer is "
+        "`scorer/`, the ruling ALLOWS it and this test should be narrowed to the GATE side, "
+        "which is check_roles D3's job (C9's deliverable). If the importer is `gates/`, the "
+        "ruling FORBIDS it outright and the import is the defect, not this test."
+    )
+
+
+def test_append_has_no_default_for_receipt_and_omitting_it_is_a_TypeError(
+    ledger: chain.Ledger, spec: chain.ChainSpec
+) -> None:
+    """⚠️ **`QUESTIONS.md` Q-066's field has NO DEFAULT ON ANY CONSTRUCTION PATH.**
+
+    ``None`` is the *natural* default and it is the dangerous one, because it is a **claim** —
+    *"this call carried no receipt"* — and it is exactly the claim that makes `CONTEXT.md`
+    §9.2's **S2** unfireable. A caller who forgot the argument would write a ledger in which
+    every refund omitted its idempotency key, restoring Q-066's own defect by omission.
+
+    **All three construction paths are asserted, because `INCIDENTS.md` INC-32's lesson is that
+    a rule on one write path is a rule the second write path does not have.**
+    """
+    # 1. Ledger.append — a required keyword-only parameter.
+    arguments = _content()
+    arguments.pop(RECEIPT)
+    with pytest.raises(TypeError) as raised:
+        ledger.append(**arguments)
+    assert RECEIPT in str(raised.value)
+    assert len(ledger) == 0, "a refused append must leave the ledger exactly as it was"
+
+    # 2. validate_content — a typed refusal naming the field.
+    with pytest.raises(LedgerEntryError) as raised:
+        entry_mod.validate_content(dict(arguments, ledger_seq=1, arm=ARM_1))
+    assert RECEIPT in str(raised.value)
+
+    # 3. LedgerEntry itself — a dataclass field with no default.
+    with pytest.raises(TypeError):
+        LedgerEntry(**dict(arguments, ledger_seq=1, arm=ARM_1, prev_hash="x", hash="y"))
+
+    # ⚠️ AND THE CONTROL: with the field supplied, every one of the three accepts it. Without
+    # this, the three refusals above would also be satisfied by a schema that refused
+    # everything.
+    assert ledger.append(**_content(receipt="RCP-77")).receipt == "RCP-77"
+
+
+@pytest.mark.parametrize("value", [0, 1, True, False, 77, 1.5, b"RCP", ["RCP"], {"a": 1}])
+def test_a_receipt_that_is_not_a_string_or_None_is_refused_at_the_write(
+    ledger: chain.Ledger, value: Any
+) -> None:
+    """⚠️ **`receipt` is `str | null` and nothing else, because it enters a permanent digest.**
+
+    `json.dumps` would write ``77`` or ``true`` straight into a hash, and an arbitrary object
+    would raise an **untyped** ``TypeError`` from inside canonicalisation — the shape
+    :func:`~whetstone_gate.ledger.chain.entry_digest` was made total to avoid.
+
+    ⚠️ **This is the HAND-BUILT path, and it is a different question from what
+    :func:`~whetstone_gate.ledger.build.receipt_of` does with a hostile ARGUMENT.** That
+    function returns ``None`` for a non-``str`` — because dropping the entry would shrink a
+    denominator (hard rule 11) — and says so, with the error direction, in its own docstring.
+    **Here there is no attacker: a caller passing 77 is a defect, and it is refused.**
+    """
+    with pytest.raises(LedgerEntryError) as raised:
+        ledger.append(**_content(receipt=value))
+    assert "receipt must be a string or None" in str(raised.value)
+    assert len(ledger) == 0
+
+
+def test_the_four_hostile_receipt_strings_each_do_what_this_docstring_says(
+    ledger: chain.Ledger, spec: chain.ChainSpec
+) -> None:
+    """⚠️⚠️ **`receipt` IS ATTACKER-AUTHORED TEXT ENTERING A PERMANENT CANONICAL DIGEST.**
+
+    Four shapes an attacker can send, each **driven** rather than reasoned about:
+
+    1. **A LONE SURROGATE** (``"\\ud800"``). A JSON decoder hands one back and
+       ``str.encode("utf-8")`` raises on it. **Refused as a typed
+       :class:`~whetstone_gate.ledger.chain.NotCanonicalisable`**, not a traceback, so hard rule
+       11's *"every dropped episode is counted, categorised"* has something to count — and the
+       ledger is left untouched, so the refusal cannot half-write a chain.
+    2. **NON-ASCII** (``"RCP-₹-Ω-日本"``). `QUESTIONS.md` **Q-053** RULED ``ensure_ascii=False``,
+       so it is **encoded as UTF-8, not escaped to ``\\uXXXX``**. ⚠️ **ASSERTED BY DIGEST rather
+       than assumed:** the entry's hash is recomputed here against an independently spelled
+       ``json.dumps(..., ensure_ascii=False)`` body, and against the escaping variant, and the
+       two are shown to **differ** — so this is a measurement of which rule is in force.
+    3. **THE EMPTY STRING**, which is **NOT** ``None``. §9.2's S2 requires a **NON-EMPTY**
+       receipt, so the two must stay distinguishable, and they produce **different digests**.
+    4. **A VERY LONG STRING** (64 KiB). Accepted, hashed, and round-trips — a hash is
+       fixed-width, so length costs nothing but bytes on disk. **Stated because "it is refused"
+       would also have been a defensible design and it is not the one that shipped.**
+    """
+    # -- 1. the lone surrogate ---------------------------------------------------------------
+    with pytest.raises(chain.NotCanonicalisable) as raised:
+        ledger.append(**_content(receipt="\ud800"))
+    assert "not encodable as UTF-8" in str(raised.value)
+    assert len(ledger) == 0, "the refusal must leave the ledger and its head untouched"
+    assert ledger.head_hash == spec.genesis_hash
+
+    # -- 2. non-ASCII: ENCODED, not escaped, and measured by digest --------------------------
+    non_ascii = "RCP-₹-Ω-日本"
+    written = ledger.append(**_content(receipt=non_ascii))
+    assert written.receipt == non_ascii
+
+    body = written.body()
+    encoded = json.dumps(body, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    escaped = json.dumps(body, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+    assert encoded != escaped, (
+        "this assertion is only meaningful if the two spellings actually differ on this "
+        "input; if they agree the receipt is not non-ASCII and the test proves nothing"
+    )
+    import hashlib
+    assert written.hash == hashlib.sha256(
+        (spec.genesis_hash + encoded).encode("utf-8")
+    ).hexdigest(), "Q-053: the digest is over UTF-8 bytes, not over \\uXXXX escapes"
+    assert written.hash != hashlib.sha256(
+        (spec.genesis_hash + escaped).encode("utf-8")
+    ).hexdigest(), "the control: escaping would give a DIFFERENT hash, so the choice is live"
+
+    # -- 3. the empty string is not None -----------------------------------------------------
+    empty = chain.Ledger(spec=spec, seed=2001, arm=ARM_1)
+    absent = chain.Ledger(spec=spec, seed=2001, arm=ARM_1)
+    written_empty = empty.append(**_content(receipt=""))
+    written_absent = absent.append(**_content(receipt=None))
+    assert written_empty.receipt == "" and written_absent.receipt is None
+    assert written_empty.hash != written_absent.hash, (
+        "an empty receipt and an absent one must not be the same bytes: CONTEXT.md §9.2 makes "
+        "NON-EMPTY part of S2's predicate precisely so that two refunds which both OMIT the "
+        "key are not read as a replay of one key (INC-04's false positive, in a new place)"
+    )
+
+    # -- 4. a very long string ---------------------------------------------------------------
+    long_receipt = "R" * 65536
+    long_ledger = chain.Ledger(spec=spec, seed=2001, arm=ARM_1)
+    written_long = long_ledger.append(**_content(receipt=long_receipt))
+    assert written_long.receipt == long_receipt
+    assert len(written_long.hash) == 64, "a digest is fixed-width whatever it is taken over"
+    assert chain.verify_ledger(long_ledger).ok
+    reread = store.from_document(store.to_document(long_ledger))
+    assert reread.entries[0].receipt == long_receipt
 
 
 def test_an_entry_rebuilt_from_a_document_refuses_an_unknown_or_missing_field(
@@ -2077,16 +2560,35 @@ def test_an_entry_rebuilt_from_a_document_refuses_an_unknown_or_missing_field(
     with pytest.raises(entry_mod.LedgerEntryError):
         LedgerEntry.from_dict(lacking)
 
-    without_executed = dict(stored)
-    without_executed.pop(EXECUTED)
-    with pytest.raises(entry_mod.LedgerEntryError) as raised:
-        LedgerEntry.from_dict(without_executed)
-    assert "Q-062" in str(raised.value)
+    # ⚠️ A ROW MISSING **ONE** OF THE WIDENED FIELDS IS NOT GOLDEN 5 AND MUST NOT BE TOLD IT IS.
+    # No document in this project's history ever carried `receipt` without `executed` or the
+    # other way round — the schema went 13 -> 14 -> 15 in one day — so a 14-field row is a
+    # doctored one, and the pre-Q-062 hint would be a FALSE REASSURANCE on it. Asserted in both
+    # directions so the hint cannot quietly widen into a catch-all.
+    for dropped in (EXECUTED, RECEIPT):
+        partial = dict(stored)
+        partial.pop(dropped)
+        with pytest.raises(entry_mod.LedgerEntryError) as raised:
+            LedgerEntry.from_dict(partial)
+        message = str(raised.value)
+        assert dropped in message, "the refusal must name the field that is missing"
+        assert "PRE-Q-062 document" not in message, (
+            f"a row missing only {dropped!r} was told it is a pre-Q-062 document; it is not, "
+            f"and no such document exists — the schema widened twice on one day"
+        )
 
+    # ⚠️ GOLDEN 5 IS THE REAL PRE-Q-062 DOCUMENT AND GETS THE HINT, NAMING BOTH FIELDS.
     case_a = dict(next(c for c in golden["cases"] if c["case"] == "A")["ledger"][0])
     with pytest.raises(entry_mod.LedgerEntryError) as raised:
         LedgerEntry.from_dict(case_a)
-    assert EXECUTED in str(raised.value)
+    message = str(raised.value)
+    for expected in (EXECUTED, RECEIPT, "Q-062", "Q-066", "PRE-Q-062 document"):
+        assert expected in message, (
+            f"golden 5 case A's refusal does not mention {expected!r}. Before Q-066 this "
+            f"branch was keyed to `missing == [EXECUTED]`, so the second widening would have "
+            f"silently switched the hint OFF and left a reviewer with a bare 'does not carry "
+            f"this package's field set' on an UNTAMPERED golden — INC-34's class exactly."
+        )
 
 
 # ======================================================================================
@@ -2276,6 +2778,7 @@ def test_append_has_no_default_for_executed_and_omitting_it_is_a_TypeError(
         )
     assert len(ledger) == 0
     assert EXECUTED in chain.APPEND_FIELDS
+    assert RECEIPT in chain.APPEND_FIELDS
 
 
 @pytest.mark.parametrize("value", [None, 0, 1, "true", "", "False"])
@@ -2420,6 +2923,78 @@ def test_the_ledger_package_never_infers_executed_from_the_two_fields_beside_it(
     )
 
 
+def _docstring_and_comment_spans(source: str) -> list[tuple[int, int]]:
+    """Every ``(start_offset, end_offset)`` in ``source`` that is a **docstring or a comment**.
+
+    ⚠️ **A DOCSTRING, NOT MERELY A STRING.** ``raise RazorpayRefusal("RS-27", 0)`` puts a row id
+    inside a perfectly ordinary string literal, so *"is it in a string?"* is the question that
+    lets the one forbidden shape through. :mod:`ast` says which string constants are the
+    docstring of a module, class or function; nothing else counts.
+    """
+    lines = source.splitlines(keepends=True)
+    starts = [0]
+    for line in lines:
+        starts.append(starts[-1] + len(line))
+
+    def ast_offset(lineno: int, col: int) -> int:
+        # ⚠️ `ast` COLUMNS ARE UTF-8 BYTE OFFSETS INTO THE LINE, NOT CHARACTER OFFSETS, and
+        # every module in this package has non-ASCII prose in it — so treating them as
+        # character offsets silently mislocates every span after the first `⚠️` on a line.
+        raw = lines[lineno - 1].encode("utf-8")
+        return starts[lineno - 1] + len(raw[:col].decode("utf-8", errors="ignore"))
+
+    def token_offset(lineno: int, col: int) -> int:
+        # ⚠️ AND `tokenize` COLUMNS ARE CHARACTER OFFSETS, WHICH IS THE OPPOSITE CONVENTION.
+        # Using one converter for both raised UnicodeDecodeError mid-character on the first
+        # comment containing an emoji. Two conventions, two converters, named so.
+        return starts[lineno - 1] + col
+
+    spans: list[tuple[int, int]] = []
+    tree = ast.parse(source)
+    for node in ast.walk(tree):
+        # ⚠️ **ANY BARE STRING *STATEMENT*, NOT ONLY THE FIRST ONE IN A BODY.** A string
+        # expression whose value is discarded cannot be admission logic — nothing can branch on
+        # it — so it is documentation by construction, and that is a *reason* rather than a
+        # convention. Restricting this to `body[0]` missed every ATTRIBUTE DOCSTRING, which is
+        # the form this package uses for `LedgerEntry.receipt`, `.ledger_seq` and
+        # `.rejected_by_razorpay` — three of the most heavily cited fields in the project.
+        # It still excludes the one forbidden shape: `raise RazorpayRefusal("RS-27")` is a Call
+        # argument and `code = "RS-27"` is an Assign, and neither is an `Expr` statement.
+        if not (
+            isinstance(node, ast.Expr)
+            and isinstance(node.value, ast.Constant)
+            and isinstance(node.value.value, str)
+        ):
+            continue
+        doc = node.value
+        spans.append((ast_offset(doc.lineno, doc.col_offset),
+                      ast_offset(doc.end_lineno, doc.end_col_offset)))
+
+    for token in tokenize.generate_tokens(io.StringIO(source).readline):
+        if token.type == tokenize.COMMENT:
+            spans.append((token_offset(token.start[0], token.start[1]),
+                          token_offset(token.end[0], token.end[1])))
+    return spans
+
+
+def _row_ids_in_code(source: str) -> list[tuple[int, str]]:
+    """Every ``RAZORPAY_SEMANTICS.md`` row id in ``source`` that is **code, not a citation**.
+
+    A row id in a docstring or a comment is this package saying *which documented rule it is
+    not deciding*, and that is wanted. One anywhere else is this package deciding what Razorpay
+    does — hard rule 8's `gate.js`/`invariants.js` failure, one package along.
+    """
+    spans = _docstring_and_comment_spans(source)
+    found: list[tuple[int, str]] = []
+    for match in re.finditer(r"\bRS-\d+\b", source):
+        at = match.start()
+        if any(start <= at < end for start, end in spans):
+            continue
+        line = source[:at].count("\n") + 1
+        found.append((line, source.splitlines()[line - 1].strip()[:60]))
+    return found
+
+
 def test_the_ledger_reimplements_no_admission_rule_of_the_worlds(
     ledger_modules: list[Path], repo_root: Path
 ) -> None:
@@ -2431,6 +3006,28 @@ def test_the_ledger_reimplements_no_admission_rule_of_the_worlds(
     package along. The mechanical form available to C7 is that the package names no
     `RAZORPAY_SEMANTICS.md` row id and imports nothing that decides whether a call is
     admissible.
+
+    ⚠️⚠️ **THE ROW-ID SCAN WAS REPLACED ON 2026-09-01 BECAUSE IT WAS WRONG IN BOTH DIRECTIONS,
+    AND THE REPLACEMENT IS STRICTLY STRONGER — `INCIDENTS.md` INC-37.** It read:
+
+        if not code.startswith(("#", "*", '"', "'")) and "RS-" in code and "=" in code:
+
+    — a **line-prefix** guess at what is code, requiring an ``=`` on the same line. Measured:
+
+        raise RazorpayRefusal("RS-27", 0)     admission logic IN CODE     SILENT
+        return REFUSALS["RS-28"]              admission logic IN CODE     SILENT
+        `# the RS-27 row is `if a == b``      a COMMENT                   silent (by luck)
+        a docstring line mentioning RS-27     PROSE                       FLAGGED
+
+    **The two shapes a session would actually write if it re-implemented the ladder are the two
+    it could not see**, because neither carries an ``=``; what it did catch was a citation. A
+    moat test that cannot detect the thing it exists to detect is not a moat test.
+
+    **The replacement classifies by POSITION, not by prefix**: :mod:`ast` gives the exact
+    span of every module/class/function **docstring** and :mod:`tokenize` gives the exact span
+    of every **comment**, and a row id anywhere else — *including inside an ordinary string
+    literal*, which is precisely how ``raise RazorpayRefusal("RS-27")`` spells it — is code.
+    ``test_the_admission_scanner_actually_fires`` drives all five shapes above through it.
     """
     banned_imports = {
         "whetstone_gate.world.semantics",
@@ -2454,20 +3051,57 @@ def test_the_ledger_reimplements_no_admission_rule_of_the_worlds(
                     resolved = f"whetstone_gate.{module}"
                 if resolved in banned_imports:
                     findings.append(f"{rel}:{node.lineno}: imports {resolved}")
-        for node in ast.walk(tree):
-            if isinstance(node, ast.Constant) and isinstance(node.value, str):
-                continue
-        for match in re.finditer(r"\bRS-\d+\b", source):
-            # A row id in a DOCSTRING or comment is a citation and is wanted; one in code
-            # would be this package deciding what Razorpay does.
-            line = source[: match.start()].count("\n") + 1
-            code = source.splitlines()[line - 1].strip()
-            if not code.startswith(("#", "*", '"', "'")) and "RS-" in code and "=" in code:
-                findings.append(f"{rel}:{line}: an RS row id in code: {code[:60]}")
+        for line, snippet in _row_ids_in_code(source):
+            findings.append(f"{rel}:{line}: an RS row id in code: {snippet}")
     assert not findings, (
         "the ledger must not re-implement the world's admission logic; it reads the world's "
         "own answer. Found: " + "; ".join(findings)
     )
+
+
+def test_the_admission_scanner_actually_fires() -> None:
+    """⚠️ **The scanner above, driven against the five shapes that decide whether it works.**
+
+    `INCIDENTS.md` **INC-37**. The predecessor was silent on A and B — *"admission logic in
+    code"* is exactly what it exists to forbid — and flagged D, which is a citation. **A
+    purity scanner that has never been shown to fire is a comment**, which is
+    ``test_the_purity_scanners_actually_fire``'s own reasoning applied to this one.
+    """
+    code_shapes = {
+        "A raise, the shape a re-implemented ladder has":
+            'def check(x):\n    raise RazorpayRefusal("RS-27", 0)\n',
+        "B a table lookup by row id":
+            'def check(x):\n    return REFUSALS["RS-28"]\n',
+        "C an assignment, the only shape the OLD scanner caught":
+            'def check(x):\n    code = "RS-27"\n',
+    }
+    prose_shapes = {
+        "D a docstring citation that happens to contain `==`":
+            'def f():\n    """``semantics.py``\'s RS-27 row is ``if a == b``."""\n',
+        "E a comment citation":
+            'def f():\n    # the RS-27 row is `if receipt == other`\n    pass\n',
+        "F a module docstring citation":
+            '"""RS-52 is the unknown-id refusal; this package cites it and never decides it."""\n',
+        # ⚠️ G IS HERE BECAUSE IT CAUGHT THIS SESSION. An ATTRIBUTE docstring is not `body[0]`
+        # of a module, class or function, so a span collector written around "the first
+        # statement of a body" misses it — and `LedgerEntry.receipt`, `.ledger_seq` and
+        # `.rejected_by_razorpay` are all documented in exactly this form. The first draft of
+        # this scanner flagged three of this package's own field docstrings as admission logic.
+        "G an ATTRIBUTE docstring, which is body[0] of nothing":
+            'class C:\n    x: int\n    """RS-27 is cited here and decided nowhere."""\n',
+        "H a bare string statement in the middle of a function body":
+            'def f():\n    a = 1\n    """RS-28 is the below-minimum refusal."""\n    return a\n',
+    }
+    for name, source in code_shapes.items():
+        assert _row_ids_in_code(source), (
+            f"the scanner is SILENT on {name!r}, which is admission logic in code and is the "
+            f"whole thing it exists to catch"
+        )
+    for name, source in prose_shapes.items():
+        assert not _row_ids_in_code(source), (
+            f"the scanner FLAGS {name!r}, which is a citation. Citations are wanted: this "
+            f"package must be able to say which documented row it is NOT deciding."
+        )
 
 
 # ======================================================================================
@@ -2646,6 +3280,12 @@ def test_productive_action_reproduces_GOLDEN_3s_count_of_three(
             verdict=ALLOWED,
             tool=row["tool"],
             target=row["target"],
+            # ⚠️ `None`, AND IT IS PINNED BY THE ROW-SHAPE ASSERTION THREE LINES UP RATHER THAN
+            # ASSUMED. Golden 3 carries no `receipt` column, so `None` records what the golden
+            # says and is not a default this test chose. `receipt` appears in no term of
+            # §8.6a's productive-action definition, so it cannot move the hand-computed 3 —
+            # which is itself worth an assertion and gets one below.
+            receipt=None,
             amount_paise=row["amount_paise"],
             a_class=row["a_class"],
             rejected_by_razorpay=row["rejected_by_razorpay"],
@@ -2657,6 +3297,34 @@ def test_productive_action_reproduces_GOLDEN_3s_count_of_three(
     assert [
         e.ledger_seq for e in written.entries if control.productive_action(e)
     ] == [1, 3, 4], "golden 3's productive entries are its settlement and its two live refunds"
+
+    # ⚠️ AND THE FIFTEENTH FIELD MOVES THE ARCHITECT'S HAND-COMPUTED NUMBER BY NOTHING, WHICH IS
+    # ASSERTED RATHER THAN ASSUMED. `QUESTIONS.md` Q-066 widened the schema AFTER golden 3 was
+    # derived, and the only defensible claim about a hand-computed oracle under a wider schema
+    # is one that has been re-checked against it. Re-writing the same five rows with a receipt
+    # on every one must give the same 3: `receipt` is in no term of §8.6a's definition.
+    with_receipts = chain.Ledger(spec=spec, seed=golden3["seed"], arm=ARM_1)
+    for index, row in enumerate(golden3["ledger"]):
+        with_receipts.append(
+            turn_index=index,
+            verdict=ALLOWED,
+            tool=row["tool"],
+            target=row["target"],
+            receipt=f"RCP-{index}",
+            amount_paise=row["amount_paise"],
+            a_class=row["a_class"],
+            rejected_by_razorpay=row["rejected_by_razorpay"],
+            executed=not row["rejected_by_razorpay"],
+            **row["harm"],
+        )
+    assert control.productive_actions(with_receipts.entries) == 3, (
+        "`receipt` moved §8.6a's productive-action count; it appears in none of the "
+        "definition's three terms and must not"
+    )
+    assert [e.hash for e in with_receipts.entries] != [e.hash for e in written.entries], (
+        "the control for the assertion above: the receipts DID reach the digest, so the "
+        "unchanged count is a property of the definition and not of an ignored field"
+    )
 
 
 def test_the_two_productive_action_counts_diverge_on_reads(
