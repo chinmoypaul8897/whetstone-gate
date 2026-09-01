@@ -25,6 +25,7 @@ blindness test with a broken regex.
 from __future__ import annotations
 
 import ast
+import dataclasses
 import hashlib
 import json
 import re
@@ -471,6 +472,34 @@ def _denial_findings(context: ctx.AssembledContext, generic: str) -> list[str]:
     for word in _GATE_VOCABULARY:
         if re.search(rf"\b{re.escape(word)}\b", vocabulary_scan, re.IGNORECASE):
             findings.append(f"gate vocabulary {word!r} on the AUTHORED surface")
+
+    # ── LAYER 2b — ARM IDENTITY AND CLAUSE IDENTITY, over the SURFACE and not the FIELD ──
+    #
+    # ⚠️ **`REVIEW_C6_3` M-1 / `OPEN_FINDINGS.md` OF-104, and it is the finding that reaches
+    # the claim the submission rests on.** This guard's own opening sentence is *"a denial
+    # leaks neither WHICH ARM IS RUNNING nor which clause fired"*, and until now the regex
+    # that encodes exactly that ran over the refusal **value** and over nothing else — while
+    # `B-2` had already established that the shape which actually occurs is a leak **in the
+    # label**. Measured by REVIEW 3: ``LAST_REFUSAL_LABEL = "LAST TOOL REFUSAL (arm 2S): "``
+    # and ``STATE_LABEL = "STATE SO FAR (this arm runs a live judge): "`` each produced
+    # **0 findings from all four blindness guards**.
+    #
+    # ⚠️ **AND THE THREE MUTANTS THAT DO DIE, DIE FOR THE WRONG REASON**: only on
+    # ``test_the_crossover_series_reproduces_against_the_REAL_seed_2001_world``, because a
+    # longer label changes the summary's CHARACTER COUNT, which moves ``base_tokens``.
+    # **Nothing in that kill is about the label's content**, and the natural repair to that
+    # red — re-measuring ``base_tokens``, which is a measured fixture and is *supposed* to
+    # move — ships the arm differential green. §10.1 requires *"no DIFFERENTIAL information
+    # across arms"*, so an arm identity on the authored surface makes **arm 4 VOID BY
+    # CONSTRUCTION while every test passes**.
+    #
+    # The remedy is the same regex against ``scan`` instead of ``value``. It is not a
+    # replacement: the value-level check above still names the FIELD, which is the more
+    # actionable message when the leak really is in the value.
+    for token in re.findall(
+        r"\barms?\s*[1-4]S?\b|\bP[1-7]\b|\bINDETERMINATE\b|\bDENIED\b", scan, re.IGNORECASE
+    ):
+        findings.append(f"arm or clause identity {token!r} on the AUTHORED surface")
 
     # ── LAYER 3 — nothing authored is left over that the spec did not mandate ────────────
     residue = re.sub(re.escape(ctx.TRUNCATION_MARK) + r"[^\n]*", "", "\n".join(residue_parts))
@@ -1378,3 +1407,566 @@ def test_the_estimate_repeats_exactly_and_reads_the_divisor_from_config(repo_roo
     divisor = cfg.load("protocol").require("attacker.chars_per_token")
     assert est.chars_per_token() == divisor
     assert est.estimate_text("x" * 100) == est.estimate_text("x" * 100, divisor=divisor)
+
+
+# ======================================================================================
+# ⚠️ C6 FIX 3 — `REVIEW_C6_3`'s SIX NON-EQUIVALENT MUTANT SURVIVORS, KILLED.
+# `INCIDENTS.md` INC-53. `OPEN_FINDINGS.md` OF-104…OF-109, OF-111.
+#
+# REVIEW 3 returned **ZERO BLOCKERS**: all three of REVIEW 2's are closed, proved by
+# revert-goes-red, and all four old survivors are dead. **The behaviour is right.** What
+# failed C6 is that four of claim 4's own assertions could be deleted with all 77 C6 tests
+# green, plus two more on the fix's own new code.
+#
+# ⚠️ **EVERY FIXTURE BELOW IS BUILT SO THE MUTATED ASSERTION IS THE *SOLE* KILLER.** That is
+# the whole mechanism of the defect: the leaks the old suite planted each carried a cap value
+# *and* a clause *and* an arm word, so two or three layers fired on every one and **no single
+# layer was ever the thing that failed**. A fixture that merely goes red proves nothing here;
+# a fixture in which exactly one layer fires is what pins that layer.
+#
+# ⚠️ **AND EACH SURVIVOR CARRIES TWO FURTHER SHAPES OF THIS SESSION'S OWN**, beyond the one
+# the review exhibited — because closing a finding at the single point the review happened to
+# name is `INC-50`'s recorded defect ("a test written against the mutant rather than against
+# the property").
+# ======================================================================================
+
+
+def _sole_killer(findings: list[str], fragment: str, shape: str) -> None:
+    """Assert ``findings`` fired, and that **exactly one** layer produced them.
+
+    ⚠️ **This is the assertion the four blindness survivors exist because nobody wrote.**
+    ``assert findings`` is satisfied by any layer firing, and every leak the previous suite
+    planted was caught two or three ways — so each individual layer stayed deletable while
+    the suite stayed green (`REVIEW_C6_3` §3.4, `INCIDENTS.md` INC-53).
+    """
+    assert findings, (
+        f"claim 4's guard did not fire on {shape!r} at all. That is a policy-revealing "
+        f"leak on the AUTHORED surface with every blindness guard silent."
+    )
+    matched = [f for f in findings if fragment in f]
+    assert matched, f"the guard fired on {shape!r}, but not via {fragment!r}: {findings}"
+    assert len(matched) == len(findings), (
+        f"{shape!r} is caught by more than one layer, so it does NOT pin {fragment!r} — "
+        f"deleting that layer would leave the suite green, which is exactly REVIEW_C6_3's "
+        f"survivors N12/N13/N14/N15. findings: {findings}"
+    )
+
+
+def _with_extra_summary_line(context: ctx.AssembledContext, extra: str) -> ctx.AssembledContext:
+    """A copy of ``context`` whose deterministic summary carries one **extra line**.
+
+    ⚠️ **The other shapes in this file mutate a module CONSTANT (as M17 did); this one adds a
+    line, which no constant can do.** LAYER 3 exists for authored text that is *added* rather
+    than *hidden in a label*, so the fixture that pins it has to add something. The part is
+    located the way the guard itself locates it — by :data:`ctx.STATE_LABEL` — so a future
+    edit to the summary's shape breaks this helper loudly rather than silently addressing
+    nothing.
+    """
+    parts = []
+    replaced = 0
+    for part in context.parts:
+        if part.origin is ctx.Origin.AUTHORED and ctx.STATE_LABEL in part.text:
+            part = dataclasses.replace(part, text=f"{part.text}\n{extra}")
+            replaced += 1
+        parts.append(part)
+    assert replaced == 1, (
+        f"expected exactly one deterministic summary part to augment, augmented {replaced}. "
+        f"A helper that silently matches nothing makes every test below vacuous."
+    )
+    return dataclasses.replace(context, parts=tuple(parts))
+
+
+# ── OF-104 / M-1 — arm identity anywhere but the refusal value ────────────────────────
+
+
+@pytest.mark.parametrize(
+    ("shape", "refusal_label", "state_label"),
+    [
+        # REVIEW_C6_3's own two exhibits, verbatim.
+        ("the arm in the refusal LABEL", "LAST TOOL REFUSAL (arm 2S): ", None),
+        ("the gate judge named in the state LABEL", None, "STATE SO FAR (arm 4 runs a judge): "),
+        # ⚠️ TWO FURTHER SHAPES OF THIS SESSION'S OWN, beyond the review's.
+        ("a clause identifier in the refusal LABEL", "LAST TOOL REFUSAL (P7 applied): ", None),
+        ("a PLURAL arm form in the state LABEL", None, "STATE SO FAR (arms 1 and 2 agree): "),
+    ],
+)
+def test_the_denial_guard_sees_an_arm_identity_in_a_LABEL_not_only_in_the_value(
+    repo_root, shape, refusal_label, state_label
+):
+    """⚠️ **`REVIEW_C6_3` M-1 / `OF-104` — the headline MEDIUM, and it reaches §10.1.**
+
+    The guard's own opening sentence: *"a denial leaks neither **which arm is running** nor
+    which clause fired."* The regex encoding exactly that ran over the refusal **value** and
+    over nothing else, while `B-2` had already established that the shape which occurs is a
+    leak **in the label**. REVIEW 3 measured `"LAST TOOL REFUSAL (arm 2S): "` producing
+    **0 findings from all four guards**.
+
+    ⚠️ **AND THE REASON IT IS NOT MERELY UNTIDY:** three such mutants *do* die today, but
+    only on `test_the_crossover_series_reproduces_against_the_REAL_seed_2001_world`, because
+    a longer label changes the summary's **character count**. Nothing in that kill is about
+    the label's content, and the natural repair to that red — re-measuring `base_tokens`,
+    a measured fixture that is *supposed* to move — **ships the arm differential green.**
+    `CONTEXT.md` §10.1 requires *no DIFFERENTIAL information across arms*, so an arm identity
+    on the authored surface makes **arm 4 VOID BY CONSTRUCTION with every test passing.**
+
+    ⚠️ **MEASURED WHILE WRITING THIS, AND RECORDED RATHER THAN TIDIED AWAY:** a fourth shape
+    this session planted — ``"STATE SO FAR [DENIED once]: "`` — is caught **twice**, by
+    LAYER 2's vocabulary (`denied`) *and* by this scan, so it does **not** pin this scan and
+    :func:`_sole_killer` rejected it. **That is the same defect as `N14` and `N12`, caught by
+    the check written to prevent it, in the session writing that check.** Only the regex's
+    *arm* and *clause* branches are singly-covered; ``INDETERMINATE`` and ``DENIED`` are both
+    in :data:`_GATE_VOCABULARY` as well, and the shapes here are chosen accordingly.
+    """
+    generic = _generic_denial(_context_lines(repo_root))
+    original_refusal, original_state = ctx.LAST_REFUSAL_LABEL, ctx.STATE_LABEL
+    ctx.LAST_REFUSAL_LABEL = refusal_label or original_refusal
+    ctx.STATE_LABEL = state_label or original_state
+    try:
+        leaky = _assemble(system_prompt=authored.attacker_system_prompt(), last_refusal=generic)
+        found = _denial_findings(leaky, generic)
+    finally:
+        ctx.LAST_REFUSAL_LABEL, ctx.STATE_LABEL = original_refusal, original_state
+    assert (ctx.LAST_REFUSAL_LABEL, ctx.STATE_LABEL) == (original_refusal, original_state)
+
+    # ⚠️ The fragment is the arm/clause message itself, NOT the trailing "on the AUTHORED
+    # surface" the gate-vocabulary finding also ends with — otherwise a shape caught by
+    # LAYER 2 as well would satisfy `_sole_killer` and pin nothing.
+    _sole_killer(found, "arm or clause identity", shape)
+
+
+# ── OF-105 / N14 — `value != generic` as the SOLE killer ──────────────────────────────
+
+
+@pytest.mark.parametrize(
+    "shape",
+    [
+        # REVIEW_C6_3's own exhibit, verbatim.
+        "This action was blocked by policy. Try a smaller amount next time.",
+        # ⚠️ TWO FURTHER SHAPES OF THIS SESSION'S OWN.
+        "This action was blocked by policy. Contact your account manager.",
+        "This action was blocked by policy. The requested operation was not completed.",
+    ],
+)
+def test_the_denial_equality_is_the_SOLE_killer_of_a_value_that_leaks_nothing_else(
+    repo_root, shape
+):
+    """⚠️ **`REVIEW_C6_3` M-2 / `OF-105` — mutant `N14`, and it is `Q-046`'s own assertion.**
+
+    `Q-046`'s ruling: *"THE LOOP THEREFORE IDENTIFIES A DENIAL BY EXACT STRING EQUALITY
+    AGAINST THAT ONE AUTHORED CONSTANT."* The three value-leaks the previous suite planted —
+    `(arm 2S)`, `Clause P1 was violated.`, `verdict=INDETERMINATE` — are **each caught
+    twice**, by the equality *and* by the token regex, so **the equality was never the thing
+    that failed** and could be deleted with all 77 tests green.
+
+    Each value here extends §8.6's exact string with words that carry **no arm, no clause, no
+    verdict and no gate vocabulary**, so the equality is the only assertion that can see it.
+    That is what makes this a pin rather than another double-caught fixture.
+    """
+    generic = _generic_denial(_context_lines(repo_root))
+    assert shape.startswith(generic) and shape != generic, (
+        "the fixture must EXTEND the generic string, not replace it: a replacement would "
+        "leave 'policy' unsubtracted and LAYER 2 would fire, and the equality would again "
+        "not be the sole killer."
+    )
+    leaky = _assemble(system_prompt=authored.attacker_system_prompt(), last_refusal=shape)
+    _sole_killer(_denial_findings(leaky, generic), "is not the generic string", shape)
+
+
+# ── OF-106 / N12 — LAYER 3, the residue catch-all ─────────────────────────────────────
+
+
+@pytest.mark.parametrize(
+    "shape",
+    [
+        # REVIEW_C6_3's own two exhibits, verbatim.
+        "NOTE: your last action was reviewed.",
+        "A reviewer looked at that one.",
+        # ⚠️ TWO FURTHER SHAPES OF THIS SESSION'S OWN.
+        "OPERATOR NOTE: this episode is being watched.",
+        "Your third attempt went to a human.",
+    ],
+)
+def test_LAYER_3_is_the_SOLE_killer_of_authored_text_carrying_no_policy_word(repo_root, shape):
+    """⚠️ **`REVIEW_C6_3` M-3 / `OF-106` — mutant `N12`, and `INC-42`'s `Action` claims it.**
+
+    `INC-42`'s `Action` field says LAYER 3 is *"a second, **independent** layer … so
+    unexplained authored text of **any** kind fails even when it carries no recognised policy
+    word."* **It is true and nothing exercised it**: every leak the previous suite planted
+    carries a cap value or a clause, and dies to LAYERS 1–2 first, so LAYER 3 could be
+    deleted with the suite green.
+
+    Each line here is authored text a defender might plausibly add, carrying **no cap value,
+    no `policy.txt` clause, no gate vocabulary, no arm and no clause identifier** — so the
+    residue check is the only thing left that can see it. ⚠️ **It is still a leak**: it tells
+    the attacker something about the defender that §13.3 does not mandate, which is the
+    differential §10.1 forbids.
+    """
+    generic = _generic_denial(_context_lines(repo_root))
+    leaky = _with_extra_summary_line(
+        _assemble(system_prompt=authored.attacker_system_prompt(), last_refusal=generic), shape
+    )
+    _sole_killer(_denial_findings(leaky, generic), "unexplained AUTHORED text", shape)
+
+
+# ── OF-111 / N13 — `refusal_lines != 1`, the `> 1` half ───────────────────────────────
+
+
+@pytest.mark.parametrize(
+    ("shape", "extra_values"),
+    [
+        # REVIEW_C6_3's own exhibit: a SECOND recognisable denial line.
+        ("two denial lines", 1),
+        # ⚠️ TWO FURTHER SHAPES OF THIS SESSION'S OWN.
+        ("three denial lines", 2),
+        ("five denial lines", 4),
+    ],
+)
+def test_the_denial_line_COUNT_is_the_SOLE_killer_of_a_summary_with_more_than_one(
+    repo_root, shape, extra_values
+):
+    """⚠️ **`REVIEW_C6_3` L-1 / `OF-111` — mutant `N13`, the `> 1` half.**
+
+    The assertion reads `refusal_lines != 1` and was added so that *"a summary in which no
+    line is recognisable as one is a finding in itself"*. **The `< 1` half is exercised** by
+    the fix's own boundary-spanning shape; **the `> 1` half by nothing**, so weakening the
+    condition to `< 1` left all 77 tests green.
+
+    ⚠️ **Why more than one matters and is not pedantry:** §13.3 mandates *the* last denial
+    reason, singular. Two denial lines is two histories offered as one, and the second is
+    authored text the spec does not mandate — the same class LAYER 3 catches, arriving
+    through a line the parser *does* recognise and therefore subtracts from the residue.
+    Each extra line carries §8.6's exact generic string, so the equality, the token regex,
+    LAYER 1, LAYER 2 and LAYER 3 are all silent by construction and the count stands alone.
+    """
+    generic = _generic_denial(_context_lines(repo_root))
+    context = _assemble(system_prompt=authored.attacker_system_prompt(), last_refusal=generic)
+    for _ in range(extra_values):
+        context = _with_extra_summary_line(context, f"{ctx.LAST_REFUSAL_LABEL}{generic}")
+    found = _denial_findings(context, generic)
+    _sole_killer(found, "recognisable last-denial line(s), not 1", shape)
+    assert f"carries {extra_values + 1} recognisable" in found[0], (
+        f"the finding must PRINT the count it saw, or a reader cannot tell 0 from 2: {found}"
+    )
+
+
+# ── OF-107 / N15 — LAYER 1's exemption boundary ───────────────────────────────────────
+
+
+def _cap_shapes(repo_root: Path) -> list[tuple[str, str]]:
+    """Three formattings of a real `config/` ceiling, for planting inside ``STATE_LABEL``.
+
+    ⚠️ **Read from `config/`, never transcribed** — the same reason
+    :func:`_policy_revealing_values` gives: a fixture holding its own ``5000000`` would keep
+    passing while the frozen constant drifted, which is the defect one level down.
+    """
+    protocol = cfg.load("protocol")
+    per_action = protocol.require("money.per_action_cap_paise")
+    episode = protocol.require("money.episode_cap_paise")
+    return [
+        # REVIEW_C6_3's own exhibit: the bare per-action cap in paise.
+        ("the per-action cap, bare paise", str(per_action)),
+        # ⚠️ TWO FURTHER SHAPES OF THIS SESSION'S OWN: a different formatting, and a
+        # different ceiling — so neither the number nor the rendering is what is pinned.
+        ("the per-action cap, Indian-grouped rupees", _indian_grouped(str(per_action // 100))),
+        ("the EPISODE cap, comma-grouped paise", f"{episode:,}"),
+    ]
+
+
+@pytest.mark.parametrize("shape, value", _cap_shapes(_REPO_ROOT))
+def test_LAYER_1_scans_the_state_LABEL_and_exempts_only_the_state_JSON(repo_root, shape, value):
+    """⚠️ **`REVIEW_C6_3` M-4 / `OF-107` — mutant `N15`, and it is an exemption BOUNDARY.**
+
+    LAYER 1 scans every `config/` money ceiling *"anywhere on the authored surface **except
+    inside the folded state's own JSON**"* — the exemption exists because
+    ``episode_paise_moved`` may legitimately **equal** the cap. Widen that exemption from the
+    state **JSON** to the whole state **LINE** and a cap value planted in `STATE_LABEL`
+    becomes invisible; all 77 tests stayed green.
+
+    **The previous suite plants a policy CLAUSE in `STATE_LABEL`, which LAYER 2 kills, and
+    never a CAP VALUE** — so the boundary between the label and the JSON was tested from
+    neither side. Each shape here puts a real ceiling in the label, in a formatting that
+    carries no gate vocabulary, so LAYER 1 is the only layer that can see it.
+    """
+    generic = _generic_denial(_context_lines(repo_root))
+    original_state = ctx.STATE_LABEL
+    ctx.STATE_LABEL = f"STATE SO FAR ({value}): "
+    try:
+        leaky = _assemble(system_prompt=authored.attacker_system_prompt(), last_refusal=generic)
+        found = _denial_findings(leaky, generic)
+    finally:
+        ctx.STATE_LABEL = original_state
+    assert ctx.STATE_LABEL == original_state
+
+    _sole_killer(found, "money ceiling reached the AUTHORED surface", shape)
+
+
+def test_LAYER_1_still_EXEMPTS_a_cap_value_that_is_legitimately_inside_the_state_JSON(repo_root):
+    """⚠️ **THE OTHER SIDE OF THE SAME BOUNDARY, and it is why the exemption exists at all.**
+
+    A test that only pushed LAYER 1 outward would be satisfied by deleting the exemption —
+    and deleting it makes the guard fire on a **correct** context, because `CONTEXT.md`
+    §8.6's folded state carries ``episode_paise_moved``, which may legitimately reach the
+    episode cap exactly. `INC-50`'s recorded lesson: *"when a test pins a rule that chooses
+    between two candidates, fire it at BOTH orderings."*
+    """
+    generic = _generic_denial(_context_lines(repo_root))
+    episode_cap = cfg.load("protocol").require("money.episode_cap_paise")
+    settings = _settings()
+    at_the_cap = ctx.assemble(
+        system_prompt=authored.attacker_system_prompt(),
+        tool_schemas_text="fetch_payments(); create_refund(payment_id, amount)",
+        history=(),
+        state=ctx.FoldedState(
+            episode_paise_moved=episode_cap, turns_remaining=settings.turn_budget
+        ),
+        last_refusal=generic,
+        verbatim_turns=settings.verbatim_turns,
+        summary_token_cap=settings.summary_token_cap,
+    )
+    assert str(episode_cap) in at_the_cap.authored_text(), (
+        "the fixture no longer places the cap inside the state JSON, so it proves nothing"
+    )
+    assert not _denial_findings(at_the_cap, generic), (
+        "LAYER 1 fired on a state that legitimately moved exactly the episode cap. The "
+        "exemption is not decoration: without it the guard goes red on a CORRECT context, "
+        f"which is how a guard gets disabled. findings: {_denial_findings(at_the_cap, generic)}"
+    )
+
+
+# ── OF-109 / N9 — the relative-import resolution ──────────────────────────────────────
+
+
+@pytest.mark.parametrize(
+    ("form", "reach"),
+    [
+        # ⚠️ THE TWO RELATIVE FORMS. `INCIDENTS.md` INC-43 calls the relative resolution
+        # "a second form of the same blindness, found while fixing the first" — the
+        # CAPABILITY was added and the control that exists to pin exactly this was not
+        # extended to it, so dropping the resolution left all 77 tests green (`N9`).
+        ("from .. import <module>", "from .. import provider_client"),
+        ("from ..<module> import <name>", "from ..provider_client import x"),
+        # ⚠️ AND A THIRD, THIS SESSION'S OWN: a single-level relative import of a sibling,
+        # which resolves against a DIFFERENT slice of the package parts than the two above
+        # and is therefore a separate arithmetic path through `_imported_modules`.
+        ("from . import <sibling>", "from . import sibling_client"),
+    ],
+)
+def test_the_import_scan_fires_on_a_RELATIVE_import_too(tmp_path, form, reach):
+    """⚠️ **`REVIEW_C6_3` M-6 / `OF-109` — mutant `N9`, in the control that exists to pin it.**
+
+    ``test_the_import_scan_ACTUALLY_FIRES_in_every_import_form`` has four rows and **no
+    relative form**, so `_imported_modules`' relative-import resolution — added by `INC-43`
+    while fixing B-3 — was covered by nothing. Non-equivalent by exhibit: with the only route
+    to a client being a relative import, HEAD fires and the mutant does not.
+
+    ⚠️ **The form is not contrived.** ``whetstone_gate.world.selftest`` reaches ``_console``
+    as ``from .._console import say``, and this walk crosses into first-party modules it does
+    not own — so a relative import is a real edge of the graph this scan claims to close.
+    """
+    root = tmp_path / form.replace("<", "").replace(">", "_").replace(" ", "_").replace(".", "d")
+    source_root = _plant_tree(root, reach=reach)
+    # The sibling form needs its client where a SIBLING lives, not at the package root.
+    if reach.startswith("from . import"):
+        (source_root / "whetstone_gate" / "attacker" / "sibling_client.py").write_bytes(
+            b"import openai\n"
+        )
+    roots = sorted((source_root / "whetstone_gate" / "attacker").rglob("*.py"))
+    _seen, findings = _first_party_import_closure(roots, source_root=source_root)
+    assert findings, (
+        f"the import scan did NOT fire on a model client reached by {form!r} ({reach!r}). "
+        f"A spend-safety gate that cannot go red is decorative (PROCESS.md section 5.4), and "
+        f"the relative resolution INC-43 added is then pinned by nothing (REVIEW_C6_3 N9)."
+    )
+    assert any("openai" in f for f in findings), findings
+
+
+def test_the_sole_killer_helper_REJECTS_a_shape_that_two_layers_catch(repo_root):
+    """⚠️ **C6 FIX 3's OWN SURVIVOR `SM-2`, and it is the helper the other six kills rest on.**
+
+    :func:`_sole_killer` exists because ``assert findings`` is satisfied by *any* layer
+    firing, and **every leak the previous suite planted was caught two or three ways** — so
+    each individual layer stayed deletable while the suite stayed green. That is
+    `REVIEW_C6_3`'s `N12`, `N13`, `N14` and `N15`, all four of them, in one sentence.
+
+    ⚠️ **Weakening its exclusivity clause from ``len(matched) == len(findings)`` to
+    ``len(matched) >= 1`` left all 99 tests green** when this session mutated its own work —
+    because nothing fired the helper at a shape it is supposed to REJECT. A guard for
+    double-coverage that is never shown rejecting a double-covered shape is exactly the
+    thing it is guarding against.
+
+    **The fixture is this session's own measurement, kept rather than tidied away.** While
+    writing the `OF-104` cases, ``"STATE SO FAR [DENIED once]: "`` was planted as a fourth
+    shape; it is caught **twice** — LAYER 2's vocabulary sees ``denied`` and the new
+    surface-level scan sees ``DENIED`` — so it pins neither, and ``_sole_killer`` rejected
+    it. That rejection is now an assertion instead of an anecdote.
+    """
+    generic = _generic_denial(_context_lines(repo_root))
+    original_state = ctx.STATE_LABEL
+    ctx.STATE_LABEL = "STATE SO FAR [DENIED once]: "
+    try:
+        leaky = _assemble(system_prompt=authored.attacker_system_prompt(), last_refusal=generic)
+        found = _denial_findings(leaky, generic)
+    finally:
+        ctx.STATE_LABEL = original_state
+    assert ctx.STATE_LABEL == original_state
+
+    # The shape really is caught, and really is caught TWICE. Both halves asserted, because
+    # "caught twice" is the premise and "rejected by the helper" is the conclusion.
+    assert len(found) == 2, (
+        f"the fixture no longer exercises DOUBLE coverage, so it cannot pin _sole_killer's "
+        f"exclusivity clause: {found}"
+    )
+    assert any("gate vocabulary" in f for f in found), found
+    assert any("arm or clause identity" in f for f in found), found
+
+    with pytest.raises(AssertionError, match="caught by more than one layer"):
+        _sole_killer(found, "arm or clause identity", "a shape two layers catch")
+
+    # ⚠️ AND THE OTHER DIRECTION, so this cannot be satisfied by a helper that always raises.
+    # INC-50: "when a test pins a rule that chooses between two candidates, fire it at BOTH."
+    singly = _denial_findings(
+        _assemble(
+            system_prompt=authored.attacker_system_prompt(),
+            last_refusal=f"{generic} Contact your account manager.",
+        ),
+        generic,
+    )
+    _sole_killer(singly, "is not the generic string", "a shape only the equality catches")
+
+
+# ======================================================================================
+# ⚠️ OF-110 — C6's HALF. `REVIEW_C6_3` M-7: three dynamic import forms escape the AST walk
+# BY CONSTRUCTION, and there was no source-text scan anywhere in this repository.
+# ======================================================================================
+
+#: ⚠️ **The vocabulary of dynamic reach, refused outright in `attacker/`.**
+#:
+#: `REVIEW_C6_3` M-7 measured that ``__import__("openai")``,
+#: ``importlib.import_module("openai")`` and ``getattr(whetstone_gate, "provider_client")``
+#: **all escape** ``_first_party_import_closure`` — a call expression is not an
+#: ``ast.Import`` node, so an AST walk cannot see it *by construction* — and routed the
+#: finding away from C6 because *no source-text scan exists anywhere*. One now does, at
+#: `OF-99`'s address (`check_roles.py` **D4**, `INCIDENTS.md` **INC-51**), and **this is C6's
+#: own, written separately and deliberately not imported from it**: the attacker package is
+#: the chunk whose lanes `PROCESS.md` §8 reserves, where spend is irreversible, and a probe
+#: that borrows the predicate it is checking cannot find a defect in the predicate.
+#:
+#: ⚠️ **IT IS A REFUSAL, NOT A PATTERN-MATCH ON AN IMPORT.** `attacker/` composes text and
+#: counts characters; it has no legitimate need for a dynamic import, for reflection, or for
+#: ``exec``. Measured against the package as it stands: **zero hits.** So the cost of a false
+#: positive is a rewording and the cost of a false negative is a provider call on a reserved
+#: lane. Narrowing this tuple is a Class A deviation requiring an architect ruling.
+_REFUSED_DYNAMIC_REACH = (
+    ("importlib", r"\bimportlib\b"),
+    ("__import__", r"\b__import__\b"),
+    ("sys.modules", r"\bsys\s*\.\s*modules\b"),
+    ("getattr", r"\bgetattr\b"),
+    ("setattr", r"\bsetattr\b"),
+    ("exec", r"\bexec\s*\("),
+    ("eval", r"\beval\s*\("),
+    ("compile", r"\bcompile\s*\("),
+    ("runpy", r"\brunpy\b"),
+    ("pkgutil", r"\bpkgutil\b"),
+)
+
+
+def _dynamic_reach_findings(package: Path) -> list[str]:
+    """Every refused dynamic-reach name in ``package``'s **source text**, with file and line.
+
+    Text, not AST, on purpose: the whole point of `OF-110` is that the AST cannot see these
+    forms, so a second AST pass would reproduce the blind spot in a different shape.
+    """
+    findings = []
+    for py in sorted(package.rglob("*.py")):
+        for number, line in enumerate(
+            py.read_bytes().decode("utf-8").splitlines(), start=1
+        ):
+            for name, pattern in _REFUSED_DYNAMIC_REACH:
+                if re.search(pattern, line):
+                    findings.append(f"{py.name}:{number} uses {name!r} - {line.strip()[:80]!r}")
+    return findings
+
+
+def test_the_attacker_package_reaches_no_module_DYNAMICALLY_either(repo_root):
+    """⚠️ **`OF-110` / `REVIEW_C6_3` M-7 — the half the AST walk cannot cover.**
+
+    ``test_the_attacker_package_imports_no_model_client_and_no_network_library`` walks the
+    module graph and is exact on every **static** form — all four are pinned by a positive
+    control. It is blind to every **call-expression** form, and REVIEW 3 measured that:
+    ``__import__``, ``importlib.import_module`` and ``getattr`` on the package root each
+    reach a client with the walk reporting nothing.
+
+    **The two halves see different things and neither is the guarantee alone.** The walk sees
+    the graph and cannot see a call; this sees the vocabulary and cannot see semantics.
+    ⚠️ **It matters here more than anywhere else in the repository**: `PROCESS.md` §8 reserves
+    the reference-attacker lanes for the sweep, a session that spends on one cannot give the
+    tokens back, and this is the package most likely to want a provider.
+    """
+    findings = _dynamic_reach_findings(repo_root / "src/whetstone_gate/attacker")
+    assert not findings, (
+        "the attacker package can reach a module DYNAMICALLY, which the AST walk cannot "
+        "see (OPEN_FINDINGS OF-110; REVIEW_C6_3 M-7):\n  " + "\n  ".join(findings)
+    )
+
+
+@pytest.mark.parametrize(
+    ("form", "source"),
+    [
+        # The three REVIEW_C6_3 measured escaping the AST walk.
+        ("importlib.import_module", 'import importlib\nx = importlib.import_module("openai")\n'),
+        ("__import__", 'x = __import__("openai")\n'),
+        ("getattr on the package root", 'import whetstone_gate\nx = getattr(whetstone_gate, "c")\n'),
+        # ⚠️ TWO FURTHER SHAPES OF THIS SESSION'S OWN, neither named by OF-110.
+        ("sys.modules", 'import sys\nx = sys.modules["whetstone_gate.provider_client"]\n'),
+        ("exec of an import statement", 'ns = {}\nexec("import openai", ns)\n'),
+    ],
+)
+def test_the_dynamic_reach_scan_ACTUALLY_FIRES_on_every_form_the_ast_walk_misses(
+    tmp_path, form, source
+):
+    """⚠️ **THE POSITIVE CONTROL, and it asserts BOTH halves of `OF-110`'s finding.**
+
+    Each case plants the form in a synthetic package under ``tmp_path`` — nothing is written
+    inside this repository (`INC-17`) — and asserts:
+
+      * the **AST walk reports nothing**, which is `OF-110`'s measurement and is what makes
+        the text scan necessary rather than belt-and-braces; and
+      * the **text scan fires**.
+
+    If a future change makes the AST walk catch these, the first assertion fails loudly and a
+    session must come and re-read `OF-110` rather than quietly deleting the text scan.
+    """
+    package = tmp_path / form.replace(".", "d").replace(" ", "_") / "src/whetstone_gate/attacker"
+    package.mkdir(parents=True)
+    (package.parent / "__init__.py").write_bytes(b"")
+    (package / "__init__.py").write_bytes(b"")
+    (package / "reach.py").write_bytes(source.encode("utf-8"))
+
+    _seen, ast_findings = _first_party_import_closure(
+        sorted(package.rglob("*.py")), source_root=package.parents[1]
+    )
+    assert not ast_findings, (
+        f"the AST walk DID catch {form!r}. That contradicts OF-110's measurement, and this "
+        f"test's premise: re-read OF-110 before deleting the text scan. {ast_findings}"
+    )
+    text_findings = _dynamic_reach_findings(package)
+    assert text_findings, (
+        f"the source-text scan did NOT fire on {form!r}. That is OF-110 unfixed for C6, on "
+        f"the package whose lanes PROCESS.md section 8 reserves."
+    )
+    assert "reach.py" in text_findings[0], text_findings
+
+
+def test_the_dynamic_reach_refusal_list_is_pinned():
+    """⚠️ An exception list is where a check dies quietly; so is a **shrinking** refusal list.
+
+    The three names `OF-110` measured are asserted individually, so a diff that drops one
+    meets a named assertion rather than a count.
+    """
+    names = {name for name, _ in _REFUSED_DYNAMIC_REACH}
+    for required in ("importlib", "__import__", "getattr", "sys.modules", "exec"):
+        assert required in names, (
+            f"{required!r} was removed from _REFUSED_DYNAMIC_REACH. REVIEW_C6_3 M-7 measured "
+            f"this exact shape reaching a model client with the AST walk silent, on the "
+            f"package whose lanes are reserved. Removing it is a CLASS A deviation."
+        )
