@@ -155,6 +155,30 @@ right name and the wrong `e` (fixed, `c44b752`), and `CONTEXT.md` §11.3, `PROVE
 because both were outside the fence (**Q-049**). A probe supplies the byte comparison meanwhile;
 **that is a test, not a registry row**, and the row is owed.
 
+### ⚠️ ADDENDUM — A SECOND RED, AND IT IS THIS SESSION'S OWN FAULT
+
+*⚠️ **ADDENDUM, C6 FIX 1 (`7b99a85a`), 2026-09-01 — A SECOND RED, AND THIS ONE IS THIS SESSION'S OWN
+FAULT RATHER THAN A DEFECT IT EXPOSED. `INCIDENTS.md` INC-30, `QUESTIONS.md` Q-051.**
+`make test` is **445 passed, 2 FAILED** — not the 442 / 1 the entry below states, and that entry is
+left **unedited** because it was true when it was written. The second failure is
+`tests/test_c1_review_2_probes.py::test_no_reviewer_probe_file_has_ever_been_edited_by_a_later_session`,
+**the mechanical form of hard rule 6**, and it fired **correctly**: a **C4 REVIEW** session
+(`0852ea56`) was writing into this same working tree, and this session's commit `17585ab` carries
+**five files that are not its own**, including **`tests/test_c4_review_probes.py`** — so a reviewer's
+probe file now carries a **fix** session's token. ⚠️ **The cause is that `git add <explicit paths>`
+gives NO isolation: `git commit` commits the whole SHARED index, and only `git commit -- <paths>` is
+scope-limited.** This session **saw** the concurrent writes at 09:57, **wrote down** that it would
+*"stage only my own files, explicitly"*, and then applied the precaution that protects the *staging*
+and not the *commit* — the danger was identified in writing and mitigated with the wrong command,
+which is worse than not having noticed. The other eight commits were audited one by one and are
+clean; nothing was lost or altered, and the C4 session's own `754c0bd`, three minutes later, is the
+authoritative state of its file — the defect is **attribution**, not content. ⚠️ **NOT REPAIRABLE
+FORWARD:** a rewrite is forbidden and would rewrite **their** commits in a tree their session may
+still be live in, and a revert would add a **third** commit under this session's token. Every
+subsequent commit here used `git commit -- <paths>`. **Q-051 asks the architect the narrow question
+and the wider one: which remedy stands, and whether two sessions should share one working tree at
+all.**
+
 ### WHAT THIS SESSION GOT WRONG, OR COULD NOT DO
 
 1. **`data/` is not on the fence's `ONLY` list** while the Q-046 ruling says the constant is *"read

@@ -3905,6 +3905,75 @@ failure is this one and its cause is measured above.
 
 ---
 
+### Q-051 — ⚠️ STOP: this fix session committed a concurrent REVIEW's probe file under its own token, and the mechanical hard-rule-6 guard is RED because of it
+**Raised by:** C6 FIX (`7b99a85a`) · **Date:** 2026-09-01 · **Status:** **OPEN — BLOCKING a
+green suite; the history is PERMANENT and cannot be repaired forward** · **Class:** **A** — it
+is a fence breach that already happened, and the remedy touches a reviewer's own assertion.
+**`INCIDENTS.md`:** **INC-30**.
+
+**Context.** A **C4 REVIEW** session (`0852ea56`) was writing into this working tree while this
+fix session ran. `git add <explicit paths>` gives **no isolation**, because `git commit`
+without a pathspec commits the **whole shared index** — so commit `17585ab` (this session's
+F-1 fix) carries five files belonging to that session, including
+**`tests/test_c4_review_probes.py`**.
+
+```
+tests/test_c1_review_2_probes.py::test_no_reviewer_probe_file_has_ever_been_edited_by_a_later_session
+
+  tests/test_c4_review_probes.py: {
+    '0852ea56': ['754c0bd  test: C4 REVIEW 1 - four more kept probes ...'],
+    '7b99a85a': ['17585ab  fix: F-1 - the summary folds the LAST DENIAL ...']
+  }
+```
+
+⚠️ **THE GUARD IS RIGHT AND IT FIRED CORRECTLY.** Its whole purpose is *"a fix session editing
+a reviewer's probe to get green is the precise move hard rule 6 exists to catch"*, and a fix
+session's token is now on a reviewer's probe file. **That the cause was a git-index race and
+not an edit for green does not make the guard wrong; it makes the guard's finding need a
+ruling.** The eight other commits of this session were audited one by one and are clean.
+
+**What actually happened to the file, stated so the ruling can be proportionate.** Nothing was
+lost, deleted or altered. `17585ab` captured an **intermediate** state of a file the C4 REVIEW
+session was mid-way through writing; that session's own `754c0bd`, **three minutes later**, is
+the authoritative final state and is intact. The defect is **attribution**, not content.
+
+**Options seen:**
+  1. ⚠️ **Rewrite history to un-commit the five files.** **Rejected, and not merely because
+     `CLAUDE.md` §5 says *"No history rewrite, ever."*** The C4 REVIEW session's own `754c0bd`
+     is **later in the log** than `17585ab`, so any rebase rewrites **their** commits, in a
+     tree **their session may still be live in**. That is destructive to another session's
+     work to tidy this one's record.
+  2. **`git revert` the contamination.** **Rejected — it makes the finding worse.** A revert
+     adds a **third** commit touching their probe file, again carrying this session's token.
+  3. **Update the assertion to tolerate a token that only ever ADDED a file it did not
+     author.** ⚠️ **The guard's own docstring already contemplates being amended:** *"A
+     legitimate reason for a later session to touch one exists … When that happens the edit is
+     made by a review session, deliberately, and this assertion is updated citing it."*
+     **Outside this session's fence** — `tests/test_c1_review_2_probes.py` is an existing test
+     file **and** a reviewer's probe file, so a fix session editing it would commit the exact
+     offence the guard exists to catch, **twice**.
+  4. **Leave the assertion and record the breach as a permanent, named exception**, the way
+     Q-014 (iv) pins the four `CTX-13.4` commits at exactly four entries so the exception
+     cannot grow into an amnesty. That shape already exists in this project and is the closest
+     precedent.
+
+**Default taken:** ⚠️ **NONE — work stopped on this item.** The red is reported, not worked
+around (`CLAUDE.md` §4, hard rule 1). The only action taken is **forward-only**: every
+subsequent commit in this session used the pathspec-limited `git commit -- <paths>`, which
+commits only the named paths whatever else is in the shared index.
+
+**What the architect is asked to rule:** which of options 3 and 4 stands, and which session
+applies it — noting that **option 3 cannot be applied by any FIX session**, by the guard's own
+logic. And, separately and more importantly than this instance: ⚠️ **whether concurrent
+sessions should share one working tree at all.** `CLAUDE.md` §4 already sends throwaway work
+to a fresh OS temp directory; a `git worktree` per session makes this class impossible.
+**Two sessions have now been recorded writing into this tree concurrently on the same day** —
+`STATUS.md`'s C6 REVIEW note and this one — and this is the first time it cost anything.
+
+**RULING (architect, <date>):** *<pending>*
+
+---
+
 ## Rulings carried in from before the repository existed
 
 These were made by the architect in `PROJECT_SPEC.md` before C0 and are **already binding**. They

@@ -1803,3 +1803,124 @@ pretend a convention is a mechanism — INC-25's own conclusion about `_console.
 *"a convention with no mechanism behind it"* is exactly how a rule fails the sixth time.
 
 ---
+
+## INC-30 — `git add <paths> && git commit` is NOT scope-limited when two sessions share a working tree: this fix session committed a CONCURRENT REVIEW's files under its own token, and broke the one mechanical guard that polices hard rule 6
+
+**Date:** 2026-09-01 (caused by C6 FIX `7b99a85a` at 09:58:38 +0530, in commit `17585ab`;
+found by the same session at 10:14 when the final full-suite run went red on a test that had
+been green all day.)
+
+**Event:** `tests/test_c1_review_2_probes.py::test_no_reviewer_probe_file_has_ever_been_edited_by_a_later_session`
+— **the mechanical form of hard rule 6, and the exact guard this session's own prompt warned
+about in capitals** — failed:
+
+```
+a reviewer's probe file has been touched by MORE THAN ONE SESSION.
+  tests/test_c4_review_probes.py: {
+    '0852ea56': ['754c0bd test: C4 REVIEW 1 - four more kept probes ...'],
+    '7b99a85a': ['17585ab fix: F-1 - the summary folds the LAST DENIAL ...']   <- MINE
+  }
+```
+
+⚠️ **A C4 REVIEW session (`0852ea56`) was working in the same working tree, and commit
+`17585ab` — this session's F-1 fix — carries FIVE FILES THAT ARE NOT ITS OWN:**
+
+```
+17585ab  fix: F-1 ...
+  data/generic_denial.txt                            <- mine
+  src/whetstone_gate/attacker/{context,loop,texts}.py <- mine
+  docs/reviews/independent/c4_diff_harness.py         <- C4 REVIEW's
+  docs/reviews/independent/c4_reimpl_diff.txt         <- C4 REVIEW's
+  docs/reviews/independent/c4_reimpl_expected.json    <- C4 REVIEW's
+  docs/reviews/independent/c4_vectors.py              <- C4 REVIEW's
+  tests/test_c4_review_probes.py                      <- C4 REVIEW's  *** the offence ***
+```
+
+**The other eight commits of this session are clean** — audited one by one, `git show
+--name-only` on each — so the blast radius is one commit and five files.
+
+**Action:** Audited all nine commits; confirmed the reciprocal direction is clean (`7db3e72`,
+`51404cc` and `754c0bd` contain none of this session's files); switched every remaining commit
+to the **pathspec-limited** form `git commit -- <paths>`, which commits *only* the named paths
+regardless of what else is in the index; recorded this entry and `QUESTIONS.md` **Q-051**; and
+reported it as the first item of the FIX report's *"what I could not do"*. ⚠️ **NOT REPAIRED,
+and it cannot be repaired forward** — see `Fix`.
+
+**Expectation:** `git add <explicit paths>` followed by `git commit` should commit those paths
+and nothing else. That is true for one session in one working tree and it is **false the
+moment a second session shares the tree**: `git add` writes to `.git/index`, `git commit`
+without a pathspec commits **the whole index**, and the index is shared process-global state.
+The other session staged its files in the ~26 seconds between this session's `git add` and its
+`git commit`, and they were swept in.
+
+**Missing:** Any check that a commit's file list is a subset of the session's declared fence.
+The fence exists as prose in a prompt; nothing in the repository knows it; and `check-roles`
+polices *who* committed (the `Session-Token` trailer) but never *what*. ⚠️ A cheap check
+exists and is specific: **a pre-commit hook, or a `check-roles` rule, comparing each commit's
+`--name-only` list against a fence declared in the commit trailer.** It is not written here —
+see `Systemic guardrail`.
+
+**Missed:** ⚠️ **THIS SESSION SAW THE CONCURRENT WRITES, NAMED THEM, TOOK A PRECAUTION, AND
+TOOK THE WRONG ONE.** At 09:57 it ran `git status --porcelain`, saw
+`docs/reviews/independent/c4_*` and `tests/test_c4_review_probes.py` in its own tree, wrote
+*"⚠️ A concurrent session is writing C4 review files into this tree. Those are not mine — I'll
+stage only my own files, explicitly"*, and then did exactly that — **`git add` with explicit
+paths, which is the precaution that does not work.** The reasoning was one step short: it
+protected the *staging* and not the *commit*, and `git commit` does not take its scope from
+the last `git add`. **The danger was identified, stated in writing, and mitigated with the
+wrong command, which is worse than not having noticed — a session that had not noticed would
+not have recorded a false assurance.**
+⚠️ **AND THE PROMPT ITSELF NAMED THE VERY FILE CLASS, IN CAPITALS:** *"No reviewer's probe file
+in this project has ever been edited by a later session and that record is now mechanically
+asserted."* The sentence was read, understood as being about `tests/test_c6_review_probes.py`
+— which this session correctly never touched — and **not generalised to every reviewer probe
+file in the tree**, which is precisely what the guard globs for and precisely what the
+sentence says.
+⚠️ **A third signal was on screen and unread:** `STATUS.md`'s own most recent entry records
+*"A C6 REVIEW session was writing into this working tree concurrently"* — the identical
+hazard, one session earlier, in a file this session read in its prescribed read order.
+
+**Diagnosis:** `git commit` takes its scope from the **index**, not from the preceding
+`git add`, and the index is shared between concurrent sessions in one working tree — so
+explicit staging gives no isolation whatsoever and only `git commit -- <paths>` does. The
+session identified the hazard and applied a mitigation that addresses the wrong half of the
+operation.
+
+**Fix:** ⚠️ **NONE, AND THE HISTORY IS PERMANENT. This field says so rather than being left
+blank.** `CLAUDE.md` §5: *"No force-push. No tag moves. No amending a tagged commit. No history
+rewrite, ever."* Three further reasons make a rewrite the wrong answer even setting that
+aside: **(i)** the C4 REVIEW session's own commit `754c0bd` is **later in the log** than
+`17585ab`, so any rewrite would rewrite *their* commits, in a tree **their session may still
+be live in**; **(ii)** a `git revert` would not help — it adds a **third** commit touching
+their probe file, again under this session's token, making the guard's finding worse rather
+than better; **(iii)** nothing was lost or corrupted, only mis-attributed: their `754c0bd` is
+the authoritative final state of the file and it is intact. **The remedy this session applied
+is forward-only: every subsequent commit used `git commit -- <paths>`.** The red guard is
+raised as `QUESTIONS.md` **Q-051** for the architect, whose own docstring already contemplates
+being *"updated citing"* a legitimate cause.
+
+**Systemic guardrail:** ⚠️ **NONE LANDED, and one is genuinely available and is named at its
+true size rather than gestured at.** *(1)* **The one-line habit that removes the whole class:
+`git commit -- <paths>` instead of `git add <paths> && git commit`.** That is a convention, and
+`INCIDENTS.md` **INC-25**'s own conclusion is that *"a convention with no mechanism behind it"*
+is exactly how a rule fails the sixth time — so it is offered as the immediate mitigation and
+**not** as the guardrail. *(2)* **The real one is a mechanism and it is small:** `check-roles`
+already parses every commit's `Session-Token` trailer for E1/E2/E3; adding a rule that a
+commit's `git show --name-only` list must not contain a path belonging to a *different*
+session's chunk is the same walk over the same log. ⚠️ **It is NOT claimed as landed** — it
+belongs in `src/whetstone_gate/check_roles.py` and `tests/test_repo_invariants.py`, both
+outside this session's fence, which is `INCIDENTS.md` **INC-28**'s pattern arriving for the
+**fourth** time in the same session that recorded the third. *(3)* ⚠️ **The cheapest fix of all
+is not in the repository at all: two sessions should not share one working tree.** `CLAUDE.md`
+§4 already sends throwaway work to a fresh OS temp directory; the same reasoning applied to
+concurrent *sessions* — a `git worktree` each — would have made this impossible, and it is the
+architect's to decide. **Two sessions have now been recorded writing into this tree
+concurrently on the same day** (`STATUS.md`'s C6 REVIEW note, and this), and this is the first
+time it cost anything.
+
+*⚠️ Recorded by the session that caused it, before its FINAL OUTPUT was printed, and filed
+under the failure rather than under the concurrency: the other session did nothing wrong, the
+shared tree is a standing condition this project already knew about, and the wrong command was
+this session's own choice made after it had written down the risk in its own words.*
+
+---
