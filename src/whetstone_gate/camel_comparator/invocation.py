@@ -534,7 +534,7 @@ def _named_functions(tree: ast.Module) -> dict[str, ast.FunctionDef]:
     found: dict[str, ast.FunctionDef] = {}
     for node in tree.body:
         if isinstance(node, ast.FunctionDef):
-            found.setdefault(node.name, node)
+            found[node.name] = node
         elif isinstance(node, ast.ClassDef):
             for child in node.body:
                 if isinstance(child, ast.FunctionDef):

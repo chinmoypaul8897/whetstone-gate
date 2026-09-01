@@ -43,7 +43,7 @@ import dataclasses
 import re
 import shutil
 import subprocess
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 
 import pytest
 
@@ -739,6 +739,265 @@ def test_the_live_log_path_is_located_by_ast_and_proved_reachable(tmp_path):
         invocation.live_log_path_from_source(live + dead)
 
 
+def test_BOTH_path_flavours_are_pinned_including_the_WINDOWS_half(tmp_path):
+    """⚠️ **`OF-96` / mutant `N11`, which SURVIVED C13 REVIEW 2's whole suite.**
+
+    `_is_relative_literal` checks **POSIX and Windows rules**, deliberately, because
+    ``PureWindowsPath("/var/logs").is_absolute()`` is **False** (no drive) — so a
+    Windows-only check would call CaMeL's own POSIX-style absolute path *relative* and M16
+    would walk through the guard written to stop it. **Only the POSIX half was pinned.**
+    Deleting ``PureWindowsPath(root).is_absolute()`` left the entire suite green.
+
+    ⚠️ **AND AN END-TO-END ASSERTION IS NOT ENOUGH, which is the finding inside the
+    finding.** REVIEW 2 proved that the end-to-end kill of a Windows-absolute mutant comes
+    from ``claim.root_literal == "logs"`` and **not** from ``is_relative``: running
+    `N11 + M16-abs-win` together, the property test still dies, for the wrong reason. So
+    the discrimination is asserted **at the function**, where nothing else can satisfy it.
+    **This is `B-2`'s shape one level smaller, inside the code written to close `B-2`.**
+    """
+    # -- The two rules, each absolute flavour caught by exactly one of them. -------------
+    assert invocation._is_relative_literal("logs") is True
+    assert invocation._is_relative_literal("/var/logs") is False, "POSIX-absolute"
+    assert invocation._is_relative_literal("C:/logs") is False, (
+        "drive-absolute with forward slashes: PurePosixPath calls this RELATIVE, so only "
+        "the Windows rule can catch it — N11 deletes exactly that rule"
+    )
+    assert invocation._is_relative_literal("C:\\logs") is False, (
+        "the BACKSLASH flavour, which no fixture fired before OF-96"
+    )
+    assert invocation._is_relative_literal("\\\\server\\share\\logs") is False, "UNC"
+
+    # ⚠️ Each half proved LOAD-BEARING by exhibiting a string only it rejects. Without
+    # this, deleting either rule would still leave the four assertions above satisfiable
+    # by the other — which is how N11 survived in the first place.
+    assert PurePosixPath("C:/logs").is_absolute() is False, (
+        "the POSIX rule alone CANNOT see this one; if this ever becomes True the Windows "
+        "half stops being load-bearing and OF-96's mutant becomes equivalent"
+    )
+    assert PureWindowsPath("/var/logs").is_absolute() is False, (
+        "and the Windows rule alone cannot see CaMeL's own POSIX-style absolute path"
+    )
+
+    # -- And through the real derivation, so the integration path is covered too. --------
+    live = (
+        'from pathlib import Path\n'
+        'def replay_task(pipeline_name, suite_name, user_task_id, attack_name):\n'
+        '    trace_path = (\n'
+        '        Path("C:/logs")\n'
+        '        / pipeline_name\n'
+        '        / (attack_name or "none")\n'
+        '    )\n'
+        '    return TaskResults.model_validate_json(trace_path.read_text())\n'
+    )
+    caller = (
+        'class PrivilegedLLMReplayer:\n'
+        '    def query(self, q, runtime, env, messages, extra_args):\n'
+        '        return replay_task(self._pipeline_name, "banking", None, None)\n'
+    )
+    claim = invocation.live_log_path_from_source(live + caller)
+    assert claim.root_literal == "C:/logs"
+    assert claim.is_relative is False, (
+        "a DRIVE-absolute log path deletes the same-working-directory requirement exactly "
+        "as a POSIX-absolute one does; asserting root_literal here would pass under N11"
+    )
+
+
+def test_crashes_loudly_is_pinned_in_its_FALSE_direction_too(tmp_path):
+    """⚠️ **`OF-97` / mutant `N13`, which SURVIVED.** Adding ``"glob"`` to the loud set
+    inverts `INC-39`'s central distinction and **nothing failed**.
+
+    `INC-39` is that distinction getting inverted: ``read_text`` over a missing file raises
+    ``FileNotFoundError`` — **loud, diagnosable inside a 90-minute box**; ``glob`` over a
+    missing directory yields an empty iterator — **a silent zero, a number nobody can tell
+    from a real one**. `same_working_directory_reason` branches on
+    :attr:`LogPathClaim.crashes_loudly` to generate the sentence **RUN-1 acts on**.
+
+    The suite only ever saw ``read_call == "read_text"``, so the **False** direction — the
+    half that says *"this one is the undiagnosable failure"* — was asserted nowhere.
+    `M17-glob` dies on ``claim.read_call == "read_text"``, which is a different claim.
+
+    ⚠️ **Constructed through the REAL derivation, not by hand-building the dataclass**, so
+    this pins the path the run actually takes: ``glob`` is in ``_READ_CALLS``, so a live
+    function that globs is genuinely reachable and genuinely produces ``read_call='glob'``.
+    """
+    globbing = (
+        'from pathlib import Path\n'
+        'def replay_task(pipeline_name, suite_name, user_task_id, attack_name):\n'
+        '    trace_path = (\n'
+        '        Path("logs")\n'
+        '        / pipeline_name\n'
+        '        / (attack_name or "none")\n'
+        '    )\n'
+        '    return [p for p in trace_path.glob("*.json")]\n'
+    )
+    caller = (
+        'class PrivilegedLLMReplayer:\n'
+        '    def query(self, q, runtime, env, messages, extra_args):\n'
+        '        return replay_task(self._pipeline_name, "banking", None, None)\n'
+    )
+    quiet = invocation.live_log_path_from_source(globbing + caller)
+    assert quiet.read_call == "glob"
+    assert quiet.crashes_loudly is False, (
+        "a glob over a missing directory yields nothing and raises nothing. Calling that "
+        "'loud' is INC-39's inversion, and it is the direction the suite could not see"
+    )
+
+    # ⚠️ And the reason it matters: the sentence RUN-1 is handed FLIPS with it.
+    silent = invocation.same_working_directory_reason("vendor/camel-prompt-injection", quiet)
+    assert "SILENT ZERO" in silent and "read_text" not in silent
+    assert "UNHANDLED" not in silent, (
+        "a glob claim must NOT be described to RUN-1 as an unhandled crash; that is the "
+        "guidance INC-39 was written about, generated backwards"
+    )
+
+    # The control: the pin's own shape still reports the loud, diagnosable failure.
+    loud = invocation.live_log_path()
+    assert loud.read_call == "read_text" and loud.crashes_loudly is True
+    assert "CRASHES LOUDLY" in invocation.same_working_directory_reason("x", loud)
+
+
+def test_the_refusal_is_EXACTLY_ONE_reachable_and_not_merely_AT_LEAST_ONE(tmp_path):
+    """⚠️ **`OF-98` / mutant `N8`, which SURVIVED.** Weakening ``len(live) != 1`` to
+    ``len(live) < 1`` left the suite green.
+
+    Nothing constructed the state the refusal exists for. The suite's `M17` case has
+    **zero** reachable constructions, and ``0 < 1`` still raises — so the mutant was
+    invisible. The state it is blind to is **two**: there, HEAD refuses and the mutant
+    silently takes ``sorted(live)[0]`` and publishes a citation for whichever function
+    happened to sort first.
+
+    ⚠️ **That refusal is the sentence `INC-39`'s remedy rests on.** `INC-39` is a citation
+    that named a line inside a function nothing calls; *"exactly one REACHABLE one"* is the
+    whole check, and *"the string is present"* is what it replaced.
+    """
+    two_readers = (
+        'from pathlib import Path\n'
+        'def replay_task(pipeline_name, suite_name, user_task_id, attack_name):\n'
+        '    trace_path = (\n'
+        '        Path("logs")\n'
+        '        / pipeline_name\n'
+        '        / (attack_name or "none")\n'
+        '    )\n'
+        '    return TaskResults.model_validate_json(trace_path.read_text())\n'
+        'def replay_task_v2(pipeline_name, suite_name, user_task_id, attack_name):\n'
+        '    other_path = (\n'
+        '        Path("logs")\n'
+        '        / suite_name\n'
+        '        / (attack_name or "none")\n'
+        '    )\n'
+        '    return TaskResults.model_validate_json(other_path.read_text())\n'
+    )
+    caller = (
+        'class PrivilegedLLMReplayer:\n'
+        '    def query(self, q, runtime, env, messages, extra_args):\n'
+        '        if self._legacy:\n'
+        '            return replay_task_v2(self._pipeline_name, "banking", None, None)\n'
+        '        return replay_task(self._pipeline_name, "banking", None, None)\n'
+    )
+
+    # First: prove the fixture really reaches TWO, so this is not a test of something else.
+    tree = ast.parse(two_readers + caller)
+    functions = invocation._named_functions(tree)
+    constructions = {
+        name: built
+        for name, node in functions.items()
+        if (built := invocation._log_path_construction(node)) is not None
+    }
+    reachable = invocation._reachable_from(functions, "PrivilegedLLMReplayer.query")
+    assert sorted(set(constructions) & reachable) == ["replay_task", "replay_task_v2"], (
+        "the fixture must construct len(live) == 2, or this test proves nothing about N8"
+    )
+
+    with pytest.raises(invocation.InvocationError) as excinfo:
+        invocation.live_log_path_from_source(two_readers + caller)
+    message = str(excinfo.value)
+    assert "not exactly one" in message
+    assert "reaches 2 function(s)" in message, (
+        "the count must be NAMED. `len(live) < 1` never reaches this line at all, which is "
+        "why N8 survived; a refusal that fires only on zero is not 'exactly one'"
+    )
+    assert "replay_task" in message and "replay_task_v2" in message, (
+        "both candidates must be named, so the operator can see WHICH two collided"
+    )
+
+    # ⚠️ The control, so this is not merely a refusal machine: remove one edge and the
+    # SAME source resolves cleanly. A gate that refuses everything is not a gate.
+    one_reader = caller.replace(
+        '        if self._legacy:\n'
+        '            return replay_task_v2(self._pipeline_name, "banking", None, None)\n',
+        "",
+    )
+    resolved = invocation.live_log_path_from_source(two_readers + one_reader)
+    assert resolved.function == "replay_task"
+    assert resolved.unreachable_others == ("replay_task_v2",)
+
+
+def test_a_shadowed_module_function_resolves_to_the_definition_PYTHON_binds(tmp_path):
+    """⚠️ **`OF-100`, the latent one — `_named_functions` disagreed with the interpreter.**
+
+    ``setdefault`` kept the **FIRST** module-level definition of a name; Python binds the
+    **LAST**. The method half of the same function already used ``[…] = child`` and so kept
+    the last — **so the two halves disagreed with each other, and the module half disagreed
+    with Python.** On a shadowed redefinition the derivation reported the *dead* definition
+    and called it live.
+
+    ⚠️ **LATENT, NOT LIVE:** CaMeL has no shadowed redefinition at the pin, so no published
+    number moved. It is fixed anyway, because this module's entire job is **analysing code
+    the run does not execute**, and *"the derivation and the interpreter disagree about
+    which definition is real"* is `INC-39`'s sentence with the nouns changed. A latent
+    defect in a call-graph analyser is a live defect the moment the analysed tree changes,
+    and `vendor/` is pinned but not frozen forever.
+    """
+    shadowed = (
+        'from pathlib import Path\n'
+        'def replay_task(pipeline_name, suite_name, user_task_id, attack_name):\n'
+        '    trace_path = (\n'
+        '        Path("logs")\n'
+        '        / pipeline_name\n'
+        '        / (attack_name or "none")\n'
+        '    )\n'
+        '    return TaskResults.model_validate_json(trace_path.read_text())\n'
+        'def replay_task(pipeline_name, suite_name, user_task_id, attack_name):\n'
+        '    trace_path = (\n'
+        '        Path("/var/logs")\n'
+        '        / pipeline_name\n'
+        '        / (attack_name or "none")\n'
+        '    )\n'
+        '    return TaskResults.model_validate_json(trace_path.read_text())\n'
+    )
+    caller = (
+        'class PrivilegedLLMReplayer:\n'
+        '    def query(self, q, runtime, env, messages, extra_args):\n'
+        '        return replay_task(self._pipeline_name, "banking", None, None)\n'
+    )
+
+    claim = invocation.live_log_path_from_source(shadowed + caller)
+    assert claim.root_literal == "/var/logs", (
+        "Python binds the LAST module-level definition, so THAT is the one the run would "
+        "execute. Reporting the first is reporting a function the interpreter has thrown "
+        "away — which is INC-39's defect (analysing code the run does not execute)"
+    )
+    assert claim.is_relative is False, (
+        "and the consequence is not cosmetic: first-wins reported is_relative=True here, "
+        "so the same-working-directory requirement would have been reported INTACT while "
+        "the definition Python actually binds had destroyed it"
+    )
+
+    # ⚠️ And the two halves of `_named_functions` now agree with each other. The method
+    # half always kept the last; this asserts it, so a future edit cannot re-split them.
+    methods = invocation._named_functions(
+        ast.parse(
+            'class C:\n'
+            '    def m(self):\n'
+            '        return 1\n'
+            '    def m(self):\n'
+            '        return 2\n'
+        )
+    )
+    assert len(methods["C.m"].body) == 1
+    assert methods["C.m"].body[0].value.value == 2, "the method half keeps the LAST too"
+
+
 def test_the_invocation_names_only_the_key_variable_never_a_value(context_md, camel_root):
     """`CLAUDE.md` §4: to confirm a key exists, read only its **name**."""
     plan = invocation.run1_plan(context_md, camel_root)
@@ -1394,8 +1653,40 @@ def test_every_published_figure_carries_url_date_and_digest():
         ({"table": "Tables 5-7"}, "RANGE"),
         # And the base model asserted with no statement of where it is asserted.
         ({"base_model_source": ""}, "base_model_source is empty"),
+        # ⚠️ (6) OF-101 / mutant N14. `fullmatch` -> `match` SURVIVED the whole suite,
+        # because every range this fixture fired was PLURAL and `match` rejects those too
+        # (the regex needs "Table " then a digit, and "Tables" has the s in the way). The
+        # SINGULAR range is the one only `fullmatch` refuses - and it is Q-058's defect one
+        # character smaller. REVIEW 1's own M6 equivalence proof said in terms that "the
+        # strength of the check is `fullmatch`, not the absence of `s?`"; this asserts it.
+        ({"table": "Table 5-7"}, "RANGE"),
+        # The same hole, three more shapes, so the pin is on TRAILING JUNK and not on one
+        # literal: a conjunction, a table with its appendix glued on, and a figure range.
+        ({"table": "Table 5 and Table 7"}, "RANGE"),
+        ({"table": "Table 2, Appendix B"}, "RANGE"),
+        ({"table": "Figure 9-11"}, "RANGE"),
+        # ⚠️ And APPENDIX's `fullmatch`, which is NOT symmetric with the one above and was
+        # nearly asserted as though it were. `APPENDIX` ends in `.+`, and `.` does not match
+        # a newline - so for any SINGLE-LINE value `fullmatch` and `match` agree exactly, and
+        # a leading-junk fixture ("see Appendix C, ...") is rejected by BOTH. Measured, not
+        # assumed: mutant N15 (APPENDIX.fullmatch -> match) SURVIVED a leading-junk case.
+        # The only value that separates them is a MULTI-LINE one, where `match` accepts the
+        # first line and silently drops the rest - a provenance field with smuggled content.
+        ({"appendix": "Appendix C, Baseline results\nand a second line nobody reads"}, "appendix="),
     ],
-    ids=["no-table", "no-appendix", "no-base-model", "no-row", "a-RANGE-not-a-table", "no-source"],
+    ids=[
+        "no-table",
+        "no-appendix",
+        "no-base-model",
+        "no-row",
+        "a-RANGE-not-a-table",
+        "no-source",
+        "a-SINGULAR-range-OF-101",
+        "a-conjunction-not-a-table",
+        "a-table-with-its-appendix-glued-on",
+        "a-FIGURE-range",
+        "an-appendix-with-a-SMUGGLED-second-line",
+    ],
 )
 def test_the_figure_provenance_gate_goes_red_on_each_field_in_turn(overrides, expect_in_message):
     """⚠️ **THE GUARDRAIL `Q-058`'s RULING INSTALLS, PROVED ABLE TO FIRE ON ALL OF IT.**
@@ -1625,6 +1916,71 @@ def test_the_ceiling_gate_goes_red_on_a_count_missing_it(overrides, expect):
     percentage = dataclasses.replace(branch_b.HEADLINE_FIGURES[0], **overrides)
     assert not percentage.is_a_count
     assert percentage.provenance_failures() == []
+
+
+def test_banking_rows_is_keyed_on_the_TABLE_and_not_saved_by_tuple_ORDER():
+    """⚠️ **`OF-102` / mutant `N6`, which SURVIVED and was 'equivalent TODAY' only by luck.**
+
+    `banking_rows` filters on table, base model and suite. Deleting the **table** clause
+    left the suite green — because in `CITED_TABLE_FIGURES` the row key `CaMeL` collides
+    across **Tables 5, 6 and 7** under one base model (`Claude 3.5 Sonnet`, since Appendix C
+    names none), and a dict comprehension keeps the **last**. Table 7's rows happen to be
+    listed last, so last-wins happened to pick the right one. **Append a table after Table 7,
+    or reorder the tuple, and `p2_holds_for` silently reads another table's row.**
+
+    ⚠️ **This function's own docstring records that an EARLIER DRAFT had exactly this
+    collapse** — keyed on the base model alone, it kept `Workspace` and reported that P2's
+    shape failed on the one configuration the paper says it holds on. **The repair was one
+    ordering away from being invisible again**, which is what this test removes.
+
+    So the property is asserted **directly** — each table returns its OWN rows — and then
+    **under a reversed tuple**, which is the form no accident of ordering can satisfy.
+    """
+    model = "Claude 3.5 Sonnet"
+    cited = branch_b.CITED_TABLE_FIGURES
+
+    # -- 1. Each table returns ITS OWN banking rows. Table 5 is the discriminating one: --
+    # with the table clause gone, this call returns Table 6's and Table 7's values instead.
+    assert branch_b.banking_rows(cited, "Table 5", model) == {
+        "CaMeL": "75.00% +/- 21.22",
+        "Undefended model": "81.25% +/- 19.12",
+    }, "Table 5 is DEFENCES UTILITY; reading Table 7's counts here is Q-058's own defect"
+    assert branch_b.banking_rows(cited, "Table 6", model) == {
+        "CaMeL": "70.83% +/- 7.42",
+        "Undefended model": "84.03% +/- 5.98",
+    }
+    assert branch_b.banking_rows(cited, "Table 7", model) == {
+        "CaMeL": "0 +/- 0.0",
+        "CaMeL (no policies)": "1 +/- 0.0",
+    }
+
+    # ⚠️ 2. The collision is REAL and is exhibited, so nobody later reads the assertions
+    # above as belt-and-braces. `CaMeL` genuinely occurs on banking in all three tables.
+    colliding = [f.table for f in cited if f.row == "CaMeL" and f.suite.lower() == "banking"]
+    assert sorted(colliding) == ["Table 5", "Table 6", "Table 7"], (
+        "if this ever stops being true the table key stops being load-bearing and N6 "
+        "becomes genuinely equivalent - which is a different finding, not this one"
+    )
+
+    # -- 3. ⚠️ ORDER-INDEPENDENCE, which is the property itself rather than the accident. -
+    reversed_figures = tuple(reversed(cited))
+    for table in ("Table 5", "Table 6", "Table 7"):
+        assert branch_b.banking_rows(reversed_figures, table, model) == branch_b.banking_rows(
+            cited, table, model
+        ), (
+            f"{table}'s rows changed when the tuple was reversed. Nothing about a citation "
+            f"may depend on the order figures happen to be declared in"
+        )
+        assert branch_b.p2_holds_for(reversed_figures, table, model) == branch_b.p2_holds_for(
+            cited, table, model
+        ), "and P2's derived verdict must not move either"
+
+    # And the derivation that CONTEXT.md v1.9 §8.5.2 rests on is unchanged under reversal.
+    assert branch_b.p2_holds_for(cited, "Table 7", model) is True
+    assert branch_b.p2_holds_for(cited, "Table 5", model) is None, (
+        "Table 5 has no `CaMeL (no policies)` banking row, so P2's shape is UNDEFINED "
+        "there - not False. Collapsing those two is how a missing row becomes a result"
+    )
 
 
 def test_table_4_is_published_IN_FULL_and_P2s_shape_is_COUNTED_not_asserted():
