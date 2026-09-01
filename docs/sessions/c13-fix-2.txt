@@ -1,0 +1,449 @@
+PUSHED SHA: 0df86a4  - the last commit carrying THIS SESSION's substantive work.
+            !! THIS LINE IS ITSELF INSIDE A COMMIT, so the pushed head is one further than
+            any SHA writable here. The regress is inherent and STOPS AT ONE: the only
+            commit after 0df86a4 carrying this session's work is the one carrying THIS
+            FILE, touching docs/sessions/c13-fix-2.txt ALONE. `git log` is the authority.
+            A concurrent C6 REVIEW 3 session (3605d31c) shares this working tree - its
+            commit c477cf8 already sits INSIDE this session's range - so origin/main's
+            head may be its commit rather than this one.
+
+================================================================================
+C13 - THE CaMeL COMPARATOR - FIX, ATTEMPT 2.   SESSION-TOKEN 91eb51c1.
+TAG c13-pass: **NOT CUT**.  A FIX SESSION DOES NOT CERTIFY ITS OWN FIX.
+ZERO PROVIDER CALLS. ZERO TOKENS. evals/ untouched; evals/usage/ holds 0 files.
+================================================================================
+
+>> READ THIS FIRST: `make test` IS RED AT HEAD AND THIS SESSION BROKE IT. <<
+   721 passed / 1 FAILED / 1 skipped / 2 deselected.
+   The ONE failure is tests/test_repo_invariants.py::test_check_roles_exits_zero.
+   It is caused by THIS SESSION's own commit c4d4460 and by nothing else.
+   It is a DECLARED STOP (Q-080 / INC-49), not a defect left lying. See section 6.
+
+--------------------------------------------------------------------------------
+1. THE TWO BLOCKERS - BOTH CLOSED
+--------------------------------------------------------------------------------
+
+TASK 0 FIRST, AS HARD RULE 13 REQUIRES. INC-46 and INC-47 were written and committed
+at 6ab21b8 BEFORE a line of code changed. Their `Fix:` fields were left empty and
+filled in afterwards (0df86a4) rather than invented - an invented incident has no
+commit.
+
+INC-46 (B-3) - "a QUESTION carried TWO defects under a title that named ONE, so the
+prompt that acted on it enumerated four sites of the other half and the un-narrowed
+Branch-B trigger survived in config/ - the artefact that outranks the law the moment
+it is frozen."
+  Missed:    THE SIGNAL WAS IN CAPITALS, UNDER ITS OWN HEADING, IN THE ENTRY BEING
+             WORKED FROM - Q-064's "AND THE SAME KEY IS BEHIND Q-057 TOO, WHICH IS
+             THE HALF THAT IS EASY TO MISS" - and repeated verbatim in OF-62's own
+             row. Not faint, not buried, not inferable-only. It named the exact key
+             and predicted its own fate.
+  Diagnosis: Q-064's TITLE names one defect and its TABLE enumerates four sites of
+             that one, so every downstream artefact - the FIX prompt, the commit
+             subject, the OPEN_FINDINGS disposition - inherited the TITLE's scope
+             instead of the ENTRY's. Nothing compares a question's title to its
+             contents.
+  Fix:       778c8f2 (the config edit) + 4be0b86 (the reader).
+
+INC-47 (B-4) - "an INCIDENTS.md `Action` field claimed a correction at FIVE sites when
+FOUR landed, and two further records repeated it: `Fix:` is bound to a commit and
+cannot be invented, `Action:` is bound to nothing."
+  >> THE GENERAL FORM, RECORDED BECAUSE THE ARCHITECT WILL ACT ON IT <<
+  Hard rule 13's own rationale names TWO pressures on an incident entry: to
+  UNDER-REPORT a failure that costs a fix session, and to DRAMATISE one that reads
+  well. THIS IS A THIRD, AND THE FORMAT DOES NOT CATCH IT:
+        AN `Action` FIELD THAT OVERSTATES WHAT WAS DONE.
+  It is not under-reporting - the incident is real, fully reported and unflattering.
+  It is not dramatisation - nothing is invented and the fix exists. It is an entry
+  describing its INTENDED remedy in the past tense, in the one field with no
+  counterparty. `Fix:` carries a SHA that git resolves and check_roles constrains;
+  `Action:` is prose that nothing parses and nothing would have turned red.
+  Cheap remedies, named not built (they are PROCESS.md's):
+    (i)  require `Action:` to name the artefacts it changed, checked against the
+         entry's own commits exactly as `Fix:` is; or
+    (ii) state in rule 13 that `Action:` records ONLY what a commit in that entry
+         demonstrates, and that anything else belongs under `Systemic guardrail:`
+         as NOT LANDED.
+  Missed:    THE CLAIM WAS CHECKABLE IN ONE COMMAND BY THE SESSION THAT WROTE IT.
+             `git show --numstat <sha> -- QUESTIONS.md` across FIX 1's seven returns
+             +215/-0. A correction to an existing line is a deletion; there were
+             none. AND IT WAS NOT A FENCE PROBLEM: QUESTIONS.md was INSIDE FIX 1's
+             fence and FIX 1 wrote 214 lines into it in the same session, at f17709c.
+             The fifth site was in a file the session had open and was appending to.
+  Diagnosis: the four corrections were made inside src/ where the session was already
+             editing, and the fifth was written into the `Action` sentence as part of
+             the same list because it belonged to the same REMEDY - so the field
+             recorded the remedy as DESIGNED rather than the edits as MADE.
+  Fix:       0beb8ee.
+
+--------------------------------------------------------------------------------
+2. TASK 1 - B-3. THE CONFIG EDIT, QUOTED BEFORE AND AFTER
+--------------------------------------------------------------------------------
+
+Q-079's ruling was recorded VERBATIM at e2b4778 BEFORE the edit (hard rule 5), with
+the architect's own recorded error included as the ruling directs.
+
+BEFORE (config/lanes.yaml:202, one key):
+  branch_a_condition: "the model id is still served AND the run completes inside the
+                       90-minute box"
+
+AFTER (config/lanes.yaml, commit 778c8f2 - its own commit, citing Q-079):
+  branch_a_condition: "IT RUNS: both passes of the two-pass protocol complete inside
+    the 90-minute box, from the same working directory. Pass 1 is `--model
+    google:gemini-2.0-flash-lite-001 --suites banking --run-attack`; pass 2 is the
+    same command with --replay-with-policies, and it reads the logs/ tree pass 1
+    wrote. Publish the live table"
+
+  branch_b_condition: "THE RUN DOES NOT COMPLETE, ON A CAUSE THAT HAS BEEN DIAGNOSED
+    AND RECORDED IN PROTOCOL.md BEFORE A BRANCH IS SELECTED. 'It errored' is not a
+    cause, and a harness defect is NEVER Branch B - a provider error on the suffixed
+    string is a HARNESS DEFECT, because dispatch succeeds on substring containment and
+    the suffixed string reaches genai.Client as a model id (Q-057). A
+    pre-registration whose negative branch can be reached by our own bug measures
+    nothing"                                                    <-- KEY **ADDED**
+
+  A branch_b_condition KEY WAS ADDED, which is option 1 of Q-079. Branch B's trigger
+  existed in config/ ONLY as the NEGATION of branch_a_condition, which is exactly how
+  the defect survived: with no positive statement, "not (it runs)" carries no
+  diagnosis requirement at all.
+
+  ONE THING REMOVED BEFORE COMMIT AND DECLARED: a warning glyph was drafted into the
+  branch_b_condition VALUE and taken out. A non-cp1252 character in a config VALUE is
+  INC-08 / INC-25 / INC-45's hazard on the operator's own console - the neighbouring
+  branch_b_action is ASCII + section-sign for exactly that reason. Caught because this
+  session's OWN diagnostic died on it. The glyph survives only in comments, which
+  nothing prints. (That console hazard hit this session THREE times in total.)
+
+THE LOADER-READ TEST THAT NOW ASSERTS IT (4be0b86):
+  tests/test_c13_camel_comparator.py::
+    test_the_pre_registered_branch_condition_carries_the_DIAGNOSIS_requirement
+  It reads BOTH keys through cfg.load("lanes").require(...) - the read path that did
+  not exist when Q-079 was raised - and it asserts every required phrase occurs in
+  CONTEXT.md S8.5.1 **FIRST**, before requiring it of config/. So neither side is
+  transcribed, and if the architect amends the law this goes red THERE, which is the
+  correct place for it to go red.
+  Backed by a pure predicate in src/, invocation.branch_condition_problems(a, b),
+  following branch_value_problem's precedent in the same module for the sibling key:
+  PURE, returns a LIST so a failure NAMES THE FIELD, and firable at a constructed
+  value so it is proved red without config/ ever holding the defective string.
+  >> CLASS B DEVIATION, DECLARED (hard rule 2): the prompt asked for a test; a
+     predicate in src/ is more. Rationale is this project's own, at
+     branch_b.assert_provenance: "a property enforced only in a test file is a
+     property that holds until somebody adds a figure without running the tests."
+     Both files are inside the fence. Judged at review.
+
+  PROVED ABLE TO GO RED - FRESH OS TEMP SANDBOX, whetstone_gate.__file__ PRINTED:
+    .../scratchpad/sbx1/src/whetstone_gate/__init__.py
+      CONTROL  the corrected config                                    1 passed
+      R1       pre-fix branch_a_condition, no branch_b_condition       1 FAILED
+      R2       branch_a fixed, branch_b_condition DELETED              1 FAILED
+               (Q-079's ACTUAL HEAD state) - dies on MissingRequiredValue,
+               hard rule 9's REFUSAL, not a silent pass
+      R3       branch_b_condition present, diagnosis requirement absent 1 FAILED
+    Nothing in the repository was edited to establish these.
+
+AFTER THE EDIT, MEASURED:
+  - config/lanes.yaml still parses through the loader; both keys read.
+  - camel_comparator.branch is STILL the TODO_C13_RUN1 sentinel; require() still
+    raises UndeterminedValue on it.
+  - `make selftest` STILL RED, and FOR THAT REASON: 1 failed, 1 passed, 712
+    deselected; sole failure test_the_camel_branch_is_decided_before_any_camel_run,
+    on UndeterminedValue for camel_comparator.branch.
+  - `make check-prereg`  VERDICT: **NOT-YET-FROZEN**, exit 0. PROTOCOL.md does not
+    exist; it is written by C14. This is not a PASS, it is "not yet".
+  - GIT BLOB SHA-256 OF config/lanes.yaml, FOR C14 TO CARRY:
+        BEFORE  f9f190dc2164ae06527c4b0bc9ea08adcb2ec5732daae3145b357cdc55a8d3b2
+        AFTER   23b8db927cf66d0b0876a9a393c523b3e5287f2bb392b8efdb3d9f52accea0bd
+    C14 must write PROTOCOL.md's manifest against the AFTER value.
+  - LEGAL TODAY, ILLEGAL TOMORROW, CHECKED NOT ASSUMED: `git tag -l` returns
+    c0-pass..c4-pass; prereg-v1 does not resolve.
+
+--------------------------------------------------------------------------------
+3. TASK 2 - B-4. WHICH REMEDY, AND INC-39 CORRECTED IN PLACE
+--------------------------------------------------------------------------------
+
+REMEDY (a) TAKEN - the stronger, and the one REVIEW 2 recommended, because it fixes
+the live danger as well as the bookkeeping. Q-057's status is "BLOCKING RUN-1 if
+unread" and CLAUDE.md S1 makes QUESTIONS.md item 6 of every session's mandatory read
+order, so what survived was a false file:line about third-party code, pointing into a
+function with no caller, in the document RUN-1 is directed to read - B-1 verbatim, in
+the one place B-1 was supposed to have been fixed.
+
+  A DATED CORRECTION NOTE IS APPENDED TO Q-057 DIRECTLY BENEATH FACT 4 - not at the
+  end of the entry, because RUN-1 reads fact 4. It names:
+        function                      replay_task
+        the Path("logs")/... build    replay_privileged_llm.py:140-145
+        the read                      :148  (trace_path.read_text())
+        its call site                 :305  from PrivilegedLLMReplayer.query
+        and states                    :321 is inside replay_user_task, which is
+                                      called only by replay_suite (:344), called only
+                                      by replay_benchmark (:356) - AND replay_benchmark
+                                      HAS NO CALLER ANYWHERE IN THE TREE.
+  It also carries the corrected FAILURE MODE, which is the half RUN-1 acts on:
+  replay_task spans 129-238, its only try is 185-198 catching SecurityPolicyDeniedError,
+  line 148 is NOT inside it; PrivilegedLLMReplayer.query (287-315) has ZERO try blocks;
+  AgentDojo wraps only `except AbortAgentError`. -> UNHANDLED FileNotFoundError. IT
+  CRASHES LOUDLY. That is the diagnosable failure, not the silent zero.
+
+  >> FACT 4 ITSELF IS LEFT STANDING AND IS NOT EDITED. It is the historical record of
+     what c2b7f419 found, and overwriting it would destroy the evidence of the original
+     error while claiming to correct it.
+
+INC-39's `Action` IS CORRECTED IN PLACE WITH A DATED NOTE, ITS ORIGINAL WORDS LEFT
+STANDING. An entry that quietly repairs its own false claim is the failure INC-47 is
+about, one turn later. The note states, measured by this session across all seven of
+C13 FIX 1's commits: ef4b8d5 is +1/-0 on QUESTIONS.md, f17709c is +214/-0, the other
+five do not touch the file, TOTAL DELETIONS ZERO. A correction to an existing line is
+a deletion; there were none, so the claim could not have been true.
+
+OF-103 - WHICH SPAN IS RIGHT: **BOTH ARE, AND NEITHER IS WRONG.**
+  Measured over the git blob at pin f083b6b3, not inferred:
+        ast.Assign        = (139, 146)   the ASSIGNMENT STATEMENT,
+                                         `trace_path = ( ... )` incl. its parentheses
+        Assign.value      = (140, 145)   the EXPRESSION, the Path("logs")/... chain
+        line 139 = `trace_path = (`      line 146 = the closing `)`
+  _log_path_construction returns node.value.lineno .. node.value.end_lineno, so the
+  ARTEFACT emits the expression span and 139-146 is what a human reading the statement
+  writes down. PREFER 140-145 when citing the construction: it is generated from the
+  call graph and cannot drift, which is INC-39's own remedy.
+  ACTION TAKEN: LABELLED, NOT CORRECTED - inside this fence (INCIDENTS.md and
+  QUESTIONS.md both carry the label). docs/sessions/c13-fix-1.txt and REVIEW_13_1.md
+  are append-only history and were NOT touched.
+
+--------------------------------------------------------------------------------
+4. TASK 3 - THE MUTANT SURVIVORS. ALL SIX KILLED, NONE LEFT OPEN
+--------------------------------------------------------------------------------
+
+MUTATION RUNS IN A FRESH OS TEMP SANDBOX. vendor/ is a READ-ONLY JUNCTION to the
+pinned trees (the harness reads `git cat-file blob`), so NOT ONE BYTE of vendor/ is
+touched and every mutant is fired at FIRST-PARTY source - which is why
+live_log_path_from_source was split out in the first place.
+  whetstone_gate.__file__ = ...\scratchpad\sbx2\src\whetstone_gate\__init__.py
+
+  CONTROL                                                98 passed, 0 failed
+  N11   OF-96   delete PureWindowsPath(...).is_absolute()     KILLED (1)
+  N13   OF-97   add "glob" to crashes_loudly's loud set       KILLED (1)
+  N8    OF-98   len(live) != 1  ->  len(live) < 1             KILLED (1)
+  ---   OF-100  found[name]=node -> setdefault (the old code) KILLED (1)
+  N14   OF-101  TABLE_NUMBER.fullmatch -> match               KILLED (4)
+  N15   OF-101  APPENDIX.fullmatch -> match                   KILLED (1)
+  N6    OF-102  banking_rows loses its `table` clause         KILLED (1)
+  ORACLE-2 OF-100  "keep the def containing /var/logs"        KILLED (1)
+  CONTROL restored                                       98 passed, 0 failed
+
+OF-96 (N11) - the Windows half. ASSERTED AT THE FUNCTION, not end-to-end, because
+  REVIEW 2 proved the end-to-end kill comes from claim.root_literal == "logs" and NOT
+  from is_relative. Both drive-letter flavours fired ('C:/logs' and 'C:\logs') plus
+  UNC, PLUS the two exhibits that prove EACH disjunct load-bearing -
+  PurePosixPath("C:/logs").is_absolute() is False and
+  PureWindowsPath("/var/logs").is_absolute() is False - so neither rule can be deleted
+  while the others still pass. Also fired through the real derivation with 'C:/logs'.
+OF-97 (N13) - crashes_loudly's FALSE direction, constructed THROUGH THE REAL
+  DERIVATION ('glob' is in _READ_CALLS, so a globbing live function genuinely yields
+  read_call='glob') rather than by hand-building the dataclass; and it asserts that the
+  sentence RUN-1 is handed FLIPS with it - the previously `# pragma: no cover` branch.
+OF-98 (N8) - the two-reachable-construction source built, and the fixture PROVES
+  len(live) == 2 before asserting the refusal, so the test cannot pass for another
+  reason. The message must name the count AND both candidates. CONTROL included:
+  remove one edge and the same source resolves - a gate that refuses everything is not
+  a gate.
+OF-100 - setdefault -> assignment, so the derivation follows the definition PYTHON
+  binds, and the module half now agrees with the method half. Fixed although LATENT,
+  because this module's whole job is ANALYSING CODE THE RUN DOES NOT EXECUTE - INC-39's
+  sentence with the nouns changed.
+OF-101 (N14, N15) - the SINGULAR 'Table 5-7' lands, plus a conjunction, a table with
+  its appendix glued on, and a figure range, so the pin is on TRAILING JUNK not on one
+  literal.
+OF-102 (N6) - each table asserted to return ITS OWN rows; the CaMeL collision across
+  Tables 5/6/7 EXHIBITED so the assertions are not read as belt-and-braces; and the
+  property pinned ORDER-INDEPENDENTLY by reversing the tuple. REVIEW 2's suggested
+  remedy - "assert the dict's size, or key on (table, row)" - was DECLINED and the
+  reason is stated: a size assertion still passes under a reorder, which IS the failure
+  mode.
+
+>> TWO OF THIS SESSION'S OWN FIXTURES WERE WRONG. BOTH DECLARED, NEITHER QUIETLY
+   REPAIRED.
+  (i)  APPENDIX IS NOT SYMMETRIC WITH TABLE_NUMBER and the first fixture written for
+       it PINNED NOTHING. A leading-junk appendix ("see Appendix C, ...") is rejected
+       by `match` too; APPENDIX ends in `.+` and `.` does not match a newline, so the
+       two differ ONLY on a MULTI-LINE value. Measured (N15 SURVIVED), corrected to a
+       smuggled-second-line fixture, re-measured (N15 KILLED).
+  (ii) OF-100's FIRST TEST WAS GREEN BY ACCIDENT OF ITS FIXTURE - INC-50. It fired ONE
+       definition order, where "keep the LAST" and "keep whichever is ABSOLUTE" agree,
+       so an ORACLE-2 mutant SURVIVED THE ENTIRE C13 FILE at b07365f (98 passed,
+       nothing red). dfffba7 adds the MIRROR - the same fixture reversed, asserting the
+       reversal actually happened - and it dies.
+       THIS IS INC-26 / INC-29 / OF-82's CLASS FOR THE FOURTH TIME, in a test written
+       to close a mutation survivor, by the session closing it, IN THE SAME COMMIT as
+       another test (OF-102's) that got it right by reversing its tuple on purpose.
+       It was found by an INDEPENDENT ADVERSARIAL CHECK OF THIS SESSION'S OWN LANDED
+       COMMIT - not by the session's own seven-mutant run, which fired exactly the
+       mutants the review had named and no others.
+
+--------------------------------------------------------------------------------
+5. INCIDENTS - FIVE, AND THREE ARE THIS SESSION'S OWN
+--------------------------------------------------------------------------------
+INC-46  B-3.  (section 1)                                    Fix 778c8f2 + 4be0b86
+INC-47  B-4, and the THIRD pressure rule 13 does not catch.   Fix 0beb8ee
+INC-48  THIS SESSION'S OWN e2b4778 SWEPT A CONCURRENT SESSION'S WORK.   Fix eb17627
+        + c0511ff (no source change, no history rewrite)
+INC-49  THIS SESSION BROKE `make test`. A declared STOP.      Fix: **NONE** (Q-080)
+INC-50  THIS SESSION'S OWN OF-100 TEST WAS GREEN BY ACCIDENT. Fix dfffba7
+
+INC-48, in full, because it is the one a reviewer will check:
+  e2b4778 ("Q-079 RULED") carries 128/1 on QUESTIONS.md. 79/1 is this session's ruling.
+  THE OTHER 49 LINES ARE THE CONCURRENT C6 REVIEW 3 SESSION'S (3605d31c) TOKEN ROW 39
+  AND ITS 41-LINE SELF-RECORD PARAGRAPH, committed under Session-Token: 91eb51c1.
+  e2b4778's own message says "Swept: nothing". IT WAS TRUE WHEN WRITTEN AND FALSE WHEN
+  COMMITTED, and the sequence is proved rather than asserted:
+        QUESTIONS.md at session start (1f82c48)        6664 lines
+        after the Q-079 edit, `git diff --numstat`     79 1   -> 6742 lines
+        as committed at e2b4778                        128 1  -> 6791 lines
+  The 49 lines landed BETWEEN the check and the commit. `Missed:` says so plainly:
+  nothing was missed at the moment of the check, because the signal did not exist yet;
+  what was missed is one level up - INC-36's "read the diff first" remedy is A CHECK
+  AND NOT A LOCK, and this repository has carried it as though it were a lock.
+  NOTHING IS LOST AND NOTHING IS REWRITTEN. 3605d31c's content is intact, complete and
+  present exactly once; e2b4778 is not amended and nothing is reverted.
+  GUARDRAIL, PROVED IN A THROWAWAY REPOSITORY, BOTH DIRECTIONS:
+        A  git diff --numstat j.md   -> 1 0        (the check)
+           <concurrent line lands>
+           git commit -- j.md        -> committed: mine / MY-EDIT / OTHER-SESSION-LINE
+        B  git add -- j.md
+           git diff --cached --numstat -> 1 0      (the same check, on the INDEX)
+           <the same concurrent line lands, same window>
+           git commit                -> committed: mine / MY-EDIT      <-- NOT SWEPT
+  `git commit -- <paths>` commits the WORKING TREE and ignores the index; `git add`
+  then `git commit` WITH NO PATHSPEC commits the INDEX SNAPSHOT. It does not make
+  sweeping impossible (a write landing BEFORE the add is still staged), so the Swept:
+  rule stays necessary - that limit is stated rather than glossed. EVERY COMMIT FROM
+  eb17627 ONWARD USES IT, and 3605d31c's two untracked files under
+  docs/reviews/independent/ were in the tree at commit time and are in NONE of them.
+  >> ONE CONSEQUENCE BELONGS TO 3605d31c AND MUST REACH IT: its paragraph says its row
+     is "committed FIRST, and the Phase-1 seal is the commit after it". THE ORDERING
+     HOLDS - the row precedes the seal in the tree - but the row is NOT IN A COMMIT OF
+     ITS OWN. It is in e2b4778.
+
+--------------------------------------------------------------------------------
+6. THE RED, AND WHY NOTHING WAS DONE ABOUT IT - Q-080 / INC-49
+--------------------------------------------------------------------------------
+c4d4460's commit MESSAGE contains TWO lines beginning `Session-Token:` at column 0:
+    line 22   Session-Token: 91eb51c1, so `make check-roles` was E1-red in between...
+    line 37   Session-Token: 91eb51c1
+Line 37 is the real trailer and is WELL FORMED. Line 22 is PROSE - a sentence recording
+that four earlier commits already carried the trailer.
+check_roles.py:835 _TOKEN_TRAILER (strict) matches line 37, so **E1, E2 and E3 all
+PASS** and the commit's role separation is not in doubt. check_roles.py:841
+_TOKEN_TRAILER_ANY matches BOTH; line 22 fails the strict form; **E5 FAILS**.
+-> `make check-roles` exits non-zero -> test_check_roles_exits_zero fails ->
+   `make test` is RED.
+
+NOTHING WAS FIXED, AND THAT IS THE ACTION. All three remedies are the architect's:
+  1. Amend c4d4460 - a HISTORY REWRITE. CLAUDE.md S5: "No history rewrite, EVER."
+     The stated RATIONALE (it would destroy probe-v1, prereg-v1 and every cN-pass tag)
+     does NOT apply to an untagged, unpushed tip commit; the RULE AS WRITTEN is
+     absolute and admits no such reading. THAT GAP IS EXACTLY WHAT HARD RULE 1 SAYS A
+     SESSION MUST NOT CLOSE ON ITS OWN.
+  2. Add it to E5_EXCEPTIONS - forbidden by that list's own comment, which pins it at
+     four and says E5 must fail on any NEW malformed trailer from now on. Rejected on
+     the merits too: the four existing entries are C0-era commits with NO prompt token
+     to carry, which is a different thing from a session that had one and quoted it.
+  3. Fix the parser to read the trailer BLOCK the way git defines it (the message's
+     LAST PARAGRAPH, per `git interpret-trailers`) - edits check_roles.py, which this
+     fence names under NOT, and re-opens Q-014 (i), whose ruling reads "_TOKEN_TRAILER
+     IS NOT WIDENED. That stands and is not reopened."
+>> THE GENERALISABLE HALF, WHICH IS WHY Q-080 EXISTS: _TOKEN_TRAILER_ANY CANNOT
+   DISTINGUISH A TRAILER FROM A QUOTATION OF ONE. Column 0 is the only thing that makes
+   a line a trailer. ANY commit message that writes ABOUT tokens trips it - and this
+   project REQUIRES sessions to write about their own tokens. Option 3 removes the
+   CLASS; options 1 and 2 only fix c4d4460.
+   INC-49's `Missed:` - this session quoted the string at column 0 in the commit
+   registering its own row IN THE TOKEN TABLE, the single most likely place on the
+   project for it to happen, and four earlier commits kept it indented BY LUCK.
+
+--------------------------------------------------------------------------------
+7. COUNTS - MEASURED BY THIS SESSION, BEFORE AND AFTER. NOT TAKEN FROM THE PROMPT.
+--------------------------------------------------------------------------------
+  BEFORE  `make test`   711 passed / 0 failed / 1 skipped / 2 deselected
+  AFTER   `make test`   721 passed / 1 FAILED / 1 skipped / 2 deselected
+  The +10 are this session's ten new C13 cases.
+  tests/test_c13_camel_comparator.py:  88 passed -> 98 passed, 0 failed.
+
+  FAILURES ATTRIBUTED BY FILE:
+    tests/test_repo_invariants.py::test_check_roles_exits_zero
+        -> THIS SESSION'S (91eb51c1), via c4d4460. Q-080 / INC-49. Declared above.
+    NOTHING ELSE IS RED. No failure belongs to the concurrent C6 REVIEW 3 session
+    (3605d31c), whose commit c477cf8 sits inside this session's range.
+  The count did NOT move between runs this time; both post-fix runs read identically
+  (721/1/1/2). Two separate `make test` executions, 160s and 126s.
+
+  `make check-roles`  17 passed / 0 failed / 4 n/a  ->  16 / 1 / 4 (E5 only)
+  `make selftest`     STILL RED on camel_comparator.branch, same sentinel, same reason
+  `make check-prereg` NOT-YET-FROZEN, before and after
+
+  STANDING PROPERTIES, PROVED NOT ASSUMED:
+    ALL THREE vendored trees at their pins, rev-parse == pin, status --porcelain
+    EMPTY, `git diff <pin>` 0 BYTES:
+        agentdojo               928bbae820a89556b03de5cf818eb350cd6082d1
+        camel-prompt-injection  f083b6b396399d3b3c7f2ddaf613a5945eaf32d8
+        tau2-bench              a2c024725189473d2d7cea3a5cfdbcc67478e41f
+    `git status --porcelain tests/goldens/`  EMPTY.
+    ZERO provider calls, ZERO tokens; no evals/ path in ANY of this session's 13
+    commits; evals/usage/ holds 0 files. CaMeL was NOT run and it was NOT checked
+    whether the model id is still served - that is Branch A's condition and RUN-1's
+    alone.
+    The untracked grep.exe.stackdump at the repo root belongs to no session and WAS
+    NOT DELETED.
+    All 13 commits carry Session-Token: 91eb51c1 and touch only in-fence paths;
+    c477cf8 is 3605d31c's own and is cleanly separate.
+    CR BYTES 0, counted as BYTES, in every file this session wrote.
+
+--------------------------------------------------------------------------------
+8. `Swept:` LINES - EVERY ONE
+--------------------------------------------------------------------------------
+  6ab21b8  Swept: nothing - docs/reviews/ status and diff both empty.
+  e2b4778  Swept: nothing         <-- **THIS IS FALSE.** It swept 3605d31c's token row
+                                      39 and its 41-line paragraph. INC-48. The check
+                                      was run and was empty; the write landed after it.
+  778c8f2  Swept: nothing - verified.
+  0beb8ee  Swept: nothing - verified on the STAGED SNAPSHOT.
+  eb17627  Swept: nothing - first commit to verify on the STAGED SNAPSHOT.
+  4be0b86 / c4d4460 / b07365f / 362fabb / dfffba7 / ea80592 / c0511ff / 0df86a4
+           Swept: nothing - all verified on the STAGED SNAPSHOT, not the working tree.
+  Only e2b4778 swept, and it is the only commit made with `git commit -- <paths>`.
+
+--------------------------------------------------------------------------------
+9. NOT MINE - OWED TO C14, NAMED AS THE PROMPT REQUIRES
+--------------------------------------------------------------------------------
+  Q-074  the FIFTH citation site, tests/test_lanes_operator_placeholders.py:141.
+         CONFIRMED still present, still the ONLY live-text site, and still PRINTED IN
+         FULL by `make selftest` - the most-read copy of the five. Outside this fence
+         ("NOT: tests/test_lanes_operator_placeholders.py"). NOT REACHED FOR.
+  OF-99  Q-064's ACTUAL remedy - a repository-wide superseded-string tripwire.
+         RE-CONFIRMED ABSENT AT HEAD: `grep -rn superseded` over tests/, src/ and the
+         Makefile returns NOTHING. Outside this fence. NOT REACHED FOR.
+         The class has now bitten twice and no mechanism knows a citation has copies.
+  Q-080  the E5 trailer-vs-quotation defect. It is why `make test` is red.
+  Q-079's generalisable half - "no mechanism knows that a QUESTION has more than one
+         defect in it" - is owed alongside OF-99.
+
+--------------------------------------------------------------------------------
+10. WHAT I COULD NOT DO
+--------------------------------------------------------------------------------
+  1. **CLEAR THE RED.** All three remedies are the architect's (section 6). Nothing
+     was edited and no workaround was built. `make test` is RED at HEAD.
+  2. Q-074 and OF-99 - outside the fence, owed to C14 (section 9).
+  3. UN-SWEEP e2b4778 - it would require a history rewrite. The record corrects it
+     instead (INC-48), and 3605d31c's content is intact.
+  4. OF-103 in docs/sessions/c13-fix-1.txt and REVIEW_13_1.md - append-only history,
+     not touched. The label lives in INCIDENTS.md and QUESTIONS.md, which are in fence.
+  5. CONTEXT.md was NOT touched (v1.9 audited CLEAN by REVIEW 2), nor PROCESS.md,
+     vendor/, tests/goldens/, or any other test file.
+
+--------------------------------------------------------------------------------
+OPEN_FINDINGS: OF-96, OF-97, OF-98, OF-100, OF-101, OF-102 CLOSED with SHAs;
+OF-103 CLOSED (settled + labelled); OF-99 OPEN and it says why. No new OF- row
+opened - this session's findings are rulings (Q-079, Q-080) or incidents (46-50).
+
+TAG c13-pass: **NOT CUT.** I do not self-certify. A fresh adversarial re-review
+follows and only it may tag.
+================================================================================
