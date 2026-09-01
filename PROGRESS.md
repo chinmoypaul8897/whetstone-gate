@@ -6,6 +6,151 @@ not a record; this file is.
 
 ---
 
+## C7 — THE LEDGER — **BUILD** attempt 1 — 2026-09-01 — 🔨 built, unreviewed · all four golden-5 cases reproduce · **one STOP declared that blocks C8** · ZERO provider calls
+
+**SESSION-TOKEN:** `3a6e3d07` — **NOT in the batch.** Appended as
+`| `3a6e3d07` | C7 | BUILD | 2026-09-01 |` and numbered **from the reconciliation table** as the
+**fourteenth** self-recorded row. ⚠️ **The prompt did not number it** — it named both prior
+miscounts (`7b99a85a` short by one, `5c4f8e11` short by two) and told this session to count. That
+is the cheap half of the remedy `5c4f8e11` recorded as OWED, and it does not replace the mechanism,
+which is still owed. **Thirteen of fourteen are still the same defect.**
+
+**Ran concurrently with C13 BUILD (`c2b7f419`)** in one working tree. See *"the concurrency"* below.
+
+**Token spend: ZERO.** No provider call, no network, no lane touched. A ledger is a hash chain over
+data already in hand.
+
+### What was built
+
+`src/whetstone_gate/ledger/` — four core modules and one shell.
+
+* **`entry.py`** — the **closed** entry schema. Thirteen content fields plus `prev_hash` and
+  `hash`, and the set is closed by **arithmetic** rather than by taste: every content field is
+  inside the digest, so a fourteenth changes all twelve of golden 5's hashes and hard rule 3
+  forbids editing the golden. Nine fields are `CONTEXT.md` §12.2's typed harm record; `turn_index`,
+  `arm` and `verdict` are `PROCESS.md` §12.1's C7 row; `target` and `amount_paise` are the call's
+  arguments, which `MockWorld.log`'s **own docstring** assigns to this chunk in those words.
+  **The verdict set is the arm's** (§8.6a) and anything else is a hard refusal — **C7 builds no
+  gate**; it carries the field and refuses a value the specification cannot produce.
+* **`chain.py`** — `entry_hash = SHA-256(prev_hash ‖ canonical-JSON(entry, sorted keys, no
+  whitespace))`, implemented from §16's sentence and **then** checked against golden 5, which is the
+  order §5.2 requires. **The verifier recomputes each entry's digest from its contents.** The
+  genesis root is loaded from `config/` with no default and **re-read on every call** — never cached
+  at import, because C14 rewrites it to the `prereg-v1` tag object id and that change is the one
+  free proof this project gets.
+* **`build.py`** — the ledger is built from **`MockWorld.log`, never from `harm_records`**
+  (`REVIEW_C4_1.md` INFO-2). One log row, one ledger entry, unconditionally.
+* **`store.py`** — the thin shell, the only module that opens a file. Atomic publish-on-complete,
+  idempotent, LF newlines explicitly, and a refusal to rewrite a completed episode.
+
+`tests/test_c7_ledger.py` — **108 tests**.
+
+### The measurements, all reproduced rather than asserted
+
+| what | result |
+|---|---|
+| golden 5 **A** intact | `VALID`, first-bad `null` ✅ |
+| golden 5 **B** the CONTROL, link broken | `DETECTED`, first-bad **2** ✅ |
+| golden 5 **C** value altered, hash stale | `DETECTED`, first-bad **2** ✅ |
+| golden 5 **D** prior entry's CONTENTS altered, its hash untouched | `DETECTED`, first-bad **1** ✅ |
+| the **writer** reproduces case A | byte for byte, **including key order** ✅ |
+| the stored-field verifier §5.2 names | `DETECTED` on B, `VALID` on C and D — matches the golden's own `stored_field_verifier_returns` on all four ✅ |
+| cases where the two verifiers disagree | **computed** as `{C, D}`, asserted equal to the two the golden marks ✅ |
+| missing `ledger.genesis_hash` | `MissingRequiredValue` ✅ |
+| the probe-naming count (INFO-2) | **3 log entries, 2 harm records, 3 ledger entries** naming the probe ✅ |
+| the counterfactual beside it | a ledger built from `harm_records` reaches **2** where the truth is **3** — a **33% undercount** of CANARY-B reach on this fixture |
+| `make test` | **450 → 596 passed**, 1 failed *(not this chunk's — see below)*, 1 skipped, 2 deselected |
+| `check-roles` | **17 / 0 / 4, exit 0** — unchanged |
+| `git status --porcelain tests/goldens/` | **EMPTY** |
+
+**The one failure is C13's and it is attributed rather than carried.**
+`tests/test_config_loader.py::test_protocol_sentinels_are_exactly_the_undecided_ones` fires because
+C13 resolved `vendor.camel_sha` in `config/protocol.yaml` at `c610d46` and that test asserts the
+sentinel set by **equality**. C13 declared it as `Q-061`; both files are outside this fence.
+**Measured rather than claimed:** with both new test files excluded the pre-existing suite is
+`450 passed, 2 failed` — **the identical 450 that were green at baseline** — so C7 adds zero reds.
+
+### What broke — two incidents, both this session's own, both before any review
+
+**`INC-32`** — the verifier hashed a **fixed field list** instead of the entry, so a smuggled
+fourteenth key was invisible and a tampered ledger came back `VALID`. ⚠️ **Golden 5 has no case
+that would ever have caught it**: its four cases each change or break a field that already exists,
+none adds a key and none removes one. **Missed:** the golden's own `hash_rule` — *"EXCLUDES
+`prev_hash` and `hash`"*, i.e. **includes everything else** — quoted verbatim in the module
+docstring three lines above the line that got it wrong.
+
+**`INC-33`** — the **read path** re-hashed whatever it was handed, so it **laundered** golden 5's
+cases **B, C and D** into valid ledgers, and `verify_ledger(store.read(p))` was a **tautology that
+could not fail on any input**. ⚠️ **Three of this session's own docstrings stated the correct
+behaviour as though it were implemented** — *"`read` … **would raise**"* — and they are corrected
+rather than deleted so the diff shows what was claimed. **Missed:** `INC-32`, written by this same
+session about this same file forty minutes earlier, is the **identical root cause one function
+along** — *"a checker that reads input through the schema it expects"*. The diagnosis was already
+written down and was not generalised. Fixed `669d6af`.
+
+### ⚠️⚠️ The STOP — `Q-062`, and it blocks C8
+
+**Nothing on a ledger entry says whether a call EXECUTED.** Measured on seed 2001: a
+`capture_payment` that **executed and moved ₹665.23** and a `capture_payment` the **MCP tool layer
+refused** produce entries identical in **all thirteen content fields**, carrying the **same digest**
+`3c544463…`. The discriminator is `currency`, a `Required` parameter, and the schema has no field
+for it and none for *"did this happen"*.
+
+* **NOT computable:** §8.6a's *"productive action"* (the confound control §8 makes mandatory),
+  E1/E2/E3's *money moved*, and S3.
+* ✅ **CANARY-A and the void rule ARE computable**, worked through rather than rounded up — the
+  probe is already `captured`, so a capture on it is refused by RS-32, and a refund's tool-layer
+  refusal must omit `payment_id` or `amount`, both of which are on the entry.
+* **Second instance, same root cause:** `receipt` is on no entry, so S2 — which **Q-027 moved to
+  ISSUE precisely so the ledger could score it** — is partially unscoreable.
+* **NO DEFAULT TAKEN.** A fourteenth field is Class A against a set the oracle pins. Instead the gap
+  is a **kept test that asserts the current behaviour and goes RED the moment it closes**.
+* **Why it was not found earlier:** golden 3's ledger is money actions **only**, so within its frame
+  `rejected_by_razorpay == false` **does** mean executed. C7's ledger is a **superset**, which
+  INFO-2 requires. Two artefacts each right, their conjunction not.
+
+### Also raised
+
+`Q-053` (canonical JSON's non-ASCII convention — golden 5 is all-ASCII and cannot discriminate it,
+and `target` carries attacker-authored text), `Q-054` (`ledger_seq` means the ledger's row here and
+the world's **write counter** in C4 — measured divergence `[1,2]` against `[1,2,3]`), `Q-055`
+(CANARY-B counts *"tool arguments"* and the entry carries only `target`), `OF-57` (**nothing anchors
+the end of the chain** — truncation *and* a re-derived suffix both verify), `OF-61` (the episode
+`seed` is the one stored value no digest covers).
+
+### The concurrency
+
+**C13 BUILD held `src/whetstone_gate/camel_comparator/`, `config/` and `vendor/`; this session held
+`src/whetstone_gate/ledger/`.** Every commit on both sides used **`git commit -- <paths>`**, and
+**neither swept the other's files** — audited commit by commit with `git show --stat` across all
+four of C13's and all six of this session's. **That is `Q-051`'s remedy and `INC-30`'s lesson
+holding, on the first occasion two build sessions have actually overlapped in this tree.**
+
+⚠️ **What it did not prevent, and it is named rather than smoothed over:** C13 took `Q-056`…`Q-061`
+and `OF-58`…`OF-60` from the same counters **while this session was drafting `Q-056`**. This session
+re-read both files before committing and renumbered **from the file** to `Q-062` and `OF-61`. That
+is `ARCH UNBLOCK 2`'s recorded class again — *"two sessions allocating from one counter neither of
+them holds"* — it cost the two `OF-53` rows last time, it cost nothing this time, and **the only
+reason is that a session re-read a file it had already read: a habit, not a guardrail.**
+
+### What I could not do
+
+1. ⚠️ **Close `Q-062`.** A fourteenth field is Class A and needs a ruling. Everything else in the
+   chunk was built; **C8 is blocked on this and should not start until it is ruled.**
+2. **Close `Q-053`, `Q-054`, `Q-055`, `OF-57`, `OF-61`.** All are architect or later-chunk calls.
+3. **Add a fifth case to golden 5** covering the add-a-field mutation `INC-32` names.
+   `tests/goldens/` is read-only to a build session (hard rule 3) and it is not this session's.
+4. **Fix the C13-caused red.** `tests/test_config_loader.py` and `config/` are outside this fence;
+   C13 declared it as `Q-061`.
+5. **Run mutants over `ledger/`.** `PROCESS.md` §5.3 makes ≥8 mutants a **review** deliverable for a
+   `full` chunk, not a build one. ⚠️ `INC-33`'s general form — **nothing in this repository detects a
+   test whose assertion cannot fail** — is exactly what a mutation harness would catch, and it is
+   named in that entry's `Systemic guardrail` as NOT landed rather than gestured at.
+6. **A mechanism for the shared counters.** Still owed, still prose-only, and this session is the
+   ninth consecutive one-off to say so.
+
+---
+
 ## C13 — THE CaMeL COMPARATOR — **BUILD** attempt 1 — 2026-09-01 — ✅ built, unreviewed · 8/8 third-party claims reproduce at the pin · **two Class A findings** · zero tokens
 
 **SESSION-TOKEN:** `c2b7f419` — **NOT in the batch.** Appended as
