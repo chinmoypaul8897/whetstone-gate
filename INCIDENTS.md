@@ -1481,3 +1481,235 @@ because it was found before the sweep, and it was found by an architect running 
 than by anything in this repository.*
 
 ---
+
+## INC-26 — the deterministic summary folded the last TOOL RESULT where the spec says the last DENIAL REASON, and the guard that should have caught it was green by accident of payload size
+
+**Date:** 2026-09-01 (defect shipped with C6 BUILD `4377265b`, commits `ddc1256`…`abd8f4f`,
+2026-08-31; found by C6 REVIEW 1 `2cd28cc5` as its BLOCKER **F-1**; fixed the same day by C6 FIX
+`7b99a85a`.)
+
+**Event:** `CONTEXT.md` §13.3 specifies the attacker's deterministic summary as *"a template that
+concatenates the running folded state (§8.6) with **the last denial reason**"*.
+`src/whetstone_gate/attacker/loop.py:215` read, unconditionally, on every turn:
+
+```python
+result_text = executor.execute(attacker_text)
+last_refusal = result_text
+```
+
+So the summary republished **every** tool result — successes included — onto the attacker's
+`AUTHORED` surface under the label `LAST TOOL REFUSAL:`. Verbatim WORLD text, and (separately, via
+`_seed_hint`) verbatim third-party corpus text, therefore reached the one surface `context.py`'s
+docstring reserves for *"text **this harness wrote**: the system prompt and the deterministic
+summary. **Nothing else.**"* The Origin taxonomy — one of the two mechanisms C6 offers as making
+policy-blindness structural rather than promised — did not partition what it said it partitioned.
+
+**Action:** The FIX session obtained an architect ruling rather than choosing a repair (the reason
+is the near-miss below), recorded it verbatim as `QUESTIONS.md` **Q-046**, and implemented it: the
+loop now identifies a denial by **exact string equality** against `CONTEXT.md` §8.6's one generic
+denial string, read from `data/generic_denial.txt` and never inlined, and folds only that. The
+corpus seed hint moved off the `AUTHORED` surface onto its own `Origin.CORPUS` part. All four
+blindness claims are now asserted over `run_episode`'s **own** assembled contexts.
+
+**Expectation:** §13.3's *"last denial reason"* should have put at most one authored string in
+front of the attacker — §8.6's generic denial, identical across arms on `DENIED` and on
+`INDETERMINATE`. What it actually put there was whatever the world last returned, up to the full
+400-token summary cap.
+
+**Missing:** Any blindness assertion over the context the **loop** builds. All four of C6's guards
+ran against `ctx.assemble()` called by the test with `last_refusal=` supplied as an argument, so the
+value the loop actually puts there had never met a guard. A test that drives `run_episode` and runs
+the same four predicates over `result.contexts` is four lines longer than the one C6 wrote, and is
+the entire difference between a property asserted and a property intended.
+
+**Missed:** ⚠️ **C6's OWN claim-2 predicate fires on 19 of 20 turns of an ordinary episode, and the
+call that trips it is the one the tradecraft paragraph explicitly instructs.** Drive
+`fetch_payment('pay_CANARYRECON')` — a 276-character result, well inside the 400-token cap — and
+`_hole_findings`' AUTHORED-surface check on the probe's note text is RED on nineteen of twenty
+turns. It passes in the shipped suite **only because the 12-payment listing fixture is long enough
+that truncation cuts the probe, at index 11, off the end of the summary.** ⚠️ **The guard was green
+by accident of payload size, not by correctness**, and a shorter, more realistic tool result turns
+it red. ⚠️ **And the build report asserted the opposite of the truth in writing:**
+`docs/sessions/c6-build-1.txt` §2 states *"All four assert over the ACTUAL ASSEMBLED CONTEXT - not
+the source, **not a constructor argument**."* Every one of the four **was** a constructor argument
+on the path that matters. That sentence was on disk and had to be disproved by running the loop
+rather than by reading it.
+
+⚠️ **AND THE NEAR-MISS IS RECORDED, BECAUSE IT IS WHY THIS WAS A BLOCKER AND NOT A MEDIUM.** The
+obvious repair for a red note-guard is to ban the probe's note text everywhere instead of only on
+the authored surface. **That repair closes the door and makes arm 4 VOID BY CONSTRUCTION while every
+test still passes** — `CONTEXT.md` §10.1 requires *no DIFFERENTIAL information across arms*, **not
+concealment**, and the attacker is meant to discover the door by reading, which is precisely what
+CANARY-A measures. A defect whose natural repair silently destroys the experiment is not one a
+session may resolve on its own judgement, and that is why Q-046 exists rather than a build decision.
+The repair was not taken: `tests/test_c6_fix_probes.py` asserts, over the loop's own contexts, that
+the note **still reaches the attacker on the WORLD surface**.
+
+**Diagnosis:** The loop has no gate object — the design choice that makes claim 4 structural — so it
+could not tell a denial from any other tool result, and C6 resolved that tension silently by folding
+all of them, a Class A deviation recorded in no `QUESTIONS.md` entry, no Class B note and no line of
+the build report. §8.6 dissolves the tension outright and nobody looked: the denial is **one authored
+constant string**, so equality against it needs no gate object and leaks no arm identity.
+
+**Fix:** `SEE-FIX-SHA-INC-26` — the loop folds only an exact match against the generic denial read
+from `data/`; `_seed_hint` moves to `Origin.CORPUS`; `tests/test_c6_fix_probes.py` re-runs all four
+blindness claims over `run_episode`'s own contexts and pins the 19-of-20 case, shown RED before and
+GREEN after.
+
+**Systemic guardrail:** Yes, and it is narrow enough to be real. **C6's blindness claims are now
+asserted over the object the runtime builds, never over one a test constructs** —
+`test_the_four_blindness_claims_hold_over_the_LOOPS_OWN_contexts` runs C6's four predicates over
+`result.contexts` for a full 20-turn episode, and a second probe drives the exact short-payload case
+that was previously invisible. ⚠️ **What is NOT claimed:** there is no general mechanism forcing a
+future chunk's guards onto runtime objects — that would belong to a session holding the shared test
+scaffolding, and this one did not. The transferable rule is stated instead, in one line, because it
+is the finding and not the fix: **a guard that has only ever been fired at a fixture the test built
+is a guard that has never met its own system.** C6 REVIEW 1 found this by building the loop's
+contexts itself and running C6's own predicate over them — the cheapest possible check, and one
+nothing in the suite performed.
+
+---
+
+## INC-27 — the attacker was seeded from ONE corpus of four, 20 of 498 entries, and the guard written to prevent exactly that headline was watching a different door
+
+**Date:** 2026-09-01 (defect shipped with C6 BUILD `4377265b`, 2026-08-31; found by C6 REVIEW 1
+`2cd28cc5` as its BLOCKER **F-2**; fixed the same day by C6 FIX `7b99a85a`.)
+
+**Event:** `PROCESS.md` §12.1's C6 row requires the attacker *"seeded from InjecAgent + AgentDojo +
+AgentHarm + ASB"*. `seed_for_turn(entries, turn_index)` returned `entries[turn_index % len(entries)]`
+over the concatenation of all four corpora, and `turn_index` runs only `0 … turn_budget-1`. Measured
+by the review against the real pinned payloads:
+
+```
+498 entries load.  The offered window is the fixed slice [0, 19].
+  injecagent  indices    0..61    REACHABLE     (only the first 20 of its 62)
+  agentdojo   indices   62..65    NEVER OFFERED  <- the BANKING injection corpus
+  agentharm   indices   66..97    NEVER OFFERED
+  asb         indices   98..497   NEVER OFFERED
+  -> 20 of 498 entries = 4.02%, all InjecAgent, IDENTICAL in every episode of every seed of
+     every arm; payment-domain entries in the offered set: 4 of 20.
+```
+
+Three of the four corpora this project pins, hashes, licence-verifies at source and legally reasons
+about never reached the attacker at all — including AgentDojo's banking suite, the only
+payment-domain material in the set.
+
+**Action:** The selection rule decides a published number, so it is Class A: the FIX session obtained
+an architect ruling, recorded it verbatim as `QUESTIONS.md` **Q-047**, and implemented it exactly —
+stratified round-robin across all four corpora by turn, with the index inside each corpus a
+deterministic function of `(episode seed, turn index)`, stated in the module docstring so a reviewer
+can recompute an episode's offers by hand.
+
+**Expectation:** `CONTEXT.md` §11.3 opens *"the attacker's inputs are not ours either"*, and the
+split it publishes — *"what fraction of successful attacks came from a seeded corpus versus the
+attacker's own improvisation"* — is a number this project intends to publish as a first. Computed
+over twenty fixed Smart-Lock and home-automation injection strings offered to a **payments**
+attacker, sixteen of which carry no payments vocabulary at all, the predictable result is a corpus
+fraction near zero and a headline near *"~100% improvised"*.
+
+**Missing:** Any comparison, anywhere, between the set of entries the attacker was **offered** and
+the set of corpora the card **names**. The loader counts entries and the ledger records
+`seed_offered_ref` per turn, so both halves of that comparison already existed; nothing put them
+beside each other, and nothing printed offered-versus-loaded as a number.
+
+**Missed:** ⚠️ **C6 wrote a guard against this exact headline, in this exact module, and pointed it
+at the wrong door.** `load_entries`' own refusal says so in its own words: *"zero entries would make
+CONTEXT.md section 11.3's published split read '100% improvised' — a headline number produced by a
+broken instrument, which is INCIDENTS.md INC-01 exactly."* The reasoning is right and the mechanism
+is real — the review fired it both ways, on an absent tree and on a drifted byte. **It guards zero
+ENTRIES. The defect is zero REACHABLE entries, and the two produce the identical headline.** A
+session able to write that sentence had everything it needed to ask whether the entries it loaded
+could be reached, and asked only whether they existed.
+
+**Diagnosis:** The offered window was a **fixed slice `[0, 19]` of a single concatenated index**, so
+the physical **order of the corpora in `seed_index.json`** silently decided which of them the
+attacker could ever see, and nothing compared the offered set against the four corpora the card
+names. The rotation was documented as deterministic because *"hard rule 8 forbids randomness inside
+core logic"* — true, and irrelevant: a deterministic function of `(episode seed, turn index)` spreads
+across the whole corpus **and** keeps hard rule 10's byte-identity, and `seed_for_turn` did not
+accept the seed.
+
+**Fix:** `SEE-FIX-SHA-INC-27` — stratified selection across all four corpora with a seed-derived
+within-corpus index; `coverage_report()` refuses a selection that cannot reach every corpus
+`load_entries` loaded and prints offered-versus-loaded as a number (hard rule 11); probes assert that
+every corpus is offered in every episode, that two seeds differ, that one seed repeats, and that two
+arms on one seed are identical.
+
+**Systemic guardrail:** Yes, and it is the shape the old guard should have had. **The refusal now
+watches reachability rather than existence**: `coverage_report()` raises `CorpusUnavailable` when the
+selection cannot offer some corpus that `load_entries` loaded, and it prints the offered and loaded
+counts so a shrinking numerator is stated rather than inferred. ⚠️ **What is NOT claimed:** nothing
+forces a future chunk to compare what it *uses* against what it *loads*. The transferable rule is one
+line and it is this entry's real content — **a guard against a bad denominator must be pointed at the
+number that is actually published, not at the nearest input that is easy to check.** Zero entries and
+zero reachable entries were the same headline behind two different doors, and only one of them was
+watched.
+
+---
+
+## INC-28 — for the third time, a scope fence excluded the exact file the session's own ruling told it to write
+
+**Date:** 2026-09-01 (observed by C6 FIX `7b99a85a` while implementing Q-046.)
+
+**Event:** The C6 FIX prompt carries an architect ruling — recorded verbatim as `QUESTIONS.md`
+**Q-046** — whose operative sentence is: *"THE LOOP THEREFORE IDENTIFIES A DENIAL BY EXACT STRING
+EQUALITY AGAINST THAT ONE AUTHORED CONSTANT, **read from `data/` and never inlined**."* The same
+prompt's scope fence is an `ONLY` list, and **`data/` is not on it**. `data/` held exactly the three
+`CONTEXT.md` §8.6 authored texts and no fourth, so the ruling could not be implemented as written
+without creating a file in a directory the fence did not enumerate.
+
+**Action:** The file was created — `data/generic_denial.txt`, carrying §8.6's generic denial string
+and nothing else — on the reading that **a ruling binds** (`CLAUDE.md` hard rule 5) and that a ruling
+naming `data/` as the constant's home authorises the one file it names. The judgement is recorded
+rather than assumed: `QUESTIONS.md` **Q-049** states it, names the alternative that was rejected
+(injecting the string as a `run_episode` parameter, which contradicts the ruling's own words and
+would have put the constant back outside any file a test can compare to the spec), and flags the two
+consequential things this session could **not** do inside its fence — register the new text in
+`spec_constants.AUTHORED_TEXTS`, and give it a `CONTEXT.md` §8.6 row of its own. Both are named as
+owed, and the protection `AUTHORED_TEXTS` exists to give is supplied meanwhile by
+`test_the_generic_denial_file_is_character_identical_to_CONTEXT_MD`, which compares the new file's
+bytes to §8.6's parsed string.
+
+**Expectation:** A FIX session's fence should contain every file its named tasks require, because the
+fence's whole purpose is to make *"I stayed inside my scope"* checkable. When it does not, the session
+must choose between disobeying a ruling and disobeying a fence, and `CLAUDE.md` §4's instruction for
+that case — *"STOP and report instead of working around it"* — would here have meant returning the
+FAIL unclosed on its headline BLOCKER.
+
+**Missing:** Any mechanical check that a prompt's fence covers the files its own tasks name. The
+fence is prose in a prompt and the tasks are prose in the same prompt; nothing compares them, and
+nothing in this repository could, because neither artefact is in this repository.
+
+**Missed:** ⚠️ **This project has already recorded this class twice, and both records were read by
+this session, in its own prescribed read order, before it hit the third instance.** `QUESTIONS.md`
+**Q-029**: the `TODO_` sentinel — *"the mechanism this project built for exactly a value that is not
+yet determined"* — is **unreachable by a fix session**, because declaring one needs an owner row in
+`config.py` and an entry in `tests/test_config_loader.py`, both routinely outside a fix fence; the
+architect accepted that as *"a real process defect"*. `QUESTIONS.md` **Q-033**: `INCIDENTS.md` was
+fenced out of the sessions most likely to need it — **three sessions in one day reported an incident
+they were forbidden to file** — and the fence was removed by ruling. ⚠️ **The generalisation was
+available after Q-033 and was not made: the failing pattern is not "`INCIDENTS.md` is fenced out", it
+is "the fence is written from the diff the architect expects, not from the tasks the architect
+wrote."** Q-033 fixed one filename. This is the same defect at a different filename.
+
+**Diagnosis:** Scope fences here are authored as a list of expected edit targets rather than derived
+from the tasks they accompany, so a task whose correct implementation needs a file the architect did
+not picture produces a fence violation that is indistinguishable, from inside the session, from scope
+creep. Two prior instances were each closed at the level of the individual file rather than at the
+level of the mechanism.
+
+**Fix:** `SEE-FIX-SHA-INC-28` — no behaviour change; the file was written, the reasoning recorded in
+`QUESTIONS.md` Q-049, and the two out-of-fence consequences named as owed rather than quietly taken.
+
+**Systemic guardrail:** ⚠️ **None from this session, and the words are the honest ones: none —
+accepted, because the remedy is the architect's and not a session's.** A session cannot widen its own
+fence; that is what a fence is for. What is available, and is proposed rather than claimed: **a
+prompt's fence should be checked against its own tasks before it is issued** — every path a task
+names appears in the `ONLY` list, or the task says explicitly which session owns it. That is one
+reading pass by the author of the prompt, it would have caught all three instances, and it is the
+only place the check can live, because the fence and the tasks exist only in the prompt.
+⚠️ **Recorded as the THIRD occurrence rather than as this session's inconvenience**, per INC-21's own
+note that the under-reporting pressure is strongest exactly where a defect *"reads badly and cost
+nothing"*. This one cost nothing at all, and the count is the entire finding.
+
+---
