@@ -383,3 +383,54 @@ found by this session's own `git status` and removed in the same minute, and eve
 to the scratchpad. **Adjacent to INC-06's class without being an instance** — nothing was written to
 a *project* file by a translating layer; a throwaway landed in the wrong directory. Reported because
 it reads badly and cost nothing, which is exactly the shape rule 13 warns is under-reported.
+
+---
+
+## STATUS UPDATE BY ARCH BUILD (`5c4f8e11`), 2026-09-01 — one ruling recorded, one ID collision named
+
+**This session opened no finding of its own.** It applied `QUESTIONS.md` **Q-049**, **Q-050** and
+**Q-051**, and this block records what those rulings do to rows already in this file. **No existing
+row's text was edited.**
+
+### `OF-53` (C6, MEDIUM — `data/generic_denial.txt`) — **STANDS OPEN, and now has a deadline**
+
+`QUESTIONS.md` **Q-049** was RULED on 2026-09-01. The ruling upholds the C6 FIX session's decision
+to write the file (*"a ruling binds, and Q-046 said the constant is read from `data/`"*), names the
+fence omission as the architect's own defect, and disposes of this row in its own words:
+
+> *OF-53 STANDS OPEN: `data/generic_denial.txt` is an §8.6 authored text and belongs in
+> `spec_constants.AUTHORED_TEXTS` and in §8.6's fenced-block list. Both are outside this session's
+> fence too. OWED, before `prereg-v1`.*
+
+**So the status is unchanged and the remedy is unchanged** — one `AUTHORED_TEXTS` entry, one
+`_TEXT_MARKERS` entry, and a `§8.6` marker so the existing three-way parse covers the fourth text.
+**What is new is the deadline: before `prereg-v1`**, the tag that freezes `config/` and the
+pre-registration set. It is not taken here: `src/whetstone_gate/spec_constants.py`, `CONTEXT.md` and
+`tests/test_c6_attacker.py`'s authored-texts assertion are all outside this session's fence, which
+names `tests/test_c6_attacker.py` for **one** assertion and that is Q-050's.
+
+### ⚠️ NEW, PROCESS: **there are TWO `OF-53`s in this file, and they are different findings**
+
+* **`OF-53` (C6, MEDIUM)** — `data/generic_denial.txt` is in neither `AUTHORED_TEXTS` nor §8.6's
+  fenced-block list. Raised by **C6 FIX (`7b99a85a`)**, self-raised, 2026-09-01.
+* **`OF-53` (C4, MEDIUM)** — the A-class does not survive a refusal for A4, and `harm.py` says
+  without qualification that it does. Raised by **REVIEW_C4_1 (`0852ea56`)**, 2026-09-01.
+
+**Both are open, both are cited by number elsewhere, and the number no longer identifies one of
+them.** `STATUS.md`'s C6 row cites *"OF-53 NEW, self-raised"*; the C4 review's own closing paragraph
+cites *"**OF-53** (MEDIUM) and **OF-55** (LOW) are carried above"* — **two documents, one number, two
+findings.** ⚠️ **Cause, and it is the shared-tree hazard in a second dress:** the two sessions ran
+**concurrently on 2026-09-01**, each read this file, each took *"the next free number"*, and each was
+right when it looked. `INCIDENTS.md` **INC-30** records the git-index half of that same concurrency;
+this is the half that needs no index at all — **two sessions allocating from one counter neither of
+them holds.**
+
+**Not renumbered here, deliberately.** Renumbering either one would edit a row this session did not
+raise, in a file two other sessions cite by number, and would silently invalidate the citations in
+`STATUS.md` and in `REVIEW_C4_1`. **The remedy is the architect's**, and the two candidates are
+worth stating: renumber the **later** of the two to `OF-56` and fix its two citations in one commit,
+or leave both and disambiguate every citation as `OF-53 (C6)` / `OF-53 (C4)`. **Recorded rather than
+resolved**, which is the same disposition this project gives every collision it does not own.
+
+**Every other row in this file is untouched by this session.** `OF-47`…`OF-52`, `OF-54` and `OF-55`
+are exactly as their raising sessions left them.

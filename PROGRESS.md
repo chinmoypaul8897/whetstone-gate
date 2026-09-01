@@ -6,6 +6,220 @@ not a record; this file is.
 
 ---
 
+## ARCH — two ruled test corrections, three rulings, and golden 5 — **BUILD** (chunk cell ARCH) — 2026-09-01 — ✅ both inherited reds cleared, `make test` GREEN, no feature added
+
+**SESSION-TOKEN:** `5c4f8e11` — **NOT in the batch.** Appended as
+`| `5c4f8e11` | ARCH | BUILD | 2026-09-01 |`; no other session's line was touched.
+⚠️ **The prompt numbered it the ELEVENTH self-recorded row and it is the THIRTEENTH**, numbered from
+the table rather than from the prose, under hard rule 4 — the same correction `7b99a85a` made, for a
+bigger gap. **Two self-recorded rows landed without a paragraph in `QUESTIONS.md`:** `df238be6`
+numbered itself the *eighth* in **this file** only (so `3af1c9d2` then took "eighth" there as well —
+**there are two eighths in this project's records**), and `0852ea56` appended its row and claimed no
+number anywhere. The full reconciliation is a thirteen-row table in `QUESTIONS.md`'s token preamble,
+every row checkable against the token table above it. **Class C, resolved in favour of the file.**
+⚠️ **The second-order finding is worth more than the count:** the `7b99a85a` paragraph recorded that
+*"numbering in advance is exactly the step that can now be wrong by one"*; **it has now been wrong
+twice running and by two rather than one**, so the honest reading is that a hand-maintained running
+total kept in prose in two files is the wrong instrument. `check_roles.py` already parses that table
+for E1 and could count it — **OWED, not written; `src/` is outside this fence.**
+
+**TOKEN SPEND: ZERO PROVIDER MODEL CALLS. ZERO TOKENS ON ANY LANE. NO NETWORK.** Every measurement
+here is local. The reference-attacker, gate-judge and ladder lanes are untouched.
+
+**RAN ALONE, AND IT WAS CHECKED RATHER THAN ASSUMED** (the prompt required it; INC-30 is why).
+Before the first edit: `git log --oneline -3` → `0981c39`, `0e94d6e`, `fe71ca3`; `git status
+--porcelain` → **empty**; last commit **22 minutes** old — nothing had landed in the last few
+minutes. ⚠️ **EVERY COMMIT OF THIS SESSION USED `git commit -- <explicit paths>`, without
+exception**, which is Q-051's binding part (i). The one new file was `git add`-ed first because a
+pathspec commit cannot reach an untracked path — **the `add` is the part that never gave isolation;
+the pathspec on the `commit` is the part that does.**
+
+---
+
+### THE COUNTS, BEFORE AND AFTER
+
+| | `make test` | `check-roles` |
+|---|---|---|
+| **BEFORE** (`0981c39`, tree clean) | **446 passed, 2 FAILED, 1 skipped, 2 deselected** | **17 / 0 / 4, exit 0** |
+| **AFTER** | see the FINAL OUTPUT block for the measured line | **17 / 0 / 4, exit 0** |
+
+**Both inherited failures are gone and no other test is red.** **No test was deleted, skipped,
+loosened or approximated**; two tests were **added**, and both are pins over exception lists.
+
+---
+
+### TASK 1 — Q-051: the attribution defect gets a pinned, dated exception
+
+`FOREIGN_TOKEN_COMMIT_EXCEPTIONS` in `tests/test_c1_review_2_probes.py`, keyed by **`(path, full
+40-hex SHA)`**, holding **exactly one** entry: `tests/test_c4_review_probes.py` at
+`17585ab09c5517c9f1af8cac30481fa8fa349e75`, with the date, the reason and Q-051 cited in the entry's
+own string. Pinned at one by `test_the_foreign_token_exception_list_is_exactly_the_one_INC_30_commit`
+— the instrument `E5_EXCEPTIONS` (4), `NULL_IS_A_VALUE` (2) and `TRIPWIRE_SELF_EXCLUSION` (1) already
+use here — and the pin asserts the **key shape** as well as the count, because a token key would be
+the amnesty.
+
+⚠️ **PROVED IN BOTH DIRECTIONS, ON A CLONE IN A TEMP DIRECTORY. Nothing in this repository was edited
+to establish any of it**, and `cfg.repo_root()` was printed to prove each measurement came from the
+clone — **the first attempt at this passed for the wrong reason**, because the editable install
+resolved `repo_root()` back to this repository and the guard walked the wrong git log. That is
+INC-17's own lesson arriving live, and it is recorded because a demonstration that measures the
+wrong tree is worse than no demonstration.
+
+* **the pin fires** — a second entry added in a throwaway copy → *"holds 2 entries, not 1"*.
+* **the guard still fires on a NEW edit by the EXCEPTED session** — a fresh commit on
+  `tests/test_c4_review_probes.py` under **`7b99a85a`** → RED, and the offender list names **only
+  the new SHA**. `17585ab` was excepted; the exception did not spread to its session.
+* **the guard still fires on any other reviewer probe file** — a fresh commit on
+  `tests/test_c6_review_probes.py` under a different foreign token → RED.
+
+⚠️ **AND IT NEEDED A SECOND LIST, WHICH THE PROMPT DID NOT ANTICIPATE AND WHICH IS RAISED RATHER
+THAN WAVED THROUGH — `QUESTIONS.md` Q-052 / `INCIDENTS.md` INC-31.**
+`tests/test_c1_review_2_probes.py` **is itself a reviewer's probe file**, so applying the ruling
+commits to it under this session's token — and **no SHA-keyed entry can name its own commit's SHA**,
+because the SHA does not exist when the entry naming it must be written. **The regress does not
+terminate.** Measured, not reasoned about: with the second list neutered, this session's own commit
+turns the guard RED on this file, reporting `5c4f8e11` beside `df238be6`. `GUARD_AMENDMENT_SESSIONS`
+is keyed by `(path, token)`, holds exactly one entry, and its pin asserts the path is **the file the
+guard is defined in**, so it can never excuse a different file. It is deliberately **not** the
+`TRIPWIRE_SELF_EXCLUSION` shape, which would drop this file from the guard for **every** session
+forever. **NOT CLAIMED: that it is as tight as the list beside it.** A token can be re-used by that
+session on that file where a SHA cannot; Q-052 states the gap and asks for a ruling.
+
+**`17585ab` IS NOT REPAIRED, WHICH IS THE RULING'S ANSWER AND NOT A SHORTFALL.** Q-051 endorses the
+C6 FIX session's refusal to "fix" it either way: the defect is attribution, not content, and
+`754c0bd` is the authoritative state. Part (iii) records `git worktree` per session as **the correct
+fix, declined under time pressure, with the reason** — so **the hazard is still live**, and this
+session's answer to it was a habit (running alone, and checking) and not a mechanism.
+
+---
+
+### TASK 2 — Q-050: the assertion said byte-constancy; the property is non-growth
+
+One line in `tests/test_c6_attacker.py`. `len(set(steady)) == 1` → *no element exceeds its
+predecessor*. The fixture is unchanged and no other assertion in the file was touched.
+
+⚠️ **THE RULING REQUIRED THE DIFFERENCE SHOWN AND NOT CLAIMED. Exhibited, on the clone:**
+
+```
+turn |  est  | summary len | turns_remaining
+   7 | 6038  | 196         | 14      <- the window has filled; steady state begins
+  11 | 6038  | 196         | 10
+  12 | 6037  | 195         | 9   <- summary 196 -> 195, the ONLY change in the whole run
+  20 | 6037  | 195         | 1
+
+steady = [6038, 6038, 6038, 6038, 6037, 6037, 6037, 6037, 6037, 6037, 6037, 6037, 6037]
+OLD  len(set(steady)) == 1              -> 2 == 1     -> FAIL
+NEW  no element exceeds its predecessor -> grew at [] -> PASS
+```
+
+⚠️ **One indexing correction, made because a number nobody can reproduce is worse than no number:**
+this table is **1-indexed by turn**; INC-29 and Q-050's own measurement are **0-indexed by record**,
+which is why they say *"turn 11"* where this says turn 12. **Same event, stated rather than left for
+a reader to trip over.**
+
+⚠️ **PROVED IN THE OTHER DIRECTION, which is the half that makes it a correction rather than a
+relaxation (hard rule 6).** A one-line mutant in the clone's `attacker/context.py` — `kept =
+history`, removing the window entirely, which is the spike's own ~300K-token defect — turns the
+**new** assertion **RED** at every step: `[6991, 7944, 8897, … 18426]`, *"It grew at [(1, 6991,
+7944), … (12, 17473, 18426)]"*. **So the property the test is named for is still enforced; only the
+property §8.6 forbids has stopped being asserted.** The old form is not merely stricter — **no
+implementation, correct or otherwise, satisfies it at `turn_budget = 20`**, because an int's decimal
+width must narrow somewhere in a twenty-turn countdown. Rule 6 protects a test that a correct
+implementation can pass.
+
+---
+
+### TASK 3 — Q-049: `data/` and the authored-text registry
+
+**Recorded verbatim, and nothing was implemented, because the ruling itself says both consequences
+are outside this fence.** Option 1 stands: `data/generic_denial.txt` stays. `OF-53` (C6) **STANDS
+OPEN** with the deadline the ruling sets — **before `prereg-v1`** — and that is written into
+`docs/reviews/OPEN_FINDINGS.md` beside the row rather than only into `QUESTIONS.md`.
+
+⚠️ **The adopted generalisation binds the architect, and this session's own fence broke it a fourth
+time.** Q-049 rules: *"the fence is written from the diff the architect expects, not from the tasks
+the architect wrote … the remedy is that a fence is derived from the task list."* This fence names
+`tests/test_c1_review_2_probes.py (ONE exception list)` — the expected **diff** — where the **task**
+is *"amend a guard that forbids exactly this edit."* **Q-029, Q-033, INC-28 and INC-31 are four
+instances of one class, and the fourth arrived in the first fence written after the third was
+ruled.** That is evidence that a ruling adopted in prose is not yet a mechanism.
+
+⚠️ **AND A SECOND, UNASKED-FOR FINDING IN THE SAME FILE: THERE ARE TWO `OF-53`s.** One is C6's
+(`data/generic_denial.txt`, raised by `7b99a85a`); the other is C4's (the A-class not surviving an
+A4 refusal, raised by `0852ea56`). **Both open, both cited by number elsewhere, and the number no
+longer identifies one of them.** Cause: the two sessions ran **concurrently on 2026-09-01** and each
+took *"the next free number"*, and **each was right when it looked** — INC-30's shared-tree hazard in
+a dress that needs no git index at all, two sessions allocating from one counter neither of them
+holds. **Recorded, not renumbered:** renumbering would edit a row this session did not raise and
+would silently invalidate citations in `STATUS.md` and in `REVIEW_C4_1`. Both candidate remedies are
+stated for the architect.
+
+---
+
+### TASK 4 — golden 5, copied and not computed
+
+`tests/goldens/golden5_tamper.json`. **Verified as observed here, at the destination, after the
+copy:**
+
+```
+sha256        cb707237d93cccc4520b6bf03f96799fb19f7191eb1be02ef4094b02642cc40b   (matches the prompt)
+bytes         9,830                                                             (matches the prompt)
+cmp           identical to the architect's source file, byte for byte
+git hash-object              631d6186949dcbea4bc3ca0903789ba1dc15c41c
+git hash-object --no-filters 631d6186949dcbea4bc3ca0903789ba1dc15c41c   (equal - no filter mangling)
+check-roles A5               PASS; its TEXT branch moved 155 -> 156, so it demonstrably saw it
+git status --porcelain tests/goldens/  ->  A  tests/goldens/golden5_tamper.json   (ONE addition)
+                                            M  tests/goldens/README.md            (in fence, task 4b)
+```
+
+**The three prior goldens are UNMODIFIED, checked by blob rather than by eye** — identical git blob
+ids at `0981c39` and at HEAD: `world_seed_2001.json` `afb546d4…`, `golden1_money.json` `2461257b…`,
+`golden3_harm_vector.json` `22daf722…`.
+
+⚠️ **NO HASH CHAIN WAS IMPLEMENTED ANYWHERE, NOT EVEN TO "CHECK" THE FILE.** `src/whetstone_gate/`
+carries no `ledger/` package at all on the commit that lands it. **The digest is the verification** —
+a golden checked by a reimplementation has stopped being independent, and a golden of **digests**
+checked by a reimplementation would be a tautology with a SHA in it.
+
+**4b — the README.** Golden 5's row, its section, and **C7 named as unblocked**, with history kept
+visible in the file's own style: the *"Three of nine"* table is preserved verbatim beside the new
+one, **including its now-settled prediction that *"the six still owed block C7"***, which is a dated
+claim a reader can check against `golden5_tamper.json`'s git log.
+⚠️ **Published in golden 7's HOUSE STYLE — the first golden to use it — and MEASURED FIRST rather
+than assumed.** Q-035's anchor fix landed in `9c5dbb5`, so the parser is bound to golden 7's own
+section. But `tests/test_c4_goldens.py` parses byte counts with a pattern matching only the
+**workaround's** form and is **outside this fence**, so the house style was checked against it on a
+copy of the README before a word was written here: C4's helper is section-anchored and reads only
+goldens 1 and 3, so **both of its parses stay at one digest and one byte count.** **Q-035's owed
+two-file withdrawal for goldens 1 and 3 is untouched and still owed**, and the README now carries a
+dated postscript saying exactly when the workaround stopped being necessary and which half of it
+still is.
+
+---
+
+### WHAT I COULD NOT DO, AND WHAT IS OWED
+
+**(a)** `OF-53` (C6) — the `AUTHORED_TEXTS` row and the §8.6 marker. **Outside the fence, and the
+ruling says so in its own words.** Owed **before `prereg-v1`**.
+**(b)** Q-035's withdrawal for goldens 1 and 3 — a two-file edit needing `tests/test_c4_goldens.py`.
+**Outside the fence.** Still owed.
+**(c)** The `OF-53` **ID collision**. Recorded, not renumbered; the remedy is the architect's.
+**(d)** A mechanism for the self-recorded-row count — `check_roles.py` already walks that table.
+**Outside the fence** (`src/`).
+**(e)** A check that a commit's file list falls inside the session's fence — INC-30's `Missing`,
+still open, still belongs in `check_roles.py`. **Outside the fence.**
+**(f)** `INC-31` was written **after** the code was in the working tree, though **before any of it
+was committed**. Rule 13's *"before it changes a line of code"* binds a **FIX** session after a
+review FAIL; this session is neither. **Said plainly rather than glossed**, because the ordering is
+the part of rule 13 that is easy to claim and hard to check.
+**(g)** One item is reported to the architect in the FINAL OUTPUT **and deliberately not written
+into `QUESTIONS.md`**, with the reason stated there. It concerns C7 and `PROCESS.md` §5.4, and
+writing it into a file every session reads in its prescribed order would itself be the leak.
+
+**NO TAG. Nothing here is self-certified, and a fresh adversarial review follows.**
+
+---
+
 ## C4 — world semantics, the five-tool surface, the harm record, the self-test — **REVIEW** — attempt 1 — 2026-09-01 — ✅ **PASS, `c4-pass` cut; and this review left one test RED by a declared STOP of its own**
 
 **SESSION-TOKEN:** `0852ea56` — **NOT in the batch.** The prompt said so and put `QUESTIONS.md` in
