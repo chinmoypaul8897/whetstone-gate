@@ -202,6 +202,113 @@ def branch_value_problem(branch: object) -> str | None:
     return None
 
 
+#: ⚠️ **THE SUPERSEDED BRANCH-B TRIGGER, CARRIED AS THE SHAPE THIS MODULE REFUSES.**
+#: `CONTEXT.md` v1.7 §8.5.1 made Branch B's condition *"the model id is no longer served"*, so
+#: `config/`'s Branch-A key read *"the model id is still served AND …"*. `Q-057`'s ruling narrowed
+#: it, because ``"google" in model`` is **substring containment**: dispatch SUCCEEDS on the suffixed
+#: pipeline name, the whole string reaches ``genai.Client`` as a model id, and the provider error
+#: that follows is **indistinguishable from Branch B's own trigger**. This is the phrasing that
+#: makes a harness defect look like the pre-registered negative result.
+SUPERSEDED_BRANCH_TRIGGER = "model id is still served"
+
+#: §8.5.1's Branch-B requirements, as the **spec's own** phrases. ⚠️ Each is asserted to occur in
+#: `CONTEXT.md` §8.5.1 before it is required of `config/`, so this tuple cannot quietly become a
+#: third copy that drifts from the law — which is the failure `Q-058` and `Q-064` are both about.
+BRANCH_B_REQUIREMENTS: tuple[tuple[str, str], ...] = (
+    (
+        "the diagnosis requirement",
+        "on a cause that has been diagnosed",
+    ),
+    (
+        "the words that make 'it errored' insufficient",
+        "is not a cause",
+    ),
+    (
+        "the harness-defect exclusion",
+        "a harness defect is never branch b",
+    ),
+    (
+        "where the diagnosed cause is recorded before a branch is selected",
+        "protocol.md",
+    ),
+)
+
+
+def branch_condition_problems(
+    branch_a_condition: object, branch_b_condition: object
+) -> list[str]:
+    """Every way `config/`'s two branch conditions fall short of §8.5.1 v1.9. Empty is a pass.
+
+    ⚠️ **`Q-079` IS WHY THIS EXISTS, AND THE REASON IS ONE SENTENCE: NOTHING READ THAT KEY.**
+    `Q-064` named `branch_a_condition` as carrying the **un-narrowed** Branch-B trigger and
+    printed the cause as a number — *"`grep -rn` returns one hit, the definition itself"*.
+    A fix session with the file open corrected the sibling key and not this one, and no
+    test could have noticed, because **a pre-registered condition that nothing asserts is a
+    comment**. `config/` is a pre-registration artefact and hard rule 4 makes a **frozen**
+    one outrank `CONTEXT.md`, so after `prereg-v1` this string would have been the higher
+    authority on which branch RUN-1 takes.
+
+    ⚠️ **A LIST, NOT A BOOL, AND PURE** — the same two choices as
+    :func:`branch_value_problem` and :func:`branch_b.assert_provenance`, for the same two
+    reasons. A failure must **name the field**, because a gate whose only output is *"no"*
+    is a gate somebody edits out under time pressure; and the predicate must be firable at
+    a constructed value, so the guard can be proved to go red **without `config/` ever
+    having to hold the defective string**.
+
+    ⚠️ **Branch B is the NEGATION of Branch A**, which is exactly how the defect survived:
+    `Q-079` records that with no `branch_b_condition` key, `config/` bound the project to
+    taking its pre-registered negative branch whenever *"the run does not complete"*, with
+    **no diagnosis requirement** — the thing `Q-057`'s ruling forbade in terms: *"a
+    pre-registration whose negative branch can be reached by our own bug measures
+    nothing."* So Branch B's trigger is required to be **stated**, never inferred.
+    """
+    problems: list[str] = []
+    for label, value in (
+        ("branch_a_condition", branch_a_condition),
+        ("branch_b_condition", branch_b_condition),
+    ):
+        if not isinstance(value, str) or not value.strip():
+            problems.append(f"{label} is {value!r}, which states no condition.")
+            continue
+        if SUPERSEDED_BRANCH_TRIGGER in value.lower():
+            problems.append(
+                f"{label} still carries {SUPERSEDED_BRANCH_TRIGGER!r}, the pre-Q-057 "
+                f"trigger. That phrasing is indistinguishable from a harness defect: "
+                f"dispatch succeeds on substring containment, so a provider error on the "
+                f"suffixed string would present as the pre-registered negative result."
+            )
+
+    if not isinstance(branch_b_condition, str):
+        return problems
+    lowered = branch_b_condition.lower()
+    for what, phrase in BRANCH_B_REQUIREMENTS:
+        if phrase not in lowered:
+            problems.append(
+                f"branch_b_condition does not carry {what} ({phrase!r}). CONTEXT.md v1.9 "
+                f"§8.5.1: Branch B is taken only on a cause that has been DIAGNOSED and "
+                f"recorded in PROTOCOL.md before a branch is selected; 'it errored' is not "
+                f"a cause, and a harness defect is never Branch B."
+            )
+    return problems
+
+
+def branch_conditions_are_stale() -> list[str]:
+    """:func:`branch_condition_problems` over the two keys `config/` actually holds.
+
+    ⚠️ ``require()`` is the only read path, so a missing file and a missing key are the
+    same answer rather than two different silences — and a **missing** `branch_b_condition`
+    is the exact state `Q-079` found, so it must be a refusal and never an empty pass.
+    """
+    try:
+        lanes = cfg.load("lanes")
+        return branch_condition_problems(
+            lanes.require("camel_comparator.branch_a_condition"),
+            lanes.require("camel_comparator.branch_b_condition"),
+        )
+    except cfg.ConfigError as exc:
+        return [f"{type(exc).__name__}: {exc}"]
+
+
 def branch_is_undecided() -> str | None:
     """Why the CaMeL branch is not yet decided, or ``None`` once RUN-1 has decided it.
 

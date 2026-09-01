@@ -762,6 +762,90 @@ def test_the_model_string_and_selections_come_from_config_not_from_source(contex
     assert plan.model_string in " ".join(plan.passes[0].argv)
 
 
+def test_the_pre_registered_branch_condition_carries_the_DIAGNOSIS_requirement(context_md):
+    """⚠️ **`Q-079` / `OF-104`, and the reason it existed is that NOTHING READ THIS KEY.**
+
+    `config/lanes.yaml`'s `camel_comparator.branch_a_condition` read *"the model id is
+    still served AND the run completes inside the 90-minute box"* until 2026-09-02 — the
+    Branch-B trigger `Q-057`'s ruling **narrowed** and `CONTEXT.md` v1.8 replaced. `Q-064`
+    named it, under its own heading, in the same entry as the citation defect; C13 FIX 1
+    closed the citation half. **No test could have caught that**, because `Q-064` had
+    already printed the cause as a number — *"`grep -rn "branch_b_action"` returns one hit,
+    the definition itself"* — and C13 REVIEW 1 measured the same thing for this key.
+    **A pre-registered condition that nothing asserts is a comment.**
+
+    ⚠️ **Why it is a BLOCKER and not tidying.** `config/` is a pre-registration artefact
+    (`CONTEXT.md` §15.0) and hard rule 4 says a **frozen** one **outranks `CONTEXT.md`**.
+    `prereg-v1` does not exist yet, so this is fixable today and unfixable the moment C14
+    cuts the tag — at which point `config/` would have been the higher authority on which
+    branch RUN-1 takes, and it would have said *"take Branch B whenever the run does not
+    complete"*, with no diagnosis requirement at all.
+
+    ⚠️ **NEITHER SIDE IS TRANSCRIBED HERE**, per this module's own rule. One side is read
+    from `config/` **through the loader** — which is the whole point, since the defect was
+    that nothing read it. The other is `CONTEXT.md` §8.5.1 itself: every phrase required of
+    `config/` is first asserted to occur **in the law**, so this test cannot become a third
+    copy that drifts from both. If the architect amends §8.5.1, this goes red *there*
+    first, which is the correct place for it to go red.
+    """
+    lanes = cfg.load("lanes")
+    condition_a = lanes.require("camel_comparator.branch_a_condition")
+    condition_b = lanes.require("camel_comparator.branch_b_condition")
+
+    # -- 1. The law still says it. Asserted BEFORE anything is required of `config/`. -----
+    starts = [i for i, line in enumerate(context_md.splitlines()) if line.startswith("### 8.5.1 ")]
+    assert len(starts) == 1, "'### 8.5.1 ' must occur exactly once; a parser that reads nothing passes everything"
+    lines = context_md.splitlines()
+    end = next((i for i in range(starts[0] + 1, len(lines)) if lines[i].startswith("## ")), len(lines))
+    section = re.sub(r"\s+", " ", "\n".join(lines[starts[0] : end])).lower()
+
+    for what, phrase in invocation.BRANCH_B_REQUIREMENTS:
+        assert phrase in section, (
+            f"CONTEXT.md §8.5.1 no longer carries {what} ({phrase!r}). This test requires it "
+            f"of config/ ONLY because the law states it; if the law moved, config/ is not the "
+            f"thing to correct and this assertion is the one that must be read first."
+        )
+    assert invocation.SUPERSEDED_BRANCH_TRIGGER not in section, (
+        "CONTEXT.md §8.5.1 has re-acquired the pre-Q-057 trigger. Q-057's ruling: a provider "
+        "error on the suffixed string is a HARNESS DEFECT, and 'a pre-registration whose "
+        "negative branch can be reached by our own bug measures nothing.'"
+    )
+
+    # -- 2. `config/` agrees with it, read THROUGH THE LOADER. ---------------------------
+    assert invocation.branch_condition_problems(condition_a, condition_b) == [], (
+        "config/lanes.yaml's branch conditions do not match CONTEXT.md v1.9 §8.5.1"
+    )
+    assert invocation.branch_conditions_are_stale() == [], (
+        "read through cfg.load('lanes').require(), which is the read path that did not exist "
+        "when Q-079 was raised"
+    )
+
+    # -- 3. ⚠️ And the guard is PROVED ABLE TO GO RED, at the exact string it exists for. --
+    # The pre-fix pair, fired here so `config/` never has to hold it (INC-11, INC-17).
+    stale = invocation.branch_condition_problems(
+        "the model id is still served AND the run completes inside the 90-minute box",
+        condition_b,
+    )
+    assert stale, "the guard must reject the very string Q-079 was raised about"
+    assert any(invocation.SUPERSEDED_BRANCH_TRIGGER in problem for problem in stale)
+
+    # A Branch B stated WITHOUT the diagnosis requirement is the un-narrowed trigger, which
+    # is what `config/` encoded by NEGATION while no `branch_b_condition` key existed at all.
+    undiagnosed = invocation.branch_condition_problems(condition_a, "the run does not complete")
+    assert len(undiagnosed) == len(invocation.BRANCH_B_REQUIREMENTS), (
+        "every missing Branch-B requirement must be named separately; a gate whose only "
+        "output is 'no' is a gate somebody edits out under time pressure"
+    )
+    for what, _ in invocation.BRANCH_B_REQUIREMENTS:
+        assert any(what in problem for problem in undiagnosed), f"{what} is not named"
+
+    # And a missing key is a refusal, not an empty pass — the state Q-079 actually found.
+    assert invocation.branch_condition_problems(condition_a, None), (
+        "an ABSENT branch_b_condition is exactly what Q-079 found, and it must never read "
+        "as a pass; Branch B's trigger existed only as the negation of Branch A's"
+    )
+
+
 def test_this_chunk_does_not_decide_the_branch(package_dir):
     """⚠️ **RUN-1 decides the branch. A build session that decided it would be inventing
     a result from a chair.**
