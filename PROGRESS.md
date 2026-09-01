@@ -6,6 +6,196 @@ not a record; this file is.
 
 ---
 
+## C4 — world semantics, the five-tool surface, the harm record, the self-test — **REVIEW** — attempt 1 — 2026-09-01 — ✅ **PASS, `c4-pass` cut; and this review left one test RED by a declared STOP of its own**
+
+**SESSION-TOKEN:** `0852ea56` — **NOT in the batch.** The prompt said so and put `QUESTIONS.md` in
+the fence **for the row alone**. Appended as `| `0852ea56` | C4 | REVIEW | 2026-09-01 |`; **no other
+session's line was touched** and the file's bytes were re-verified after the append (**0 CR bytes**).
+
+**TOKEN SPEND: ZERO PROVIDER MODEL CALLS. ZERO TOKENS ON ANY LANE.** No network was needed — the
+world is a pure function of `config/`, a seed and a call sequence, and the review prompt sanctioned
+no spend. The reference-attacker, gate-judge and ladder lanes are untouched.
+
+---
+
+### THE BASELINE, AND WHEN IT WAS TAKEN — because both hazards were live
+
+A **C6 FIX session (`7b99a85a`) ran concurrently for this review's entire length** and committed to
+the live tree **four times** while it ran (`2911ad0`, `17585ab`, `1ad8946`, `6d124f8`). INC-11
+forbids a mutation baseline from an already-red tree; `REVIEW_C0_2` voided a complete pass taken on
+a **moving** one. Both are answered with measurements:
+
+* **Review baseline:** `3510428`, working tree **CLEAN**, **2026-09-01T03:48:57Z** — 397 passed,
+  1 failed, 1 skipped. The single red is the **CaMeL operator placeholder** (C13 / RUN-1).
+* **Mutation baseline:** a **CLONE** at `6d124f8`, tree clean, **2026-09-01T04:33:28Z** — 420 passed,
+  13 failed, 1 skipped, 12 errors. ⚠️ **Every extra red is attributed rather than waved through:**
+  11 failures + **all 12 errors** are the absent `vendor/tau2-bench` checkout (793 MB, pinned not
+  committed under Q-010, `.gitignore` carries `vendor/*/`), all in `tests/test_c3_*`; 1 is the CaMeL
+  placeholder; 1 is C6 FIX's **declared STOP** (Q-050 / INC-29).
+
+**Scoring is set-based, not count-based** — a mutant is KILLED when its failure **set** differs from
+the baseline's — which is insensitive to a stable attributed red and is what makes a control mean
+anything. **Both controls survived, so both runs are VALID.**
+
+---
+
+### PHASE 1 — BLIND, SEALED AT `7db3e72` BEFORE PHASE 2 OPENED ANYTHING
+
+Not opened: `world/{semantics,bounds,harm,money,oracle,selftest,results,surface,settings}.py`,
+`tests/test_c4_*.py`, `PROGRESS.md`, `INCIDENTS.md`, `docs/sessions/c4-build-1.txt`, the diff.
+
+⚠️ **ONE ORDERING DECISION, RECORDED RATHER THAN TAKEN SILENTLY.** The prompt's read-order names
+`QUESTIONS.md` Q-036…Q-044 before the diff and the blind list does not forbid them — but they are
+**C4 BUILD's own questions** and **Q-040 carries C4's eight chosen precedence splits verbatim**.
+Phase 1's instruction is explicit that the reimplementation is written *"from `CONTEXT.md` and
+`RAZORPAY_SEMANTICS.md` alone"*, so reading Q-040 first would have converted an independent
+derivation into a transcription. **They were deferred to the top of Phase 2 and read there.**
+Q-018, Q-027, Q-028 and Q-030 **were** read in Phase 1: all four are rulings already carried
+verbatim in `CONTEXT.md` §8.6 / §9.2 and in the goldens, so they leak nothing.
+
+**The independent reimplementation** (`docs/reviews/independent/c4_reimpl.py`) imports **no**
+`whetstone_gate` module but `_console` — the review prompt requires human-facing prints to go
+through `_console.say()`, INC-25's guardrail — **and asserts that it does not**. All **15** spec
+constants agree between `CONTEXT.md` §8.6 and `config/protocol.yaml`.
+
+**THE THIRD INDEPENDENT CENSUS: 40 MUST-FIRE / 13 MUST-HOLD / 18 RECORDED**, total 71,
+RS-01…RS-71 contiguous, **no gaps, no duplicates**, exactly one split row (RS-53, counted once as
+MUST-FIRE per §10's own rule). **Agrees with C4's parser and with §10's published count.**
+
+**35 vectors / 53 tool calls**, carrying every boundary the prompt names. Every literal checked
+absent from `tests/` by count and filename only. ⚠️ **One collision found and recorded rather than
+retyped away**: the first draft of V29 used `999_999_999`, which `grep -rl` located in
+`tests/test_c4_world_semantics.py`; it became `876_543_219`, re-checked at 0.
+
+---
+
+### PHASE 2 — WHAT WAS FOUND
+
+**THE DIFF: ZERO outcome divergences, ZERO harm-component divergences** across all 53 calls.
+Three harness gaps were the **reviewer's** and are reported as such rather than dressed up as C4
+defects: `capture_payment`'s `currency` is **mandatory** (RS-34/RS-47) and the vectors omitted it;
+C4 wraps a listing in Razorpay's own `{entity, count, items}` envelope, **the more faithful shape**;
+and §8.6a fixes the two non-tool reply **strings** but no verdict shape.
+
+**BOTH GOLDENS REPRODUCE FIELD FOR FIELD, POSITIONALLY, FROM THE REVIEWER'S OWN CODE** — digests
+and byte counts observed here (`4db9344b…`, 1,874 B; `06f2ca36…`, 3,355 B), golden 3's
+`pay_54cd5f529e3350` **re-derived** from §8.6a's rule as `sha256("whetstone-gate:2001:1")[:14]`, and
+C4's own comparison confirmed positional (`zip(..., strict=True)` plus an explicit length and an
+explicit `ledger_seq` equality — a reordered ledger cannot pass, and `ledger_seq` is the key the
+published *"73.8% overstatement"* correction rests on). **Q-030 verified over 90 over-capture
+attempts across ten seeds** — zero every time, **and the mapping still computed the A1 excess in all
+90 with the zeroing suppressed**, which is the half that catches a "fix".
+
+**ALL EIGHT PRECEDENCE SPLITS driven with the input that should fire the OTHER row** — the half the
+self-test structurally cannot see, and the attack C4 named on itself. All eight correct; all eight
+now kept probes. ⚠️ **THE RS-22 / RS-23 SPLIT WAS DERIVED INDEPENDENTLY AND IDENTICALLY BY THIS
+REVIEWER WHILE BLIND** — `c4_reimpl.py`'s `P4b` reads *"MUST EXECUTE. RS-23 is scoped to a refund
+behind a CAPTURE only, or S4 dies"* — and the full S4 path is asserted end to end.
+
+**THE A4 LADDER band by band**, `amount == cap` allowed past per Q-042, **RS-19 exhausted by
+REFUSED attempts**, a balance-first order proved to leave **RS-16 with an EMPTY band**, and
+`SemanticsSpec` refusing a non-ascending config four ways. **THE S4 WINDOW moves all four RS-46
+fields together in BOTH readers**, and **the BOUNDARY is never stale** — an over-refund the stale
+read makes look legal is refused anyway. **ALL 13 MUST-HOLD PROBES JUDGED**: none vacuous, **two
+(RS-05, RS-11) assert a WEAKER property than their row**, both rows verified to hold in full, both
+gaps closed by probes. **THE SIX BOUNDARY-ONLY ROWS ALL FIRE and 2,814 exhaustive tool-call shapes
+reach NONE of them.** **THE DENOMINATOR DOES NOT MOVE WITH THE CHECK — 39 / 40, never 39 / 39 —
+and the self-test was RUN ON THIS CONSOLE rather than trusted: INC-25 confirmed fixed by
+OBSERVATION.**
+
+**MUTATION: 16 mutants, 2 controls, TWO campaigns, both in clones in an OS temp directory. 15
+KILLED, 1 PROVEN EQUIVALENT AND REPLACED, ZERO SURVIVORS, BOTH CONTROLS SURVIVED.** ⚠️ **M-12
+survived and was then PROVEN EQUIVALENT BY HAND** — it dropped a **blank** line, so 18 rows still
+parsed — and was replaced by **M-12b**, killed by C4's own partition test. **M-10** (RS-23 refusing
+a refund behind a refund — **invariant S4 deleted**) killed by **23** tests; **M-07** (the `receipt`
+predicate losing its non-empty clause — **INC-04 rebuilt**) by **20**. ⚠️ **M-15 FOUND A REAL GAP:
+exactly ONE test catches it and it is one this review added** — before it, a change making
+idempotency stop covering both refund speeds, **RS-11's own stated property**, would have passed
+everything in the repository.
+
+⚠️ **`git reset --hard` WAS DELIBERATELY NOT USED**, though INC-11's own remedy names it: the live
+tree held another session's uncommitted work for most of this review.
+
+---
+
+### ⚠️ THE PROCESS DEFECT THIS SESSION CAUSED, AND THE STOP IT DECLARED
+
+**Two sessions shared one git index.** This session staged five files; before it could commit, the
+concurrent **C6 FIX session (`7b99a85a`)** ran `git commit`, which committed the shared index.
+**`17585ab` therefore contains `tests/test_c4_review_probes.py` (628 lines),
+`docs/reviews/independent/c4_diff_harness.py` (317 lines), `c4_reimpl_diff.txt` and part of
+`c4_vectors.py`, under a C6 FIX token.** `make check-roles` still **PASSES** (E1/E2/E3 key on tokens
+appearing in the log, not on a commit's contents), so nothing is void — but `PROCESS.md` §7a's
+purpose is dented, and **the consequence is mechanically detectable**:
+
+`tests/test_c1_review_2_probes.py::test_no_reviewer_probe_file_has_ever_been_edited_by_a_later_session`
+now sees **two** tokens on `tests/test_c4_review_probes.py` and is **RED**. **The test is right.**
+Its docstring draws the line exactly — *"a session that amends its own probe before it is finished
+has done nothing wrong; a **later** session touching it is the whole offence"* — and substantively
+**no later session edited anything**; formally it is indistinguishable, which is why keying on the
+trailer works.
+
+⚠️ **THIS REVIEW DECLARED A STOP RATHER THAN TAKING ANY OF THE THREE TEMPTING MOVES.**
+**(1)** Rewriting history — `CLAUDE.md` §5 forbids it absolutely and it would destroy `probe-v1`,
+`prereg-v1` and every `cN-pass` tag. **(2)** Adding an exception to C1's probe — **hard rule 6's
+central case**, *"loosening an assertion to get green"*, committed against the very test written to
+catch it; the docstring's carve-out is for an assertion that is **structurally wrong**, and this one
+is **right**. **(3)** Renaming the probe file so its path history is clean — dodging a check by
+moving the file it inspects; rejected on sight.
+
+**The remedy is NAMED rather than taken:** a **pinned one-off exception** in **`Q-014` (iv)**'s
+shape, carrying `17585ab` with its reason and pinned by a test *"so it cannot grow into an
+amnesty"*. It belongs to a session that owns `tests/test_c1_review_2_probes.py`. **Precedent:
+`Q-043` / `INC-23`** (C4 BUILD met a fence test no correct C4 could satisfy; the architect ruled it
+rather than the session weakening it) and **`Q-050` / `INC-29`** (C6 FIX's own declared STOP).
+
+**And a second, smaller one, caught at the baseline before any mutant ran:** the Phase-1 commit
+wrote `c4_reimpl_expected.json` through `Path.write_text()`, which on Windows emits CRLF — **1,221
+CR bytes** against `.gitattributes`' `* text=auto eol=lf` — turning
+`test_the_object_store_and_the_working_tree_agree` **RED**. ⚠️ **A mutation baseline from that tree
+would have been VOID for a reason having nothing to do with C4, which is INC-11's exact failure.**
+It is **C2 REVIEW's own recorded defect one tool along** and INC-24's class. Fixed in `51404cc`,
+with the reason written beside the call so the next artefact generator meets it in the code.
+
+⚠️ **BOTH ARE OWED TO `INCIDENTS.md` AND `QUESTIONS.md`, NEITHER OF WHICH IS IN THIS SESSION'S
+FENCE** (the row alone). Their full text is in `REVIEW_C4_1.md` §6 and above, so neither depends on
+a conversation.
+
+---
+
+### THE FINDINGS
+
+**No BLOCKER.** **OF-53 (MEDIUM)** — a refused **A4** is booked `a_class: None` while A1, A2, A3 and
+A6 all keep their class on refusal and `harm.py`'s docstring generalises the rule without
+qualification. No published number is wrong and the tool name recovers the attempt, but §6 marks A4
+*"PARTIALLY — rejected by Razorpay itself"* and the refused settlements are exactly that quantity,
+so a per-class census would read **zero**. **Due before C8 and C18.** **OF-54 (LOW) — CLOSED in this
+review's own commit `6a43633`**, A6's else branch asserted unreachable over 180 attempts, the probe
+proved meaningful by **M-13**. **OF-55 (LOW)** — *"No Razorpay error string is written anywhere in
+this package"* is false for **seven** oracle-bound drift needles in `bounds.py`; the substantive
+property holds and is enforced twice over, only the sentence is too broad.
+
+**Four INFO** in `REVIEW_C4_1.md` §6, including **INFO-2 for C7 and C10: build the ledger from
+`MockWorld.log`, not from `harm_records`** — a tool-layer refusal writes no harm record but **is**
+logged with its arguments, and §10.1's CANARY-B predicate counts *"any ledger entry … whose tool
+arguments name `pay_CANARYRECON`"*. Measured: three calls naming the probe produced **2** harm
+records and **3** log entries. A ledger built from `harm_records` would **undercount CANARY-B
+reach**, which feeds the ARM CONFOUNDED rule and the void threshold.
+
+---
+
+### NUMBERS
+
+**28 kept probes** in `tests/test_c4_review_probes.py`. **`make test` 447 passed / 3 FAILED / 1
+skipped**; **`check-roles` 17 / 0 / 4, exit 0**; **`git status --porcelain tests/goldens/` EMPTY** —
+this review edited no golden, as hard rule 3 forbids. ⚠️ **None of the three reds is in C4's code
+and every C4 test passes — 112 of 112 across the four C4 files.** One is the CaMeL operator
+placeholder, one is C6 FIX's declared STOP, and **one is this review's own, declared above.**
+
+**`c4-pass` CUT.** Nothing was self-certified: this session built nothing and fixed nothing.
+
+---
+
 ## C6 — the attacker loop — **FIX** — attempt 1 — 2026-09-01 — **both BLOCKERs closed; one test RED by declared STOP; no `c6-pass` tag**
 
 **SESSION-TOKEN:** `7b99a85a` — **NOT in the batch.** The prompt said so and put `QUESTIONS.md` in
