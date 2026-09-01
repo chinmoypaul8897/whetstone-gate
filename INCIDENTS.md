@@ -3722,3 +3722,164 @@ remedy already required. ⚠️ **The count is four — `INC-26`, `INC-29`, `OF-
 fourth happened inside a test written to close a mutation survivor, by the session closing it, in
 the same commit as another test that got it right.** That is not bad luck; it is the absence of a
 rule, and it is recorded so the ruling is made against a number.
+
+---
+
+## INC-51 — the assertion `CLAUDE.md` calls "the whole moat" reports **clean** over a gate that calls the scorer's predicate on every decision: an AST import walk cannot see a call expression, and D1, D2 and D3 all pass
+
+**Date:** 2026-09-02 (NIGHT RUN SESSION A / C0 FIX, `9c7c5973`. Predicted as `OF-110` by **C6
+REVIEW 3** (`3605d31c`) against a *different* walker; **measured here against `check_roles.py`'s D3,
+which is the moat itself**. Fix SHA recorded under **Fix**.)
+
+**Event:** `OF-110` recorded that `__import__("openai")`, `importlib.import_module("openai")` and
+`getattr(pkg, "name")` all escape an AST import walk **by construction** — a call expression is not
+an `ast.Import` node — and named `check_roles.py` nowhere. This session's prompt pointed that
+finding at `check_roles.py:686-697`, which is `_resolve_imports`, the walk behind **D1, D2 and D3**.
+⚠️ **D3 is not one guard among several. `CLAUDE.md` hard rule 8 calls it *"the whole moat"*;
+`CONTEXT.md` §7 makes it the submission's central argument** — *in the spike, `gate.js` and
+`invariants.js` both called `world.js:intentKey`, so the invariant could not have fired unless the
+gate had a bug; that is not a result, it is a definition.*
+
+**Action:** ⚠️ **MEASURED FIRST, IN A FRESH OS TEMP CLONE, BEFORE ANY FIX WAS WRITTEN**, with
+`whetstone_gate.__file__` printed to prove nothing in this repository was edited to establish the
+result: `…\scratchpad\moat\src\whetstone_gate\__init__.py`. A minimal `src/whetstone_gate/scorer/`
+holding one predicate (`over_cap`) and a minimal `src/whetstone_gate/gates/` were planted, and
+`gates/` reached the scorer's predicate three ways, one per module:
+
+| planted in `gates/` | the shape | D1 | D2 | D3 |
+|---|---|---|---|---|
+| `arm2.py` | `importlib.import_module("whetstone_gate.scorer.predicate")` | **PASS** | **PASS** | **PASS** |
+| `arm3.py` | `__import__("whetstone_gate.scorer.predicate", fromlist=[…])` | **PASS** | **PASS** | **PASS** |
+| `arm4.py` | `getattr(whetstone_gate, "scorer")` + `sys.modules[…]` | **PASS** | **PASS** | **PASS** |
+
+D3's own printed detail read *"src/whetstone_gate/gates and src/whetstone_gate/scorer share no
+first-party module on any path. The allow-list holds 0 entr(y/ies)."* ⚠️ **And the reach is live, not
+dead code:** `gates.arm2.decide(6_000_000, 5_000_000)` returned `DENY`, computed by
+`scorer/predicate.py`, whose `__file__` was printed from the same process.
+
+**Expectation:** D3 is the single assertion that `gates/` and `scorer/` share no first-party module,
+with an allow-list that is **empty on purpose** and whose extension is a Class A deviation. A gate
+that executes the scorer's predicate on every call is the spike defect exactly, and D3 should have
+been unable to print `clean` over it.
+
+**Missing:** ⚠️ **any check on the SOURCE TEXT of the two packages.** `check_roles.py` had six check
+groups and every one of them is structural or AST-based; a search over `tests/`, `src/` and the
+`Makefile` for a text scan of either package returned nothing. The AST walk's own docstring argues,
+correctly, that *"`ast.parse` executes nothing; it only reads"* — and that argument is about
+**safety**, not about **coverage**, and had been carried as though it were about both.
+
+**Missed:** ⚠️ **`OF-110` said this in writing on 2026-09-02 and named four walkers — C2's, C3's,
+C6's and C13's — and did not name D3, the one that matters most.** Its own remedy line points at
+*"whichever chunk owns the repository-wide tripwires"*, i.e. `OF-99`'s address, and `check_roles.py`
+is where those live. **The finding was one inference away from the moat and nobody made the
+inference for a day.** ⚠️ **And a second signal was older and louder:** `REVIEW_C0.md` **B-02** had
+already found *three of four* attack forms walking through this same check, and `Q-015`'s ruling
+closed the three it found. **Nothing asked whether the enumeration of forms was complete** — the
+review fixed the instances it constructed, and a fourth class it had not constructed survived.
+
+**Diagnosis:** an import expressed as a **call** — `importlib.import_module`, `__import__`,
+`getattr` on a package, `sys.modules[…]` — produces no `ast.Import` or `ast.ImportFrom` node, so a
+walk over those two node types cannot record the edge; D3 then computes the intersection of two
+closures neither of which contains the crossing. The walk was not wrong about what it saw; it was
+complete over the wrong set.
+
+**Fix:** **`PENDING`** *(the source commit does not exist yet; this SHA is filled in by this session once it does, and is NOT invented)* — a **source-text refusal scan** (`D4`) over both packages, alongside the AST
+walk, listing `importlib`, `__import__`, `sys.modules`, `getattr`, `setattr`, `exec`, `eval`,
+`compile`, `runpy`, `pkgutil`, `imp`, `globals`, `locals` and `vars`. **A dynamic import inside
+`gates/` or `scorer/` is a REFUSAL, not a puzzle to resolve** — neither package has any legitimate
+need for one, and both are still unwritten, so the constraint lands **before** the builders rather
+than as a retrofit. `MOAT_REFUSED_DYNAMIC` is pinned by a test the same way `MOAT_ALLOW_LIST` is:
+removing a name from it requires editing an assertion a review will see.
+*(This entry is written and committed before that commit exists; the SHA is filled in afterwards
+rather than invented.)*
+
+**Systemic guardrail:** ⚠️ **THE GUARDRAIL IS THE PAIRING, AND ITS LIMIT IS STATED WITH IT.** AST
+sees the static forms exactly and text sees the dynamic ones; **neither alone is the moat and the
+docstring now says so, naming `OF-110` and C6 REVIEW 3.** What it does **not** close, said plainly
+rather than implied away: a text scan is a text scan — it fires on the word wherever the word
+appears, including inside a docstring, and it cannot see an import assembled at runtime from
+fragments. **That is why the list is a REFUSAL of the whole vocabulary rather than a pattern-match
+on an import**: there is no expression involving these names that a pure-predicate package needs,
+so the false-positive cost is a rewording and the false-negative cost is the submission's central
+claim. ⚠️ **NOT CLOSED AND OWED TO OTHER CHUNKS:** `tests/test_c2_world.py`,
+`tests/test_c3_tau2_enumeration.py`, `tests/test_c6_fix_probes.py` and
+`tests/test_c13_camel_comparator.py` each carry the identical AST-only limit; **this session's fence
+names them under NOT** and they are re-declared as owed rather than gestured at.
+
+---
+
+## INC-52 — `Q-080`'s ruling, implemented **exactly as worded**, would have made `make check-roles` green by making E1 stop looking at 74 of 277 commits — and the measurement that caught it also found one commit whose trailer **git itself** cannot read
+
+**Date:** 2026-09-02 (NIGHT RUN SESSION A / C0 FIX, `9c7c5973`. Caught **before** anything was
+committed, by running the literal implementation over the whole log. `Q-081` carries the deviation;
+this entry carries the mechanism. Fix SHA recorded under **Fix**.)
+
+**Event:** `Q-080` was ruled remedy 3 — *"Fix the parser to read the trailer BLOCK the way git
+itself defines it: the message's LAST PARAGRAPH (`git interpret-trailers`). Lines earlier in the
+message are prose, whatever they start with."* Implemented literally and run read-only over all 277
+commits, that parser **changes the `Session-Token:` verdict on 74 of them.** Every one is a commit
+whose message ends with the token trailer, a blank line, and the harness's `Co-Authored-By:`
+trailer in a paragraph of its own.
+**Verified against git rather than inferred:** `git interpret-trailers --parse` on `1f82c48` returns
+`Co-Authored-By:` **and nothing else**; synthetically, `A-Key: 1` + blank + `B-Key: 2` returns
+**`B-Key` only**, while the same two lines with no blank between them return **both**. Git's trailer
+block stops at the first blank line.
+
+**Action:** the literal parser was **not shipped**. What shipped reads the maximal trailing **run**
+of paragraphs whose every line is trailer-shaped or a whitespace continuation — git's own criterion
+for a trailer paragraph, extended in exactly one direction, across a blank line between two
+paragraphs that are both entirely trailers. Measured effect: **1 of 277** commits changes verdict
+instead of 74, and `c4d4460`'s quoted line — which sits inside a four-line **prose** paragraph — is
+correctly no longer read as a trailer. ⚠️ **The deviation from the ruling's wording is declared as
+Class A in `Q-081`, with both numbers**, and the architect is asked to confirm it or to direct the
+literal form with its blind spot published as a limitation.
+
+**Expectation:** a ruling that fixes a parser should not make the check it fixes see less. Under the
+literal form, **E1 — the check that catches a token that was never issued — falls from 261 of 277
+commits to 187**, and **E4 reports 90 commits as carrying no trailer, 74 of which do.**
+
+**Missing:** ⚠️ **the ruling had no number attached to it, and neither did the question that asked
+for it.** `Q-080` reasoned entirely about `c4d4460` — one commit, one quoted line — and its options
+block never asks *how many commits' trailers currently sit outside the last paragraph*. **The
+measurement takes eleven lines of read-only Python and nobody ran it**, on either side, before the
+remedy was chosen. A remedy stated as *"the way git itself defines it"* is checkable against git in
+one command, and that command was not in the entry.
+
+**Missed:** ⚠️ **the signal was in this repository's own commit convention and in this session's own
+prompt.** `PROCESS.md` §7 and the harness both put `Co-Authored-By` beneath the token, separated by
+a blank line — **the shape is in every recent commit, including the four `Q-080` itself calls
+*"clean BY LUCK"***. Those four are clean under the *old* parser; under the *ruled* one they would
+have been clean by being invisible, which is a different thing and is the thing hard rule 6 forbids.
+⚠️ **And `97a5981` was visible in the same output and had been for a day:** its message both begins
+and ends with a bare `@` line — a PowerShell here-string delimiter that leaked into the message,
+`INC-06`'s quoting class, on a commit nobody re-read — so its last paragraph is
+`Session-Token: 8e0f4a13` followed by `@`, and **`git interpret-trailers --parse` returns nothing
+for it.** One non-trailer line disqualifies the paragraph in git too. **That commit's trailer has
+been unreadable to git since the day it was written and no check said so**, because the old parser
+scanned the whole body and never asked git anything.
+
+**Diagnosis:** `git interpret-trailers` defines the trailer block as the **last paragraph** and
+stops at a blank line, so a ruling that adopts git's definition verbatim adopts its blind spot for
+this project's own two-paragraph trailer convention. The second half is independent: a stray
+non-trailer line inside the last paragraph disqualifies the whole block, so a message-corruption
+artefact silently costs a commit its trailer.
+
+**Fix:** **`PENDING`** *(the source commit does not exist yet; this SHA is filled in by this session once it does, and is NOT invented)* — `_trailer_block()` as described above, plus **E4's detail now separates
+*"carries no `Session-Token:` line at all"* from *"carries one that is OUTSIDE its trailer block"***,
+names the second class and prints its count, so `97a5981` is a **reported number** instead of a
+silent reclassification into a list that would then be saying something false about it.
+`E5_EXCEPTIONS` is untouched and still pinned at four; `_TOKEN_TRAILER` is byte-identical and
+`Q-014 (i)` is not reopened.
+*(This entry is written and committed before that commit exists; the SHA is filled in afterwards
+rather than invented.)*
+
+**Systemic guardrail:** ⚠️ **ONE RULE, AND IT IS THE ONE THIS ENTRY IS FOR: A RULING THAT CHANGES A
+PARSER IS RUN OVER THE WHOLE CORPUS BEFORE IT IS SHIPPED, AND THE DIFF IS REPORTED AS A COUNT.**
+*"How many commits change verdict?"* is eleven lines of read-only Python and it is the difference
+between a fix and a blinding. It caught this one before a byte was committed. ⚠️ **NOT LANDED as a
+mechanism**, and said plainly rather than claimed: nothing forces the next session to run it —
+`PROCESS.md` is outside this fence, and no test can assert *"you measured before you chose"*. What
+**is** landed is narrower and real: `tests/test_c0_fix_probes.py` now pins the trailer block's
+behaviour in **both** directions — the two-paragraph convention is still read, and a malformed
+trailer alone in its own paragraph in the trailing run is still caught — so a future session that
+narrows the parser further meets a red test rather than a green one.
