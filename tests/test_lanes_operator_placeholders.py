@@ -138,8 +138,23 @@ def test_the_camel_branch_is_decided_before_any_camel_run():
     """RUN-1 (31 Aug, 90 minutes, timeboxed) decides Branch A or Branch B.
 
     ! **Branch B is published as a result, not hidden as a failure** - the comparator
-    ships as a citation of Tables 5-7 of arXiv 2503.18813v2 with the `CONTEXT.md` S8.5.1
-    reason verbatim. Either way the answer is recorded in `PROTOCOL.md` before the tag.
+    ships as a citation of **Table 2, Appendix B ("Full results tables"), the `o3 High`
+    block, `banking` column** of arXiv 2503.18813v2 - CaMeL 81.2% +/- 19.1 against
+    `Native Tool Calling API` 62.5% +/- 23.7, the paper's own Difference row +18.8% +/- 4.6
+    - with the `CONTEXT.md` S8.5.1 reason verbatim. Either way the answer is recorded in
+    `PROTOCOL.md` before the tag.
+
+    ! **NOT Tables 5-7.** Those are Appendix C ("Baseline results"), base model
+    `Claude 3.5 Sonnet`, CaMeL against OTHER DEFENCES, and on `banking` they show CaMeL
+    BEHIND the undefended model. **Table 7 is RETAINED as S8.5.2's P2 citation**, where it
+    is right and where C13 verified it exactly. (Q-058 RULED 2026-09-01; Q-064; Q-074.)
+
+    ! This docstring is the FIFTH site of Q-064's citation and the one a human actually
+    reads: this test is deliberately red in `make selftest`, so the text above is printed
+    IN FULL every time any session runs the pre-spend gate. It survived four fences that
+    each named this file under NOT (Q-074). `tests/test_repo_invariants.py`'s
+    superseded-string tripwire now scans for it, and was fired at this docstring's previous
+    text to prove it would have caught it.
     """
     problem = camel_branch_problem()
     assert problem is None, problem

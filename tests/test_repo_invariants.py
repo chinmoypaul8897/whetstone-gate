@@ -7,6 +7,8 @@ Same code, two entry points — not two implementations.
 
 from __future__ import annotations
 
+import dataclasses
+import re
 import subprocess
 
 import pytest
@@ -320,15 +322,33 @@ def test_gates_and_scorer_share_no_first_party_module(repo_root):
 
     Today neither directory exists (``scorer/`` is C8, ``gates/`` is C9), so this reports
     ``n/a``. ``n/a`` is asserted as ``n/a`` — never quietly as a pass.
+
+    ⚠️ **THE MOAT IS AST *PLUS* SOURCE TEXT SINCE 2026-09-02 — `OF-110`, `INCIDENTS.md`
+    INC-51.** D1–D3 walk the module graph and **cannot see a call expression by
+    construction**; measured in a fresh temp clone, a ``gates/`` module reaching a
+    ``scorer/`` predicate by ``importlib.import_module``, by ``__import__`` or by
+    ``getattr`` on the package root made **all three report PASS**. **D4** must therefore be
+    present in this group, whatever its verdict — an absent check and a passing one are not
+    the same thing to a caller (`INC-07`), and D4's absence is the state the moat was in
+    while it was evadable.
     """
     results = check_roles.check_gate_scorer_isolation(repo_root)
     for result in results:
         assert result.ok is not False, result.detail
 
-    if len(results) == 1 and results[0].ok is None:
+    checks = {result.check[:2] for result in results}
+    assert "D4" in checks, (
+        "D4 — the source-text half of the moat — is not being reported. OF-110 measured "
+        "that three dynamic-import shapes escape the AST walk BY CONSTRUCTION, and INC-51 "
+        "measured D1, D2 and D3 all reporting PASS over a gates/ module that really did "
+        f"execute a scorer/ predicate. Group reported: {sorted(checks)}"
+    )
+
+    if all(result.ok is None for result in results):
         pytest.skip(
             "gates/ and scorer/ do not exist yet (C9 and C8). Both candidate layouts were "
-            "checked — see QUESTIONS.md Q-004 for the unresolved CONTEXT.md §16 ambiguity."
+            "checked — see QUESTIONS.md Q-004 for the unresolved CONTEXT.md §16 ambiguity. "
+            "D1 and D4 are both reported as n/a rather than omitted."
         )
 
 
@@ -419,4 +439,249 @@ def test_python_is_312(repo_root):
     assert sys.version_info[:2] == (3, 12), (
         f"running on {sys.version_info.major}.{sys.version_info.minor}; the pinned "
         f"tau2-bench requires >=3.12,<3.14"
+    )
+
+
+# =======================================================================================
+# OF-99 / Q-064 / Q-074 — THE SUPERSEDED-STRING TRIPWIRE.
+#
+# ⚠️ `Q-064`'s NAMED REMEDY HAS NEVER EXISTED, AND THE SAME DEFECT GOT THROUGH TWICE.
+# Both `Q-064` and `Q-074` say the same sentence — *"A grep for the superseded string, run
+# as a test, would have caught all four in one line."* `OF-99` then searched first-hand and
+# found nothing: this file already carries repository-wide scans for CRLF, secret-shaped
+# strings, forged session tokens, the gates/scorer module graph, undetermined config values
+# and hardcoded spec values — **and nothing for a citation.**
+#
+# The hard part is not the grep. `OF-99` measured **66 hits** for the superseded citation
+# and exactly **one** was live text; a tripwire that cannot tell a **live claim** from a
+# **recorded one** fires 65 times on its first run and is disabled by its second. So the
+# discrimination is explicit and has two parts, both of them reviewable:
+#
+#   1. **PATH.** Append-only history — `docs/sessions/`, `docs/reviews/`, and the journals —
+#      records what was said. A superseded citation there is the record working correctly.
+#   2. **QUOTATION.** A line that QUOTES the superseded claim in order to say it is wrong is
+#      not making it. That is `Q-080`'s own logic, three days later and in a second file:
+#      *a quotation of X is not X.* `src/whetstone_gate/camel_comparator/branch_b.py:39` —
+#      *So a Branch-B artefact that says "cite Tables 5-7, banking column" would point a
+#      panelist at a table stating the opposite* — is the case that forced it.
+#
+# ⚠️ AND THE PATTERN MATCHES THE **CLAIM**, NOT THE STRING. The defect `Q-058` ruled on is
+# not the words *Tables 5-7*; it is *citing* them for the CaMeL/native banking pair. Live
+# text must stay free to name them — `CONTEXT.md` §8.5.1's own ⚠️ NOT-Tables-5-7 clause
+# depends on it — so the pattern requires a citing verb immediately in front.
+# =======================================================================================
+
+
+@dataclasses.dataclass(frozen=True)
+class SupersededString:
+    """One superseded claim, with everything a reader needs to judge a hit."""
+
+    label: str
+    #: The superseded CLAIM as a regex — a citing verb, then the superseded citation.
+    superseded: str
+    #: What live text must say instead.
+    replacement: str
+    #: The ruling that superseded it. A hit is a violation *of this ruling*, and the message
+    #: says so, because "wrong" without a ruling is an opinion.
+    ruling: str
+    #: Paths where it may legitimately still appear: append-only history.
+    history_paths: tuple[str, ...]
+
+
+#: ⚠️ **THE LIST. ONE ENTRY TODAY, AND THE SHAPE IS THE POINT** — a second superseded string
+#: is four lines, not a new test. Adding one is ordinary work; **removing one, or widening a
+#: `history_paths` tuple, is where this check would die quietly** and is a Class A deviation.
+SUPERSEDED_STRINGS: tuple[SupersededString, ...] = (
+    SupersededString(
+        label="the pre-v1.8 CaMeL table citation",
+        # Built by concatenation so THIS FILE does not carry the live phrase and trip its
+        # own scan — the same self-exclusion problem `TRIPWIRE_SELF_EXCLUSION` solves by
+        # naming a file, solved here without an exemption list, which is strictly better:
+        # an exemption list is the natural place for a check to die.
+        superseded=(
+            r"(?:cit" + r"ation of|cit" + r"e[sd]?|cit" + r"ing|ships? as|shipping as)"
+            r"\s+(?:a\s+)?(?:CaMeL's\s+published\s+)?\**Tab" + r"les? 5[-–—]7"
+        ),
+        replacement=(
+            "Table 2, Appendix B ('Full results tables'), the `o3 High` block, `banking` "
+            "column of arXiv 2503.18813v2 — CaMeL 81.2% +/- 19.1 against Native Tool "
+            "Calling API 62.5% +/- 23.7. Tables 5-7 are Appendix C, `Claude 3.5 Sonnet`, "
+            "where CaMeL is BEHIND on banking; Table 7 remains CONTEXT.md 8.5.2's P2 "
+            "citation."
+        ),
+        ruling="Q-058 (Class A, RULED 2026-09-01); carried to five sites by Q-064 and Q-074",
+        history_paths=(
+            "docs/sessions/",
+            "docs/reviews/",
+            "QUESTIONS.md",
+            "PROGRESS.md",
+            "STATUS.md",
+            "INCIDENTS.md",
+        ),
+    ),
+)
+
+#: Quotation marks that mark a line as *reporting* the superseded claim rather than making
+#: it. Deliberately three characters and no cleverness: if a future entry needs more, the
+#: entry says so rather than this constant growing invisibly.
+_QUOTE_CHARACTERS = "\"'`"
+
+
+def _is_quoted(line: str, start: int, end: int) -> bool:
+    """Is the span ``line[start:end]`` enclosed in quotation marks **on its own line**?
+
+    ⚠️ `Q-080`'s logic, applied to a citation instead of a trailer: *a quotation of X is not
+    X*. A line that reproduces the superseded claim in order to say it is wrong — which is
+    what `branch_b.py` and the C13 tests do throughout — is the check working, not failing.
+    """
+    return any(q in line[:start] for q in _QUOTE_CHARACTERS) and any(
+        q in line[end:] for q in _QUOTE_CHARACTERS
+    )
+
+
+def superseded_string_hits(files: dict[str, str]) -> list[tuple[str, str, int, str]]:
+    """Every LIVE occurrence of a superseded claim in ``{path: text}``.
+
+    Returns ``(entry label, path, line number, the line)``. A hit under an entry's
+    ``history_paths``, or quoted on its own line, is **recorded** rather than live and is
+    not returned — which is the whole difference between a tripwire and a nuisance.
+    """
+    hits: list[tuple[str, str, int, str]] = []
+    for entry in SUPERSEDED_STRINGS:
+        pattern = re.compile(entry.superseded, re.IGNORECASE)
+        for path, text in files.items():
+            posix = path.replace("\\", "/")
+            if any(
+                posix == where or posix.startswith(where) for where in entry.history_paths
+            ):
+                continue
+            for number, line in enumerate(text.splitlines(), start=1):
+                match = pattern.search(line)
+                if match and not _is_quoted(line, match.start(), match.end()):
+                    hits.append((entry.label, posix, number, line.strip()))
+    return hits
+
+
+def _tracked_text(repo_root) -> dict[str, str]:
+    """Every tracked file this scan can read, as ``{path: text}``. Binaries are skipped."""
+    listing = subprocess.run(
+        ["git", "ls-files"], cwd=repo_root, check=True, capture_output=True, text=True
+    ).stdout
+    files: dict[str, str] = {}
+    for path in filter(None, listing.splitlines()):
+        candidate = repo_root / path
+        try:
+            files[path] = candidate.read_text(encoding="utf-8")
+        except (UnicodeDecodeError, OSError):
+            continue
+    return files
+
+
+def test_no_superseded_string_survives_in_live_text(repo_root):
+    """⚠️ **`Q-064`'s REMEDY, WHICH HAS NEVER EXISTED AND LET THE SAME DEFECT THROUGH TWICE.**
+
+    `Q-058` ruled that citing Tables 5-7 for the CaMeL/native banking pair *"would point a
+    panelist at a table stating the opposite of the claim it is offered to support, in a
+    submission whose thesis is that other people's numbers are unsound."* Four sites were
+    corrected under `Q-064`. A **fifth** — `tests/test_lanes_operator_placeholders.py` —
+    survived, because it was outside every fence that met it (`Q-074`), and it is the copy
+    a human actually reads: it is printed in full in every ``make selftest`` failure.
+
+    **Nothing in this repository knew a citation had copies.** This is that mechanism.
+    """
+    hits = superseded_string_hits(_tracked_text(repo_root))
+    assert not hits, "\n".join(
+        [f"{len(hits)} LIVE occurrence(s) of a superseded claim:"]
+        + [f"  {path}:{number}\n      {line}" for _, path, number, line in hits]
+        + [
+            f"\nSuperseded by {entry.ruling}.\nIt must now say: {entry.replacement}"
+            for entry in SUPERSEDED_STRINGS
+        ]
+    )
+
+
+def test_the_superseded_string_tripwire_fires_on_a_planted_live_occurrence():
+    """⚠️ **FIRED, IN BOTH DIRECTIONS.** A tripwire nobody has seen go red is decoration.
+
+    The planted text is `Q-074`'s site **as it stood before this session corrected it** —
+    the real defect, not an invented one — and it is assembled from fragments so this file
+    never carries the live phrase and cannot trip its own scan.
+    """
+    live = (
+        "    the comparator\n"
+        "    ships as a cit" + "ation of Tab" + "les 5-7 of arXiv 2503.18813v2 with the\n"
+        "    `CONTEXT.md` S8.5.1 reason verbatim.\n"
+    )
+    hits = superseded_string_hits({"tests/some_live_test.py": live})
+    assert len(hits) == 1, f"the tripwire did not fire on the real pre-fix text: {hits}"
+    assert hits[0][2] == 2, f"it must name the LINE, or it is not actionable: {hits}"
+
+
+def test_the_tripwire_does_not_fire_on_the_append_only_history_or_on_a_quotation():
+    """⚠️ **THE HALF THAT DECIDES WHETHER THIS CHECK SURVIVES A WEEK.**
+
+    `OF-99` measured **66 hits, of which exactly one was live text.** A tripwire that cannot
+    tell a live claim from a recorded one fires 65 times on its first run and is switched
+    off on its second — `Q-009`'s own argument, turned on this check. Both discriminators
+    are fired here at text that MUST NOT trip them:
+
+      1. the identical live sentence, sitting in `docs/sessions/` — append-only history;
+      2. the identical claim, **quoted** inside a passage saying it is wrong, which is
+         `branch_b.py:39` and is `Q-080`'s logic in a second file.
+    """
+    live = "ships as a cit" + "ation of Tab" + "les 5-7 of arXiv 2503.18813v2\n"
+
+    for where in ("docs/sessions/c13-fix-1.txt", "docs/reviews/REVIEW_13_2.md",
+                  "QUESTIONS.md", "PROGRESS.md", "STATUS.md", "INCIDENTS.md"):
+        assert superseded_string_hits({where: live}) == [], (
+            f"the tripwire fired on {where}, which is append-only history. It records what "
+            f"was said; a superseded citation there is the record working correctly."
+        )
+
+    quoted = (
+        'So a Branch-B artefact that says *"cit' + "e Tab" + 'les 5-7, banking column"* '
+        "would point a panelist at a table stating the opposite.\n"
+    )
+    assert superseded_string_hits({"src/whetstone_gate/camel_comparator/branch_b.py": quoted}) == [], (
+        "the tripwire fired on a QUOTATION of the superseded claim inside a passage "
+        "explaining why it is wrong — branch_b.py:39's real text. A quotation of X is not X "
+        "(Q-080's own logic), and firing here would make the check unusable in exactly the "
+        "module that documents the ruling."
+    )
+
+
+def test_the_tripwire_would_have_caught_q074s_site_and_that_site_is_now_correct(repo_root):
+    """⚠️ **`Q-074`, CLOSED — and the closure is checked against the mechanism, not asserted.**
+
+    Two halves, and the second is the one `Q-074` is really about:
+
+      1. the docstring at `tests/test_lanes_operator_placeholders.py` **as it stood** trips
+         the tripwire — so 1c would have caught 1d; and
+      2. the file **as it stands now** does not, and carries the four fields `Q-058`'s
+         ruling requires of every published third-party figure: table number, appendix,
+         base model and row.
+    """
+    before = (
+        "    ships as a cit" + "ation of Tab" + "les 5-7 of arXiv 2503.18813v2 with the "
+        "`CONTEXT.md` S8.5.1\n"
+    )
+    assert superseded_string_hits({"tests/test_lanes_operator_placeholders.py": before}), (
+        "the tripwire does not fire on Q-074's site as it stood — then it would not have "
+        "caught the defect it exists for, and 1c proves nothing about 1d"
+    )
+
+    now = (repo_root / "tests" / "test_lanes_operator_placeholders.py").read_text(
+        encoding="utf-8"
+    )
+    assert superseded_string_hits({"tests/test_lanes_operator_placeholders.py": now}) == [], (
+        "Q-074's fifth site still carries the superseded citation"
+    )
+    for field in ("Table 2", "Appendix B", "o3 High", "banking"):
+        assert field in now, (
+            f"Q-058's ruling requires every published third-party figure to carry the table "
+            f"number, its appendix, its base model and its row. {field!r} is missing."
+        )
+    assert "Table 7" in now, (
+        "Q-058's ruling RETAINS Tables 5-7 where they are right: Table 7 is CONTEXT.md "
+        "8.5.2's P2 citation and C13 verified it exactly. Dropping it would over-correct."
     )

@@ -25,6 +25,19 @@ own, because they are facts about the repository rather than about any module:
      importing file's own package and ``from whetstone_gate import X`` resolved to
      ``whetstone_gate.X``, against an allow-list (:data:`MOAT_ALLOW_LIST`) that is **empty**
      and that may not be added to without an architect ruling.
+
+     ⚠️ **THE GUARD IS AST *PLUS* SOURCE TEXT, SINCE 2026-09-02, AND THE AST HALF ALONE WAS
+     MEASURED TO BE EVADABLE.** `OF-110`, raised by **C6 REVIEW 3** (`3605d31c`), measured
+     that ``__import__(…)``, ``importlib.import_module(…)`` and ``getattr(pkg, "name")``
+     escape an AST import walk **by construction** — a call expression is not an
+     ``ast.Import`` node — and named four *other* walkers. Pointed at **this** check, in a
+     fresh OS temp clone, all three shapes made a ``gates/`` module execute a ``scorer/``
+     predicate while **D1, D2 and D3 every one reported PASS** (`INCIDENTS.md` **INC-51**).
+     **D4** therefore scans both packages' **raw source text** for
+     :data:`MOAT_REFUSED_DYNAMIC` and refuses the whole vocabulary of dynamic reach.
+     **The two halves see different things and neither is the moat alone:** the AST walk
+     sees every static import exactly and cannot see a call; the text scan sees the
+     vocabulary and cannot see semantics.
   E. Session-token discipline (`PROCESS.md` §7a): no commit carries a token that was never
      issued, and no token is reused across roles or shared by a chunk's build and review.
      **E5 additionally FAILS on a trailer that is PRESENT but MALFORMED** — Q-014 (i):
@@ -623,6 +636,78 @@ def check_secrets(root: Path) -> list[Result]:
 #: share.
 MOAT_ALLOW_LIST: frozenset[str] = frozenset()
 
+#: ⚠️ **THE SECOND HALF OF THE MOAT, ADDED 2026-09-02 — `OF-110`, RAISED BY C6 REVIEW 3
+#: (`3605d31c`), MEASURED AGAINST **THIS** CHECK AND FOUND TO PASS. `INCIDENTS.md` INC-51.**
+#:
+#: `OF-110` measured that ``__import__("openai")``, ``importlib.import_module("openai")`` and
+#: ``getattr(pkg, "name")`` **all escape an AST import walk BY CONSTRUCTION** — a call
+#: expression is not an ``ast.Import`` node — and named C2's, C3's, C6's and C13's walkers.
+#: It did **not** name D3. This session pointed it at D3 and measured, in a fresh OS temp
+#: clone: a minimal ``gates/`` reaching a minimal ``scorer/`` predicate by
+#: ``importlib.import_module``, by ``__import__`` and by ``getattr`` + ``sys.modules``
+#: **passed D1, D2 AND D3, all three, on all three shapes**, while
+#: ``gates.arm2.decide(6_000_000, 5_000_000)`` really did return ``DENY`` computed by the
+#: scorer's module. **The line `CLAUDE.md` calls "the whole moat" printed `clean` over the
+#: spike defect it exists to make impossible.**
+#:
+#: So the guard is now **AST *plus* source text**, and the two halves cover different
+#: things: the AST walk sees every *static* import exactly and cannot see a call; this scan
+#: sees the *vocabulary* of dynamic reach and cannot see semantics. **Neither is the moat
+#: alone.**
+#:
+#: ⚠️ **THIS IS A REFUSAL, NOT A PUZZLE TO RESOLVE.** `gates/` and `scorer/` are pure
+#: predicate packages — hard rule 8's "core logic takes data in and returns results" — and
+#: **neither has any legitimate need for a dynamic import, for reflection, or for `exec`.**
+#: The scan therefore refuses the whole vocabulary rather than trying to decide, from text,
+#: whether a particular ``getattr`` reaches a module: the cost of a false positive is a
+#: rewording, and the cost of a false negative is the submission's central argument.
+#: **Both packages are still unwritten (C8 and C9), so this lands BEFORE their builders
+#: rather than as a retrofit.**
+#:
+#: **Removing a name from this list is a Class A deviation requiring an architect ruling in
+#: `QUESTIONS.md`, exactly as adding to `MOAT_ALLOW_LIST` is**, and
+#: ``tests/test_c0_fix_probes.py`` pins the set so that narrowing it means editing an
+#: assertion a review will see.
+MOAT_REFUSED_DYNAMIC: tuple[tuple[str, str], ...] = (
+    ("importlib", r"\bimportlib\b"),
+    ("__import__", r"\b__import__\b"),
+    ("sys.modules", r"\bsys\s*\.\s*modules\b"),
+    ("getattr", r"\bgetattr\b"),
+    ("setattr", r"\bsetattr\b"),
+    ("exec", r"\bexec\s*\("),
+    ("eval", r"\beval\s*\("),
+    ("compile", r"\bcompile\s*\("),
+    ("runpy", r"\brunpy\b"),
+    ("pkgutil", r"\bpkgutil\b"),
+    ("imp", r"\bimp\s*\.\s*load_"),
+    ("globals", r"\bglobals\s*\(\s*\)"),
+    ("locals", r"\blocals\s*\(\s*\)"),
+    ("vars", r"\bvars\s*\("),
+)
+
+
+def _dynamic_reach_hits(packages: dict[str, Path]) -> list[tuple[str, int, str, str]]:
+    """Every :data:`MOAT_REFUSED_DYNAMIC` name appearing in either package's SOURCE TEXT.
+
+    Returns ``(relative path, line number, refused name, the line)``, sorted. The scan is
+    over **raw text**, deliberately: the whole point of `OF-110` is that the AST cannot see
+    these forms, so a second AST pass would reproduce the blind spot in a different shape.
+    """
+    hits: list[tuple[str, int, str, str]] = []
+    for label, package in packages.items():
+        for py in sorted(package.rglob("*.py")):
+            try:
+                text = py.read_text(encoding="utf-8", errors="replace")
+            except OSError as exc:  # pragma: no cover - unreadable file, reported not skipped
+                hits.append((f"{label}/{py.name}", 0, "UNREADABLE", f"{type(exc).__name__}"))
+                continue
+            where = f"{label}/{py.relative_to(package).as_posix()}"
+            for number, line in enumerate(text.splitlines(), start=1):
+                for name, pattern in MOAT_REFUSED_DYNAMIC:
+                    if re.search(pattern, line):
+                        hits.append((where, number, name, line.strip()[:120]))
+    return sorted(hits)
+
 
 def _module_name(py: Path, src_root: Path) -> str:
     """The dotted first-party module name of ``py``, relative to ``src/``.
@@ -722,15 +807,25 @@ def check_gate_scorer_isolation(root: Path) -> list[Result]:
         if gates.is_dir() and scorer.is_dir():
             return _walk_isolation(root, gates, scorer, gates_rel, scorer_rel)
 
+    absent = (
+        "neither directory exists yet — gates/ is built by C9, scorer/ by C8. Q-004 "
+        "ruled OPTION 1 on 2026-08-31: both live UNDER the package, at "
+        "src/whetstone_gate/gates/ and src/whetstone_gate/scorer/. Both candidate "
+        "layouts are still checked — it costs nothing and the ruled one is now first"
+    )
     return [
+        Result("D1 gates/ and scorer/ share no first-party module", None, absent),
+        # ⚠️ OF-03's doctrine, which this file already applies to F2–F4: a check's ABSENCE
+        # and a check's PASS must never be the same thing to a caller. D4 is emitted here
+        # as `n/a` so that a reviewer reading this output learns the source-text half
+        # EXISTS and has not run, rather than learning nothing about it at all.
         Result(
-            "D1 gates/ and scorer/ share no first-party module",
+            "D4 no dynamic import in gates/ or scorer/",
             None,
-            "neither directory exists yet — gates/ is built by C9, scorer/ by C8. Q-004 "
-            "ruled OPTION 1 on 2026-08-31: both live UNDER the package, at "
-            "src/whetstone_gate/gates/ and src/whetstone_gate/scorer/. Both candidate "
-            "layouts are still checked — it costs nothing and the ruled one is now first",
-        )
+            f"{absent}. This is the source-text half of the moat added for OF-110 "
+            f"(C6 REVIEW 3, 3605d31c) and INC-51: it refuses "
+            f"{len(MOAT_REFUSED_DYNAMIC)} names outright",
+        ),
     ]
 
 
@@ -822,6 +917,39 @@ def _walk_isolation(
             ),
         )
     )
+
+    # ⚠️ D4 — THE SOURCE-TEXT HALF. OF-110 / INC-51. See MOAT_REFUSED_DYNAMIC.
+    dynamic = _dynamic_reach_hits({gates_rel: gates, scorer_rel: scorer})
+    results.append(
+        Result(
+            "D4 no dynamic import in gates/ or scorer/",
+            not dynamic,
+            f"neither package names any of the {len(MOAT_REFUSED_DYNAMIC)} refused "
+            f"dynamic-reach forms in its source text. D1–D3 walk the AST, which cannot see "
+            f"a call expression BY CONSTRUCTION; this walks the text, which cannot see "
+            f"semantics. Neither is the moat alone (OF-110, INC-51)"
+            if not dynamic
+            else (
+                "REFUSED DYNAMIC REACH: "
+                + "; ".join(
+                    f"{where}:{number} uses {name!r} — {line!r}"
+                    for where, number, name, line in dynamic[:6]
+                )
+                + f" ({len(dynamic)} hit(s) total). ⚠️ gates/ and scorer/ are PURE "
+                "PREDICATE packages and neither has any legitimate need for a dynamic "
+                "import, for reflection, or for exec. MEASURED 2026-09-02 (INC-51): a "
+                "gates/ module reaching scorer/ by importlib.import_module, by __import__ "
+                "or by getattr on the package root PASSES D1, D2 AND D3 — a call "
+                "expression is not an ast.Import node, so the AST walk cannot see it. "
+                "In the spike, gate.js and invariants.js both called world.js:intentKey, "
+                "so the invariant COULD NOT HAVE FIRED unless the gate had a bug: that is "
+                "not a result, it is a definition. Write it statically so D1–D3 can see "
+                "it, or write it twice on purpose. Removing a name from "
+                "MOAT_REFUSED_DYNAMIC is a CLASS A deviation requiring an architect "
+                "ruling in QUESTIONS.md"
+            ),
+        )
+    )
     return results
 
 
@@ -839,6 +967,82 @@ _TOKEN_TRAILER = re.compile(r"^Session-Token:\s*([0-9a-fA-F]{8})\s*$", re.MULTIL
 #: *"this commit carries a trailer nobody can read"*, which E4 used to conflate while
 #: printing a false statement about four commits that do carry one.
 _TOKEN_TRAILER_ANY = re.compile(r"^Session-Token:\s*(\S.*?)\s*$", re.MULTILINE)
+
+#: A **trailer-shaped** line, as git itself shapes one: a key of ASCII letters, digits and
+#: hyphens, optional space, then the separator. `[VERIFIED HERE, 2026-09-02]` against
+#: ``git interpret-trailers --parse`` on seven synthetic messages — see :func:`_trailer_block`.
+_TRAILER_SHAPED = re.compile(r"^[A-Za-z0-9-]+[ \t]*:")
+
+
+def _trailer_block(body: str) -> str:
+    """The commit message's **trailer block** — where a trailer may be read from.
+
+    ⚠️ **`QUESTIONS.md` Q-080, RULED 2026-09-02, remedy 3.** ``_TOKEN_TRAILER_ANY`` cannot
+    tell **a trailer** from **a quotation of one**, and this project *requires* sessions to
+    write about their own tokens in their own commit messages, so a quoted line at column 0
+    turned E5 red on a commit that was correctly tokened (`INCIDENTS.md` **INC-49**). The
+    ruling's remedy: read the trailer block, not the whole body. **Neither pattern above is
+    widened — Q-014 (i) is not reopened — only *where* they are applied narrows.**
+
+    ⚠️ **AND THE RULING'S PARENTHETICAL GLOSS IS REFINED IN EXACTLY ONE DIRECTION, WHICH IS
+    A DECLARED CLASS A DEVIATION RECORDED IN `QUESTIONS.md` Q-081 AND `INCIDENTS.md`
+    INC-52.** The gloss reads *"the message's LAST PARAGRAPH (`git interpret-trailers`)"*.
+    **That was implemented literally first and MEASURED over the whole log before anything
+    shipped: it changes the verdict on 74 of 277 commits**, because
+
+      * `git interpret-trailers` stops at the **first blank line** — verified against git
+        itself, not inferred: ``A-Key: 1`` + blank + ``B-Key: 2`` parses to **`B-Key` only**,
+        and the same two lines with no blank between them parse to **both**; and
+      * **this project's own convention puts a blank line between `Session-Token:` and the
+        harness's `Co-Authored-By:`**, so under the literal gloss the token sits one
+        paragraph too high and becomes invisible.
+
+    Shipping that would take **E1 — the check that catches a token that was never issued —
+    from 261 of 277 commits to 187**, and make E4 print a false statement about 74 commits
+    that *do* carry a trailer: `Q-014 (ii)`'s recorded defect at eighteen times the scale,
+    which is **hard rule 6**. So what this returns is git's own criterion for a *trailer
+    paragraph*, extended across a blank line **only between paragraphs that are themselves
+    entirely trailers**:
+
+      the maximal trailing run of paragraphs — the subject paragraph excluded, as in git —
+      in which **every** line is trailer-shaped or a whitespace continuation of one.
+
+    Measured effect against the previous whole-body scan: **1 of 277 commits** changes
+    verdict (`97a5981`, whose message carries a stray bare ``@`` from a leaked here-string
+    delimiter, and whose trailer **git itself** has never been able to read either), plus
+    `c4d4460`'s quotation, which is the defect being fixed.
+
+    ⚠️ **The residual is named rather than hoped away:** a quotation still escapes if it is
+    alone in its own paragraph *and* contiguous with the trailing trailer run. That shape is
+    fired at, and asserted still-caught, in ``tests/test_c0_fix_probes.py``.
+    """
+    lines = body.replace("\r\n", "\n").split("\n")
+    paragraphs: list[list[str]] = []
+    current: list[str] = []
+    for line in lines:
+        if line.strip():
+            current.append(line)
+        elif current:
+            paragraphs.append(current)
+            current = []
+    if current:
+        paragraphs.append(current)
+
+    # git: "the first paragraph is the title and cannot be trailers". A one-paragraph
+    # message therefore has no trailer block at all, which is git's answer too.
+    def _is_trailer_paragraph(paragraph: list[str]) -> bool:
+        if not _TRAILER_SHAPED.match(paragraph[0]):
+            return False
+        return all(
+            _TRAILER_SHAPED.match(line) or line[:1].isspace() for line in paragraph[1:]
+        )
+
+    block: list[str] = []
+    for paragraph in reversed(paragraphs[1:]):
+        if not _is_trailer_paragraph(paragraph):
+            break
+        block.insert(0, "\n".join(paragraph))
+    return "\n".join(block)
 
 #: ⚠️ Q-014 (iii): the CHUNK group is widened to ``(C\d+|ARCH)`` **and no further**. ``ARCH``
 #: denotes an architect-artefact session that is not a numbered chunk — a spec correction,
@@ -905,20 +1109,36 @@ def check_session_tokens(root: Path) -> list[Result]:
     log = _git("log", "--format=%H%x1f%B%x1e", root=root)
     used: dict[str, list[str]] = {}
     untrailered: list[str] = []
+    outside_block: list[str] = []
     malformed: list[tuple[str, str]] = []
     for record in filter(None, (r.strip() for r in log.split("\x1e"))):
         sha, _, body = record.partition("\x1f")
-        strict = _TOKEN_TRAILER.findall(body)
+        # ⚠️ Q-080's ruling: a trailer is read from the TRAILER BLOCK, never from the whole
+        # body, so a commit message that QUOTES a trailer at column 0 in a prose paragraph
+        # is no longer parsed as carrying one. Q-081/INC-52 record the one refinement to
+        # the ruling's wording, and `_trailer_block` carries the measurement.
+        block = _trailer_block(body)
+        strict = _TOKEN_TRAILER.findall(block)
         # ⚠️ Q-014 (i): the PERMISSIVE pattern is applied ONLY where the strict one did not
         # match, and a trailer it catches that the strict one did not is MALFORMED — not
         # absent. `_TOKEN_TRAILER` is the authority for "well formed"; there is deliberately
         # no second copy of the 8-hex predicate here to drift away from it.
-        for value in _TOKEN_TRAILER_ANY.findall(body):
+        for value in _TOKEN_TRAILER_ANY.findall(block):
             if value not in strict:
                 malformed.append((sha, value))
         tokens = [t.lower() for t in strict]
         if not tokens and not any(s == sha for s, _ in malformed):
             untrailered.append(sha)
+            # ⚠️ Q-014 (ii) applied to the NEW parser, and INC-52's second half. "No
+            # trailer" and "a trailer this parser will not read" must not collapse into one
+            # list again: that collapse is the false statement Q-014 (ii) was ruled about.
+            # A commit here has a `Session-Token:`-shaped line somewhere OUTSIDE its trailer
+            # block — a prose quotation, or a real trailer that a stray non-trailer line in
+            # the same paragraph disqualifies, which is `97a5981` and which git itself
+            # cannot read either. It is REPORTED, with its count, never rounded into the
+            # untrailered prose.
+            if _TOKEN_TRAILER_ANY.search(body):
+                outside_block.append(sha)
         for token in tokens:
             used.setdefault(token, []).append(sha[:7])
 
@@ -973,17 +1193,33 @@ def check_session_tokens(root: Path) -> list[Result]:
     )
 
     if untrailered:
+        absent = [s for s in untrailered if s not in set(outside_block)]
         out.append(
             Result(
                 "E4 every commit carries a Session-Token trailer",
                 None,
-                f"{len(untrailered)} commit(s) carry no trailer: "
-                f"{[s[:7] for s in untrailered[:6]]}. "
+                f"{len(untrailered)} commit(s) carry no trailer IN THEIR TRAILER BLOCK. "
+                f"{len(absent)} of them carry no Session-Token: line ANYWHERE: "
+                f"{[s[:7] for s in absent[:6]]}. "
                 "The C0 build prompt issued no SESSION-TOKEN and this session did not "
                 "fabricate one — a fabricated token would be exactly the 'token that was "
                 "never issued' that E1 exists to catch. See QUESTIONS.md Q-001. "
                 "⚠️ This list holds ONLY commits with no trailer at all: a trailer that is "
-                "present but malformed is E5's, not this list's (Q-014 (i))",
+                "present but malformed is E5's, not this list's (Q-014 (i))"
+                + (
+                    f". ⚠️ AND {len(outside_block)} commit(s) DO carry a Session-Token: "
+                    f"line, OUTSIDE the trailer block, so this parser does not read it: "
+                    f"{[s[:7] for s in outside_block[:6]]}. That is a prose QUOTATION "
+                    "(correct, and the whole point of Q-080) or a real trailer whose "
+                    "paragraph holds a stray non-trailer line — 97a5981 carries a bare "
+                    "'@' from a leaked here-string delimiter, and `git interpret-trailers "
+                    "--parse` returns nothing for it either. Counted and NAMED rather than "
+                    "folded into the sentence above, because folding them together is "
+                    "exactly the false statement Q-014 (ii) was ruled about "
+                    "(QUESTIONS.md Q-081; INCIDENTS.md INC-52)"
+                    if outside_block
+                    else ""
+                ),
             )
         )
     else:

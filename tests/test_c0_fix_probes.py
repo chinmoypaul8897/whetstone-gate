@@ -1351,3 +1351,331 @@ def test_the_summary_cap_row_fires_on_its_own_name_and_not_on_http_400():
                 f"{constant.key} still scans STRICT for a bare 400, so moving this one row "
                 f"changed nothing."
             )
+
+
+# =======================================================================================
+# Q-080 / Q-081 / INC-49 / INC-52 — THE TRAILER BLOCK.
+#
+# A trailer is read from the commit message's TRAILER BLOCK, never from the whole body, so
+# a session that QUOTES a trailer at column 0 while writing about its own token no longer
+# turns E5 red. Every probe below fails on the pre-fix parser and passes on this one, which
+# is hard rule 6's "provably meaningful" bar in the direction that matters.
+#
+# ⚠️ The pair that matters most is the LAST TWO: the ruling's literal gloss ("the last
+# paragraph") was measured to blind 74 of 277 commits, because git's trailer block stops at
+# the first blank line and this project puts one between `Session-Token:` and the harness's
+# `Co-Authored-By:`. Those two probes are what make the refinement in `_trailer_block`
+# provably load-bearing rather than a preference. QUESTIONS.md Q-081; INCIDENTS.md INC-52.
+# =======================================================================================
+
+_QUOTING_BODY = (
+    "docs: the token row\n"
+    "\n"
+    "DECLARED RATHER THAN HIDDEN: this row is registered AFTER four commits already carried\n"
+    "Session-Token: 91eb51c1, so `make check-roles` was E1-red in between. That is OF-89's\n"
+    "ordering fault, landing on the third consecutive session.\n"
+    "\n"
+    "Session-Token: abcd1234\n"
+)
+
+_CONVENTION_BODY = (
+    "docs: the ordinary shape every commit in this repository has\n"
+    "\n"
+    "Body prose.\n"
+    "\n"
+    "Session-Token: abcd1234\n"
+    "\n"
+    "Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>\n"
+)
+
+
+def _tokened_repo(tmp_path, body: str):
+    """A throwaway repo whose SECOND commit carries ``body`` as its message."""
+    repo = _init(tmp_path / "r")
+    (repo / "QUESTIONS.md").write_text(
+        _questions("| `abcd1234` | C0 | BUILD | 2026-09-02 |\n"), encoding="utf-8"
+    )
+    _commit(repo, "root with no trailer")
+    (repo / "note.md").write_text("note\n", encoding="utf-8")
+    sp.run(["git", "add", "-A"], cwd=repo, check=True, capture_output=True)
+    sp.run(["git", "commit", "-q", "-F", "-"], cwd=repo, check=True,
+           input=body, text=True, capture_output=True)
+    sha = sp.run(["git", "rev-parse", "HEAD"], cwd=repo, check=True,
+                 capture_output=True, text=True).stdout.strip()
+    return repo, sha
+
+
+def test_a_quoted_trailer_in_a_prose_paragraph_is_not_read_as_a_trailer(tmp_path):
+    """⚠️ Q-080's ruling, and **the class rather than the instance**.
+
+    `INC-49`: `c4d4460` carried two lines beginning ``Session-Token:`` — one a real trailer
+    and one a **wrapped line of prose** that happened to start at column 0 — and the
+    permissive matcher, scanning the whole body under ``re.MULTILINE``, recorded the prose
+    as a malformed trailer. **The guard that exists to catch a typed token was defeated by a
+    session explaining tokens correctly**, in a commit about the token table, which is the
+    most likely place for it to happen.
+
+    The fixture reproduces that message's *shape*, not its bytes: a four-line prose
+    paragraph whose second line begins ``Session-Token:``, and a real trailer beneath it.
+    """
+    repo, sha = _tokened_repo(tmp_path, _QUOTING_BODY)
+    results = _results(check_roles.check_session_tokens(repo))
+
+    e5 = results["E5 malformed Session-Token trailer"]
+    assert e5.ok is True, (
+        "a QUOTATION of a trailer, inside a prose paragraph, was read as a malformed "
+        f"trailer — Q-080/INC-49's defect: {e5.detail}"
+    )
+    # And the real trailer is still read: the fix must not have bought E5 with E1's sight.
+    e1 = results["E1 no commit carries an UNISSUED token"]
+    assert e1.ok is True, e1.detail
+    assert sha[:7] in e1.detail or "1 token(s) appear" in e1.detail, (
+        f"the commit's real trailer stopped being read at all: {e1.detail}"
+    )
+    assert check_roles._trailer_block(_QUOTING_BODY) == "Session-Token: abcd1234", (
+        "the trailer block must be the real trailer and nothing else; got "
+        f"{check_roles._trailer_block(_QUOTING_BODY)!r}"
+    )
+
+
+def test_e5_still_fires_on_a_malformed_trailer_inside_the_trailer_block(tmp_path):
+    """⚠️ **A CHECK THAT STOPPED CHECKING IS NOT A FIX.**
+
+    Q-080 narrows *where* a trailer is read from. It must not narrow *whether* a malformed
+    one fails. Both shapes are fired here:
+
+      1. malformed **alone in the last paragraph** — the ordinary case;
+      2. malformed **alone in its own paragraph, directly above the real trailer** — which
+         is the residual `Q-081` names, and the one shape a quotation could still take.
+         It is asserted **caught**, so the boundary is documented rather than hoped for.
+    """
+    for label, body in (
+        ("last paragraph", "subject\n\nbody\n\nSession-Token: WG-2026-09-02-NOT-HEX\n"),
+        (
+            "inside the trailing trailer run",
+            "subject\n\nbody\n\nSession-Token: not-eight-hex\n\nSession-Token: abcd1234\n",
+        ),
+    ):
+        repo, sha = _tokened_repo(tmp_path / label.replace(" ", "_"), body)
+        e5 = _results(check_roles.check_session_tokens(repo))[
+            "E5 malformed Session-Token trailer"
+        ]
+        assert e5.ok is False, (
+            f"E5 stopped checking: a malformed trailer {label} passed. {e5.detail}"
+        )
+        assert sha[:7] in e5.detail, f"E5 must name the SHA ({label}): {e5.detail}"
+
+
+def test_the_trailer_block_crosses_a_blank_line_between_two_trailer_paragraphs(tmp_path):
+    """⚠️ **Q-081 / INC-52 — THE PROBE THAT MAKES THE REFINEMENT LOAD-BEARING.**
+
+    ``git interpret-trailers`` stops at the first blank line: ``A-Key: 1`` + blank +
+    ``B-Key: 2`` parses to **`B-Key` only**. This project's own commit convention puts a
+    blank line between ``Session-Token:`` and the harness's ``Co-Authored-By:``, so the
+    ruling's literal gloss — *"the message's LAST PARAGRAPH"* — was **measured** to change
+    the verdict on **74 of 277** commits, taking E1 from 261/277 to 187/277 and making E4
+    print a false statement about 74 commits that do carry a trailer (`Q-014 (ii)`'s defect
+    at eighteen times the scale, which is **hard rule 6**).
+
+    So the block crosses a blank line **only** between paragraphs that are themselves
+    entirely trailers. This probe pins that, in both directions.
+    """
+    block = check_roles._trailer_block(_CONVENTION_BODY)
+    assert "Session-Token: abcd1234" in block, (
+        "the ordinary two-paragraph trailer convention was not read — this is the literal "
+        f"'last paragraph' reading, and it blinds E1 on 74 of 277 commits. Block: {block!r}"
+    )
+    assert "Co-Authored-By" in block, f"the last paragraph itself was dropped: {block!r}"
+
+    repo, _ = _tokened_repo(tmp_path, _CONVENTION_BODY)
+    results = _results(check_roles.check_session_tokens(repo))
+    assert results["E1 no commit carries an UNISSUED token"].ok is True
+    e4 = results["E4 every commit carries a Session-Token trailer"]
+    assert "1 commit(s) carry no trailer" in e4.detail, (
+        "exactly one fixture commit (the root) carries no trailer; the second carries one "
+        f"in the ordinary two-paragraph shape and must be read. {e4.detail}"
+    )
+
+    # The other direction: a PROSE paragraph beneath the trailer must stop the run, or the
+    # crossing rule would swallow the whole message and Q-080's fix would be undone.
+    prose_beneath = "subject\n\nSession-Token: abcd1234\n\nnot a trailer at all\n"
+    assert check_roles._trailer_block(prose_beneath) == "", (
+        "a non-trailer paragraph must end the block; otherwise the run rule reaches back "
+        f"into prose and Q-080 is undone. Got {check_roles._trailer_block(prose_beneath)!r}"
+    )
+
+
+def test_e4_separates_no_trailer_at_all_from_a_trailer_outside_the_block(tmp_path):
+    """⚠️ `Q-014 (ii)` applied to the NEW parser — `INC-52`'s second half.
+
+    *"E4 printed a false statement, naming four commits that do carry a trailer among
+    'commit(s) carry no trailer'."* The new parser creates one more way to make that same
+    statement: a commit whose ``Session-Token:`` line sits **outside** its trailer block —
+    a prose quotation, or a real trailer whose paragraph carries a stray non-trailer line,
+    which is `97a5981` and which **git itself** cannot read either. Those must be counted
+    and named, never folded into the untrailered prose.
+    """
+    repo = _init(tmp_path / "r")
+    (repo / "QUESTIONS.md").write_text(
+        _questions("| `abcd1234` | C0 | BUILD | 2026-09-02 |\n"), encoding="utf-8"
+    )
+    _commit(repo, "root with genuinely no trailer")
+    (repo / "a.md").write_text("a\n", encoding="utf-8")
+    sp.run(["git", "add", "-A"], cwd=repo, check=True, capture_output=True)
+    # 97a5981's shape exactly: a real trailer, then a stray bare line from a leaked
+    # here-string delimiter, in the same paragraph.
+    sp.run(["git", "commit", "-q", "-F", "-"], cwd=repo, check=True,
+           input="subject\n\nbody\n\nSession-Token: abcd1234\n@\n", text=True,
+           capture_output=True)
+
+    e4 = _results(check_roles.check_session_tokens(repo))[
+        "E4 every commit carries a Session-Token trailer"
+    ]
+    assert "2 commit(s) carry no trailer IN THEIR TRAILER BLOCK" in e4.detail, e4.detail
+    assert "1 of them carry no Session-Token: line ANYWHERE" in e4.detail, (
+        "E4 collapsed 'no trailer' and 'a trailer this parser will not read' into one "
+        f"list — that collapse IS the false statement Q-014 (ii) was ruled about: {e4.detail}"
+    )
+    assert "OUTSIDE the trailer block" in e4.detail, e4.detail
+
+
+def test_the_strict_and_permissive_patterns_were_not_widened_by_q080():
+    """⚠️ Q-080's ruling in terms: *"THIS DOES NOT REOPEN Q-014 (i)."*
+
+    ``_TOKEN_TRAILER`` *"IS NOT WIDENED. That stands and is not reopened."* Only **where**
+    the patterns are applied narrows. If a later session widens either pattern while
+    pointing at Q-080, this fails and says so.
+    """
+    body = "subject\n\nSession-Token: {}\n"
+    assert check_roles._TOKEN_TRAILER.findall(body.format("deadbeef")) == ["deadbeef"]
+    assert check_roles._TOKEN_TRAILER.findall(body.format("deadbee")) == []
+    assert check_roles._TOKEN_TRAILER.findall(body.format("deadbeef0")) == []
+    assert check_roles._TOKEN_TRAILER.findall(body.format("WG-2026-08-30-CTX-13.4-A")) == []
+    assert check_roles._TOKEN_TRAILER_ANY.findall(
+        body.format("WG-2026-08-30-CTX-13.4-A")
+    ) == ["WG-2026-08-30-CTX-13.4-A"]
+
+
+# =======================================================================================
+# OF-110 / INC-51 — D4, THE SOURCE-TEXT HALF OF THE MOAT.
+#
+# MEASURED 2026-09-02 in a fresh OS temp clone: a gates/ module reaching a scorer/ predicate
+# by importlib.import_module, by __import__, or by getattr on the package root PASSES D1, D2
+# AND D3 — every one — because a call expression is not an ast.Import node. The AST walk was
+# not wrong about what it saw; it was complete over the wrong set.
+# =======================================================================================
+
+_DYNAMIC_REACH = {
+    "importlib.import_module": (
+        "import importlib\n\n\n"
+        "def decide(paise, cap):\n"
+        '    p = importlib.import_module("whetstone_gate.scorer.replay")\n'
+        "    return p.over_cap(paise, cap)\n"
+    ),
+    "__import__": (
+        "def decide(paise, cap):\n"
+        '    m = __import__("whetstone_gate.scorer.replay", fromlist=["over_cap"])\n'
+        "    return m.over_cap(paise, cap)\n"
+    ),
+    "getattr on the package root": (
+        "import whetstone_gate\n\n\n"
+        "def decide(paise, cap):\n"
+        '    scorer = getattr(whetstone_gate, "scorer")\n'
+        "    return scorer.replay.over_cap(paise, cap)\n"
+    ),
+    "sys.modules": (
+        "import sys\n\n\n"
+        "def decide(paise, cap):\n"
+        '    p = sys.modules["whetstone_gate.scorer.replay"]\n'
+        "    return p.over_cap(paise, cap)\n"
+    ),
+    "exec of an import statement": (
+        "def decide(paise, cap):\n"
+        "    ns = {}\n"
+        '    exec("from whetstone_gate.scorer.replay import over_cap", ns)\n'
+        '    return ns["over_cap"](paise, cap)\n'
+    ),
+}
+
+
+@pytest.mark.parametrize("shape", sorted(_DYNAMIC_REACH))
+def test_d4_refuses_every_dynamic_reach_shape_the_ast_walk_cannot_see(tmp_path, shape):
+    """⚠️ **THE MOAT, AND IT WAS MEASURED EVADABLE BEFORE THIS EXISTED.** `OF-110`, `INC-51`.
+
+    Each shape reaches ``scorer/`` from ``gates/`` without producing a single ``ast.Import``
+    node. The probe asserts **both halves of the finding**:
+
+      * **D1 and D3 PASS** — the AST walk cannot see it, *by construction*, and saying so in
+        an assertion is what makes `INC-51` a measurement rather than a claim; and
+      * **D4 FAILS** — the source-text scan does.
+
+    If a future change makes D1/D3 catch these too, this probe's first half fails loudly and
+    a session must come and re-read `INC-51` rather than quietly deleting D4.
+    """
+    root = _moat_tree(
+        tmp_path, _DYNAMIC_REACH[shape], "def over_cap(paise, cap):\n    return paise > cap\n"
+    )
+    results = _results(check_roles.check_gate_scorer_isolation(root))
+
+    assert results["D1 gates/ imports nothing from scorer/"].ok is True, (
+        "D1 caught a dynamic reach — if that is now true, INC-51's measurement has changed "
+        "and D4's justification must be re-read, not deleted"
+    )
+    assert results["D3 no shared first-party module"].ok is True, (
+        "D3 caught a dynamic reach — see the note on D1 above"
+    )
+    d4 = results["D4 no dynamic import in gates/ or scorer/"]
+    assert d4.ok is False, (
+        f"D4 did NOT refuse {shape!r} — the moat is open on the shape OF-110 named and "
+        f"INC-51 measured: {d4.detail}"
+    )
+    assert "REFUSED DYNAMIC REACH" in d4.detail
+    assert "arm4_kernel.py" in d4.detail, f"D4 must name the file and line: {d4.detail}"
+
+
+def test_d4_does_not_fire_on_a_clean_pair_or_on_empty_packages(tmp_path):
+    """A tripwire that fires on correct code is disabled within a day.
+
+    Two negatives, because they fail differently: a pair that shares nothing and uses no
+    refused name, and a pair of **empty** packages — which must report **PASS**, not
+    silence. (`n/a` for a package that does not exist is D1's job and is asserted in
+    ``tests/test_repo_invariants.py``.)
+    """
+    clean = _moat_tree(
+        tmp_path / "clean",
+        "def decide(paise, cap):\n    return paise > cap\n",
+        "def over_cap(paise, cap):\n    return paise > cap\n",
+    )
+    d4 = _results(check_roles.check_gate_scorer_isolation(clean))[
+        "D4 no dynamic import in gates/ or scorer/"
+    ]
+    assert d4.ok is True, f"D4 fired on a clean pair, which is how a tripwire dies: {d4.detail}"
+
+    empty = _moat_tree(tmp_path / "empty", "", "")
+    d4_empty = _results(check_roles.check_gate_scorer_isolation(empty))[
+        "D4 no dynamic import in gates/ or scorer/"
+    ]
+    assert d4_empty.ok is True, d4_empty.detail
+
+
+def test_the_moat_refusal_list_is_pinned_the_way_the_allow_list_is():
+    """⚠️ An exception list is where a check dies quietly; so is a **shrinking** refusal list.
+
+    ``MOAT_ALLOW_LIST`` may not be **added** to without an architect ruling. The same
+    protection runs the other way here: ``MOAT_REFUSED_DYNAMIC`` may not be **narrowed**
+    without one, because dropping ``getattr`` or ``importlib`` from it reopens exactly the
+    hole `INC-51` measured. The three names `OF-110` measured are asserted individually, so
+    a diff that removes one meets a named assertion rather than a count.
+    """
+    names = {name for name, _ in check_roles.MOAT_REFUSED_DYNAMIC}
+    for required in ("importlib", "__import__", "getattr", "sys.modules", "exec"):
+        assert required in names, (
+            f"{required!r} was removed from MOAT_REFUSED_DYNAMIC. That is a CLASS A "
+            f"deviation requiring an architect ruling in QUESTIONS.md: OF-110 measured "
+            f"this exact shape escaping the AST walk, and INC-51 measured D1, D2 and D3 "
+            f"all reporting PASS over it."
+        )
+    assert len(check_roles.MOAT_REFUSED_DYNAMIC) == 14, (
+        f"MOAT_REFUSED_DYNAMIC holds {len(check_roles.MOAT_REFUSED_DYNAMIC)} names, not 14. "
+        f"Narrowing it is a Class A deviation; widening it is not, but it must be visible."
+    )
