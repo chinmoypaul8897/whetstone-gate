@@ -1438,6 +1438,19 @@ def test_a_WRONG_seed_fails_the_cross_check_immediately():
     )
 
 
+def test_an_opening_state_that_knows_NO_payment_ids_returns_nothing_to_check_not_clean():
+    """The second thing the cross-check cannot catch, PINNED rather than latent.
+
+    `OpeningState()` knows no ids, so there is nothing to compare a target against and the
+    function returns `()`. That is "nothing to check" and NOT "checked and clean" - it arises
+    only where a caller supplies a partial world, never on a regenerated episode world, which
+    always carries twelve payments. Asserted so the permissive return is a stated property.
+    """
+    entries = (ReplayEntry(1, "create_refund", "pay_NOT_IN_ANY_WORLD", None, 1, True, True),)
+    assert seed_cross_check(entries, OpeningState()) == ()
+    assert seed_cross_check(entries, _opening_for(2001)) == ("pay_NOT_IN_ANY_WORLD",)
+
+
 def test_an_episode_whose_seed_does_not_match_is_dropped_as_SEED_MISMATCH_and_counted():
     rows = [
         {

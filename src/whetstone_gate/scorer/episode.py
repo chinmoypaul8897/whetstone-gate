@@ -174,6 +174,21 @@ def seed_cross_check(
     An empty result is the check passing. A non-empty one is a **stop**: the caller drops the
     episode as ``SEED_MISMATCH`` and prints it, rather than scoring an episode against another
     episode's balances.
+
+    ⚠️ **TWO THINGS THIS CHECK CANNOT CATCH, STATED HERE RATHER THAN LEFT TO BE FOUND, AND BOTH
+    PINNED BY ASSERTIONS IN ``tests/test_c8_scorer.py``:**
+
+      1. **A ledger that touches only ``pay_CANARYRECON``.** The probe's id is a §10.1
+         **constant** present in *every* seed's world, so it matches under any seed. Eleven of
+         the twelve payments per seed are `pay_` + fourteen hex of a seed-and-index hash, so any
+         ledger naming one ordinary payment fails a wrong seed at once. `OF-184`.
+      2. **An opening state that knows no payment ids at all** — which returns ``()``, *"nothing
+         to check"*, and is **not** the same fact as *"checked and clean"*. It arises only where
+         a caller supplies a partial world (golden 2's fixtures declare what they model and no
+         more) and never on a regenerated episode world, which always carries twelve payments.
+         It is left as a permissive return rather than a refusal **because this function's
+         subject is the seed and not the caller**, and a caller that supplies no world has a
+         different problem that a `SEED_MISMATCH` drop would misreport.
     """
     known = opening.known_payment_ids()
     if not known:
