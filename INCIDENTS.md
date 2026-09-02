@@ -4134,10 +4134,26 @@ the comparison together** and the comparison degenerated into an identity. The s
 even a non-circular assertion fired at it could not have separated a strong requirement from a
 weakened one.
 
-**Fix:** ⚠️ **PENDING AT THE TIME OF WRITING — this entry precedes the code, and the SHAs are filled
-in by a later commit of this same session once they exist**, which is the two-step `INC-46`/`INC-47`
-and `INC-53`/`INC-54` already took in this repository. The change is confined to
-`tests/test_c13_camel_comparator.py` plus the export and one caller inside
+**Fix:** ⚠️ **`9084422`** — the two circular assertions are gone; the single fixture is replaced by
+**one weak-form fixture per requirement**, each derived from the real `branch_b_condition` read
+through the loader by degrading exactly one phrase, the degradation **asserted to have happened**
+first, and each asserted **REJECTED with exactly one complaint quoting exactly that requirement
+against a literal written in the test**; `len(BRANCH_B_REQUIREMENTS) == 4` is pinned against the
+**literal `4`**; and the undegraded value is asserted **ACCEPTED**, because four rejections and no
+acceptance is what a guard that refuses everything looks like. The same commit closes `OF-115`,
+`OF-117`, `OF-118` and `OF-119`. ⚠️ **And `73de008`**, which closes **two further defects this
+session found in its own remedy** by mutating it — `SD-11`, a complaint quoting *every* requirement
+rather than the one that failed, and `SD-13`, a call site that keeps `OF-118`'s call and throws its
+result away; **both survived the full suite before they were closed.**
+⚠️ **Measured, not asserted:** `N-B`, `N-C`, `N-D`, `N-E` and `N-I2` are each **KILLED** at
+`73de008` — *1 failed, 99 passed* apiece — in a fresh OS temp clone with the clone's
+`whetstone_gate.__file__` **printed** and the mutation **committed inside the clone**, control **100
+passed / 0 failed** first. **Nineteen mutants, nineteen killed, zero survivors, zero claimed
+equivalent.** `make test` **772 → 774 passed, 0 failed in both runs**.
+*(This paragraph was written `PENDING` at `86f21c2`, before the code existed, and filled in here:
+the entry precedes the fix by hard rule 13, and a commit cannot contain its own hash. It is the
+two-step `INC-46`/`INC-47` and `INC-53`/`INC-54` already took in this repository.)*
+The change is confined to `tests/test_c13_camel_comparator.py` plus the export and one caller inside
 `src/whetstone_gate/camel_comparator/`; **no `config/` value, no `CONTEXT.md` text, no number and no
 figure is touched by it.**
 
