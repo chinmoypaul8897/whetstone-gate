@@ -1,11 +1,11 @@
 # REVIEW_C6_6 — C6, THE ATTACKER LOOP. Adversarial review, attempt 6, after FIX 5. **C6's LAST.**
 
 **SESSION-TOKEN: `7f4b0e93`** · **Date:** 2026-09-02 → 2026-09-03 · **Personas:** evaluation-integrity + code
-**Token row:** **55**, counted from `QUESTIONS.md`'s table in the operator's working tree at
-`C:\Users\chinm\whetstone-gate`, where line 103 held row 54 (`5c2e8b74`, C6 FIX 5)
+**Token row:** **DATA ROW 55, 8-HEX ROW 54** — both figures given because the two conventions
+in use differ by one (`OF-179`), counted from `QUESTIONS.md`'s table in the operator's working
+tree at `C:\Users\chinm\whetstone-gate`, where data row 54 was `5c2e8b74` (C6 FIX 5)
 **Phase-1 seal:** `5e91e0e` · **Subject measured at:** `ae5199a` — `src/` byte-identical to REVIEW 5's
 measurement point `615993d`
-**I did not build this chunk, I did not fix it, and I have not reviewed it before.**
 
 ---
 
@@ -18,7 +18,7 @@ measurement point `615993d`
 |---|---|
 | **BLOCKERS** | **0** |
 | **MEDIUM** | 6 |
-| **LOW** | 4 |
+| **LOW** | 5 |
 | **Mutants** | **48 scored · 40 KILLED · 2 PROVEN EQUIVALENT · 1 NOT A VALID MUTANT (mine) · 5 non-equivalent survivors** |
 | **Positive controls** | **22 runs across 13 slices, and every one DIED** (`OF-159`, both parts) |
 | **Survivors marked OWNED** | **3** — `N-32`, `N-35b`, `N-39`. **These are the FAIL.** |
@@ -627,6 +627,7 @@ with 12; all six cells the prompt named are closed by fixtures that go red when 
 | **L-2** | ⚠️ **THIS REVIEW'S OWN, TWICE.** My needle `over-capture` fires on §8.6's own system prompt, so my clean-surface control read **1 of 73** rather than 0 — my seal's exclusion list named the word and my needle used a substring of it. And my first carrier-matrix measurement read an implausible 73/73 in a label because the harness restored the mutated module constant before running the guard. **Both are recorded on `OF-114`'s principle.** |
 | **L-3** | ⚠️ **THIS REVIEW'S OWN, THIRD.** `N-29` is a degenerate operator: deleting an assertion inside the very test that constitutes the fixture removes the fixture rather than unpinning a catcher, and every such mutant "survives". §6.4. **Reported as an invalid plan row and replaced by `N-29b`, which dies with 2.** |
 | **L-4** | **A CLONE OF THIS REPOSITORY CANNOT BE BUILT BY A TOOL CALL THAT MAY TIME OUT, AND THE FAILURE IS INVISIBLE UNTIL THE PROVENANCE LINE IS READ.** My first `tree_C` was left with no `src/` by an interrupted clone; its pre-run control read **0 passed** and its provenance named the **live repository**. The harness declared the slice VOID in 17 seconds. **That is `INC-69`'s exact failure mode, caught by the mechanism `OF-159` asks for** — and it is a second, cheaper argument for `OF-139`'s unbuilt `make mutate-clone`. |
+| **L-5** | ⚠️ **TWO SESSIONS PUBLISHED "ROW 55" FOR TWO DIFFERENT TOKEN ROWS ON THE SAME DAY, AND BOTH ARE CORRECT.** The table holds **56 data rows** and **55 8-hex rows**; `check_roles._TOKEN_ROW` counts only the second kind. `5c2e8b74` is data 54 / hex 53 and said *"ROW 54"*; `7f4b0e93` is data 55 / hex 54 and said *"ROW 55"*; `b8c31a57` is data 56 / hex 55 and said *"ROW 55"*. **The convention is unstated and the two predecessors disagreed.** ⚠️ **THIS FINDING'S FIRST DRAFT CALLED IT A COLLISION AND WAS WRONG** — the measurement that settles it was made first by the concurrent C7 REVIEW 2 session and is credited rather than re-discovered. **What DID collide is `OPEN_FINDINGS.md`'s ids:** this review's residue was written `OF-164`…`OF-168` and renumbered `OF-174`…`OF-178` when that session's ten rows landed first. **Both sessions re-read immediately before appending and the discipline did not prevent it** — `OF-67`, with a measurement. `OF-179`. |
 
 ### ⚪ INFO
 
@@ -686,18 +687,26 @@ one line, and states in §2 and §3 that everything the prompt required of the f
 **Ordered by what a reader should care about, with the remedy for each. Nothing here is a defect in
 what the attacker loop DOES; every one is a guard that is not fired.**
 
-1. **`OF-164` — the corpus-vs-improvisation split's partition is unpinned** (`N-32`). The published
+⚠️ **THE IDS WERE RE-COUNTED AFTER THE CONCURRENT SESSION COMMITTED, AND THEY MOVED.** This section first read `OF-164`...`OF-168`, counted when `OPEN_FINDINGS.md`'s highest entry was `OF-163`. Between that count and the append, a concurrent **C7 REVIEW 2** session (`b8c31a57`) landed `OF-164`...`OF-173`. **The ids below are `OF-174`...`OF-178`, re-read immediately before the append**, and the earlier numbering is recorded rather than erased. **See L-5.**
+
+1. **`OF-174` — the corpus-vs-improvisation split's partition is unpinned** (`N-32`). The published
    §11.3 split can silently lose a turn. **Remedy: one line.**
-2. **`OF-165` — copy 2's claim-2 probe-vocabulary scan is fired at nothing** (`N-35b`). **Remedy: one
+2. **`OF-175` — copy 2's claim-2 probe-vocabulary scan is fired at nothing** (`N-35b`). **Remedy: one
    fixture, mirroring copy 1's.**
-3. **`OF-166` — copy 2's claim-3 attack-list patterns are fired at nothing** (`N-39`). **Remedy: one
+3. **`OF-176` — copy 2's claim-3 attack-list patterns are fired at nothing** (`N-39`). **Remedy: one
    fixture.**
-4. **`OF-167` — claim 1's clause-identifier scan lacks the state-JSON exemption, in both copies**, and
+4. **`OF-177` — claim 1's clause-identifier scan lacks the state-JSON exemption, in both copies**, and
    an attacker-chosen `receipt` reaches it. **Remedy: the exemption LAYER 1 already has.**
-5. **`OF-168` — `INC-70`'s matrix enumerates 8 of copy 2's 13 catchers.** **Remedy: the architect's —
+5. **`OF-178` — `INC-70`'s matrix enumerates 8 of copy 2's 13 catchers.** **Remedy: the architect's —
    it is `OF-160`'s artefact.**
-6. **Still open and correctly so:** `OF-127`, `OF-128`, `OF-129`, `OF-130`, `OF-133`, `OF-153`,
+6. **`OF-179` — two sessions published the same token-row ordinal for different rows**, each
+   correct under a different unstated convention, and `OPEN_FINDINGS.md`'s ids DID collide.
+   **Remedy: the architect's.**
+   one, in the token table `make check-roles` reads. **Remedy: the architect's.**
+7. **Still open and correctly so:** `OF-127`, `OF-128`, `OF-129`, `OF-130`, `OF-133`, `OF-153`,
    `OF-154`, and `OF-160`…`OF-163`.
+8. **`Q-089` is raised** — `Q-084` moved the gate from the mutant set to the property set, and the
+   property set has no termination condition either. **The verdict follows the ruling as written.**
 
 ---
 

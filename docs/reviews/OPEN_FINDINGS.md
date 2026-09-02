@@ -2148,3 +2148,62 @@ what is **REPORTED** while `moved_money` returns a `bool`. **`OF-143` is likewis
 UNCHANGED at NOT OWNED, MEDIUM** — `REVIEW_7_2.md` §11 judges `C7 FIX 1`'s five-route argument and
 finds routes 1, 2 and 4 sound and sufficient, route 3 sound but contradicted by the builder's own
 docstring, and route 5 (the `OF-57`-at-one-remove argument) **partly sound and unnecessary**.
+
+---
+
+## ⚠️ RAISED BY C6 REVIEW 6 (`7f4b0e93`), 2026-09-03 — `OF-174`…`OF-179`, and `OF-146`…`OF-150` VERIFIED CLOSED
+
+**Every id is counted from THIS FILE, re-read immediately before this append, in the operator's
+working tree at `C:\Users\chinm\whetstone-gate`**, where the highest entry is **`OF-173`**, raised by
+the concurrent **C7 REVIEW 2** session (`b8c31a57`) at `3d8fb6c`. `INC-54` requires a session to say
+which tree it counted.
+
+⚠️ **AND THE RE-READ WAS NOT A FORMALITY: THE FIRST COUNT WAS WRONG.** This review's residue was
+written as `OF-164`…`OF-168` when the highest entry here was `OF-163`; C7 REVIEW 2's ten rows landed
+between that count and this append. **The renumbering is recorded rather than erased, and it is
+raised below as `OF-179`** — `OF-67`'s standing complaint, with a measurement attached.
+
+⚠️ **`OF-174`, `OF-175` AND `OF-176` HOLD THE TAG. The rest do not**, and which is which is decided by
+`Q-084`'s ruling rather than by this reviewer: **the gate is every OWNED property PINNED**, and each of
+those three is a property enumerated and argued in
+`docs/reviews/independent/c6_review6_criteria.md` — `OP-18` **sealed at `5e91e0e` before a single
+mutant was written**, `OP-20` and `OP-21` added in Phase 2 under the seal's own rule that Phase 2 may
+ADD and never remove, both from the same C6-card sentence the seal already quoted.
+
+### VERIFIED CLOSED BY C6 FIX 5 (`000270ed` / `4d5a836`), RE-MUTATED BY THIS REVIEW
+
+* **`OF-146`** (`M-12`) — ✅ **CLOSED.** Re-mutated as `N-11`: **KILLED, 3 failures**, by
+  `test_the_LOOP_copys_GATE_VOCABULARY_scan_FIRES_on_a_reason_that_leaks_nothing_else` and nothing
+  else.
+* **`OF-147`** (`M-16`) — ✅ **CLOSED.** Re-mutated as `N-17`: **KILLED, 3**. ⚠️ **And the fixture
+  exercises what it claims**: the drift is injected at `texts.generic_denial`, the seam `run_episode`
+  actually reads. **Measured from the file side too** — `N-31` drifts `data/generic_denial.txt` itself
+  and dies with **8**, copy 2's fixtures among the killers.
+* **`OF-148`** (`M-12d`) — ✅ **CLOSED.** Re-mutated as `N-13`: **KILLED, 3**.
+* **`OF-149`** (`M-39`) — ✅ **CLOSED, IN BOTH DIRECTIONS.** Re-mutated as `N-21`: **KILLED, 1**.
+  ⚠️ **And the global ban `Q-046` forbids was re-run as `N-22` and DIES WITH 12** — arm 4 cannot be
+  voided by construction silently.
+* **`OF-150`** (copy 2 had no residue catcher) — ✅ **CLOSED.** The layer exists; re-mutated as `N-15`:
+  **KILLED, 3**. A second operator on the same layer (`N-RES2`) also dies, with 3.
+* **`SM-7`** — ✅ **CLOSED.** Re-mutated as `N-33`: **KILLED, 1**, and its exhibit re-derived
+  independently: one leading space on the summary part gives **20 findings, all from that check**,
+  against a control of **0**.
+* **`OF-153`** — 🔶 **STAYS OPEN, and its measured reason HOLDS.** `SM-1` re-run as `N-SM1`:
+  **KILLED, 23 failures**, the first being
+  `test_the_four_blindness_claims_hold_over_the_LOOPS_OWN_contexts` — **the CLEAN episode.** The
+  obvious widening goes red on a correct context, which is `INC-50`'s shape.
+* **`OF-127`, `OF-128`, `OF-129`, `OF-130`, `OF-133`, `OF-154`, `OF-160`…`OF-163`** — 🔶 **OPEN, and
+  findings rather than gate**, as this session's prompt directs. `OF-127`/`OF-133` are **confirmed by
+  a third independent corpus**: 29 of this review's 73 needles escape both copies when carried in a
+  structural label, and all 73 are caught in the refusal VALUE by both.
+
+### RAISED
+
+| ID | Chunk | Severity | Finding | Spec citation | Raised by | Status | Closed by (SHA) |
+|---|---|---|---|---|---|---|---|
+| **OF-174** | C6 | ⚠️ **MEDIUM — HOLDS THE TAG** | **MUTANT `N-32`, SURVIVOR: THE CORPUS-vs-IMPROVISATION SPLIT'S PARTITION IS PINNED BY NOTHING.** `EpisodeResult.corpus_turns`: `for r in self.records` → `for r in self.records[1:]` leaves **all 136 tests green** (135 C6 plus the `OF-139` guard). ⚠️ **THE PARTITION ASSERTION EXISTS AND IS FIRED AT A FIXTURE WHERE THE MUTATED BRANCH IS VACUOUS.** `test_every_turn_records_corpus_or_improvisation` asserts `corpus_turns + improvised_turns == len(records)`, and its client never reuses the offered entry, so that episode has **zero** corpus turns and `records[1:]` versus `records` is `0 == 0`. **Non-equivalent by exhibit, measured, on an episode whose turn 0 IS a corpus turn — a shape `test_a_verbatim_corpus_reuse_is_recorded_as_corpus_with_its_reference` ALREADY BUILDS, four tests away:** HEAD `corpus_turns=20`, `improvised_turns=0`, partition sums **TRUE**; mutant `corpus_turns=19`, partition sums **FALSE**; **the published §11.3 split moves 20/20 → 19/20 and nothing goes red.** **Remedy: ONE LINE — give that test a client that reuses the entry, or move the partition assertion into the all-corpus test that already exists.** | `PROCESS.md` §12.1 C6 card — *"the corpus-vs-improvisation split instrumented"*; `CONTEXT.md` §11.3; `CLAUDE.md` hard rule 11; persona 1 — *"Does every partition sum to its total?"*; `Q-084` | **C6 REVIEW 6 (`7f4b0e93`)** | ⚠️ **OPEN** | — |
+| **OF-175** | C6 | ⚠️ **MEDIUM — HOLDS THE TAG** | **MUTANT `N-35b`, SURVIVOR: COPY 2's CLAIM-2 PROBE/HOLE VOCABULARY SCAN IS FIRED AT NOTHING.** `for token in ("CANARY-A", "CANARY-B", "HOLES.md", "exemption clause"):` → `for token in ():` leaves the suite green. **Non-equivalent by FOUR exhibits, each a probe word and nothing else, each planted in `STATE_LABEL` BEFORE the episode runs so the leak is in `run_episode`'s real output:** `CANARY-A` → **HEAD 20 findings, all 20 from that scan and 0 from any other layer; the mutant 0**; `CANARY-B` 20 → 0; `HOLES.md` 20 → 0; `exemption clause` 20 → 0. **Control, clean labels: 0.** ⚠️ **COPY 1's EQUIVALENT IS PINNED — mutant `N-35` (`_HOLE_VOCABULARY` emptied) dies with 1**, on `test_the_attackers_context_contains_no_hole`, which fires it at *"CANARY-A is the breach predicate."* **This is `OF-146`…`OF-149`'s shape ONE CLAIM OVER, and it is a cell `INC-70`'s eight-row matrix does not enumerate.** **Remedy: one fixture in copy 2, through `_sole_layer`, mirroring copy 1's `named_leak`.** | `PROCESS.md` §12.1 C6 card — *"no hole"*; `CONTEXT.md` §10.1; `Q-084`; `Q-085` (REJECTED) | **C6 REVIEW 6 (`7f4b0e93`)** | ⚠️ **OPEN** | — |
+| **OF-176** | C6 | ⚠️ **MEDIUM — HOLDS THE TAG** | **MUTANT `N-39`, SURVIVOR: COPY 2's CLAIM-3 ATTACK-LIST PATTERNS ARE FIRED AT NOTHING.** The four-pattern tuple (`A[1-6]`, `E[1-3]`, `S[1-4]`, `INVARIANTS.md`) collapsed to one unmatchable pattern leaves the suite green. **Non-equivalent by FOUR exhibits, each planted in `STATE_LABEL` before the episode runs:** `E2` → **HEAD 20 findings, all 20 from the envelope-invariant pattern and 0 from any other layer; the mutant 0**; `A5` 20 → 0; `S1` 20 → 0; `INVARIANTS.md` 20 → 0. Control 0. ⚠️ **COPY 1's EQUIVALENT IS PINNED** by `test_the_attackers_context_contains_no_attack_list`, which fires `_attack_list_findings` at *"Try A4 instant settlement; it breaches E2 and S1."* **Also a cell `INC-70`'s matrix does not enumerate.** **Remedy: one fixture in copy 2, through `_sole_layer`.** | `PROCESS.md` §12.1 C6 card — *"no attack list"*; `CONTEXT.md` §9; `Q-084` | **C6 REVIEW 6 (`7f4b0e93`)** | ⚠️ **OPEN** | — |
+| **OF-177** | C6 | **MEDIUM** | **CLAIM 1's CLAUSE-IDENTIFIER SCAN HAS NO STATE-JSON EXEMPTION, IN EITHER COPY, AND THE ADVERSARY CAN REACH IT.** Both copies scan `P[1-7]` over the WHOLE authored surface, which includes the §8.6 folded state that §13.3 mandates the summary carry. **Measured: an attacker-supplied idempotency key `"P4"` — which lands in `idempotency_keys_seen` — gives HEAD 20 findings, ALL from that scan, on a context that is ENTIRELY CORRECT.** ⚠️ **`receipt` is one of `create_refund`'s five real parameters (`Q-027`, RS-27) and `Q-027` moved S2 onto it precisely so it would be attacker-chosen, so this is reachable by the thing the experiment is pointed at.** Copy 2's LAYER 1 and copy 1's LAYER 1 both carry the state-JSON exemption this scan lacks; LAYER 2b's identical `P[1-7]` alternative scans the SUBTRACTED surface and does not fire. **`INC-50`'s shape: a guard that goes red on a correct context is a guard somebody switches off.** ⚠️ **This is ALSO why mutant `N-38` is graded NOT-OWNED** — its only separating inputs are ones where HEAD is the false positive. **Remedy: the exemption LAYER 1 already has, in both copies.** | `CONTEXT.md` §8.6 (the folded state), §13.3; `INCIDENTS.md` INC-50; `QUESTIONS.md` Q-027 | **C6 REVIEW 6 (`7f4b0e93`)** | ⚠️ **OPEN** | — |
+| **OF-178** | C6, **process** | **MEDIUM** | **`INC-70`'s MATRIX ENUMERATES EIGHT CATCHERS AND COPY 2's GUARD HAS THIRTEEN.** The five it does not carry are claim 1's clause-IDENTIFIER regex, claim 2's probe-VOCABULARY tuple, claim 3's FOUR attack-list patterns, the denial-VALUE arm/clause regex, and the summary LOCATOR. **THREE of this review's findings are among them** (`OF-175`, `OF-176`, `OF-177`), and a fourth (`N-40`) is proven equivalent only because §8.6's denial string happens to match none of its alternatives — a boundary, not a design. ⚠️ **`INC-70` does NOT claim completeness — its `Systemic guardrail` says PARTIAL and names what is not closed — so `INC-47`'s test does NOT fire on it, and this row says so explicitly.** The finding is that the artefact `Q-084` needs is still partial, that it was built by hand for the third review running, and that the next reader will inherit it as if it were the map. **It is `OF-160`'s residual, measured.** **Remedy: the architect's — the enumeration `OF-160` asks for must be per CATCHER per COPY, not per claim-4 LAYER.** | `QUESTIONS.md` Q-084 (RULED), `OF-160`; `INCIDENTS.md` INC-56, INC-70 | **C6 REVIEW 6 (`7f4b0e93`)** | ⚠️ **OPEN — for the architect** | — |
+| **OF-179** | **process** | LOW | ⚠️ **TWO SESSIONS PUBLISHED "ROW 55" FOR TWO DIFFERENT ROWS ON THE SAME DAY, AND BOTH ARE CORRECT, BECAUSE THE FIELD'S CONVENTION IS UNSTATED.** Measured in the operator's tree: `QUESTIONS.md`'s `## Session tokens` table holds **56 DATA ROWS** and **55 8-HEX TOKEN ROWS** — they differ by one because the first data row, `WG-2026-08-30-CTX-13.4-A`, is not an 8-hex token. `check_roles._TOKEN_ROW` matches only the 8-hex form. So: `5c2e8b74` (C6 FIX 5) is **data row 54 / hex row 53** and published *"ROW 54"*; `7f4b0e93` (this session) is **data row 55 / hex row 54** and published *"ROW 55"*; `b8c31a57` (C7 REVIEW 2) is **data row 56 / hex row 55** and also published *"ROW 55"*. **Neither is wrong. Both used a convention their predecessor used, and the two predecessors disagreed.** ⚠️ **THIS ROW'S FIRST DRAFT CALLED IT A COLLISION AND THAT WAS WRONG; the correction is recorded rather than the draft quietly replaced, and the measurement that settles it was made FIRST by the concurrent C7 REVIEW 2 session, which stated both figures in its own `PROGRESS.md` entry.** ⓘ **What IS a straightforward collision, and it happened to this session:** `OPEN_FINDINGS.md`'s ids. This review's residue was written as `OF-164`…`OF-168`, counted when the highest entry here was `OF-163`; C7 REVIEW 2's ten rows landed between the count and the append, and the residue was renumbered `OF-174`…`OF-178`. **Both sessions re-read immediately before appending, as the discipline requires, and the discipline did not prevent it.** **REMEDY, and it is the architect's, in two parts: (1) state which convention a "row N" claim means — the cheapest form is for `check-roles` to PRINT both figures for the row it just validated, so no session has to choose; (2) for the id counters, a per-session PREFIX, or the `git worktree` declined twice under `Q-063`, because `OF-67` is right that re-reading is a habit and not a guardrail.** | `OF-67`; `QUESTIONS.md` Q-063; `INCIDENTS.md` INC-36, INC-54; `src/whetstone_gate/check_roles.py:_TOKEN_ROW` | **C6 REVIEW 6 (`7f4b0e93`)** | ⚠️ **OPEN — for the architect** | — |

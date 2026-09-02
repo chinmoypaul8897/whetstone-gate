@@ -5,6 +5,166 @@ Each entry opens with that session's `SESSION-TOKEN` (`PROCESS.md` §7a). Chat h
 not a record; this file is.
 
 ---
+## C6 — **REVIEW 6** — 2026-09-02 → 2026-09-03 — ⚠️ **FAIL WITH ZERO BLOCKERS. `src/` UNTOUCHED, ALL SIX CELLS RE-KILLED, AND THREE OWNED SURVIVORS — NONE OF THEM IN CLAIM 4**
+
+**SESSION-TOKEN:** `7f4b0e93` · **Data row 55 / 8-hex row 54** of `QUESTIONS.md`'s `## Session
+tokens` table — **both figures given, because the two conventions in use differ by one and this
+session's first draft got that wrong** (`OF-179`). Counted **in the operator's working tree** at
+`C:\Users\chinm\whetstone-gate` — not a clone, not a worktree — where data row 54 was `5c2e8b74`
+(C6 FIX 5). The row was registered **before this session's first commit**, because `check_roles`
+**E1** fails on a token that is not in that table. **ZERO PROVIDER MODEL CALLS. NO TOKEN SPEND.
+NO TAG — `c6-pass` is NOT cut.**
+
+**Commits:** `5e91e0e` (⚠️ **THE PHASE-1 SEAL** — the criteria, the owned-property set, the mutant
+plan, the polarities, the reimplementation) → `d73910b` (`REVIEW_C6_6.md`, the probes, the mutation
+harness, the consolidated output, the `INC-47` harness, and **`c6_mutants_6.md`, which was OWED**) →
+this entry's own commit, carrying `OPEN_FINDINGS.md`, `QUESTIONS.md` and `STATUS.md` → one further
+commit for `docs/sessions/c6-review-6.txt`.
+
+⚠️ **A CONCURRENT C7 REVIEW 2 SESSION (`b8c31a57`) SHARES THIS WORKING TREE.** Every commit of this
+session was made through a **PRIVATE INDEX** (`GIT_INDEX_FILE` under this session's own OS temp
+directory) with **step 5 — the scoped `git reset -- <the same paths>` — included**, which `INC-68`
+records is the half whose omission causes the loss the procedure exists to prevent.
+`git diff --cached --name-status` was **read** immediately before every commit, and `Q-063` clause
+(i)'s diff over the five journals was run and read before each. **`Swept: NOTHING` on every commit,
+and it is measured rather than reasoned.**
+
+---
+
+### WHAT THIS REVIEW WAS ASKED TO DO
+
+C6's **last** review. The architect fixed in writing that C6 ships after it whatever the verdict, with
+its residue published — *"NOT licence to pass it — licence to stop, and to say plainly what
+remains."* Under `Q-084`, RULED, the bar is **every owned property PINNED, not every mutant killed**;
+under `Q-085`, REJECTED, *"another test covers it"* is not an answer.
+
+### PHASE 1, SEALED AT `5e91e0e` — BEFORE THE FIX WAS OPENED
+
+`OF-80`. Sealed before `git diff` of any FIX 5 commit, before anything under `src/` or `tests/`,
+before `INCIDENTS.md` INC-70/71/72, and before `OPEN_FINDINGS.md`'s FIX 5 disposition block.
+`STATUS.md` was read **for which chunks are tagged and nothing else** (`OF-145`); the tag set came
+from `git tag -l`. **Nineteen owned properties, each argued from a clause quoted in the seal, three of
+them this reviewer's own** — `OP-17` the `data/` fold-constant seam, `OP-18` the corpus-split
+partition, `OP-19` *"no guard may silently inspect nothing"*, which is `SM-7` generalised and is
+sealed **because a property first asked after the result is a property chosen after the result.**
+**Fifty pre-committed polarities**, several predicting survival, absence or this reviewer's own error.
+**A scoped reimplementation that imports nothing from the package and asserts it** — 42 vectors
+scored, 0 bad.
+
+### WHAT FIX 5 DELIVERED — THE LARGER HALF, STATED FIRST
+
+* **`git diff -- src/` is EMPTY across its six commits** — verified per-commit, across the range, and
+  **by BLOB HASH against REVIEW 5's own measurement point `615993d`**, all six attacker modules
+  identical. **`tests/test_c6_attacker.py` is blob-identical too**, so `R-05`/`R-12` are verifiably
+  untouched and **no REVIEW 4 or REVIEW 5 exhibit needs re-measuring.**
+* **All six cells re-run by me in fresh clones and all six dead:** `M-12` 3, `M-16` 3, `M-12d` 3,
+  `M-39` 1, `M-RES` 3, `SM-7` 1. **FIX 5's own counts reproduce exactly.**
+* **Each fixture exercises what it claims.** `OF-147`'s injects the drift at `texts.generic_denial`,
+  the seam `run_episode` reads — and the FILE side is pinned too: `N-31` drifts
+  `data/generic_denial.txt` and dies with **8**, copy 2's fixtures among the killers. `OF-149`'s fires
+  **both** ways, and **the global ban `Q-046` forbids dies with 12**: arm 4 cannot be voided by
+  construction silently.
+* **The four blindness claims hold by my own 73-needle method** — 2 AUTHORED hits, **both located and
+  neither a leak**. **A real `INC-42`-shaped leak in `src/` dies with 40.** **Reimplementation 21/21.**
+* **`INC-70` is a good correcting entry.** It quotes `INC-56`'s false sentence, carries a mutant id
+  per cell, says **PARTIAL** rather than complete, and names what is not closed. Its 20-call-site AST
+  figure — which corrected REVIEW 5's 23 — **reproduces against my own independent walk.**
+
+### WHAT FAILS IT — THREE OWNED SURVIVORS, NONE IN CLAIM 4
+
+* **`OF-174` / `N-32`** — `EpisodeResult.corpus_turns` over `records[1:]` leaves **136 tests green**.
+  ⚠️ **The partition assertion EXISTS and is fired at an episode with ZERO corpus turns**, where the
+  mutated branch is `0 == 0`. Exhibit on an episode whose turn 0 IS a corpus turn — a shape an
+  adjacent test already builds — **HEAD 20/20 partition TRUE; mutant 19/20 partition FALSE.**
+* **`OF-175` / `N-35b`** — copy 2's claim-2 **probe vocabulary** is fired at nothing. Four exhibits,
+  **20 findings each, all from that scan**, control 0. **Copy 1's IS pinned** (`N-35` dies with 1).
+* **`OF-176` / `N-39`** — copy 2's claim-3 **attack-list patterns** are fired at nothing. Four
+  exhibits, 20 each, control 0. **Copy 1's IS pinned.**
+
+⚠️ **THIS IS `INC-56`'s DIAGNOSIS ONE DIMENSION OUT, AND IT IS NOT THE SAME FINDING AGAIN.** Five
+reviews found the (class × copy) pattern **inside claim 4**. This one enumerated **every catcher in
+both copies** — `INC-70`'s matrix has **eight rows** and copy 2's guard has **thirteen catchers**
+(`OF-178`) — and the pattern is outside it. The C6 card's sentence that owns all three, *"no policy
+string, no hole, no attack list and no gate reason"*, has been in front of six reviews and **only
+claim 4 had ever been enumerated.**
+
+### THE MUTATION RUN
+
+**48 mutants, 13 slices, 7 fresh OS temp clones. 40 KILLED, 2 PROVEN EQUIVALENT (boundaries named),
+1 NOT A VALID MUTANT — this reviewer's own — 2 NOT-OWNED, 3 OWNED.** Control **136 / 0** before and
+after every slice; **every restore verified by SHA-256**; the clone environment passed to
+`subprocess.run` **itself** with the provenance print in the **same** subprocess (`INC-69`).
+
+⚠️ **`OF-159` IS SATISFIED IN BOTH ITS PARTS, AND THIS APPEARS TO BE THE FIRST RUN IN THIS PROJECT TO
+CARRY A POSITIVE CONTROL AT ALL.** `N-PC` in `src/` proves the clone's **source** is under test;
+**`N-PC2` — `OF-159`'s `CTRL-LIVE` by name, a bare `assert False` in copy 2's own helper — proves the
+clone's TEST FILE is.** **22 positive-control runs; every one died.**
+
+⚠️ **ONE SLICE WAS VOID AND IS REPORTED RATHER THAN DISCARDED.** Its clone had been left without
+`src/` by an interrupted tool call; its pre-run control read **0 passed** and its provenance line
+named **the live repository**. **That is `INC-69`'s exact failure mode, caught in 17 seconds by the
+mechanism `OF-159` asks for** rather than by a human distrusting a result.
+
+### `INC-47`'s TEST, FOURTH APPLICATION — 35 claims verified, ONE overstated
+
+`INC-70` claims only what it can prove. **`INC-71`'s census decomposes its 8 non-resolving strings as
+5 tokens + 2 blobs + 1 absent, and the measurement is 6 token occurrences + 2 blobs** — `5c4f8e11`
+appears in both `INC-29` and `INC-30`, and an ABSENT SHA cannot be one of 8 strings that exist. **LOW.
+Every substantive claim reproduces exactly at the tree it was written from, including `INC-71`'s own
+correction of `OF-152`** — the two 40-hex strings are `INC-24`'s git **blobs**, not vendor pins.
+
+### THIS SESSION'S OWN ERRORS, PUBLISHED AS FINDINGS
+
+* **`L-2`** — my needle `over-capture` fires on §8.6's own system prompt, so my **clean-surface
+  control read 1 of 73 rather than 0**. My seal's exclusion list named the word; my needle used a
+  substring of it. **The control did exactly its job.** And my first carrier-matrix measurement read
+  an implausible 73/73 because the harness restored the mutated label **before** running the guard.
+* **`L-3`** — `N-29` is a **degenerate operator**: deleting an assertion inside the very test that
+  constitutes the fixture removes the fixture rather than unpinning a catcher, so every such mutant
+  "survives". Replaced by `N-29b`, the real-drift form, which dies with 2.
+* **`L-5` / `OF-179`** — ⚠️ **and this one is a correction of my own finding.** I first wrote that this
+  session and C7 REVIEW 2 had **collided** on token row 55. **Measured, they did not:** the table holds
+  56 data rows and 55 8-hex rows, `check_roles` counts only the second kind, and each session is right
+  under the convention its predecessor used. **The measurement that settles it was made first by that
+  session, and it is credited rather than re-discovered.** What DID collide is `OPEN_FINDINGS.md`'s
+  ids — my residue was written `OF-164`…`OF-168` and renumbered `OF-174`…`OF-178`.
+
+### THE SEAL PREDICTED PASS
+
+**Of 50 polarities fixed at `5e91e0e`, seven did not hold and one was not measured — every one named
+individually in `REVIEW_C6_6.md` §1.1. Four were wrong in the fix's favour or against my own
+competence**, including **P-48, which predicted PASS before any measurement**, and **P-06**, which
+predicted the residue fixture would be the weakest of the five and it is among the strongest.
+**P-32 held exactly as sealed:** it predicted `N-32` would survive because nothing suggested the split
+had a denominator test — and there is one, fired at a fixture where it cannot see.
+
+### REGRESSIONS, MEASURED BY ME
+
+`make test` **801 passed, 0 failed**, 1 skipped, 2 deselected (656.71 s). `make selftest` **RED on
+`camel_comparator.branch` and nothing else** — not C6's, and correctly red until RUN-1.
+`make check-roles` **17 passed, 0 failed, 5 n/a, exit 0**. The C6 suite alone **135 passed** (69 copy
+1, 60 copy 2, 6 review probes). `git status --porcelain tests/goldens/` **EMPTY**, and no commit in
+FIX 5's range touches a golden. **`evals/` does not exist.** `git tag -l` unchanged — neither
+`probe-v1` nor `prereg-v1` is cut.
+
+### RAISED, AND WHAT IS OWED
+
+**`OF-174`…`OF-179`** and **`Q-089`** — `Q-084` moved the gate from the mutant set to the property
+set, and **the property set has no termination condition either**; the verdict follows the ruling as
+written and the question exists so the architect can bound the grain on the record.
+⚠️ **`INCIDENTS.md` IS NAMED UNDER *NOT* IN THIS SESSION'S FENCE**, and `CLAUDE.md` §6 duty 4 requires
+every session to append what broke. **Nothing is written there.** What broke this session — the
+harness's format-string abort, the empty clone, the two measurement errors above, the degenerate
+mutant operator and the row-convention correction — is routed to `OPEN_FINDINGS.md` and stated in the
+FINAL OUTPUT instead, and **the `INCIDENTS.md` entry is declared OWED.** That is the same tension the
+concurrent session raised as `Q-088`.
+
+**`docs/reviews/mutants/c6_mutants_6.md` IS WRITTEN AND THE DEBT `INC-70` NAMED IS DISCHARGED** — it
+carries FIX 5's twelve transcribed and this review's 48.
+
+**PASS: NO. TAG `c6-pass`: NOT CUT. Nothing self-certified.**
+
+---
 ## C7 — **REVIEW 2** — 2026-09-03 — ⚠️ **FAIL WITH ZERO BLOCKERS: EVERY FINDING OF REVIEW 1 IS CLOSED AND THREE OWNED PROPERTIES ARE PINNED BY NOTHING**
 
 **SESSION-TOKEN:** `b8c31a57` · **Data row 56** of `QUESTIONS.md`'s `## Session tokens` table, and

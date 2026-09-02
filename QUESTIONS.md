@@ -8133,3 +8133,89 @@ live for non-build sessions.
 **What the architect is asked to rule:** whether a review session's fence should carry
 `INCIDENTS.md` (it can only append), or whether duty 4 is explicitly suspended for review sessions
 and the record lives in `QUESTIONS.md` and the review file — which is what happened here.
+
+---
+
+## ⚠️ RAISED BY C6 REVIEW 6 (`7f4b0e93`), 2026-09-03 — Q-089
+
+⚠️ **NUMBERED FROM THIS FILE, RE-READ IMMEDIATELY BEFORE THIS APPEND.** The highest entry is
+**`Q-088`**, raised by the concurrent **C7 REVIEW 2** session (`b8c31a57`) at `3d8fb6c`, which holds
+this working tree. `INC-54` requires a session to say which tree it counted: the operator's, at
+`C:\Users\chinm\whetstone-gate`. ⚠️ **This session's own token row collided with that session's — both
+counted row 55 from a 54-row table — which is `OF-179`, raised today with the measurement attached.**
+
+⚠️ **THIS ENTRY IS NOT A REQUEST TO BE LET OFF.** `REVIEW_C6_6`'s verdict is **FAIL** under `Q-084` as
+ruled, and it is delivered on that basis. This exists so the architect can bound the ruling **on the
+record** rather than by a reviewer's discretion — which is exactly why `REVIEW_C6_4` raised `Q-082`
+and `REVIEW_C6_5` raised `Q-084`.
+
+---
+
+### Q-089 — ⚠️ `Q-084` MOVED THE GATE FROM THE MUTANT SET TO THE PROPERTY SET, AND THE PROPERTY SET HAS NO TERMINATION CONDITION EITHER — THE SAME REGRESS `Q-082` CLOSED, ONE LEVEL UP
+**Raised by:** C6 REVIEW 6 (`7f4b0e93`) · **Date:** 2026-09-03 · **Status:** ⚠️ **OPEN — NOT
+blocking; the ruling was applied as written and the verdict is FAIL** · **Class:** **A** — it decides
+`cN-pass` tags from here.
+
+**Context, stated as a measurement rather than as a worry.** `Q-082`'s ruling closed a regress it
+named in terms: *"'every mutant killed or proven equivalent' HAS NO TERMINATION CONDITION, because
+the reviewer chooses the mutant set — REVIEW 3 found six, REVIEW 4 found seven more, three of them on
+REVIEW 3's own fixes, and REVIEW 5 would find more on REVIEW 4's. THE GATE IS THE REQUIRED SET: at
+least one mutant per property or invariant the chunk owns, minimum eight."*
+
+`Q-084` then replaced that gate: *"THE GATE IS EVERY OWNED PROPERTY PINNED, NOT EVERY MUTANT KILLED.
+Mutants are the INSTRUMENT, not the definition."* **That is the right ruling and this review applied
+it, and applying it produced the same shape one level up.**
+
+**MEASURED, on this review.** `REVIEW_C6_5` sealed **sixteen** owned properties and its four
+survivors were all inside claim 4. This review sealed **nineteen** — three of them its own additions
+before any measurement — and then, in Phase 2, **added three more (`OP-20`, `OP-21`, `OP-22`) by
+applying `Q-084`'s own method one level finer: enumerate every CATCHER in every COPY, not every
+LAYER of claim 4.** **All three new properties produced survivors**, and two of them carry the FAIL.
+The C6 card's sentence that owns them — *"no policy string, no hole, no attack list and no gate
+reason"* — has been in front of six reviews, and **only claim 4 had ever been enumerated.**
+
+⚠️ **So the reviewer still chooses the set, and a finer choice always finds more.** `INC-70`'s matrix
+has eight rows; copy 2's guard has thirteen catchers; a reviewer who enumerates predicates rather
+than catchers would find more again. **Nothing in `CONTEXT.md`, `PROCESS.md` §5.3 or
+`docs/reviews/README.md` says at what grain the enumeration stops** — and `OF-160` already records
+that none of them says the enumeration is required at all.
+
+**The question, exactly.** Is *"every owned property PINNED"*:
+
+1. **as ruled, with the grain left to the reviewer** — a property is whatever the reviewer can argue
+   from a quoted clause, and a review that enumerates finer than its predecessor may fail a chunk its
+   predecessor passed; or
+2. **bounded by an ARTEFACT** — the gate is every property in a committed, reviewed enumeration
+   (`OF-160`'s), and a property a reviewer adds beyond it is a MEDIUM finding that does not hold the
+   tag but **does** get added to the artefact for the next chunk; or
+3. **bounded by GRAIN** — the enumeration is per **catcher per copy** and stops there, stated once in
+   `docs/reviews/README.md`.
+
+**Options seen:**
+
+1. **The ruling as written (TAKEN, and it is what this review applied).** Consistent with `Q-082`'s
+   own reasoning that a bar which moves when the project is behind schedule is not a bar. ⚠️ Cost, and
+   it is the one `Q-082` identified: **there is no round at which a chunk is finished**, because the
+   next reviewer can always enumerate finer. C6 has now failed six times and the last two failures
+   were found by enumerating one grain finer than the previous review did.
+2. **Bound it to an artefact.** Cheap, and it makes `OF-160` load-bearing rather than advisory.
+   ⚠️ Cost: **the artefact does not exist**, and until it does this option is unenforceable; worse, an
+   artefact written by the sessions being reviewed is the circularity `docs/reviews/README.md` exists
+   to prevent.
+3. **Bound it to a grain.** ⚠️ Cost: *"per catcher per copy"* is this reviewer's phrase, not the
+   spec's, and it would have excluded `OP-18` — the corpus-split partition, which is not a catcher at
+   all and is the finding with the clearest published-number consequence.
+
+**Default taken pending a ruling: option 1**, because it is the ruling as written, because narrowing
+a bar on the day it would unblock the chunk in front of us is precisely what `Q-085`'s rejection
+calls *choosing the standard after seeing which way it cuts*, and because **this reviewer sealed a
+prediction of PASS at `5e91e0e` and then measured a FAIL** — so the incentive here runs the other way.
+
+⚠️ **AND ONE THING THAT IS NOT AMBIGUOUS AND IS NOT ASKED HERE:** the three survivors are real, each
+exhibited on a concrete input on which HEAD and the mutant differ, each sole-layer, each with a
+one-line or one-fixture remedy, and they are in `OPEN_FINDINGS.md` as `OF-174`, `OF-175` and `OF-176`
+whatever the ruling. **The question is only whether they hold the tag, and whether the NEXT review of
+any chunk inherits a bounded set or chooses one again.**
+
+⚠️ **THE ARCHITECT HAS ALSO FIXED THAT C6 SHIPS AFTER THIS REVIEW WHATEVER IT RETURNS**, so a ruling
+here changes no C6 outcome. It changes what C7, C13 and every chunk after them are measured against.
