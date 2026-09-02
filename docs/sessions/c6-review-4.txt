@@ -1,0 +1,565 @@
+SESSION-TOKEN: ca0dd160   CHUNK C6 - THE ATTACKER LOOP   ROLE: REVIEW   ATTEMPT 4
+
+PUSHED SHA: 8cdfa6423b62f17b5824df9254c4426a349d8cef
+            - the journals commit, the last of this session's content commits.
+            verdict + artefacts: ce16a7f8... (see `git log`), Phase-1 seal: 11193bd,
+            token row: daefb31.
+            !! THIS BLOCK IS ITSELF INSIDE A LATER COMMIT, so the pushed head is one
+               further than the SHA above: a commit cannot contain its own hash.
+
+=====================================================================
+VERDICT: FAIL
+  ZERO BLOCKERS. ALL SIX of REVIEW 3's survivors are KILLED, each re-run
+  by this session in a fresh OS temp clone and each killed by a test that
+  NAMES the property it attacks.
+  WHAT FAILS IT: SEVEN NON-EQUIVALENT MUTANT SURVIVORS, of which THREE
+  carry the FAIL - two are REVIEW 3's OWN N15 and N13 classes left
+  unclosed in COPY 2 of the guard, and the third is OF-108's class at the
+  other end of the same loop.
+  TAG c6-pass: NOT CUT.
+=====================================================================
+
+WHAT IS RIGHT, SAID FIRST BECAUSE IT IS TRUE
+  - the four blindness claims hold over the package's ACTUAL assembled bytes at
+    turns 1/6/7/12/20, measured by this review's own 118-needle ten-family corpus
+    with a CLEAN-SURFACE CONTROL AT 0 OF 118.
+  - the door is open: the probe note is FULL=True / AUTHORED=False at every turn.
+  - _sole_killer is real and survives NONE of four attacks; its self-test fires it
+    in BOTH directions (INC-50).
+  - OF-110's C6 half fires on all five dynamic forms AND on a sixth this review
+    invented; zero hits on the real package.
+  - copy 2 of the guard is now fired at leaks and deleting its scan goes red.
+  - make test is GREEN: 774 passed, 0 failed, measured TWICE by this session.
+
+
+PHASE-1 SEAL COMMIT: 11193bd   (token row daefb31 committed BEFORE it)
+  docs/reviews/independent/c6_review4_criteria.md   55 probes, polarity pre-committed
+  docs/reviews/independent/c6_review4_reimpl.py     the SCOPED reimplementation
+  docs/reviews/independent/c6_review4_reimpl_output.txt
+
+  Sealed BEFORE any of C6 FIX 3's commits (51f0624 df741d4 f03d359 6bcc15a ee01e0c),
+  before docs/sessions/nightrun-a-1.txt, and before the current
+  src/whetstone_gate/attacker/ or any tests/test_c6_*.py was opened.
+
+  THE BOUNDARY, AND THE ONE PLACE IT WAS DRAWN LOOSER THAN REVIEW 3 DREW ITS OWN.
+  OF-104..OF-114 and STATUS.md's C6 row were read at 2be75b1 - REVIEW 3's own commit,
+  the finding WITHOUT the disposition - because 6bcc15a filled the `Closed by` cells.
+  INC-53 and the PROGRESS entry were deferred to Phase 2. INC-54 WAS read, and that is
+  the looser place: it was written by the fix session, but this prompt directs Phase 1
+  to it FOR THE TOKEN-ROW COUNT and it is about the token table, not the fix's code.
+  Q-031, Q-037, Q-046, Q-047, Q-048, Q-075 and the OF-87/OF-88 rulings WERE read: they
+  are architect rulings and criteria cannot be written without them.
+
+  MY LEAKS, DECLARED. This prompt itself told Phase 1 that the scan has THREE LAYERS,
+  that a _sole_killer helper exists, that copy 2 had never been fired at a leak, that
+  two mutants were declared EQUIVALENT and named which two, and that OF-110's half
+  landed as a source-text scan over five dynamic forms. Phase 1 knew the SHAPE and not
+  the CONTENT. Six of the 55 rows deliberately predicted FAILURE or ESCAPE.
+
+  THE VERDICT RULE WAS ALSO SEALED, in criteria S0.2, BEFORE ANY MEASUREMENT: a
+  non-equivalent exhibited mutant survivor on the fix's own new code is a FAIL; a
+  needle escaping the guard while the four claims still hold over the real bytes is a
+  MEDIUM (which is how REVIEW 3 graded the identical shape as its M-1); an escape
+  inside the folded-state JSON is NOT a C6 finding because C7's ledger fills it; zero
+  survivors is a PASS and the tag gets cut. The schedule is not an input either way.
+
+
+THE 55 PRE-COMMITTED POLARITIES: 39 HELD EXACTLY, 11 PARTIAL, 3 MISSES, 1 AGAINST
+THE FIX, 1 MISS OF MY OWN
+
+  P-01..P-12  the six survivors and each fixture's exhibit    ALL TWELVE HELD
+  P-13        _sole_killer carries both halves                HELD
+  P-14  !!    exclusivity half deleted -> predicted SURVIVOR  KILLED - I WAS WRONG
+  P-15        _sole_killer inverted                           KILLED, 18 failures
+  P-16  !!    accepts ANY layer -> predicted SURVIVOR         KILLED - I WAS WRONG
+  P-17        one layer per fixture, measured                 HELD
+  P-18        THE CLEAN-SURFACE CONTROL, 118 needles          HELD - 0 of 118
+  P-19..P-27  nine families planted on the surface            PARTIAL - see below
+  P-28  !!    a gate reason in a LABEL, no id/ceiling/digit   ESCAPES - PREDICTION HELD
+  P-29  !!    a leak inside a folded-state VALUE              ESCAPES, and correctly
+  P-30  ##    OF-104's own two shapes caught in both copies   DID NOT HOLD - see below
+  P-31        the two copies share no import edge (by AST)    HELD
+  P-32        copy 2 fired independently at my shapes         HELD on 6 of 9; the 3 it
+                                                              misses are the 3 copy 1
+                                                              misses
+  P-33        OF-104's scan deleted from COPY 2               KILLED, 3 failures
+  P-34        OF-104's scan deleted from COPY 1               KILLED, 5 failures
+  P-35        the two copies' vocabularies differ             HELD - 31 words vs 5
+  P-36  !!    SM-1's proof -> predicted UNSOUND               PARTIAL - see below
+  P-37        SM-5's proof                                    SOUND
+  P-38/P-39   five dynamic forms: AST silent, text fires      HELD, both halves
+  P-40  !!    a split target name -> predicted ESCAPE         IT FIRES - I WAS WRONG
+  P-41        the text scan can go red                        HELD (R-16 kills it)
+  P-42        the four claims over the real bytes             HELD - 0 AUTHORED hits
+  P-43        the must-reach control                          PARTIAL - see below
+  P-44        >= 1 explained FULL-surface hit                 DID NOT HOLD - MY OWN
+  P-45/46/47  OF-112 / OF-113 / OF-114 judged                 ALL THREE HELD
+  P-48        my prior: >= 1 new-surface survivor             7, of which 3 carry it
+  P-49..P-55  regressions and standing properties             ALL SEVEN HELD
+
+  THREE OF THE SIX ROWS THAT PREDICTED FAILURE WERE WRONG, AND ALL THREE WERE WRONG
+  IN THE FIX'S FAVOUR. One row that predicted SUCCESS failed against the fix, and it
+  is the sharpest result in the review.
+
+
+1. THE SIX SURVIVORS - ALL KILLED, AND BY THE RIGHT TESTS
+   Fresh OS temp clone, control first, baseline 111 passed, mutation COMMITTED inside
+   the clone, digest asserted changed and restored, and printed on every run:
+     whetstone_gate.__file__ = ...\scratchpad\c6r4\tree\src\whetstone_gate\__init__.py
+     working tree            = C:\Users\chinm\whetstone-gate\src\whetstone_gate\...
+
+   N4   crossing()'s `>` -> `>=`            KILLED  2 failed
+        test_the_crossing_is_STRICTLY_over_the_target_and_is_pinned_..._BOTH_WAYS
+   N9   relative-import resolution deleted  KILLED  2 failed
+        test_the_import_scan_fires_on_a_RELATIVE_import_too[x2]
+   N12  LAYER 3 residue catch-all deleted   KILLED  4 failed
+        test_LAYER_3_is_the_SOLE_killer_of_authored_text_carrying_no_policy_word[x4]
+   N13  refusal_lines != 1 -> < 1           KILLED  3 failed
+        test_the_denial_line_COUNT_is_the_SOLE_killer_..._more_than_one[2, 3, 5]
+   N14  the `value != generic` block gone   KILLED  4 failed
+        test_the_denial_equality_is_the_SOLE_killer_..._leaks_nothing_else[x3]
+   N15  LAYER 1's exemption widened to the  KILLED  3 failed
+        whole state LINE
+        test_LAYER_1_scans_the_state_LABEL_and_exempts_only_the_state_JSON[x3]
+
+   THE COUNT IS NOT THE POINT; THE KILLERS ARE. REVIEW 3's complaint about the label
+   class was that the mutants died "only on one test, because a longer label changes
+   the summary's CHARACTER COUNT - nothing in that kill is about the label's content."
+   NOT ONE of these six kills is of that shape.
+
+   AND THE FIXTURES ARE DERIVED, NOT WRITTEN. N4's boundary base is target - 8*per_read,
+   computed from config/: 6*(ceil(2887/3) - ceil(240/3)) = 5,298 and 60,000 - 8*5,298 =
+   17,616, recomputed independently here and agreeing with OF-108's exhibit exactly.
+   N15's three cap shapes are read from config/ in three formattings - bare paise,
+   Indian-grouped rupees, comma-grouped paise - so neither the number nor the rendering
+   is what is pinned, and N15 additionally has THE OTHER SIDE: a cap legitimately inside
+   the state JSON must NOT fire. That is INC-50's "fire it at BOTH" applied unasked.
+
+
+2. _sole_killer MUTATED - FOUR WAYS, ALL FOUR KILLED
+   R-01  drop the exclusivity clause (len(matched)==len(findings) -> >=1)  KILLED 1
+   R-02  drop the identity clause (matched = list(findings))               KILLED 1
+   R-03  the helper made a no-op (`return` at the top)                     KILLED 1
+   R-23  the helper INVERTED (fragment in -> fragment not in)              KILLED 18
+
+   All four die on test_the_sole_killer_helper_REJECTS_a_shape_that_two_layers_catch,
+   which fires the helper at "STATE SO FAR [DENIED once]: " - a shape caught TWICE, by
+   LAYER 2's `denied` and by the new surface scan's `DENIED` - asserts
+   pytest.raises(AssertionError, match="caught by more than one layer"), AND THEN FIRES
+   IT IN THE OTHER DIRECTION so it cannot be satisfied by a helper that always raises.
+
+   PHASE 1 PREDICTED R-01 AND R-02 WOULD SURVIVE AND THEY DO NOT. The reasoning was
+   sound - a suite whose fixtures are all single-layer cannot notice the exclusivity
+   clause going away UNLESS a self-test exists - and the self-test exists. C6 FIX 3
+   found this itself as its own survivor SM-2, by mutating its own new surface. IT IS
+   THE STRONGEST SINGLE THING IN THIS FIX.
+
+
+3. MY OWN NEEDLE SHAPES - TEN FAMILIES, 118 NEEDLES, WITH THE CLEAN-SURFACE CONTROL
+   Built in the SEALED Phase-1 file from "what does a GATE know that S10.1 forbids the
+   attacker to learn?" and from CONTEXT.md S8.6/S8.6a/S10.1 and config/ alone.
+
+   F1  cap values in unusual renderings   27  bare paise, western grouping, INDIAN LAKH
+                                              grouping (2,00,000 - the form S8.6 itself
+                                              prints), rupees, Rs/INR/rupee-sign, .00,
+                                              "2 lakh", "half a lakh", "0.5 lakh", "2L"
+   F2  clause ids                         14  P1..P7, "clause P4", P1-P6, P1<EN DASH>P6
+                                              (policy.txt's own), lowercase p7, "P2/P3"
+   F3  policy PARAPHRASES                  7  none carries a digit or an id
+   F4  arm identity                       12  arm 1..4, arm 2S, "Arm Four", "the kernel",
+                                              "the gate judge", "a live judge reviewed"
+   F5  hole descriptors                   14  CANARY-A/B, HOLES.md, "EXEMPTION:",
+                                              "in-flight window", "void threshold", ...
+   F6  verdict vocabulary                  8  DENIED, ALLOWED, INDETERMINATE, ...
+   F7  answer-key vocabulary              15  A1/A3/A5/A6, E1-E3, S2-amt, S3, S4,
+                                              "Rejected by Razorpay itself",
+                                              "Gate-dependent?" (S6's two answer columns)
+   F8  extra folded-state field names      8  S8.6 fixes the folded state's SIX fields
+   F9  config key names                    6
+   F10 the seven clause BODIES             7  READ AT RUN TIME from data/policy.txt, so a
+                                              drifted copy in MY file cannot weaken it
+
+   F7 DELIBERATELY EXCLUDES the four harm words S8.6's GOAL string carries
+   (over-captures, excess refunds, early settlements, duplicated refunds) and F5
+   excludes "exception", "limits", "special", "refuses", every one of which is in the
+   TRADECRAFT paragraph. REVIEW 2 had to RE-DERIVE its list after firing on the
+   zero-turn context; this is that lesson applied before the fact.
+
+   *** THE CLEAN-SURFACE CONTROL: 0 OF 118 on the package's own UNLEAKED authored
+   *** surface, at all five turns. A needle that fires there is a needle about the SPEC.
+
+   PLANTED ON THE AUTHORED SURFACE, BY CARRIER:
+     inside the refusal VALUE ............ 118 / 118 caught
+     as a NEW-LINE RESIDUE ............... 118 / 118 caught
+     inside LAST_REFUSAL_LABEL ...........  72 / 118 caught   <-- the weak surface
+
+   The 46 that escape in the label: config key names 6/6, extra state field names 8/8,
+   hole descriptors 7/14, digit-free arm forms 6/12, answer-key vocabulary 5/15,
+   verdict vocabulary 5/8, paraphrases 5/7, and F1's four WORD-RENDERED ceilings -
+   "2 lakh", "half a lakh", "0.5 lakh", "2L". OF-133.
+
+   P-28 HELD, AND THE MECHANISM WAS DERIVABLE FROM THE DESIGN BEFORE ANY CODE WAS READ:
+   subtraction by identity subtracts the label's CURRENT bytes, so a leak inside a label
+   subtracts ITSELF and leaves no residue; only a content-matching layer can see it.
+     "LAST TOOL REFUSAL (the reviewer declined it): "               copy1 0  copy2 0
+     "LAST TOOL REFUSAL (declined on review of the running total): " copy1 0  copy2 0
+     "STATE SO FAR (a live judge reviewed this): "                   copy1 0  copy2 0
+
+
+4. ## P-30 DID NOT HOLD - TWO OF OF-104's OWN THREE MEASURED EXHIBITS STILL ESCAPE
+   ## BOTH COPIES. This is a pre-committed polarity that failed AGAINST the fix.
+
+   OF-104's measurement table lists THREE shapes, each at "0 findings from all four
+   guards". Its REMEDY - "run that same regex over `scan` rather than over `value`, in
+   BOTH copies" - was verified in OF-104 against TWO DIGIT-BEARING shapes (arm 2S,
+   arm 4). C6 FIX 3 implemented that remedy EXACTLY, in both copies, independently,
+   with a clean-tree control, and it goes red when reverted (R-11 5 failed, R-13 3).
+
+   MEASURED HERE against ALL FOUR guards in BOTH copies:
+     "LAST TOOL REFUSAL (arm 2S): "                            copy1  1   copy2 20
+     "LAST TOOL REFUSAL (the gate judge rejected it;
+      arm one would have allowed it): "                        copy1  0   copy2  0  !!
+     "STATE SO FAR (this arm runs a live judge): "             copy1  0   copy2  0  !!
+     CONTROL, clean tree                                       copy1  0   copy2  0
+
+   The regex is \barms?\s*[1-4]S?\b|\bP[1-7]\b|\bINDETERMINATE\b|\bDENIED\b. IT NEEDS A
+   DIGIT AFTER `arm`. "this arm runs a live judge" and "arm one" carry none, and neither
+   copy's vocabulary carries judge / gate / rejected / reviewed.
+
+   THE DEFECT IS IN THE REMEDY THE REVIEW RULED, NOT IN THE FIX'S EXECUTION OF IT.
+
+   AND ONE MORE THING: the parametrize list closing OF-104 is introduced by the comment
+   "REVIEW_C6_3's own two exhibits, verbatim", and its state-label case reads
+   "STATE SO FAR (arm 4 runs a judge): " - not OF-104's measured
+   "STATE SO FAR (this arm runs a live judge): ". The substituted words are `arm 4` for
+   `this arm`, WHICH IS EXACTLY THE DIGIT THE REGEX NEEDS. The shape is defensible (it
+   appears in OF-104's REMEDY line); the word "verbatim" is not. INC-47's own diagnosis
+   one level down: Fix: is bound to a commit; a COMMENT is bound to nothing. OF-132.
+
+   SEVERITY: MEDIUM (OF-127), not a BLOCKER, under the rule sealed at 11193bd and for
+   the reason REVIEW 3 gave when it graded a STRICTLY WORSE state - coverage ZERO - as
+   its own M-1. Grading it a BLOCKER now would be manufacturing a fourth FAIL.
+   REMEDY: a word-form arm alternative and a judge/gate-reason vocabulary, in BOTH
+   copies, plus OF-104's ACTUAL third exhibit in the parametrize list.
+
+
+5. COPY 2 FIRED INDEPENDENTLY
+   P-31, BY PARSING THE IMPORT GRAPH AND NEVER BY GREP:
+     test_c6_fix_probes imports test_c6_attacker : False
+     test_c6_attacker imports test_c6_fix_probes : False
+     the 5 textual occurrences of "test_c6_attacker" in the fix-probe file are PROSE.
+   P-35: copy 1 carries 31 gate-vocabulary words, copy 2 carries 5 (ceiling, per-action,
+     per action, exceeded, not permitted); different subtraction routes; both derive 11
+     cap formattings independently.
+   P-32/P-33: copy 2 CATCHES arm-in-label, clause-in-label, cap-in-label, cap-in-state-
+     label and a paraphrase-in-value, on run_episode's REAL output (20 findings, one per
+     turn); and deleting OF-104's scan from copy 2 alone (N-M1b) KILLS 3 tests. The
+     "copy 2 had never been fired at a leak" defect IS closed.
+   The three shapes copy 2 misses are the three copy 1 misses - S4 above.
+
+
+6. BOTH EQUIVALENCE PROOFS, AUDITED
+   THE STANDARD IS REVIEW 3's OWN N6: enumerate the reachable inputs, show agreement on
+   all of them, AND NAME THE INPUT THAT WOULD SEPARATE THEM.
+
+   SM-5 (`assert replaced == 1` disarmed) - SOUND. "Disarming an assertion that is true
+     on every input any test supplies cannot fail for any suite" is exactly REVIEW 3's
+     own N10 reasoning. The separating input is named here for completeness: a context
+     with ZERO parts carrying STATE_LABEL. No code path builds one.
+
+   SM-1 (the Origin.AUTHORED filter dropped) - THE VERDICT IS RIGHT, THE PROOF IS NOT.
+     Its claim: "1 WITH the origin filter and 1 WITHOUT it, EVERY TIME, SO THE HELPER
+     RETURNS A BYTE-IDENTICAL CONTEXT EITHER WAY." That last clause is FALSE in general
+     and this review built the separating input P-36 predicted:
+       an ATTACKER part echoing "STATE SO FAR: "  -> HEAD replaced=1, MUTANT replaced=2
+       a WORLD tool result carrying it            -> HEAD replaced=1, MUTANT replaced=2
+     AND THE CONCLUSION I PRE-COMMITTED FROM THAT DOES NOT FOLLOW, REPORTED AS A MISS
+     AGAINST THIS FILE. P-36 said "if I can build a separating input, the survivor
+     stands and it is a FAIL trigger." It is not: ON EVERY SEPARATING INPUT THE MUTANT'S
+     OWN `assert replaced == 1` RAISES, so it is IDENTICAL OR LOUDER, NEVER SILENTLY
+     DIFFERENT - and the AUTHORED surface, the only thing the guard reads, is
+     byte-identical even then. That is the sound proof and it is supplied. LOW, OF-131.
+
+
+7. MY NEW-SURFACE MUTANT TABLE - 22 RUN (+ R-23), 10 KILLED, 5 EQUIVALENT, 7 SURVIVORS
+   Full table and every exhibit: docs/reviews/mutants/c6_mutants_4.md.
+
+   KILLED (10): R-01 R-02 R-03 R-23 (_sole_killer, S2) - R-04 the system-prompt
+     subtraction removed entirely (20 failed) - R-10 the `arms?` alternative removed
+     (3) - R-11 OF-104's scan removed from COPY 1 (5) - R-13 from COPY 2 (3) - R-16 the
+     source-text scan disabled (5) - R-17 `getattr` dropped from the refusal list (2) -
+     R-19 crossing()'s k=0 case removed (1).
+
+   EQUIVALENT, BOUNDARY NAMED (5):
+     R-06 LAYER 3: the STATE line contributes no residue. BY CONSTRUCTION - state_json
+          IS the whole body when untruncated, so the state line can never contribute
+          residue under HEAD either. Measured: HEAD [], mutant [].
+     R-07 LAYER 3: the REFUSAL line contributes no residue. BY CONSTRUCTION - residue is
+          `remainder minus stripped(remainder)` = whitespace. 0 separating inputs over
+          9 constructed refusal shapes.
+     R-09 `state_json = body` always. BY EXHIBIT - with an 80-key state the mark lands at
+          char 972 of 1125 and no config/ ceiling rendering appears after it. Boundary:
+          entries_dropped in {50000, 5000000, 200000, 20000000} - unreachable in 20 turns.
+     R-21 SM-1 - S6 above.
+     R-22 SM-5 - S6 above.
+
+   *** NON-EQUIVALENT SURVIVORS (7). THREE CARRY THE FAIL. ***
+
+     R-14  MEDIUM  N15/OF-107's CLASS UNCLOSED IN COPY 2.  CARRIES THE FAIL
+           Widen copy 2's LAYER-1 exemption from the state JSON to the whole state LINE:
+           all 111 tests stay green. EXHIBIT: STATE_LABEL = "STATE SO FAR (5000000): "
+           over a real 20-turn episode -> HEAD 40 findings, MUTANT 0.
+           Copy 1 got the three-cap-formatting fixture AND its other side; copy 2 got
+           neither - measured over the file, `exempts_only_the_state_JSON` is ABSENT and
+           no copy-2 test plants a cap in STATE_LABEL.
+           REMEDY: one parametrised case in copy 2, mirroring copy 1's.
+
+     R-15  MEDIUM  N13/OF-111's CLASS UNCLOSED IN COPY 2.  CARRIES THE FAIL
+           Copy 2's `refusal_lines != 1` -> `< 1` leaves the suite green.
+           EXHIBIT: a summary carrying TWO recognisable last-denial lines -> HEAD 20
+           findings, MUTANT 0. Copy 1 got a three-count fixture (2, 3, 5); copy 2 none.
+           REMEDY: one two-denial-line episode driven through copy 2.
+
+     R-20  MEDIUM  crossing()'s turn_budget END IS PINNED BY NOTHING.  CARRIES THE FAIL
+           while the k=0 end IS pinned (R-19 dies) and the target boundary IS pinned in
+           both directions (N4 dies). `range(0, turn_budget+1)` -> `range(0, turn_budget)`
+           leaves the suite green. EXHIBIT, ALL VALUES POSITIVE AND REALISTIC: a series
+           with full_listing_chars=1600 (a PAGINATED read, not the 12-payment listing),
+           displaced=240, base_tokens=5,521:
+             tokens_at(19) = 57,277 <= 60,000 < tokens_at(20) = 60,001
+             HEAD crossing = 20        MUTANT crossing = None
+           None makes crossover_note() print "NO number of full-listing reads inside 20
+           turns crosses 60,000" - A SENTENCE INSTEAD OF A NUMBER, which the method's own
+           docstring calls a DIFFERENT FINDING FOR C14. REMEDY: one fixture at that base.
+
+     -- AND THE FOUR THAT DO NOT CARRY IT, NAMED SO THE COUNT IS NOT PADDED --
+
+     R-18  LOW  _dynamic_reach_findings's rglob -> glob. EXHIBIT: a dynamic import in
+           attacker/sub/reach.py -> HEAD 2 findings, mutant 0. LATENT: attacker/ is flat
+           today and all five control packages are flat.
+     R-08  LOW  `assert len(summaries) == 1` -> `>= 1`. EXHIBIT: a SECOND authored part
+           carrying STATE_LABEL turns a loud raise into silence. No code path builds two.
+     R-12  LOW  LAYER 2b over values_scan instead of scan. EXHIBIT:
+           idempotency_keys_seen=("arm 2S",) -> HEAD ["2b 'arm 2S'"], mutant []. HEAD IS
+           THE STRICTER ONE and the surface is the S8.6 folded state, WHICH C7'S LEDGER
+           FILLS - pre-committed at 11193bd (P-29) as not a C6 defect.
+     R-05  LOW  the system-prompt subtraction, all occurrences -> one. EXHIBIT: the S8.6
+           prompt present TWICE -> HEAD [], MUTANT ["vocab 'limits'"]. THE MUTANT IS
+           STRICTER AND WRONG; HEAD is correct.
+
+
+8. THE FOUR BLINDNESS CLAIMS BY MY METHOD, WITH THE MUST-REACH CONTROL
+   Over run_episode's REAL 20-turn output, real seed-2001 world payloads from
+   whetstone_gate.world, a corpus part on every turn, and a GROWING folded state
+   (OF-82's lesson: a constant fold makes a boundedness assertion green by accident).
+
+   turn  FULL chars  FULL hits  AUTH chars  AUTH hits   pay_CANARYRECON F/A  note F/A
+      1        1214          0        1123          0        False/False      False/False
+      6       10590          0        1476          0         True/False       True/False
+      7       10719          0        1529          0         True/False       True/False
+     12       10987          0        1796          0         True/False       True/False
+     20       11035          0        1844          0         True/TRUE        True/False
+
+   ALL FOUR CLAIMS HOLD - 0 AUTHORED hits of 118 needles at every turn, and the
+   CLEAN-SURFACE CONTROL is 0 of 118.
+
+   MUST-REACH: the probe NOTE is FULL=True / AUTHORED=False at EVERY turn. THE DOOR IS
+   OPEN. A guard that banned the note from the world surface would close it and make
+   arm 4 VOID BY CONSTRUCTION.
+
+   !! TWO DIFFERENCES FROM REVIEW 3's TABLE, BOTH CAUSED BY MY OWN FIXTURE, NAMED RATHER
+      THAN LEFT UNEXPLAINED:
+      (a) pay_CANARYRECON reaches AUTHORED at turn 20. My _Fold is a GROWING fold, so by
+          turn 20 the S8.6 folded state's per_payment maps carry every id the attacker
+          has acted on, INCLUDING THE PROBE'S. THAT IS CORRECT: S13.3 mandates the folded
+          state, S8.6 fixes it as keyed by payment id, the id is one THE ATTACKER ITSELF
+          SUPPLIED, and the map is built identically in every arm, so there is NO
+          DIFFERENTIAL. REVIEW 3's cleaner reading is an artefact of its all-zero fold.
+      (b) 0 FULL-surface hits where REVIEW 3 had 1. MY F5 family carries the
+          DEFENDER-SIDE descriptions of the door and deliberately NOT the note text,
+          which S10.1 requires to reach the attacker - so my scan cannot produce that hit
+          by construction. P-44 as sealed DID NOT HOLD and the reason is MY file.
+          RECORDED AS OF-135 RATHER THAN ADJUSTED, on OF-114's own principle.
+
+
+9. c6_mutants_4.md - WRITTEN, AND IT DISCHARGES C6 FIX 3's DEBT TOO
+   docs/reviews/mutants/c6_mutants_4.md carries BOTH tables: this session's 28 mutants
+   with five equivalence proofs and their boundaries, AND C6 FIX 3's own FOURTEEN,
+   transcribed from docs/sessions/nightrun-a-1.txt because docs/reviews/mutants/ was
+   outside its fence and it NAMED THE DEBT rather than skipping it.
+
+   EVERY ONE OF ITS SIX CLAIMS THIS SESSION COULD INDEPENDENTLY RE-RUN REPRODUCES,
+   INCLUDING THE FAILURE COUNTS: N-M1a 5 failed, N-M1b 3 failed, SM-2 1 failed, SM-3 3
+   failed, SM-6 1 failed, SM-5 survives. The ONE claim that does not survive audit is
+   SM-1's EQUIVALENCE ARGUMENT - not its verdict.
+
+
+10. OF-112 / OF-113 / OF-114 - JUDGED
+    OF-112  STAYS OPEN, and C6 FIX 3's reason is RIGHT. The glob tests/test_c6_*.py did
+            put tests/test_c6_review_probes.py inside its fence, so it COULD have reached
+            it - and INC-30/INC-31 are a named hazard about a FIX session editing a
+            REVIEWER's evidence, which is the stronger consideration. CONFIRMED
+            FIRST-HAND: this review used a GROWING fold in its own driver for exactly
+            OF-82's reason. Owner: a session that owns that file.
+    OF-113  STAYS OPEN, CORRECTLY. Verified: _denial_findings subtracts only
+            authored.attacker_system_prompt(); the tool schemas stay in `scan` and are
+            scanned by LAYERS 1-2, which is what the guard's OWN docstring says. THE
+            DIRECTION IS SAFE. INCIDENTS.md is append-only (Q-033) and rule 13 fixes the
+            format, so a written Action is not rewritten.
+    OF-114  CLOSED BY THIS REVIEW. C6 FIX 3's reason - "a fix session does not close a
+            review's self-record" - is right AND DOES NOT BIND A REVIEW SESSION, which is
+            the right author. The corrected ast-based result is already in REVIEW_C6_3
+            S2.3. Nothing is owed and nothing is actionable.
+
+
+11. SUITE COUNTS I MEASURED MYSELF, WITH FAILURES ATTRIBUTED BY FILE
+    make test, measurement 1 : 774 passed, 1 skipped, 2 deselected  0 FAILED  (241.80s)
+    make test, measurement 2 : 774 passed, 1 skipped, 2 deselected  0 FAILED  (220.59s)
+      THERE ARE NO FAILURES TO ATTRIBUTE. C6 FIX 3 measured 771 and C13 REVIEW 3
+      measured 721; the concurrent C13 FIX 3 session (e9dd0346) has been landing tests
+      throughout, which is where the +3 comes from.
+    C6's three files alone, in the clone : 111 passed  (the mutation baseline)
+    make check-roles : 17 passed, 0 failed, 5 n/a, EXIT 0
+      E1 "44 issued row(s) covering 44 token(s)", E2 and E3 clean.
+    make selftest : RED - 1 failed, 1 passed, 775 deselected, in
+      tests/test_lanes_operator_placeholders.py::
+        test_the_camel_branch_is_decided_before_any_camel_run
+      on lanes: camel_comparator.branch = TODO_C13_RUN1. NOT C6's, and it is SUPPOSED to
+      be red until RUN-1 decides the branch.
+    git status --porcelain tests/goldens/ : EMPTY
+    evals/ : DOES NOT EXIST. No C6 commit touches an evals/ path - measured across all
+      six of 51f0624 df741d4 f03d359 6bcc15a ee01e0c 0fcfab2. C6 SPENT NOTHING.
+    vendored pins : tau2_bench_sha=a2c0247... and camel_sha=f083b6b... both pinned with
+      their verification tests green inside the 774; agentdojo_sha=TODO_C13_C16 is C16's
+      sentinel, deliberately left by C13, and the loader RAISES on it.
+    git tag -l : c0-pass c1-pass c2-pass c3-pass c4-pass. Neither probe-v1 nor prereg-v1
+      is cut, so no reported figure can contradict a frozen artefact.
+    SPEND: ZERO PROVIDER MODEL CALLS BY THIS SESSION.
+
+
+12. FINDINGS
+    BLOCKER: NONE.
+    MEDIUM : OF-124 R-14 - N15's class unclosed in COPY 2
+             OF-125 R-15 - N13's class unclosed in COPY 2
+             OF-126 R-20 - crossing()'s turn_budget end pinned by nothing
+             OF-127      - two of OF-104's own three exhibits still escape both copies
+             OF-128      - authored text appended to the STATE LINE escapes all 3 layers
+    LOW    : OF-129 R-18 - the dynamic-reach scan stops at the package root
+             OF-130      - three unpinned strictness choices (R-08, R-12, R-05)
+             OF-131      - SM-1's equivalence proof is false in general
+             OF-132      - a comment calls a substituted shape "verbatim"
+             OF-133      - 46 of 118 needles escape in LAST_REFUSAL_LABEL
+             OF-134      - there is no docs/sessions/c6-fix-3.txt
+             OF-135      - THIS REVIEW'S OWN: P-44 was wrong about my own file
+    Q-082 RAISED, Class A, NOT blocking - see S14.
+
+    EARLIER REVIEWS' FINDINGS, re-stated: R1 F-1/F-2/F-3/F-4/F-5/F-6 CLOSED; F-7/OF-47,
+    F-9/OF-49, F-12/OF-52->OF-90 OPEN. R2 B-1/B-2/B-3 CLOSED fe3984f and re-confirmed
+    here (R-11, R-13, R-16); M-1..M-8 CLOSED; M-9/OF-89 CLOSED 9c809c2; L-2/OF-53 OPEN
+    (verified: AUTHORED_TEXTS still holds exactly three paths); OF-90/92/94/95 OPEN,
+    outside every C6 fence. R3 OF-104 CLOSED for its ruled shape with residue OF-127;
+    OF-105/106/109 CLOSED; OF-107 and OF-111 CLOSED FOR COPY 1 only; OF-108 CLOSED with
+    OF-126 raised; OF-110's C6 half CLOSED (C2/C3/C13 halves OPEN, routed to OF-99);
+    OF-112/113 OPEN; OF-114 CLOSED; OF-123 CLOSED for the instance, CLASS OPEN.
+
+
+13. TWO THINGS THIS SESSION GOT WRONG, RECORDED RATHER THAN REPAIRED QUIETLY
+    (a) ITS OWN MUTATION HARNESS WAS INVALID ON THE FIRST RUN. The restore step ended
+        with `git checkout -- <path>`, which restores from a HEAD that HELD the mutation
+        (the harness commits it), so every mutant re-applied its predecessor and the
+        failure counts ran 2, 4, 8, 11, 15, 18 instead of 2, 2, 4, 3, 4, 3. Caught by the
+        monotone count; fixed by restoring by WRITING the original bytes and committing
+        them; the clone reset to the sealed content and re-baselined at 111 passed before
+        anything was re-measured. THE FAILURE DIRECTION WAS FLATTERING - a defeated
+        restore reports EVERY mutant as KILLED - which is why it is here, in
+        REVIEW_C6_4.md and in c6_mutants_4.md rather than only fixed.
+    (b) OF-135, S8(b) above.
+
+    AND THE cp1252 HAZARD IS LIVE ON THIS MACHINE, MET FIRST-HAND: a plain print of
+    OPEN_FINDINGS.md cells died on UnicodeEncodeError: 'charmap' codec. Every byte both
+    artefacts print now goes through one ASCII route with LF newlines, SET ON THE STREAM
+    rather than hoped for. INC-08 / INC-25 / OF-89.
+
+
+14. THE TAG, AND WHY IT IS NOT CUT
+    c6-pass: NOT CUT. docs/reviews/README.md's bar is "every mutant killed or proven
+    equivalent" and seven are neither.
+
+    THE FAIL RESTS ON OF-124, OF-125 AND OF-126 - three mutant survivors, three
+    one-fixture remedies. It does NOT rest on the four LOW survivors, on OF-127 or on
+    OF-128; those are findings, not the gate.
+
+    THE ONE JUDGEMENT IN IT IS RAISED AS Q-082, CLASS A, so the architect can overrule it
+    on the record rather than by a reviewer's discretion: is a surviving mutant on a
+    TEST-side guard a FAIL when the guard's SUBJECT is provably clean today? This project
+    has answered YES twice in the last two reviews on exactly this shape, and the README's
+    bar carries no qualification. DEFAULT TAKEN: AS WRITTEN. If the architect rules that
+    the bar is about the SUBJECT rather than the GUARD, this chunk passes on everything
+    else, and REVIEW_C6_4.md S14 names exactly which three findings to lift.
+
+    I DID NOT PASS THIS BECAUSE IT IS 2 SEPTEMBER, AND I DID NOT FAIL IT TO LOOK
+    RIGOROUS. 39 of 55 polarities sealed before the fix was opened held exactly; THREE OF
+    THE SIX ROWS THAT PREDICTED FAILURE WERE WRONG AND ALL THREE WERE WRONG IN THE FIX'S
+    FAVOUR; one row that predicted success failed against the fix; and one miss is
+    recorded against this review's own needle design. The gate went red on three
+    specific, named, reproducible mutants, each with a concrete input on which HEAD and
+    the mutant differ, and on nothing else.
+
+
+15. EVERY `Swept:` LINE FROM THIS SESSION'S FOUR COMMITS
+    daefb31 (token row 45):
+      "Swept: nothing. Verified on the STAGED SNAPSHOT (`git diff --cached --
+       QUESTIONS.md`), never on the working tree (INC-48, Q-063 clause (i)). The only
+       untracked paths are this session's own three Phase-1 artefacts, which are NOT in
+       this commit, and grep.exe.stackdump, which belongs to no session and was not
+       touched."
+    11193bd (Phase-1 seal):
+      "CR bytes in all three files: 0, counted as BYTES.
+       Swept: nothing. Verified on the STAGED SNAPSHOT (`git diff --cached --numstat`):
+       three paths, 1105 insertions, 0 deletions, all three created by this session.
+       `git status --porcelain` was read immediately before `git add` and held only these
+       three paths plus grep.exe.stackdump... The concurrent C13 FIX 3 session (e9dd0346)
+       holds tests/test_c13_camel_comparator.py and src/whetstone_gate/camel_comparator/;
+       NEITHER is in this commit, which names its three paths explicitly."
+    ce16a7f (verdict + artefacts):
+      "Swept: nothing. Verified on the STAGED SNAPSHOT (`git diff --cached --numstat`):
+       four paths, 1534 insertions, 0 deletions, all four created by this session..."
+    8cdfa64 (journals):
+      "Swept: nothing. Verified on the STAGED SNAPSHOT (`git diff --cached --numstat`):
+       133/0 PROGRESS.md, 72/0 QUESTIONS.md, 1/1 STATUS.md, 89/0 OPEN_FINDINGS.md - four
+       paths, all of them this session's own text, and STATUS.md's single deletion is the
+       C6 row being replaced by ITSELF PLUS A PREFIX, proved above."
+
+    CONCURRENCY, HANDLED RATHER THAN SURVIVED. When this session began reading,
+    e9dd0346's token row AND a staged INCIDENTS.md (INC-55) were UNCOMMITTED in the
+    shared working tree. Staging QUESTIONS.md then would have swept 31 lines of another
+    session's row into a commit under this token - INC-48's EXACT DEFECT. Nothing was
+    staged until `git status --porcelain` read clean for QUESTIONS.md and `git diff
+    --cached` read empty; that session committed both at bd2107f first.
+
+
+16. WHAT I COULD NOT DO
+    - A REVIEW SESSION FIXES NOTHING. src/, tests/, CONTEXT.md, PROCESS.md, config/,
+      check_roles.py, vendor/, INCIDENTS.md and every earlier REVIEW_C6_*.md are named
+      under NOT in this fence. THE SEVEN SURVIVORS ARE EXHIBITED, NOT CLOSED - unlike
+      REVIEW 1, which could close its four with kept probes.
+    - AN INCIDENTS.md ENTRY IS OWED AND I MAY NOT WRITE IT, for two things: this
+      session's flattering-direction harness defect (S13a), and OF-127's class - a
+      remedy implemented exactly as ruled that does not reach its own finding's exhibits.
+      This is the FIFTH time a fence has excluded the file a task required (Q-029,
+      Q-033, Q-049, REVIEW_C6_2's M-9).
+    - OF-110's C2 / C3 / C13 halves remain open and routed to OF-99's address; I verified
+      only C6's.
+    - corpora/fetched/ is git-ignored and ABSENT (Q-010), so the episode driver used four
+      SYNTHETIC corpus entries, one per corpus, which is all the blindness scan needs
+      from them. REVIEW 1 and REVIEW 2 both verified the real pins and entry counts AT
+      SOURCE; I did not re-fetch and did not need to.
+    - check_roles.py counting the session-token table itself - OF-67 / OF-70 / OF-78 -
+      is still owed, and this is the SIXTEENTH consecutive session to carry that total by
+      hand. check_roles.py is under NOT in this fence.
+    - I did not tag. Only a review may cut c6-pass and only on a PASS.
+
+
+=====================================================================
+PASS: NO.   TAG c6-pass: NOT CUT.
+=====================================================================
