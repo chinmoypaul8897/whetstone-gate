@@ -97,6 +97,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `d5c8039f` | ARCH | FIX | 2026-09-02 |
 | `6f3a91d2` | ARCH | FIX | 2026-09-02 |
 | `0ca97bbb` | C6 | REVIEW | 2026-09-02 |
+| `472cdc4b` | C7 | REVIEW | 2026-09-02 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -7657,5 +7658,63 @@ freeze to make it look complete, and not after, when editing it is forbidden out
 handling is the one already in force: **the loader keeps refusing, and C18/C19 publish AD-CMP as
 NOT RUN with its reason.** A sentinel that still refuses is the honest end state, and this paragraph
 exists so that a later session does not read it as an oversight and "fix" it.
+
+---
+
+## ⚠️ RULINGS RECORDED BY C7 REVIEW 1 (`472cdc4b`), 2026-09-02 — Q-082's ceiling, §5.4's relocation, Q-069, OF-57/OF-61
+
+**Recorded VERBATIM, BEFORE ANYTHING ELSE IN THIS SESSION WAS READ OR TOUCHED** beyond `CLAUDE.md`
+itself. `CLAUDE.md` hard rule 5: *"RULINGS ARE RECORDED VERBATIM in QUESTIONS.md before anything
+else is touched."* The four below are the text of the architect's C7 REVIEW 1 prompt, transcribed
+without paraphrase, reordering or abbreviation — including its `S<n>` notation for `CONTEXT.md`
+sections and its `PROCESS.md` section references, which are **not** normalised, because normalising
+is still altering.
+
+⚠️ **APPENDED, NOT WOVEN IN.** A concurrent **C6 REVIEW 5** session (`0ca97bbb`) holds this file, so
+this section is a pure append at the end. **The only other line this session wrote into this file is
+its own token row**, `472cdc4b · C7 · REVIEW · 2026-09-02`, appended to `## Session tokens` **before**
+the Phase-1 seal, because `check_roles` **E1** fails on a token that is not in that table and two
+prior reviews turned it red by sealing first.
+
+> "1. Q-082's CEILING BINDS THIS VERDICT. 'Every mutant killed or proven equivalent' has NO
+> TERMINATION CONDITION because the reviewer chooses the set. THE GATE IS THE REQUIRED SET: at least
+> one mutant per property or invariant THE CHUNK OWNS, minimum eight (PROCESS.md S5.3). Survivors
+> outside that set are MEDIUM findings and DO NOT hold the tag.
+> ⚠️ AND THE SAFEGUARD C13 REVIEW 4 ADDED, WHICH THE ARCHITECT ADOPTS: the required set is WORTHLESS
+> IF CHOSEN AFTER SEEING THE RESULT — that is the same regress with an extra step. ENUMERATE AND
+> ARGUE THE OWNED PROPERTIES IN THE SEALED PHASE 1, BEFORE WRITING A SINGLE MUTANT. Phase 2 may ADD
+> a member with an argument; it may never REMOVE one.
+>
+> 2. THE C7 CARD'S SEEDED-DEFECT CLAUSE IS WRONG AND YOU ARE TOLD SO DIRECTLY, BECAUSE IT WOULD
+> OTHERWISE SEND YOU HUNTING SOMETHING THAT IS NOT THERE. PROCESS.md S5.4 and S12.1's C7 row say the
+> architect writes one spec-violating defect into C7's build prompt and that the C7 review must raise
+> it as a BLOCKER or the review process is declared broken. NO C7 BUILD PROMPT CARRIED ONE — all
+> three instructed the CORRECT behaviour, in capitals. The trap was ALSO pre-announced in PROCESS.md
+> S12.1, in tests/goldens/README.md and in golden 5's own `seeded_defect_note`, so it could not have
+> worked here in any case. RULED: S5.4's test DID NOT RUN AT C7; the card's done-when clause is
+> UNSATISFIABLE AS WRITTEN and is corrected; the test RELOCATES to a later chunk which is not named.
+> That a trap is still coming is public; which chunk and what defect are not. RAISE THE CARD'S
+> UNSATISFIABLE CLAUSE AS A FINDING so the correction lands through the record — a review fixes
+> nothing, but it names what must be fixed.
+>
+> 3. Q-069: `whetstone_gate.ledger` IS SCORER-SIDE. `gates/` may never import it, on any path.
+> MOAT_ALLOW_LIST STAYS EMPTY. C9 lands the assertion in check_roles D3; C7 was required only to
+> record the prohibition where a C9 session will hit it.
+>
+> 4. OF-57 AND OF-61 ARE ACCEPTED AND PUBLISHED AS LIMITATIONS, NOT DEFECTS. Nothing anchors the END
+> of the chain — truncation AND a re-derived suffix both verify — and the episode `seed` is covered
+> by no digest. Both are stated precisely in C7's own kept tests and the README must claim no more
+> than 'evident against an edit that leaves a stale digest'. DO NOT FAIL C7 ON EITHER. DO fail it if
+> any docstring, comment or artefact claims more than that."
+
+**Status:** **BINDING ON THIS REVIEW.** Ruling 1 is applied by enumerating and arguing the required
+set in `REVIEW_7_1.md` §C **inside the sealed Phase 1**, before a mutant was written, and by marking
+every survivor **OWNED** or **NOT-OWNED**. Ruling 2 is applied by raising the C7 card's unsatisfiable
+done-when clause as a finding rather than by hunting a defect the architect states is not there.
+Ruling 3 is applied by checking that C7 recorded the prohibition where a C9 session meets it, and by
+**not** requiring C7 to enforce what no chunk without a gate can enforce. Ruling 4 is applied by
+reading every C7 docstring, comment and artefact that touches truncation, re-derivation or `seed`
+against the words *"evident against an edit that leaves a stale digest"*, and failing only on a claim
+that exceeds them.
 
 ---
