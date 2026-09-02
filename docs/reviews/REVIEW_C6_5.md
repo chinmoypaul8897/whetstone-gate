@@ -137,26 +137,27 @@ minimum of eight.**
 
 ### 1.1 The pre-committed polarities — 56 sealed, and how they held
 
-| held exactly | partial | ⚠️ **wrong, in the fix's favour** | ⚠️ **wrong, AGAINST the fix** |
+**Rather than a category count, the rows that did NOT hold are named individually — six of 56, plus
+one not measured. Every other row held as sealed.**
+
+| row | sealed prediction | measured | direction |
 |---|---|---|---|
-| **46** | 4 | **3** | **3** |
+| **P-10** | `_sole_layer`'s `fired`-as-a-list mutant SURVIVES as stricter-and-wrong | ⚠️ **not constructible** — the helper compares lengths, so that shape does not exist | **in the fix's favour** |
+| **P-11** | copy 2's LAYER 3 SURVIVES as an OWNED survivor and **carries the FAIL** | ⚠️ **it does not survive — there is nothing there to delete.** A weaker finding, graded MEDIUM (`OF-150`) | **in the fix's favour** |
+| **P-31** | the package's `_sole_layer` fixtures need explicit residue handling | ⚠️ they do not, for the same reason — copy 2 has no residue layer | **in the fix's favour** |
+| **P-12** | copy 2's vocabulary scan is **KILLED** | 🔴 **it SURVIVES** — `M-12`, and it is the FAIL | ⚠️ **against the fix** |
+| **P-45** | no `Action`/field overstatement, as two prior sessions found | 🔴 **one found** — `INC-56`'s `Systemic guardrail`, §7.1 | ⚠️ **against the fix** |
+| **P-44** | my summary labels DIFFER from the package's | 🟡 they are **identical** (`"STATE SO FAR: "`, `"LAST TOOL REFUSAL: "`) — a coincidence, and the seal's promise never to assert them stands | neutral |
+| **P-13** | copy 2's LAYER 2 subtraction widened SURVIVES | ⚪ **NOT MEASURED** — that exact operator was not run; named rather than counted as held | — |
 
-⚠️ **THREE ROWS WERE WRONG IN THE FIX'S FAVOUR AND THAT IS SAID FIRST**, because it is the evidence
-that this review is not manufacturing a fifth FAIL:
+⚠️ **THREE ROWS WERE WRONG IN THE FIX'S FAVOUR AND THAT IS SAID BEFORE THE TWO THAT WERE NOT**,
+because it is the evidence that this review is not manufacturing a fifth FAIL. **The row that
+predicted where the FAIL would come from was itself wrong**: P-11 named copy 2's residue layer, and
+the FAIL came from three other catchers in the same copy.
 
-* **P-11** predicted copy 2's LAYER 3 would survive as an OWNED survivor and **carry the FAIL**.
-  It does not survive — because **there is nothing there to delete**, which is a different and
-  weaker finding, and it is graded MEDIUM below, not as the gate.
-* **P-10** predicted `_sole_layer`'s `fired`-as-a-list mutant would survive as a stricter-and-wrong
-  mutant. It is not even constructible: the helper compares lengths, so that shape does not exist.
-* **P-31** predicted the package's own `_sole_layer` fixtures would need explicit residue handling.
-  They do not, because copy 2 has no residue layer — the prediction was right about the mechanism
-  and wrong about the file.
-
-**Three rows were wrong against the fix**, and they are the FAIL: **P-12** predicted copy 2's
-vocabulary scan would be KILLED and it **survives**; the copy-2 clause scan and the copy-2 denial
-equality were sealed as required-set members (`M-12`/`M-16` in §3 of the seal) expected to die, and
-**both survive**.
+**P-15 and P-16 held, measured:** an AST walk over both files finds **no import of either from the
+other** (`imports test_c6_*: NONE`, both directions), and their vocabularies differ — **31 words
+against 5** — so the two copies really are independent, which is what makes them worth two.
 
 ---
 
@@ -748,13 +749,14 @@ and re-runs `M-12`, `M-12d`, `M-16` and `M-39` has closed the class rather than 
 complete.
 
 ⚠️ **This review is not failing a chunk to look rigorous, and it is not passing one because the
-project is behind schedule.** Forty-six of fifty-six polarities sealed before the fix was opened
-held exactly; **three of the rows that predicted failure were wrong, and all three were wrong in the
-fix's favour**, including the one that predicted where the FAIL would come from; one miss is recorded
-against this review's own file; and the positive results — a clean subject by an independent method,
-an open door, an untouched `src/`, and a helper that survives nothing — are stated first and in full.
-**The gate went red on three specific, named, reproducible mutants from a set fixed before any of
-them was written, and on nothing else.**
+project is behind schedule.** Of 56 polarities sealed before the fix was opened, **six did not hold
+and one was not measured — every one of the seven named individually in §1.1 rather than absorbed
+into a category count.** **Three of them were wrong in the fix's favour**, including the row that
+predicted where the FAIL would come from; one is recorded against this review's own file
+(`OF-154`); and the positive results — a clean subject by an independent method, an open door, an
+untouched `src/`, a helper that survives nothing, and a measured bound showing **no real leak escapes
+the suite** — are stated first and in full. **The gate went red on four specific, named, reproducible
+mutants from a set fixed before any of them was written, and on nothing else.**
 
 ---
 
