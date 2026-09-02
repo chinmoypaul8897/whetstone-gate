@@ -84,6 +84,7 @@ from .claims import (
 from .invocation import (
     Invocation,
     Run1Plan,
+    branch_conditions_are_stale,
     branch_is_undecided,
     run1_plan,
 )
@@ -108,6 +109,7 @@ __all__ = [
     "UnmodifiedProof",
     "agentdojo_root",
     "assert_vendor_at_pin",
+    "branch_conditions_are_stale",
     "branch_is_undecided",
     "parse_predictions",
     "pinned_sha",

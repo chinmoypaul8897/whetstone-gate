@@ -116,6 +116,15 @@ def main() -> int:
         say("  RUN-1 writes it. A build session that turned this green would have decided,")
         say("  from a chair, a question the specification reserves for a timeboxed run.")
         say(f"    {plan.branch_undecided_because}")
+    # ! OF-118. The pre-registered CONDITIONS, read through the loader and checked against
+    # CONTEXT.md v1.9 S8.5.1 - here, and not only in CI, because Q-079's defect was that
+    # NOTHING READ THESE KEYS and a property enforced only in a test file holds only while
+    # the tests run (REVIEW_13_1 B-2). This is the same shape as branch_is_undecided above.
+    stale = invocation.branch_conditions_are_stale()
+    verdict = "OK - both keys agree with the law" if not stale else f"{len(stale)} PROBLEM(S)"
+    say(f"  pre-registered branch conditions vs CONTEXT.md S8.5.1: {verdict}")
+    for problem in stale:
+        say(f"    ! {problem}")
     say("  Branch B's artefact is ALREADY COMPLETE, beside this module, so taking it on the")
     say("  night is a selection and not an authoring job. Branch B is a RESULT.")
 

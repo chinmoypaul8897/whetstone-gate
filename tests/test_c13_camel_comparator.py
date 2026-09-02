@@ -1044,7 +1044,15 @@ def test_the_model_string_and_selections_come_from_config_not_from_source(contex
 
 
 def test_the_pre_registered_branch_condition_carries_the_DIAGNOSIS_requirement(context_md):
-    """⚠️ **`Q-079` / `OF-104`, and the reason it existed is that NOTHING READ THIS KEY.**
+    """⚠️ **`Q-079` / `OF-62`, and the reason it existed is that NOTHING READ THIS KEY.**
+
+    ⚠️ **THIS DOCSTRING SAID `OF-104` UNTIL 2026-09-02, AND THAT NUMBER WAS NEVER ALLOCATED
+    TO IT** (`OF-115`). `OF-104` at HEAD is **C6 REVIEW 3's** arm-identity finding, written
+    **55 minutes after** this file already carried the number; and C13 FIX 2's own
+    disposition says in terms *"this session opens no new `OF-` row"*, so `B-3` never had
+    one. `B-3`'s actual `OF-` home is **`OF-62`**, whose second half it is. A forward
+    reference to an unallocated number that another session then took is `Q-063`/`INC-36`'s
+    counter-collision class landing in a **source file** rather than a journal.
 
     `config/lanes.yaml`'s `camel_comparator.branch_a_condition` read *"the model id is
     still served AND the run completes inside the 90-minute box"* until 2026-09-02 — the
@@ -1074,11 +1082,38 @@ def test_the_pre_registered_branch_condition_carries_the_DIAGNOSIS_requirement(c
     condition_b = lanes.require("camel_comparator.branch_b_condition")
 
     # -- 1. The law still says it. Asserted BEFORE anything is required of `config/`. -----
-    starts = [i for i, line in enumerate(context_md.splitlines()) if line.startswith("### 8.5.1 ")]
-    assert len(starts) == 1, "'### 8.5.1 ' must occur exactly once; a parser that reads nothing passes everything"
+    # ⚠️ OF-119. This window used to end only at a line starting `"## "`, and `"### 8.5.2"`
+    # does NOT match that prefix — so the "§8.5.1" it read ran on to `## 8.6` and was 6,759
+    # chars against §8.5.1's own 3,592, 88% wider, while the failure message below said
+    # §8.5.1. Latent, not live: all four phrases are in §8.5.1 today. It stops here now, and
+    # the boundary is PINNED BY CONTENT below rather than left to the scan to assert itself.
     lines = context_md.splitlines()
-    end = next((i for i in range(starts[0] + 1, len(lines)) if lines[i].startswith("## ")), len(lines))
+    starts = [i for i, line in enumerate(lines) if line.startswith("### 8.5.1 ")]
+    assert len(starts) == 1, "'### 8.5.1 ' must occur exactly once; a parser that reads nothing passes everything"
+    subsection = [i for i, line in enumerate(lines) if line.startswith("### 8.5.2 ")]
+    assert len(subsection) == 1, "'### 8.5.2 ' must occur exactly once; it is this window's end"
+    end = next(
+        (
+            i
+            for i in range(starts[0] + 1, len(lines))
+            if lines[i].startswith("### 8.5.2 ") or lines[i].startswith("## ")
+        ),
+        len(lines),
+    )
+    assert end == subsection[0], (
+        "the §8.5.1 window must stop AT `### 8.5.2 `, not run past it to the next `## `. "
+        "OF-119: it ran on for 88% more text than §8.5.1 contains, under a failure message "
+        "that named §8.5.1."
+    )
     section = re.sub(r"\s+", " ", "\n".join(lines[starts[0] : end])).lower()
+    # ⚠️ Pinned against CONTENT, not only against the index above: `"policy coverage"` is
+    # §8.5.2's P3 and occurs nowhere in §8.5.1, so a window that swallowed §8.5.2 would
+    # carry it. A boundary asserted only by the rule that computed it asserts nothing.
+    assert "policy coverage" not in section, (
+        "the §8.5.1 window has swallowed §8.5.2 — 'policy coverage' is P3's phrase. "
+        "Every assertion below would then be satisfied by text from a section whose name "
+        "the failure message never mentions (OF-119)."
+    )
 
     for what, phrase in invocation.BRANCH_B_REQUIREMENTS:
         assert phrase in section, (
@@ -1110,20 +1145,228 @@ def test_the_pre_registered_branch_condition_carries_the_DIAGNOSIS_requirement(c
     assert stale, "the guard must reject the very string Q-079 was raised about"
     assert any(invocation.SUPERSEDED_BRANCH_TRIGGER in problem for problem in stale)
 
-    # A Branch B stated WITHOUT the diagnosis requirement is the un-narrowed trigger, which
-    # is what `config/` encoded by NEGATION while no `branch_b_condition` key existed at all.
-    undiagnosed = invocation.branch_condition_problems(condition_a, "the run does not complete")
-    assert len(undiagnosed) == len(invocation.BRANCH_B_REQUIREMENTS), (
-        "every missing Branch-B requirement must be named separately; a gate whose only "
-        "output is 'no' is a gate somebody edits out under time pressure"
+    # -- 4. ⚠️ OF-116 / INC-55. EACH REQUIREMENT, WEAKENED ON ITS OWN, MUST BE REJECTED. ---
+    #
+    # ⚠️ WHAT WAS HERE BEFORE COULD NOT FAIL, AND THAT IS WHY IT IS GONE. It read
+    #
+    #     assert len(undiagnosed) == len(invocation.BRANCH_B_REQUIREMENTS)
+    #     for what, _ in invocation.BRANCH_B_REQUIREMENTS:
+    #         assert any(what in problem for problem in undiagnosed)
+    #
+    # — the predicate's OUTPUT against the predicate's OWN INPUT TUPLE, on both lines. Drop
+    # an entry and both sides move together; weaken a phrase to a substring and the `what`
+    # LABELS are untouched, so the loop still passes. The law-side check five lines above
+    # does not catch it either: "cause", "harness" and "md" all occur in §8.5.1. Under that,
+    # a `branch_b_condition` reading "a harness defect is SOMETIMES Branch B" — the direct
+    # INVERSION of Q-057's ruling — passed the whole repository green. INC-55.
+    #
+    # ⚠️ SO NOTHING BELOW READS ITS EXPECTED VALUE OUT OF `invocation`. The count is a
+    # LITERAL; every phrase quoted at a failure is a LITERAL written here; and each fixture
+    # is the REAL `branch_b_condition` with EXACTLY ONE requirement degraded — so it carries
+    # three requirements at full strength and can only be rejected for the fourth.
+    assert len(invocation.BRANCH_B_REQUIREMENTS) == 4, (
+        "§8.5.1 states FOUR Branch-B requirements and this literal is the only thing "
+        "outside invocation.py that says so. A length compared to its own source (INC-55) "
+        "cannot notice an entry being deleted, which is exactly mutant N-E"
     )
-    for what, _ in invocation.BRANCH_B_REQUIREMENTS:
-        assert any(what in problem for problem in undiagnosed), f"{what} is not named"
+
+    # (the phrase the complaint must QUOTE, what to degrade in the real value, and to what)
+    weak_forms = [
+        (
+            "on a cause that has been diagnosed",
+            "ON A CAUSE THAT HAS BEEN DIAGNOSED",
+            "FOR SOME CAUSE",
+        ),
+        (
+            "is not a cause",
+            "'It errored' is not a cause, and ",
+            "",
+        ),
+        (
+            "a harness defect is never branch b",
+            "a harness defect is NEVER Branch B",
+            "a harness defect is SOMETIMES Branch B",
+        ),
+        (
+            "protocol.md",
+            "PROTOCOL.md",
+            "CONTEXT.md",
+        ),
+    ]
+    assert len(weak_forms) == 4, "one weak form per requirement, and there are four"
+
+    for required, needle, replacement in weak_forms:
+        # ⚠️ INC-50's mirror move: assert the degradation ACTUALLY HAPPENED. A `.replace()`
+        # that silently matched nothing leaves a perfectly VALID condition behind, and the
+        # rejection below would then pass for a reason that has nothing to do with it.
+        assert needle in condition_b, (
+            f"config/lanes.yaml's branch_b_condition no longer contains {needle!r}, so this "
+            f"fixture degrades nothing. Re-derive the weak form from the value as written."
+        )
+        weak = condition_b.replace(needle, replacement)
+        assert weak != condition_b, "the weak form must differ from the real value"
+        assert required not in weak.lower(), (
+            f"the weak form still carries {required!r}, so it is not weak and proves nothing"
+        )
+
+        problems = invocation.branch_condition_problems(condition_a, weak)
+        assert len(problems) == 1, (
+            f"degrading exactly one requirement ({required!r}) must produce exactly ONE "
+            f"complaint, naming it. Got {len(problems)}: {problems}. More than one means "
+            f"the fixture degraded something else too; ZERO means the guard no longer "
+            f"requires that phrase at all — which is mutants N-B, N-C, N-D and N-E."
+        )
+        assert repr(required) in problems[0], (
+            f"the single complaint must QUOTE {required!r} so a reader knows which "
+            f"requirement failed; got {problems[0]!r}. A gate whose only output is 'no' is "
+            f"a gate somebody edits out under time pressure"
+        )
+
+    # ⚠️ AND THE CONTROL, WITHOUT WHICH THE FOUR ABOVE PROVE NOTHING: the undegraded value
+    # is ACCEPTED. Four rejections and no acceptance is also what a guard that refuses
+    # everything looks like.
+    assert invocation.branch_condition_problems(condition_a, condition_b) == [], (
+        "the real branch_b_condition must be accepted, or the four rejections above are "
+        "not attributable to the degradation"
+    )
+
+    # A Branch B stated WITHOUT any of the four is the un-narrowed trigger — what `config/`
+    # encoded by NEGATION while no `branch_b_condition` key existed at all. Every count and
+    # every phrase below is a LITERAL, for the reason above.
+    undiagnosed = invocation.branch_condition_problems(condition_a, "the run does not complete")
+    assert len(undiagnosed) == 4, (
+        "every missing Branch-B requirement must be named separately; a gate whose only "
+        "output is 'no' is a gate somebody edits out under time pressure. FOUR is a "
+        "literal here on purpose (INC-55)"
+    )
+    for required, _, _ in weak_forms:
+        assert any(repr(required) in problem for problem in undiagnosed), (
+            f"{required!r} is not named in {undiagnosed}"
+        )
 
     # And a missing key is a refusal, not an empty pass — the state Q-079 actually found.
     assert invocation.branch_condition_problems(condition_a, None), (
         "an ABSENT branch_b_condition is exactly what Q-079 found, and it must never read "
         "as a pass; Branch B's trigger existed only as the negation of Branch A's"
+    )
+
+
+def test_a_SENTINEL_branch_condition_is_a_REFUSAL_and_never_flows_in_as_a_VALUE(monkeypatch):
+    """⚠️ **`OF-117`. Hard rule 9, on the two keys `Q-079` was raised about.**
+
+    *"Every spec-specified value lives in `config/`, loaded through one loader, with **no
+    default for a required value** — a missing value is a hard refusal, never a silent
+    fallback."* :func:`invocation.branch_conditions_are_stale` reads both keys through
+    ``require()`` and its docstring makes that the point — *"the only read path, so a
+    missing file and a missing key are the same answer rather than two different
+    silences"* — and **nothing asserted it.**
+
+    ⚠️ **Mutant `N-I2` is why this test exists.** Replacing ``lanes.require(…)`` with
+    ``lanes.data.get("camel_comparator", {}).get(key, "")`` **survived the full suite**.
+    It is not equivalent, and the exhibit is below: with a sentinel in the key, HEAD
+    **refuses** and the mutant lets ``TODO_C14_PENDING`` flow in **as a value**, reporting
+    four content complaints about a string nobody has decided yet.
+
+    ⚠️ **`config/` NEVER HOLDS EITHER STATE.** The poisoned mapping is constructed here and
+    the loader is pointed at it, exactly as `INC-11` and `INC-17` require: a test may not
+    edit a pre-registration artefact to make its own guard fire.
+    """
+    lanes = cfg.load("lanes")
+
+    def _poisoned(branch_b) -> "cfg.Config":
+        block = dict(lanes.data["camel_comparator"])
+        if branch_b is None:
+            block.pop("branch_b_condition", None)
+        else:
+            block["branch_b_condition"] = branch_b
+        return cfg.Config(
+            name=lanes.name, path=lanes.path, data={**lanes.data, "camel_comparator": block}
+        )
+
+    # -- the sentinel: DECLARED undetermined, with an owner. A refusal, not a value. ------
+    poisoned = _poisoned("TODO_C14_PENDING")
+    monkeypatch.setattr(cfg, "load", lambda name: poisoned if name == "lanes" else lanes)
+
+    problems = invocation.branch_conditions_are_stale()
+    assert len(problems) == 1, (
+        f"a sentinel is ONE refusal from the loader, not a list of content complaints "
+        f"about the sentinel's own text. Got {len(problems)}: {problems}. Four complaints "
+        f"is mutant N-I2 — require() replaced by a defaulting read (OF-117)"
+    )
+    assert problems[0].startswith("UndeterminedValue: "), (
+        f"hard rule 9: an undetermined value is a TYPED, hard refusal. Got {problems[0]!r}"
+    )
+    assert "TODO_C14_PENDING" in problems[0], "the refusal must name what it actually found"
+    assert "not determined yet" in problems[0]
+    assert "branch_b_condition" in problems[0], "and which key is not determined"
+
+    # -- and the OTHER half of the same rule: a MISSING key is the state Q-079 FOUND. -----
+    monkeypatch.setattr(cfg, "load", lambda name: _poisoned(None) if name == "lanes" else lanes)
+    missing = invocation.branch_conditions_are_stale()
+    assert len(missing) == 1, f"an absent key is one refusal too, not a content report: {missing}"
+    assert missing[0].startswith("MissingRequiredValue: "), (
+        f"`config/` with NO branch_b_condition key is exactly what Q-079 found, and under a "
+        f"defaulting read it comes back as '' — a blank that reads as 'states no condition' "
+        f"rather than as 'nobody wrote this key'. Got {missing[0]!r}"
+    )
+    assert "branch_b_condition" in missing[0]
+
+
+def test_the_branch_condition_predicate_is_EXPORTED_and_has_a_NON_TEST_CALLER(package_dir):
+    """⚠️ **`OF-118`. A Class B deviation has to buy what it was declared for.**
+
+    C13 FIX 2 added :func:`invocation.branch_conditions_are_stale` as a **Class B**
+    deviation on this project's own rationale — `REVIEW_13_1.md`'s **BLOCKER B-2**,
+    *"a property enforced only in a test file is a property that holds until somebody adds
+    a figure without running the tests"* — and declared *"RUN-1 can call it; CI is not the
+    only reader."* ⚠️ **C13 REVIEW 3 measured that and it was not yet true:** the only
+    caller anywhere was this file, and the name was not in ``camel_comparator.__all__``.
+    **The classification was right and the reasoning was right; the deviation had not yet
+    bought what it was declared for.**
+
+    Both precedents it cites do better, and this test holds it to them:
+    :func:`invocation.branch_value_problem` ← :func:`invocation.branch_is_undecided`, which
+    **is** exported and is what ``make selftest`` fires; ``branch_b.assert_provenance`` ←
+    ``render_branch_b``, which is why deleting it goes red.
+
+    ⚠️ **Asserted STRUCTURALLY, over the module's own AST**, rather than by importing
+    ``__main__`` and running it: ``main()`` walks the vendored trees, and a test that had
+    to run the whole harness report to prove one call site would be a slow test measuring
+    the wrong thing.
+    """
+    from whetstone_gate import camel_comparator as package
+
+    assert "branch_conditions_are_stale" in package.__all__, (
+        "OF-118: a predicate RUN-1 is told it can call must be in the package's __all__, "
+        "or 'CI is not the only reader' is a statement about possibility only"
+    )
+    assert package.branch_conditions_are_stale is invocation.branch_conditions_are_stale, (
+        "the exported name must BE the predicate, not a re-implementation beside it"
+    )
+
+    # ⚠️ AND ONE NON-TEST CALLER, PROVED BY READING THE PACKAGE, NOT BY TRUSTING A COMMENT.
+    callers = []
+    for source in sorted(package_dir.rglob("*.py")):
+        tree = ast.parse(source.read_text(encoding="utf-8"), filename=str(source))
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            func = node.func
+            name = func.attr if isinstance(func, ast.Attribute) else getattr(func, "id", None)
+            if name == "branch_conditions_are_stale":
+                callers.append(f"{source.name}:{node.lineno}")
+
+    assert callers, (
+        "OF-118: `branch_conditions_are_stale` has NO caller inside the package, so the "
+        "property it enforces holds only while CI runs — which is the exact shape "
+        "REVIEW_13_1's BLOCKER B-2 rejected. Its precedent, branch_value_problem, is "
+        "called by branch_is_undecided, which __main__ prints."
+    )
+    assert any(caller.startswith("__main__.py:") for caller in callers), (
+        f"the caller must be on the path a HUMAN runs — `python -m "
+        f"whetstone_gate.camel_comparator`, which is what the operator runs on RUN-1 "
+        f"night, and which is where branch_is_undecided's result is already printed. "
+        f"Found only: {callers}"
     )
 
 
