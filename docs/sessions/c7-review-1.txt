@@ -1,4 +1,6 @@
-PUSHED SHA: <filled by the commit that follows this one; see the last line of this file>
+PUSHED SHA: ae5d600  (ae5d6002876c41c6a67cd424c792b94f3ff60969)
+            The commit that carries this file. Its own SHA cannot be inside itself, so it
+            is filled by the commit that FOLLOWS it, which is this project's convention.
 SESSION: 472cdc4b - C7 - REVIEW - attempt 1 - 2026-09-02 - review type: full, two sealed phases
 
 =====================================================================
@@ -513,4 +515,6 @@ docs/reviews/OPEN_FINDINGS.md (OF-141..OF-145, appended); QUESTIONS.md (the toke
 rulings, appended); STATUS.md (the C7 row, review history APPENDED never erased); PROGRESS.md; and
 this file. NOTHING under src/, tests/, config/, CONTEXT.md, PROCESS.md, INCIDENTS.md or vendor/.
 
-PUSHED SHA: stated at the head of this file by the commit that follows it.
+PUSHED SHA: ae5d600 - the commit carrying this file - filled in at the head of this file by
+the commit that follows it, which is this project's convention for a SHA a file cannot
+contain about itself.
