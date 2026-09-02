@@ -1,10 +1,12 @@
 SESSION-TOKEN: 6f3a91d2   CHUNK ARCH   ROLE: FIX   2026-09-02
 FINAL OUTPUT. Committed to docs/sessions/arch-goldens-2.txt BEFORE it was printed.
 
-PUSHED SHA: <pending - this file is committed BEFORE it is printed, so the SHA of its own
-            commit cannot be inside it. The commit that follows this one fills the line
-            below, and the printed FINAL OUTPUT states the true final pushed SHA.>
-PUSHED SHA (this file's own commit, filled by the commit that follows): <pending>
+PUSHED SHA: this file was committed at cb44af5 BEFORE it was printed, so the SHA of its own
+            commit could not be inside it. This line was filled by the commit that follows
+            cb44af5, and the printed FINAL OUTPUT states that follow-up commit's SHA as the
+            true final pushed SHA. The two differ by exactly this fill, which is why both are
+            named here rather than one being passed off as the other.
+PUSHED SHA (this file's own commit): cb44af5
 
 =====================================================================
 1. THE CONTROL RESULT, FIRST, BECAUSE NOTHING ELSE IS WORTH READING IF IT FAILED
