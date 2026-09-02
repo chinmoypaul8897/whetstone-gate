@@ -1,4 +1,4 @@
-PUSHED SHA: <filled by the commit that follows this one; the work commit is 3d8fb6c>
+PUSHED SHA: 7564586   (this file landed at 7564586; the work commit it reports on is 3d8fb6c)
 SESSION: b8c31a57 . C7 . REVIEW attempt 2 . 2026-09-03 . ZERO PROVIDER MODEL CALLS . NO TOKEN SPEND
 
 VERDICT: FAIL. NO TAG. `c7-pass` IS NOT CUT.
