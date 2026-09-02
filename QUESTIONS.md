@@ -96,6 +96,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `4b7f21ae` | C6 | FIX | 2026-09-02 |
 | `d5c8039f` | ARCH | FIX | 2026-09-02 |
 | `6f3a91d2` | ARCH | FIX | 2026-09-02 |
+| `0ca97bbb` | C6 | REVIEW | 2026-09-02 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
