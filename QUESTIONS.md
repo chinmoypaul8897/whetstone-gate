@@ -91,6 +91,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `9c7c5973` | C0 | FIX | 2026-09-02 |
 | `363a2e9f` | C6 | FIX | 2026-09-02 |
 | `e9dd0346` | C13 | FIX | 2026-09-02 |
+| `ca0dd160` | C6 | REVIEW | 2026-09-02 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -736,6 +737,49 @@ immediately before appending: 43 data rows, lines 50–92, `363a2e9f` last. So t
   in this session's fence, so this session could not have written it under any reading of its role.
 
 **No other session's line was touched by this append.** `Swept:` verified on the **STAGED SNAPSHOT**
+(`git diff --cached -- QUESTIONS.md`), never on the working tree (`INC-48`).
+
+⚠️ **AND `ca0dd160` IS ROW 45, REGISTERED BEFORE THIS SESSION'S PHASE-1 SEAL.** C6 **REVIEW 4**,
+2026-09-02, after C6 FIX 3 (`363a2e9f`) closed `REVIEW_C6_3`'s six survivors. Its prompt:
+*"REGISTER YOUR TOKEN ROW **BEFORE** THE SEAL. Sealing first turned `check-roles` E1 red on two
+reviews; the last two got it right. Number FROM THE TABLE, and see INC-54 on the printed-vs-data
+row count."*
+⚠️ **RE-COUNTED FROM THE FILE AT THIS MOMENT, NOT INHERITED AND NOT CARRIED FORWARD.** The
+paragraph immediately above counted **43 data rows** and made `e9dd0346` row 44; that count was
+correct **when it was taken** and was already stale by the time this session read it, because
+`e9dd0346` landed at `bd2107f` while this session was reading `CONTEXT.md`. **Counted immediately
+before this append: 44 data rows, lines 50–93, `e9dd0346` last. So this is row 45.**
+
+* ⚠️ **THE TWO NUMBERS ARE DIFFERENT AND THIS SESSION SAYS WHICH IT COUNTED — `INC-54` is exactly
+  about not doing so, and it is two paragraphs up.** **45 is the DATA-ROW count.** `make check-roles`
+  prints **one fewer**, because `check_roles._TOKEN_ROW` requires an 8-hex token **and** a
+  `(C\d+|ARCH)` chunk cell, and the `WG-2026-08-30-CTX-13.4-A` row matches neither. **MEASURED after
+  the append by running the command and reading its output, never derived from the row count:**
+  `make check-roles` = **17 passed, 0 failed, 5 n/a — OK**, E1 reporting **44 issued row(s) covering
+  44 token(s)**. `45 − 1 = 44`, and it reconciles with `e9dd0346`'s `44 − 1 = 43` and with
+  `363a2e9f`'s corrected `43 − 1 = 42`.
+* ⚠️ **THIS IS THE SECOND TIME IN ONE HOUR THAT TWO CONCURRENT SESSIONS HAVE COUNTED THIS TABLE
+  MINUTES APART, AND IT IS RECORDED AS A PROPERTY OF THE MECHANISM RATHER THAN AS A NEAR-MISS.**
+  `e9dd0346` and `ca0dd160` were both live, both counting by hand, and each was right at its own
+  instant. Nothing was lost this time because `e9dd0346` committed first and this session re-counted
+  rather than reusing the figure it had read minutes earlier — **which is the whole content of the
+  remedy `OF-67`, `OF-70` and `OF-78` keep asking for.**
+* **Self-record ordinal, CARRIED rather than re-derived, and labelled so.** Using this section's own
+  stated constant — *"the 15 nobody self-recorded"* — `45 − 15 = 30`, so this is the **thirtieth
+  self-recorded row and the twenty-ninth to carry a paragraph**, the gap of exactly one still being
+  `9c0c6734`'s uncounted row. ⚠️ **This session did NOT independently re-derive the 15**; it counted
+  the data rows, which is the number its own ordinal turns on, and says plainly which of the two it
+  measured.
+* ⚠️ **ORDINALS 11, 12 AND 18 REMAIN ASSERTED BY NO PARAGRAPH** (`df238be6`, `0852ea56`,
+  `9c0c6734`) and are **not this session's to close.**
+* ⚠️ **`check_roles.py` COUNTING THIS TABLE ITSELF IS STILL OWED — `OF-67`, `OF-70`, `OF-78`, the
+  SIXTEENTH consecutive session to carry the total by hand.** `check_roles.py` is named under **NOT**
+  in this session's fence, and a REVIEW session fixes nothing in any case.
+
+**No other session's line was touched by this append**, and the one that was in flight when this
+session started — `e9dd0346`'s row and its paragraph — **was committed by its own session at
+`bd2107f` before this session staged anything**, verified by `git status --porcelain` reading clean
+for `QUESTIONS.md` immediately beforehand. `Swept:` verified on the **STAGED SNAPSHOT**
 (`git diff --cached -- QUESTIONS.md`), never on the working tree (`INC-48`).
 
 ## ⚠️ THE TOKEN BATCH, 2026-08-31 — and this is what ends the collision class
