@@ -6,7 +6,7 @@ PUSHED SHA: this file was committed BEFORE it was printed, so the SHA of its own
             it and does nothing else, and the printed FINAL OUTPUT states that follow-up
             commit's SHA as the true final pushed SHA. The two differ by exactly that
             fill, which is why both are named rather than one passed off as the other.
-PUSHED SHA (this file's own commit): <FILE-COMMIT>
+PUSHED SHA (this file's own commit): cf08c9c
 PUSHED SHA (the work, already pushed): db27c37
 
 =====================================================================
@@ -34,8 +34,8 @@ COMMITS, IN ORDER
            Session-Token 6d1c8f37, which SWEPT four of this session's uncommitted
            journal edits into itself. INC-82. Nothing lost; see S13.
   db27c37  docs: INC-82 + the measured counts + STATUS.md and PROGRESS.md corrected
-  <FILE-COMMIT>  docs: this file
-  <WORK-SHA>  docs: this file's PUSHED SHA line filled
+  cf08c9c  docs: this file, committed BEFORE it was printed
+  <WORK-SHA>  docs: this file's PUSHED SHA line filled - THE FINAL PUSHED SHA
 
 =====================================================================
 1. ALL 29 ARCHITECT-STATED CELLS - FIXTURE BY FIXTURE
@@ -637,8 +637,8 @@ SWEPT LINES, ALL OF THEM:
   db27c37   "Swept: none." - Q-063 clause (i)'s diff run again immediately before it; it
             adds NO `Raised by:` line at all, and it stages only INCIDENTS.md, PROGRESS.md
             and STATUS.md by explicit path.
-  <FILE-COMMIT>   no Swept: line - docs/sessions/c8-build-1.txt only
-  <WORK-SHA>   no Swept: line - the same file, one line
+  cf08c9c   no Swept: line - docs/sessions/c8-build-1.txt only, by explicit path
+  <WORK-SHA>   no Swept: line - the same file, the two lines above
 
 TRAILER BLOCK: ONE PARAGRAPH, `Session-Token:` ADJACENT TO `Co-Authored-By:` on every
 commit (INC-66).
