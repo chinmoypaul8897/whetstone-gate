@@ -4987,3 +4987,82 @@ and remains unlanded**, and this session's fence forbids `src/whetstone_gate/che
 half `INC-36` named as uncloseable is uncloseable still, in `Q-063`'s own words: **"nothing can warn
 the session being swept."** It could not warn this one; it can only be found afterwards, by the
 session that lost the attribution, reading a file it had already written.
+
+---
+
+## INC-66 — six of this session's nine commits carry `Session-Token:` OUTSIDE the trailer block, because a `Co-Authored-By:` line was appended after a BLANK line — and one of the six is the degradation record's ONLY commit
+
+**Date:** 2026-09-02 (**"NIGHT RUN B". Both tokens are affected — `4b7f21ae` on five commits and
+`d5c8039f` on its only one.** Found by this session, at the end, while counting its own commits by
+trailer for the FINAL OUTPUT rather than by `git log --grep`. Fix SHA under **Fix**.)
+
+**Event:** a mid-session instruction directed that commit messages end with a `Co-Authored-By:`
+line. It was appended as its own paragraph, **after a blank line**, beneath the existing
+`Session-Token:` trailer:
+
+```
+Session-Token: d5c8039f
+
+Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
+```
+
+**A blank line ENDS the trailer block.** `git interpret-trailers --parse` therefore reads only the
+final paragraph, and returns **`Co-Authored-By`** alone — the `Session-Token` line is prose to any
+parser that uses git's own trailer semantics. Measured across this session's nine commits:
+
+| commit | `Session-Token` inside the trailer block? |
+|---|---|
+| `6b9af8f`, `7cbe908`, `da9fc96` | ✅ **YES** — written before the instruction arrived |
+| `754a91a`, `0742360`, `c7583f9`, `b342ceb`, `41f554b` | 🔴 **NO** (`4b7f21ae`) |
+| **`e31f6b3`** | 🔴 **NO** (`d5c8039f`) — ⚠️ **and it is the degradation record's ONLY commit, so TASK 2 has ZERO machine-readable token trailers** |
+
+**Action:** measured and recorded rather than repaired by rewriting — **the six commits are NOT
+amended**, `CLAUDE.md` §5, and an amend here would rewrite pushed history holding `c13-pass`. **This
+entry's own commit places both trailers in ONE paragraph with no blank line between them**, which is
+the correct form and is what gives `d5c8039f` a machine-readable trailer at all. Every future commit
+on this project should use that form.
+
+**Expectation:** `CLAUDE.md` §5 — *"Every commit carries the trailer `Session-Token: <token>`"* — and
+`PROCESS.md` §7a, whose whole mechanism is that `make check-roles` can **read** those trailers.
+⚠️ **The token was present and correct in all nine messages; what failed is that six of them are not
+parseable as trailers**, which is the difference between a claim being true and a claim being
+checkable — the distinction this entire project is built on.
+
+**Missing:** ⚠️ **nothing validates a session's OWN commit trailers as it makes them.** `check-roles`
+E1 reports commits with no trailer *in their trailer block* as an informational line and E4 is
+**`n/a`**, so the suite stayed **17 passed, 0 failed** throughout — **a green gate that was, for
+these six commits, not looking at the thing it exists to look at.** A one-line pre-commit check —
+`git interpret-trailers --parse` on the message about to be used, asserting a `Session-Token` comes
+back — would have caught the first one.
+
+**Missed:** ⚠️ **this repository had ALREADY recorded this exact class, twice, and this session had
+READ BOTH.** `INC-52` is *"one commit whose trailer **git itself** cannot read"*; `Q-081` and
+`check_roles.py`'s own E1 output — **printed to this session at least four times today** — say in
+terms: *"**1 commit(s) DO carry a `Session-Token:` line, OUTSIDE the trailer block, so this parser
+does not read it**"*, naming `97a5981` and its stray `@`. ⚠️ **The session read that sentence,
+understood it well enough to quote it, and then manufactured five more instances of it in the same
+hour** — because the sentence was filed as *a fact about a past commit* rather than as *a rule about
+the next one.*
+
+**Diagnosis:** appending a new trailer as a separate paragraph silently demotes every trailer above
+it to prose, and nothing in the commit's appearance changes — the message still *reads* as though it
+ends in two trailers, so the defect is invisible without running git's own parser.
+
+**Fix:** ⚠️ **NO SHA IS INVENTED HERE.** The commit landing this entry is what binds it, and **its
+real SHA is written into this line by the commit immediately following it** — the convention this
+session adopted after fabricating two such fields earlier today (`INC-60`). **That commit is also
+the demonstration:** its own trailer block holds `Session-Token` and `Co-Authored-By` as **adjacent
+lines**, and `git interpret-trailers --parse` returns both.
+
+**Systemic guardrail:** ⚠️ **ONE, CHEAP, AND OWED RATHER THAN BUILT — `check_roles.py` is outside
+both of this session's fences.** E4 is currently `n/a`; it could instead **FAIL on any commit whose
+message contains a `Session-Token:` line that `git interpret-trailers --parse` does not return** —
+the precise defect here, mechanically detectable, over the whole corpus, in one predicate. That is
+strictly stronger than E1's current informational count, which *reports* the condition and passes.
+⚠️ **AND THE COUNT, which is what this entry is really for: this is the FIFTH unmeasured-or-
+unchecked claim to reach a written artefact in this ONE session** — two fabricated `Fix:` SHAs,
+`INC-58`'s parser reporting verdicts it had not measured, `INC-60`'s CRLF check that counted the
+letter *r*, and this. **Four of the five were caught by re-reading a number rather than by any
+gate.** `INC-60` closed with *"a number is not a measurement"*; this one adds the companion:
+⚠️ **a trailer is not a trailer because it looks like one — `git interpret-trailers` decides, and
+the only honest way to know is to ask it.**
