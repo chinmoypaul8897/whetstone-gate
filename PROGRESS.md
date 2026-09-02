@@ -6,6 +6,138 @@ not a record; this file is.
 
 ---
 
+## ARCH — **GOLDEN 2** — 2026-09-03 — ⚠️ **GOLDEN 2 LANDED AND C8 UNBLOCKED. ALL 29 ARCHITECT-STATED CELLS REPRODUCE EXACTLY, ZERO MISMATCHES — AND THE WORLD REFUSES THE LEDGER THE S4 FIXTURE STIPULATES, WHICH IS `Q-092`**
+
+**SESSION-TOKEN:** `a72f5d81` · **DATA ROW 58 / 8-HEX ROW 57** of `QUESTIONS.md`'s `## Session
+tokens` table — both figures given because the two conventions in use differ by one (`OF-179`).
+Counted **in the operator's working tree** at `C:\Users\chinm\whetstone-gate`, where data row 57 was
+`4d90c2e6` (ARCH DISPOSITION 1). The row was registered **before this session's first commit**,
+because `check_roles` **E1** fails on a token that is not in that table. **ROLE: FIX. ZERO PROVIDER
+MODEL CALLS. NO TOKEN SPEND. NO TAG.**
+
+**Commits:** `tests/goldens/golden2_invariants.json` + `tests/goldens/README.md` → `QUESTIONS.md`,
+`STATUS.md` and this entry → one further commit for `docs/sessions/arch-goldens-3.txt`.
+
+⚠️ **A CONCURRENT ARCH DISPOSITION 1 SESSION (`4d90c2e6`) SHARED THIS WORKING TREE**, and it holds
+an uncommitted `docs/sessions/arch-disposition-1.txt` in it. Every commit of this session was made
+through a **PRIVATE INDEX** (`GIT_INDEX_FILE` under this session's own OS temp directory) with
+**step 5 — the scoped `git reset -- <the same paths>` — INCLUDED**, which `INC-68` records is the
+half whose omission causes the loss the procedure exists to prevent. `git diff --cached --name-status`
+was **read** immediately before every commit and `Q-063` clause (i)'s diff run before each.
+**`Swept: NOTHING` on every commit, measured on the staged snapshot rather than reasoned**
+(`INC-47`, `INC-68`). ⚠️ **Every `git add` named EXPLICIT FILE PATHS and never `docs/sessions/`**,
+precisely because the other session's session record is sitting untracked in that directory.
+
+---
+
+### WHAT THIS SESSION WAS ASKED TO DO
+
+Land an architect-computed golden. **TRANSCRIBE a derivation; do not author one.** C8 was blocked on
+the file and could not start. The prompt supplied eight fixtures and 29 expected cells, required an
+**independent reimplementation in a fresh OS temp directory importing nothing from
+`whetstone_gate`**, required the two to be compared cell by cell with **any disagreement a STOP and
+neither side adjusted**, and forbade adding any test that consumes the file.
+
+### THE COMPARISON, WHICH IS THE ONLY PART WORTH READING FIRST
+
+**29 architect-stated cells. 29 MATCH. 0 MISMATCH. Nothing adjusted on either side.** The script was
+written from the **text** of `CONTEXT.md` §9.1/§9.2 and **run before the golden was written**; the
+golden was then verified cell by cell against it, so no value in the file was produced by moving
+either side toward the other. `src/whetstone_gate/` carries **no `scorer/` package at all** on this
+commit, so there was nothing to import even by accident.
+
+Constants were **read from `config/protocol.yaml` by a walker that DISCOVERED each key's full path**
+rather than being handed it — which is how the first finding surfaced.
+
+### WHAT THE FILE CARRIES BEYOND THE EIGHT FIXTURES
+
+* **`published_finding`**, a named key — S2-amt fires and S2 does not on **F4** and **F5** (two
+  legitimate episodes flagged: INC-04's instalment schedule and its second ₹100 goodwill refund);
+  S2 fires and S2-amt does not on **F6** (one real duplicate-receipt replay missed). ⚠️ **NOISY AND
+  BLIND IN THE SAME FIXTURE SET**, which is stronger than INC-04's own summary — INC-04 records only
+  the false positives, because the spike had no second predicate to miss against.
+* **`coverage`**, re-derived from the file's own cells rather than asserted.
+* **`realizability`**, checked against C4's source first-hand.
+* **`derivation`**, recording the script, the comparison, and **which two cells are computed rather
+  than transcribed**.
+* **`scoring_readings`** — the two places §9.1/§9.2's wording leaves a reading open (issued vs
+  executed for E1/E2/E3 and for S1) were resolved **before** scoring and then computed **both ways
+  across all eight fixtures**: identical on every one, so **no expected value depends on either
+  choice**. A choice that changes no number is still a choice and is stated rather than buried.
+
+### THE THREE FINDINGS, SMALLEST FIRST
+
+**`Q-091` (i) — the prompt's `config/` key path is wrong and the value is right.** S4's window width
+was named `world.s4_in_flight_window_width`; it is at **`invariants.s4_in_flight_window_width`**. The
+value is `2` under either name and **no number moved**, and the prompt's STOP condition is *"if any
+disagrees with the FIGURES"* — so this is **not a STOP**. It is recorded because the constants block
+of a golden is exactly where a wrong path is inherited silently.
+
+**`Q-091` (ii) — S3 has no applicable-and-clean ledger, and `PROCESS.md` §5.2 asks for one.** Seven
+of eight predicates trip on one fixture and are clean on another; S3 is clean on **none** — every
+non-F7 fixture is **n/a**, not clean. ⚠️ **A scorer returning `[]` for "no captures present" passes
+seven fixtures without implementing S3 at all.** F7's seq 1 is a **row**-level control, not the
+**ledger**-level one §5.2 specifies. A ninth fixture closes it and **this session may not author
+one**.
+
+**`Q-092` — THE ONE THAT MATTERS, AND ITS DEADLINE IS BEFORE C8 *SCORES*, NOT BEFORE IT BUILDS.**
+Measured in C4's own source, not inferred from `RAZORPAY_SEMANTICS.md`:
+`bounds.py` sets `REFUND_MINIMUM_PAISE = 100` under **RS-28** (`MUST-FIRE`), so **F2's seq 5 and
+F3's seq 4 — both one-paise refunds stipulated as EXECUTED — are refunds the world refuses**; and
+`semantics.py` refuses a cumulative over-refund under **RS-03 against TRUE state**, its own docstring
+saying so deliberately: *"the boundary itself is never stale … a world whose boundary read its own
+stale view would let an over-refund EXECUTE, which is a different and much stronger claim than the
+one this project publishes."*
+⚠️ **So F8's ledger — three executed refunds totalling 12,000,000 against a 10,000,000 capture — is
+one C4's world CANNOT PRODUCE. And the architect's own F8 figures pin S4's ledger-established
+violation as the S1 breach. If that reading stands, S4 can be scored on a stipulated ledger and
+NEVER OBSERVED in an episode** — which is `INC-20` and `Q-027` MOVE 3's exact class arriving at the
+one invariant §9.2 calls *"the moat, stated as S4 alone."*
+⚠️ **IT DOES NOT FOLLOW THAT S4 IS UNFIRABLE, and the entry does not claim it.** §9.2's mechanism
+paragraph ends *"the episode ends over the **envelope**"*, and the envelope is **E2's ₹2,00,000
+POLICY cap, which Razorpay does not police and cannot refuse**. Under that reading S4 is realizable
+and F8 would need a fixture crossing 20,000,000 rather than one crossing a capture. **Both readings
+are tabled with the evidence for and against each, and a third possibility — that golden 2's
+fixtures are deliberately ABSTRACT scoring vectors — is named too, because *"a fixture the world
+cannot produce"* and *"an invariant that can never fire"* look identical from inside C8 and are
+opposite things.** ⚠️ **A transcribing session may not reconcile a contradiction in the law**, and
+this one did not: **every architect-stated cell is landed unchanged.**
+
+**`Q-093` — S3's consumption bookkeeping.** Is `auth_1` consumed by seq 1's capture? **The breach
+list is `[2,3,4]` under both readings and the golden pins it**; only seq 4's clause attribution moves
+(`matches_on_amount` alone, versus `unconsumed` **and** `matches_on_amount`). The architect's gloss
+*"one per clause of §9.2's three"* is exactly true only under the opening-state reading, and the
+evidence leans the other way — §8.6a's *"pure function of the folded state"* and `Q-062`'s *"E1, E2,
+E3 and S3 are all uncomputable without it"*, **both verified verbatim before being written**. The
+golden therefore carries **both** attributions rather than presenting either as the answer.
+
+### WHAT WAS NOT DONE, AND WHY
+
+* **NO TEST CONSUMES THE GOLDEN.** C8's BUILD is the first session permitted to write one. A golden
+  judged by a test from the hand that placed it is the circularity `tests/goldens/README.md` exists
+  to prevent, one level down.
+* **THE FIVE EXISTING GOLDENS ARE UNTOUCHED** — `git diff` **EMPTY on all five**, printed in the
+  FINAL OUTPUT. `Q-070` **STANDS**: golden 3 is not edited. This file answers only the half of Q-070
+  that says *"then golden 2 must carry receipts"* — it does, on F1, F3, F4, F5 and F6, with F6 a
+  receipt collision scored at **issue**. `Q-071` is **addressed and not answered**: every fixture
+  carries its opening captures and authorizations, which is Q-071's option 2, and Q-071's own text
+  says of that option *"it scores the golden, not an episode."*
+* **NOTHING UNDER `src/`, NOTHING IN `CONTEXT.md`, `PROCESS.md`, `config/` OR `INCIDENTS.md`** — all
+  named under **NOT** in this session's fence. ⚠️ **`INCIDENTS.md` is outside the fence, so no
+  incident entry was written**, and none is owed by this session: nothing broke here. `Q-092` is a
+  question about the specification, not a failure of this session's work, and it is filed where
+  questions go.
+* **THE COUNTER WAS RE-READ IMMEDIATELY BEFORE THE APPEND AND THE RE-READ CHANGED THE ANSWER.** This
+  session drafted `Q-090`…`Q-092` against `HEAD`, where `Q-089` was the highest. The concurrent
+  session had already written **`Q-090`** into the shared working tree. **All three entries were
+  renumbered to `Q-091`…`Q-093` before anything was committed**, and the renumber was propagated
+  into the golden and the README, which had already been written citing the old numbers — then the
+  golden's digest was re-measured and the README's published digest corrected to match. ⚠️ **Sixth
+  consecutive session to allocate from a counter it does not hold; the habit saved it again, and it
+  is still a habit and not a guardrail** (`OF-67`, `Q-063`).
+
+---
+
 ## ARCH — **DISPOSITION 1** — 2026-09-03 — ⚠️ **C6 AND C7 SHIP WITH RESIDUE, NOT TAGGED; `Q-089`, `Q-087` AND `Q-088` RULED; AND THE INCIDENT DEBT TWO REVIEWS COULD NOT WRITE IS CLEARED — WITH THE PATTERN'S OWN COUNT CORRECTED**
 
 **SESSION-TOKEN:** `4d90c2e6` · **DATA ROW 57 / 8-HEX ROW 56** of `QUESTIONS.md`'s `## Session

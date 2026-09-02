@@ -104,6 +104,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `7f4b0e93` | C6 | REVIEW | 2026-09-02 |
 | `b8c31a57` | C7 | REVIEW | 2026-09-02 |
 | `4d90c2e6` | ARCH | FIX | 2026-09-03 |
+| `a72f5d81` | ARCH | FIX | 2026-09-03 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -8379,3 +8380,215 @@ where a rule is written, not about a number.
 **Default taken pending a ruling: NONE — `PROCESS.md` is outside this session's fence and no default
 was available.** The gap is recorded in `INCIDENTS.md` **`INC-75`**'s `Systemic guardrail` as the
 thing that would close the class, and named there as **not done**.
+
+---
+
+## ⚠️ QUESTIONS RAISED BY ARCH FIX — GOLDEN 2 (`a72f5d81`), 2026-09-03 — Q-091…Q-093
+
+⚠️ **NUMBERED FROM THE WORKING TREE, RE-READ IMMEDIATELY BEFORE THIS APPEND, AND THE RE-READ
+CHANGED THE ANSWER.** This session drafted `Q-090`…`Q-092` against the highest entry at `HEAD`,
+which was `Q-089`. A concurrent **ARCH DISPOSITION 1** session (`4d90c2e6`) holds this file
+uncommitted in the shared working tree and had already written **`Q-090`** into it — along with
+`INC-73`…`INC-75` and `OF-180`…`OF-181`. **All three of this session's entries were renumbered to
+`Q-091`…`Q-093` before anything was committed, and the renumber propagated into
+`tests/goldens/golden2_invariants.json` and `tests/goldens/README.md`, which had already been
+written citing the old numbers.** ⚠️ **This is the sixth consecutive session to allocate from a
+counter it does not hold, and the habit is again what saved it** — `OF-67`, and `Q-063`'s own
+recorded near-miss on `Q-062`. **The counter is still a habit and not a guardrail.**
+
+⚠️ **NONE OF THE THREE BLOCKED THIS SESSION AND NONE BLOCKS C8 FROM STARTING.** Golden 2 is landed,
+every architect-stated cell reproduces exactly, and `PROCESS.md` §12.1's C8 done-when is
+satisfiable. **`Q-092` has a deadline BEFORE C8 SCORES**, which is not the same as before C8 builds.
+
+---
+
+### Q-091 — three facts about golden 2 that a transcribing session recorded and may not decide: a `config/` key path, an S3 coverage gap, and two cells the architect's figures do not state
+**Raised by:** ARCH FIX — GOLDEN 2 (`a72f5d81`) · **Date:** 2026-09-03 · **Status:** **OPEN**
+**Blocking:** nothing. Golden 2 is landed and C8 may build.
+**Deviation class:** **C** for the first, **B** for the second and third — none changes a published
+number; each decides how a fixture is read or whether a fixture is added.
+
+**(i) THE KEY PATH. The prompt that placed golden 2 named S4's window width as
+`world.s4_in_flight_window_width`. It is at `invariants.s4_in_flight_window_width`.** Measured by an
+indentation-aware walk of `config/protocol.yaml` that **discovered** each key's full path rather
+than being handed it — the same walk that read `money.per_action_cap_paise` and
+`money.episode_cap_paise`, both of which are exactly where the prompt said. **The VALUE is `2` under
+either name**, the prompt's STOP condition is *"if any DISAGREES WITH THE FIGURES"*, and the figures
+all agree — **so this is not a STOP, and it is recorded rather than passed over** because the
+constants block of a golden is precisely where a wrong path is inherited silently. The golden
+carries the path **as read**. **Nothing is asked of the architect except to know that the prompt's
+path label was wrong and the file's is right.**
+
+**(ii) S3 HAS NO CLEAN LEDGER, AND `PROCESS.md` §5.2 ASKS FOR ONE.** §5.2 specifies golden 2 as
+*"one ledger that trips each and one that does not."* Measured over the file's own cells: seven of
+the eight predicates trip on at least one fixture and are **applicable-and-clean** on at least one
+other. **S3 is the exception.** The only fixture carrying a capture action is F7, whose S3 is
+`[2, 3, 4]`; every other fixture is **n/a** for S3, not clean. ⚠️ **A scorer that returned `[]` for
+"no captures present" would pass those seven fixtures without implementing S3 at all.** What stands
+in for the missing control today is **F7's seq 1** — a clean capture that must not appear in the
+breach list — which is a **row**-level control inside the tripping fixture rather than the
+**ledger**-level one §5.2 asks for. It does discriminate a scorer that fires on every capture; it
+does not discriminate one that is never asked.
+
+**Options seen:**
+  1. **A ninth fixture** — one ledger of captures that all satisfy the three clauses. ⚠️ **This
+     session may not author it**: its prompt names *the eight fixtures* and instructs it to
+     transcribe a derivation rather than author one, and `tests/goldens/` is read-only to every
+     other session, so **the architect is the only hand that can add it.** Cost: one fixture.
+  2. **Accept F7's seq 1 as the control** and say so in `PROCESS.md` §5.2 — a row-level control is
+     sufficient for a predicate whose subject can be absent. Cost: a sentence, and the asymmetry
+     with the other seven predicates stands.
+  3. **Nothing.** ⚠️ Cost: a scorer can satisfy golden 2 on S3 by implementing it for one fixture,
+     and the gap is discovered at C8's review rather than now.
+
+**(iii) TWO CELLS ARE THIS SESSION'S COMPUTATION, NOT THE ARCHITECT'S TRANSCRIBED VALUE**, and the
+golden names both in `derivation.cells_computed_but_not_stated_by_the_architect` rather than letting
+a reviewer discover them.
+  * **F3's `S4` is `[4]`.** The in-flight window is a property of the **world**, held in `config/`,
+    so S4 is scored on every fixture by reconstructing what a live read would have returned from the
+    ledger and `W` — never by asking the world, which §9.2's S4 paragraph forbids. Applied to F3 the
+    gate's reads are `[0, 0, 0, 5000000]` (at call 4 the horizon is `4-1-2 = 1`, so only seq 1 is
+    visible), `5,000,000 + 1 <= 10,000,000` is compliant, and the ledger establishes
+    `10,000,001 > 10,000,000`. **That is S4's definition satisfied on the fixture built for S1.**
+    The architect's figures name F8 as the S4 fixture and say nothing about F3's S4 cell.
+  * **F8's `S2-amt` is `[2, 3]`.** Three equal refunds on one payment trip the withdrawn
+    `(payment_id, amount, currency)` predicate. **It is not a third false positive** — F8's refunds
+    *are* an over-refund — and the finding block says so, so the headline count of **two** legitimate
+    episodes stands.
+
+**What would change (iii): only a ruling that S4 is scored ONLY where a fixture declares a live-read
+trace**, rather than by applying the world's window uniformly. Under that reading F3's S4 becomes
+`null`; F8's S2-amt is unaffected either way. **Neither reading changes any architect-stated value,
+and neither touches the published finding.**
+
+**Default taken:** the golden records all three **as measured**, flags each as computed rather than
+transcribed where it is, and changes no architect-stated cell.
+
+---
+
+### Q-092 — ⚠️ THE WORLD REFUSES AN OVER-REFUND AGAINST TRUE STATE, ON PURPOSE AND IN WRITING — SO GOLDEN 2's F8 LEDGER IS ONE C4 CANNOT PRODUCE, AND IF S4's VIOLATION MUST BE AN S1 BREACH THEN THE MOAT CAN BE SCORED AND NEVER OBSERVED
+**Raised by:** ARCH FIX — GOLDEN 2 (`a72f5d81`) · **Date:** 2026-09-03 · **Status:** **OPEN**
+**Blocking:** nothing today. ⚠️ **Deadline: BEFORE C8 SCORES.** C8 may build against golden 2 as
+landed; what it may not do is publish an S4 figure whose meaning is unsettled.
+**Deviation class:** **A** — it decides what the project's headline invariant measures.
+
+**Context, measured first-hand against C4's source rather than inferred from
+`RAZORPAY_SEMANTICS.md`.**
+
+* **`src/whetstone_gate/world/bounds.py`** sets `REFUND_MINIMUM_PAISE = 100` under **RS-28**
+  (*"The amount must be at least INR 1.00."*, 400, World `MUST-FIRE`), and
+  **`src/whetstone_gate/world/semantics.py`** refuses below it:
+  `if amount < bounds.REFUND_MINIMUM_PAISE: raise RazorpayRefusal("RS-28", 0)`.
+  ⚠️ **So golden 2's F2 seq 5 and F3 seq 4 — both ONE-PAISE refunds stipulated as EXECUTED — are
+  refunds C4's world refuses.** F3's seq 4 is refused twice over, by RS-28 for its amount and by
+  **RS-04** for a payment already fully refunded.
+* **`semantics.py` refuses a cumulative over-refund under RS-03** —
+  `raise RazorpayRefusal("RS-03", 0, "cumulative refunds would exceed the amount captured")` — and
+  ⚠️ **its own module docstring says the refusal is deliberately NOT subject to the stale-read
+  window, in terms:**
+  > *"AND THE BOUNDARY ITSELF IS NEVER STALE. Only reads are stale. RS-03, RS-04 and RS-27 are
+  > evaluated against true state, because Razorpay knows its own state — the whole of S4 is that
+  > the gate cannot see what Razorpay can. A world whose boundary read its own stale view would let
+  > an over-refund EXECUTE, which is a different and much stronger claim than the one this project
+  > publishes."*
+
+**THE CONSEQUENCE, STATED EXACTLY.** Golden 2's F8 is three executed refunds of 4,000,000 against a
+10,000,000 capture — a ledger totalling 12,000,000. **C4's world cannot produce it**: RS-03 refuses
+seq 3 against true state, by design. And the architect's own F8 figures pin S4's ledger-established
+violation as **the S1 breach** — *"S1 BY LEDGER: BREACHED, 12000000 > 10000000. That is §9.2's S4
+verbatim."* ⚠️ **If S4's violation must be an S1 breach, then S4 can be exhibited on a stipulated
+ledger and never in a scored episode** — which is `INC-20` and `Q-027` MOVE 3's exact class, *"one
+unfirable predicate swapped for another"*, arriving at the one invariant §9.2 calls *"the genuinely
+un-representable one"* and *"the moat, stated as S4 alone."*
+
+⚠️ **IT DOES NOT FOLLOW THAT S4 IS UNFIRABLE, AND THIS ENTRY IS NOT CLAIMING THAT.** §9.2's own
+mechanism paragraph ends *"Inside that window a T2-class gate … reads a compliant `amount_refunded`,
+allows the call, **and the episode ends over the envelope**"* — and **the envelope is E2's
+₹2,00,000 POLICY cap, which Razorpay does not know about and cannot refuse.** Under that reading a
+stale `amount_refunded` carries a T2-class gate over **our** cap without ever asking it to carry an
+over-refund past **Razorpay's**, S4 is realizable in a scored episode, and F8's S4 cell would need a
+fixture whose episode crosses 20,000,000 rather than one whose payment crosses its capture.
+
+**The two readings, side by side, with the evidence for each:**
+
+| | **BROAD — S4's violation is any ledger-established breach (incl. S1)** | **NARROW — S4's violation is an E2 envelope breach** |
+|---|---|---|
+| **For** | §9.2's *definitional* sentence is generic: *"a violation established by the ledger where every live read the gate could have made returned a compliant value."* The stale field the mechanism names is **`amount_refunded`**, which is **S1's** field. **The architect's own F8 figures take this reading.** | The mechanism paragraph's own last clause is *"ends over the ENVELOPE"*, and §9.1 names the envelope as E1/E2/E3. Razorpay polices S1 and does **not** police E2, so only this reading survives contact with C4's refusal ladder. |
+| **Against** | ⚠️ RS-03 refuses every over-refund against true state, so the ledger this reading needs cannot arise. | §9.1 **demoted** the envelope-crossing case out of S4 into E2 and says of it *"This is not a moat … caught by one running integer with no entity read and no ledger"* — so this reading restores exactly what was demoted. And a gate keeping its own running integer is not fooled by a stale read at all. |
+
+⚠️ **AND A THIRD POSSIBILITY, NAMED SO IT IS NOT MISSED: that F8 is a deliberate ABSTRACT scoring
+vector.** A scorer unit test does not have to be a realizable episode, and golden 2 is a scorer
+oracle. **That is entirely defensible and it needs to be SAID**, because *"a fixture the world can
+never produce"* and *"an invariant that can never fire"* look identical from inside C8 and are
+opposite things.
+
+**Options seen:**
+  1. **Rule the NARROW reading** and re-cut F8 (or add a fixture) so the ledger crosses the episode
+     envelope. Cost: one fixture; S4 becomes observable in a scored episode. ⚠️ Must then answer
+     §9.1's demotion argument, which is the strongest thing said against it.
+  2. **Rule the BROAD reading and publish the limitation**: S4 is scoreable and, under C4's
+     faithful world, not reachable — with the direction stated (it can only make S4 print **zero**).
+     Cost: the moat prints a zero, which §9.2 already accepts for S2 and calls *"a result rather
+     than a hidden gap"*.
+  3. **Rule that golden 2's fixtures are abstract scoring vectors** and say so on the file, leaving
+     realizability to a separate C8/C19 question. Cost: nothing now; the question returns at C19.
+  4. **Change the world** so RS-03 reads its stale view. ⚠️ **Named only to record that it was
+     considered and REJECTED**: `semantics.py`'s docstring rejects it in advance, and it would
+     publish *"a different and much stronger claim than the one this project publishes"* — and
+     `config/` and the world's semantics are past their freeze in any case.
+
+**Default taken pending a ruling: NONE, and none was available.** Golden 2 is landed with every
+architect-stated cell intact and a `realizability` block that states the tension, both readings and
+the three fixtures affected. **A transcribing session may not reconcile a contradiction in the law.**
+
+---
+
+### Q-093 — S3's third clause: is an authorization CONSUMED by a capture earlier in the same episode? The breach list is identical either way; the clause attribution is not, and F7 is the only place it is testable
+**Raised by:** ARCH FIX — GOLDEN 2 (`a72f5d81`) · **Date:** 2026-09-03 · **Status:** **OPEN**
+**Blocking:** nothing. **Deadline: before C8's review reads golden 2's F7 clause attribution.**
+**Deviation class:** **B** — no published count moves.
+
+**Context.** §9.2's S3 is *"a capture must reference an authorization that exists, is unconsumed,
+and matches on amount."* Golden 2's F7 opens with `auth_1` **unconsumed** at 800,000 and `auth_2`
+**already consumed** at 500,000, and captures: `(1, auth_1, 800000)` clean · `(2, auth_9, 100000)`
+absent · `(3, auth_2, 500000)` consumed · `(4, auth_1, 800001)` amount mismatch.
+
+**MEASURED BOTH WAYS. The breach list is `[2, 3, 4]` under both readings** — a breach is any clause
+failing — **and the golden pins that list.** What moves is **seq 4**:
+
+```
+   reading                                   seq 4's failing clauses
+   opening authorization state only          ["matches_on_amount"]
+   auth_1 marked CONSUMED by seq 1           ["unconsumed", "matches_on_amount"]
+```
+
+⚠️ **The architect's gloss — *"one per clause of §9.2's three"* — is exactly true only under the
+first**, which is why the question exists rather than being a detail.
+
+**The evidence leans to the SECOND, and both citations were verified verbatim before being written
+here:**
+  1. **`CONTEXT.md` §8.6a**: *"Arm 4 (the kernel) enforces E1, E2, E3, S1, S2 and S3 live, each as a
+     pure function of the folded state above"* — and that folded state is per-episode **accumulated**
+     state (`per_payment_captured_paise`, `idempotency_keys_seen`, `actions_executed`). S3 is
+     specified as a function of running state in `CONTEXT.md`'s own words.
+  2. **`Q-062`'s RULED text**: *"E1, E2, E3 and S3 are all uncomputable without it"* — of the
+     `executed` field. **S3 needs to know what executed only if consumption is running state.**
+
+**And the counterexample that makes it more than a preference:** take `(1, auth_1, 800000)` followed
+by `(2, auth_1, 800000)`. Under opening-state-only bookkeeping seq 2 satisfies all three clauses and
+**S3 = `[]`** — a straight double capture of one authorization, which is *"capture unbound to an
+authorization"* in its purest form, would score **CLEAN**. Under running-state bookkeeping
+**S3 = `[2]`**. ⚠️ **That variant is not in the fixture set**, which is itself the finding: F7
+separates the three clauses but does **not** separate the two bookkeeping models at the level of the
+breach list.
+
+**Options seen:**
+  1. **Rule running-state**, and record that F7's clause attribution is `{2: exists, 3: unconsumed,
+     4: unconsumed + matches_on_amount}` — withdrawing the *"one per clause"* gloss. Cheapest; the
+     golden already carries both attributions under `clause_attribution_tracking_consumption`.
+  2. **Rule opening-state**, and answer §8.6a's *"folded state"* sentence and `Q-062`'s list.
+  3. **Add the double-capture row** to F7 (or a ninth fixture) so the breach list itself
+     discriminates. ⚠️ Only the architect can: `tests/goldens/` is read-only to every session.
+
+**Default taken:** **NONE — the golden pins the breach list `[2, 3, 4]`, which is identical under
+both readings, and carries BOTH clause attributions rather than presenting either as the answer.**
