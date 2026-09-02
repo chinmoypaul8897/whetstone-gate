@@ -362,5 +362,205 @@ reading the STAGED SNAPSHOT every time, never the working tree:
 TASK 2 - THE DEGRADATION RECORD (d5c8039f)
 ======================================================================================
 
-<This section is written after TASK 1's hard gate is measured. If the gate did not hold,
-this section says so and TASK 2 was not started.>
+THE HARD GATE HELD, AND IT WAS MEASURED BY THIS SESSION BEFORE TASK 2 BEGAN:
+  make test                              784 passed, 1 skipped, 2 deselected, 0 FAILED
+  make check-roles                       17 passed, 0 failed, 5 n/a, exit 0
+  git status --porcelain tests/goldens/  EMPTY (at 11:58 - see section 8)
+  vendored pins, PROVED not assumed      tau2_bench_sha = a2c024725189473d2d7cea3a5cfdbcc67478e41f
+                                         camel_sha      = f083b6b396399d3b3c7f2ddaf613a5945eaf32d8
+                                         agentdojo_sha  -> RAISES UndeterminedValue on its
+                                                           sentinel TODO_C13_C16. A hard refusal,
+                                                           never a silent default (hard rule 9).
+  make selftest                          RED, and ONLY on lanes: camel_comparator.branch =
+                                         TODO_C13_RUN1 - declared, and not C6's.
+Nothing was red for a reason TASK 1 did not itself declare and close.
+
+-- 1. Q-083, RECORDED VERBATIM BEFORE A ROW OF PROCESS.md WAS TOUCHED -----------------
+
+The architect fired degradation RUNGS 1, 3 AND 5 at 08:10 IST = 02:40 UTC on 2026-09-02,
+under the operator's standing authorisation. The ruling is in QUESTIONS.md Q-083, verbatim,
+no word altered. PROCESS.md S14: "Record every cut in INCIDENTS.md AT THE MOMENT IT IS
+MADE, with the time, the rung, and the reason."
+
+-- 2. ONE INCIDENTS ENTRY PER RUNG, HARD RULE 13's EIGHT FIELDS, UTC AND IST ----------
+
+INC-61  RUNG 1 - C15's ladder-harness review folds into C18's; C20's video review folds
+        into C21's. Cost ~ two review slots. Neither chunk publishes a number.
+INC-62  RUNG 3 - C16 / AD-CMP, the AgentDojo comparator, 80 episodes (InjectionTask6 x 16
+        user tasks x 5 arms): NOT RUN. The second external environment is LOST. tau-2 bench
+        remains - pinned, never-cut at any rung - SO THE EXTERNALLY-AUTHORED-ANSWER-KEY
+        CLAIM, THE ONE THE SUBMISSION RESTS ON, IS UNTOUCHED.
+INC-63  RUNG 5 - C17's and C19's reviews downgrade from full to code. Neither publishes a
+        number. Written as ONE entry covering both because they were fired as one act, in
+        one ruling, at one time - which is more accurate than splitting one decision into
+        two records.
+
+!! Missed: IS THE SAME IN ALL THREE, AND THAT IS THE FINDING RATHER THAN A REPETITION.
+   PROCESS.md S14's own slip trigger reads "31 Aug 18:00 - C10 or C11 is not PASSed ->
+   fire rung 1, then rung 3." C10 AND C11 HAD NOT STARTED - strictly worse than the
+   trigger describes - so all three rungs were AVAILABLE AND PRE-AUTHORISED ON 31 AUGUST
+   AND WERE FIRED TWO DAYS LATE.
+
+!! Diagnosis: the ladder's triggers are DATED CONDITIONS THAT NOTHING EVALUATES ON THE
+   DATE. They are checked when somebody thinks to look - which is exactly the moment when
+   firing them feels like an admission rather than a plan.
+
+!! "WE RAN OUT OF TIME" IS NOT THE DIAGNOSIS AND APPEARS NOWHERE. The schedule was
+   consumed by TWENTY-ONE SESSIONS ON TWO CHUNKS (C6 and C13), and by THE ARCHITECT
+   DEFERRING THIS DECISION THREE TIMES AFTER RECOMMENDING IT. Both are written into the
+   entries as the causal mechanism, because the honest answer was available.
+
+!! RUNG 3's Systemic guardrail, as the prompt required, says what would have made an
+   80-episode comparator affordable: NOTHING MECHANICAL WOULD HAVE - 80 episodes x 5 arms
+   on free-tier lanes plus a full review is roughly a working day, and the two days
+   remaining are committed to C18, C19 and C21, none of which can be cut without ending
+   the submission. WHAT WOULD HAVE MADE IT AFFORDABLE IS A SCHEDULING DECISION TWO DAYS
+   EARLIER, which is precisely what INC-61's Missed field records as available and unused.
+   Recorded as "accepted, because ..." with the arithmetic, not as regret.
+
+-- 3. A CONSEQUENCE THE RULING DID NOT STATE, MEASURED HERE --------------------------
+
+config/protocol.yaml carries vendor.agentdojo_sha = TODO_C13_C16, a SENTINEL, and the
+loader RAISES UndeterminedValue on it rather than defaulting - hard rule 9 working as
+designed, measured this session alongside tau2_bench_sha and camel_sha, which both resolve.
+C16 NOT RUNNING MEANS THAT SENTINEL IS NEVER RESOLVED.
+!! config/ IS A PRE-REGISTRATION ARTEFACT AND MUST NOT BE EDITED TO TIDY IT AWAY - not
+   before the freeze to look complete, and not after, when editing it is forbidden
+   outright. THE LOADER KEEPS REFUSING, AND THAT IS THE CORRECT END STATE. Written down in
+   Q-083, INC-62, the PROCESS.md C16 row and the C18/C19 note, so that a later session
+   does not read it as an oversight and "fix" it.
+
+-- 4. WHAT WAS DELIBERATELY NOT DONE -------------------------------------------------
+
+RUNGS 2, 4 AND 6 ARE NOT FIRED AND ARE NOT SPENT EARLY. Each changes what is MEASURED, and
+after prereg-v1 none can be changed at all, so all three remain live decisions until C14.
+S14's table now says so on each of those rows.
+!! N IS NOT A RUNG AND WAS NOT TOUCHED. If the sweep cannot finish, the episodes that did
+   not run are counted, categorised and PRINTED AS A NUMBER (hard rule 11).
+!! NOTHING ON THE NEVER-CUT LIST IS AFFECTED: tau-2 bench, the competence probe and void
+   rule, the freeze and its external witness, INCIDENTS.md, the counter-metric, the
+   seeded-defect test, C21's two form paragraphs and the git-history secret scan.
+!! THE ARCHITECT'S EARLIER SUGGESTION TO DROP C15/C17/C20 NOW IS WITHDRAWN AS PREMATURE -
+   rungs 1 and 5 already remove most of their cost, and CUTTING WHAT YOU HAVE NOT YET
+   NEEDED TO CUT IS THE THING THIS PROJECT CRITICISES. They are recorded as the
+   PRE-DECLARED NEXT THREE, IN THAT ORDER, in Q-083 and in STATUS.md - BEFORE they are
+   needed, which is the entire point.
+
+-- 5. EVERY ROW QUOTED BEFORE AND AFTER ----------------------------------------------
+
+PROCESS.md S12.1 - the Review cell of each row. THE ORIGINAL TEXT IS PRESERVED INSIDE THE
+AMENDED CELL IN EVERY CASE; nothing is erased.
+
+  C15  BEFORE: **code**
+       AFTER : **code** - FOLDED INTO C18's REVIEW, 2026-09-02 (rung 1; INC-61; Q-083).
+               The original entry read code and stands above; the fold is the change.
+               C15 publishes no number of its own and C18 consumes its output.
+
+  C16  BEFORE: **full**
+       AFTER : NOT RUN - CUT 2026-09-02 (rung 3; INC-62; Q-083). The original entry read
+               **full** and stands above, with its original reason - "this chunk publishes
+               a claim about a third party's system" - because what the plan WAS is part
+               of the record. AD-CMP's 80 episodes are NOT RUN and are named as *not run*,
+               with why, in RESULTS.md and the README (S14). tau-2 bench remains, so the
+               externally-authored-answer-key claim is UNTOUCHED. config/protocol.yaml's
+               vendor.agentdojo_sha sentinel therefore stays unresolved and the loader
+               keeps RAISING - that is the correct end state and config/ must NOT be
+               edited to tidy it away.
+
+  C17  BEFORE: **full**
+       AFTER : **code** - DOWNGRADED FROM full 2026-09-02 (rung 5; INC-63; Q-083). The
+               original entry read **full** and stands above. C17 replays a STORED ledger
+               and publishes no number, so there is no figure for a reimplementation to
+               disagree with; a code review still reads the diff, runs the suite and may
+               raise BLOCKERs.
+
+  C19  BEFORE: **full**
+       AFTER : **code** - DOWNGRADED FROM full 2026-09-02 (rung 5; INC-63; Q-083). The
+               original entry read **full** and stands above. C19 writes prose and
+               publishes no computed number. BUT ONE VERIFICATION IN ITS done-when
+               SURVIVES THE DOWNGRADE AND IS NAMED HERE SO IT IS NOT SKIPPED: "a fresh
+               session runs S6a.3's verification procedure start to finish from that clean
+               clone and reproduces the published fingerprint" - that is a reproduction
+               check on the PRE-REGISTRATION, it is a PROCEDURE rather than a
+               reimplementation, and it is REQUIRED under code.
+
+  C20  BEFORE: **code** + **submission**
+       AFTER : **code** + **submission** - THE code REVIEW IS FOLDED INTO C21's,
+               2026-09-02 (rung 1; INC-61; Q-083). The original entry stands above; the
+               fold is the change. C21's review is full + submission and reads C20's
+               output, so the video is still adversarially reviewed - by the session that
+               also checks the form paragraphs. C20 publishes no number.
+
+PROCESS.md S14's rung table - the "Pre-declared?" cell of each rung:
+
+  RUNG 1  BEFORE: new, this document
+          AFTER : FIRED 2026-09-02 08:10 IST / 02:40 UTC - INC-61, Q-083.
+                  Pre-declared: new, this document
+  RUNG 2  BEFORE: **yes** - spec S13.3.3
+          AFTER : NOT FIRED. RESERVED UNTIL C14 - it changes what is MEASURED, and after
+                  prereg-v1 it cannot be changed at all. Pre-declared: **yes** - spec S13.3.3
+  RUNG 3  BEFORE: new, this document
+          AFTER : FIRED 2026-09-02 08:10 IST / 02:40 UTC - C16 IS NOT RUN - INC-62, Q-083.
+                  Named as *not run*, with why, in RESULTS.md and the README.
+                  Pre-declared: new, this document
+  RUNG 4  BEFORE: **yes** - spec S13.4, "the one pre-declared further reduction". ...
+          AFTER : NOT FIRED. RESERVED UNTIL C14 - it changes what is MEASURED.
+                  Pre-declared: **yes** - spec S13.4, ... (rest of the original cell intact)
+  RUNG 5  BEFORE: new, this document
+          AFTER : FIRED 2026-09-02 08:10 IST / 02:40 UTC - INC-63, Q-083.
+                  Pre-declared: new, this document
+  RUNG 6  BEFORE: **yes** - spec S8.5.1
+          AFTER : NOT FIRED. RESERVED UNTIL C14 - it changes what is MEASURED. C13 PASSED
+                  (c13-pass) on 2026-09-02, so the branch is RUN-1's to decide, not the
+                  ladder's. Pre-declared: **yes** - spec S8.5.1
+
+STATUS.md - each row's Review / Status / review-history cells. EVERY history cell was
+EMPTY ("-") before, and is APPENDED to, never erased:
+
+  C15  BEFORE: code | todo | -
+       AFTER : code - FOLDED into C18's review (rung 1, 2 Sep) | todo - review folded |
+               RUNG 1 FIRED ... + the pre-declared-contingency note (FIRST of the next three)
+  C16  BEFORE: full | todo | -
+       AFTER : ~~full~~ - NOT RUN | NOT RUN - CUT (rung 3) | RUNG 3 FIRED ... + the
+               agentdojo-sentinel note
+  C17  BEFORE: full | todo | -
+       AFTER : code - DOWNGRADED from full | todo - review downgraded | RUNG 5 FIRED ...
+               + "reduces adversarial coverage on the renderer, published as a cost"
+  C19  BEFORE: full | todo | -
+       AFTER : code - DOWNGRADED from full | todo - review downgraded | RUNG 5 FIRED ...
+               + the S6a.3 verification that SURVIVES the downgrade, named
+  C20  BEFORE: code + submission | todo | -
+       AFTER : code + submission - the code review FOLDED into C21's | todo - review
+               folded | RUNG 1 FIRED ...
+
+-- 6. THE NOTE FOR C18 AND C19, WRITTEN WHERE THEY WILL READ IT ----------------------
+
+A new block in PROCESS.md S14, immediately above "N IS NOT A RUNG", tabulates exactly what
+must be published about every cut: C16/AD-CMP as NOT RUN in BOTH RESULTS.md and README.md
+with its reason and INC-62; C15's and C20's folded reviews; C17's and C19's downgrades. It
+closes on the one that is easiest to get wrong - vendor.agentdojo_sha keeps raising, DO NOT
+report it as a defect and DO NOT edit config/ to resolve it, report it as the visible
+consequence of a published cut - and on why this is not bookkeeping: A PROJECT THAT CUTS A
+COMPARATOR AND DOES NOT SAY SO HAS DONE THE THING IT CRITICISES.
+
+-- 7. TOKENS NOT CROSSED, AND IT IS DEMONSTRATED RATHER THAN ASSERTED ----------------
+
+TASK 2's Q-083 block was LIFTED OUT of QUESTIONS.md before TASK 1's correction commit was
+staged, so that commit carries no TASK 2 content; git diff --cached -- QUESTIONS.md was
+checked to contain ZERO occurrences of d5c8039f. Q-083 was restored afterwards and
+committed under its own token. make check-roles E2/E3 clean at every boundary.
+
+-- 8. CONCURRENCY DURING TASK 2, AND A GATE RESULT THAT CHANGED AFTERWARDS -----------
+
+!! ANOTHER SESSION BECAME ACTIVE IN THIS WORKING TREE DURING TASK 2 and is named here
+   because it changes a gate result this session published.
+   At 11:58 the hard gate measured git status --porcelain tests/goldens/ EMPTY. At 12:06
+   an UNTRACKED file appeared: tests/goldens/golden5b_ledger_writer.json. Shortly after,
+   tests/test_repo_invariants.py showed as modified. NEITHER IS THIS SESSION'S - nothing
+   between those times ran anything that writes a golden - and BOTH ARE OUTSIDE THIS
+   SESSION'S FENCE IN BOTH DIRECTIONS (tests/goldens/ is read-only to every session,
+   CLAUDE.md S4; test_repo_invariants.py is named under NOT in both task fences).
+   NEITHER WAS TOUCHED AND NEITHER WAS STAGED - every commit used explicit paths and
+   git diff --cached --name-only was read before each one.
+   THE GATE RESULT STANDS AS MEASURED AT THE TIME IT WAS MEASURED, and the later arrival
+   is named here rather than left to make a published "EMPTY" look wrong later.

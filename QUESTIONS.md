@@ -95,6 +95,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `7a1e6c84` | C13 | REVIEW | 2026-09-02 |
 | `4b7f21ae` | C6 | FIX | 2026-09-02 |
 | `d5c8039f` | ARCH | FIX | 2026-09-02 |
+| `6f3a91d2` | ARCH | FIX | 2026-09-02 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -7575,5 +7576,59 @@ invariant was verifying the property continuously; the ad-hoc grep added nothing
 like evidence.** For line endings, a session should **cite the suite**, not re-implement the check —
 an untested second implementation of a tested predicate is hard rule 8's anti-circularity argument
 pointed at a shell one-liner.
+
+---
+## ⚠️ RECORDED BY THE ARCHITECT FIX SESSION (`d5c8039f`), 2026-09-02 — Q-083
+
+### Q-083 — ⚠️ THE DEGRADATION LADDER IS FIRED: RUNGS 1, 3 AND 5. Recorded VERBATIM, at the moment the cut was made, BEFORE any row of `PROCESS.md` was touched
+
+**Recorded by:** the ARCH FIX session (`d5c8039f`), 2026-09-02 · **Class:** **A** — it changes what
+is measured and what is published · **Status:** ⚠️ **RULED AND FIRED. Not a question.**
+
+`PROCESS.md` §14: *"Record every cut in `INCIDENTS.md` **at the moment it is made**, with the time,
+the rung, and the reason. A cut item is never silently lost: it is named in `RESULTS.md` and in the
+README as **not run**, with why."* **This entry and `INC-60`/`INC-61`/`INC-62` are that record.**
+⚠️ **It is not bookkeeping.** It is the difference between honest scope reduction and cherry-picking,
+in a submission whose thesis is that other people's numbers are unsound.
+
+**THE RULING, VERBATIM (hard rule 5). No word is altered.**
+
+> "THE ARCHITECT FIRED DEGRADATION RUNGS 1, 3 AND 5 AT 08:10 IST ON 2026-09-02, with the operator's
+> standing authorisation. REASON: five of twenty-two chunks are tagged with two days remaining; C6
+> and C13 have together consumed twenty-one sessions; C8, C9, C10 and C11 have not started. The
+> freeze does not move (standing operator instruction); the ladder fires instead.
+>   RUNG 1 — C15's ladder-harness review folds into C18's; C20's video review folds into C21's.
+>   RUNG 3 — C16 / AD-CMP, the AgentDojo comparator, 80 episodes: NOT RUN. Tau-2 bench remains, so
+>     the externally-authored-answer-key claim — the one the submission rests on — is UNTOUCHED.
+>   RUNG 5 — C17's and C19's reviews downgrade from `full` to `code`. Neither publishes a number.
+> RUNGS 2, 4 AND 6 ARE NOT FIRED AND ARE NOT SPENT EARLY. Each changes what is MEASURED, and after
+> `prereg-v1` none can be changed at all, so all three remain live decisions until C14 and the
+> architect brings them to the operator before the freeze.
+> PRE-DECLARED CONTINGENCY, RECORDED TODAY, BEFORE IT IS NEEDED, WHICH IS THE ENTIRE POINT: if the
+> clock forces further reduction, the next three to go are C15, C17 and C20, IN THAT ORDER. The
+> architect's earlier suggestion to drop them NOW is WITHDRAWN as premature — rungs 1 and 5 already
+> remove most of their cost, and cutting what you have not yet needed to cut is the thing this
+> project criticises.
+> ⚠️ N IS NOT A RUNG AND IS NOT TOUCHED. If the sweep cannot finish, the episodes that did not run
+> are counted, categorised and PRINTED AS A NUMBER (hard rule 11). NOTHING ON THE OPERATOR'S
+> NEVER-CUT LIST IS AFFECTED: tau-2 bench, the competence probe and void rule, the freeze and its
+> external witness, INCIDENTS.md, the counter-metric, the seeded-defect test, C21's two form
+> paragraphs and the git-history secret scan all stand."
+
+**Where it is applied, by this session:** `INC-60` (rung 1), `INC-61` (rung 3), `INC-62` (rung 5),
+each in hard rule 13's eight fields with both UTC and IST; `PROCESS.md` §12.1's C15/C16/C17/C19/C20
+rows and §14's rung table; `STATUS.md`; and a note written where C18 and C19 will read it.
+
+⚠️ **ONE CONSEQUENCE OF RUNG 3 THAT THE RULING DOES NOT STATE AND THIS SESSION MEASURED, RECORDED
+BECAUSE IT IS EXACTLY THE KIND OF THING A CUT HIDES.** `config/protocol.yaml` carries
+`vendor.agentdojo_sha = TODO_C13_C16`, a **sentinel**, and the loader **raises**
+`UndeterminedValue` on it rather than defaulting — hard rule 9 working as designed (measured this
+session: `vendor.tau2_bench_sha` and `vendor.camel_sha` resolve; `vendor.agentdojo_sha` raises).
+**C16 not running means that sentinel is never resolved.** ⚠️ **`config/` is a pre-registration
+artefact (hard rule 9, `PROCESS.md` §6a) and MUST NOT be edited to tidy it away** — not before the
+freeze to make it look complete, and not after, when editing it is forbidden outright. The correct
+handling is the one already in force: **the loader keeps refusing, and C18/C19 publish AD-CMP as
+NOT RUN with its reason.** A sentinel that still refuses is the honest end state, and this paragraph
+exists so that a later session does not read it as an oversight and "fix" it.
 
 ---

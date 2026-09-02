@@ -6,6 +6,84 @@ not a record; this file is.
 
 ---
 
+## ARCH — THE DEGRADATION RECORD — **FIX** — 2026-09-02 — **RUNGS 1, 3 AND 5 FIRED AND RECORDED AT THE MOMENT OF THE CUT; RUNGS 2, 4 AND 6 DELIBERATELY NOT SPENT**
+
+**SESSION-TOKEN:** `d5c8039f` · Row **48**, registered before this task's first commit. "NIGHT RUN
+B" held **two** chunk tokens — `4b7f21ae` for C6 FIX 4 (TASK 1) and this one for the ARCH record —
+and **they are never crossed.** ⚠️ **Demonstrated rather than asserted:** TASK 2's `Q-083` block was
+**lifted out of `QUESTIONS.md` before TASK 1's correction commit was staged**, so that commit
+carries no TASK 2 content, and `git diff --cached -- QUESTIONS.md` was checked to contain **zero**
+occurrences of `d5c8039f`. It was restored afterwards and committed under its own token.
+
+**Pushed SHA:** see the FINAL OUTPUT in `docs/sessions/nightrun-b-1.txt`.
+**Gate:** ⚠️ **TASK 1's HARD GATE HELD before this task began** — `make test` **784 passed, 1
+skipped, 2 deselected, 0 FAILED**; `make check-roles` **17 passed, 0 failed, 5 n/a, exit 0**;
+`git status --porcelain tests/goldens/` **EMPTY**; vendored pins proved. `make selftest` red **only**
+on `camel_comparator.branch`, which is declared and is not C6's.
+
+### What this session did
+
+**`Q-083` RECORDED VERBATIM FIRST**, before a row of `PROCESS.md` was touched: the architect fired
+degradation **rungs 1, 3 and 5** at **08:10 IST / 02:40 UTC on 2026-09-02** under the operator's
+standing authorisation. Then one `INCIDENTS.md` entry per rung, in hard rule 13's eight fields, each
+carrying **both UTC and IST**, the rung, the cost and what is lost.
+
+* **`INC-61` — RUNG 1.** C15's ladder-harness review folds into C18's; C20's video review folds into
+  C21's. Cost ≈ two review slots; neither chunk publishes a number.
+* **`INC-62` — RUNG 3.** **C16 / AD-CMP, 80 episodes: NOT RUN.** The second external environment is
+  lost. **τ²-bench remains** — pinned at `a2c0247…`, never-cut at any rung — **so the
+  externally-authored-answer-key claim, the one the submission rests on, is untouched.**
+* **`INC-63` — RUNG 5.** C17's and C19's reviews drop `full` → `code`. Neither publishes a number.
+
+⚠️ **`Missed:` IS THE SAME IN ALL THREE, AND THAT IS THE FINDING RATHER THAN A REPETITION.**
+`PROCESS.md` §14's own slip trigger reads *"31 Aug 18:00 — C10 or C11 is not PASSed → **fire rung 1,
+then rung 3**"*. **C10 and C11 had not STARTED** — strictly worse than the trigger describes — so all
+three rungs were **available and pre-authorised on 31 August and were fired two days late.**
+`Diagnosis:` the ladder's triggers are dated conditions that **nothing evaluates on the date**; they
+are checked when somebody thinks to look, which is exactly when firing them feels like an admission
+rather than a plan. ⚠️ **"We ran out of time" is not the diagnosis and is not written anywhere:** the
+schedule was consumed by **twenty-one sessions on two chunks (C6 and C13)**, and by **the architect
+deferring this decision three times after recommending it.**
+
+⚠️ **ONE CONSEQUENCE THE RULING DID NOT STATE, MEASURED BY THIS SESSION AND RECORDED BECAUSE IT IS
+EXACTLY WHAT A CUT HIDES:** `config/protocol.yaml` carries `vendor.agentdojo_sha = TODO_C13_C16`, and
+the loader **raises `UndeterminedValue`** on it rather than defaulting — measured here, alongside
+`tau2_bench_sha` and `camel_sha`, which both resolve. **C16 not running means that sentinel is never
+resolved.** `config/` is a pre-registration artefact and **must not be edited to tidy it away**;
+**a sentinel that still refuses is the correct end state**, and it is written down so a later session
+does not read it as an oversight and "fix" it.
+
+### What was deliberately NOT done
+
+**Rungs 2, 4 and 6 are NOT fired and are NOT spent early.** Each changes what is **measured**, and
+after `prereg-v1` none can be changed at all, so all three stay live until C14 and the architect
+brings them to the operator before the freeze. §14's table now says so on each row.
+⚠️ **N IS NOT A RUNG AND WAS NOT TOUCHED.** If the sweep cannot finish, the episodes that did not run
+are counted, categorised and **printed as a number** (hard rule 11).
+⚠️ **NOTHING ON THE NEVER-CUT LIST IS AFFECTED:** τ²-bench, the competence probe and void rule, the
+freeze and its external witness, `INCIDENTS.md`, the counter-metric, the seeded-defect test, C21's
+two form paragraphs and the git-history secret scan all stand.
+⚠️ **The architect's earlier suggestion to drop C15/C17/C20 NOW is WITHDRAWN as premature** — rungs 1
+and 5 already remove most of their cost, and **cutting what you have not yet needed to cut is the
+thing this project criticises.** They are recorded as the **pre-declared next three, in that order**,
+in `STATUS.md` and in `Q-083`, *before* they are needed, which is the entire point.
+
+### Amendments — appended, never overwritten
+
+`PROCESS.md` §12.1: C15, C16, C17, C19 and C20. **Every original cell is preserved inside the amended
+one**, so a reader sees what the plan **was** and what it **became** — including C16's original
+`full` and its original justification. §14's table: rungs 1/3/5 **FIRED with the date**, rungs 2/4/6
+**NOT FIRED — RESERVED UNTIL C14**. A new §14 block states **exactly what C18 and C19 must publish
+about every cut**, in the place those chunks will read it. `STATUS.md`: C16 **NOT RUN**; C15/C17/C19/
+C20 annotated, with the review-history column **appended to**, never erased.
+
+⚠️ **AND ONE THING NAMED AS A REAL COST RATHER THAN MITIGATED AWAY:** rung 5 reduces adversarial
+coverage on **the two chunks a judge reads first** — the README and the renderer behind the video's
+RACE beat. C21's review is `full` + `submission` and reads C19's output verbatim, and `INC-61`'s fold
+puts C20 inside it. **That is a mitigation, not an equivalence, and it is published as such.**
+
+---
+
 ## C6 — THE ATTACKER LOOP — **FIX** attempt 4 — 2026-09-02 — **THE THREE THAT CARRIED THE FAIL ARE CLOSED AND RE-MUTATED KILLED; ONE OF THIS SESSION'S OWN MUTANTS SURVIVED AND IS REPORTED**
 
 **SESSION-TOKEN:** `4b7f21ae` · **NOT in the batch.** Row **47**, registered **before this task's
