@@ -1,0 +1,193 @@
+====================================================================================================
+PROVENANCE
+====================================================================================================
+  chain.__file__     C:\Users\chinm\whetstone-gate\src\whetstone_gate\ledger\chain.py
+  config.repo_root() C:\Users\chinm\whetstone-gate
+
+====================================================================================================
+§1  THE H-1 FIXTURE'S FIVE SHAPES — WHICH ONES ACTUALLY RUN
+====================================================================================================
+  The fixture loops over five prev_hash shapes and skips any equal to the genesis root.
+  Today's genesis root IS the literal 'PRE-FREEZE', so shape 1 — the one the fixture's
+  own comment calls 'THE threat shape' — is SKIPPED. Four shapes run.
+    shape 'PRE-FREEZE'    SKIPPED (== genesis)
+    shape 'bbbbbbbbbbbbbb'  DETECTED  seq=1    the link is broken: entry 1 stores prev_ha
+    shape 'bbbbbbbbbbbbbb' DETECTED at seq 1 for the LINK                    OK
+    shape 'aaaaaaaaaaaaaa'  DETECTED  seq=1    the link is broken: entry 1 stores prev_ha
+    shape 'aaaaaaaaaaaaaa' DETECTED at seq 1 for the LINK                    OK
+    shape ''              DETECTED  seq=1    the link is broken: entry 1 stores prev_ha
+    shape '' DETECTED at seq 1 for the LINK                                  OK
+    shape 'PRE-FREEZE-2'  DETECTED  seq=1    the link is broken: entry 1 stores prev_ha
+    shape 'PRE-FREEZE-2' DETECTED at seq 1 for the LINK                      OK
+    four of the fixture's five shapes actually run                           OK
+
+====================================================================================================
+§2  ⚠️ OF-141's STATED COST, DRIVEN — the claim is that entry 1's link check is 'the only
+    thing standing between a PRE-FREEZE ledger and a SCORED one'.
+====================================================================================================
+
+  (a) REVIEW 1's EXHIBIT — entry 1's prev_hash alone, digest untouched, verified against
+      the REAL root. This is what M12 lets through, and it reproduces:
+      HEAD  -> DETECTED at 1
+      M12   -> VALID
+    the exhibit: HEAD DETECTED, M12 VALID                                    OK
+
+  (b) ⚠️ THE ACTUAL PUBLISHED THREAT — a ledger WRITTEN pre-freeze, PRESENTED as scored.
+      Build it from the PRE-FREEZE root, then verify it against the tag object id every
+      scored episode would chain from. Three forgeries, each driven under HEAD AND M12:
+      0. untouched, verified against the TAG root                      HEAD=DETECTED  M12=DETECTED
+    forgery '0' is DETECTED by HEAD                                          OK
+    forgery '0' is DETECTED by M12 TOO                                       OK
+      1. entry 1's prev_hash rewritten to the TAG root, digest untouched HEAD=DETECTED  M12=DETECTED
+    forgery '1' is DETECTED by HEAD                                          OK
+    forgery '1' is DETECTED by M12 TOO                                       OK
+      2. entry 1's prev_hash LEFT at PRE-FREEZE (M12 would skip the link check) HEAD=DETECTED  M12=DETECTED
+    forgery '2' is DETECTED by HEAD                                          OK
+    forgery '2' is DETECTED by M12 TOO                                       OK
+
+  ⚠️ THE MECHANISM, READ OFF chain.verify's OWN SOURCE RATHER THAN INFERRED:
+      recomputed = entry_digest(expected_prev, body, algorithm=algorithm)
+    the recomputation hashes from `expected_prev`, NOT from the entry's stored prev_hash OK
+
+      So entry 1's digest is bound to THE ROOT THE VERIFIER WAS GIVEN. Removing the link
+      check leaves that binding intact, and a pre-freeze ledger presented as scored is
+      caught AT THE RECOMPUTATION under M12 exactly as under HEAD.
+      chain.py's own docstring says this correctly: a pre-freeze episode 'cannot be
+      presented as a scored one WITHOUT RE-DERIVING EVERY DIGEST IN IT'.
+
+====================================================================================================
+§3  THE THREE REFUSAL SOURCES PLUS THE EXECUTED ROW, ON ONE LEDGER
+====================================================================================================
+    ['GATE_REFUSED', 'GATE_REFUSED', 'RAZORPAY_REFUSED', 'TOOL_LAYER_REFUSED', None]
+    the five sources                                                         OK
+    the ledger verifies                                                      OK
+    the tool-layer row and the executed row have DIFFERENT digests           OK
+    content fields that differ between the tool-layer row and the executed row: ['ledger_seq', 'turn_index', 'executed']
+    and the ONLY content difference besides the row number and turn is `executed` OK
+    productive_action is TRUE only on the executed row                       OK
+
+====================================================================================================
+§4  THE FOUR CONSISTENCY ASSERTIONS, EACH DRIVEN — assertion 3 PER COMPONENT
+====================================================================================================
+    assertion 1: DENIED + executed                                           OK
+    assertion 1: INDETERMINATE + executed (§9.3)                             OK
+    assertion 2: rejected_by_razorpay + executed                             OK
+    assertion 3 PER COMPONENT: customer_overcharge_paise non-zero on a non-executed call OK
+    assertion 3 PER COMPONENT: merchant_irrecoverable_outflow_paise non-zero on a non-executed call OK
+    assertion 3 PER COMPONENT: merchant_float_moved_paise non-zero on a non-executed call OK
+    assertion 3 PER COMPONENT: fees_incurred_paise non-zero on a non-executed call OK
+    assertion 4: a REJECTED record carrying non-zero harm                    OK
+    ⚠️ a SUM-BASED assertion 3 would pass three of those four single-component rows,
+       which is why the check is per component and why it is driven four times.
+
+====================================================================================================
+§5  PURITY, APPEND-ONLY-NESS AND THE SHELL — every scanner FIRED AT A DIRTY FILE FIRST
+====================================================================================================
+    the DIRTY CONTROL first — a scanner that fires on nothing is INC-14's shape:
+      clock / randomness                       dirty control -> ['.now()', 'datetime', 'random', 'time']
+    scanner 'clock / randomness' fires on the dirty control                  OK
+      a binary float literal                   dirty control -> [0.0025]
+    scanner 'a binary float literal' fires on the dirty control              OK
+      a model client or network import         dirty control -> ['requests']
+    scanner 'a model client or network import' fires on the dirty control    OK
+      a TOTAL of the four harm components      dirty control -> ['+ chain over all four']
+    scanner 'a TOTAL of the four harm components' fires on the dirty control OK
+
+    and now at the package:
+      clock / randomness                       the ledger package -> clean
+    the ledger package is clean for 'clock / randomness'                     OK
+      a binary float literal                   the ledger package -> clean
+    the ledger package is clean for 'a binary float literal'                 OK
+      a model client or network import         the ledger package -> clean
+    the ledger package is clean for 'a model client or network import'       OK
+      a TOTAL of the four harm components      the ledger package -> clean
+    the ledger package is clean for 'a TOTAL of the four harm components'    OK
+
+    the SHELL — which modules touch the filesystem:
+      __init__.py    none
+      chain.py       none
+      entry.py       none
+      build.py       none
+      control.py     none
+      store.py       ['open', 'read_bytes', 'replace']
+    only store.py performs I/O                                               OK
+
+    the APPEND-ONLY API:
+      Ledger public surface: ['algorithm', 'append', 'arm', 'entries', 'genesis_hash', 'head_hash', 'seed']
+    no mutator on the public surface                                         OK
+    a returned entry is FROZEN                                               OK
+    `entries` returns a tuple                                                OK
+    mutating a copy of it changes nothing                                    OK
+
+    DETERMINISM — two independent builds from the same inputs:
+    byte-identical                                                           OK
+
+    THE GENESIS ROOT IS RE-READ, NEVER CACHED:
+      two calls across a changed config -> ['ROOT-A', 'ROOT-B']
+    the second call sees the new root                                        OK
+    the genesis-literal scanner FIRES on a dirty control                     OK
+    no genesis literal outside a docstring in chain.py                       OK
+    no genesis literal outside a docstring in entry.py                       OK
+    no genesis literal outside a docstring in build.py                       OK
+    no genesis literal outside a docstring in control.py                     OK
+    no genesis literal outside a docstring in store.py                       OK
+    no genesis literal outside a docstring in __init__.py                    OK
+
+====================================================================================================
+§6  THE READ PATH OVER GOLDEN 5's FOUR CASES
+====================================================================================================
+      case A  LedgerEntryError (a SCHEMA refusal, not a tamper accusation)
+    case A is a SCHEMA refusal, correctly NOT a tamper accusation            OK
+      case B  TamperDetected at seq 2
+    case B is TamperDetected at 2                                            OK
+      case C  TamperDetected at seq 2
+    case C is TamperDetected at 2                                            OK
+      case D  TamperDetected at seq 1
+    case D is TamperDetected at 1                                            OK
+
+====================================================================================================
+§7  THE RULINGS, SITED WHERE THE CHOICE IS MADE
+====================================================================================================
+      Q-053  -> chain.py       found
+    Q-053 is cited in chain.py                                               OK
+      Q-054  -> entry.py       found
+    Q-054 is cited in entry.py                                               OK
+      Q-055  -> build.py       found
+    Q-055 is cited in build.py                                               OK
+      Q-062  -> build.py       found
+    Q-062 is cited in build.py                                               OK
+      Q-066  -> build.py       found
+    Q-066 is cited in build.py                                               OK
+      Q-067  -> control.py     found
+    Q-067 is cited in control.py                                             OK
+      Q-068  -> control.py     found
+    Q-068 is cited in control.py                                             OK
+      Q-069  -> __init__.py    found
+    Q-069 is cited in __init__.py                                            OK
+
+      Q-069's prohibition, first 200 characters of the PACKAGE docstring:
+      `whetstone_gate.ledger` — **the append-only, hash-chained substrate every number reads.** ⚠️⚠️ **STOP. THIS PACKAGE IS SCORER-SIDE. `gates/` MAY NEVER IMPORT IT, ON ANY PATH, EVER.** **`QUESTIONS.md` 
+    Q-069's prohibition is in the package docstring's opening                OK
+
+====================================================================================================
+§8  THE CLAIM CEILING, IN BOTH DIRECTIONS (ruling 4 / OF-142 / M39)
+====================================================================================================
+    STATED: 'evident against an edit that leaves a stale digest'             OK
+    STATED: 'and against nothing else'                                       OK
+    STATED: 'the README must not say more'                                   OK
+    STATED: 'exactly two'                                                    OK
+    STATED: 'Truncation'                                                     OK
+    STATED: 'RE-DERIVED SUFFIX'                                              OK
+    STATED: 'WHAT THIS CHAIN DOES NOT DETECT'                                OK
+      'any alteration is detected' appears; disclaimed within 200 chars: True
+    NOT EXCEEDED: 'any alteration is detected' is disclaimed                 OK
+      NOT EXCEEDED: 'every alteration is detected' absent entirely
+    NOT EXCEEDED: 'every alteration is detected'                             OK
+
+      AND THE LIMITATIONS ARE REAL — both shapes driven:
+    a TRUNCATED tail still verifies (OF-57, shape 1)                         OK
+    a RE-DERIVED SUFFIX still verifies (OF-157, shape 2)                     OK
+
+====================================================================================================
+DRIVEN CHECKS: 72      FAILURES: 0
+====================================================================================================

@@ -7989,3 +7989,147 @@ enumerate the properties **and** ask, for each, whether a catcher exists **in ev
 owns** — which is a question no mutant run can ask, because the absence produces nothing to mutate.
 `REVIEW_C6_5` §7.1's cell-by-cell table is the shape that answers it. **Writing that requirement into
 the review bar is the architect's, and it is raised as `OF-160`.**
+
+---
+
+## ⚠️ QUESTIONS RAISED BY C7 REVIEW 2 (`b8c31a57`), 2026-09-03 — Q-086…Q-088
+
+⚠️ **NUMBERED FROM THE FILE, RE-READ IMMEDIATELY BEFORE THIS APPEND.** The highest entry at that
+moment was **`Q-085`**, raised by C6 REVIEW 5 (`0ca97bbb`) and ruled by C6 FIX 5 (`5c2e8b74`). A
+**concurrent C6 REVIEW 6** session (`7f4b0e93`) holds a token row in this file, so the read was not
+a formality. This is the **sixth consecutive session** to allocate from a counter it does not hold,
+and it is still a habit rather than a guardrail — `OF-67`.
+
+⚠️ **APPENDED, NOT WOVEN IN. Exactly one line elsewhere in this file was touched by this session:**
+its own token row, `b8c31a57 · C7 · REVIEW · 2026-09-02`, landed in `c9bf0d5` **before this
+session's first finding was written**. No other word of any other session's entry was altered.
+
+**None of the three blocks the verdict.** `REVIEW_7_2`'s **FAIL** rests on `OF-171` and `OF-172`,
+neither of which is in question, and `Q-086` is raised precisely because this reviewer declined to
+settle a question about its own sealed row in its own favour.
+
+---
+
+### Q-086 — ⚠️ DOES A VERIFIER'S `reason` STRING BELONG TO AN OWNED PROPERTY? THE SEALED ROW SAYS YES, THE ARTEFACTS IT CITES SAY NOTHING, AND THIS REVIEW GRADED IT THE STRICTER WAY ON PURPOSE
+**Raised by:** C7 REVIEW 2 (`b8c31a57`) · **Date:** 2026-09-03 · **Status:** **OPEN — NOT
+blocking; the stricter reading was applied and the finding is graded HIGH** · **Class:** **A** — it
+decides a `cN-pass` tag, and it will decide one on every chunk whose refusals carry a message.
+
+**Context, stated as a measurement.** This review's sealed required set
+(`docs/reviews/independent/c7_review2_criteria.md` §3, sealed `37ecb90`) carries:
+
+> **RP-09** — *case D is DETECTED at seq 1 **for the RIGHT REASON** — a stale digest, not a broken
+> link* · mandate: *golden 5 case D; C7 card ("including the recompute-the-previous-digest case")*
+
+Mutant **`M11`** rewords `chain.verify`'s recomputation branch so that a stale digest is reported as
+*"the link is broken"*. **Verdict and first-bad seq are unchanged; the whole suite stays green, over
+the four ledger-relevant files and over the ENTIRE suite (0 new failing ids).** On golden 5 case D
+the new message is **false** — entry 1's `prev_hash` does equal the genesis root, measured.
+
+⚠️ **AND THE MANDATE THE SEALED ROW CITES DOES NOT, READ STRICTLY, REACH THE MESSAGE.**
+`golden5_tamper.json` carries `expected_verdict` and `expected_first_bad_ledger_seq` and **no
+`reason` field**; `PROCESS.md` §5.2's golden-5 paragraph names none; the C7 card's done-when says
+*"golden 5 reproduces, including the recompute-the-previous-digest case"*, which is a **mechanism**.
+**The mechanism half IS pinned** — `M08`, the recomputation removed outright, is KILLED by golden
+5's cases C and D. So RP-09 splits into a pinned half and an unpinned one, and the sealed row does
+not split it.
+
+**Options seen:**
+
+1. **The sealed row read literally: the message is part of the property, and `M11` GATES. — TAKEN.**
+   `Q-082`'s safeguard exists against a reviewer narrowing its own set on the day narrowing would
+   help, and this is that day. ⚠️ **Cost:** it grades a diagnostic string at the same bar as a
+   published number.
+2. **Criterion C2 read strictly: the message is not mandated by any artefact, so `M11` is MEDIUM.**
+   ⚠️ **Cost, and it is the serious one:** `INCIDENTS.md` **INC-34** is *"the right verdict at the
+   right seq for an entirely fabricated reason"*, and `C7 FIX 1`'s own H-1 fixture cites it as the
+   reason it asserts a reason at all. Grading the message out would grade out the one field that
+   incident is about.
+3. **Rule that a refusal's `reason` is owned wherever an artefact names the MECHANISM**, since a
+   message that misnames the mechanism misreports a checked artefact to the reviewer §6a.3 is
+   written for. ⚠️ Cost: it needs a boundary, or every error string in the repository becomes
+   gate-bearing.
+
+**Default taken pending a ruling: option 1**, and ⚠️ **it changes nothing about this verdict, which
+is stated so the choice can be checked:** the FAIL already rests on `OF-171` (assertion 4) and
+`OF-172` (the append-only API), both of which are unambiguously owned and unpinned. **There is no
+incentive here in either direction, which is exactly why it is the right moment to ask.**
+
+**What the architect is asked to rule:** whether a refusal's `reason` is inside an owned property
+when the artefact mandates only the verdict — and, if it is, where the boundary sits.
+
+---
+
+### Q-087 — ⚠️ `tests/goldens/README.md` DESIGNATES C7's REVIEW AS THE FIRST SESSION PERMITTED TO WRITE A TEST AGAINST GOLDEN 5B, AND THE C7 REVIEW 2 PROMPT'S FENCE NAMES `tests/` UNDER **NOT**
+**Raised by:** C7 REVIEW 2 (`b8c31a57`) · **Date:** 2026-09-03 · **Status:** **OPEN — the fence was
+obeyed and the guard was not written** · **Class:** **A** — it decides whether a hand-derived
+answer key is pinned by anything at all before C8 consumes it.
+
+**Context.** `tests/goldens/README.md`, verbatim:
+
+> ⚠️ **NO TEST IN THIS REPOSITORY CONSUMES THIS GOLDEN YET, DELIBERATELY. C7's review is the first
+> session permitted to write one.** A golden judged by a test from the hand that placed it is the
+> circularity this directory exists to prevent, one level down.
+
+**This session's prompt, verbatim:** *"FENCE: ONLY docs/reviews/REVIEW_7_2.md,
+docs/reviews/independent/, docs/reviews/mutants/, docs/reviews/OPEN_FINDINGS.md, QUESTIONS.md,
+STATUS.md, PROGRESS.md, docs/sessions/ … **NOT: src/, tests/, tests/goldens/** …"*
+
+**The two disagree, and `CLAUDE.md` §1 says a disagreement is a STOP-and-record.** The prompt is the
+architect's most recent instruction and it governs the fence, so **no test was written**; this entry
+is the record, and `OF-166` is the finding.
+
+⚠️ **WHAT THE GAP ACTUALLY IS, MEASURED RATHER THAN ASSERTED.** `golden5b_ledger_writer.json`
+appears under `tests/` in **three comments and no code**, two of them now stale (*"pending golden
+5B"*, *"until golden 5B lands"*). The verifier is pinned against hand-derived digests by golden 5 at
+**thirteen** fields; the fifteen-field **field set** is pinned by `CONTENT_FIELDS` and
+`validate_content`; **the conjunction — an externally-authored FIFTEEN-field digest — is pinned by
+nothing**, and writer-versus-verifier agreement cannot substitute because both call `entry_digest`.
+**This review recomputed all three digests by hand and they match** (`REVIEW_7_2.md` §4.2), so the
+value is verified and only the *guard* is missing.
+
+**Options seen:**
+  1. **A later C7 FIX session writes it**, since a fix session's fence ordinarily includes `tests/`.
+     ⚠️ But `tests/goldens/README.md`'s circularity argument is about the hand that *placed* the
+     fixture, and a fix session is not that hand, so this looks admissible.
+  2. **C8 writes it** as part of consuming the ledger. ⚠️ Cost: C8 is the first chunk that would
+     *depend* on the digests, so it is the worst candidate — the oracle would be pinned by its own
+     consumer.
+  3. **The architect places it with a chunk that owns it**, as `OF-155` says of the cross-golden
+     check.
+
+**Default taken pending a ruling: NONE — the fence forbade it and no default was available.**
+
+---
+
+### Q-088 — ⚠️ THIS SESSION'S FENCE NAMES `INCIDENTS.md` UNDER **NOT**, AND `CLAUDE.md` §6 DUTY 4 REQUIRES EVERY SESSION TO APPEND WHAT BROKE
+**Raised by:** C7 REVIEW 2 (`b8c31a57`) · **Date:** 2026-09-03 · **Status:** **OPEN — the fence was
+obeyed; the two defects are recorded HERE and in `REVIEW_7_2.md` §16 instead** · **Class:** **C**
+going on **B** — it is about where a record lives, not about a number.
+
+**Context.** `CLAUDE.md` §6, duty 4: *"Append to `INCIDENTS.md` anything that broke, in rule 13's
+format, with `Diagnosis` and `Missed` filled in."* This session's prompt fences `INCIDENTS.md` under
+**NOT**. `INC-69` was written by a **FIX** session about its own harness, so the duty is plainly
+live for non-build sessions.
+
+**The two things that broke in this session, recorded here because they have nowhere else to go:**
+
+1. **The mutation harness aborted on `UnicodeDecodeError: 'charmap' codec can't decode byte 0x8f`.**
+   `subprocess.run(..., text=True)` decodes with the Windows ANSI codepage and this suite's output
+   carries `§`, `⚠` and `₹`. ⚠️ **It produced NO numbers; it stopped** — which is the safe
+   direction, and the reason it is worth recording anyway is the unsafe neighbour: a harness that
+   had *swallowed* that error would have mis-parsed the `FAILED` lines it scores mutants on, which
+   is `INC-69`'s class one layer over. Remedy applied: `encoding="utf-8", errors="replace"` on both
+   `subprocess.run` calls, and the clone re-verified byte-identical to the live tree before the
+   restart.
+2. ⚠️ **This session's first `QUESTIONS.md` edit converted the WHOLE FILE to CRLF — 7,991 CR bytes**
+   — against `.gitattributes`' `* text=auto eol=lf`, because `pathlib.Path.write_text` applies
+   platform newline translation on Windows. **It was caught by reading `git diff --stat` rather than
+   by trusting the edit**, repaired by a byte-level rewrite, and the committed diff reads exactly
+   `1 insertion(+), 0 deletions(-)` with 0 CR bytes in the file. `INC-60`'s lesson — *for line
+   endings, cite the measurement* — pointed at this session's own editor, and every subsequent write
+   this session made to a tracked file went through `write_bytes`.
+
+**What the architect is asked to rule:** whether a review session's fence should carry
+`INCIDENTS.md` (it can only append), or whether duty 4 is explicitly suspended for review sessions
+and the record lives in `QUESTIONS.md` and the review file — which is what happened here.

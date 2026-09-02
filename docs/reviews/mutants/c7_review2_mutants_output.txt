@@ -1,0 +1,438 @@
+====================================================================================================
+C7 REVIEW 2 — MUTATION SWEEP
+====================================================================================================
+  clone            C:\Users\chinm\AppData\Local\Temp\c7rev2.65K6vp
+  suite            tests/test_c7_ledger.py tests/test_config_loader.py tests/test_repo_invariants.py tests/test_tripwire_registry.py
+  mutants          47 (incl. 2 controls)
+
+DRY RUN — every mutation target must occur EXACTLY ONCE
+  all 47 targets unique
+
+  pristine chain.py                 sha256 d3af4d0b789a9a31
+  pristine entry.py                 sha256 541ab2ddc7643eb3
+  pristine build.py                 sha256 a4465989a6bf7f10
+  pristine control.py               sha256 a9cdf086222e969d
+  pristine store.py                 sha256 c7a530e379d8ce91
+  pristine __init__.py              sha256 7d3e674ece3000ea
+  pristine test_c7_ledger.py        sha256 e899b26fa079098b
+
+BASELINE
+  8 failed, 203 passed, 1 skipped in 75.86s (0:01:15)   (85 s)
+  failing at baseline: 8  — these are CLONE ARTEFACTS (no vendor/, no .git)
+      tests/test_c7_ledger.py::test_the_golden_is_the_byte_for_byte_file_the_architect_authored
+      tests/test_repo_invariants.py::test_check_roles_exits_zero
+      tests/test_repo_invariants.py::test_gitattributes_is_correct_and_in_the_first_commit
+      tests/test_repo_invariants.py::test_no_commit_carries_a_forged_or_reused_session_token
+      tests/test_repo_invariants.py::test_no_env_file_is_tracked_and_the_example_holds_names_only
+      tests/test_repo_invariants.py::test_no_secret_shaped_string_in_any_tracked_file
+      tests/test_repo_invariants.py::test_no_superseded_string_survives_in_live_text
+      tests/test_repo_invariants.py::test_the_object_store_and_the_working_tree_agree
+
+CTRL-LIVE — a bare failing assertion injected into the CLONE's OWN test file.
+  It proves the tests being run are the clone's, which no provenance line about
+  `whetstone_gate.__file__` can show (INC-69: the guard ran elsewhere).
+  9 failed, 203 passed, 1 skipped in 102.34s (0:01:42)   CTRL-LIVE died: True
+
+----------------------------------------------------------------------------------------------------
+CTRL-KILL  POSITIVE CONTROL — must DIE   [chain.py]
+  22 failed, 189 passed, 1 skipped in 117.70s (0:01:57)   (131 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_ENTRY_1s_LINK_TO_THE_GENESIS_ROOT_IS_CHECKED_AND_ITS_BREAK_IS_DETECTED_AT_SEQ_1
+      killed by  tests/test_c7_ledger.py::test_a_13_field_golden_5_VERIFIES_and_is_still_refused_by_the_READ_path
+      killed by  tests/test_c7_ledger.py::test_a_truncated_tail_is_NOT_detected_and_that_is_a_stated_limitation
+      killed by  tests/test_c7_ledger.py::test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[A]
+      killed by  tests/test_c7_ledger.py::test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[B]
+      killed by  tests/test_c7_ledger.py::test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[C]
+      ... and 8 more
+
+----------------------------------------------------------------------------------------------------
+CTRL-NOOP  NEGATIVE CONTROL — must SURVIVE   [control.py]
+  8 failed, 203 passed, 1 skipped in 78.04s (0:01:18)   (89 s)
+  VERDICT: SURVIVED
+
+----------------------------------------------------------------------------------------------------
+M01  RP-01 sorted keys   [chain.py]
+  22 failed, 189 passed, 1 skipped in 41.65s   (67 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_ENTRY_1s_LINK_TO_THE_GENESIS_ROOT_IS_CHECKED_AND_ITS_BREAK_IS_DETECTED_AT_SEQ_1
+      killed by  tests/test_c7_ledger.py::test_a_13_field_golden_5_VERIFIES_and_is_still_refused_by_the_READ_path
+      killed by  tests/test_c7_ledger.py::test_a_truncated_tail_is_NOT_detected_and_that_is_a_stated_limitation
+      killed by  tests/test_c7_ledger.py::test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[A]
+      killed by  tests/test_c7_ledger.py::test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[B]
+      killed by  tests/test_c7_ledger.py::test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[C]
+      ... and 8 more
+
+----------------------------------------------------------------------------------------------------
+M02  RP-02 ensure_ascii=False   [chain.py]
+  11 failed, 200 passed, 1 skipped in 51.22s   (73 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_a_non_ascii_target_is_hashed_as_utf8_and_not_escaped
+      killed by  tests/test_c7_ledger.py::test_text_that_is_not_encodable_as_utf8_is_a_typed_refusal_not_a_traceback
+      killed by  tests/test_c7_ledger.py::test_the_four_hostile_receipt_strings_each_do_what_this_docstring_says
+
+----------------------------------------------------------------------------------------------------
+M03  RP-03 prev_hash/hash excluded from the digest   [chain.py]
+  25 failed, 186 passed, 1 skipped in 45.11s   (65 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_ENTRY_1s_LINK_TO_THE_GENESIS_ROOT_IS_CHECKED_AND_ITS_BREAK_IS_DETECTED_AT_SEQ_1
+      killed by  tests/test_c7_ledger.py::test_a_13_field_golden_5_VERIFIES_and_is_still_refused_by_the_READ_path
+      killed by  tests/test_c7_ledger.py::test_a_re_derived_suffix_is_NOT_detected_and_that_is_the_same_limitation
+      killed by  tests/test_c7_ledger.py::test_a_refused_append_leaves_the_head_and_the_ledger_exactly_as_they_were
+      killed by  tests/test_c7_ledger.py::test_a_stored_ledger_round_trips_and_every_digest_is_recomputed
+      killed by  tests/test_c7_ledger.py::test_a_truncated_tail_is_NOT_detected_and_that_is_a_stated_limitation
+      ... and 11 more
+
+----------------------------------------------------------------------------------------------------
+M04  RP-04 the exclusion is BY KEY, not by SCHEMA (INC-32)   [chain.py]
+  10 failed, 201 passed, 1 skipped in 47.37s   (69 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_the_round_trip_is_a_check_and_not_a_tautology
+      killed by  tests/test_c7_ledger.py::test_verify_detects_an_added_or_removed_field
+
+----------------------------------------------------------------------------------------------------
+M05  RP-05 concatenation ORDER   [chain.py]
+  21 failed, 190 passed, 1 skipped in 44.63s   (70 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_ENTRY_1s_LINK_TO_THE_GENESIS_ROOT_IS_CHECKED_AND_ITS_BREAK_IS_DETECTED_AT_SEQ_1
+      killed by  tests/test_c7_ledger.py::test_a_13_field_golden_5_VERIFIES_and_is_still_refused_by_the_READ_path
+      killed by  tests/test_c7_ledger.py::test_a_truncated_tail_is_NOT_detected_and_that_is_a_stated_limitation
+      killed by  tests/test_c7_ledger.py::test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[A]
+      killed by  tests/test_c7_ledger.py::test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[B]
+      killed by  tests/test_c7_ledger.py::test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[C]
+      ... and 7 more
+
+----------------------------------------------------------------------------------------------------
+M06  RP-05 operands encoded UTF-16   [chain.py]
+  21 failed, 190 passed, 1 skipped in 48.53s   (67 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_ENTRY_1s_LINK_TO_THE_GENESIS_ROOT_IS_CHECKED_AND_ITS_BREAK_IS_DETECTED_AT_SEQ_1
+      killed by  tests/test_c7_ledger.py::test_a_13_field_golden_5_VERIFIES_and_is_still_refused_by_the_READ_path
+      killed by  tests/test_c7_ledger.py::test_a_truncated_tail_is_NOT_detected_and_that_is_a_stated_limitation
+      killed by  tests/test_c7_ledger.py::test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[A]
+      killed by  tests/test_c7_ledger.py::test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[B]
+      killed by  tests/test_c7_ledger.py::test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[C]
+      ... and 7 more
+
+----------------------------------------------------------------------------------------------------
+M07  RP-06 a binary float is SERIALISED rather than refused   [chain.py]
+  10 failed, 201 passed, 1 skipped in 46.92s   (66 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_a_float_anywhere_in_an_entry_is_refused_rather_than_serialised
+      killed by  tests/test_c7_ledger.py::test_a_float_nested_inside_an_entry_is_refused_too
+
+----------------------------------------------------------------------------------------------------
+M08  RP-07 THE RECOMPUTATION DISABLED OUTRIGHT (PROCESS.md S5.4's defect)   [chain.py]
+  15 failed, 196 passed, 1 skipped in 56.50s   (85 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[C]
+      killed by  tests/test_c7_ledger.py::test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[D]
+      killed by  tests/test_c7_ledger.py::test_the_read_path_REFUSES_every_tampered_golden_5_case[C]
+      killed by  tests/test_c7_ledger.py::test_the_read_path_REFUSES_every_tampered_golden_5_case[D]
+      killed by  tests/test_c7_ledger.py::test_the_round_trip_is_a_check_and_not_a_tautology
+      killed by  tests/test_c7_ledger.py::test_the_verifier_reads_a_stored_document_exactly_as_it_is_including_tampering
+      ... and 1 more
+
+----------------------------------------------------------------------------------------------------
+M09  RP-07 the walk carries the STORED digest forward (REVIEW 1's M08)   [chain.py]
+  8 failed, 203 passed, 1 skipped in 52.89s   (79 s)
+  VERDICT: SURVIVED
+
+----------------------------------------------------------------------------------------------------
+M10  RP-08 the first-bad ledger_seq is OFF BY ONE   [chain.py]
+  14 failed, 197 passed, 1 skipped in 58.96s   (88 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[C]
+      killed by  tests/test_c7_ledger.py::test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[D]
+      killed by  tests/test_c7_ledger.py::test_the_read_path_REFUSES_every_tampered_golden_5_case[C]
+      killed by  tests/test_c7_ledger.py::test_the_read_path_REFUSES_every_tampered_golden_5_case[D]
+      killed by  tests/test_c7_ledger.py::test_the_verifier_reads_a_stored_document_exactly_as_it_is_including_tampering
+      killed by  tests/test_c7_ledger.py::test_verify_detects_an_added_or_removed_field
+
+----------------------------------------------------------------------------------------------------
+M11  RP-09 case D's REASON reworded to the LINK, which is the wrong reason   [chain.py]
+  8 failed, 203 passed, 1 skipped in 50.88s   (71 s)
+  VERDICT: SURVIVED
+
+----------------------------------------------------------------------------------------------------
+M12  RP-10 ENTRY 1's GENESIS LINK UNCHECKED (REVIEW 1's M12 / OF-141)   [chain.py]
+  9 failed, 202 passed, 1 skipped in 48.49s   (62 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_ENTRY_1s_LINK_TO_THE_GENESIS_ROOT_IS_CHECKED_AND_ITS_BREAK_IS_DETECTED_AT_SEQ_1
+
+----------------------------------------------------------------------------------------------------
+M13  RP-10 the genesis link unchecked ONLY for the PRE-FREEZE sentinel   [chain.py]
+  9 failed, 202 passed, 1 skipped in 42.01s   (62 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_the_genesis_value_appears_in_no_string_literal_in_the_package
+
+----------------------------------------------------------------------------------------------------
+M14  RP-11 the EMPTY chain reported DETECTED   [chain.py]
+  9 failed, 202 passed, 1 skipped in 51.43s   (71 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_an_empty_ledger_is_valid_and_its_head_is_the_genesis
+
+----------------------------------------------------------------------------------------------------
+M15  RP-12 the READ path re-appends WITHOUT verifying (INC-33)   [chain.py]
+  12 failed, 199 passed, 1 skipped in 44.86s   (67 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_the_read_path_REFUSES_every_tampered_golden_5_case[B]
+      killed by  tests/test_c7_ledger.py::test_the_read_path_REFUSES_every_tampered_golden_5_case[C]
+      killed by  tests/test_c7_ledger.py::test_the_read_path_REFUSES_every_tampered_golden_5_case[D]
+      killed by  tests/test_c7_ledger.py::test_the_round_trip_is_a_check_and_not_a_tautology
+
+----------------------------------------------------------------------------------------------------
+M16  RP-13 `entries` hands back the LIVE list   [chain.py]
+  10 failed, 201 passed, 1 skipped in 57.48s   (77 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_entries_are_handed_back_as_a_tuple_and_a_caller_cannot_reach_the_list
+      killed by  tests/test_c7_ledger.py::test_the_ledger_api_has_one_write_path_and_no_mutator
+
+----------------------------------------------------------------------------------------------------
+M17  RP-14 the entry record is NOT frozen   [entry.py]
+  9 failed, 202 passed, 1 skipped in 64.93s (0:01:04)   (88 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_a_written_entry_cannot_be_mutated_in_place
+
+----------------------------------------------------------------------------------------------------
+M18  RP-15 ledger_seq becomes 0-based (Q-054)   [chain.py]
+  102 failed, 109 passed, 1 skipped in 100.05s (0:01:40)   (131 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_ASSERTION_1_executed_true_implies_verdict_ALLOWED[DENIED]
+      killed by  tests/test_c7_ledger.py::test_ASSERTION_1_executed_true_implies_verdict_ALLOWED[INDETERMINATE]
+      killed by  tests/test_c7_ledger.py::test_ASSERTION_2_executed_true_implies_rejected_by_razorpay_False
+      killed by  tests/test_c7_ledger.py::test_ASSERTION_2_holds_in_the_WORLD_and_not_only_in_the_validator
+      killed by  tests/test_c7_ledger.py::test_ASSERTION_3_any_non_zero_harm_component_implies_executed[customer_overcharge_paise]
+      killed by  tests/test_c7_ledger.py::test_ASSERTION_3_any_non_zero_harm_component_implies_executed[fees_incurred_paise]
+      ... and 88 more
+
+----------------------------------------------------------------------------------------------------
+M19  RP-16/RP-34 A CLOCK IS READ INTO THE DIGEST   [chain.py]
+  22 failed, 189 passed, 1 skipped in 69.52s (0:01:09)   (103 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_ENTRY_1s_LINK_TO_THE_GENESIS_ROOT_IS_CHECKED_AND_ITS_BREAK_IS_DETECTED_AT_SEQ_1
+      killed by  tests/test_c7_ledger.py::test_a_13_field_golden_5_VERIFIES_and_is_still_refused_by_the_READ_path
+      killed by  tests/test_c7_ledger.py::test_a_truncated_tail_is_NOT_detected_and_that_is_a_stated_limitation
+      killed by  tests/test_c7_ledger.py::test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[A]
+      killed by  tests/test_c7_ledger.py::test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[B]
+      killed by  tests/test_c7_ledger.py::test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[C]
+      ... and 8 more
+
+----------------------------------------------------------------------------------------------------
+M20  RP-17 a missing genesis_hash DEFAULTS instead of refusing   [chain.py]
+  10 failed, 201 passed, 1 skipped in 47.92s   (74 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_a_missing_genesis_hash_in_config_is_a_hard_refusal_not_a_default
+      killed by  tests/test_c7_ledger.py::test_the_genesis_value_appears_in_no_string_literal_in_the_package
+
+----------------------------------------------------------------------------------------------------
+M21  RP-18 the genesis root HARDCODED in source   [chain.py]
+  11 failed, 200 passed, 1 skipped in 59.99s   (80 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_a_missing_genesis_hash_in_config_is_a_hard_refusal_not_a_default
+      killed by  tests/test_c7_ledger.py::test_the_genesis_root_is_re_read_on_every_call_and_never_cached_at_import
+      killed by  tests/test_c7_ledger.py::test_the_genesis_value_appears_in_no_string_literal_in_the_package
+
+----------------------------------------------------------------------------------------------------
+M22  RP-19 ⚠️ THE FORBIDDEN INFERENCE — executed read from the harm record   [build.py]
+  18 failed, 193 passed, 1 skipped in 50.69s   (69 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_ASSERTION_2_holds_in_the_WORLD_and_not_only_in_the_validator
+      killed by  tests/test_c7_ledger.py::test_Q054_no_chunk_may_join_a_harm_record_to_an_entry_on_ledger_seq
+      killed by  tests/test_c7_ledger.py::test_Q066s_OWN_uncovered_case_a_duplicate_receipt_refused_EARLIER_IN_THE_LADDER
+      killed by  tests/test_c7_ledger.py::test_a_log_row_whose_result_carries_no_ok_is_a_REFUSAL_and_never_a_False
+      killed by  tests/test_c7_ledger.py::test_a_stored_ledger_round_trips_and_every_digest_is_recomputed
+      killed by  tests/test_c7_ledger.py::test_every_entry_carries_every_field_the_section_18_renderer_needs
+      ... and 4 more
+
+----------------------------------------------------------------------------------------------------
+M23  RP-20 a missing `ok` becomes False instead of a refusal   [build.py]
+  9 failed, 202 passed, 1 skipped in 50.88s   (79 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_a_log_row_whose_result_carries_no_ok_is_a_REFUSAL_and_never_a_False
+
+----------------------------------------------------------------------------------------------------
+M24  RP-21 INDETERMINATE is not a GATE refusal   [control.py]
+  9 failed, 202 passed, 1 skipped in 56.02s   (87 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_the_three_refusal_sources_are_jointly_derivable
+
+----------------------------------------------------------------------------------------------------
+M25  RP-21 the residual reported as RAZORPAY   [control.py]
+  11 failed, 200 passed, 1 skipped in 62.04s (0:01:02)   (90 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_a_RAZORPAY_REFUSED_READ_lands_in_the_tool_layer_bucket_and_that_is_measured
+      killed by  tests/test_c7_ledger.py::test_a_tool_layer_refusal_is_a_DIFFERENT_ROW_from_an_executed_harmless_action
+      killed by  tests/test_c7_ledger.py::test_the_three_refusal_sources_are_jointly_derivable
+
+----------------------------------------------------------------------------------------------------
+M26  RP-22 `""` normalised to None (INC-04 rebuilt)   [build.py]
+  9 failed, 202 passed, 1 skipped in 59.90s   (89 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_receipt_is_read_from_the_calls_own_arguments_for_every_row
+
+----------------------------------------------------------------------------------------------------
+M27  RP-23 the field ORDER is sorted, so `receipt` no longer follows `target`   [entry.py]
+  9 failed, 202 passed, 1 skipped in 77.17s (0:01:17)   (112 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_golden_5_carries_the_THIRTEEN_pre_Q062_fields_and_this_package_carries_fifteen
+
+----------------------------------------------------------------------------------------------------
+M28  RP-24 assertion 1 disabled   [entry.py]
+  11 failed, 200 passed, 1 skipped in 65.12s (0:01:05)   (93 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_ASSERTION_1_executed_true_implies_verdict_ALLOWED[DENIED]
+      killed by  tests/test_c7_ledger.py::test_ASSERTION_1_executed_true_implies_verdict_ALLOWED[INDETERMINATE]
+      killed by  tests/test_c7_ledger.py::test_productive_action_reduces_to_executed_over_every_writable_entry
+
+----------------------------------------------------------------------------------------------------
+M29  RP-24 assertion 1 misses INDETERMINATE   [entry.py]
+  10 failed, 201 passed, 1 skipped in 77.86s (0:01:17)   (104 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_ASSERTION_1_executed_true_implies_verdict_ALLOWED[INDETERMINATE]
+      killed by  tests/test_c7_ledger.py::test_productive_action_reduces_to_executed_over_every_writable_entry
+
+----------------------------------------------------------------------------------------------------
+M30  RP-25 assertion 2 disabled   [entry.py]
+  10 failed, 201 passed, 1 skipped in 62.73s (0:01:02)   (90 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_ASSERTION_2_executed_true_implies_rejected_by_razorpay_False
+      killed by  tests/test_c7_ledger.py::test_productive_action_reduces_to_executed_over_every_writable_entry
+
+----------------------------------------------------------------------------------------------------
+M31  RP-26 assertion 3 on the FIRST COMPONENT ONLY   [entry.py]
+  11 failed, 200 passed, 1 skipped in 68.08s (0:01:08)   (101 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_ASSERTION_3_any_non_zero_harm_component_implies_executed[fees_incurred_paise]
+      killed by  tests/test_c7_ledger.py::test_ASSERTION_3_any_non_zero_harm_component_implies_executed[merchant_float_moved_paise]
+      killed by  tests/test_c7_ledger.py::test_ASSERTION_3_any_non_zero_harm_component_implies_executed[merchant_irrecoverable_outflow_paise]
+
+----------------------------------------------------------------------------------------------------
+M32  RP-27 assertion 4 — a REJECTED record may carry non-zero harm   [entry.py]
+  8 failed, 203 passed, 1 skipped in 64.93s (0:01:04)   (97 s)
+  VERDICT: SURVIVED
+
+----------------------------------------------------------------------------------------------------
+M33  RP-28 term 1 dropped — the gate ALLOWED   [control.py]
+  9 failed, 202 passed, 1 skipped in 59.01s   (92 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_productive_action_term_by_term_each_clause_varied_ALONE
+
+----------------------------------------------------------------------------------------------------
+M34  RP-28 term 2 dropped — the world EXECUTED   [control.py]
+  13 failed, 198 passed, 1 skipped in 46.09s   (75 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_a_RAZORPAY_REFUSED_READ_lands_in_the_tool_layer_bucket_and_that_is_measured
+      killed by  tests/test_c7_ledger.py::test_productive_action_on_REAL_entries_and_the_count_over_a_ledger
+      killed by  tests/test_c7_ledger.py::test_productive_action_reduces_to_executed_over_every_writable_entry
+      killed by  tests/test_c7_ledger.py::test_productive_action_term_by_term_each_clause_varied_ALONE
+      killed by  tests/test_c7_ledger.py::test_the_two_productive_action_counts_diverge_on_reads
+
+----------------------------------------------------------------------------------------------------
+M35  RP-28 term 3 dropped — no documented Razorpay error   [control.py]
+  9 failed, 202 passed, 1 skipped in 35.78s   (57 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_productive_action_term_by_term_each_clause_varied_ALONE
+
+----------------------------------------------------------------------------------------------------
+M36  RP-29 ⚠️ Q-067 REVERSED — money actions only   [control.py]
+  10 failed, 201 passed, 1 skipped in 36.13s   (55 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_productive_action_term_by_term_each_clause_varied_ALONE
+      killed by  tests/test_c7_ledger.py::test_the_two_productive_action_counts_diverge_on_reads
+
+----------------------------------------------------------------------------------------------------
+M37  RP-31 CANARY-B's selector drops DENIED entries   [build.py]
+  10 failed, 201 passed, 1 skipped in 41.69s   (58 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_every_log_row_becomes_exactly_one_entry_including_the_tool_layer_refusal
+      killed by  tests/test_c7_ledger.py::test_the_target_is_read_for_every_tool_including_the_stub_and_an_unknown_name
+
+----------------------------------------------------------------------------------------------------
+M38  RP-32 the arm/verdict table not enforced   [entry.py]
+  15 failed, 196 passed, 1 skipped in 41.29s   (59 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_a_refused_append_leaves_the_head_and_the_ledger_exactly_as_they_were
+      killed by  tests/test_c7_ledger.py::test_a_verdict_that_is_not_a_verdict_at_all_is_refused
+      killed by  tests/test_c7_ledger.py::test_each_arm_accepts_exactly_its_own_verdicts_and_refuses_every_other[DENIED-1]
+      killed by  tests/test_c7_ledger.py::test_each_arm_accepts_exactly_its_own_verdicts_and_refuses_every_other[INDETERMINATE-1]
+      killed by  tests/test_c7_ledger.py::test_each_arm_accepts_exactly_its_own_verdicts_and_refuses_every_other[INDETERMINATE-2S]
+      killed by  tests/test_c7_ledger.py::test_each_arm_accepts_exactly_its_own_verdicts_and_refuses_every_other[INDETERMINATE-2]
+      ... and 1 more
+
+----------------------------------------------------------------------------------------------------
+M39  RP-33 `turn_index` dropped from the stored entry   [chain.py]
+  102 failed, 109 passed, 1 skipped in 63.77s (0:01:03)   (81 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_ASSERTION_1_executed_true_implies_verdict_ALLOWED[DENIED]
+      killed by  tests/test_c7_ledger.py::test_ASSERTION_1_executed_true_implies_verdict_ALLOWED[INDETERMINATE]
+      killed by  tests/test_c7_ledger.py::test_ASSERTION_2_executed_true_implies_rejected_by_razorpay_False
+      killed by  tests/test_c7_ledger.py::test_ASSERTION_2_holds_in_the_WORLD_and_not_only_in_the_validator
+      killed by  tests/test_c7_ledger.py::test_ASSERTION_3_any_non_zero_harm_component_implies_executed[customer_overcharge_paise]
+      killed by  tests/test_c7_ledger.py::test_ASSERTION_3_any_non_zero_harm_component_implies_executed[fees_incurred_paise]
+      ... and 88 more
+
+----------------------------------------------------------------------------------------------------
+M40  RP-35 Q-069's prohibition DELETED from the package docstring   [__init__.py]
+  9 failed, 202 passed, 1 skipped in 40.32s   (59 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_Q069_the_scorer_side_prohibition_is_stated_in_the_package_itself
+
+----------------------------------------------------------------------------------------------------
+M41  RP-36 ⚠️ THE CLAIM CEILING RAISED TO AN OVERCLAIM (REVIEW 1's M39 / OF-142)   [chain.py]
+  9 failed, 202 passed, 1 skipped in 50.88s   (68 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_the_TAMPER_EVIDENCE_CLAIM_CEILING_IS_STATED_IN_chain_py_AND_IS_NOT_EXCEEDED
+
+----------------------------------------------------------------------------------------------------
+M42  RP-37 `append_log` FILTERS OUT non-executed rows (hard rule 11)   [build.py]
+  19 failed, 192 passed, 1 skipped in 71.50s (0:01:11)   (89 s)
+  VERDICT: KILLED
+      killed by  tests/test_c7_ledger.py::test_ASSERTION_2_holds_in_the_WORLD_and_not_only_in_the_validator
+      killed by  tests/test_c7_ledger.py::test_Q054_no_chunk_may_join_a_harm_record_to_an_entry_on_ledger_seq
+      killed by  tests/test_c7_ledger.py::test_Q066s_OWN_uncovered_case_a_duplicate_receipt_refused_EARLIER_IN_THE_LADDER
+      killed by  tests/test_c7_ledger.py::test_a_RAZORPAY_REFUSED_READ_lands_in_the_tool_layer_bucket_and_that_is_measured
+      killed by  tests/test_c7_ledger.py::test_a_tool_name_the_world_actually_logged_is_recorded_however_odd_it_is
+      killed by  tests/test_c7_ledger.py::test_an_EXECUTED_capture_and_an_MCP_LAYER_REFUSAL_NOW_DIFFER
+      ... and 5 more
+
+----------------------------------------------------------------------------------------------------
+M43  RP-38 the four harm components SUMMED into a total   [control.py]
+  8 failed, 203 passed, 1 skipped in 47.27s   (66 s)
+  VERDICT: SURVIVED
+
+----------------------------------------------------------------------------------------------------
+M44  NOT OWNED (sealed §4) — `append_log`'s all-or-nothing batch semantics   [build.py]
+  8 failed, 203 passed, 1 skipped in 42.48s   (59 s)
+  VERDICT: SURVIVED
+
+----------------------------------------------------------------------------------------------------
+M45  OUTSIDE THE SEALED SET — store.write is not publish-on-complete (hard rule 10)   [store.py]
+  8 failed, 203 passed, 1 skipped in 53.57s   (71 s)
+  VERDICT: SURVIVED
+
+====================================================================================================
+POST-RESTORE CONTROL: 8 failed, 203 passed, 1 skipped in 38.00s
+  identical to baseline: True
+  chain.py                   byte-identical to its pre-run bytes: True
+  entry.py                   byte-identical to its pre-run bytes: True
+  build.py                   byte-identical to its pre-run bytes: True
+  control.py                 byte-identical to its pre-run bytes: True
+  store.py                   byte-identical to its pre-run bytes: True
+  __init__.py                byte-identical to its pre-run bytes: True
+  test_c7_ledger.py          byte-identical to its pre-run bytes: True
+
+====================================================================================================
+CONTROLS
+  CTRL-KILL (must DIE)      DIED — ok
+  CTRL-LIVE (must DIE)      DIED — ok
+  CTRL-NOOP (must SURVIVE)  SURVIVED — ok
+  post-restore == baseline  True
+  RUN IS SCORED
+
+SURVIVORS: 6
+  M09        OWNED          RP-07 the walk carries the STORED digest forward (REVIEW 1's M08)
+  M11        OWNED          RP-09 case D's REASON reworded to the LINK, which is the wrong reason
+  M32        OWNED          RP-27 assertion 4 — a REJECTED record may carry non-zero harm
+  M43        OWNED          RP-38 the four harm components SUMMED into a total
+  M44        NOT_OWNED      NOT OWNED (sealed §4) — `append_log`'s all-or-nothing batch semantics
+  M45        OUTSIDE_SET    OUTSIDE THE SEALED SET — store.write is not publish-on-complete (hard rule 10)

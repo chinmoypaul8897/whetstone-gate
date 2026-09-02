@@ -5,6 +5,121 @@ Each entry opens with that session's `SESSION-TOKEN` (`PROCESS.md` §7a). Chat h
 not a record; this file is.
 
 ---
+## C7 — **REVIEW 2** — 2026-09-03 — ⚠️ **FAIL WITH ZERO BLOCKERS: EVERY FINDING OF REVIEW 1 IS CLOSED AND THREE OWNED PROPERTIES ARE PINNED BY NOTHING**
+
+**SESSION-TOKEN:** `b8c31a57` · **Data row 56** of `QUESTIONS.md`'s `## Session tokens` table, and
+**row 55 / the 55th 8-hex token** by `check_roles`' own parse — the two conventions in use disagree
+by one because the first data row (`WG-2026-08-30-CTX-13.4-A`) is not an 8-hex token, and **both
+figures are measured rather than derived** (`INC-54`). C6 FIX 5 used the data-row convention; this
+session's commit message `c9bf0d5` says *"ROW 55"*, which is `check_roles`' figure. Counted **in the
+operator's working tree** at `C:\Users\chinm\whetstone-gate` — not a clone, not a worktree — where
+the last row was `7f4b0e93`, a **concurrent C6 REVIEW 6** session's. The row was registered **before
+this session's first finding was written**. **ZERO PROVIDER MODEL CALLS. NO TOKEN SPEND. NO TAG —
+this session does not self-certify, and on a FAIL there is nothing to certify.**
+
+**Commits:** `37ecb90` (**THE PHASE-1 SEAL** — criteria, reimplementation, vectors, goldens harness)
+→ `c9bf0d5` (the token row) → this entry's own commit, which carries `REVIEW_7_2.md`, the Phase-2
+harnesses and transcripts, `c7_mutants_2.md`, `OF-164`…`OF-173`, `Q-086`…`Q-088` and `STATUS.md` →
+one further commit for `docs/sessions/c7-review-2.txt`.
+
+⚠️ **A CONCURRENT C6 REVIEW 6 SESSION (`7f4b0e93`) SHARES THIS WORKING TREE.** Every commit of this
+session was made through a **PRIVATE INDEX** (`GIT_INDEX_FILE` in this session's own OS temp
+directory), which is `INC-68`/`OF-156`'s remedy for the shared-index race the `Swept:` discipline
+provably cannot close, **including step 5** — the scoped `git reset -- <the same paths>` that stops
+a private-index commit leaving the shared index holding pre-commit blobs. The shared index was
+measured **empty** before each commit and re-synced after. `Q-063` clause (i)'s diff over the five
+journals was run and read before every commit; **`Swept: NOTHING` on all of them, and it is measured
+rather than reasoned** (`INC-68`): the staged snapshot under the private index was read with
+`git diff --cached --name-only` each time.
+
+**WHAT THIS REVIEW WAS ASKED TO DO, AND WHAT IT FOUND.** `REVIEW_7_1` failed C7 on four findings.
+**All four are closed, and each closure is measured rather than accepted:**
+
+* **`B-1`** — the architect's re-cut of `golden5b_ledger_writer.json` — is **verified independently
+  and BY SEARCH, not by confirmation.** The **CONTROL ran first** and reproduced golden 5 case A's
+  three THIRTEEN-field digests on the first attempt from a rule written in the sealed phase. Then:
+  all **32** assignments of `executed` over golden 3's five rows, scored against **both** pinned
+  counts, leave **2 satisfying** with seqs 1–4 **FORCED** `(T, F, T, T)` and seq 5 free; all
+  **1024** assignments of `executed` **and** the gate verdict together leave **8**, with the same
+  four forced and verdicts forced `ALLOWED` on 1, 3 and 4; and the **second route**, which never
+  reads `productive_actions`, forces seq 3 on its own — §10.1's CANARY-A counts executed refunds on
+  the probe above the 5,000,000-paise cap, only seqs 2 and 3 qualify on amount, seq 2 is
+  Razorpay-rejected. **All three FIFTEEN-field digests recompute exactly** (`186a2118`, `26019af3`,
+  `5433c3f4`), the **superseded** `6ae5bd20` reproduces from `executed: false`, dropping `receipt`
+  moves all three, and the withdrawn rule applied to golden 3 yields `productive_actions` **1** and
+  `canary_a_breach` **0** — `INC-67`'s own measurement, reproduced. **The retraction should NOT be
+  deleted**, and the reason is not a preference: `docs/reviews/independent/c7_review1_goldens.py`
+  pins the superseded digest and is append-only, so deleting the retraction leaves two artefacts
+  disagreeing with no explanation in either.
+* **`B-2`** — `OF-157` states the two undetected shapes **exactly as `chain.py` states them**:
+  compared term by term against the docstring parsed out of the AST, **eight of eight agree**, and
+  both shapes were **driven** (a truncated tail and a re-derived suffix each verify `VALID`).
+* **`H-1`/`M12`** and **`H-2`/`M39`** are both **KILLED**, each by exactly one test, and in both
+  cases that test is the one `C7 FIX 1` wrote. **`MX5`** — `SM-I`'s shape carrying **no literal** —
+  is killed by the same H-1 fixture, which is what proves its **short** shapes are load-bearing.
+
+**WHAT FAILED IT, AND IT IS NOT WHAT THE CODE DOES.** ⚠️ **Three properties from the sealed set of
+thirty-eight are pinned by NOTHING**, which `Q-084` makes a FAIL in terms — *"THE GATE IS EVERY
+OWNED PROPERTY PINNED, NOT EVERY MUTANT KILLED."*
+
+* **`OF-171` — consistency assertion 4.** Narrowing `entry.py`'s integrity guard to `if not executed
+  and not rejected:` lets a **Razorpay-REJECTED record claim ₹75,000** of irrecoverable outflow.
+  HEAD refuses it; the mutant writes it; **12 of 60 writable shapes diverge**; and the suite stays
+  green over the four ledger-relevant files **and over the ENTIRE suite — 0 new failing ids, while
+  `CTRL-KILL` over the same suite produces 14.** The file carries `test_ASSERTION_1_…`, `_2` and
+  `_3` **and no assertion-4 test at all**. §12.2's four components are the money metric and
+  `[MEASURED, spike]` **59% of escapes were Razorpay-rejected**, so this is the largest bucket in
+  the run.
+* **`OF-172` — the append-only API's *no mutator* half.** Adding `drop_last` to `Ledger` leaves the
+  suite green; nothing in the repository enumerates the class's public surface. `CONTEXT.md` §9.2's
+  **S4** rests on that half, and `chain.py`'s own docstring says *"a comment saying so is not a
+  mechanism"* — and then no test holds it.
+* **`OF-173` — the verifier's stale-digest `reason`.** `INC-34`'s class exactly. ⚠️ **Its ownership
+  is genuinely arguable and was NOT settled in this reviewer's favour**: golden 5 carries no
+  `reason` field, so read strictly only RP-09's **mechanism** half is mandated — and that half is
+  pinned. It is counted as gate because the seal is the seal, **it costs nothing because `OF-171`
+  and `OF-172` already carry the FAIL**, and the question goes to the architect as `Q-086`.
+
+**THE MUTATION RUN.** 47 mutants in batch 1 and 7 in batch 2; **41 KILLED**; `M09` and `M43`
+**PROVEN EQUIVALENT** — `M09` is `REVIEW_7_1`'s `M08`, confirmed independently by control flow and
+by an 18-shape search rather than inherited, and `M43`'s equivalence rests on a validation the
+package enforces (`>= 0` on every component). Run integrity: provenance resolved **in the same
+subprocess, with the same `env` object, as the measurement** (`INC-69`, whose defect was a guard
+that ran elsewhere); restores by **writing captured bytes** and re-hashing (`INC-57`); scoring by
+**failing-test-id identity** (`OF-163`); and **three controls, two of them POSITIVE** — `CTRL-KILL`
+DIED, `CTRL-LIVE` (a bare failing assertion in the clone's own test file) DIED, `CTRL-NOOP`
+SURVIVED. That closes `OF-159`'s complaint for this run: *"negative controls everywhere and positive
+controls nowhere."*
+
+⚠️ **TWO DEFECTS OF THIS SESSION'S OWN, RECORDED RATHER THAN SMOOTHED, AND NEITHER IS IN
+`INCIDENTS.md` BECAUSE THE FENCE FORBIDS IT (`Q-088`).** (1) The mutation harness aborted on
+`UnicodeDecodeError: 'charmap'` — `subprocess.run(text=True)` decodes with the Windows ANSI codepage
+— **and it produced no numbers, it stopped**; the unsafe neighbour is a harness that swallows that
+error and mis-parses the `FAILED` lines it scores on. (2) This session's first `QUESTIONS.md` edit
+converted **the whole file to CRLF** (7,991 CR bytes) through `pathlib.write_text`'s newline
+translation; it was caught by **reading `git diff --stat` rather than trusting the edit**, repaired
+by a byte-level rewrite, and the committed diff reads exactly `1 insertion(+), 0 deletions(-)`.
+⚠️ **AND ONE MUTANT WAS KILLED BY THE WRONG TEST:** `M13` introduced the literal `PRE-FREEZE` and
+died on the literal scanner, which says nothing about the link check it attacks. `MX5` re-runs it
+carrying no literal and is killed by the right test. **Both are in `REVIEW_7_2.md` §16 and
+`c7_mutants_2.md` §1 and §3.**
+
+**REGRESSIONS.** Full suite **1 failed, 802 passed, 1 skipped** in 643 s; the one red is
+`tests/test_lanes_operator_placeholders.py::test_the_camel_branch_is_decided_before_any_camel_run`
+on the `camel_comparator.branch` sentinel — **C13/RUN-1's, not C7's**. `make selftest` RED on
+exactly that (`1 failed, 1 passed, 802 deselected`). `make check-roles` **17 passed, 0 failed, 5
+n/a, exit 0**, E1 clean over 55 issued rows. `make check-prereg` `NOT-YET-FROZEN`. `tests/goldens/`
+clean and golden 5B's sha256 `68374f59…` / 14,750 bytes / 0 CR matches `INC-67`'s `Fix` record.
+**All three vendored pins proved** at their SHAs and clean. `evals/` absent. `git status --porcelain
+src/ tests/ config/` **EMPTY throughout**, before and after both sweeps.
+
+**WHAT THE NEXT FIX SESSION OWES: THREE TESTS AND NO `src/` CHANGE** — an assertion-4 test
+parametrised over the four components, an API-surface test on `Ledger`, and a `reason` assertion on
+the stale-digest branch. **It must not touch `tests/goldens/`, must not rewrite `OF-57`, and must
+not edit `OF-141`'s row** — `OF-165`'s remedy is an appended correction, as `OF-157`'s was.
+
+---
+
 ## C6 — **FIX 5** — 2026-09-02 — ⚠️ **THE FOUR UNFIRED CATCHERS FIRED, THE FIFTH CELL BUILT RATHER THAN SHIPPED, AND `src/` NOT TOUCHED BY ONE BYTE**
 
 **SESSION-TOKEN:** `5c2e8b74` · Row **54** of `QUESTIONS.md`'s `## Session tokens` table, counted

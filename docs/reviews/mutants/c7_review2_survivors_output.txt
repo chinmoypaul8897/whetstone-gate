@@ -1,0 +1,132 @@
+====================================================================================================
+M09 — RP-07: `expected_prev = recomputed` becomes `expected_prev = stored['hash']`
+       (this is REVIEW 1's `M08`, re-tested rather than inherited)
+====================================================================================================
+
+  THE CONTROL-FLOW PROOF, read off the shipped source rather than described:
+      the guard  `if recomputed != stored["hash"]:`  ends in a `return`  : True
+      the assignment is reached ONLY by falling through that guard      : True
+    at the assignment, `recomputed` and `stored['hash']` are equal BY CONSTRUCTION OK
+
+  AND THE SEARCH, because a proof that is only an argument is an argument.
+  Every mutation shape over golden 5 case A, both verifiers, looking for ONE disagreement:
+      18 shapes searched; disagreements: 0
+    M09 and HEAD agree on every shape                                            OK
+
+  ⚠️ AND WHAT M09 IS NOT. `PROCESS.md` §5.4's defect is a verifier that NEVER RECOMPUTES.
+     M09 changes which of two provably equal names carries the value forward, with the
+     recomputation intact. The mutant that removes the recomputation is M08, and M08 was
+     KILLED. VERDICT: EQUIVALENT — M09 is evidence FOR the verifier, not against it.
+
+====================================================================================================
+M11 — RP-09: the STALE-DIGEST branch's `reason` reworded to say 'the link is broken'
+====================================================================================================
+
+  GOLDEN 5 CASE D — the load-bearing case, under both:
+      HEAD  DETECTED / 1 / "entry 1's CONTENTS do not hash to its stored digest: recomputed d5d6d9"
+      M11   DETECTED / 1 / 'the link is broken at entry 1: recomputed ...'
+    verdict and seq are UNCHANGED                                                OK
+    the REASON changes, and changes to a statement that is FALSE about case D    OK
+
+  ⚠️ WHY THE NEW REASON IS FALSE AND NOT MERELY DIFFERENT — case D's link IS intact:
+      entry 1's stored prev_hash == the genesis root : True
+      entry 1's contents hash to its stored digest   : False
+    so 'the link is broken' is a FABRICATED reason for case D                    OK
+
+  ⚠️ NOT EQUIVALENT. `INCIDENTS.md` INC-34 is precisely 'the right verdict at the right
+     seq for an entirely fabricated reason', and the FIX's own H-1 fixture says a right
+     verdict for the wrong reason is the failure INC-34 nearly shipped — then asserts the
+     reason for the LINK branch and for no other. The STALE-DIGEST branch's reason is
+     asserted by nothing in this repository.
+      occurrences of 'CONTENTS do not hash'             in tests/test_c7_ledger.py: 0
+      occurrences of 'do not hash to its stored digest' in tests/test_c7_ledger.py: 0
+      occurrences of '.reason'                          in tests/test_c7_ledger.py: 6
+      every `.reason` assertion in the suite:
+        assert verdict.verdict == chain.VALID, verdict.reason
+        assert "link is broken" in outcome.reason, (
+        f"{outcome.reason!r} (prev_hash={broken!r})"
+        assert "link is broken" in forged_outcome.reason, (
+        assert "not an entry" in outcome.reason
+        f"those words — and it does not: {verdict.reason}"
+    no assertion in the suite mentions the stale-digest reason                   OK
+
+====================================================================================================
+M32 — RP-27: assertion 3's guard narrowed to `if not executed and not rejected:`
+====================================================================================================
+
+  THE EXHIBIT: a RAZORPAY-REJECTED record claiming Rs 75,000 of irrecoverable outflow.
+      HEAD writes it : False
+      M32 writes it  : True
+    HEAD REFUSES it and M32 ACCEPTS it — NOT EQUIVALENT                          OK
+
+  ⚠️ WHAT IT COSTS, and it is a PUBLISHED NUMBER rather than a message. §12.2's four
+     components are the money metric. golden 3's `structural_finding` says a rejected
+     record 'contributes ZERO to all four', and §12.2 zeroes them for an action the
+     world did not perform. Under M32 a ledger can carry harm attributed to a call
+     RAZORPAY REFUSED — the exact class `INCIDENTS.md` INC-03 is about, one layer up,
+     and 59% of the spike's escapes were Razorpay-rejected.
+
+  AND THE EXHAUSTIVE SEARCH over the writable space, so the exhibit is not a lucky one:
+      60 writable shapes; HEAD and M32 disagree on 12
+    M32 is NOT equivalent                                                        OK
+
+====================================================================================================
+M43 — RP-38: `moved_money`'s `any(c != 0)` becomes `sum(c) != 0`
+====================================================================================================
+
+  THE PROOF, and it rests on a validation this package ENFORCES rather than on taste:
+      entry._validate requires each component `>= 0`: True
+    every harm component is a NON-NEGATIVE integer on every construction path    OK
+      over non-negative integers, `sum(x) != 0`  <=>  `any(x != 0)`.
+
+  AND THE SEARCH over every component pattern up to two non-zero values:
+      81 patterns; disagreements: 0
+    M43 is EQUIVALENT over the writable space                                    OK
+
+  ⚠️ AND THE PROPERTY IT LOOKS LIKE IT BREAKS, judged rather than waved past. §12.2's
+     reporting rule 1 is *'the four components are REPORTED separately and are NEVER
+     summed'*. `moved_money` returns a BOOL; it reports no figure and no rupee total, so
+     no reporting rule is breached. The stronger prohibition — *'there is no total() in
+     this package and there must never be one'* — is a COMMENT IN THE CODE, which under
+     the sealed criterion C2 is not an artefact that outranks the code.
+     VERDICT: EQUIVALENT, with the residual named — the property is pinned by a comment.
+
+====================================================================================================
+M44 — `append_log`'s ALL-OR-NOTHING batch semantics  (NOT OWNED, sealed §4)
+====================================================================================================
+
+  Re-driven rather than inherited from REVIEW 1's OF-143. The exhibit, on HEAD:
+      a three-row batch whose LAST row carries a verdict arm 1 cannot emit:
+        refused: True      len(ledger) afterwards: 0  (M16/M44 would leave 2)
+    HEAD is all-or-nothing                                                       OK
+
+  ⚠️ THE DISPOSITION IS THE SEALED ONE AND THE SEAL PREDATES THIS MEASUREMENT.
+     `CONTEXT.md` §16 says append-only, hash-chained and nothing about batches; no C7
+     card clause, no ruling and no golden mentions one. It is the builder's Class B
+     choice, argued in `append_log`'s docstring — and hard rule 2 makes a Class B choice
+     'recorded with rationale, JUDGED AT REVIEW'. NOT OWNED. MEDIUM. `OF-143` stays open.
+
+====================================================================================================
+M45 — `store.write` is not publish-on-complete  (OUTSIDE the sealed set)
+====================================================================================================
+
+  Hard rule 10 names 'atomic writes, publish-on-complete' in terms, and `store.write`
+  implements it with a `.partial` sibling and `os.replace`. THIS REVIEWER'S OWN PHASE-1
+  TABLE HAS NO ROW FOR IT — the omission is this review's, and it is reported as one.
+      `.partial` temporary written then os.replace()d: True
+    the property HOLDS on HEAD                                                   OK
+      and it is pinned by: NOTHING — M45 removes the temporary entirely and the suite
+      stays green. Under Q-082 a survivor OUTSIDE the required set is MEDIUM and does
+      NOT hold the tag; the omission from the set is named so it is not read as a pass.
+
+====================================================================================================
+SURVIVOR DISPOSITIONS
+====================================================================================================
+  M09  RP-07  EQUIVALENT — proved by control flow AND by a 18-shape search
+  M11  RP-09  ⚠️ OWNED, NOT EQUIVALENT — the stale-digest reason is pinned by nothing
+  M32  RP-27  ⚠️ OWNED, NOT EQUIVALENT — assertion 4 is pinned by nothing
+  M43  RP-38  EQUIVALENT — components are validated >= 0, so sum != 0 <=> any != 0
+  M44  ----   NOT OWNED (sealed §4). MEDIUM, `OF-143`, unchanged
+  M45  ----   OUTSIDE the sealed set. MEDIUM, and the omission is this review's
+
+CHECKS: 0 failures

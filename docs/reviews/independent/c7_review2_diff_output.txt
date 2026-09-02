@@ -1,0 +1,97 @@
+================================================================================================
+PROVENANCE — read BEFORE any result, because INC-69 is a harness that measured the wrong tree
+================================================================================================
+  whetstone_gate.ledger.chain.__file__  C:\Users\chinm\whetstone-gate\src\whetstone_gate\ledger\chain.py
+  config.repo_root()                    C:\Users\chinm\whetstone-gate
+  reimplementation                      C:\Users\chinm\whetstone-gate\docs\reviews\independent\c7_review2_reimpl.py
+  vectors                               C:\Users\chinm\whetstone-gate\docs\reviews\independent\c7_review2_vectors.py
+  vector count                          77 under 53 id stems
+
+VECTOR    KIND        WHAT                                       REIMPLEMENTATION               PROJECT                       
+----------------------------------------------------------------------------------------------------------------------------------
+V01       verify      the EMPTY chain                            (VALID, None)                  (VALID, None)                  
+V02       verify      a SINGLE entry                             (VALID, None)                  (VALID, None)                  
+V03       verify      three intact entries                       (VALID, None)                  (VALID, None)                  
+V04       verify      entry 2's contents altered, stored hash le (DETECTED, 2)                  (DETECTED, 2)                  
+V05       verify      ⚠️ entry 1's CONTENTS altered, its stored  (DETECTED, 1)                  (DETECTED, 1)                  
+V06       verify      entry 2's prev_hash broken outright (case  (DETECTED, 2)                  (DETECTED, 2)                  
+V07       verify      an ADDED content field                     (DETECTED, 2)                  (DETECTED, 2)                  
+V08       verify      a REMOVED content field                    (DETECTED, 2)                  (DETECTED, 2)                  
+V09       verify      a TRUNCATED chain — the STATED LIMITATION  (VALID, None)                  (VALID, None)                  
+V10       verify      a RE-DERIVED SUFFIX — the SECOND undetecte (VALID, None)                  (VALID, None)                  
+V11       verify      ⚠️ ENTRY 1's prev_hash ALONE altered; its  (DETECTED, 1)                  (DETECTED, 1)                  
+V12       verify      ⚠️ H-1's CONTROL — entry 1 WHOLLY re-chain (DETECTED, 1)                  (DETECTED, 1)                  
+V13       verify      entry 2's prev_hash alone altered          (DETECTED, 2)                  (DETECTED, 2)                  
+V14       verify      golden 5 case A's own thirteen-field rows  (VALID, None)                  (VALID, None)                  
+V15       digest      a NON-ASCII receipt — Q-053 on reachable i 06687bb335d4dff3…              06687bb335d4dff3…              
+V16       digest      a NON-ASCII target — the attacker-authored 3e4eade081c1c5e5…              3e4eade081c1c5e5…              
+V17       digest      a LONE SURROGATE in target — not encodable REFUSED(NotCanonicalisable)    REFUSED(NotCanonicalisable)    
+V18       digest      receipt = the EMPTY STRING                 9e3ec7b623d2c32a…              9e3ec7b623d2c32a…              
+V19       digest      receipt = null                             45fdeb090d8853f9…              45fdeb090d8853f9…              
+V20       digest      the receipt KEY REMOVED from the canonical a1fede2a8e7d5c66…              a1fede2a8e7d5c66…              
+V21       digest      a BINARY FLOAT in a harm component         REFUSED(NotCanonicalisable)    REFUSED(NotCanonicalisable)    
+V22       digest      the digest under a DIFFERENT genesis root  1e30e7a78ab6874f…              1e30e7a78ab6874f…              
+V23       digest      prev_hash and hash present in the body — t 45fdeb090d8853f9…              45fdeb090d8853f9…              
+V24.00    append      arm 1 x verdict ALLOWED                    45fdeb090d8853f9…              45fdeb090d8853f9…              
+V24.01    append      arm 1 x verdict DENIED                     REFUSED(ReimplError)           REFUSED(LedgerEntryError)      
+V24.02    append      arm 1 x verdict INDETERMINATE              REFUSED(ReimplError)           REFUSED(LedgerEntryError)      
+V24.03    append      arm 2 x verdict ALLOWED                    c2f9d4494692c616…              c2f9d4494692c616…              
+V24.04    append      arm 2 x verdict DENIED                     593697a51641ea68…              593697a51641ea68…              
+V24.05    append      arm 2 x verdict INDETERMINATE              REFUSED(ReimplError)           REFUSED(LedgerEntryError)      
+V24.06    append      arm 2S x verdict ALLOWED                   f06c5d98de0d95c4…              f06c5d98de0d95c4…              
+V24.07    append      arm 2S x verdict DENIED                    fcd26d5f6c84bed4…              fcd26d5f6c84bed4…              
+V24.08    append      arm 2S x verdict INDETERMINATE             REFUSED(ReimplError)           REFUSED(LedgerEntryError)      
+V24.09    append      arm 3 x verdict ALLOWED                    abdb60d61d450c85…              abdb60d61d450c85…              
+V24.10    append      arm 3 x verdict DENIED                     8f3924924c6ef31b…              8f3924924c6ef31b…              
+V24.11    append      arm 3 x verdict INDETERMINATE              REFUSED(ReimplError)           REFUSED(LedgerEntryError)      
+V24.12    append      arm 4 x verdict ALLOWED                    9617bf2ceb61cb40…              9617bf2ceb61cb40…              
+V24.13    append      arm 4 x verdict DENIED                     b8913eadd27e95c1…              b8913eadd27e95c1…              
+V24.14    append      arm 4 x verdict INDETERMINATE              ebec9df58bb69d6e…              ebec9df58bb69d6e…              
+V25       append      assertion 1 — a DENIED call that EXECUTED  REFUSED(ReimplError)           REFUSED(LedgerEntryError)      
+V26       append      assertion 1 — an INDETERMINATE call that E REFUSED(ReimplError)           REFUSED(LedgerEntryError)      
+V27       append      assertion 2 — a RAZORPAY-refused call that REFUSED(ReimplError)           REFUSED(LedgerEntryError)      
+V28.0     append      ⚠️ assertion 3, PER COMPONENT — customer_o REFUSED(ReimplError)           REFUSED(LedgerEntryError)      
+V28.1     append      ⚠️ assertion 3, PER COMPONENT — merchant_i REFUSED(ReimplError)           REFUSED(LedgerEntryError)      
+V28.2     append      ⚠️ assertion 3, PER COMPONENT — merchant_f REFUSED(ReimplError)           REFUSED(LedgerEntryError)      
+V28.3     append      ⚠️ assertion 3, PER COMPONENT — fees_incur REFUSED(ReimplError)           REFUSED(LedgerEntryError)      
+V29       append      assertion 4 — a Razorpay-rejected record w REFUSED(ReimplError)           REFUSED(LedgerEntryError)      
+V30       append      executed MISSING from the body             REFUSED(ReimplError)           REFUSED(TypeError)             
+V31       append      executed = None                            REFUSED(ReimplError)           REFUSED(LedgerEntryError)      
+V32       append      executed = 1 (an int, not a bool)          REFUSED(ReimplError)           REFUSED(LedgerEntryError)      
+V33       append      receipt MISSING from the body — no default REFUSED(ReimplError)           REFUSED(TypeError)             
+V34       append      amount_paise = None — a READ carries no am cdb87f768db8a691…              cdb87f768db8a691…              
+V35       append      an UNKNOWN arm                             REFUSED(ReimplError)           REFUSED(ChainConfigError)      
+V36       append_many the THREE REFUSAL SOURCES plus the execute (593697a51641…, 7cdd0ca2d6c4…, (593697a51641…, 7cdd0ca2d6c4…, 
+V37       append_many golden 5B's THREE ROWS driven THROUGH THE  (186a2118ba23…, 26019af38ccd…, (186a2118ba23…, 26019af38ccd…, 
+V38       append_many golden 3's FIVE ROWS under this reviewer's (186a2118ba23…, 26019af38ccd…, (186a2118ba23…, 26019af38ccd…, 
+V39       determinism DETERMINISM — the same bodies built twice, True                           True                           
+V40.0     predicate   productive truth table: ALLOWED=True execu (True, False, NONE)            (True, False, NONE)            
+V40.1     predicate   productive truth table: ALLOWED=True execu REFUSED(ReimplError)           REFUSED(LedgerEntryError)      
+V40.2     predicate   productive truth table: ALLOWED=True execu (False, False, TOOL_LAYER)     (False, False, TOOL_LAYER_REFU 
+V40.3     predicate   productive truth table: ALLOWED=True execu (False, False, RAZORPAY)       (False, False, RAZORPAY_REFUSE 
+V40.4     predicate   productive truth table: ALLOWED=False exec REFUSED(ReimplError)           REFUSED(LedgerEntryError)      
+V40.5     predicate   productive truth table: ALLOWED=False exec REFUSED(ReimplError)           REFUSED(LedgerEntryError)      
+V40.6     predicate   productive truth table: ALLOWED=False exec (False, False, GATE)           (False, False, GATE_REFUSED)   
+V40.7     predicate   productive truth table: ALLOWED=False exec (False, False, GATE)           (False, False, GATE_REFUSED)   
+V41       predicate   an executed READ — productive under Q-067' (True, False, NONE)            (True, False, NONE)            
+V42       predicate   CANARY-A: executed refund on the probe ABO (True, True, NONE)             (True, True, NONE)             
+V43       predicate   CANARY-A: executed refund on the probe EXA (True, True, NONE)             (True, True, NONE)             
+V44       predicate   CANARY-A: an above-cap refund on the probe (False, True, RAZORPAY)        (False, True, RAZORPAY_REFUSED 
+V45       predicate   CANARY-A: an above-cap call on the probe w (True, True, NONE)             (True, True, NONE)             
+V46       predicate   ⚠️ CANARY-B on a DENIED entry — it must st (False, True, GATE)            (False, True, GATE_REFUSED)    
+V47       predicate   CANARY-B on an entry naming an ordinary pa (True, False, NONE)            (True, False, NONE)            
+V48       genesis     genesis: a well-formed config              PRE-FREEZE                     PRE-FREEZE                     
+V49       genesis     genesis: the KEY ABSENT                    REFUSED(ReimplError)           REFUSED(MissingRequiredValue)  
+V50       genesis     genesis: the LEDGER BLOCK absent           REFUSED(ReimplError)           REFUSED(MissingRequiredValue)  
+V51       genesis     genesis: BLANK                             REFUSED(ReimplError)           REFUSED(BlankValue)            
+V52       genesis     genesis: NULL                              REFUSED(ReimplError)           REFUSED(BlankValue)            
+V53       genesis     genesis: a TODO_ SENTINEL                  REFUSED(ReimplError)           REFUSED(UndeterminedValue)     
+
+================================================================================================
+REFUSAL-CLASS AGREEMENT IS NOT ASSERTED AND IS NOT A DIVERGENCE.
+Both implementations are compared on WHETHER they refuse, not on the exception's name:
+the reimplementation raises one type and the project raises typed subclasses, and a
+review that scored the class names would be scoring vocabulary rather than behaviour.
+================================================================================================
+
+VECTORS RUN: 77      DIVERGENCES: 0
