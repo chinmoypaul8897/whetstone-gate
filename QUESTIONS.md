@@ -90,6 +90,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `c09c385b` | C13 | REVIEW | 2026-09-02 |
 | `9c7c5973` | C0 | FIX | 2026-09-02 |
 | `363a2e9f` | C6 | FIX | 2026-09-02 |
+| `e9dd0346` | C13 | FIX | 2026-09-02 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -706,6 +707,36 @@ immediately before appending: 42 data rows, `9c7c5973` last, so this is row 43.*
   project exists to catch, and it is reported as this session's own.**
 
 **No other session's line was touched by this append.** `Swept:` verified on the **STAGED SNAPSHOT**.
+
+⚠️ **AND `e9dd0346` IS ROW 44, REGISTERED BEFORE THIS SESSION'S FIRST COMMIT.** C13 **FIX 3**,
+2026-09-02, after C13 REVIEW 3's FAIL. Its prompt: *"Token row NUMBERED FROM THE TABLE. REVIEW 3
+counted 40 rows and made itself 41. Re-count from the HEADINGS."*
+⚠️ **RE-COUNTED FROM THE FILE AT THIS MOMENT, NOT INHERITED.** A concurrent **C6 REVIEW 4** session
+(`ca0dd160`) holds `docs/reviews/` and shares these journals, so a count carried forward from any
+earlier paragraph would have been wrong the moment it appended — `OF-67`'s finding, applied. **Counted
+immediately before appending: 43 data rows, lines 50–92, `363a2e9f` last. So this is row 44.**
+
+* ⚠️ **THE TWO NUMBERS ARE DIFFERENT AND THIS SESSION SAYS WHICH IT COUNTED — `INC-54`, one
+  paragraph above, is exactly about not doing so.** **44 is the DATA-ROW count.** `make check-roles`
+  prints **one fewer**, because `check_roles._TOKEN_ROW` requires an 8-hex token **and** a
+  `(C\d+|ARCH)` chunk cell, and the `WG-2026-08-30-CTX-13.4-A` row matches neither. **Measured after
+  the append, not inferred from the row count:** `make check-roles` = **17 passed, 0 failed, 5 n/a —
+  OK**, E1 reporting **43 issued row(s) covering 43 token(s)**. `44 − 1 = 43`, and it reconciles with
+  `363a2e9f`'s corrected `43 − 1 = 42`.
+* **Self-record ordinal, carried rather than re-derived, and labelled so.** Using this section's own
+  stated constant — *"the 15 nobody self-recorded"* — `44 − 15 = 29`, so this is the **twenty-ninth
+  self-recorded row and the twenty-eighth to carry a paragraph**, the gap of exactly one still being
+  `9c0c6734`'s uncounted row. ⚠️ **This session did NOT independently re-derive the 15**; it counted
+  the data rows, which is the number its own ordinal turns on, and says plainly which of the two it
+  measured.
+* ⚠️ **ORDINALS 11, 12 AND 18 REMAIN ASSERTED BY NO PARAGRAPH** (`df238be6`, `0852ea56`, `9c0c6734`)
+  and are **not this session's to close**.
+* ⚠️ **`check_roles.py` COUNTING THIS TABLE ITSELF IS STILL OWED — `OF-67`, `OF-70`, `OF-78`, the
+  FIFTEENTH consecutive session to carry the total by hand.** `check_roles.py` is named under **NOT**
+  in this session's fence, so this session could not have written it under any reading of its role.
+
+**No other session's line was touched by this append.** `Swept:` verified on the **STAGED SNAPSHOT**
+(`git diff --cached -- QUESTIONS.md`), never on the working tree (`INC-48`).
 
 ## ⚠️ THE TOKEN BATCH, 2026-08-31 — and this is what ends the collision class
 
