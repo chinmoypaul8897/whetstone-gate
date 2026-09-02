@@ -1,0 +1,184 @@
+C6 REVIEW 6 - THE MUTATION RUN, CONSOLIDATED FROM THE SLICE LOGS
+SESSION-TOKEN 7f4b0e93 - ZERO PROVIDER MODEL CALLS
+==============================================================================================
+
+1.  SLICE VALIDITY.  A slice is scored only if BOTH positive controls died and both
+    controls read 136 passed / 0 failed.  (OF-159; INC-17's inverse.)
+----------------------------------------------------------------------------------------------
+  slice void   PRE-control    POST-control   positive controls
+  A     no     136/0/0        136/0/0        N-PC=KILLED
+  A2    no     136/0/0        136/0/0        N-PC=KILLED, N-PC2=KILLED
+  B     no     136/0/0        136/0/0        N-PC=KILLED
+  B2    no     136/0/0        136/0/0        N-PC=KILLED, N-PC2=KILLED
+  C     no     136/0/0        136/0/0        N-PC=KILLED, N-PC2=KILLED
+  C (attempt 1) no     0/0/0          -/-/-          -
+  C (attempt 1, mutants_run_ABDE.log) YES    -/-/-          -/-/-          -
+  D     no     136/0/0        136/0/0        N-PC=KILLED
+  D2    no     136/0/0        136/0/0        N-PC=KILLED, N-PC2=KILLED
+  E     no     136/0/0        136/0/0        N-PC=KILLED
+  E2    no     136/0/0        136/0/0        N-PC=KILLED, N-PC2=KILLED
+  F     no     136/0/0        136/0/0        N-PC=KILLED, N-PC2=KILLED
+  G     no     136/0/0        136/0/0        N-PC=KILLED, N-PC2=KILLED
+  H     no     136/0/0        136/0/0        N-PC=KILLED, N-PC2=KILLED
+  I     no     136/0/0        136/0/0        N-PC=KILLED, N-PC2=KILLED
+
+2.  PROVENANCE, PRINTED FROM INSIDE THE SAME SUBPROCESS AS THE MEASUREMENT (INC-69)
+----------------------------------------------------------------------------------------------
+  [A] PROVENANCE PKG  : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c244f5e3-c03a-4a05-87c0-bd560ab92bde\scratchpad\c6r6\tree_A\src\whetstone_gate\__init__.py
+  [A] PROVENANCE ROOT : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c244f5e3-c03a-4a05-87c0-bd560ab92bde\scratchpad\c6r6\tree_A
+  [A2] PROVENANCE PKG  : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c244f5e3-c03a-4a05-87c0-bd560ab92bde\scratchpad\c6r6\tree_A\src\whetstone_gate\__init__.py
+  [A2] PROVENANCE ROOT : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c244f5e3-c03a-4a05-87c0-bd560ab92bde\scratchpad\c6r6\tree_A
+  [B] PROVENANCE PKG  : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c244f5e3-c03a-4a05-87c0-bd560ab92bde\scratchpad\c6r6\tree_B\src\whetstone_gate\__init__.py
+  [B] PROVENANCE ROOT : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c244f5e3-c03a-4a05-87c0-bd560ab92bde\scratchpad\c6r6\tree_B
+  [B2] PROVENANCE PKG  : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c244f5e3-c03a-4a05-87c0-bd560ab92bde\scratchpad\c6r6\tree_B\src\whetstone_gate\__init__.py
+  [B2] PROVENANCE ROOT : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c244f5e3-c03a-4a05-87c0-bd560ab92bde\scratchpad\c6r6\tree_B
+  [C] PROVENANCE PKG  : C:\Users\chinm\whetstone-gate\src\whetstone_gate\__init__.py
+  [C] PROVENANCE ROOT : C:\Users\chinm\whetstone-gate
+  [D] PROVENANCE PKG  : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c244f5e3-c03a-4a05-87c0-bd560ab92bde\scratchpad\c6r6\tree_D\src\whetstone_gate\__init__.py
+  [D] PROVENANCE ROOT : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c244f5e3-c03a-4a05-87c0-bd560ab92bde\scratchpad\c6r6\tree_D
+  [D2] PROVENANCE PKG  : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c244f5e3-c03a-4a05-87c0-bd560ab92bde\scratchpad\c6r6\tree_D\src\whetstone_gate\__init__.py
+  [D2] PROVENANCE ROOT : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c244f5e3-c03a-4a05-87c0-bd560ab92bde\scratchpad\c6r6\tree_D
+  [E] PROVENANCE PKG  : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c244f5e3-c03a-4a05-87c0-bd560ab92bde\scratchpad\c6r6\tree_E\src\whetstone_gate\__init__.py
+  [E] PROVENANCE ROOT : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c244f5e3-c03a-4a05-87c0-bd560ab92bde\scratchpad\c6r6\tree_E
+  [E2] PROVENANCE PKG  : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c244f5e3-c03a-4a05-87c0-bd560ab92bde\scratchpad\c6r6\tree_E\src\whetstone_gate\__init__.py
+  [E2] PROVENANCE ROOT : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c244f5e3-c03a-4a05-87c0-bd560ab92bde\scratchpad\c6r6\tree_E
+  [F] PROVENANCE PKG  : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c244f5e3-c03a-4a05-87c0-bd560ab92bde\scratchpad\c6r6\tree_F\src\whetstone_gate\__init__.py
+  [F] PROVENANCE ROOT : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c244f5e3-c03a-4a05-87c0-bd560ab92bde\scratchpad\c6r6\tree_F
+  [G] PROVENANCE PKG  : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c244f5e3-c03a-4a05-87c0-bd560ab92bde\scratchpad\c6r6\tree_G\src\whetstone_gate\__init__.py
+  [G] PROVENANCE ROOT : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c244f5e3-c03a-4a05-87c0-bd560ab92bde\scratchpad\c6r6\tree_G
+  [H] PROVENANCE PKG  : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c244f5e3-c03a-4a05-87c0-bd560ab92bde\scratchpad\c6r6\tree_A\src\whetstone_gate\__init__.py
+  [H] PROVENANCE ROOT : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c244f5e3-c03a-4a05-87c0-bd560ab92bde\scratchpad\c6r6\tree_A
+  [I] PROVENANCE PKG  : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c244f5e3-c03a-4a05-87c0-bd560ab92bde\scratchpad\c6r6\tree_B\src\whetstone_gate\__init__.py
+  [I] PROVENANCE ROOT : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c244f5e3-c03a-4a05-87c0-bd560ab92bde\scratchpad\c6r6\tree_B
+
+3.  EVERY MUTANT
+----------------------------------------------------------------------------------------------
+  id      slice verdict   failed  killed by (first three)
+  N-01    F     KILLED    1       test_the_window_sizes_are_read_from_config_and_not_from_
+  N-02    D     KILLED    7       test_the_window_keeps_exactly_the_configured_number_of_v
+                                  test_the_window_sizes_are_read_from_config_and_not_from_
+                                  test_the_LOOP_copys_denial_line_COUNT_fires_on_a_summary
+  N-03    F     KILLED    1       test_identical_state_produces_byte_identical_summary_tex
+  N-04    D     KILLED    1       test_the_cap_is_INCLUSIVE_and_pinned_in_BOTH_directions
+  N-05    F     KILLED    1       test_the_cap_is_INCLUSIVE_and_pinned_in_BOTH_directions
+  N-06    D     KILLED    1       test_the_cap_is_a_HARD_REFUSAL_below_the_marker_rather_t
+  N-08    C     KILLED    4       test_LAYER_1_scans_the_state_LABEL_and_exempts_only_the_
+                                  test_the_attackers_context_contains_no_gate_denial_reaso
+  N-09    B     KILLED    4       test_the_LOOP_copys_LAYER_1_scans_the_state_LABEL_and_ex
+                                  test_the_sole_layer_helper_REJECTS_a_shape_that_TWO_of_c
+  N-10    C     KILLED    1       test_the_sole_killer_helper_REJECTS_a_shape_that_two_lay
+  N-11    A     KILLED    3       test_the_LOOP_copys_GATE_VOCABULARY_scan_FIRES_on_a_reas
+  N-12    C     SURVIVED  0       -
+  N-12c   B     KILLED    4       test_the_LOOP_copys_own_claim_4_scan_ACTUALLY_FIRES_on_a
+                                  test_the_sole_layer_helper_REJECTS_a_shape_that_TWO_of_c
+  N-13    A     KILLED    3       test_the_LOOP_copys_VERBATIM_CLAUSE_scan_FIRES_on_a_TOOL
+  N-14    C     KILLED    4       test_LAYER_3_is_the_SOLE_killer_of_authored_text_carryin
+  N-15    A     KILLED    3       test_the_LOOP_copys_RESIDUE_layer_FIRES_on_authored_text
+  N-16    C     KILLED    4       test_the_denial_equality_is_the_SOLE_killer_of_a_value_t
+                                  test_the_sole_killer_helper_REJECTS_a_shape_that_two_lay
+  N-17    A     KILLED    3       test_the_LOOP_copys_DENIAL_EQUALITY_FIRES_on_a_DRIFTED_f
+  N-18    B     KILLED    4       test_the_LOOP_copys_denial_line_COUNT_ALSO_fires_when_th
+                                  test_the_LOOP_copys_denial_line_COUNT_fires_on_a_summary
+  N-19    B     KILLED    1       test_the_sole_layer_helper_REJECTS_a_shape_that_TWO_of_c
+  N-20    B     KILLED    1       test_the_sole_layer_helper_REJECTS_a_shape_that_TWO_of_c
+  N-21    A     KILLED    1       test_the_LOOP_copys_PROBE_NOTE_check_FIRES_when_WE_write
+  N-22    E     KILLED    12      test_the_LOOP_copys_GATE_VOCABULARY_scan_FIRES_on_a_reas
+                                  test_the_LOOP_copys_LAYER_1_scans_the_state_LABEL_and_ex
+                                  test_the_LOOP_copys_LAYER_1_still_EXEMPTS_a_cap_LEGITIMA
+  N-23    F     KILLED    2       test_the_offered_reach_is_MEASURED_per_episode_and_acros
+                                  test_the_selection_function_is_hand_recomputable_exactly
+  N-24    F     KILLED    4       test_coverage_ACCUMULATES_across_the_seed_set_instead_of
+                                  test_the_offered_reach_is_MEASURED_per_episode_and_acros
+                                  test_the_same_seed_repeats_exactly_and_different_seeds_d
+  N-25    F     KILLED    1       test_the_estimator_divisor_is_READ_FROM_CONFIG_and_not_f
+  N-26    D     KILLED    3       test_the_crossing_is_STRICTLY_over_the_target_and_is_pin
+                                  test_the_crossing_is_pinned_at_the_TURN_BUDGET_END_of_it
+                                  test_the_crossing_returns_ZERO_when_the_base_alone_alrea
+  N-27    D     KILLED    1       test_the_crossing_is_pinned_at_the_TURN_BUDGET_END_of_it
+  N-28    G     KILLED    1       test_the_dynamic_reach_scan_ACTUALLY_FIRES_on_every_form
+  N-29    G     SURVIVED  0       -
+  N-29b   H     KILLED    2       test_the_three_authored_texts_are_character_identical_to
+                                  test_the_crossover_series_reproduces_against_the_REAL_se
+  N-30    D     KILLED    3       test_the_LOOP_copys_denial_line_COUNT_fires_on_a_summary
+  N-31    G     KILLED    8       test_the_LOOP_copys_DENIAL_EQUALITY_FIRES_on_a_DRIFTED_f
+                                  test_the_LOOP_copys_RESIDUE_layer_FIRES_on_authored_text
+                                  test_the_generic_denial_file_is_character_identical_to_C
+  N-32    E     SURVIVED  0       -
+  N-33    A     KILLED    1       test_the_LOOP_copys_RESIDUE_layer_SAYS_SO_when_it_cannot
+  N-34a   B     KILLED    0+1E    (collection error)
+  N-34b   C     SURVIVED  0       -
+  N-34c   C     KILLED    4       test_LAYER_1_scans_the_state_LABEL_and_exempts_only_the_
+                                  test_the_attackers_context_contains_no_gate_denial_reaso
+  N-35    G     KILLED    1       test_the_attackers_context_contains_no_hole
+  N-35b   G     SURVIVED  0       -
+  N-37    H     KILLED    1       test_the_attackers_context_contains_no_hole
+  N-38    I     SURVIVED  0       -
+  N-39    I     SURVIVED  0       -
+  N-40    I     SURVIVED  0       -
+  N-RES2  G     KILLED    3       test_the_LOOP_copys_RESIDUE_layer_FIRES_on_authored_text
+  N-RL1   E     KILLED    40      test_LAYER_1_scans_the_state_LABEL_and_exempts_only_the_
+                                  test_LAYER_1_still_EXEMPTS_a_cap_value_that_is_legitimat
+                                  test_LAYER_3_is_the_SOLE_killer_of_authored_text_carryin
+  N-RL2   E     KILLED    34      test_LAYER_1_still_EXEMPTS_a_cap_value_that_is_legitimat
+                                  test_LAYER_3_is_the_SOLE_killer_of_authored_text_carryin
+                                  test_the_attackers_context_contains_no_gate_denial_reaso
+  N-RL3   E     KILLED    43      test_LAYER_1_scans_the_state_LABEL_and_exempts_only_the_
+                                  test_LAYER_1_still_EXEMPTS_a_cap_value_that_is_legitimat
+                                  test_the_attackers_context_contains_no_gate_denial_reaso
+  N-SM1   G     KILLED    23      test_the_LOOP_copys_DENIAL_EQUALITY_FIRES_on_a_DRIFTED_f
+                                  test_the_LOOP_copys_GATE_VOCABULARY_scan_FIRES_on_a_reas
+                                  test_the_LOOP_copys_LAYER_1_scans_the_state_LABEL_and_ex
+  N-PC    E     KILLED    1       test_the_crossover_series_reproduces_against_the_REAL_se
+  N-PC    B     KILLED    1       test_the_crossover_series_reproduces_against_the_REAL_se
+  N-PC    D     KILLED    1       test_the_crossover_series_reproduces_against_the_REAL_se
+  N-PC    A     KILLED    1       test_the_crossover_series_reproduces_against_the_REAL_se
+  N-PC    A2    KILLED    1       test_the_crossover_series_reproduces_against_the_REAL_se
+  N-PC    D2    KILLED    1       test_the_crossover_series_reproduces_against_the_REAL_se
+  N-PC    B2    KILLED    1       test_the_crossover_series_reproduces_against_the_REAL_se
+  N-PC    E2    KILLED    1       test_the_crossover_series_reproduces_against_the_REAL_se
+  N-PC    F     KILLED    1       test_the_crossover_series_reproduces_against_the_REAL_se
+  N-PC    G     KILLED    1       test_the_crossover_series_reproduces_against_the_REAL_se
+  N-PC    C     KILLED    1       test_the_crossover_series_reproduces_against_the_REAL_se
+  N-PC    H     KILLED    1       test_the_crossover_series_reproduces_against_the_REAL_se
+  N-PC    I     KILLED    1       test_the_crossover_series_reproduces_against_the_REAL_se
+  N-PC2   A2    KILLED    14      test_the_LOOP_copys_DENIAL_EQUALITY_FIRES_on_a_DRIFTED_f
+                                  test_the_LOOP_copys_GATE_VOCABULARY_scan_FIRES_on_a_reas
+                                  test_the_LOOP_copys_PROBE_NOTE_check_FIRES_when_WE_write
+  N-PC2   D2    KILLED    14      test_the_LOOP_copys_DENIAL_EQUALITY_FIRES_on_a_DRIFTED_f
+                                  test_the_LOOP_copys_GATE_VOCABULARY_scan_FIRES_on_a_reas
+                                  test_the_LOOP_copys_PROBE_NOTE_check_FIRES_when_WE_write
+  N-PC2   B2    KILLED    14      test_the_LOOP_copys_DENIAL_EQUALITY_FIRES_on_a_DRIFTED_f
+                                  test_the_LOOP_copys_GATE_VOCABULARY_scan_FIRES_on_a_reas
+                                  test_the_LOOP_copys_PROBE_NOTE_check_FIRES_when_WE_write
+  N-PC2   E2    KILLED    14      test_the_LOOP_copys_DENIAL_EQUALITY_FIRES_on_a_DRIFTED_f
+                                  test_the_LOOP_copys_GATE_VOCABULARY_scan_FIRES_on_a_reas
+                                  test_the_LOOP_copys_PROBE_NOTE_check_FIRES_when_WE_write
+  N-PC2   F     KILLED    14      test_the_LOOP_copys_DENIAL_EQUALITY_FIRES_on_a_DRIFTED_f
+                                  test_the_LOOP_copys_GATE_VOCABULARY_scan_FIRES_on_a_reas
+                                  test_the_LOOP_copys_PROBE_NOTE_check_FIRES_when_WE_write
+  N-PC2   C     KILLED    14      test_the_LOOP_copys_DENIAL_EQUALITY_FIRES_on_a_DRIFTED_f
+                                  test_the_LOOP_copys_GATE_VOCABULARY_scan_FIRES_on_a_reas
+                                  test_the_LOOP_copys_PROBE_NOTE_check_FIRES_when_WE_write
+  N-PC2   G     KILLED    14      test_the_LOOP_copys_DENIAL_EQUALITY_FIRES_on_a_DRIFTED_f
+                                  test_the_LOOP_copys_GATE_VOCABULARY_scan_FIRES_on_a_reas
+                                  test_the_LOOP_copys_PROBE_NOTE_check_FIRES_when_WE_write
+  N-PC2   H     KILLED    14      test_the_LOOP_copys_DENIAL_EQUALITY_FIRES_on_a_DRIFTED_f
+                                  test_the_LOOP_copys_GATE_VOCABULARY_scan_FIRES_on_a_reas
+                                  test_the_LOOP_copys_PROBE_NOTE_check_FIRES_when_WE_write
+  N-PC2   I     KILLED    14      test_the_LOOP_copys_DENIAL_EQUALITY_FIRES_on_a_DRIFTED_f
+                                  test_the_LOOP_copys_GATE_VOCABULARY_scan_FIRES_on_a_reas
+                                  test_the_LOOP_copys_PROBE_NOTE_check_FIRES_when_WE_write
+
+  SCORED MUTANTS: 48    KILLED: 40    SURVIVED: 8
+  POSITIVE CONTROLS: 22, and every one DIED
+  RESTORE VERIFIED BY SHA-256 ON EVERY ROW: True
+
+  SURVIVORS:
+    N-12    (slice C)
+    N-29    (slice G)
+    N-32    (slice E)
+    N-34b   (slice C)
+    N-35b   (slice G)
+    N-38    (slice I)
+    N-39    (slice I)
+    N-40    (slice I)
