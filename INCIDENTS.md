@@ -4033,3 +4033,127 @@ reporting five defects that did not exist), `Q-081`'s near-miss, and this. **Fou
 caught by the author, which is the only encouraging thing in the list, and `INC-47`'s own diagnosis
 already said why: `Fix:` is bound to a commit and cannot be invented, `Action:` is bound to
 nothing.** This entry adds a sixth field to that observation: **so is `Measured:`.**
+
+---
+
+## INC-55 — the assertion written to prove the Branch-B guard "names every missing requirement separately" compared the guard's OUTPUT against the guard's OWN INPUT LIST, and under it a `branch_b_condition` reading "a harness defect is SOMETIMES Branch B" — the direct inversion of `Q-057`'s ruling — passes the whole repository
+
+**Date:** 2026-09-02 (C13 FIX 3, `e9dd0346`. ⚠️ **The defective assertions are C13 FIX 2's own**,
+landed at **`4be0b86`** — *"test: Q-079 — the branch conditions are now READ, which is the half that
+was missing"*, 01:21:36 — the very commit written to close **BLOCKER B-3**. Found by **C13 REVIEW 3**
+(`c09c385b`), whose sixteen new-surface mutants left **five alive**. ⚠️ **This entry is written
+BEFORE this session changes a line**, hard rule 13.)
+
+**Event:** C13 REVIEW 3 ran sixteen mutants over the surface C13 FIX 2 had just created — a surface
+**no review had seen** — and reported **11 killed, 5 SURVIVED**, every one of the five
+non-equivalent **by exhibit** and every one of the five surviving **the full suite**, not merely the
+C13 file. REVIEW 3's figures, quoted here as **REVIEW 3's** and re-run independently by this session
+under TASK 2: `N-B` + `N-C` + `N-D` + `N-I2` applied **together**, full suite → *2 failed, 722
+passed, 1 skipped*; `N-E` alone, full suite → the same *2 failed, 722 passed, 1 skipped*; both
+failures in both runs **pre-existing** and neither C13's. Four of the five trace to **one defect in
+two lines**, at `tests/test_c13_camel_comparator.py:1116-1121`:
+
+```python
+undiagnosed = invocation.branch_condition_problems(condition_a, "the run does not complete")
+assert len(undiagnosed) == len(invocation.BRANCH_B_REQUIREMENTS)      # output vs. the SAME input list
+for what, _ in invocation.BRANCH_B_REQUIREMENTS:
+    assert any(what in problem for problem in undiagnosed)            # output vs. the SAME input list
+```
+
+**Both assertions compare the predicate's output against the predicate's own input tuple**, so
+neither can fail when that tuple changes: drop an entry and both sides move together (`N-E`); weaken
+a phrase to a short substring and the `what` **labels** are untouched, so the loop still passes
+(`N-B`, `N-C`, `N-D`). The law-side assertion five lines above does not catch it either — `"cause"`,
+`"harness"` and `"md"` **all occur in `CONTEXT.md` §8.5.1**, so `assert phrase in section` is
+satisfied by every weakened form.
+
+⚠️ **THE EXHIBIT, WHICH IS WHAT MAKES THIS AN INCIDENT AND NOT A TIDY-UP.** Weakening ONE requirement
+string — `"a harness defect is never branch b"` → `"harness"` (`N-C`), or deleting that whole tuple
+entry (`N-E`) — lets a `config/lanes.yaml` `branch_b_condition` reading **"… a harness defect is
+SOMETIMES Branch B …"** pass the **entire repository, green**. That sentence is the **direct
+inversion** of the ruling this guard exists to enforce. `Q-057` is recorded verbatim in
+`QUESTIONS.md`: *"Branch B is taken only on a cause that has been DIAGNOSED and recorded, and 'it
+errored' is not a cause. A pre-registration whose negative branch can be reached by our own bug
+measures nothing."* `config/` is a **pre-registration artefact**, and hard rule 4 makes a **frozen**
+one outrank `CONTEXT.md` — so after C14 cuts `prereg-v1` that inverted string would have been the
+higher authority on which branch RUN-1 takes, with the whole suite reporting green over it. **The
+guard exists precisely to stop that, and it could not have stopped it.**
+
+**Action:** this entry first, before a line of code. Then, and only then: the single fixture
+`"the run does not complete"` is replaced by **one weak-form fixture per requirement**, each
+**derived from the real `branch_b_condition` read through the loader** by degrading **exactly one**
+phrase — with the degradation itself **asserted to have happened** before it is used, which is
+`INC-50`'s own mirror move — and each asserted **REJECTED, with exactly one problem, naming exactly
+that requirement, quoted against a literal written in the test**. `len(BRANCH_B_REQUIREMENTS)` is
+pinned **against the literal `4`**, and the all-four-missing case is pinned against the literal `4`
+and four literal phrases rather than against the tuple. Separately, `branch_conditions_are_stale()`
+gains an assertion that a **sentinel** `branch_b_condition` comes back as an `UndeterminedValue`
+**refusal** and a **missing** one as `MissingRequiredValue` (`OF-117`, hard rule 9); the predicate is
+exported and given a non-test caller (`OF-118`); the docstring's `OF-104` citation is corrected to
+`OF-62`/`Q-079` (`OF-115`); and the §8.5.1 window is ended at `### 8.5.2` (`OF-119`).
+
+**Expectation:** an assertion whose stated purpose is *"every missing Branch-B requirement must be
+named separately; a gate whose only output is 'no' is a gate somebody edits out under time pressure"*
+should be **able to fail when the set of requirements is weakened**. That is the only proposition it
+claims. As written it is an **identity** — `len(f(x)) == len(L)` where `L` is the very list `f`
+iterates, and `label in f(x)` where the labels are drawn from `L` — and an identity holds for every
+`L`, including an empty one. **A test that cannot fail is not evidence, and this one carried an
+error message asserting a discrimination it did not perform.**
+
+**Missing:** ⚠️ **ANY MECHANISM, ANYWHERE IN THIS REPOSITORY, THAT NOTICES A TEST READING ITS
+EXPECTED VALUE OUT OF THE MODULE UNDER TEST.** The shape is mechanically detectable — the same name
+(`invocation.BRANCH_B_REQUIREMENTS`) on both sides of a comparison whose left side is a call into
+that same module — and nothing looks for it. Also missing, and cheaper: **any requirement that a
+module-level table which production code ITERATES be pinned in size against a literal.** `config/`
+gets exactly this treatment — hard rule 9's tripwire scans the source against `CONTEXT.md` §8.6's
+constants table — while a first-party constant tuple that a **guard** iterates gets none. And missing
+at the level of process: `PROCESS.md` requires mutants of the code a review named, and — since C6
+REVIEW 3's standing ruling — of the code a fix session itself writes; **it requires nothing of the
+ORACLE of a new assertion**, which is where all four of these survivors live.
+
+**Missed:** ⚠️ **`INC-50` IS THIS EXACT CLASS, IT WAS WRITTEN BY C13 FIX 2 ABOUT ITS OWN TEST, IN THE
+SAME SESSION AND THE SAME FILE, AND IT WAS WRITTEN *AFTER* THE DEFECT ABOVE HAD ALREADY LANDED.**
+Measured here, not recalled: `4be0b86` (**01:21:36**) landed these two assertions; `dfffba7`
+(**01:42:43**, twenty-one minutes later) landed `INC-50`'s mirror; `0df86a4` (**01:51:48**, thirty
+minutes later) wrote `INC-50` itself. The two tests are **181 lines apart in one file** —
+`test_a_shadowed_module_function_resolves_to_the_definition_PYTHON_binds` at `:935`,
+`test_the_pre_registered_branch_condition_carries_the_DIAGNOSIS_requirement` at `:1046` — with
+**exactly two test functions between them**. So the session **diagnosed the class, wrote it up in its
+own words, and did not carry it three functions along the same file.** ⚠️ **And `INC-50`'s own
+`Systemic guardrail` names, in the imperative, the remedy that would have caught this:** *"vary the
+discriminating input and see whether the verdict moves."* The discriminating input here is the
+requirement list; it was never varied; the verdict therefore never moved. **This is the FIFTH
+appearance of the class in this repository** — `INC-26`, `INC-29`, `OF-82`, `INC-50`, and this — and
+`INC-50` already recorded the count as four *"so the ruling is made against a number."* The number is
+now five, and the fifth is the sequel to the fourth.
+
+**Diagnosis:** both assertions took their expected value from `invocation.BRANCH_B_REQUIREMENTS`, the
+same tuple `branch_condition_problems` iterates, so any change to that tuple moved **both sides of
+the comparison together** and the comparison degenerated into an identity. The single fixture
+`"the run does not complete"` carried **none** of the four required phrases at **any** strength, so
+even a non-circular assertion fired at it could not have separated a strong requirement from a
+weakened one.
+
+**Fix:** ⚠️ **PENDING AT THE TIME OF WRITING — this entry precedes the code, and the SHAs are filled
+in by a later commit of this same session once they exist**, which is the two-step `INC-46`/`INC-47`
+and `INC-53`/`INC-54` already took in this repository. The change is confined to
+`tests/test_c13_camel_comparator.py` plus the export and one caller inside
+`src/whetstone_gate/camel_comparator/`; **no `config/` value, no `CONTEXT.md` text, no number and no
+figure is touched by it.**
+
+**Systemic guardrail:** ⚠️ **NONE IN CODE, AND THE HONEST STATEMENT IS THAT THE THING THAT CAUGHT
+THIS WAS NOT A MECHANISM** — it was a review session mutating a surface no review had seen, which is
+exactly what `INC-50`'s guardrail said of its own discovery, one night earlier, about this same file.
+Named rather than built, because `PROCESS.md` is outside this session's fence: **(1) A TEST'S
+EXPECTED VALUE MAY NOT BE READ FROM THE MODULE UNDER TEST.** If the oracle needs the module's own
+table, the test is measuring the module against itself; pin the table's size against a **literal**
+and write **one fixture per entry** that degrades **exactly that entry**. **(2) A FIXTURE MUST CARRY
+THE THING IT DISCRIMINATES.** A fixture satisfying **none** of a list of requirements cannot tell a
+strong requirement from a weak one — only a fixture satisfying *all but one* can, and there must
+therefore be as many fixtures as there are requirements. **(3) DERIVE THE NEGATIVE FIXTURE FROM THE
+REAL VALUE, AND ASSERT THE DEGRADATION HAPPENED.** A `.replace()` that silently matched nothing
+yields a fixture that is quietly *correct* and an assertion that quietly passes for the wrong reason;
+this is `INC-50`'s mirror move, and it is why the new fixtures assert their needle is present
+**before** they degrade it. ⚠️ **The count for the underlying class is now FIVE, and the count for
+"a test written to close a finding was itself defective" is now THREE — `INC-50`, `INC-53` and this.**
+Recorded so that the ruling, when it comes, is made against a number and not against an impression.
