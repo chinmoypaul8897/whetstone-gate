@@ -4571,3 +4571,91 @@ had just written** — `4e1c8a92` (six, found by `REVIEW_C6_3`), `363a2e9f` (fiv
 found by itself), `ca0dd160`'s harness (`INC-57`), and this. ⚠️ **Two of the four were found by the
 author**, which is the ruling working; **`INC-53`'s `Systemic guardrail` said a ruling is not a
 mechanism, and four sessions later that is still true and still the best available.**
+
+---
+
+## INC-60 — the "CRLF checked, not assumed" line in three commit messages was produced by a command that counted the letter **r**: the conclusion was right, the evidence was ceremony, and `INC-44` was the entry it was performing for
+
+**Date:** 2026-09-02 (**C6 FIX 4, `4b7f21ae`. The failure is this session's own**, in `7cbe908`,
+`da9fc96` and `754a91a`. Found by this session, after those three commits were pushed, while
+verifying a *different* file. Fix SHA under **Fix**.)
+
+**Event:** every line-ending check this session ran used `grep -c $'\r' <file>`. **Under this Git
+Bash `$'\r'` was not expanded**, so `grep` searched for the literal letter **`r`** and returned *the
+number of lines containing an r* — which is nearly every line of prose. The results looked like
+strong evidence precisely because they matched so exactly:
+
+```
+INCIDENTS.md    lines=4573  CR=4573   mixed=NO      <- "CR" here is the letter r
+STATUS.md       lines=907   CR=907    mixed=NO
+staged_CR=2089  worktree_CR=2089                    <- compared r-counts, not endings
+```
+
+Three commit messages carry the conclusion drawn from it: `7cbe908` — *"both files were ALREADY CRLF
+in the HEAD blob"*; `da9fc96` — *"staged_CR = worktree_CR = 2089"*; `754a91a` — *"No mixed line
+endings in any file."*
+
+**Action:** re-measured over **raw bytes** in Python. ⚠️ **The true state is the OPPOSITE of what was
+written, and the property is nonetheless safe:** every tracked file this session touched is **pure
+LF, CRLF count ZERO**, and each worktree file is **byte-identical to its HEAD blob** —
+`tests/test_c6_fix_probes.py` (2089 LF, 0 CRLF), `tests/test_c6_attacker.py` (1991, 0),
+`INCIDENTS.md` (4573, 0), `PROGRESS.md` (6900, 0), `STATUS.md` (907, 0), `OPEN_FINDINGS.md`
+(1718, 0), `docs/sessions/nightrun-b-1.txt` (345, 0). The repository is LF throughout, exactly as
+`.gitattributes`' `* text=auto eol=lf` intends. **The three commit messages are NOT amended** — no
+history rewrite (`CLAUDE.md` §5), which would destroy `probe-v1`, `prereg-v1` and every `cN-pass`
+tag. The correction is carried here, in `QUESTIONS.md`, and in `docs/sessions/nightrun-b-1.txt`.
+
+**Expectation:** `INC-44` is *"a REVIEW session's own Phase-1 seal committed two CRLF files and
+turned `make test` red"*, and this session's prompt named the hazard directly (*"CR as BYTES"*).
+**The instruction was followed in form and defeated in substance:** the check ran, printed numbers,
+and measured the wrong thing. ⚠️ **A prompt that says "check X" is satisfied by any command that
+produces a number, and nothing in this process distinguishes a check that ran from a check that
+worked.**
+
+**Missing:** ⚠️ **a POSITIVE CONTROL on the measuring command itself — one line, and it would have
+failed instantly.** Running the same `grep -c $'\r'` against a file known to contain CRLF, or simply
+against a **string with no `r` in it**, would have exposed it: `printf 'abc\n' | grep -c $'\r'`
+returns 0 while `printf 'car\n' | grep -c $'\r'` returns 1. **This repository already demands exactly
+that discipline of its own guards** — `INC-43`'s *"a release gate that has never gone red is only
+decorative"*, and `tests/test_repo_invariants.py` literally contains
+`test_the_crlf_check_still_fires_on_text_and_no_longer_lies_about_binary`. **The project's own CRLF
+check has a test proving it can fire. This session's ad-hoc one had none.**
+
+**Missed:** ⚠️ **the numbers were absurd on their face and were read as confirmation.**
+`lines=4573 CR=4573` for **every** file, including one just created, means *every line of every file
+ends in CR* — for a repository whose `.gitattributes` exists specifically to force LF. **A perfect
+match across seven heterogeneous files is not corroboration; it is the signature of a degenerate
+predicate**, and this session had, that same hour, written `INC-58` about a parser whose default
+made two different states indistinguishable. ⚠️ **And there was a second, louder signal:** the very
+first byte-level command run in this session, `od -c` on `QUESTIONS.md`, printed `n . \n \n - - - \n`
+— **visible bare LF, no `\r`** — hours before the grep results claimed universal CRLF. Two
+measurements disagreed and the convenient one was never re-examined.
+
+**Diagnosis:** `grep -c $'\r'` degrades silently into a search for `r` when the shell does not
+expand `$'…'`, so a broken line-ending check returns a large plausible number instead of an error —
+and because the *conclusion* it supported was true, nothing downstream ever contradicted it.
+
+**Fix:** ⚠️ **NO SHA IS INVENTED HERE.** The commit that lands this entry is what binds the
+correction, and **its real SHA is written into this line by the commit immediately following it**
+(`git log -p -- INCIDENTS.md`). What the fix consists of: the byte-level re-measurement above, the
+correction in `docs/sessions/nightrun-b-1.txt` §7 and in `QUESTIONS.md`, and the three superseded
+sentences quoted rather than erased. **No code changed, because nothing in the repository was
+wrong** — only this session's account of why it was right.
+
+**Systemic guardrail:** ⚠️ **NONE ADDED IN CODE, AND THE REASON IS THAT ONE ALREADY EXISTS AND WAS
+DOING THE WORK THE WHOLE TIME.** `make test` ran **784 passed, 0 failed** after every edit, and that
+suite contains `test_the_object_store_and_the_working_tree_agree` **and** `check_gitattributes`' A3
+*"no CRLF in any tracked file"*. **The property was verified continuously by the repository's own
+invariant; the ad-hoc grep contributed nothing and only appeared to.** The lesson is therefore not
+*"write a better grep"* but the one this entry is named for: ⚠️ **when the repository already has a
+tested invariant for a property, a session's own ad-hoc re-check of it is not extra rigour — it is
+an UNTESTED SECOND IMPLEMENTATION of a tested predicate, which is hard rule 8's anti-circularity
+argument pointed at a shell one-liner.** The correct move was to cite the suite, which is what every
+future session should do for line endings. ⚠️ **AND THE COUNT, which is the part worth more than the
+guardrail: this is the FOURTH unmeasured-or-mismeasured claim to reach a written artefact IN THIS
+ONE SESSION** — two fabricated `Fix:` SHAs caught while drafting, `INC-58`'s parser that reported
+verdicts it had not measured, and this. **`INC-54`'s closing line was *"`Action:` is bound to
+nothing, and so is `Measured:`."* This entry adds the sharper form: ⚠️ **a number is not a
+measurement. A command that produces a plausible figure while measuring the wrong quantity is
+indistinguishable, in the written record, from one that works — and the only thing that separated
+them here was reading the output twice.**

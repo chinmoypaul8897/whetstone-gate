@@ -313,9 +313,30 @@ until then - the same debt C6 FIX 3 named and REVIEW 4 discharged for it.
   (testpaths = ["tests"], so its independent/*.py is not collected) - checked, not
   assumed.
 
-  CRLF CHECKED, NOT ASSUMED (INC-44): both test files were ALREADY CRLF in the HEAD blob,
-  confirmed with `git cat-file` (which applies no filters), and every staged blob's CR
-  count equals its worktree's. No file has mixed endings.
+  !! THE CRLF CLAIM THIS SESSION MADE THREE TIMES WAS MEASURED WITH A BROKEN COMMAND, AND
+     THE CORRECTION IS HERE RATHER THAN QUIETLY DROPPED - INC-60.
+     `grep -c $'\r'` under this Git Bash did NOT expand `$'\r'`; it matched the LETTER "r",
+     so it counted lines containing "r" - nearly every line. That is why the numbers looked
+     so persuasive: "lines=4573 CR=4573" was arithmetic about the letter r.
+     MEASURED CORRECTLY, in Python, over raw bytes:
+        EVERY tracked file this session touched is PURE LF - CRLF count ZERO - and each
+        worktree file is BYTE-IDENTICAL to its HEAD blob:
+        tests/test_c6_fix_probes.py (2089 LF, 0 CRLF), test_c6_attacker.py (1991, 0),
+        INCIDENTS.md (4573, 0), PROGRESS.md (6900, 0), STATUS.md (907, 0),
+        OPEN_FINDINGS.md (1718, 0), this file (345, 0).
+     SO THE CONCLUSION HELD AND THE STATED REASON FOR IT DID NOT. The repository is LF
+     throughout, exactly as `.gitattributes`' `* text=auto eol=lf` intends; this session
+     introduced no CRLF; the object store and the working tree agree. But the sentence
+     "both files were ALREADY CRLF in the HEAD blob" in `7cbe908`'s message is FALSE -
+     they are LF - and `da9fc96`'s "staged_CR = worktree_CR = 2089" counts the letter r.
+     !! THOSE COMMIT MESSAGES ARE NOT AMENDED. No history rewrite (CLAUDE.md S5); a rewrite
+        would destroy probe-v1, prereg-v1 and every cN-pass tag. The correction lives here,
+        in INC-60, and in QUESTIONS.md.
+     !! AND THE INDEPENDENT CHECK THAT MAKES THIS SAFE RATHER THAN LUCKY: `make test` is
+        784 passed / 0 failed AFTER every edit, and that suite CONTAINS
+        test_the_object_store_and_the_working_tree_agree and A3 "no CRLF in any tracked
+        file". The property was verified by the repository's OWN invariant the whole time.
+        The broken command added NOTHING - it was ceremony that read like evidence.
 
   !! THE cp1252 HAZARD HIT THIS SESSION TOO, for the SIXTH time on this machine
      (INC-08/INC-25/OF-89/INC-45): a plain `print` of a STATUS.md cell died on

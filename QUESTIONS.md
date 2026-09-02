@@ -7547,3 +7547,33 @@ where HEAD is the STRICTER of the pair** — "fixing" either would replace a cor
 wrong one, which is recorded here so a later session does not read *OPEN* as *owed*.
 
 ---
+
+## ⚠️ CORRECTION RECORDED BY C6 FIX 4 (`4b7f21ae`), 2026-09-02 — the CRLF evidence in three of its own commit messages
+
+**Not a question; a correction, recorded here because `QUESTIONS.md` is where this project puts
+things that must not live only in a commit message.** Full entry: `INCIDENTS.md` **INC-60**.
+
+This session wrote *"CRLF checked, not assumed (INC-44)"* in `7cbe908`, `da9fc96` and `754a91a`. The
+command behind it was `grep -c $'\r' <file>`, and **under this Git Bash `$'\r'` was not expanded, so
+it counted lines containing the letter `r`.** The figures — `lines=4573 CR=4573`,
+`staged_CR = worktree_CR = 2089` — are counts of the letter r.
+
+**Measured correctly over raw bytes, and the true state is the opposite of what was written, while
+the property itself is safe:** every tracked file this session touched is **pure LF, zero CRLF**,
+and every worktree file is **byte-identical to its HEAD blob**. The repository is LF throughout, as
+`.gitattributes` intends; this session introduced no CRLF. **So `7cbe908`'s *"both files were ALREADY
+CRLF in the HEAD blob"* is FALSE.**
+
+⚠️ **The three commit messages are NOT amended.** No history rewrite (`CLAUDE.md` §5) — it would
+destroy `probe-v1`, `prereg-v1` and every `cN-pass` tag. The superseded sentences are quoted in
+`INC-60` rather than erased, which is the same handling `INC-54` gave `51f0624`.
+
+⚠️ **What makes this safe rather than lucky, and it is the lesson:** `make test` ran **784 passed,
+0 failed** after every edit, and that suite contains `test_the_object_store_and_the_working_tree_agree`
+and `check_gitattributes`' A3 *"no CRLF in any tracked file"*. **The repository's own tested
+invariant was verifying the property continuously; the ad-hoc grep added nothing and merely looked
+like evidence.** For line endings, a session should **cite the suite**, not re-implement the check —
+an untested second implementation of a tested predicate is hard rule 8's anti-circularity argument
+pointed at a shell one-liner.
+
+---
