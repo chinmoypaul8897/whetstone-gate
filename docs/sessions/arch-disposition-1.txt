@@ -372,7 +372,23 @@ Q-090 RAISED - Class B, OPEN, for the architect, NOT blocking:
   f793bfe  INCIDENTS.md - INC-73, INC-74, INC-75.       Swept: NOTHING
   e0842e3  STATUS.md, docs/reviews/OPEN_FINDINGS.md, PROGRESS.md - the disposition.
                                                        Swept: NOTHING
-  3c0abfb  docs/sessions/arch-disposition-1.txt         Swept: NOTHING
+  e2ea8f8  docs/sessions/arch-disposition-1.txt - THIS FILE, committed BEFORE it was
+           printed (CLAUDE.md S6 duty 1).                Swept: NOTHING
+  73b2f6e  the `PUSHED SHA, THIS FILE` line filled with e2ea8f8, and nothing else.
+                                                       Swept: NOTHING
+  <next>   THIS SECTION'S OWN CORRECTION - see below.   Swept: NOTHING
+
+CORRECTION, RECORDED AGAINST THIS SESSION RATHER THAN SMOOTHED.  The line above read
+`3c0abfb` in the first draft of this file - A SHA THIS SESSION INVENTED as a
+placeholder while writing, for a commit that did not exist.  It was caught before the
+file was ever committed, and the header's `PUSHED SHA, THIS FILE` line was rewritten
+to an EXPLICIT PENDING MARKER for the same reason; THIS LINE WAS MISSED IN THAT SWEEP
+AND WENT INTO e2ea8f8 CARRYING THE INVENTED VALUE.  It is corrected here rather than
+silently, because an invented SHA in a commit table is exactly the defect INC-71
+measured - and because a session that publishes a correction to its own record is
+making the record checkable, which is the only reason this file exists.
+`3c0abfb` was never a real object in this repository: `git cat-file -e 3c0abfb`
+returns non-zero.  MEASURED, not asserted.
 
 EVERY `Swept:` LINE IS MEASURED, NOT REASONED.  Q-063 clause (i)'s diff over the journals
 was run and READ before every commit: 768 added lines, and THE ONLY "Raised by:" token in
