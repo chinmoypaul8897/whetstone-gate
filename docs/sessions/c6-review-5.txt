@@ -2,6 +2,14 @@ PUSHED SHA: 805bc54  (805bc54ab39fa65bb0f044c023e7270fab391f91)
             The commit that carries this file. Its own SHA cannot be inside itself, so it
             is filled by the commit that FOLLOWS it, which is this project's convention.
             The commit before it, already pushed, is 016c41a.
+COMMIT CHAIN, so the final state is checkable without recursion. Seven commits, all pushed:
+            e22fc3d  the token row, registered BEFORE the seal
+            615993d  PHASE-1 SEAL - criteria + reimplementation
+            8c15ef4  the VERDICT - REVIEW_C6_5.md, probes, mutants, OF, Q, STATUS
+            016c41a  the PROGRESS entry
+            805bc54  THIS FILE - the FINAL OUTPUT, committed before it is printed
+            ef1fb7e  this file's PUSHED SHA filled from `git rev-parse`
+            5065aef  REVIEW_C6_5.md's polarity accounting corrected, and this note
 SESSION: 0ca97bbb - C6 - REVIEW - attempt 5 - 2026-09-02 - review type: FULL, two sealed phases
 
 =====================================================================
