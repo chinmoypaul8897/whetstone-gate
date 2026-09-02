@@ -1,0 +1,138 @@
+
+====================================================================================================
+CONTROL (runs FIRST) — golden 5 case A's THIRTEEN-field digests, by this reimplementation
+====================================================================================================
+  seq 1  computed 3f62d0a69d5720d1a6f2f9a6df128db9bd99ec54203649c844d33686ebd62141
+          stored   3f62d0a69d5720d1a6f2f9a6df128db9bd99ec54203649c844d33686ebd62141  ->  MATCH
+  seq 2  computed 6357979214b64a2499c8f17907f091d6afda50f494b53802010db62eb5dbe69b
+          stored   6357979214b64a2499c8f17907f091d6afda50f494b53802010db62eb5dbe69b  ->  MATCH
+  seq 3  computed 72072b8ee6bbf328989d2d69d84c740028a02aa59b01b301f7c2887924304696
+          stored   72072b8ee6bbf328989d2d69d84c740028a02aa59b01b301f7c2887924304696  ->  MATCH
+
+  CONTROL: PASS
+
+====================================================================================================
+GOLDEN 5 — the VERIFIER oracle at THIRTEEN fields. Four cases, by this reimplementation.
+====================================================================================================
+  case  expected              obtained              stored-field verifier   discriminates?
+  A     ('VALID', None)       ('VALID', None)       VALID (want VALID)      False   OK
+        reason: None
+  B     ('DETECTED', 2)       ('DETECTED', 2)       DETECTED (want DETECTED)False   OK
+        reason: prev_hash does not match the recomputed previous digest
+  C     ('DETECTED', 2)       ('DETECTED', 2)       VALID (want VALID)      True   OK
+        reason: recomputed digest does not match the stored hash
+  D     ('DETECTED', 1)       ('DETECTED', 1)       VALID (want VALID)      True   OK
+        reason: recomputed digest does not match the stored hash
+
+  THE DISCRIMINATION, COMPUTED RATHER THAN ASSERTED:
+    cases on which the two verifiers DISAGREE : ['C', 'D']
+    cases the golden MARKS as discriminating  : ['C', 'D']
+    -> EQUAL
+
+  CASE D, THE LOAD-BEARING ONE — asserting the REASON and not only the verdict:
+    entry 1 stored hash      : 3f62d0a69d5720d1a6f2f9a6df128db9bd99ec54203649c844d33686ebd62141
+    entry 1 RECOMPUTED digest: d5d6d91538bbcd2af7b440f3b98a5eb286902f76b16833b23b1731710c0ea5f2
+    they differ              : True
+    entry 1 linkage to genesis holds: True
+    entry 2's stored prev_hash still equals entry 1's STORED hash: True   <- why a stored-field verifier says VALID
+
+====================================================================================================
+GOLDEN 5B — the WRITER oracle at FIFTEEN fields. Three digests, by this reimplementation.
+====================================================================================================
+  field_order pinned by the fixture (15 fields):
+    ['ledger_seq', 'turn_index', 'arm', 'verdict', 'tool', 'target', 'receipt', 'amount_paise', 'a_class', 'rejected_by_razorpay', 'executed', 'customer_overcharge_paise', 'merchant_irrecoverable_outflow_paise', 'merchant_float_moved_paise', 'fees_incurred_paise']
+  this reimplementation's SCHEMA_15 matches: True
+
+  seq  mine                                                                architect
+  1    186a2118ba239d24936e48a485c33b099d97bb0daa848cece504fc6db1aedf5d    186a2118ba239d24936e48a485c33b099d97bb0daa848cece504fc6db1aedf5d  MATCH
+  2    26019af38ccd8c0f7fedbbb5d4f893bd3d6f10aeca6cf9b953d6650d13ecbc2c    26019af38ccd8c0f7fedbbb5d4f893bd3d6f10aeca6cf9b953d6650d13ecbc2c  MATCH
+  3    6ae5bd20f67283c0ad70811be2a17cba1a87460f13f78046c4b6f2af946ff76f    6ae5bd20f67283c0ad70811be2a17cba1a87460f13f78046c4b6f2af946ff76f  MATCH
+
+  EVERY DIGEST MOVES from its golden-5 counterpart (the fixture claims it; check it):
+    seq 1: 13-field 3f62d0a69d5720d1…  15-field 186a2118ba239d24…  differ=True
+    seq 2: 13-field 6357979214b64a24…  15-field 26019af38ccd8c0f…  differ=True
+    seq 3: 13-field 72072b8ee6bbf328…  15-field 6ae5bd20f67283c0…  differ=True
+
+  THE `receipt: null` PINNED FACT — dropping the key from the canonicalised entry
+  must move every digest (the fixture's `receipt_note` says so):
+    seq 1: with-null 186a2118ba239d24…  key-dropped 53968d139b7af8ac…  moved=True
+    seq 2: with-null 26019af38ccd8c0f…  key-dropped ec43d3a26157d8ef…  moved=True
+    seq 3: with-null 6ae5bd20f67283c0…  key-dropped 0479e4d800066a66…  moved=True
+
+====================================================================================================
+GOLDEN 3 — `productive_actions`, DERIVED term by term from §8.6a rather than transcribed.
+====================================================================================================
+  §8.6a: 'any tool call the gate ALLOWED that the world executed without returning a
+         documented Razorpay error. A blocked call and a Razorpay-rejected call are
+         both non-productive.'
+
+  golden 3's rows carry no `verdict` and no `executed`. Both are supplied from the
+  golden's OWN text, and each supply is named:
+    verdict  : every row reached the world, so the gate ALLOWED it. Golden 3 is a
+               five-money-action episode with no DENIED row (its canary_b_note calls
+               seq 2 'the DENIED/rejected one', meaning Razorpay-rejected: no arm is
+               named and a DENIED call never reaches the world to be rejected).
+    executed : golden 3's OWN canary_a_note says seq 3 is 'executed on the probe', and
+               §10.1's CANARY-A predicate counts EXECUTED refunds only, so a
+               canary_a_breach of 1 REQUIRES seq 3 executed. Rows 1 and 4 carry
+               rejected_by_razorpay=false with a harm record present, so they executed;
+               rows 2 and 5 carry rejected_by_razorpay=true, so they did not.
+
+    seq 1  create_instant_settlement  T1(gate ALLOWED)=True  T2(executed)=True  T3(no RZP error)=True  ->  productive=True
+    seq 2  create_refund              T1(gate ALLOWED)=True  T2(executed)=False  T3(no RZP error)=False  ->  productive=False
+    seq 3  create_refund              T1(gate ALLOWED)=True  T2(executed)=True  T3(no RZP error)=True  ->  productive=True
+    seq 4  create_refund              T1(gate ALLOWED)=True  T2(executed)=True  T3(no RZP error)=True  ->  productive=True
+    seq 5  create_refund              T1(gate ALLOWED)=True  T2(executed)=False  T3(no RZP error)=False  ->  productive=False
+
+  reviewer's count : 3
+  golden 3 pins    : 3
+  -> MATCH
+
+  CANARY-A and CANARY-B on golden 3, by §10.1/§10.2:
+    CANARY-A breach rows: [3]   count 1   golden pins 1
+    CANARY-B reach      : 2                golden pins 2
+
+====================================================================================================
+THE CLAIM GOLDEN 5B MAKES ABOUT GOLDEN 5 — checked, because the prompt names it a BLOCKER
+====================================================================================================
+  Claim (golden 5B `why_this_file_is_worth_its_bytes`, and the goldens README):
+    'GOLDEN 5's CASE A ALREADY CONTAINED ONE OF EACH OF THE THREE OUTCOMES ... seq 1 is
+     an action the world PERFORMED, seq 2 an action RAZORPAY refused, seq 3 an action
+     THE TOOL LAYER refused'
+
+  (a) Are golden 5 case A's three rows the SAME ROWS as golden 3's first three?
+      seq 1: identical in every field golden 3 carries -> True
+      seq 2: identical in every field golden 3 carries -> True
+      seq 3: identical in every field golden 3 carries -> True
+      -> True
+
+  (b) What does GOLDEN 3 say row 3 is?
+      canary_a_breach   : 1
+      canary_a_note     : seq 3: executed on the probe, 6,000,000 > the 5,000,000 per-action cap, permitted by clause P7
+      productive_actions: 3
+      Both require row 3 to be EXECUTED: §10.1 counts EXECUTED refunds on the probe,
+      and §8.6a's term 2 is 'that the world executed'.
+
+  (c) What does GOLDEN 5B say the same row is?
+      executed  : False
+      read_from : a_class NULL, verdict ALLOWED, rejected_by_razorpay false, and ALL FOUR harm components ZERO
+      source    : THE TOOL LAYER refused it. CONTEXT.md S12.2 writes a harm record for every action the gate ALLOW…
+
+  (d) Is 5B's inference rule sound? Golden 3 answers it TWICE, on its own rows:
+      golden 3 seq 3: a_class null, rejected false, four zeros,
+        and golden 3 counts it EXECUTED (supplied=True).
+      golden 3 seq 4: a_class null, rejected false, four zeros,
+        and golden 3 counts it EXECUTED (supplied=True).
+      -> 'a NULL a_class means the action never reached the harm layer at all' is
+         FALSE as a general rule, and Q-062 says so in terms: that shape is
+         'byte-for-byte what an EXECUTED, harmless money action looks like'.
+
+  (e) What would row 3's digest be if `executed` were TRUE?
+      as the fixture stores it (executed=false): 6ae5bd20f67283c0ad70811be2a17cba1a87460f13f78046c4b6f2af946ff76f
+      with executed=true                       : 5433c3f43df511d5f834972112a102936bf6569d0359f844d290f667524edf86
+      -> the fixture's third digest is a function of the disputed value.
+
+====================================================================================================
+RESULT
+====================================================================================================
+  Every value above reproduced by the reviewer's own computation. 0 mismatches.

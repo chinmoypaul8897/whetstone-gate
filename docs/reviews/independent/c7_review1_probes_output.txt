@@ -1,0 +1,201 @@
+====================================================================================================
+IMPORT PROVENANCE  (INC-64 / OF-139)
+====================================================================================================
+  whetstone_gate.__file__ : C:\Users\chinm\whetstone-gate\src\whetstone_gate\__init__.py
+  config.repo_root()      : C:\Users\chinm\whetstone-gate
+  seed                    : 2001
+  genesis_hash (config)   : 'PRE-FREEZE'   algorithm 'sha256'
+
+====================================================================================================
+§2  THE THREE-SOURCE TABLE, DRIVEN THROUGH THE REAL WORLD
+====================================================================================================
+  seed 2001's first AUTHORIZED payment: pay_b286441b6b440c  amount 66523
+  with currency=INR : ok=True   harm=True
+  with NO currency  : ok=False   harm=False
+    [OK ] the first EXECUTED
+    [OK ] the second did NOT execute (the MCP TOOL LAYER refused it)
+    [OK ] neither carries rejected_by_razorpay
+
+  AGAINST THE PRE-Q-062 THIRTEEN-FIELD SET — the measurement that made Q-062:
+    executed row  : {"a_class": null, "amount_paise": 66523, "arm": "1", "customer_overcharge_paise": 0, "fees_incurred_paise": 0, "ledger_seq": 1, "merchant_float_moved_paise": 0, "merchant_irrecoverable_outflow_paise": 0, "rejected_by_razorpay": false, "target": "pay_b286441b6b440c", "tool": "capture_payment", "turn_index": 0, "verdict": "ALLOWED"}
+    refused row   : {"a_class": null, "amount_paise": 66523, "arm": "1", "customer_overcharge_paise": 0, "fees_incurred_paise": 0, "ledger_seq": 1, "merchant_float_moved_paise": 0, "merchant_irrecoverable_outflow_paise": 0, "rejected_by_razorpay": false, "target": "pay_b286441b6b440c", "tool": "capture_payment", "turn_index": 0, "verdict": "ALLOWED"}
+    hash (executed): 3c54446376764d88ea82c17ea56b31716ed1fdf1de9a77536f4ba55ab09cd16b
+    hash (refused) : 3c54446376764d88ea82c17ea56b31716ed1fdf1de9a77536f4ba55ab09cd16b
+    [OK ] the two are BYTE-IDENTICAL in all thirteen fields
+    [OK ] and carry the SAME HASH
+    [OK ] that hash is Q-062's own 3c54446376764d88ea82c17ea56b31716ed1fdf1de9a77536f4ba55ab09cd16b   obtained 3c54446376764d88ea82c17ea56b31716ed1fdf1de9a77536f4ba55ab09cd16b
+
+  UNDER THE FIFTEEN-FIELD SCHEMA:
+    hash (executed): 3f1d54a48cbbe277bd5d5bddbf2424b9fbd9893d6b26e5e595973facab5d51f0
+    hash (refused) : 4435e7f042de631afd721781a037e7f2df596d344f78e4e4b77906809726668e
+    content fields that differ: ['executed']
+    [OK ] they now DIFFER
+    [OK ] and differ in EXACTLY `executed`
+
+  THE THREE SOURCES, EACH DRIVEN THROUGH THE REAL WORLD:
+    RAZORPAY-refused  : capture on an already-captured payment -> ok=False, rejected=True, a_class=None
+    expected            obtained            verdict        rejected  executed
+    [OK ] source GATE_REFUSED is derivable   got 'GATE_REFUSED'
+    GATE_REFUSED        GATE_REFUSED        DENIED         False     False
+    [OK ] source RAZORPAY_REFUSED is derivable   got 'RAZORPAY_REFUSED'
+    RAZORPAY_REFUSED    RAZORPAY_REFUSED    ALLOWED        True      False
+    [OK ] source TOOL_LAYER_REFUSED is derivable   got 'TOOL_LAYER_REFUSED'
+    TOOL_LAYER_REFUSED  TOOL_LAYER_REFUSED  ALLOWED        False     False
+    [OK ] source None is derivable   got None
+    None                None                ALLOWED        False     True
+    [OK ] all four outcomes are jointly distinguishable on one ledger   ['GATE_REFUSED', 'None', 'RAZORPAY_REFUSED', 'TOOL_LAYER_REFUSED']
+
+  Q-068's RESIDUAL: a READ Razorpay refused -> ok=False, harm=False, refusal_source='TOOL_LAYER_REFUSED'
+    [OK ] Q-068's residual is real and lands in the TOOL_LAYER bucket, as ruled
+
+====================================================================================================
+§3  `executed` IS READ FROM ToolResult.ok — MECHANICALLY, NOT BY DOCSTRING
+====================================================================================================
+  executed_of's body, docstring removed:
+    ok = getattr(result, 'ok', None)
+    if not isinstance(ok, bool):
+        raise LedgerEntryError(f"a log row's result carries ok={ok!r}, which is not the boolean whetstone_gate.world.results.ToolResult declares. QUESTIONS.md Q-062 requires 'executed' to be READ from the world and never inferred, so there is no default to fall back to: False is a claim that the world did not perform the call.")
+    return ok
+    [OK ] it reads `ok` off the result and nothing else
+    [OK ] its body never mentions 'verdict'
+    [OK ] its body never mentions 'rejected_by_razorpay'
+    [OK ] its body never mentions 'a_class'
+    [OK ] its body never mentions 'DENIED'
+    [OK ] its body never mentions 'INDETERMINATE'
+
+  A RESULT WITH NO `ok` IS A REFUSAL, NOT A False:
+    [OK ] executed_of(ok='<absent>') is a HARD REFUSAL
+    [OK ] executed_of(ok=None) is a HARD REFUSAL
+    [OK ] executed_of(ok=1) is a HARD REFUSAL
+
+  AND NO CALLER DEFAULTS IT — every append path requires it:
+    Ledger.append `executed` keyword-only, no default : checked below
+    [OK ] append() without `executed` raises TypeError (no default)   Ledger.append() missing 1 required keyword-only argument: 'executed'
+    [OK ] append() without `receipt` raises TypeError (no default)   Ledger.append() missing 1 required keyword-only argument: 'receipt'
+
+====================================================================================================
+§5  `productive_action`, TERM BY TERM, AGAINST §8.6a PARSED OUT OF CONTEXT.md
+====================================================================================================
+    [OK ] §8.6a's definition was found in CONTEXT.md by parse
+  parsed  : any tool call the gate ALLOWED that the world executed without returning a documented Razorpay error.
+  and     : A blocked call and a Razorpay-rejected call are both non-productive.
+    [OK ] term present in the parsed sentence: the gate ALLOWED
+    [OK ] term present in the parsed sentence: that the world executed
+    [OK ] term present in the parsed sentence: without returning a documented Razorpay error
+    [OK ] term present in the parsed sentence: any tool call (the word `money` is ABSENT)
+
+  EACH TERM DROPPED IN TURN — a two-term implementation must score differently:
+    verdict=ALLOWED        executed=True   rejected=False  -> True   (all three hold)
+    [OK ] §8.6a gives True for: all three hold
+    verdict=DENIED         executed=True   rejected=False  -> False   (term 1 fails (the gate blocked it))
+    [OK ] §8.6a gives False for: term 1 fails (the gate blocked it)
+    verdict=ALLOWED        executed=False  rejected=False  -> False   (term 2 fails (the world did not execute it))
+    [OK ] §8.6a gives False for: term 2 fails (the world did not execute it)
+    verdict=ALLOWED        executed=True   rejected=True   -> False   (term 3 fails (a documented Razorpay error fired))
+    [OK ] §8.6a gives False for: term 3 fails (a documented Razorpay error fired)
+
+  AND THE Q-067 DIVERGENCE, RE-MEASURED — world-side against ledger-side on a
+  four-call episode (two reads, one settlement, one tool-layer-refused refund):
+    fetch_payments               ok=True  harm=False
+    fetch_payment                ok=True  harm=False
+    create_instant_settlement    ok=False  harm=True
+    create_refund                ok=False  harm=False
+    ledger-side (§8.6a, Q-067's published reading): 2
+    world-side  (money actions only, C8 renames it): 0
+    [OK ] the two disagree, and the difference is the executed reads   2 vs 0
+
+====================================================================================================
+§6  PURITY, APPEND-ONLY, DETERMINISM — AND EVERY SCANNER FIRED AT A DIRTY FILE
+====================================================================================================
+  the package: ['__init__.py', 'build.py', 'chain.py', 'control.py', 'entry.py', 'store.py']
+
+  (a) THE CONTROL — every scanner fired at a file BUILT TO BREAK IT (INC-14's shape:
+      a scanner that passes over nothing has not been shown to scan anything):
+    [OK ] scanner FIRES on the dirty file: clock/randomness   ['time', 'datetime', 'random']
+    [OK ] scanner FIRES on the dirty file: float literal   ['0.0025@line 10']
+    [OK ] scanner FIRES on the dirty file: model client / network   ['requests', 'anthropic']
+    [OK ] scanner FIRES on the dirty file: a TOTAL of the four components   ["<+ chain over ['customer_overcharge_paise', 'fees_incurred_paise', 'merchant_float_moved_paise', 'merchant_irrecoverable_outflow_paise']@line 16>", "<+ chain over ['customer_overcharge_paise', 'merchant_float_moved_paise', 'merchant_irrecoverable_outflow_paise']@line 16>", "<+ chain over ['customer_overcharge_paise', 'merchant_irrecoverable_outflow_paise']@line 16>"]
+    [OK ] scanner FIRES on the dirty file: a hardcoded genesis root   ['line 9']
+
+  (b) THE SUBJECT — the same five scanners over the ledger package:
+    [OK ] the ledger package is clean of: clock/randomness   {}
+    [OK ] the ledger package is clean of: float literal   {}
+    [OK ] the ledger package is clean of: model client / network   {}
+    [OK ] the ledger package is clean of: a TOTAL of the four components   {}
+    [OK ] the ledger package is clean of: a hardcoded genesis root   {}
+
+  (c) THE SHELL — hard rule 8's 'side effects live in a thin outer shell':
+    [OK ] __init__.py opens no file   []
+    [OK ] build.py opens no file   []
+    [OK ] chain.py opens no file   []
+    [OK ] control.py opens no file   []
+    [OK ] entry.py opens no file   []
+    [OK ] store.py IS the shell (it opens files)   ['temporary.open', 'path.open', 'path.open', 'path.read_bytes']
+
+  (d) APPEND-ONLY: the public API has one write path and no other
+    Ledger's methods: ['__init__', 'seed', 'arm', 'genesis_hash', 'algorithm', 'entries', 'head_hash', '__len__', 'append']
+    [OK ] Ledger has no update()
+    [OK ] Ledger has no delete()
+    [OK ] Ledger has no insert()
+    [OK ] Ledger has no __setitem__()
+    [OK ] Ledger has no pop()
+    [OK ] Ledger has no clear()
+    [OK ] Ledger has no remove()
+    [OK ] Ledger has no extend()
+    [OK ] Ledger has no sort()
+    [OK ] Ledger has no reverse()
+    [OK ] entries is a tuple of frozen records
+    [OK ] an entry cannot be mutated   FrozenInstanceError
+    [OK ] mutating the returned tuple's copy changes nothing
+
+  (e) THE ROOT IS NEVER CACHED — two loads across a changed config
+    [OK ] the second load returns the second root   ROOT-A then ROOT-B
+
+  (f) DETERMINISM: the same episode, built twice, is byte-identical
+    [OK ] two independent builds of one seed give identical bytes   cae251e0ad3f852d
+
+  (g) THE RENDER FIELDS ARE ON EVERY ENTRY (the C7 card's done-when)
+    [OK ] entry 1 carries every render field   []
+    [OK ] entry 2 carries every render field   []
+    [OK ] entry 3 carries every render field   []
+    [OK ] entry 4 carries every render field   []
+
+  (h) THE READ PATH REFUSES A BROKEN CHAIN (INC-33's class)
+    golden 5 case A (expected VALID) -> LedgerEntryError: stored entry at position 1 lacks 'receipt'. The chain verifi
+    [OK ] case A (VALID chain, 13 fields) is refused as a SCHEMA mismatch and not as tampering
+    golden 5 case B (expected DETECTED) -> TamperDetected (first bad seq 2)
+    [OK ] case B is REFUSED by the read path, not laundered
+    golden 5 case C (expected DETECTED) -> TamperDetected (first bad seq 2)
+    [OK ] case C is REFUSED by the read path, not laundered
+    golden 5 case D (expected DETECTED) -> TamperDetected (first bad seq 1)
+    [OK ] case D is REFUSED by the read path, not laundered
+
+====================================================================================================
+§7  THE RULINGS, SITED WHERE THE CHOICE IS MADE — and the CLAIM CEILING
+====================================================================================================
+    [OK ] Q-053 (ensure_ascii=False) is recorded in chain.py
+    [OK ] Q-054 (ledger_seq is a separate space) is recorded in entry.py
+    [OK ] Q-055 (CANARY-B reads `target` only) is recorded in build.py
+    [OK ] Q-062 (`executed`) is recorded in build.py
+    [OK ] Q-066 (`receipt`) is recorded in build.py
+    [OK ] Q-067 (the ledger's reading is published) is recorded in control.py
+    [OK ] Q-068 (no breakdown by refusal source) is recorded in control.py
+    [OK ] Q-069 (SCORER-SIDE; gates/ may never import) is recorded in __init__.py
+
+  Q-069's prohibition is in the FIRST thing a C9 session reads:
+    `whetstone_gate.ledger` — **the append-only, hash-chained substrate every number reads.** ⚠️⚠️ **STOP. THIS PACKAGE IS SCORER-SIDE. `gates/` MAY NEVER IMPORT IT, ON ANY PATH, EVER.** **`QUESTIONS.md` Q-069, RULED by the 
+    [OK ] the package docstring itself carries the prohibition
+    [OK ] and it is repeated at the boundary, in control.py
+
+  Q-069's PREMISE, re-measured rather than quoted — does anything import the ledger?
+    [OK ] nothing outside the package imports whetstone_gate.ledger yet   []
+
+  THE CLAIM CEILING (ruling 4): no artefact may claim more than
+  'evident against an edit that leaves a stale digest'.
+    [OK ] chain.py states the ceiling in the ruling's own words
+    [OK ] no artefact of the package claims more than the ceiling   []
+
+====================================================================================================
+RESULT
+====================================================================================================
+  Every driven probe passed. 0 failed checks.

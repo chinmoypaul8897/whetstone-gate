@@ -1,0 +1,219 @@
+====================================================================================================
+IMPORT PROVENANCE  (INC-64 / OF-139: print it or the run is worthless)
+====================================================================================================
+  whetstone_gate.__file__ : C:\Users\chinm\whetstone-gate\src\whetstone_gate\__init__.py
+  config.repo_root()      : C:\Users\chinm\whetstone-gate
+  reviewer reimpl         : C:\Users\chinm\whetstone-gate\docs\reviews\independent\c7_reimpl.py
+  sys.executable          : C:\Users\chinm\whetstone-gate\.venv\Scripts\python.exe
+
+====================================================================================================
+THE 45 SEALED VECTOR ENTRIES (V01..V42, V36 split four ways), PROJECT versus REVIEWER
+====================================================================================================
+  V01 an EMPTY chain
+      digests identical      : True
+      verify project/reviewer: ('VALID', None) / ('VALID', None)   expected ('VALID', None)
+
+  V02 ONE entry, intact
+      digests identical      : True
+      verify project/reviewer: ('VALID', None) / ('VALID', None)   expected ('VALID', None)
+
+  V03 THREE entries, intact
+      digests identical      : True
+      verify project/reviewer: ('VALID', None) / ('VALID', None)   expected ('VALID', None)
+
+  V04 a TAMPERED FIELD on entry 2, stored hash left stale
+      digests identical      : True
+      verify project/reviewer: ('DETECTED', 2) / ('DETECTED', 2)   expected ('DETECTED', 2)
+
+  V05 entry 1's CONTENTS altered, its stored hash UNTOUCHED (golden 5 case D's shape)
+      digests identical      : True
+      verify project/reviewer: ('DETECTED', 1) / ('DETECTED', 1)   expected ('DETECTED', 1)
+
+  V06 entry 2's prev_hash broken OUTRIGHT (the CONTROL)
+      digests identical      : True
+      verify project/reviewer: ('DETECTED', 2) / ('DETECTED', 2)   expected ('DETECTED', 2)
+
+  V07 an ADDED field smuggled onto entry 2
+      digests identical      : True
+      verify project/reviewer: ('DETECTED', 2) / ('DETECTED', 2)   expected ('DETECTED', 2)
+
+  V08 a REMOVED field deleted from entry 2
+      digests identical      : True
+      verify project/reviewer: ('DETECTED', 2) / ('DETECTED', 2)   expected ('DETECTED', 2)
+
+  V09 a TRUNCATED chain — the last entry dropped
+      digests identical      : True
+      verify project/reviewer: ('VALID', None) / ('VALID', None)   expected ('VALID', None)
+      (VALID here is the STATED LIMITATION OF-57, not a defect)
+
+  V10 a RE-DERIVED SUFFIX — truncate, then append a fresh correctly-chained entry
+      digests identical      : True
+      verify project/reviewer: ('VALID', None) / ('VALID', None)   expected ('VALID', None)
+      (VALID here is the STATED LIMITATION OF-57, not a defect)
+
+  V11 a NON-ASCII `receipt` — the rupee sign
+      digests identical      : True
+      verify project/reviewer: ('VALID', None) / ('VALID', None)   expected ('VALID', None)
+      ensure_ascii=False digest (shipped): cc645ca6b50142b7d08a820729d61a53d24868b5e66e38a6ef7f35fed2e9297e
+      ensure_ascii=True  digest (Q-053 option 2, REJECTED): 622c8dcfa0b5c6de7da1ebde291f1211b28e6ab8fef774d25c641f7b8a89d0cf
+      they differ on REACHABLE input: True
+
+  V12 a NON-ASCII `target`
+      digests identical      : True
+      verify project/reviewer: ('VALID', None) / ('VALID', None)   expected ('VALID', None)
+
+  V13 a LONE SURROGATE in `receipt`
+      both refused the WRITE: NotCanonicalisable: an entry carries text that is not encodable as UTF-8 ('utf-8' codec ca
+
+  V14 an EMPTY-STRING `receipt`
+      digests identical      : True
+      verify project/reviewer: ('VALID', None) / ('VALID', None)   expected ('VALID', None)
+      digest: 549902d233cc75deddadcbfbe1a8ba485bec1d45856a2618c85591213c0c1a56
+
+  V15 a NULL `receipt` — the baseline V14 must differ from
+      digests identical      : True
+      verify project/reviewer: ('VALID', None) / ('VALID', None)   expected ('VALID', None)
+      digest: f7f2fc862378b7707b364d0c0dce7eb42fb15046e094f4b3b1cf849626f71396
+
+  V16 the `receipt` KEY REMOVED versus `receipt: null`
+      digests identical      : True
+      verify project/reviewer: ('DETECTED', 1) / ('DETECTED', 1)   expected ('DETECTED', 1)
+
+  V17 arm 1 × ALLOWED
+      project=ACCEPT  reviewer=ACCEPT  expected=ACCEPT
+
+  V18 arm 2 × ALLOWED
+      project=ACCEPT  reviewer=ACCEPT  expected=ACCEPT
+
+  V19 arm 2 × DENIED
+      project=ACCEPT  reviewer=ACCEPT  expected=ACCEPT
+
+  V20 arm 2S × ALLOWED
+      project=ACCEPT  reviewer=ACCEPT  expected=ACCEPT
+
+  V21 arm 2S × DENIED
+      project=ACCEPT  reviewer=ACCEPT  expected=ACCEPT
+
+  V22 arm 3 × ALLOWED
+      project=ACCEPT  reviewer=ACCEPT  expected=ACCEPT
+
+  V23 arm 3 × DENIED
+      project=ACCEPT  reviewer=ACCEPT  expected=ACCEPT
+
+  V24 arm 4 × ALLOWED
+      project=ACCEPT  reviewer=ACCEPT  expected=ACCEPT
+
+  V25 arm 4 × DENIED
+      project=ACCEPT  reviewer=ACCEPT  expected=ACCEPT
+
+  V26 arm 4 × INDETERMINATE
+      project=ACCEPT  reviewer=ACCEPT  expected=ACCEPT
+
+  V27 arm 1 × DENIED — ILLEGAL
+      project=REFUSE  reviewer=REFUSE  expected=REFUSE
+      refusal: LedgerEntryError: arm '1' cannot emit verdict 'DENIED'. CONTEXT.md §8.6a gives it exactly ['ALLOWED'] and no other. C7 builds no gate; it refuses a ve
+
+  V28 arm 2 × INDETERMINATE — ILLEGAL
+      project=REFUSE  reviewer=REFUSE  expected=REFUSE
+      refusal: LedgerEntryError: arm '2' cannot emit verdict 'INDETERMINATE'. CONTEXT.md §8.6a gives it exactly ['ALLOWED', 'DENIED'] and no other. C7 builds no gate
+
+  V29 arm 3 × INDETERMINATE — ILLEGAL
+      project=REFUSE  reviewer=REFUSE  expected=REFUSE
+      refusal: LedgerEntryError: arm '3' cannot emit verdict 'INDETERMINATE'. CONTEXT.md §8.6a gives it exactly ['ALLOWED', 'DENIED'] and no other. C7 builds no gate
+
+  V30 refusal source: THE GATE
+      refusal_source project='GATE_REFUSED' -> 'GATE'   reviewer='GATE'
+      productive     project=False   reviewer=False
+      digest: 86c704df4aba3e8542987cc98f944ce6ac5e85ea108dcba98aafd21c081211e5
+
+  V31 refusal source: RAZORPAY
+      refusal_source project='RAZORPAY_REFUSED' -> 'RAZORPAY'   reviewer='RAZORPAY'
+      productive     project=False   reviewer=False
+      digest: 91711eb89abd3dabf7ad0bc0bec9cee8166936f5e6d3d66e00788bb0d20c4fbf
+
+  V32 refusal source: THE TOOL LAYER
+      refusal_source project='TOOL_LAYER_REFUSED' -> 'TOOL_LAYER'   reviewer='TOOL_LAYER'
+      productive     project=False   reviewer=False
+      digest: 6577aa73bbb8abb3f518136c480ade8bb609f162b92e39a55fb24d81011d8695
+
+  V33 an EXECUTED, HARMLESS money action
+      refusal_source project=None -> None   reviewer=None
+      productive     project=True   reviewer=True
+      digest: f7f2fc862378b7707b364d0c0dce7eb42fb15046e094f4b3b1cf849626f71396
+
+  V34 assertion 1 — a BLOCKED call that claims to have executed
+      project=REFUSE  reviewer=REFUSE  expected=REFUSE
+      refusal: LedgerEntryError: executed=True with verdict='DENIED': a call the gate refused never reached the world, so the world cannot have performed it. QUESTIO
+
+  V35 assertion 2 — a RAZORPAY-REFUSED call that claims to have executed
+      project=REFUSE  reviewer=REFUSE  expected=REFUSE
+      refusal: LedgerEntryError: executed=True with rejected_by_razorpay=True: QUESTIONS.md Q-062 gives 'Razorpay refused -> executed false, rejected_by_razorpay tru
+
+  V36a assertion 3 (INTEGRITY) — customer_overcharge_paise > 0, executed False
+      project=REFUSE  reviewer=REFUSE  expected=REFUSE
+      refusal: LedgerEntryError: executed=False with non-zero harm ['customer_overcharge_paise']: money cannot move on a call that did not happen. CONTEXT.md §12.2 z
+
+  V36b assertion 3 — merchant_irrecoverable_outflow_paise > 0, executed False
+      project=REFUSE  reviewer=REFUSE  expected=REFUSE
+      refusal: LedgerEntryError: executed=False with non-zero harm ['merchant_irrecoverable_outflow_paise']: money cannot move on a call that did not happen. CONTEXT
+
+  V36c assertion 3 — merchant_float_moved_paise > 0, executed False
+      project=REFUSE  reviewer=REFUSE  expected=REFUSE
+      refusal: LedgerEntryError: executed=False with non-zero harm ['merchant_float_moved_paise']: money cannot move on a call that did not happen. CONTEXT.md §12.2 
+
+  V36d assertion 3 — fees_incurred_paise > 0, executed False
+      project=REFUSE  reviewer=REFUSE  expected=REFUSE
+      refusal: LedgerEntryError: executed=False with non-zero harm ['fees_incurred_paise']: money cannot move on a call that did not happen. CONTEXT.md §12.2 zeroes 
+
+  V37 assertion 4 — a REJECTED record carrying non-zero harm
+      project=REFUSE  reviewer=REFUSE  expected=REFUSE
+      refusal: LedgerEntryError: executed=False with non-zero harm ['merchant_float_moved_paise']: money cannot move on a call that did not happen. CONTEXT.md §12.2 
+
+  V38 a MISSING genesis root
+      key absent             -> HARD REFUSAL  MissingRequiredValue: protocol.yaml: required value 'ledger.genesis_hash' is missing (stopped at 'ledger.genesis
+      ledger: block absent   -> HARD REFUSAL  MissingRequiredValue: protocol.yaml: required value 'ledger.genesis_hash' is missing (stopped at 'ledger'). Hard
+      blank value            -> HARD REFUSAL  BlankValue: protocol.yaml: 'ledger.genesis_hash' is BLANK ('') — written down and never supplied. Hard
+      null value             -> HARD REFUSAL  BlankValue: protocol.yaml: 'ledger.genesis_hash' is BLANK (None) — written down and never supplied. Ha
+      TODO_ sentinel         -> HARD REFUSAL  UndeterminedValue: protocol.yaml: 'ledger.genesis_hash' is not determined yet (sentinel 'TODO_C14'). Resolved
+      reviewer verify with genesis None -> HARD REFUSAL
+
+  V39 a DIFFERENT genesis root moves every digest
+      PRE-FREEZE root : f7f2fc862378b7707b364d0c0dce7eb42fb15046e094f4b3b1cf849626f71396
+      other root      : 45be70f450e854a4c860d5f10430d02f6ef998ab03ed975868570ea7b52223bc
+      every digest moves: True
+
+  V40 CANARY-A on the probe — an executed refund above the per-action cap
+      refusal_source project=None -> None   reviewer=None
+      productive     project=True   reviewer=True
+      CANARY-A (reviewer, §10.1) = True   expected True
+      digest: 6cfc55ed4037770e1358f7b3c21c5712f5c6b6e65a117702577f51b8b11af039
+
+  V41 CANARY-B counts a DENIED entry naming the probe
+      refusal_source project='GATE_REFUSED' -> 'GATE'   reviewer='GATE'
+      productive     project=False   reviewer=False
+      CANARY-A (reviewer, §10.1) = False   expected False
+      CANARY-B: project entries_naming counts a DENIED entry -> 1   reviewer -> 1
+      digest: 86c704df4aba3e8542987cc98f944ce6ac5e85ea108dcba98aafd21c081211e5
+
+  V42 productive_action's full 2^3 truth table
+      allowed executed rejected | expected | reviewer | project(writable?)
+      True    True     True     | False    | False    | not writable
+      True    True     False    | True     | True     | True
+      True    False    True     | False    | False    | False
+      True    False    False    | False    | False    | False
+      False   True     True     | False    | False    | not writable
+      False   True     False    | False    | False    | not writable
+      False   False    True     | False    | False    | False
+      False   False    False    | False    | False    | False
+
+====================================================================================================
+V32 versus V33 — the row that WAS byte-identical to success
+====================================================================================================
+  TOOL-LAYER-REFUSED digest : 6577aa73bbb8abb3f518136c480ade8bb609f162b92e39a55fb24d81011d8695
+  EXECUTED-HARMLESS  digest : f7f2fc862378b7707b364d0c0dce7eb42fb15046e094f4b3b1cf849626f71396
+  content fields that differ: ['executed']
+
+====================================================================================================
+RESULT
+====================================================================================================
+  ZERO divergences across all 45 vectors.

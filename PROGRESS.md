@@ -6,6 +6,160 @@ not a record; this file is.
 
 ---
 
+## C7 — THE LEDGER — **REVIEW 1** — 2026-09-02 — ⚠️ **FAIL. NO TAG. TWO BLOCKERS AND TWO OWNED-PROPERTY MUTANT SURVIVORS — AND THE CHUNK'S BEHAVIOUR MEASURED CORRECT ON EVERYTHING THIS REVIEW COULD DRIVE**
+
+**SESSION-TOKEN:** `472cdc4b` · Row **51** of `QUESTIONS.md`'s `## Session tokens` table — **50 8-hex
+rows plus the one non-8-hex `WG-2026-08-30-CTX-13.4-A` row**, so my row is the **50th 8-hex row and
+the 51st row overall**. ⚠️ **Counted in the WORKING TREE, and `HEAD` agrees** because the row is
+already committed at `fdd9526`. ⚠️ **`make check-roles` prints *"50 issued row(s)"* and both numbers
+are right about different things** (`INC-54`): `check_roles._TOKEN_ROW` does not parse the non-8-hex
+row. **The row was registered BEFORE the Phase-1 seal**, because sealing first has turned `E1` red on
+two prior reviews.
+
+**Pushed SHA:** the FINAL OUTPUT in `docs/sessions/c7-review-1.txt` states it as its first line.
+**Spend:** ⚠️ **ZERO provider model calls, zero tokens, on every lane.** No `evals/` file was read,
+written or touched — `evals/` does not exist in the working tree. ⚠️ **NO TAG. `c7-pass` DOES NOT
+EXIST.**
+
+### The verdict, and what it does and does not rest on
+
+**FAIL.** Four of `docs/reviews/README.md`'s six PASS clauses are met and two are not:
+
+| PASS requires | obtained |
+|---|---|
+| all four golden-5 cases with their reasons | **yes** |
+| golden 5B's three digests by the reviewer's own computation | **yes** |
+| golden 3's three | **yes** |
+| the reimplementation agreeing on all ≥20 vectors | **yes — 45 vectors, 0 divergences** |
+| every REQUIRED-SET mutant killed or proven equivalent | ❌ **M12 and M39 survive on owned properties** |
+| ZERO BLOCKERS | ❌ **two: B-1 and B-2** |
+
+⚠️ **THREE OF THE FOUR GATE FAILURES ARE ABOUT WHAT IS PINNED OR PUBLISHED RATHER THAN ABOUT WHAT
+THE CODE DOES, AND ONE IS ABOUT A FIXTURE THIS CHUNK MAY NOT TOUCH.** The chain, the verifier, the
+writer, the three refusal sources, the four consistency assertions, `productive_action` term by term,
+the genesis refusal, the purity claims and the READ path all reproduce independently from a
+reimplementation written before the code was opened.
+
+### What this session did
+
+**(1) PHASE 1 SEALED AT `f1ccde1`, and pushed before `src/whetstone_gate/ledger/` was opened.** A
+from-scratch ledger importing **nothing** from `src/` — asserted by an `ast` parse of its own source
+rather than by its docstring — **forty-five** vectors against a floor of twenty (`V01`…`V42`, `V36` split into `V36a`…`V36d`; ⚠️ **the sealed file's own header says *forty-two*, which counts id numbers and not entries, and it is NOT edited**), and ⚠️ **THE REQUIRED
+SET: THIRTY-THREE PROPERTIES ENUMERATED AND ARGUED BEFORE A SINGLE MUTANT EXISTED**, which is
+`Q-082`'s safeguard applied as the ruling words it, **with what *owns* means stated BEFORE the list
+so the list can be checked against it**. Three properties were marked **NOT OWNED in advance with
+their owners named**: the end-of-chain anchor (`OF-57`/`OF-61`), `check_roles` D3's assertion (C9),
+and the `world.harm` rename (C8).
+
+**(2) THE ARCHITECT'S OWN CONTROL RAN FIRST AND PASSED FIRST TRY.** Golden 5 case A's thirteen-field
+digests — `3f62d0a6…`, `63579792…`, `72072b8e…` — reproduced from a rule written blind out of
+`CONTEXT.md` §16, golden 5's own `hash_rule` and `Q-053`. Only then was a new value computed.
+
+**(3) ALL FOUR GOLDEN-5 CASES REPRODUCE WITH THEIR REASONS** — A VALID/`null`, B DETECTED/2,
+C DETECTED/2, **D DETECTED/1 because entry 1's own contents do not hash to its own stored digest, and
+for no other reason** (`INC-34`'s shape asserted rather than assumed). ⚠️ **The disagreement set
+between the shipped verifier and the stored-field verifier was COMPUTED as `['C','D']` and asserted
+equal to the golden's own marks.** **Golden 5B's three digests reproduced independently**;
+**golden 3's `productive_actions` = 3** derived term by term from §8.6a **parsed out of `CONTEXT.md`**,
+with `canary_a_breach` 1 and `canary_b_reach` 2 beside it.
+
+**(4) 45 VECTORS, ZERO DIVERGENCES**, including an empty chain, one entry, a tampered field, an ADDED
+field, a REMOVED field, a truncated chain, a re-derived suffix, a non-ASCII `receipt`, a lone
+surrogate, `""` vs `null` vs the key removed, every arm crossed with every verdict plus the three
+illegal crossings, and each of `Q-062`'s three refusal sources. ⚠️ **Two divergences in the
+REVIEWER's favour are recorded against the REIMPLEMENTATION and not against C7** — a diff is only
+evidence if it is read in both directions — and **the sealed file is not edited to hide either.**
+
+**(5) `Q-062`'s OWN DIGEST REPRODUCED CHARACTER FOR CHARACTER.** The two seed-2001 `capture_payment`
+rows are byte-identical at thirteen fields with hash `3c54446376…b09cd16b`, and at fifteen they
+differ in **exactly** `executed`. All three refusal sources plus the executed row were driven through
+the **real world** and are jointly distinguishable on one ledger; `Q-068`'s residual — a Razorpay-
+refused **read** landing in the tool-layer bucket — reproduced. `executed` is read from
+`ToolResult.ok` **mechanically**: `executed_of`'s body never mentions `verdict`,
+`rejected_by_razorpay`, `a_class`, `DENIED` or `INDETERMINATE`, asserted by parsing.
+
+**(6) 87 DRIVEN PROBES, 0 FAILURES**, and ⚠️ **every purity scanner was FIRED FIRST AT A FILE BUILT
+TO BREAK IT** (`INC-14`'s shape) before being pointed at the package. The genesis refusal was driven
+in **five** shapes and is a hard refusal in all five; the root is re-read per call; one seed built
+twice is byte-identical; the READ path refuses golden 5's B/C/D as `TamperDetected` at 2/2/1 and case
+A as a **schema** mismatch, correctly not as a tamper accusation.
+
+**(7) 39 REQUIRED-SET MUTANTS ACROSS ALL 33 PROPERTIES: 35 KILLED, 4 SURVIVED. Three no-op CONTROL
+mutants were run and all three SURVIVED**; clone provenance printed; the repository's own `OF-139`
+guard run **inside the clone**; post-restore control green at **159 passed**; every file
+byte-identical to its pre-run bytes. ⚠️ **ONE HARNESS INCIDENT, AND IT IS THE HAZARD ITSELF
+ARRIVING:** the first sweep exceeded this session's command timeout and was cut off **mid-mutant with
+a mutation still applied in the clone**; the next run's baseline read RED and **the harness VOIDED
+itself**, which is `INC-57`'s guard working through a timeout rather than through git. The clone was
+restored by copying the pristine bytes and verifying SHA-256 on all six files. **The repository's own
+`src/` and `tests/` were never touched** — `git status --porcelain src/ tests/` empty throughout.
+
+**(8) THE FOUR SURVIVORS, EACH DISPOSITIONED BY EXHIBIT.**
+* **`M08` is EQUIVALENT** — carrying the *stored* digest forward instead of the recomputed one. The
+  assignment is reached **only** where the two values are provably equal; confirmed by an 18-shape
+  search on which the two verifiers disagree **0 times**. ⚠️ **The mutant that actually removes the
+  recomputation is `M09`, and `M09` DIED on golden 5's cases C and D**, so M08's equivalence is
+  evidence *for* the verifier.
+* **`M12` is OWNED and holds the tag** — `OF-141`.
+* **`M39` is OWNED and holds the tag** — `OF-142`.
+* **`M16` is NOT OWNED and does not hold it** — `OF-143`, argued against the sealed definition of
+  *owns* rather than asserted, and ⚠️ **explicitly costing this review nothing, since the verdict was
+  already FAIL on four other grounds.**
+
+**(9) TWO BLOCKERS.**
+⚠️ **`B-1` — GOLDEN 5B's `executed` COLUMN CONTRADICTS GOLDEN 3.** Golden 5 case A's three rows are
+golden 3's first three, **identical in every field golden 3 carries**; golden 3 says seq 3 is
+**executed** (its own `canary_a_note`, its `canary_a_breach: 1` and its `productive_actions: 3`), and
+golden 5B says `executed: false`, deriving it from *"a NULL `a_class` means the action never reached
+the harm layer at all"* — **the very inference this session's prompt forbids, and one `Q-062`
+falsifies in terms.** ⚠️ **MEASURED: under 5B's stated rule, golden 3's `productive_actions` becomes
+1 against a pinned 3 and its `canary_a_breach` becomes 0 against a pinned 1.** The finding holds
+under both available readings and both are stated. **The fix is the ARCHITECT's re-cut** —
+`tests/goldens/` is read-only to every session — **and a FIX session must not touch either golden.**
+⚠️ **`B-2` — `OF-57`'s PUBLISHED ROW CLAIMS MORE TAMPER-EVIDENCE THAN THE CHAIN DELIVERS.**
+*"truncation is the one mutation the chain cannot see"* and *"any alteration break it and are
+DETECTED"* are both **false** against this review's own V10, and ruling 4 says to fail on exactly
+that. **`chain.py` itself is CORRECT** and names both undetected shapes; it is the carried-forward
+row that is stale. Remedy: an **appended** correction row — the original is not rewritten.
+
+**(10) THE C7 CARD'S UNSATISFIABLE CLAUSE RAISED, as ruling 2 requires** — `OF-144`. §5.4's
+seeded-defect test **did not run at C7**; the done-when clause cannot be satisfied; the test
+relocates. ⚠️ **And this review's FAIL must not be read as that test passing: the gate went red on
+this review's OWN findings, which is weaker evidence than a planted red, and the review says so.**
+
+**(11) FIVE FINDINGS APPENDED — `OF-141`…`OF-145`**, ids **counted from the file, re-read immediately
+before the append** (`OF-140` was the highest). ⚠️ **The two BLOCKERs are deliberately NOT in that
+table**, on the ground `OPEN_FINDINGS.md`'s own header states: a BLOCKER never appears there as open.
+
+### Regressions, measured by this session
+
+`786 passed, 1 failed, 1 skipped` over the full suite in the real repository. **The one failure,
+attributed by file: `tests/test_lanes_operator_placeholders.py`, one test —
+`test_the_camel_branch_is_decided_before_any_camel_run`, on `lanes.yaml`'s `camel_comparator.branch`
+sentinel. NOT C7's**, and it is the expected pre-existing red. `make selftest` RED on exactly that
+test. `make check-roles` **17 passed, 0 failed, 5 n/a, exit 0**. `make check-prereg` NOT-YET-FROZEN,
+which is *"not yet"* and not a PASS. `git status --porcelain` **empty** on `tests/goldens/`,
+`vendor/`, `src/` and `tests/`. **C7 contributes zero failures.**
+
+### Q-063's `Swept:` discipline
+
+Clauses (i) and (ii) followed on **every** commit, and the **staged snapshot** re-checked in the
+direction clause (ii) names — is somebody **else's** entry inside what is about to be committed
+(`INC-65`). **`Swept: none` on all three commits.** A concurrent **C6 REVIEW 5** session (`0ca97bbb`)
+shares this tree and had uncommitted files in `docs/reviews/independent/`; **explicit paths were
+staged and the staged snapshot read back to confirm none of them is in any commit of mine.**
+
+### What is owed after this session
+
+**A FIX session** takes `B-2`, `OF-141` and `OF-142` — each has a one-fixture remedy named in
+`REVIEW_7_1.md`. **The ARCHITECT** takes `B-1` (the golden re-cut) and `OF-144` (the C7 card and
+`docs/reviews/README.md`). `OF-143` and `OF-145` are carried. ⚠️ **No test against golden 5B was
+written**, although the fixture says this session is the first permitted to: the review fence names
+nothing under `tests/` — *"A REVIEW SESSION FIXES NOTHING"* — and `B-1` means the value such a test
+would pin is the disputed one.
+
+---
+
 ## ARCH — GOLDEN 5B AND `OF-139` — **FIX** — 2026-09-02 — **THE WRITER IS RE-PINNED AT FIFTEEN FIELDS, THE CLONE-IMPORTS-THE-LIVE-TREE GUARD IS BUILT AND FIRED BOTH WAYS, AND THIS SESSION WAS ITSELF SWEPT**
 
 **SESSION-TOKEN:** `6f3a91d2` · Row **49** of `QUESTIONS.md`'s `## Session tokens` table, counted in

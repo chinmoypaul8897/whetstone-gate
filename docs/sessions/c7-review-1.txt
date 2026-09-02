@@ -1,0 +1,516 @@
+PUSHED SHA: <filled by the commit that follows this one; see the last line of this file>
+SESSION: 472cdc4b - C7 - REVIEW - attempt 1 - 2026-09-02 - review type: full, two sealed phases
+
+=====================================================================
+VERDICT: FAIL.  NO TAG.  `c7-pass` IS NOT CUT.
+  2 BLOCKERS (B-1, B-2) and 2 OWNED-PROPERTY MUTANT SURVIVORS (M12, M39).
+  ZERO PROVIDER MODEL CALLS. ZERO TOKENS. NO `evals/` FILE READ OR WRITTEN.
+=====================================================================
+
+THE CHUNK'S BEHAVIOUR MEASURED CORRECT ON EVERYTHING THIS REVIEW COULD DRIVE. Three of the four
+gate failures are about what is PINNED or PUBLISHED rather than about what the code DOES, and one
+is about a fixture this chunk may not touch. Under Q-082's ruling and ruling 4, those are exactly
+the failures that hold a tag.
+
+---------------------------------------------------------------------
+0. THE FOUR RULINGS
+---------------------------------------------------------------------
+All four recorded VERBATIM in QUESTIONS.md under
+`## RULINGS RECORDED BY C7 REVIEW 1 (472cdc4b), 2026-09-02`, in commit fdd9526, BEFORE anything
+else in this session was read or touched. Applied as follows:
+  1. Q-082's ceiling - the required set was ENUMERATED AND ARGUED IN THE SEALED PHASE 1, before a
+     mutant existed, and every survivor is marked OWNED or NOT-OWNED with the argument.
+  2. The C7 card's seeded-defect clause - raised as a finding (OF-144), not hunted.
+  3. Q-069 - checked that C7 RECORDED the prohibition; C7 is not held to C9's assertion.
+  4. OF-57/OF-61 - not failed on. But FAILED on an artefact claiming more than the ceiling: B-2.
+
+---------------------------------------------------------------------
+1. THE PHASE-1 SEAL
+---------------------------------------------------------------------
+SEAL SHA: f1ccde1  (f1ccde10e9ff15bf03bc164d5cb71541fc530e17), pushed before src/ was opened.
+Three artefacts:
+  docs/reviews/independent/c7_reimpl.py        a from-scratch ledger - canonical JSON, the chain
+                                               digest, the verifier, the writer, the append-only
+                                               store, the derived predicates. IMPORTS NOTHING FROM
+                                               src/, asserted by an ast parse of its own source.
+  docs/reviews/independent/c7_vectors.py       FORTY-FIVE vectors against a floor of twenty:
+                                               V01..V42 with V36 split into V36a..V36d, one per
+                                               harm component. THE SEALED FILE'S OWN HEADER SAYS
+                                               'FORTY-TWO', WHICH COUNTS ID NUMBERS AND NOT
+                                               ENTRIES, AND IT IS NOT EDITED - the seal is the
+                                               seal. All 45 ran; the harness iterates VECTORS.
+  docs/reviews/independent/c7_phase1_blind.md  THE REQUIRED SET: 33 properties, argued, with what
+                                               "owns" means stated BEFORE the list.
+
+THE REQUIRED SET AS SEALED (33 members against PROCESS.md S5.3's floor of eight):
+  A digest+exclusion  P-01 sorted keys/no whitespace  P-02 ensure_ascii=False  P-03 prev_hash and
+                      hash excluded  P-04 the exclusion is by KEY not by SCHEMA  P-05 SHA-256(
+                      prev_hash || canonical-JSON), both UTF-8
+  B verifier          P-06 recomputes the previous entry's digest  P-07 the first-bad ledger_seq
+                      P-08 case D for the RIGHT REASON  P-09 the empty chain and the single entry
+                      P-10 the READ path refuses a broken chain
+  C append-only       P-11 append-only  P-12 ledger_seq is the ledger's row (Q-054)  P-13 determinism
+  D genesis           P-14 a missing value is a HARD REFUSAL  P-15 re-read per call, never cached
+  E executed/receipt  P-16 executed READ from ToolResult.ok NEVER INFERRED  P-17 source GATE
+                      P-18 source RAZORPAY  P-19 source TOOL LAYER  P-20 receipt read, no default
+  F assertions        P-21 blocked => not executed  P-22 Razorpay-refused => not executed
+                      P-23 THE INTEGRITY ONE: any non-zero harm component => executed, PER COMPONENT
+                      P-24 a rejected record is zero on all four
+  G productive_action P-25 the gate ALLOWED  P-26 the world EXECUTED  P-27 no documented Razorpay
+                      error  P-28 the reading is "any tool call" (Q-067)
+  H table/render      P-29 each arm's verdict set, refused at admission  P-30 the render fields
+  I purity/isolation  P-31 no clock/float/randomness/model client  P-32 Q-069's prohibition recorded
+                      P-33 no artefact claims more tamper-evidence than the chain has
+NOT OWNED, named in advance with owners: the end-of-chain anchor (OF-57/OF-61, accepted
+limitations); check_roles D3's assertion (C9); the world.harm rename (C8).
+
+---------------------------------------------------------------------
+2. THE ARCHITECT'S OWN CONTROL - RUN FIRST, PASSED FIRST TRY
+---------------------------------------------------------------------
+Golden 5 case A's THIRTEEN-field digests, reproduced by the sealed reimplementation from a rule
+written blind out of CONTEXT.md S16, golden 5's own hash_rule and Q-053:
+  seq 1  3f62d0a69d5720d1a6f2f9a6df128db9bd99ec54203649c844d33686ebd62141  MATCH
+  seq 2  6357979214b64a2499c8f17907f091d6afda50f494b53802010db62eb5dbe69b  MATCH
+  seq 3  72072b8ee6bbf328989d2d69d84c740028a02aa59b01b301f7c2887924304696  MATCH
+CONTROL: PASS. Only then was any new value computed.
+
+---------------------------------------------------------------------
+3. GOLDEN 5 - ALL FOUR CASES, VERDICT, FIRST-BAD SEQ AND REASON
+---------------------------------------------------------------------
+  case  expected        obtained        reason obtained                       stored-field verifier
+  A     VALID / null    VALID / null    -                                     VALID
+  B     DETECTED / 2    DETECTED / 2    the link is broken                     DETECTED  (CONTROL)
+  C     DETECTED / 2    DETECTED / 2    contents do not hash to stored digest  VALID
+  D     DETECTED / 1    DETECTED / 1    contents do not hash to stored digest  VALID
+
+THE DISCRIMINATION IS COMPUTED, NOT ASSERTED. Cases on which the recomputing verifier and the
+stored-field verifier disagree: ['C','D']. Cases the golden MARKS discriminating: ['C','D']. EQUAL.
+
+CASE D, THE LOAD-BEARING ONE - THE REASON ASSERTED, NOT ONLY THE VERDICT (INC-34's shape):
+  entry 1 stored hash        3f62d0a69d5720d1a6f2f9a6df128db9bd99ec54203649c844d33686ebd62141
+  entry 1 RECOMPUTED digest  d5d6d91538bbcd2af7b440f3b98a5eb286902f76b16833b23b1731710c0ea5f2
+  they differ                                                                              True
+  entry 1's link to genesis still holds                                                    True
+  entry 2's prev_hash still equals entry 1's STORED hash                                   True
+So D is DETECTED at seq 1 because entry 1's own contents do not hash to its own stored digest, and
+for no other reason. The project's verify returns the identical verdict, seq AND reason.
+
+---------------------------------------------------------------------
+4. GOLDEN 5B - THREE DIGESTS, MINE BESIDE THE ARCHITECT'S
+---------------------------------------------------------------------
+  seq  mine                                                              architect
+  1    186a2118ba239d24936e48a485c33b099d97bb0daa848cece504fc6db1aedf5d  identical
+  2    26019af38ccd8c0f7fedbbb5d4f893bd3d6f10aeca6cf9b953d6650d13ecbc2c  identical
+  3    6ae5bd20f67283c0ad70811be2a17cba1a87460f13f78046c4b6f2af946ff76f  identical
+The pinned field_order matches the sealed SCHEMA_15 exactly. Every digest MOVES from its golden-5
+counterpart, and dropping the `receipt` key from the canonicalised entry moves all three - the
+receipt:null fact 5B exists to pin, checked rather than believed.
+
+GOLDEN 3: productive_actions = 3, derived TERM BY TERM from S8.6a PARSED OUT OF CONTEXT.md.
+  seq 1 settlement  T1 yes  T2 yes  T3 yes  -> PRODUCTIVE
+  seq 2 refund      T1 yes  T2 no   T3 no   -> no
+  seq 3 refund      T1 yes  T2 yes  T3 yes  -> PRODUCTIVE
+  seq 4 refund      T1 yes  T2 yes  T3 yes  -> PRODUCTIVE
+  seq 5 refund      T1 yes  T2 no   T3 no   -> no
+  reviewer 3, golden pins 3.  CANARY-A breach rows [3] = 1 (pins 1). CANARY-B reach 2 (pins 2).
+
+---------------------------------------------------------------------
+5. BLOCKER B-1 - GOLDEN 5B's `executed` COLUMN CONTRADICTS GOLDEN 3
+---------------------------------------------------------------------
+THE CLAIM CHECKED, because the prompt named it a BLOCKER in advance:
+  "GOLDEN 5's CASE A ALREADY CONTAINED ONE OF EACH OF THE THREE OUTCOMES ... seq 3 an action THE
+   TOOL LAYER refused."
+
+(a) GOLDEN 5 CASE A's THREE ROWS ARE GOLDEN 3's FIRST THREE, measured field by field over every
+    field golden 3 carries:   seq 1 True   seq 2 True   seq 3 True
+(b) GOLDEN 3 SAYS THAT ROW IS EXECUTED, TWICE OVER: its canary_a_note reads "seq 3: executed on the
+    probe, 6,000,000 > the 5,000,000 per-action cap"; S10.1's CANARY-A counts EXECUTED refunds
+    only, so canary_a_breach:1 requires it, and S8.6a's term 2 is "that the world executed", so
+    productive_actions:3 requires it too.
+(c) GOLDEN 5B's STATED DERIVATION IS THE FORBIDDEN INFERENCE AND IT IS UNSOUND. Its read_from for
+    seq 3 is "a_class NULL, verdict ALLOWED, rejected_by_razorpay false, and ALL FOUR harm
+    components ZERO", concluding "a NULL a_class means the action never reached the harm layer at
+    all". Q-062 says the opposite in terms - that shape is "byte-for-byte what an EXECUTED,
+    harmless money action looks like" - and GOLDEN 3 FALSIFIES IT TWICE ON ITS OWN ROWS: seq 3 and
+    seq 4 both carry a_class null + rejected false + four zeros and golden 3 counts BOTH executed.
+    It is also the exact inference this session's prompt item 3 forbids.
+(d) THE CONSEQUENCE, MEASURED (docs/reviews/independent/c7_golden5b_consequence.txt). Applying 5B's
+    stated rule to golden 3's five rows:
+        productive_actions  1  against a PINNED 3
+        canary_a_breach     0  against a PINNED 1
+(e) THE DIGEST IS A FUNCTION OF THE DISPUTED VALUE. With executed:false it is 6ae5bd20f67283c0...;
+    with executed:true it is 5433c3f43df511d5f834972112a102936bf6569d0359f844d290f667524edf86.
+
+THE FINDING HOLDS UNDER BOTH READINGS. If case A is golden 3's episode, the two goldens contradict
+each other about the same event. If it is a different synthetic episode, then "already contained"
+is FALSE as stated - a thirteen-field row cannot CONTAIN executed - and what 5B does is STIPULATE
+the assignment while defending it with rule (c), which stays unsound whichever episode it is about.
+
+WHAT IS NOT CLAIMED: the three digests are arithmetically correct for the values stored, and this
+review reproduced all three. chain.py is NOT at fault - it reads executed from ToolResult.ok
+mechanically - and NO C7 TEST CONSUMES GOLDEN 5B, so C7's code is pinned to nothing wrong today.
+WHO FIXES IT: the ARCHITECT. tests/goldens/ is read-only to every build, fix and review session.
+A FIX SESSION MUST NOT TOUCH EITHER GOLDEN.
+
+---------------------------------------------------------------------
+6. BLOCKER B-2 - OF-57's ROW CLAIMS MORE TAMPER-EVIDENCE THAN THE CHAIN DELIVERS
+---------------------------------------------------------------------
+Ruling 4: "DO fail it if any docstring, comment or artefact claims more than that."
+chain.py is CORRECT - it names EXACTLY TWO undetected shapes (truncation and a re-derived suffix)
+and states the ceiling in the ruling's own words. OPEN_FINDINGS.md's OF-57 row does not:
+  "truncation is the one mutation the chain cannot see"           FALSE - V10 verifies
+  "deletion from the MIDDLE and any alteration break it and are
+   DETECTED"                                                      FALSE - a re-derived suffix is an
+                                                                  alteration and is not detected
+  "'tamper-evident' means against modification, and against
+   deletion anywhere but the end"                                 FALSE, and it is the CEILING
+                                                                  sentence - a re-derived suffix is
+                                                                  a modification
+Neither OF-57 nor OF-61 contains the words "re-derived" or "suffix". The row predates the second
+shape's identification; the code caught up and the published row did not. OPEN_FINDINGS.md is a
+published artefact of the submission and this is the sentence a C19/C20 session copies into the
+README. REMEDY: a FIX session APPENDS a correction row. OF-57's original text is NOT rewritten -
+this directory is append-only.
+
+---------------------------------------------------------------------
+7. THE 45 VECTORS - PROJECT AGAINST REIMPLEMENTATION - ZERO DIVERGENCES
+---------------------------------------------------------------------
+  V01-V03  empty chain / one entry / three entries      VALID / null, both
+  V04-V06  a tampered field / case D's shape / CONTROL  DETECTED 2 / 1 / 2
+  V07-V08  an ADDED field / a REMOVED field             DETECTED 2, both
+  V09-V10  a truncated chain / a RE-DERIVED SUFFIX      VALID - the STATED LIMITATION OF-57
+  V11-V13  non-ASCII receipt / non-ASCII target / a LONE SURROGATE
+  V14-V16  "" vs null vs the key REMOVED                three distinct digests
+  V17-V29  each arm crossed with each verdict + the 3 ILLEGAL crossings   10 accepted, 3 refused
+  V30-V33  the three refusal sources + the executed-harmless row          all four distinguishable
+  V34-V37  the four consistency assertions, assertion 3 PER COMPONENT     all refused
+  V38-V39  the genesis refusal (5 shapes) / a different root              hard refusal x5
+  V40-V42  CANARY-A / CANARY-B on a DENIED entry / the 2^3 truth table    as specified
+ZERO DIVERGENCES across all forty-five.
+V11: the same entry hashes to cc645ca6b50142b7... under ensure_ascii=False and 622c8dcfa0b5c6de...
+under ensure_ascii=True. Q-053 is not academic and the ruled reading ships.
+V13: both refuse. The project's refusal is TYPED (NotCanonicalisable) - stronger than mine.
+TWO DIVERGENCES IN THE REVIEWER'S FAVOUR, RECORDED AGAINST THE REIMPLEMENTATION AND NOT AGAINST C7,
+because a diff is only evidence if it is read in both directions:
+  (1) my reimpl requires amount_paise to be an integer; the project allows None. THE PROJECT IS
+      RIGHT - a fetch_payments call has no amount, and refusing would be hard rule 11's shrinkage.
+  (2) my reimpl records the lone-surrogate behaviour; the project types the refusal. PROJECT RIGHT.
+The sealed file is NOT edited to hide either. The seal is the seal.
+
+---------------------------------------------------------------------
+8. THE TWO capture_payment HASHES, THEN AND NOW
+---------------------------------------------------------------------
+Seed 2001, pay_b286441b6b440c, 66,523 paise; one call with currency:INR, one without.
+AGAINST THE PRE-Q-062 THIRTEEN-FIELD SET:
+  byte-identical in all thirteen fields                                              True
+  hash (executed)  3c54446376764d88ea82c17ea56b31716ed1fdf1de9a77536f4ba55ab09cd16b
+  hash (refused)   3c54446376764d88ea82c17ea56b31716ed1fdf1de9a77536f4ba55ab09cd16b
+  and it is Q-062's OWN digest, character for character                              True
+UNDER THE FIFTEEN-FIELD SCHEMA:
+  hash (executed)  3f1d54a48cbbe277bd5d5bddbf2424b9fbd9893d6b26e5e595973facab5d51f0
+  hash (refused)   4435e7f042de631afd721781a037e7f2df596d344f78e4e4b77906809726668e
+  content fields that differ                                                ['executed']
+
+THE THREE-SOURCE TABLE, EACH ROW DRIVEN THROUGH THE REAL WORLD:
+  source              verdict        rejected  executed  how it was produced
+  GATE                DENIED         False     False     a refund the gate refused
+  RAZORPAY            ALLOWED        True      False     a capture on the already-captured probe
+  TOOL LAYER          ALLOWED        False     False     capture_payment with no currency
+  (none - executed)   ALLOWED        False     True      the same capture with currency:INR
+All four jointly distinguishable on one ledger. Q-068's residual reproduced: a fetch_payment
+Razorpay refused writes no harm record and lands in the TOOL_LAYER bucket, exactly as ruled.
+
+`executed` IS MECHANICAL. executed_of's body, docstring stripped by ast, is three statements: read
+`ok`, refuse a non-bool, return it. Its body NEVER mentions verdict, rejected_by_razorpay, a_class,
+DENIED or INDETERMINATE - asserted by parsing. A result with no `ok`, ok=None or ok=1 is a HARD
+REFUSAL, never a False. Ledger.append has NO DEFAULT for executed OR receipt: omitting either is a
+TypeError. Mutant M20 - the forbidden inference - was KILLED by four tests.
+
+---------------------------------------------------------------------
+9. THE FOUR CONSISTENCY ASSERTIONS, EACH DRIVEN
+---------------------------------------------------------------------
+  1  a BLOCKED call never executed (INDETERMINATE blocks as hard as DENIED)   V34    REFUSED
+  2  a RAZORPAY-refused call never executed                                   V35    REFUSED
+  3  ANY NON-ZERO HARM COMPONENT => executed - THE INTEGRITY ONE              V36a-d REFUSED x4
+  4  a rejected record contributes ZERO to all four                           V37    REFUSED
+Assertion 3 is driven FOUR TIMES, ONCE PER COMPONENT, because S12.2 rule 1 forbids a total and a
+sum-based check passes three of the four single-component violations. Mutant M28 - narrowing it to
+the first component - was KILLED. Assertion 4 is implied by 2+3 and was DRIVEN anyway.
+All four are REFUSALS AT THE WRITE, not assertions in a test.
+
+---------------------------------------------------------------------
+10. productive_action, TERM BY TERM
+---------------------------------------------------------------------
+S8.6a PARSED OUT OF CONTEXT.md by regex, not transcribed. All four terms present in the parsed
+sentence, including "any tool call" with the word MONEY ABSENT - which is Q-067's ruling.
+  none dropped                       -> productive        correct
+  T1 the gate ALLOWED                -> non-productive    correct
+  T2 the world EXECUTED              -> non-productive    correct
+  T3 no documented Razorpay error    -> non-productive    correct
+Q-067's divergence RE-MEASURED on a fresh four-call episode: ledger-side 2, world-side 0. The
+rename of world.harm.productive_actions is C8's (OF-65). M31/M32/M33 dropped each term in turn and
+all three were KILLED; M34 - the narrow money-only reading Q-067 rejected - was KILLED too.
+
+---------------------------------------------------------------------
+11. PURITY, APPEND-ONLY, DETERMINISM - EVERY SCANNER FIRED AT A DIRTY FILE FIRST
+---------------------------------------------------------------------
+  scanner                            fires on the dirty control      the ledger package
+  clock / randomness                 ['time','datetime','random']    clean
+  a binary float literal             ['0.0025@line 10']              clean
+  a model client / network import    ['requests','anthropic']        clean
+  a TOTAL of the four components     a + chain over all four         clean
+  a hardcoded genesis root           ['line 9']                      clean
+ONE FALSE POSITIVE IN MY OWN SCANNER, CORRECTED AND RECORDED: the genesis-literal scanner first
+excluded only leading docstrings and reported chain.py:159, which is the PEP 257 ATTRIBUTE
+DOCSTRING under ChainSpec.genesis_hash. The correct rule is "a string constant that is not the
+value of an ast.Expr". THE FINDING WAS THE PROBE'S, NOT C7's.
+  the shell (hard rule 8)      only store.py opens a file
+  append-only API              append plus read-only accessors; no update/delete/insert/__setitem__
+                               /pop/clear/remove/extend/sort/reverse
+  frozen records               FrozenInstanceError on mutation; entries is a tuple
+  the root is never cached     two loads across a changed config -> ROOT-A then ROOT-B
+  the genesis refusal          FIVE shapes - key absent, block absent, blank, null, TODO_ sentinel
+                               - HARD REFUSAL on all five
+  determinism                  one seed, two independent builds, BYTE-IDENTICAL
+  the render fields            turn_index, arm, verdict + the four components on EVERY entry
+  the READ path                golden 5 B/C/D -> TamperDetected at 2/2/1; A -> a SCHEMA refusal,
+                               correctly NOT a tamper accusation
+87 driven probes, 0 failures.
+Q-069 is sited in the package docstring's opening lines and repeated in control.py; its PREMISE was
+RE-MEASURED - nothing outside the package imports whetstone_gate.ledger today, by an ast walk of
+every src/**/*.py. Every one of Q-053, Q-054, Q-055, Q-062, Q-066, Q-067, Q-068 and Q-069 is
+recorded at the site where the choice is made.
+
+---------------------------------------------------------------------
+12. THE MUTANTS
+---------------------------------------------------------------------
+HARNESS INTEGRITY, BEFORE ANY RESULT:
+  CLONE                    C:\Users\chinm\AppData\Local\Temp\c7rev1.yYyRAk
+  whetstone_gate.__file__  <clone>\src\whetstone_gate\__init__.py
+  config.repo_root()       <clone>
+  both resolve INSIDE the clone                                    True
+  the repository's OWN OF-139 guard, run in the clone              PASS
+  BASELINE CONTROL                                      159 passed, 0 failed
+  POST-RESTORE CONTROL                                  159 passed, 0 failed
+  every file byte-identical to its pre-run bytes                   True
+Restores WRITE BACK THE ORIGINAL BYTES and re-hash. Git is never used to restore (INC-57).
+THREE NO-OP CONTROL MUTANTS WERE RUN AND ALL THREE SURVIVED.
+
+ONE HARNESS INCIDENT, RECORDED BECAUSE IT IS THE HAZARD ITSELF ARRIVING: the first sweep ran the
+suite TWICE per killed mutant, exceeded this session's command timeout, and was cut off MID-MUTANT
+with a mutation still applied in the clone. The next run's baseline read RED and THE HARNESS VOIDED
+ITSELF - the guard working, in INC-57's direction, reached through a timeout rather than through
+git. The clone was restored by copying the pristine bytes from the repository, SHA-256 verified on
+all six files; the repository's own src/ and tests/ were NEVER touched (git status --porcelain
+src/ tests/ empty throughout). No result below comes from the aborted run.
+
+39 REQUIRED-SET MUTANTS ACROSS ALL 33 SEALED PROPERTIES. 35 KILLED, 4 SURVIVED.
+  M01 P-01 sort_keys True->False                          KILLED  golden-5 A-D +10
+  M02 P-01 separators spaced                              KILLED  golden-5 A-D +10
+  M03 P-02 ensure_ascii=True                              KILLED  the non-ASCII target test
+  M04 P-03 prev_hash inside the digest                    KILLED  golden-5 A-D +13
+  M05 P-04 digest body selected by SCHEMA (INC-32)        KILLED  added-or-removed-field test
+  M06 P-05 concatenation order reversed                   KILLED  golden-5 A-D +9
+  M07 P-05 operands encoded UTF-16                        KILLED  golden-5 A-D +9
+  M08 P-06 carry the STORED digest forward                SURVIVED  *** EQUIVALENT - proved ***
+  M09 P-06 the recomputation disabled                     KILLED  golden-5 C and D +4
+  M10 P-07 first-bad seq off by one                       KILLED  golden-5 C and D +3
+  M11 P-08 verifier requires the content schema (INC-34)  KILLED  golden-5 A-D +6
+  M12 P-09 entry 1's genesis link unchecked               SURVIVED  *** OWNED - HOLDS THE TAG ***
+  M13 P-10 READ path re-appends unverified (INC-33)       KILLED  the read-path tests B/C/D
+  M14 P-11 entries returns the live list                  KILLED  the one-write-path test
+  M15 P-12 ledger_seq 0-based                             KILLED  94 tests
+  M16 ---- append_log not all-or-nothing                  SURVIVED  *** NOT OWNED - MEDIUM ***
+  M17 P-14 a missing root DEFAULTS                        KILLED  the hard-refusal test
+  M18 P-15 the root hardcoded in source                   KILLED  the never-cached test +2
+  M19 P-16 a missing ok becomes False                     KILLED  the no-ok-is-a-REFUSAL test
+  M20 P-16 THE FORBIDDEN INFERENCE                        KILLED  the executed-is-read test +3
+  M21 P-17 INDETERMINATE not a gate refusal               KILLED  the three-sources test
+  M22 P-18 RAZORPAY reported as the tool layer            KILLED  the three-sources test +1
+  M23 P-19 the residual reported as RAZORPAY              KILLED  the three-sources test +2
+  M24 P-20 "" normalised to None (INC-04 rebuilt)         KILLED  the receipt-is-read test
+  M25 P-20 receipt gains a default                        KILLED  the no-default test
+  M26 P-21 assertion 1 disabled                           KILLED  the assertion-1 parametrisation
+  M27 P-22 assertion 2 disabled                           KILLED  the assertion-2 tests
+  M28 P-23 assertion 3 on the FIRST COMPONENT ONLY        KILLED  the per-component parametrisation
+  M29 P-23 assertion 3 only for gate-blocked calls        KILLED  the same
+  M30 P-24 the absence case fabricates rejected=True      KILLED  the three-source/residual tests
+  M31 P-25 term 1 dropped                                 KILLED  the term-by-term test
+  M32 P-26 term 2 dropped                                 KILLED  the same
+  M33 P-27 term 3 dropped                                 KILLED  the same
+  M34 P-28 Q-067 REVERSED - money actions only            KILLED  the divergence test
+  M35 P-29 the arm/verdict table not enforced             KILLED  the verdict-set tests
+  M36 P-30 turn_index dropped from the stored entry       KILLED  the render-fields test
+  M37 P-31 a float serialised rather than refused         KILLED  the float-refusal tests
+  M38 P-32 Q-069's prohibition deleted                    KILLED  the docstring-parse test
+  M39 P-33 the claim ceiling raised to an overclaim       SURVIVED  *** OWNED - HOLDS THE TAG ***
+  C-1 CONTROL a local renamed                             SURVIVED  as required
+  C-2 CONTROL one docstring word changed                  SURVIVED  as required
+  C-3 CONTROL a message reworded                          SURVIVED  as required
+
+THE THREE NON-EQUIVALENT SURVIVORS WERE RE-RUN AGAINST EVERY TEST FILE THAT CAN SEE THE LEDGER -
+test_c7_ledger.py, test_config_loader.py and test_repo_invariants.py are the only three files in
+the repository that mention it. Baseline 4 failed / 195 passed / 1 skipped; identical under M12,
+M39 and M16; identical post-restore. (The four are clone artefacts - no vendor/ - and are constant.)
+
+M08 IS EQUIVALENT, AND THE PROOF IS NOT AN ASSERTION. The assignment is reached ONLY by falling
+through `if recomputed != stored["hash"]: return ...`, so the two names hold the same value BY
+CONSTRUCTION. Confirmed by a search over 18 mutation shapes on which the two verifiers disagree 0
+times. AND WHAT M08 IS NOT: S5.4's defect is a verifier that NEVER RECOMPUTES. M08 changes only
+which of two provably equal names carries the value forward. The mutant that actually removes the
+recomputation is M09, AND M09 WAS KILLED BY GOLDEN 5's CASES C AND D.
+
+M12 IS OWNED, AND THE EXHIBIT IS ONE INPUT. A three-entry ledger whose ENTRY 1's prev_hash ALONE is
+edited from PRE-FREEZE to anything else, its stored hash untouched:
+  HEAD             -> DETECTED at seq 1 (the link is broken)
+  the LIVE verify  -> DETECTED at seq 1
+  M12              -> VALID
+The integrity check CANNOT cover it: prev_hash is EXCLUDED from the canonicalised entry, so editing
+it moves no digest, and the link check is the only thing that reads it. WHAT IT COSTS, in
+config/protocol.yaml's own words: "A ledger cannot contain the hash of a tag that did not exist
+when it was written, so pre-freeze episodes are CRYPTOGRAPHICALLY DISTINGUISHABLE from scored ones.
+This is the one free proof available and it costs a single line." THAT PROOF RESTS ON ENTRY 1's
+LINK AND ON NOTHING ELSE, AND NO TEST IN THIS REPOSITORY COVERS IT. Golden 5's case B breaks entry
+2; no fixture breaks entry 1. NOT OVERSTATED: a whole entry 1 forged to chain from a different root
+- prev_hash AND hash both recomputed - is DETECTED by HEAD and by M12 alike. REMEDY: ONE FIXTURE.
+
+M16 IS NOT OWNED, AND THE ARGUMENT IS THE DISPOSITION. Not equivalent: a three-row batch whose last
+row is invalid leaves the ledger with 0 entries under HEAD and 2 under M16, and a short ledger
+VERIFIES (OF-57), so the loss is silent. But the sealed P-13 is DETERMINISM, which M16 does not
+touch; all-or-nothing batching passes the sealed criterion 1 and FAILS criterion 2 - no artefact
+that outranks the code requires it. CONTEXT.md S16 says "append-only, hash-chained" and nothing
+about batches; no card clause, no ruling and no golden mentions it. Hard rule 11 does not reach: a
+caller-supplied bad row is not a dropped episode. MEDIUM, OF-143.
+THIS DISPOSITION COST THIS REVIEW NOTHING AND IT IS SAID SO IT CAN BE CHECKED: the verdict was
+already FAIL on B-1, B-2, M12 and M39.
+
+M39 IS OWNED. Replacing chain.py's ceiling sentence with "the ledger is tamper-evident: any
+alteration is detected" leaves the 159-test suite GREEN. Not equivalent - the replacement is FALSE
+and this review's own V09 and V10 disprove it. Owned - ruling 4 puts it there in terms. THE REMEDY
+IS A PATTERN THIS CHUNK ALREADY USES: M38, deleting Q-069's prohibition, was KILLED by a test that
+PARSES the docstring. The identical fixture, ten lines away, closes M39.
+
+---------------------------------------------------------------------
+13. THE C7 CARD'S UNSATISFIABLE CLAUSE, RAISED AS RULING 2 REQUIRES
+---------------------------------------------------------------------
+PROCESS.md S12.1's C7 row ends "and the C7 review either raises the seeded defect as a BLOCKER or
+the review process is declared broken and building halts", and S5.4 says the architect writes one
+into C7's build prompt. NO C7 BUILD PROMPT CARRIED ONE - all three instructed the correct behaviour,
+in capitals - and the trap was PRE-ANNOUNCED in PROCESS.md S12.1, in tests/goldens/README.md and in
+golden 5's own seeded_defect_note, so it could not have worked at C7 in any case. THE CLAUSE IS
+UNSATISFIABLE AS WRITTEN. Raised as OF-144 so the correction lands through the record: S5.4's test
+DID NOT RUN AT C7, the clause is corrected, and the test RELOCATES to a chunk that is not named.
+PROCESS.md S12.1's C7 row and docs/reviews/README.md's "C7 is the SEEDED-DEFECT CHUNK" paragraph
+both still say otherwise in the repository, and that is the architect's edit.
+AND THIS REVIEW'S FAIL MUST NOT BE READ AS THE SEEDED-DEFECT TEST PASSING. The verdict rests on
+B-1, B-2, M12 and M39, none of which is a planted defect. THE GATE WENT RED ON ITS OWN FINDINGS,
+WHICH IS WEAKER EVIDENCE THAN A PLANTED RED, AND THIS REVIEW DOES NOT CLAIM OTHERWISE.
+
+---------------------------------------------------------------------
+14. FINDINGS, AND WHICH ARE GATE
+---------------------------------------------------------------------
+  B-1   BLOCKER  golden 5B's executed column contradicts golden 3 on byte-identical      GATE
+                 rows; "already contained" is false; read_from is the forbidden
+                 inference. FIXED BY THE ARCHITECT, not by a FIX session.
+  B-2   BLOCKER  OF-57's published row claims more tamper-evidence than the chain        GATE
+                 delivers (ruling 4). FIXED BY AN APPENDED CORRECTION ROW.
+  H-1   HIGH     M12 - entry 1's genesis link is covered by no test.  OF-141             GATE
+  H-2   HIGH     M39 - chain.py's claim ceiling is pinned by no test. OF-142             GATE
+  M-1   MEDIUM   M16 - append_log's all-or-nothing semantics unpinned. OF-143            not gate
+  F-1   process  the C7 card's seeded-defect clause is UNSATISFIABLE.   OF-144           not gate
+  R-01  process  the read order puts STATUS.md inside the blind phase.  OF-145           not gate
+
+---------------------------------------------------------------------
+15. COUNTS I MEASURED, WITH FAILURES ATTRIBUTED BY FILE
+---------------------------------------------------------------------
+  full suite, real repo, PYTHONPATH=src python -m pytest tests/
+        786 passed, 1 failed, 1 skipped   (233 s)
+  the one failure, ATTRIBUTED BY FILE
+        tests/test_lanes_operator_placeholders.py  ...  1 file, 1 test
+        ::test_the_camel_branch_is_decided_before_any_camel_run
+        reason: UndeterminedValue: lanes.yaml 'camel_comparator.branch' sentinel TODO_C13_RUN1
+        NOT C7's. It is the expected pre-existing red.
+  make selftest        RED on exactly that test:  1 failed, 1 passed, 786 deselected
+  make check-roles     17 passed, 0 failed, 5 n/a, exit 0. E1 clean over 50 issued rows.
+  make check-prereg    NOT-YET-FROZEN - PROTOCOL.md is C14's and does not exist. Not a PASS.
+  git status --porcelain tests/goldens/    EMPTY
+  git status --porcelain vendor/           EMPTY - all vendored pins clean
+  evals/                                   DOES NOT EXIST in the working tree
+  git status --porcelain src/ tests/       EMPTY throughout, before and after the mutation sweep
+C7 CONTRIBUTES ZERO FAILURES TO THE SUITE.
+
+TOKEN ROW: 472cdc4b - C7 - REVIEW - 2026-09-02. COUNTED IN THE WORKING TREE, and HEAD agrees
+because the row is already committed at fdd9526. The table holds 51 data rows: 50 8-hex rows plus
+the one non-8-hex WG-2026-08-30-CTX-13.4-A row that check_roles._TOKEN_ROW does not parse. MY ROW
+IS THE 50th 8-HEX ROW AND THE 51st ROW OVERALL, and check-roles reports "50 issued row(s)" - both
+numbers are right about different things (INC-54).
+
+---------------------------------------------------------------------
+16. THE TAG
+---------------------------------------------------------------------
+NOT CUT. `c7-pass` DOES NOT EXIST. The verdict is FAIL: two BLOCKERs and two owned-property mutant
+survivors. docs/reviews/README.md: "PASS requires ALL of: every golden reproduced by the reviewer's
+own computation; every mutant killed or proven equivalent; the reimplementation agreeing on all >=20
+vectors; zero BLOCKER findings." Four of the six clauses are met; two are not.
+I DID NOT PASS THIS CHUNK BECAUSE THE PROJECT IS BEHIND SCHEDULE, AND I DID NOT HUNT AN EXTRA
+MUTANT TO JUSTIFY A FAIL: the required set was sealed at f1ccde1 before any mutant existed, and
+under Q-082's ceiling only M12 and M39 gate. M16 is marked NOT OWNED and released.
+
+---------------------------------------------------------------------
+17. EVERY `Swept:` LINE
+---------------------------------------------------------------------
+Q-063 clauses (i) and (ii) were followed on EVERY commit this session made. `git diff --
+QUESTIONS.md INCIDENTS.md docs/reviews/OPEN_FINDINGS.md STATUS.md PROGRESS.md` was run and READ
+immediately before each, and the STAGED SNAPSHOT was re-checked in the direction clause (ii) names
+- is somebody ELSE's entry inside what is about to be committed (INC-65).
+  fdd9526  token row + the four rulings   ->  Swept: none
+  f1ccde1  the PHASE 1 SEAL               ->  Swept: none  (the concurrent C6 REVIEW 5 session
+                                               0ca97bbb had an uncommitted file in
+                                               docs/reviews/independent/ and it is NOT in that
+                                               commit; explicit paths were staged and the staged
+                                               snapshot was read back to confirm it)
+  <this commit>  the review of record     ->  Swept: none
+NO COMMIT OF THIS SESSION SWEPT ANY FOREIGN ENTRY.
+
+---------------------------------------------------------------------
+18. ANYTHING I COULD NOT DO, AND EVERY WEAKNESS IN THIS REVIEW
+---------------------------------------------------------------------
+(1) THE SEAL IS BLIND TO THE CODE AND NOT TO THE BUILD'S OWN ACCOUNT OF ITSELF. CLAUDE.md S1 makes
+    STATUS.md item 4 of the mandatory read order and the prompt's DO-NOT-READ list does not name
+    it; C7's row narrates all three build rounds, INC-32 through INC-38, the two capture_payment
+    digests and the mutant counts. Disclosed in REVIEW_7_1.md S1, in c7_reimpl.py's own docstring
+    and as OF-145. Every figure here is re-derived rather than quoted.
+(2) I COULD NOT RUN THE FULL SUITE IN THE CLONE AS A SURVIVOR CONTROL. The clone carries no
+    vendor/, so the full run there is 18 failed / 58 errors from vendored checkouts. Instead the
+    three non-equivalent survivors were re-run against EVERY test file that mentions the ledger,
+    which is exhaustive for this chunk and is the stronger check; the full suite was measured in
+    the real repository instead.
+(3) I DID NOT WRITE A TEST AGAINST GOLDEN 5B, WHICH THE FIXTURE SAYS THIS SESSION IS THE FIRST
+    PERMITTED TO WRITE. The review fence names nothing under tests/ - "A REVIEW SESSION FIXES
+    NOTHING" - and B-1 means the value such a test would pin is the disputed one. It is owed to a
+    later session, after the architect's re-cut.
+(4) MY OWN SCANNER PRODUCED ONE FALSE POSITIVE (chain.py:159, a PEP 257 attribute docstring) and
+    my sealed reimplementation is wrong in two places where the project is right (S7). Both are
+    recorded rather than quietly corrected; the sealed file is not edited.
+(5) STATUS.md's C7 ROW CARRIES A LITERAL `|` INSIDE A CODE SPAN (`str | null`) AND HAS SINCE
+    BEFORE THIS SESSION, so the row renders with one extra column. Pre-existing, another session's
+    text, not touched. Noted rather than silently left.
+(6) I MISCOUNTED MY OWN VECTORS IN THE SEALED FILE'S HEADER AND CORRECTED IT AFTERWARDS.
+    c7_vectors.py says FORTY-TWO; the list holds FORTY-FIVE entries under forty-two id
+    numbers, because V36 is split into V36a..V36d, one per harm component. THE SEALED FILE IS
+    NOT EDITED - the seal is the seal - and the count is corrected in REVIEW_7_1.md S4, in the
+    diff harness's own printed header, and here. All 45 ran: the harness iterates VECTORS.
+    Found by counting `len(VECTORS)` rather than by trusting the docstring, which is the same
+    habit this review applied to the package.
+(7) NO PROVIDER MODEL CALL WAS MADE AND NONE WAS NEEDED. A ledger is a hash chain over data
+    already in hand.
+
+FILES THIS SESSION WROTE: docs/reviews/REVIEW_7_1.md; docs/reviews/independent/c7_reimpl.py,
+c7_vectors.py, c7_phase1_blind.md, c7_review1_goldens.py + _output.txt, c7_review1_diff.py,
+c7_reimpl_diff.txt, c7_review1_probes.py + _output.txt, c7_golden5b_consequence.txt;
+docs/reviews/mutants/c7_mutants.py + _output.txt, c7_survivor_exhibits.py + _output.txt;
+docs/reviews/OPEN_FINDINGS.md (OF-141..OF-145, appended); QUESTIONS.md (the token row and the four
+rulings, appended); STATUS.md (the C7 row, review history APPENDED never erased); PROGRESS.md; and
+this file. NOTHING under src/, tests/, config/, CONTEXT.md, PROCESS.md, INCIDENTS.md or vendor/.
+
+PUSHED SHA: stated at the head of this file by the commit that follows it.

@@ -1,0 +1,169 @@
+====================================================================================================
+IMPORT PROVENANCE
+====================================================================================================
+  whetstone_gate.__file__ : C:\Users\chinm\whetstone-gate\src\whetstone_gate\__init__.py
+  config.repo_root()      : C:\Users\chinm\whetstone-gate
+
+====================================================================================================
+M08 (P-06) — EQUIVALENT, and the proof is a CONTROL-FLOW argument plus an EXHAUSTIVE SEARCH
+====================================================================================================
+  The mutation:  expected_prev = recomputed   ->   expected_prev = stored['hash']
+
+  THE PROOF. The assignment is reached only by falling through the line above it:
+      position = 0
+      for raw in entries:
+          position += 1
+          if isinstance(raw, LedgerEntry):
+              stored = raw.to_dict()
+          elif isinstance(raw, Mapping):
+              stored = dict(raw)
+          else:
+              return ChainVerdict(DETECTED, None, f'the item at position {position} is not an entry at all ({type(raw).__name__})')
+          seq = stored.get('ledger_seq')
+          label = seq if isinstance(seq, int) and (not isinstance(seq, bool)) else None
+          missing = [name for name in (LEDGER_SEQ, *CHAIN_FIELDS) if name not in stored]
+          if missing:
+              return ChainVerdict(DETECTED, label, f'entry at position {position} is missing field(s) {missing}: a chain needs a row number, a link and a digest, and this row does not carry all three')
+          if label is None:
+              return ChainVerdict(DETECTED, None, f'entry at position {position} carries ledger_seq={seq!r}, which is not an integer row number')
+          if label in seen:
+              return ChainVerdict(DETECTED, label, f'ledger_seq {label} appears more than once')
+          seen.add(label)
+          if stored['prev_hash'] != expected_prev:
+              return ChainVerdict(DETECTED, label, f'the link is broken: entry {label} stores prev_hash {stored['prev_hash']!r} where the chain has reached {expected_prev!r}')
+          body = {name: value for name, value in stored.items() if name not in CHAIN_FIELDS}
+          try:
+              recomputed = entry_digest(expected_prev, body, algorithm=algorithm)
+          except NotCanonicalisable as exc:
+              return ChainVerdict(DETECTED, label, f'entry {label} cannot be canonicalised: {exc}')
+          if recomputed != stored['hash']:
+              return ChainVerdict(DETECTED, label, f"entry {label}'s CONTENTS do not hash to its stored digest: recomputed {recomputed} against stored {stored['hash']!r}. This is the check a stored-field verifier does not make (PROCESS.md §5.2, golden 5).")
+          expected_prev = recomputed
+      return ChainVerdict(VALID, None, f'{position} entr(y/ies) recomputed from their own contents, chained from {genesis_hash!r}')
+
+  `if recomputed != stored['hash']: return ...` GUARDS the assignment, so at the
+  assignment `recomputed == stored['hash']` HOLDS BY CONSTRUCTION. Assigning either
+  name assigns the same value. There is no input on which the two differ, because
+  reaching the line at all requires them to be equal.
+
+  ⚠️ AND THE SEARCH, BECAUSE A CONTROL-FLOW ARGUMENT CAN BE WRONG. Every mutation
+  shape this review generated is run through BOTH verifiers:
+    18 shapes searched; HEAD and M08 disagree on 0 of them.
+    -> M08 is EQUIVALENT. []
+
+  ⚠️ AND WHAT M08 IS NOT. `PROCESS.md` §5.4's defect is *'the chain verifier compares
+  each entry's stored prev_hash to the previous entry's stored hash field, AND NEVER
+  RECOMPUTES the previous entry's digest from its contents.'* M08 changes only the
+  second half's *carrier*, with the recomputation still in place. The mutant that
+  actually removes the recomputation is M09, and M09 was KILLED by golden 5's cases
+  C and D. The equivalence of M08 is therefore evidence FOR the verifier, not against.
+
+====================================================================================================
+M12 (P-09) — NOT EQUIVALENT. THE EXHIBIT: an input HEAD DETECTS and M12 calls VALID.
+====================================================================================================
+  The mutation:  if stored['prev_hash'] != expected_prev:
+              ->  if position > 1 and stored['prev_hash'] != expected_prev:
+
+  THE INPUT: a three-entry ledger whose ENTRY 1's `prev_hash` alone is edited, from
+  the genesis root to something else. Nothing else is touched.
+    entry 1 prev_hash BEFORE : 'PRE-FREEZE'
+    entry 1 prev_hash AFTER  : 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    entry 1 hash             : f7f2fc862378b7707b364d0c0dce7eb42fb15046e094f4b3b1cf849626f71396   (UNCHANGED, and still correct
+                                for the body it is taken over, because the digest
+                                EXCLUDES prev_hash — golden 5's own hash_rule)
+
+    HEAD            -> DETECTED at seq 1   (reason: link)
+    the LIVE verify -> DETECTED at seq 1
+    M12             -> VALID at seq None
+    -> THEY DIFFER: True
+
+  ⚠️ WHY THE INTEGRITY CHECK DOES NOT CATCH IT, WHICH IS THE WHOLE POINT.
+  `prev_hash` is EXCLUDED from the canonicalised entry, so editing it moves NO digest.
+  The link check is the ONLY thing that reads it, and M12 removes the link check for
+  exactly the entry that binds a ledger to its genesis root.
+
+  ⚠️ WHAT IT COSTS, IN `config/protocol.yaml`'s OWN WORDS:
+      'A ledger cannot contain the hash of a tag that did not exist when it was
+       written, so pre-freeze episodes are CRYPTOGRAPHICALLY DISTINGUISHABLE from
+       scored ones. This is the one free proof available and it costs a single line.'
+  That proof rests on ENTRY 1's link and on nothing else. Under M12 the suite is
+  green while the first link is unchecked, so NO TEST IN THIS REPOSITORY COVERS the
+  binding the freeze's one free proof is made of.
+
+  THE REMEDY IS ONE FIXTURE: a ledger whose entry 1 `prev_hash` alone is altered, 
+  asserted DETECTED at seq 1. Golden 5 has no such case — its case B breaks entry 2.
+
+  AND THE CONVERSE SHAPE, CHECKED SO THE FINDING IS NOT OVERSTATED — a whole entry 1
+  forged to chain from a different root (prev_hash AND hash both recomputed):
+    HEAD -> DETECTED    M12 -> DETECTED
+    Both DETECT this one, at the recomputation. So M12's gap is narrow and real:
+    it is exactly the edit that touches `prev_hash` and leaves every digest alone.
+
+====================================================================================================
+M16 (P-13 as sealed → RE-MARKED) — NOT EQUIVALENT, and NOT OWNED. Both are argued.
+====================================================================================================
+  The mutation: `append_log` drops its validate-everything-first pass, so a bad row
+  at position k leaves rows 1…k-1 already appended.
+
+  NOT EQUIVALENT — the exhibit, run against HEAD:
+    HEAD: append_log refused -> LedgerEntryError: arm '1' cannot emit verdict 'DENIED'. CONTEXT.md §8.6a gives it exactl
+    HEAD: the ledger is left with 0 entries  <- ALL OR NOTHING
+    M16: rows 1 and 2 are already appended when row 3 refuses, leaving 2 entries.
+         A short ledger VERIFIES (nothing anchors the end — OF-57), so the loss is
+         silent. The two implementations therefore differ on a real input.
+
+  NOT OWNED, and this is argued rather than asserted, because it is the disposition
+  that decides whether it holds the tag:
+    · The sealed P-13 is DETERMINISM — *'the same inputs in the same order give
+      byte-identical digests'* — and M16 does not touch it. M16 attacks a DIFFERENT
+      property: `append_log`'s all-or-nothing batch semantics.
+    · That property passes criterion 1 of the sealed definition of *owns* (the fix is
+      inside `ledger/`) and FAILS criterion 2: NO artefact that outranks the code
+      requires it. `CONTEXT.md` §16 says *append-only, hash-chained* and nothing about
+      batches; no C7 card clause, no ruling and no golden mentions it. It is the
+      builder's own Class B choice, argued in its own docstring.
+    · Hard rule 11 is the nearest candidate and does not reach: a caller-supplied bad
+      row is not a *dropped episode*, and the caller gets the refusal either way.
+    → MEDIUM in OPEN_FINDINGS.md. It does NOT hold the tag (Q-082's ruling).
+
+  ⚠️ THIS DISPOSITION COSTS THIS REVIEW NOTHING, AND THAT IS STATED SO IT CAN BE
+  CHECKED: the verdict is already FAIL on M12 and M39, so marking M16 NOT-OWNED
+  changes no outcome. A reviewer narrowing a set to avoid a FAIL is the failure
+  Q-082's safeguard exists for; there is no such incentive here.
+
+====================================================================================================
+M39 (P-33) — NOT EQUIVALENT, and OWNED. The claim ceiling is not pinned by anything.
+====================================================================================================
+  The mutation replaces `chain.py`'s stated limitation
+      '"the ledger is tamper-evident" means **evident against an edit that leaves a
+       stale digest, and against nothing else** — and the README must not say more.'
+  with
+      'the ledger is tamper-evident: any alteration is detected.'
+  and the whole 159-test C7 suite stays GREEN.
+
+  NOT EQUIVALENT: the two texts make different claims, and the second is FALSE — this
+  review's own vectors V09 and V10 exhibit a truncation and a re-derived suffix that
+  BOTH verify. The mutant makes the package assert something the package disproves.
+
+  OWNED: P-33 is in the sealed required set, and ruling 4 of this session's prompt
+  puts it there in terms — *'DO fail it if any docstring, comment or artefact claims
+  more than that.'* The chunk owns the ceiling; nothing else can own it, because the
+  sentence lives in this package.
+
+  ⚠️ AND THE REMEDY IS A PATTERN THIS CHUNK ALREADY USES, WHICH IS WHY THE BAR IS NOT
+  UNREASONABLE: M38 — deleting Q-069's prohibition from the package docstring — was
+  KILLED by `test_Q069_the_scorer_side_prohibition_is_stated_in_the_package_itself`,
+  which PARSES the docstring rather than trusting it. The identical fixture pointed at
+  chain.py's ceiling sentence closes M39. One test, already written once, ten lines away.
+
+  The subject is CLEAN TODAY — this review measured it, and the ceiling sentence is
+  present in the ruling's own words. Q-082's ruling is explicit that this does not
+  save it: *'clean today is exactly what an unpinned guard cannot promise tomorrow.'*
+
+====================================================================================================
+SUMMARY
+====================================================================================================
+  M08  EQUIVALENT      P-06  proof by control flow + a 20-shape search, 0 disagreements
+  M12  NOT equivalent  P-09  OWNED     -> FAIL-carrying
+  M16  NOT equivalent  —     NOT OWNED -> MEDIUM in OPEN_FINDINGS.md
+  M39  NOT equivalent  P-33  OWNED     -> FAIL-carrying

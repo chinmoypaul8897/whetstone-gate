@@ -1,0 +1,119 @@
+====================================================================================================
+IMPORT PROVENANCE — printed BEFORE any mutant (INC-64 / OF-139)
+====================================================================================================
+  CLONE                   : C:\Users\chinm\AppData\Local\Temp\c7rev1.yYyRAk
+  whetstone_gate.__file__ : C:\Users\chinm\AppData\Local\Temp\c7rev1.yYyRAk\src\whetstone_gate\__init__.py
+  config.repo_root()      : C:\Users\chinm\AppData\Local\Temp\c7rev1.yYyRAk
+  both resolve INSIDE the clone: True
+  the repository's OWN OF-139 guard, run in the clone: PASS
+
+====================================================================================================
+BASELINE CONTROL (must be green before a single mutant)
+====================================================================================================
+  159 passed in 2.21s
+
+  original src/whetstone_gate/ledger/__init__.py        sha256 7d3e674ece3000ea…
+  original src/whetstone_gate/ledger/build.py           sha256 a4465989a6bf7f10…
+  original src/whetstone_gate/ledger/chain.py           sha256 d3af4d0b789a9a31…
+  original src/whetstone_gate/ledger/control.py         sha256 a9cdf086222e969d…
+  original src/whetstone_gate/ledger/entry.py           sha256 541ab2ddc7643eb3…
+
+====================================================================================================
+THE MUTANTS
+====================================================================================================
+  M01  P-01      KILLED    chain.py:231 (x1)  sort_keys=True -> False
+          killed by: test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[A], test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[B], test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[C] (+10 more)
+  M02  P-01      KILLED    chain.py:232 (x1)  separators no-whitespace -> spaced
+          killed by: test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[A], test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[B], test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[C] (+10 more)
+  M03  P-02      KILLED    chain.py:233 (x1)  ensure_ascii=False -> True (Q-053 option 2)
+          killed by: test_a_non_ascii_target_is_hashed_as_utf8_and_not_escaped, test_text_that_is_not_encodable_as_utf8_is_a_typed_refusal_not_a_traceback, test_the_four_hostile_receipt_strings_each_do_what_this_docstring_says
+  M04  P-03      KILLED    chain.py:571 (x1)  prev_hash NOT excluded from the digest
+          killed by: test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[A], test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[B], test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[C] (+13 more)
+  M05  P-04      KILLED    chain.py:571 (x1)  the digest body is selected by SCHEMA, not by key (INC-32's defect)
+          killed by: test_verify_detects_an_added_or_removed_field, test_the_round_trip_is_a_check_and_not_a_tautology
+  M06  P-05      KILLED    chain.py:268 (x1)  the concatenation order is reversed
+          killed by: test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[A], test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[B], test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[C] (+9 more)
+  M07  P-05      KILLED    chain.py:268 (x1)  the operands are encoded UTF-16, not UTF-8
+          killed by: test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[A], test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[B], test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[C] (+9 more)
+  M08  P-06      SURVIVED  chain.py:588 (x1)  ⚠️ THE §5.4 DEFECT: carry the STORED digest forward, never the recomputed one   <- SURVIVOR
+  M09  P-06      KILLED    chain.py:579 (x1)  the recomputation check is disabled outright
+          killed by: test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[C], test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[D], test_verify_detects_an_added_or_removed_field (+4 more)
+  M10  P-07      KILLED    chain.py:579 (x1)  the first-bad ledger_seq is off by one
+          killed by: test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[C], test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[D], test_verify_detects_an_added_or_removed_field (+3 more)
+  M11  P-08      KILLED    chain.py:531 (x1)  ⚠️ INC-34: the verifier requires THIS package's content schema
+          killed by: test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[A], test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[B], test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq[C] (+6 more)
+  M12  P-09      SURVIVED  chain.py:553 (x1)  the FIRST entry's link to the genesis root is not checked   <- SURVIVOR
+  M13  P-10      KILLED    chain.py:639 (x1)  ⚠️ INC-33: the READ path re-appends without verifying the stored bytes
+          killed by: test_the_read_path_REFUSES_every_tampered_golden_5_case[B], test_the_read_path_REFUSES_every_tampered_golden_5_case[C], test_the_read_path_REFUSES_every_tampered_golden_5_case[D] (+1 more)
+  M14  P-11      KILLED    chain.py:343 (x1)  `entries` hands back the LIVE list
+          killed by: test_the_ledger_api_has_one_write_path_and_no_mutator, test_entries_are_handed_back_as_a_tuple_and_a_caller_cannot_reach_the_list
+  M15  P-12      KILLED    chain.py:397 (x1)  ledger_seq is 0-based, not the dense 1-based row
+          killed by: test_the_writer_and_the_verifier_agree_on_a_ledger_THIS_package_wrote, test_a_written_entry_cannot_be_mutated_in_place, test_entries_are_handed_back_as_a_tuple_and_a_caller_cannot_reach_the_list (+91 more)
+  M16  P-13      SURVIVED  build.py:416 (x1)  append_log validates as it goes, so a bad row leaves a SHORT ledger   <- SURVIVOR
+  M17  P-14      KILLED    chain.py:174 (x1)  a missing ledger.genesis_hash DEFAULTS instead of refusing
+          killed by: test_a_missing_genesis_hash_in_config_is_a_hard_refusal_not_a_default, test_the_genesis_value_appears_in_no_string_literal_in_the_package
+  M18  P-15      KILLED    chain.py:174 (x1)  the genesis root is a HARDCODED literal in source
+          killed by: test_a_missing_genesis_hash_in_config_is_a_hard_refusal_not_a_default, test_the_genesis_root_is_re_read_on_every_call_and_never_cached_at_import, test_the_genesis_value_appears_in_no_string_literal_in_the_package
+  M19  P-16      KILLED    build.py:268 (x1)  a result with no `ok` silently becomes False instead of refusing
+          killed by: test_a_log_row_whose_result_carries_no_ok_is_a_REFUSAL_and_never_a_False
+  M20  P-16      KILLED    build.py:340 (x1)  ⚠️ THE FORBIDDEN INFERENCE: `executed` derived from verdict + harm, not read
+          killed by: test_every_entry_carries_every_field_the_section_18_renderer_needs, test_two_refunds_ISSUED_with_the_SAME_receipt_were_INVISIBLE_and_now_are_NOT, test_executed_is_read_from_the_worlds_own_ToolResult_ok_for_every_row (+1 more)
+  M21  P-17      KILLED    control.py:159 (x1)  INDETERMINATE no longer counts as a gate refusal
+          killed by: test_the_three_refusal_sources_are_jointly_derivable
+  M22  P-18      KILLED    control.py:161 (x1)  a RAZORPAY refusal is reported as the tool layer's
+          killed by: test_the_three_refusal_sources_are_jointly_derivable, test_ASSERTION_2_holds_in_the_WORLD_and_not_only_in_the_validator
+  M23  P-19      KILLED    control.py:161 (x1)  the residual bucket is reported as RAZORPAY's
+          killed by: test_the_three_refusal_sources_are_jointly_derivable, test_a_tool_layer_refusal_is_a_DIFFERENT_ROW_from_an_executed_harmless_action, test_a_RAZORPAY_REFUSED_READ_lands_in_the_tool_layer_bucket_and_that_is_measured
+  M24  P-20      KILLED    build.py:246 (x1)  an empty-string `receipt` is normalised to None (INC-04 rebuilt)
+          killed by: test_receipt_is_read_from_the_calls_own_arguments_for_every_row
+  M25  P-20      KILLED    chain.py:362 (x1)  `receipt` gains a default of None on the write path
+          killed by: test_append_has_no_default_for_receipt_and_omitting_it_is_a_TypeError
+  M26  P-21      KILLED    entry.py:567 (x1)  assertion 1 disabled: a BLOCKED call may claim executed
+          killed by: test_ASSERTION_1_executed_true_implies_verdict_ALLOWED[DENIED], test_ASSERTION_1_executed_true_implies_verdict_ALLOWED[INDETERMINATE], test_productive_action_reduces_to_executed_over_every_writable_entry
+  M27  P-22      KILLED    entry.py:574 (x1)  assertion 2 disabled: a RAZORPAY-refused call may claim executed
+          killed by: test_ASSERTION_2_executed_true_implies_rejected_by_razorpay_False, test_productive_action_reduces_to_executed_over_every_writable_entry
+  M28  P-23      KILLED    entry.py:582 (x1)  ⚠️ assertion 3 checks only the FIRST component, not all four
+          killed by: test_ASSERTION_3_any_non_zero_harm_component_implies_executed[merchant_irrecoverable_outflow_paise], test_ASSERTION_3_any_non_zero_harm_component_implies_executed[merchant_float_moved_paise], test_ASSERTION_3_any_non_zero_harm_component_implies_executed[fees_incurred_paise]
+  M29  P-23      KILLED    entry.py:581 (x1)  assertion 3 fires only for gate-blocked calls, so a tool-layer refusal may carry harm
+          killed by: test_ASSERTION_3_any_non_zero_harm_component_implies_executed[customer_overcharge_paise], test_ASSERTION_3_any_non_zero_harm_component_implies_executed[merchant_irrecoverable_outflow_paise], test_ASSERTION_3_any_non_zero_harm_component_implies_executed[merchant_float_moved_paise] (+1 more)
+  M30  P-24      KILLED    build.py:295 (x1)  the absence case claims Razorpay refused it, so a rejected record is fabricated
+          killed by: test_a_read_writes_no_harm_record_and_is_still_an_entry, test_a_denied_call_is_an_entry_that_never_reached_the_world, test_every_entry_carries_every_field_the_section_18_renderer_needs (+8 more)
+  M31  P-25      KILLED    control.py:233 (x1)  term 1 dropped (the gate ALLOWED)
+          killed by: test_productive_action_term_by_term_each_clause_varied_ALONE
+  M32  P-26      KILLED    control.py:233 (x1)  term 2 dropped (the world EXECUTED it)
+          killed by: test_a_RAZORPAY_REFUSED_READ_lands_in_the_tool_layer_bucket_and_that_is_measured, test_productive_action_term_by_term_each_clause_varied_ALONE, test_productive_action_on_REAL_entries_and_the_count_over_a_ledger (+2 more)
+  M33  P-27      KILLED    control.py:233 (x1)  term 3 dropped (no documented Razorpay error)
+          killed by: test_productive_action_term_by_term_each_clause_varied_ALONE
+  M34  P-28      KILLED    control.py:233 (x1)  ⚠️ Q-067 REVERSED: the NARROW reading — money actions only, reads not counted
+          killed by: test_productive_action_term_by_term_each_clause_varied_ALONE, test_the_two_productive_action_counts_diverge_on_reads
+  M35  P-29      KILLED    entry.py:433 (x1)  the arm/verdict table is not enforced
+          killed by: test_a_refused_append_leaves_the_head_and_the_ledger_exactly_as_they_were, test_each_arm_accepts_exactly_its_own_verdicts_and_refuses_every_other[DENIED-1], test_each_arm_accepts_exactly_its_own_verdicts_and_refuses_every_other[INDETERMINATE-1] (+3 more)
+  M36  P-30      KILLED    entry.py:321 (x1)  `turn_index` is dropped from the stored entry
+          killed by: test_the_writer_and_the_verifier_agree_on_a_ledger_THIS_package_wrote, test_a_refused_append_leaves_the_head_and_the_ledger_exactly_as_they_were, test_every_log_row_becomes_exactly_one_entry_including_the_tool_layer_refusal (+7 more)
+  M37  P-31      KILLED    chain.py:228 (x1)  a binary float is serialised instead of refused
+          killed by: test_a_float_anywhere_in_an_entry_is_refused_rather_than_serialised, test_a_float_nested_inside_an_entry_is_refused_too
+  M38  P-32      KILLED    __init__.py:3 (x1)  Q-069's prohibition is deleted from the package docstring
+          killed by: test_Q069_the_scorer_side_prohibition_is_stated_in_the_package_itself
+  M39  P-33      SURVIVED  chain.py:88 (x1)  the tamper-evidence claim is raised above the ceiling ruling 4 fixes   <- SURVIVOR
+  C-1  CONTROL   SURVIVED  control.py:248 (x1)  a local name is renamed in productive_actions (no behaviour change)
+  C-2  CONTROL   SURVIVED  chain.py:451 (x1)  one word of a prose sentence in a docstring is changed
+  C-3  CONTROL   SURVIVED  entry.py:419 (x1)  an f-string message is reworded without changing any behaviour
+
+====================================================================================================
+POST-RESTORE CONTROL (a run whose post-restore control is not green is VOID)
+====================================================================================================
+  every file byte-identical to its pre-run bytes: True
+  159 passed in 2.08s
+
+====================================================================================================
+SUMMARY
+====================================================================================================
+  REQUIRED-SET mutants : 39
+    KILLED             : 35
+    SURVIVED           : 4   ['M08', 'M12', 'M16', 'M39']
+    NOT APPLIED        : 0 []
+  CONTROL mutants      : 3   SURVIVED 3 of 3
+    C-1  SURVIVED   a local name is renamed in productive_actions (no behaviour change)
+    C-2  SURVIVED   one word of a prose sentence in a docstring is changed
+    C-3  SURVIVED   an f-string message is reworded without changing any behaviour
+  distinct REQUIRED-SET properties covered: 33  ['P-01', 'P-02', 'P-03', 'P-04', 'P-05', 'P-06', 'P-07', 'P-08', 'P-09', 'P-10', 'P-11', 'P-12', 'P-13', 'P-14', 'P-15', 'P-16', 'P-17', 'P-18', 'P-19', 'P-20', 'P-21', 'P-22', 'P-23', 'P-24', 'P-25', 'P-26', 'P-27', 'P-28', 'P-29', 'P-30', 'P-31', 'P-32', 'P-33']
