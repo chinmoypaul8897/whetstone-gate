@@ -5,6 +5,148 @@ Each entry opens with that session's `SESSION-TOKEN` (`PROCESS.md` §7a). Chat h
 not a record; this file is.
 
 ---
+## C7 — THE LEDGER — **FIX 1** — 2026-09-02 — ⚠️ **`B-2`, `H-1`/`OF-141` AND `H-2`/`OF-142` CLOSED. A SELF-DIRECTED MUTANT FOUND THIS SESSION'S OWN FIRST FIXTURE PINNING THE WRONG SHAPE, AND THE MUTATION HARNESS ITSELF WAS WRONG IN `INC-64`'s EXACT DIRECTION**
+
+**SESSION-TOKEN:** `8ad4f629` · Row **53** of `QUESTIONS.md`'s `## Session tokens` table, counted
+**from the table** in the operator's working tree (`c:\Users\chinm\whetstone-gate` — **not** a clone
+and **not** a worktree) at HEAD `1c597d4`, with `git status --porcelain QUESTIONS.md` **EMPTY** at
+the moment of counting: **52** data rows stood, the last being `3e5b7c10` — ARCH — FIX, which is
+this night run's TASK 1. ⚠️ **AND THE SECOND FIGURE IS MEASURED, NOT DERIVED (`INC-54`):**
+`check_roles._TOKEN_ROW` parses **51** issued tokens from those 52 rows before the append and **52**
+after, the first row (`WG-2026-08-30-CTX-13.4-A`) matching neither the 8-hex token nor the
+`(C\d+|ARCH)` chunk cell. **The row was registered BEFORE this task's first commit**, at `b541987`.
+**ZERO PROVIDER MODEL CALLS. NO TAG — this is not a review session.**
+
+⚠️ **TWO TOKENS RAN IN THIS ONE NIGHT RUN AND THEY WERE NEVER CROSSED.** `3e5b7c10` (ARCH FIX) closed
+`B-1` by re-cutting golden 5B and finished at `1c597d4`. `8ad4f629` (C7 FIX) owns `B-2`, `H-1` and
+`H-2`. **No commit carries both**, and `make check-roles` E1/E2/E3 are the check.
+
+**WHAT WAS AND WAS NOT WRONG WITH C7.** ⚠️ **The review measured the chunk's behaviour CORRECT on
+everything it could drive — 45 vectors, ZERO divergences, 35 of 39 mutants killed — so nothing that
+works was rewritten.** These were **coverage and claim** defects. `chain.py`, `entry.py`, `build.py`,
+`control.py` and `store.py` are **UNTOUCHED**. The whole fix is **two fixtures** in
+`tests/test_c7_ledger.py` and **three appended rows** in `docs/reviews/OPEN_FINDINGS.md`.
+
+**(1) `H-1` / `OF-141` / `M12` — entry 1's link to the genesis root, which no test touched.** The
+exhibit edits entry 1's `prev_hash` **alone**, leaving the stored `hash` correct — which the
+integrity check cannot see, because `prev_hash` is excluded from the canonicalised entry, so moving
+it moves **no digest** — and asserts **DETECTED at seq 1 with the link as the reason**. ⚠️ **The
+control the review named is in the same fixture:** a *whole* entry 1 forged from a different root,
+`prev_hash` **and** `hash` recomputed, is DETECTED by HEAD **and by M12 alike**, at the
+recomputation, so a fixture resting on that shape proves nothing. The discriminating property is
+proved directly rather than described: the link-only exhibit's contents **still** hash to its stored
+digest from the real genesis, and the forged one's do not. **`M12`: KILLED.**
+
+**(2) `H-2` / `OF-142` / `M39` — the tamper-evidence claim ceiling.** Built on the pattern this chunk
+already used ten lines away — `test_Q069_…` **parses** the docstring out of the AST, and that is what
+killed `M38`. **Both directions:** the ceiling must be stated in ruling 4's own words, **and** must
+not be exceeded. The second half is the load-bearing one, because the honest docstring **contains**
+the false sentence in order to reject it — so presence is not the test, and every occurrence of an
+overclaim must sit within 200 characters of a disclaimer. Whitespace and emphasis are normalised
+first, so a **rewrap** of the docstring cannot flip this test in either direction. **`M39`: KILLED.**
+
+**(3) `B-2` — `OF-57`'s row claims more than the chain delivers.** A correction row is **APPENDED**
+as **`OF-157`**; **`OF-57`'s original text is not rewritten**, because `docs/reviews/` is
+append-only. The two undetected shapes are stated **exactly as `chain.py` already states them** —
+`REVIEW_7_1.md` measured `chain.py` correct and `OPEN_FINDINGS.md` as the overclaiming artefact.
+⚠️ **The cost of append-only is named rather than glossed:** a reader who stops at `OF-57` never
+reaches `OF-157`, no pointer may be added to `OF-57`'s Status cell without the rewrite the remedy
+forbids, and **whether an append is enough for a published findings table is left as a question for
+the architect** rather than answered by a fix session widening its own fence. **`OF-57` and `OF-61`
+stay OPEN as accepted limitations**, which is what ruling 4 makes them.
+
+⚠️ **`M16` / `OF-143` IS LEFT OPEN, `append_log` IS NOT TOUCHED, AND THE ARGUMENT IS ON THE RECORD AS
+`OF-158` RATHER THAN PERFORMED BY SILENCE.** Four routes to making it owned were checked and each
+falls short: `CONTEXT.md` §16 says nothing about batches; **hard rule 10** binds the *file* and
+`store.write` already satisfies it with a temporary plus `os.replace`; **hard rule 11** does not reach
+a caller-supplied bad row, and the caller gets the refusal either way; and the builder's own Class B
+rationale is *the code*, not an artefact outranking it. ⚠️ **One argument is added that the review did
+not make and it cuts the same way: `M16`'s loss is silent ONLY because a short ledger verifies, which
+is `OF-57`** — so holding the tag on `M16` would be failing C7 on `OF-57` at one remove, which ruling
+4 forbids in terms. **What would change it is named**, so the row is actionable and not merely
+defended. **`OF-144` and `OF-145` are the ARCHITECT'S** — `PROCESS.md`, `CLAUDE.md` and
+`docs/reviews/README.md` are outside every fix session's fence — and are re-declared as owed.
+
+⚠️ **THE MUTATION HARNESS WAS ITSELF WRONG, IN `INC-64`'s EXACT DIRECTION, AND IT IS `INC-69`.** The
+first version built the environment that pins it to the clone and **never passed it to
+`subprocess.run`**, so every suite ran against the **LIVE** repository and reported `M12`, `M39`
+**and** `SM-A` SURVIVED at `delta +0`. ⚠️ **All four provenance lines this session's prompt requires
+printed TRUE**, because the probe and the `OF-139` guard each ran in a **different subprocess** from
+the measurement and each *did* pass `env=`. **Caught by distrusting three impossible numbers, not by
+any check** — `SM-A` deletes an assertion from a test that had passed thirty seconds earlier.
+**Fixed:** provenance is now resolved with the same environment on the same code path immediately
+before every suite run, and **two POSITIVE controls were added**, which is the direction this project
+has never had: `CTRL-KILL` (`sort_keys=True`→`False`, which golden 5 must kill) came back **+14**,
+`CTRL-LIVE` (a bare `assert False` inside the new fixture, proving the clone's *test* file is the one
+running) **+1**, and the negative `CTRL-NOOP` **+0** as required. **`OF-159`** records the general
+finding: **this project's mutation discipline has negative controls everywhere and positive controls
+nowhere**, and that asymmetry is the shape of both `INC-64` and `INC-69`. ⚠️ **Stopping the bad run
+reproduced `INC-57` immediately and it was checked rather than assumed:** the clone was left holding
+a mutation in `tests/test_c7_ledger.py`, measured by SHA-256 against the live tree, and restored by
+copying live bytes and re-hashing — never `git checkout`.
+
+⚠️ **TEN SELF-DIRECTED MUTANTS BEYOND `M12` AND `M39`, AND ONE FOUND A REAL DEFECT IN THIS SESSION'S
+OWN REMEDY.** **`SM-I` SURVIVED the first version of the `H-1` fixture.** It skips the link check at
+entry 1 **only when `prev_hash` is NOT 64 hex**, and the fixture used a single 64-hex sentinel.
+⚠️ **That is the threat shape itself:** a real pre-freeze ledger carries `prev_hash: "PRE-FREEZE"` —
+**ten characters** — and the freeze sets the genesis to a **tag object id**, not a sha-256 digest, so
+**the fixture as first written did not pin the attack it was written for**. The exhibit now runs over
+five shapes including the literal `PRE-FREEZE` sentinel, a 40-hex tag object id, an empty string and
+a near-neighbour of the sentinel. **`SM-I` re-run after the strengthening: KILLED.**
+
+**Self-directed tally, by FAILING-TEST-ID comparison rather than count deltas** (the clone carries
+constant artefacts and a count delta cannot separate *"changed nothing"* from *"broke one and fixed
+another"*): **KILLED — `SM-C`, `SM-E`, `SM-F`, `SM-G`, `SM-H`, `SM-I`. SURVIVED — `SM-A`, `SM-B`,
+`SM-D`, `SM-F2`.** ⚠️ **The four survivors are named and each is argued rather than waved through:**
+`SM-A` and `SM-B` weaken **this fixture's own assertions**, and such a mutant can only die if a
+*second* test covers the property — **none does, which is `OF-141`'s finding restated, not a new
+gap**, and `SM-G` proves the reason assertion is load-bearing against the *code* by dying when
+`chain.py`'s message is reworded. `SM-D` deletes a check that currently passes, so it breaks nothing
+by construction; **`SM-F2` is its meaningful form and its survival is the evidence that direction 2
+earns its place** — with direction 2 disabled an *added* overclaim (`SM-F`) goes undetected, and with
+it enabled `SM-F` dies.
+
+**THE MUTATION RUN, MEASURED TWICE AND BY TWO DIFFERENT METHODS, BECAUSE THE FIRST HARNESS LIED.**
+
+* **FULL SUITE**, in a fresh clone whose provenance is resolved with the same environment on the
+  same code path before every run: baseline **706 passed, 83 failed, 1 skipped** — the 83 are
+  constant clone artefacts, the clone carrying no `vendor/` and no `.git`. **`CTRL-KILL` +14,
+  `CTRL-LIVE` +1, `CTRL-NOOP` +0**, exactly as each is required to behave. **`M12` +1 KILLED.
+  `M39` +1 KILLED.** Self-directed: `SM-C`, `SM-E`, `SM-F`, `SM-G`, `SM-H`, `SM-I` each **+1
+  KILLED**; `SM-A`, `SM-B`, `SM-D`, `SM-F2` each **+0 SURVIVED**. **POST-RESTORE identical to
+  baseline, every touched file byte-identical to its pre-run bytes, RUN IS VALID.**
+* **FAILING-TEST-ID COMPARISON** over the three files that are the only ones in the repository
+  mentioning the ledger, because a count delta across 83 noisy failures cannot separate *"changed
+  nothing"* from *"broke one and fixed another"*. Baseline failing set **12**. **Every one of the
+  fifteen verdicts is IDENTICAL to the full-suite run**, and each kill names the test that made it:
+  `M12` and `SM-C`/`SM-G`/`SM-H`/`SM-I` die on
+  `test_ENTRY_1s_LINK_TO_THE_GENESIS_ROOT_IS_CHECKED_AND_ITS_BREAK_IS_DETECTED_AT_SEQ_1`; `M39` and
+  `SM-E`/`SM-F` die on `test_the_TAMPER_EVIDENCE_CLAIM_CEILING_IS_STATED_IN_chain_py_AND_IS_NOT_EXCEEDED`.
+
+**MEASURED AT THE BOUNDARY, BY THIS SESSION.** `PYTHONPATH=src python -m pytest tests/ -q` on a
+clean tree, **after** the golden re-cut and **before** this task's fixtures:
+**786 passed, 1 failed, 1 skipped** in 160.62 s. **The one red, attributed BY FILE, is
+`tests/test_lanes_operator_placeholders.py::test_the_camel_branch_is_decided_before_any_camel_run`**
+on the `TODO_C13_RUN1` sentinel — the expected pre-existing red, C13/RUN-1's, **not this session's**,
+and it stays red. ⚠️ **A SECOND RED APPEARS WHENEVER THIS SESSION HAS UNCOMMITTED EDITS AND IS
+DECLARED RATHER THAN HIDDEN:** `tests/test_repo_invariants.py::test_the_object_store_and_the_working_tree_agree`
+compares the working tree to `HEAD`, so it fires on **any** uncommitted change by construction and
+goes green the moment the commit exists. **The final count on the fully committed tree is recorded in
+`docs/sessions/nightrun-c-1.txt`.** `make check-roles`: **17 passed, 0 failed, 5 n/a, exit 0**, E1
+clean over **52** token rows after this task's append. `git status --porcelain tests/goldens/`:
+**EMPTY**. `git status --porcelain vendor/`: **EMPTY**, and `vendor/MANIFEST.md`'s `tau2-bench` pin
+`a2c024725189473d2d7cea3a5cfdbcc67478e41f` matches the on-disk checkout's `HEAD` exactly — **proved,
+not assumed**.
+
+⚠️ **WHAT THIS SESSION DID NOT DO.** It did **not** touch `tests/goldens/` — that was TASK 1's and is
+finished. It did **not** touch `chain.py`, `entry.py`, `build.py`, `control.py` or `store.py`, so **no
+behaviour changed**. It did **not** touch `append_log`. It did **not** edit `OF-57`, `OF-61` or
+`docs/reviews/REVIEW_7_1.md`. It did **not** rewrite `PROCESS.md`, `CLAUDE.md` or
+`docs/reviews/README.md`, which is why `OF-144` and `OF-145` are re-declared as owed rather than
+closed. **No tag was cut and none is owed here — a review, not a fix session, tags `c7-pass`.**
+
+---
+
 ## ARCH — **FIX** — GOLDEN 5B RE-CUT — 2026-09-02 — ⚠️ **C7 REVIEW 1's BLOCKER `B-1` UPHELD AND CLOSED. THE ARCHITECT'S OWN ANSWER KEY CARRIED A VALUE INFERRED BY THE RULE THIS PROJECT FORBIDS IN CAPITALS**
 
 **SESSION-TOKEN:** `3e5b7c10` · Row **52** of `QUESTIONS.md`'s `## Session tokens` table, counted

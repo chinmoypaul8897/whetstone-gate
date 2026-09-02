@@ -1,3 +1,71 @@
+*⚠️ **UPDATE, C7 FIX 1 (`8ad4f629`), 2026-09-02 — `REVIEW_7_1`'s THREE FIX-SESSION GATE FINDINGS
+ARE CLOSED: `B-2`, `H-1`/`OF-141` and `H-2`/`OF-142`. NO TAG — THIS IS NOT A REVIEW SESSION. ZERO
+PROVIDER MODEL CALLS.** `B-1` was the ARCHITECT'S and is closed separately at `8558639` by this
+night run's ARCH FIX task (`3e5b7c10`).
+⚠️ **C7's BEHAVIOUR WAS MEASURED CORRECT BY THE REVIEW ON EVERYTHING IT COULD DRIVE — 45 vectors,
+ZERO divergences, 35 of 39 mutants killed — SO NOTHING THAT WORKS WAS REWRITTEN.** These were
+coverage and claim defects. **`chain.py`, `entry.py`, `build.py`, `control.py` and `store.py` are
+UNTOUCHED**; the whole fix is **two fixtures in `tests/test_c7_ledger.py`** and **three appended rows
+in `docs/reviews/OPEN_FINDINGS.md`**.
+**(1) `H-1` / `OF-141` / mutant `M12` — entry 1's link to the genesis root.** New fixture
+`test_ENTRY_1s_LINK_TO_THE_GENESIS_ROOT_IS_CHECKED_AND_ITS_BREAK_IS_DETECTED_AT_SEQ_1`. It edits
+entry 1's `prev_hash` **alone**, leaving the stored `hash` correct — which the integrity check cannot
+see, because `prev_hash` is excluded from the canonicalised entry — and asserts **DETECTED at seq 1
+with the link as the reason**. ⚠️ **AND IT CARRIES THE CONTROL THE REVIEW NAMED:** a *whole* entry 1
+forged from a different root, `prev_hash` **and** `hash` both recomputed, is DETECTED by HEAD **and
+by M12 alike**, so a fixture resting on that shape would prove nothing. Both are asserted with their
+reasons, and the fixture proves the discriminating property directly — the link-only exhibit's
+contents **still** hash to its stored digest from the real genesis, and the forged one's do not.
+**`M12` RE-RUN: KILLED.**
+**(2) `H-2` / `OF-142` / mutant `M39` — the tamper-evidence claim ceiling.** New fixture
+`test_the_TAMPER_EVIDENCE_CLAIM_CEILING_IS_STATED_IN_chain_py_AND_IS_NOT_EXCEEDED`, built on the
+pattern this chunk already used ten lines away — `test_Q069_…` **parses** the docstring out of the
+AST rather than trusting it, and that is what killed `M38`. It checks **both directions**: that the
+ceiling is stated in ruling 4's own words, **and** that it is not exceeded — every occurrence of an
+overclaiming sentence must sit within 200 characters of a disclaimer, which is how the honest
+docstring can quote the false sentence in order to reject it while `M39`'s replacement, which quotes
+it to assert it, is caught. **`M39` RE-RUN: KILLED.**
+**(3) `B-2` — `OF-57`'s row claims more tamper-evidence than the chain delivers.** ⚠️ **A CORRECTION
+ROW IS APPENDED AS `OF-157`; `OF-57`'s ORIGINAL TEXT IS NOT REWRITTEN** — `docs/reviews/` is
+append-only. The two undetected shapes are stated **exactly as `chain.py` already states them**,
+because the review measured `chain.py` as correct and `OPEN_FINDINGS.md` as the artefact that
+overclaims. **`OF-57` and `OF-61` stay OPEN as accepted limitations**, which is what ruling 4 makes
+them.
+⚠️ **`M16` / `OF-143` IS LEFT OPEN AND IS NOT FIXED, AND THE ARGUMENT IS ON THE RECORD AS `OF-158`**
+rather than performed by silence. Four candidates for making it owned were checked and each falls
+short, and **one argument is added that the review did not make: `M16`'s loss is silent ONLY through
+`OF-57`**, which ruling 4 forbids failing C7 on — so holding the tag on it would be failing C7 on
+`OF-57` at one remove. **`append_log` was not touched.** **`OF-144` and `OF-145` are the
+ARCHITECT'S** — `PROCESS.md`, `CLAUDE.md` and `docs/reviews/README.md` are outside every fix
+session's fence — and are re-declared as owed in `OF-158`.
+⚠️ **THE MUTATION RUN, AND ITS OWN FAILURE, WHICH IS `INC-69`.** The first harness built the
+environment that pins it to the clone and **never passed it to `subprocess.run`**, so every suite ran
+against the **LIVE** repository and reported `M12`, `M39` **and** `SM-A` SURVIVED at `delta +0` —
+`INC-64` exactly, in the session that had just read it, **with all four required provenance lines
+printing TRUE because the probe and the guard ran in different subprocesses from the measurement**.
+Caught by distrusting three impossible numbers, not by any check. **Fixed:** provenance is now
+resolved with the same environment on the same code path immediately before every suite run, and
+**two POSITIVE controls were added** — `CTRL-KILL` (`sort_keys` flipped, which golden 5 must kill:
+**+14 failures**) and `CTRL-LIVE` (a bare `assert False` in the new fixture: **+1**) — beside the
+negative `CTRL-NOOP` (**+0**, as required). **`OF-159` records the general finding: this project's
+mutation discipline has negative controls everywhere and positive controls nowhere.**
+⚠️ **TEN SELF-DIRECTED MUTANTS BEYOND `M12` AND `M39`, AND ONE OF THEM FOUND A REAL DEFECT IN THIS
+SESSION'S OWN REMEDY.** **`SM-I` SURVIVED the first version of the `H-1` fixture** — it skips the
+link check at entry 1 **only when `prev_hash` is NOT 64 hex**, and the fixture used a single 64-hex
+sentinel. ⚠️ **That is the THREAT SHAPE ITSELF:** a real pre-freeze ledger carries
+`prev_hash: "PRE-FREEZE"` — **ten characters** — and the freeze sets the genesis to a tag object id,
+so the fixture as first written **did not pin the attack it was written for**. The exhibit now runs
+over five shapes including the literal `PRE-FREEZE` sentinel and a 40-hex tag object id. **`SM-I`
+RE-RUN AFTER THE STRENGTHENING: KILLED.**
+**Final self-directed tally (failure-SET comparison, not count deltas):** `SM-C`, `SM-E`, `SM-F`,
+`SM-G`, `SM-H`, `SM-I` **KILLED**; `SM-A`, `SM-B`, `SM-D`, `SM-F2` **SURVIVED**. ⚠️ **The four
+survivors are named and none is a defect in the fix, which is argued rather than asserted:** `SM-A`
+and `SM-B` weaken **this fixture's own assertions**, and such a mutant can only die if a *second*
+test covers the property — none does, which is `OF-141`'s finding restated rather than a new gap.
+`SM-D` deletes a check that currently passes, so it breaks nothing by construction; **`SM-F2` is the
+meaningful form and its survival is the evidence that DIRECTION 2 earns its place** — with DIRECTION
+2 disabled, an *added* overclaim (`SM-F`) goes undetected, and with it enabled `SM-F` dies.*
+
 *⚠️ **UPDATE, ARCH FIX (`3e5b7c10`), 2026-09-02 — GOLDEN 5B IS RE-CUT. C7 REVIEW 1's BLOCKER `B-1`
 IS UPHELD AND CLOSED. NO TAG — THIS IS NOT A REVIEW SESSION. ZERO PROVIDER MODEL CALLS.**
 ⚠️ **THIS BLOCK SUPERSEDES THE `6f3a91d2` BLOCK BELOW IT ON TWO FIGURES AND ONE CLAIM, AND THAT

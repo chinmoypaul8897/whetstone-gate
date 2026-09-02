@@ -5319,3 +5319,121 @@ session's fence. Until it is a rule it is one session's habit, which is precisel
 about the last four of these. ⚠️ **`Q-063` clause (iii)'s E6 remains OPEN and assigned to C11**, and
 this incident does not close it: E6 catches the sweep afterwards, a private index prevents it.
 **Recorded as `OF-156`.**
+
+---
+
+## INC-69 — the mutation harness built the environment that pins it to the clone and then DID NOT PASS IT to `subprocess.run`, so every suite ran against the LIVE repository and reported the two mutants this session exists to kill as SURVIVED — `INC-64` exactly, in the session that had just read it, with the provenance check passing because it ran in a different subprocess from the measurement
+
+**Date:** 2026-09-02 (C7 FIX 1, `8ad4f629`. **Found by this session**, before any result was written to
+an artefact, by refusing a suspicious number rather than by any check. Fix SHA under **Fix**.)
+
+**Event:** the harness's `run_pytest` read:
+
+```python
+def run_pytest(cwd):
+    env = dict(os.environ)
+    env["PYTHONPATH"] = str(cwd / "src")     # built
+    env["PYTHONIOENCODING"] = "utf-8"
+    p = subprocess.run([... "pytest" ...], cwd=cwd,
+                       capture_output=True, text=True)   # <- and never passed
+```
+
+**`env` is constructed and then discarded.** Every suite therefore ran under the parent
+environment and resolved `whetstone_gate` to the **live repository**, not to the clone the
+mutations were being written into. The run printed, at the top, exactly what `OF-139` requires:
+
+```
+whetstone_gate.__file__   <clone>\src\whetstone_gate\__init__.py
+config.repo_root()        <clone>
+both resolve INSIDE the clone                        True
+the repository's OWN OF-139 guard, run in the clone  PASS
+```
+
+⚠️ **All four lines are true and none of them is about the measurement.** The provenance probe and
+the `OF-139` guard were each launched in their **own** `subprocess.run`, and **those two calls did
+pass `env=`**. So the harness proved the clone was importable from the clone and then measured
+something else.
+
+**The result it produced, and would have published:**
+
+```
+BASELINE  786 passed, 3 failed, 1 skipped
+M12   SURVIVED  786 passed, 3 failed (delta +0)   <- the review's own M12
+M39   SURVIVED  786 passed, 3 failed (delta +0)   <- the review's own M39
+SM-A  SURVIVED  786 passed, 3 failed (delta +0)
+```
+
+**Both are in fact KILLED.** Driven directly in a second, independent clone: with `M12` applied,
+`chain.verify` returns `VALID` on the link-only exhibit and
+`test_ENTRY_1s_LINK_TO_THE_GENESIS_ROOT_IS_CHECKED_AND_ITS_BREAK_IS_DETECTED_AT_SEQ_1` **FAILS**,
+which is the mutant dying.
+
+**Action:** the running sweep was **stopped** rather than allowed to finish, because every number it
+would produce was worthless in the flattering direction. ⚠️ **Stopping it reproduced `INC-57`'s
+hazard immediately and that was checked rather than assumed:** the clone was left holding a mutation
+in `tests/test_c7_ledger.py` — measured by SHA-256 against the live tree, `chain.py` SAME and
+`test_c7_ledger.py` **DIFFERS** — and was restored by **copying the live bytes and re-hashing**,
+never by `git checkout`. `run_pytest` now (a) passes `env=env`, and (b) calls `_assert_provenance`
+**on the same code path, immediately before every suite run**, resolving
+`whetstone_gate.ledger.chain.__file__` with the identical environment and aborting if it is outside
+the clone. **And two POSITIVE CONTROLS were added in the direction that would have caught this in
+one line** — `CTRL-KILL` (`sort_keys=True` → `False`, which golden 5 must kill) and `CTRL-LIVE` (a
+bare `assert False` inside the new fixture, which proves the clone's **test** file is the one being
+run) — beside the negative `CTRL-NOOP` that must survive. **A run where `CTRL-KILL` or `CTRL-LIVE`
+survives is VOID.**
+
+**Expectation:** this session's own prompt, in capitals: *"MUTATION HARNESS, BOTH FLATTERING
+DIRECTIONS: set PYTHONPATH, PRINT `whetstone_gate.__file__` and `config.repo_root()`, and run the
+repository's own OF-139 guard inside the clone."* ⚠️ **Every one of those four instructions was
+followed, and the run was still wrong**, because all four constrain a *probe* and none of them
+constrains the *measurement*. The instruction is right and it is not sufficient, and that is the
+finding rather than an excuse.
+
+**Missing:** ⚠️ **A POSITIVE CONTROL. `OF-139`'s guard and the printed paths can only fail one way —
+they detect a clone that is not importable, and they are silent about a suite that imports something
+else.** The review this session is fixing ran **three no-op CONTROL mutants and required all three to
+SURVIVE**, which distinguishes *"a suite that kills mutants"* from *"a harness that reports KILLED
+unconditionally"* — and has **no counterpart in the other direction**, so it cannot distinguish *"a
+suite that spares an equivalent mutant"* from *"a harness measuring the wrong tree"*. **One mutant
+that MUST die would have failed in the first sixty seconds of the run.** Negative controls were
+present and were followed; the positive control that this class needs was in nobody's harness,
+including the review's.
+
+**Missed:** ⚠️ **`INC-64` is titled *"a mutation run inside a fresh clone tested the LIVE repository,
+so every mutant would have been reported SURVIVED"*, it is dated YESTERDAY, and this session read it
+— then wrote `env` on one line and omitted it on the next.** `OF-139`'s own residual says the rest
+out loud: *"a reviewer who never runs `make test` inside the clone still gets no warning"*, and the
+two remains it lists — a `docs/reviews/README.md` paragraph and a `make mutate-clone` target doing
+the three set-up steps — are **still not landed**, so every session rebuilds this harness by hand and
+gets a fresh chance to make this exact omission. ⚠️ **And the signal in the data was loud:** `M12`
+and `M39` came back `delta +0` **on the two mutants a whole adversarial review had already
+demonstrated survive-then-die**, and `SM-A` — which deletes an assertion from a test that was
+*passing thirty seconds earlier in this same session* — also read `+0`. **Three impossible readings
+in a row.** Nothing flagged them; a human distrusted them.
+
+**Diagnosis:** the provenance evidence and the measurement ran in different subprocesses with
+different environments, so the evidence was true and irrelevant. A guard that does not execute on the
+same path as the thing it guards proves only that the guard works.
+
+**Fix:** ⚠️ **THE HARNESS ITSELF HAS NO SHA, AND SAYING SO IS MORE HONEST THAN NAMING ONE.** It is
+throwaway work in a fresh OS temp directory, which `CLAUDE.md` §4 requires and which means it is
+**not in the repository** — `INC-65` set the precedent for a `Fix:` field that records this rather
+than inventing a commit. What **is** committed is the consequence: **`464c587`**, the strengthened
+`H-1` fixture that the corrected harness's `SM-I` forced, read from `git rev-parse` after the commit
+existed. **The two facts a reader needs are therefore both checkable:** the defect produced no
+repository change because the defective code was never in the repository, and the *repair* produced
+one because a working harness immediately found something the broken one could not.
+
+**Systemic guardrail:** ⚠️ **ONE, LANDED IN THIS SESSION'S OWN HARNESS, AND ONE STILL OWED AND NOT
+THIS FENCE'S.** **Landed:** every suite run is now preceded, in the same function and with the same
+environment object, by a resolution of the module under mutation, and a resolution outside the clone
+is a hard abort — plus the two positive controls above, either of whose survival VOIDS the run.
+**Owed, and it is the real remedy:** `OF-139`'s **`make mutate-clone`** target, which would do the
+three set-up steps once, correctly, for every session, instead of each session hand-rolling
+`subprocess.run` and getting one more chance at this. **The `Makefile` is outside this session's
+fence**, `OF-139` names it as not landed, and **this is now the second session in two days to be bitten
+by the gap that target exists to close**. ⚠️ **AND THE HONEST GENERALISATION, which is bigger than
+this harness: this project's mutation discipline has negative controls everywhere and positive
+controls nowhere.** Every review that has run mutants here required no-op mutants to SURVIVE and none
+required a blatant mutant to DIE. **That asymmetry is exactly the shape of `INC-64` and of this
+entry, and it should be a rule rather than one session's habit** — recorded as **`OF-159`**.

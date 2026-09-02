@@ -1909,3 +1909,107 @@ session being swept"* stands, and remains unclosed. It does not remove the need 
 catches after the fact what the index closes before it. And this session's own three commits swept
 nothing by the read-side check, so the discipline `Q-063` installed is **working in the direction it
 was built for** and is not weakened here; what is added is the direction it was never built for.
+
+---
+
+## ⚠️ Appended by C7 FIX 1 (`8ad4f629`), 2026-09-02 — `OF-157`, the CORRECTION ROW that closes `B-2`. ⚠️ `OF-57`'s ORIGINAL ROW IS NOT REWRITTEN
+
+**ONE ROW, `OF-157`. The id is counted from THIS FILE, re-read immediately before the append** —
+the highest entry at that moment was **`OF-156`**, landed at `1c597d4` by this night run's ARCH FIX
+task (`3e5b7c10`).
+
+⚠️ **THIS IS A CORRECTION APPENDED, NOT AN EDIT.** `C7 REVIEW 1`'s `B-2` names three false claims in
+**`OF-57`'s** row. **That row's text is left exactly as its raising session wrote it** — this
+directory is append-only, and `docs/reviews/README.md`'s own rule that *"a FAIL that is not in the
+repository did not happen"* applies to a wrong sentence as much as to a verdict. ⚠️ **AND THE COST OF THAT IS NAMED RATHER THAN
+GLOSSED: a reader who stops at `OF-57` never reaches this row.** No pointer is added to `OF-57`'s
+Status cell, because adding one would be the rewrite the remedy forbids. **The mitigation is that
+`chain.py` — which is what a C19 or C20 session actually reads when it writes the README — has been
+correct all along and is now PINNED by a test**, so the wrong sentence can no longer propagate from
+the code. Whether an append is enough for a published findings table is a **question for the
+architect**, and it is left open here rather than answered by a fix session widening its own fence.
+
+⚠️ **AND THE SUBJECT OF THE CORRECTION IS THE PUBLISHED ROW, NOT THE CODE.** `REVIEW_7_1.md` §13.1
+measured `chain.py` as **correct**: it names *"exactly two shapes"*, it names the re-derived suffix,
+and it states the ceiling in the architect's own words. **`OPEN_FINDINGS.md` is the artefact that
+claims more than the chain delivers**, and it is the sentence a C19 or C20 session copies into the
+README. **The two undetected shapes below are stated exactly as `chain.py` already states them,
+because `chain.py` is the one that got it right.**
+
+| ID | Chunk | Severity | Finding | Spec citation | Raised by | Status | Closed by (SHA) |
+|---|---|---|---|---|---|---|---|
+| **OF-157** | C7 | LOW — **a CORRECTION to `OF-57`, not a new defect** | ⚠️ **`OF-57`'s ROW CLAIMS MORE TAMPER-EVIDENCE THAN THE CHAIN DELIVERS, IN THREE PLACES, AND `OF-61` REPEATS THE CEILING.** Measured against `REVIEW_7_1.md`'s own vectors `V09` and `V10` and against this repository's two limitation tests. **(1)** *"truncation is **the one** mutation the chain cannot see"* — **FALSE.** There are **two**. **(2)** *"deletion from the MIDDLE and **any alteration** break it and are DETECTED"* — **FALSE**: a **re-derived suffix IS an alteration** and is **not** detected. **(3)** *"Until then *'tamper-evident'* means **against modification**, and against deletion anywhere but the end"* — **FALSE, and it is the ceiling sentence**: a re-derived suffix is a modification. ⚠️ **Neither `OF-57` nor `OF-61` contains the words *re-derived* or *suffix*** — the row predates the second shape's identification, `chain.py` caught up and the published row did not. **THE CORRECTED STATEMENT, IN `chain.py`'s OWN WORDS, WHICH ARE THE RIGHT ONES:** what `verify` detects is a **STALE DIGEST** — an entry whose stored `hash` no longer matches its contents, or whose stored `prev_hash` no longer matches where the chain has reached. **What is NOT caught is any edit that leaves NO stale digest, and there are EXACTLY TWO SHAPES of it**, both the same fact — *nothing commits to the END of the chain*: **(a) TRUNCATION** — dropping entries from the tail leaves a shorter chain that is internally perfect and `verify` returns `VALID`, correctly, because every entry still present really does hash to its stored digest from the root the document names; **(b) A RE-DERIVED SUFFIX** — altering entry *k* and then recomputing the digests of *k* onward produces a chain that also verifies. ⚠️ **So *"any alteration is detected"* is FALSE and is not claimed:** what is detected is *an alteration that is not followed through*, which is what a careless edit looks like and is not what a determined one does. **THE CEILING, VERBATIM FROM THE ARCHITECT'S C7 REVIEW 1 RULING 4:** *"the ledger is tamper-evident"* means **evident against an edit that leaves a stale digest, and against nothing else** — **and the README must not say more.** ⚠️ **`OF-57`'s and `OF-61`'s REMEDY IS UNCHANGED AND IS STILL THE RIGHT ONE**, and it closes both shapes at once: an external commitment to each episode's **head hash, entry count and seed** — `PROCESS.md` §6a's own answer to a forgeable git timestamp, *witness it outside this repository*. **NOT A NEW DEFECT AND NOT A REGRESSION:** the limitation was always real and always disclosed in `chain.py`; what was wrong was the published row's description of its extent. ⚠️ **AND THE CEILING IS NOW PINNED BY A TEST** — `test_the_TAMPER_EVIDENCE_CLAIM_CEILING_IS_STATED_IN_chain_py_AND_IS_NOT_EXCEEDED`, which parses `chain.py`'s docstring out of the AST and checks **both** that the ceiling is stated and that it is not exceeded (`OF-142`, mutant `M39`). | `PROCESS.md` §5.1, §6a; hard rule 11; the architect's C7 REVIEW 1 ruling 4; `docs/reviews/REVIEW_7_1.md` §13.1 (`B-2`); `src/whetstone_gate/ledger/chain.py` docstring | **C7 REVIEW 1 (`472cdc4b`)** as `B-2`, corrected by **C7 FIX 1 (`8ad4f629`)** | ✅ **CLOSED — this row IS the correction. `OF-57` and `OF-61` remain OPEN as LIMITATIONS**, which is what ruling 4 makes them | *(this append)* |
+
+⚠️ **WHAT THIS ROW DOES NOT DO, SAID SO THE SCOPE IS NOT READ WIDER.** It does **not** close `OF-57`
+or `OF-61`: both stay **OPEN** as accepted limitations, because ruling 4 says in terms *"OF-57 AND
+OF-61 ARE ACCEPTED AND PUBLISHED AS LIMITATIONS, NOT DEFECTS … DO NOT FAIL C7 ON EITHER."* What is
+closed is **`B-2`** — the row claiming more than the chain delivers. It does **not** edit `OF-57`'s
+or `OF-61`'s text, and it does **not** touch `docs/reviews/REVIEW_7_1.md`. And it does **not** add an
+end anchor: the chain's behaviour is unchanged by this fix session and was measured correct.
+
+---
+
+## ⚠️ Appended by C7 FIX 1 (`8ad4f629`), 2026-09-02 — `OF-158`, and `OF-143` DELIBERATELY LEFT OPEN with the argument for leaving it
+
+**ONE ROW, `OF-158`. The id is counted from THIS FILE, re-read immediately before the append** —
+the highest entry at that moment was **`OF-157`**, this session's own, one commit earlier.
+
+⚠️ **`OF-143` (mutant `M16`, `append_log`'s all-or-nothing batch semantics) IS LEFT **OPEN** AND IS
+NOT FIXED, WHICH IS A DECISION AND IS ARGUED HERE RATHER THAN PERFORMED BY SILENCE.** The remedy is
+one fixture and would have cost this session ten minutes; that is exactly why the reason for not
+writing it has to be on the record. **C7 REVIEW 1 marked it NOT OWNED** against the sealed criterion
+2 — *no artefact that outranks the code requires it* — and this session **re-tested that disposition
+rather than inheriting it**, because a fix session accepting a "not yours" is the cheapest possible
+mistake to make.
+
+**The four candidates that could have made it owned, each checked and each falling short:**
+
+1. **`CONTEXT.md` §16** says *append-only, hash-chained* and says nothing about batches. **No.**
+2. **Hard rule 10** — *"resumable (atomic writes, publish-on-complete)"*. This binds the **file**,
+   and `store.write` already satisfies it: it writes a temporary and calls `os.replace`, which is
+   atomic on POSIX and Windows alike, so a reader never sees a half-written document. A `Ledger`
+   **object** holding two of three entries is not a publication. **No.**
+3. **Hard rule 11** — *"no silent denominator shrinkage … a truncated episode is counted in the
+   denominator."* This is the nearest candidate and it is the one worth taking seriously. It does not
+   reach: a **caller-supplied bad row is not a dropped episode**, and the caller gets the refusal
+   under `M16` exactly as it does under HEAD. **No.**
+4. **The builder's own docstring**, which argues the choice as a Class B deviation. Hard rule 2 makes
+   a Class B choice *"recorded with rationale, judged at review"* — and the review judged it. A
+   rationale in a docstring is **the code**, not an artefact outranking it. **No.**
+
+⚠️ **AND ONE ARGUMENT THIS SESSION ADDS THAT THE REVIEW DID NOT MAKE, BECAUSE IT CUTS THE SAME WAY
+AND IS STRONGER.** `M16`'s loss is silent **only** because a short ledger **verifies** — and that is
+`OF-57`, whose status the architect's **C7 REVIEW 1 ruling 4** settles in terms: *"OF-57 AND OF-61
+ARE ACCEPTED AND PUBLISHED AS LIMITATIONS, NOT DEFECTS … **DO NOT FAIL C7 ON EITHER**."* **So `M16`'s
+consequence is realised entirely through a limitation the ruling forbids failing C7 on**, and holding
+the tag on it would be failing C7 on `OF-57` through one level of indirection. **That is the
+disposition, and it is now argued from the ruling rather than only from the sealed criteria.**
+
+⚠️ **WHAT WOULD CHANGE IT, NAMED SO THE ROW IS ACTIONABLE RATHER THAN MERELY DEFENDED:** if any later
+artefact — a C8 or C9 card, a ruling, or a golden — requires an episode's ledger to be written in one
+pass, `M16` becomes owned immediately and the fixture `OF-143` names (*a batch whose last row is
+invalid, asserting `len(ledger) == 0` after the refusal*) is the whole remedy. **It stays OPEN,
+MEDIUM, and this session did not touch `append_log`.**
+
+| ID | Chunk | Severity | Finding | Spec citation | Raised by | Status | Closed by (SHA) |
+|---|---|---|---|---|---|---|---|
+| **OF-158** | *(process)* | LOW | ⚠️ **TWO FINDINGS FROM `REVIEW_7_1` ARE THE ARCHITECT'S AND ARE RE-DECLARED AS OWED, BECAUSE A FIX SESSION'S FENCE CANNOT REACH THEM AND AN UNCLAIMED FINDING IS AN ABANDONED ONE.** **(a) `OF-144`** — `PROCESS.md` §12.1's C7 done-when ends *"and the C7 review either raises the seeded defect as a BLOCKER or the review process is declared broken and building halts"*, and the architect states directly that **no C7 build prompt carried a seeded defect**; the clause is **unsatisfiable as written**. The ruling (recorded verbatim in `QUESTIONS.md` under `## RULINGS RECORDED BY C7 REVIEW 1`) is that §5.4's test **DID NOT RUN AT C7**, the clause is **corrected**, and the test **RELOCATES** to a chunk that is not named. **`PROCESS.md` §12.1's C7 row and `docs/reviews/README.md`'s *"C7, the ledger, is the SEEDED-DEFECT CHUNK"* paragraph both still say otherwise in the repository today.** **(b) `OF-145`** — `CLAUDE.md` §1 makes `STATUS.md` item **4** of every session's mandatory read order and no `full`-review prompt's DO-NOT-READ list names it, so a chunk's own ~5,000-word `STATUS.md` row lands **inside the blind Phase 1**; C7's narrates all three build rounds, `INC-32`…`INC-38`, the two `capture_payment` digests and the mutant counts. **It reaches every future `full` review, not only C7's.** ⚠️ **BOTH REMEDIES TOUCH `PROCESS.md`, `CLAUDE.md` or `docs/reviews/README.md`, ALL THREE OUTSIDE EVERY FIX SESSION'S FENCE**, so this row exists to keep them attached to an owner rather than to fix them. ⚠️ **AND THE CONSEQUENCE OF (a) FOR HOW `REVIEW_7_1`'s FAIL IS READ, restated so nobody claims more than happened:** the gate went red on that review's **own** findings, which is **weaker evidence than a planted red**, and this session's FIX does not turn it into one. | `PROCESS.md` §5.4, §12.1's C7 row; `CLAUDE.md` §1; `docs/reviews/README.md`; `docs/reviews/REVIEW_7_1.md` §13.2, §13.3 | **C7 REVIEW 1 (`472cdc4b`)**, re-declared as OWED by **C7 FIX 1 (`8ad4f629`)** | ⚠️ **OPEN — the ARCHITECT'S, both halves** | — |
+
+---
+
+## ⚠️ Appended by C7 FIX 1 (`8ad4f629`), 2026-09-02 — `OF-159`, the asymmetry `INC-69` found in every mutation run this project has ever done
+
+**ONE ROW, `OF-159`. The id is counted from THIS FILE, re-read immediately before the append** —
+the highest entry at that moment was **`OF-158`**, this session's own.
+
+| ID | Chunk | Severity | Finding | Spec citation | Raised by | Status | Closed by (SHA) |
+|---|---|---|---|---|---|---|---|
+| **OF-159** | *(process)* | ⚠️ **HIGH** | **THIS PROJECT'S MUTATION DISCIPLINE HAS NEGATIVE CONTROLS EVERYWHERE AND POSITIVE CONTROLS NOWHERE, AND THAT ASYMMETRY IS THE SHAPE OF `INC-64` AND `INC-69`.** Every mutation run here has required **no-op mutants to SURVIVE** — `REVIEW_7_1.md` §12 ran three and says why: it distinguishes *"a suite that kills mutants"* from *"a harness that reports KILLED unconditionally"*. ⚠️ **No run has ever required a BLATANT mutant to DIE**, and that is the direction in which a harness measuring the **wrong tree** looks perfect: `OF-139`'s guard and the printed `whetstone_gate.__file__` / `config.repo_root()` lines can only fail one way — they detect a clone that is not *importable*, and are silent about a suite that imports **something else**. **Demonstrated, not hypothesised:** `INC-69`'s harness printed all four required provenance lines truthfully and still ran every suite against the live repository, reporting `M12`, `M39` **and** `SM-A` as SURVIVED at `delta +0` when all three are KILLED — three impossible readings in a row, caught by a human distrusting them and by no check. **`INC-64` is the same failure one day earlier, in a different session's harness.** **REMEDY, TWO PARTS.** ⚠️ **(1) A POSITIVE CONTROL IS MANDATORY IN EVERY MUTATION RUN: at least one mutant that MUST DIE, and a run in which it survives is VOID and unscored** — exactly the standing of the existing rule that a run whose post-restore control is not green is VOID. This session's harness carries two (`CTRL-KILL`, `sort_keys=True`→`False`, which golden 5 must kill; and `CTRL-LIVE`, a bare `assert False` inside the new fixture, which proves the clone's **test** file is the one being run) and it would have caught `INC-69` **in the first sixty seconds**. ⚠️ **(2) The provenance check must execute on the SAME CODE PATH and with the SAME environment object as the measurement.** `INC-69`'s probe and guard each passed `env=`; the measurement did not, so the evidence was true and irrelevant. **A guard that runs in a different subprocess from the thing it guards proves only that the guard works.** ⚠️ **AND THE STRUCTURAL FIX IS ALREADY NAMED AND STILL NOT LANDED: `OF-139`'s `make mutate-clone` target**, which would do the set-up once, correctly, for every session, instead of each session hand-rolling `subprocess.run` and getting one more chance at this. **The `Makefile` is outside every recent fence**, and **this is the second session in two days bitten by the gap that target exists to close.** | `INCIDENTS.md` INC-57, INC-58, INC-64, INC-69; `OF-139`; `PROCESS.md` §5.3; `docs/reviews/README.md` | **C7 FIX 1 (`8ad4f629`)**, from its own harness failing | ⚠️ **OPEN — HIGH. Parts (1) and (2) are the ARCHITECT'S to make a rule; `make mutate-clone` is `OF-139`'s residual** | — |
+
+⚠️ **AND WHAT THIS ROW DOES NOT CLAIM.** It does **not** say any published mutation result on this
+project is wrong. `REVIEW_7_1.md` §12's sweep carried its own integrity block, its three no-op
+controls behaved as required, and its `M12` and `M39` survivors were **independently confirmed by
+this session** — `M12` by driving the exhibit and `M39` by reading the docstring — so that review's
+numbers stand. What is claimed is that **nothing in the discipline would have caught it if they had
+not**, which is the same thing `Q-082` says about an unpinned guard: *"clean today is exactly what an
+unpinned guard cannot promise tomorrow."*
