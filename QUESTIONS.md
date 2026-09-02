@@ -92,6 +92,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `363a2e9f` | C6 | FIX | 2026-09-02 |
 | `e9dd0346` | C13 | FIX | 2026-09-02 |
 | `ca0dd160` | C6 | REVIEW | 2026-09-02 |
+| `7a1e6c84` | C13 | REVIEW | 2026-09-02 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -780,6 +781,41 @@ before this append: 44 data rows, lines 50–93, `e9dd0346` last. So this is row
 session started — `e9dd0346`'s row and its paragraph — **was committed by its own session at
 `bd2107f` before this session staged anything**, verified by `git status --porcelain` reading clean
 for `QUESTIONS.md` immediately beforehand. `Swept:` verified on the **STAGED SNAPSHOT**
+(`git diff --cached -- QUESTIONS.md`), never on the working tree (`INC-48`).
+
+⚠️ **AND `7a1e6c84` IS ROW 46, REGISTERED BEFORE THIS SESSION'S PHASE-1 SEAL.** C13 **REVIEW 4**,
+2026-09-02, after C13 FIX 3 (`e9dd0346`) closed `REVIEW_13_3`'s five survivors. Its prompt:
+*"REGISTER YOUR TOKEN ROW **BEFORE** THE SEAL. Declare your leaks in the seal, as the last four
+reviews did. Number FROM THE TABLE; see INC-54 on printed-vs-data row count."*
+⚠️ **RE-COUNTED FROM THE FILE AT THIS MOMENT, NOT INHERITED AND NOT CARRIED FORWARD.** The paragraph
+immediately above counted **44 data rows** and made `ca0dd160` row 45; that count was correct **when
+it was taken** and was already stale by the time this session read it, because `ca0dd160`'s own row
+had since landed. **A SESSION A IS RUNNING CONCURRENTLY** — this session's prompt names it, on
+`src/whetstone_gate/attacker/`, `tests/test_c6_*.py`, `PROCESS.md`, `INCIDENTS.md` and `STATUS.md` —
+so a count carried forward from any earlier paragraph would have been wrong the moment it appended.
+**Counted immediately before this append: 45 data rows, lines 50–94, `ca0dd160` last. So this is
+row 46.**
+
+* ⚠️ **THE TWO NUMBERS ARE DIFFERENT AND THIS SESSION SAYS WHICH IT COUNTED — `INC-54` is exactly
+  about not doing so.** **46 is the DATA-ROW count.** `make check-roles` prints **one fewer**,
+  because `check_roles._TOKEN_ROW` requires an 8-hex token **and** a `(C\d+|ARCH)` chunk cell, and
+  the `WG-2026-08-30-CTX-13.4-A` row matches neither. **MEASURED after the append by running the
+  command and reading its output, never derived from the row count:** the figure is recorded in this
+  session's `PROGRESS.md` entry and FINAL OUTPUT beside the command that produced it. `46 − 1 = 45`,
+  and it reconciles with `ca0dd160`'s `45 − 1 = 44` and `e9dd0346`'s `44 − 1 = 43`.
+* **Self-record ordinal, CARRIED rather than re-derived, and labelled so.** Using this section's own
+  stated constant — *"the 15 nobody self-recorded"* — `46 − 15 = 31`, so this is the **thirty-first
+  self-recorded row and the thirtieth to carry a paragraph**, the gap of exactly one still being
+  `9c0c6734`'s uncounted row. ⚠️ **This session did NOT independently re-derive the 15**; it counted
+  the data rows, which is the number its own ordinal turns on, and says plainly which of the two it
+  measured.
+* ⚠️ **ORDINALS 11, 12 AND 18 REMAIN ASSERTED BY NO PARAGRAPH** (`df238be6`, `0852ea56`,
+  `9c0c6734`) and are **not this session's to close** — this session's prompt says so in terms.
+* ⚠️ **`check_roles.py` COUNTING THIS TABLE ITSELF IS STILL OWED — `OF-67`, `OF-70`, `OF-78`, the
+  SEVENTEENTH consecutive session to carry the total by hand.** `check_roles.py` is named under
+  **NOT** in this session's fence, and a REVIEW session fixes nothing in any case.
+
+**No other session's line was touched by this append.** `Swept:` verified on the **STAGED SNAPSHOT**
 (`git diff --cached -- QUESTIONS.md`), never on the working tree (`INC-48`).
 
 ## ⚠️ THE TOKEN BATCH, 2026-08-31 — and this is what ends the collision class
@@ -7324,6 +7360,13 @@ print a false statement about commits that do carry a trailer, and this time the
 **Raised by:** C6 REVIEW 4 (`ca0dd160`) · **Date:** 2026-09-02 · **Status:** ⚠️ **OPEN — NOT
 blocking; the written bar was applied as written and the verdict is FAIL** · **Class:** **A** — it
 decides a `cN-pass` tag, and it will decide C6's next one and every re-review after it.
+> ⚠️ **SUPERSEDED, 2026-09-02: THIS ENTRY IS NOW RULED.** The status line above is **kept as
+> `ca0dd160` wrote it and is not overwritten** — it is the historical record of what was true when
+> the question was raised. **The ruling is at the foot of this entry**, recorded verbatim by C13
+> REVIEW 4 (`7a1e6c84`) before anything else in that session was read, and it **binds every review
+> from here**. This marker sits directly beneath the line it corrects, and not at the end, because
+> `CLAUDE.md` §1 makes this file item **6** of every session's mandatory read order and a reader who
+> stops at the status line would act on a superseded one.
 
 **Context, stated as a measurement rather than as a worry.** `docs/reviews/README.md`: *"PASS
 requires ALL of: every golden reproduced by the reviewer's own computation; **every mutant killed or
@@ -7384,5 +7427,37 @@ the whole review.
 exhibited with concrete inputs on which HEAD and the mutant differ, and each has a one-fixture
 remedy. **Whatever the ruling, they belong in `OPEN_FINDINGS.md`, and they are there** as `OF-124`…
 `OF-130`. The question is only whether they hold the tag.
+
+**RULING (architect, 2026-09-02), recorded VERBATIM (hard rule 5) by C13 REVIEW 4 (`7a1e6c84`)
+BEFORE ANYTHING ELSE IN THIS SESSION WAS READ OR TOUCHED.** *Carried in this session's prompt.
+No word is altered; the two `'` pairs are the prompt's own quotation marks.*
+
+> "A surviving mutant on a property THE CHUNK OWNS is a FAIL even when the subject measures clean
+> today. AND THE BAR ITSELF IS NARROWED, because 'every mutant killed or proven equivalent' has NO
+> TERMINATION CONDITION — the reviewer chooses the set, and three consecutive reviews have walked
+> into that regress. THE GATE IS THE REQUIRED SET: at least one mutant per property or invariant the
+> chunk owns, minimum eight (PROCESS.md S5.3). SURVIVORS BEYOND THAT SET ARE MEDIUM FINDINGS IN
+> OPEN_FINDINGS.md AND DO NOT HOLD THE TAG. Keep generating as many mutants as you judge useful and
+> report every survivor; only which ones gate has changed."
+
+**Status after the ruling:** ⚠️ **RULED — neither option 1 nor option 2 as this entry framed them.
+The ruling takes a fourth position the entry did not enumerate**, and that is recorded rather than
+smoothed into the nearest listed option. Option 1 (*"a mutant is a mutant"*) is **kept for the
+required set** and option 2's *"scoped to the subject"* is **rejected** — a guard-side survivor on
+an owned property still FAILs. What the ruling adds is the **termination condition** the entry
+identified as missing: the gate is `PROCESS.md` §5.3's **required set** — ≥1 mutant per property or
+invariant the chunk owns, minimum eight — and survivors outside it are MEDIUM findings that do not
+hold the tag.
+
+⚠️ **WHAT THIS DOES AND DOES NOT DO TO C6's `REVIEW_C6_4` VERDICT, stated because this entry was
+raised by that review and a reader will ask.** The ruling is recorded here by a **C13** session,
+whose fence names every earlier `REVIEW_*.md` under **NOT**. It is **not applied to C6 here**, no C6
+finding is re-dispositioned, and `OF-124`…`OF-130` are untouched. `REVIEW_C6_4.md` §14 already names
+which three findings its verdict rests on, which is what makes the ruling applicable to C6 by a C6
+session without re-reading the review.
+
+**Applied by C13 REVIEW 4 (`7a1e6c84`), 2026-09-02**, to its own verdict: every survivor this
+session finds is marked **OWNED** or **NOT-OWNED**, the determination is argued rather than
+asserted, and the required set is enumerated before the mutants are written.
 
 ---
