@@ -608,3 +608,182 @@ And, on the freeze (`PROCESS.md` §6a.4):
 > nothing can, and the `RESULTS.md` timestamps are as self-asserted as any other. What is externally
 > witnessed is that **the scorecard was named before the numbers were published**, which is the
 > property `ai-playbook` B.9 asks for.
+
+---
+
+## 5. ⚠️ APPENDED BY C14 BUILD (`6d1c8f37`), 2026-09-02 — THE FREEZE ITSELF, AND WHAT IT IS STILL OWED
+
+**APPEND ONLY. Not one character of §0–§4 was altered.** This file is a `CONTEXT.md` §15.0 frozen
+artefact; C14 writes what the freeze needs and changes nothing that is there. The `>` quote blocks,
+the A1–A6 table, §2.3's owed-values table and every licence row above are **untouched**, and the
+session's FINAL OUTPUT carries the before/after digests of this file so that claim is checkable
+rather than asserted.
+
+**ZERO PROVIDER MODEL CALLS. NO TOKEN SPEND. NO TAG CUT.**
+
+### 5.1 What was prepared, and by whom
+
+Written at **2026-09-02T21:56:28Z**, against repository HEAD **`405d247`** — moved to **`daf038a`** by a concurrent C8 BUILD session
+mid-write, with **every digest below re-measured at the new HEAD and unchanged**, `config/` having
+been outside that session's fence. Working tree clean apart
+from a concurrent C8 session's untracked `src/whetstone_gate/scorer/` and the pre-existing untracked
+`grep.exe.stackdump`.
+
+| Artefact | State |
+|---|---|
+| `INVARIANTS.md` | **NEW.** E1, E2, E3, S1, S2, S2-amt, S3, S4, each stated so a stranger can apply it, **each carrying golden 2's own words verbatim** |
+| `HOLES.md` | **NEW.** The competence probe, S4's in-flight window, and the void rule's three signals. **Complete today** — this is what `probe-v1` tags, alone |
+| `PROTOCOL.md` | **NEW.** The run protocol and **THE MANIFEST**. ⚠️ **Not complete today**, and §6 of that file says exactly which four values are owed and which run determines each |
+| `PROVENANCE.md` | **APPENDED** — this section |
+| `RAZORPAY_SEMANTICS.md` | **UNTOUCHED.** It exists, it is frozen content, and C14's fence names it under **NOT** |
+| `config/` | ⚠️ **UNTOUCHED. Its HASHES ARE RECORDED; IT IS NOT EDITED.** `git diff -- config/` is empty at the end of this session, and the FINAL OUTPUT prints it |
+
+### 5.2 The digests the freeze commits to — of the GIT BLOB, never the working tree
+
+**The manifest of record is `PROTOCOL.md` §1.1.** It is repeated here for one reason only: this file
+is the honesty ledger, and a reader who arrives at it should not have to be told where the numbers
+are without being told what they are.
+
+| Path | SHA-256 of the git blob (`405d247`, unchanged at `daf038a`) | Bytes |
+|---|---|---|
+| `config/lanes.yaml` | `23b8db927cf66d0b0876a9a393c523b3e5287f2bb392b8efdb3d9f52accea0bd` | 13,622 |
+| `config/protocol.yaml` | `2d9ab9d8a660dc92ed37d8cc62d2f52a38aaafdf75647e7c31b12b62e292d69a` | 28,818 |
+
+⚠️ **`lanes.yaml`'s digest is CROSS-CHECKED AGAINST ANOTHER SESSION'S INDEPENDENT MEASUREMENT AND
+AGREES EXACTLY.** C13 FIX 2 (`91eb51c1`) recorded that file's **AFTER** blob SHA-256 in its own FINAL
+OUTPUT — `docs/sessions/c13-fix-2.txt:155` — expressly *"so C14 writes the manifest against the
+corrected file"*. **Two hands, two days, one set of bytes.** That is the only kind of agreement worth
+recording in this file.
+
+⚠️ **AND THE DIGEST IS OF THE OBJECT, WHICH IS NOT A DETAIL.** `core.autocrlf` is `true` system-wide
+on this machine, so a file committed with LF checks out as CRLF and hashes differently. A fingerprint
+published from a working tree would fail verification **for every reviewer who clones on anything but
+Windows** — silently, at the moment of judging, **looking like fraud rather than a line-ending bug.**
+
+### 5.3 The corpora licences — verified at source, by three sessions, and re-stated here for the freeze
+
+**Nothing below is new verification.** Each row was read **first-hand at the pin** by the session
+named, and this table exists so that the licence position is inside the frozen set rather than only
+inside `corpora/MANIFEST.md`, which `CONTEXT.md` §15.0 does **not** freeze.
+
+| Corpus | Licence, as read at source | Verified by | ⚠️ The trap |
+|---|---|---|---|
+| **InjecAgent** | **MIT** © 2023 Qiusi Zhan | C6 BUILD, 2026-08-31 | ⚠️ **The file is spelled `LICENCE` — British.** A build script globbing `LICENSE*` **silently misses it** and concludes the corpus is unlicensed |
+| **AgentDojo** | **MIT** © 2024 **Edoardo Debenedetti, Jie Zhang, Mislav Balunović, Luca Beurer-Kellner, Marc Fischer, and Florian Tramèr** | C6 BUILD, 2026-08-31; pin re-read by C13, 2026-09-01 | ⚠️ **All six holders named.** `CONTEXT.md` §11.3 originally named **none**, and MIT requires the notice (`Q-034`) |
+| **AgentHarm** | **"MIT License with an additional clause"** © 2024 **Gray Swan AI and UK AI Safety Institute** | C6 BUILD, 2026-08-31 | ⚠️ **TWO holders, and a FIELD-OF-USE CLAUSE that binds even though the dataset is NOT gated** (`"gated": false`, so there is no click-through to accept): *"We prohibit using the dataset and benchmark for purposes besides improving the safety and security of AI systems."* **Our use qualifies, and we say so.** ⚠️ **And the author is the UK AI SAFETY Institute** per the card and its LICENSE — **not "Security"**; the body was renamed in Feb 2025, but the card, last modified 2024-12-19, says Safety |
+| **Agent Security Bench** | **MIT** © 2024 AGI Research | C6 BUILD, 2026-08-31 | — |
+| **R-Judge** | ⚠️ **NO LICENCE FILE OF ANY KIND.** GitHub's repository API reports `"license": null` and the root holds no licence-shaped file | C6 BUILD, 2026-08-31 | ⚠️ **CITED, NEVER VENDORED, NEVER REDISTRIBUTED.** Verified from repository **METADATA only — not one byte of the corpus was fetched**, which is the whole point of the rule. Its Finance subset is a **deliberate drop, recorded rather than silently omitted** |
+
+**And one contamination canary that is deliberately read past:** AgentHarm ships a `canary_guid`
+belonging to somebody else's benchmark. **Republishing it would damage their ability to detect
+training contamination.** The adapter never carries it into a corpus entry, and a test asserts that.
+
+⚠️ **`Q-032`'s GAP IS NOW CLOSED, AND THE CLOSURE IS NAMED RATHER THAN ASSUMED.** §3.3 above ends
+with the sentence *"the corpus pins are verified on every load but sit **outside the frozen set**, so
+`make check-prereg` does not hash them, while the inputs to every other published number are
+hashed."* **That sentence stands as written — it is the record of what was true when it was
+written — and what has changed is stated here:** the pins are now listed in **`PROTOCOL.md` §1.4**,
+alongside `config/`'s digests, exactly as the ruling requires, and
+`tests/test_c14_prereg.py::test_PROTOCOL_md_carries_the_CORPUS_PINS_that_Q032_ruled_it_must` asserts
+every pin and every file digest is present by re-reading `corpora/seed_index.json`. ⚠️ **This does
+NOT add `corpora/` to §15.0's frozen set**, which stays exactly five files plus `config/`; **what
+changed is that the pins are now part of what the pre-registration ASSERTS.**
+
+### 5.4 ⚠️ WHAT IS STILL OWED — four values, printed as a number rather than left as a silence
+
+**§2.3 above is NOT edited**; it recorded what was owed when it was written and it still reads true.
+This is its state at the freeze, and it is the reason **`prereg-v1` cannot be cut today**.
+
+⚠️ **A NOTATION NOTE THAT IS NOT COSMETIC, AND THE FINDING BEHIND IT.** In the table below each
+owed value's key is written in **segmented** form — file, then section, then leaf — and **not** as a
+backticked dotted path. That is deliberate. `tests/test_c1_fix_probes.py`'s
+`test_every_config_pointer_in_the_oracle_resolves_to_a_real_key` reads **every backticked dotted
+path in this file and in `RAZORPAY_SEMANTICS.md` as a CLAIM THAT THE KEY RESOLVES** — it is
+`REVIEW_C1_1`'s BLOCKER **F-R4**, the guard against an artefact asserting that a value *"lives in
+`config/`"* when no key exists. **These four keys exist and deliberately do NOT resolve**, because
+each holds a declared `TODO_` sentinel and the loader **raises** on it by design. Writing them in
+the dotted form would therefore be making, in the probe's own contract, a claim this session knows
+to be false. ⚠️ **AND THE PROBE CANNOT TELL THE TWO APART** — `Config.has()` returns `False` for a
+missing key **and** for a declared sentinel alike, so *"nobody wrote this down"* and *"this is
+written down, owed, and has a named owner"* are one answer to it, while hard rule 9's entire
+mechanism is that they are **opposite things**. **The probe is NOT edited** (hard rule 6; it is C1's
+probe file and it is outside this session's fence), and the finding is recorded in `QUESTIONS.md`
+**Q-101** and in `docs/reviews/OPEN_FINDINGS.md`. **The exact dotted paths are carried in
+`PROTOCOL.md` §6**, which is outside the probe's two-file scope, and
+`tests/test_c14_prereg.py::test_the_undetermined_values_are_NAMED_in_PROTOCOL_md_rather_than_left_silent`
+**asserts that every sentinel in `config/` is named there by its dotted key** — so nothing is lost,
+and the one place that must carry the paths is the place a test now watches.
+
+| Value | Key, segmented | Sentinel | Determined by |
+|---|---|---|---|
+| the probe-breach **void threshold** | `config/protocol.yaml` → `probe` → `void_threshold_breach_rate` | `TODO_C14_CALIBRATION` | the **arm-1 calibration** (n=30), 95% Wilson **lower** bound rounded **down** to 5 pp |
+| the selected **N branch** | `config/protocol.yaml` → `n_decision` → `selected_branch` | `TODO_C14_PILOT` | the **pilot** (20 episodes, seeds 2101–2110) |
+| the **measured** tokens/episode | `config/protocol.yaml` → `n_decision` → `measured_tokens_per_episode` | `TODO_C14_PILOT` | the **pilot** |
+| the **CaMeL branch** | `config/lanes.yaml` → `camel_comparator` → `branch` | `TODO_C13_RUN1` | **RUN-1**, and Branch B only on a **diagnosed** cause |
+
+**Neither the pilot nor the calibration ran in this session, and neither could:** C14 BUILD's prompt
+sanctions **ZERO provider model calls** and no lane, no call ceiling and no token ceiling. **A
+sanction of "max N calls" alone would not have been a sanction either** — one spike episode burned
+~300K tokens against a 200K-TPD lane. **The values are therefore still owed, and they are named here
+rather than guessed**, which is hard rule 9 doing the job it exists for.
+
+⚠️ **AND ONE VALUE IS OWED TO NOBODY AND MUST NOT BE RESOLVED:** `config/protocol.yaml` → `vendor` →
+`agentdojo_sha` stays at `TODO_C13_C16` and the loader keeps raising — segmented for the reason
+given above, because it is a fifth sentinel and not a fifth omission. **That is the visible consequence of a published cut —
+degradation rung 3, `INC-62`, C16 / AD-CMP NOT RUN — and not a defect.** *A reader who greps
+`agentdojo` must find the cut, not a mystery.*
+
+### 5.5 THE EXTERNAL WITNESS — content prepared here, publication is the OPERATOR's
+
+⚠️ **THIS SESSION DID NOT PUBLISH THE WITNESS, AND COULD NOT.** It requires a tag this session must
+not cut and a public post outside this repository. **Without it the freeze is self-asserted**, which
+is why the witness is on `PROCESS.md` §14's **NEVER-CUT** list.
+
+**What the operator publishes, within 30 minutes of cutting `prereg-v1` and BEFORE the first scored
+episode:** a **public GitHub gist** named `whetstone-gate-prereg-v1.txt` carrying the tag name, the
+combined SHA-256 fingerprint of the frozen set, and the per-file manifest — **every digest computed
+from git objects** by `PROCESS.md` §6a.2's procedure, which was executed end to end by the auditor
+including a clone with `core.autocrlf=false` simulating a Linux reviewer. **Do not paraphrase those
+commands and do not "improve" them**: a paraphrase risks reintroducing the line-ending failure.
+
+**Why a gist is the primary anchor and OpenTimestamps is not:** GitHub assigns `created_at` and each
+history entry's `committed_at` **server-side**, and the create endpoint accepts only `description`,
+`files`, `public` — **there is no client-settable date field.** A judge checks it with one `curl`.
+OpenTimestamps is Bitcoin-backed and trustless, but `ots verify` at the CLI **requires a local
+Bitcoin Core node**, and **no judge will run one** — excellent as a second anchor, unusable as the
+primary.
+
+⚠️ **AND THE VERIFIER READS THE OLDEST ENTRY OF `history[]`, NEVER THE CURRENT STATE**, because a
+gist can be edited later and `created_at`'s behaviour under every edit path is not documented. That
+is the conservative reading and it is what the reviewer procedure does.
+
+**What the operator must then record, in `INCIDENTS.md` AND in the README:** the gist's `created_at`
+and its **OLDEST** history entry's `version` and `committed_at`. **Then, and only then, the first
+scored episode may run.**
+
+**Hash-only is the right trade, and it is a trade rather than a shortcut.** Publishing the three
+protocol files themselves on 31 August would be strictly stronger, and it would hand the full
+protocol design to ~1,800 competitors four days before the deadline. **SHA-256 over whole files is a
+binding commitment and reveals nothing** — and the guess-the-preimage weakness does not apply
+**because the files are long and prose-heavy**. ⚠️ **It WOULD apply to hashing a bare integer, which
+is exactly why `HOLES.md` publishes its values in the clear and commits to them by whole-file
+digest** — recorded as a deviation from `CONTEXT.md` §15.1's wording in `QUESTIONS.md` **Q-098**,
+for the architect to confirm **before `probe-v1` is cut**.
+
+### 5.6 What this section does NOT claim
+
+- **It does not claim the freeze has happened.** No tag is cut by this session; `probe-v1` and
+  `prereg-v1` are the operator's, after review.
+- **It does not claim `make check-prereg` now returns a real verdict.** It does not — see
+  `QUESTIONS.md` **Q-100**. The comparison logic lives in `src/whetstone_gate/tasks.py`, which C14's
+  fence names under **NOT**, and it additionally requires the `prereg-v1` tag to resolve. **The real
+  verdict is delivered today by `tests/test_c14_prereg.py`, inside `make test`**, and the standalone
+  target's remaining gap is recorded rather than worked around.
+- **It does not claim the ledger is tamper-proof.** *"The ledger is tamper-evident"* means **evident
+  against an edit that leaves a stale digest, and against nothing else**; **truncation** and a
+  **re-derived suffix** are both undetected, because a hash chain anchors its START and nothing
+  anchors its END. **The witness above is the remedy**, extended to each episode's head hash, entry
+  count and seed.
+- **It does not claim the run is reproducible by re-running the models.** The **world, the ledger
+  schema, the scorer and the replay** are byte-identical from the same seed and are tested to be;
+  **model output is NOT** — the attacker runs at **temperature 0.7** against a hosted provider.
