@@ -66,7 +66,21 @@ edited or reset by C8.** Every commit here was made through a **PRIVATE `GIT_IND
 explicit pathspec, `git diff --cached --name-status` read before each, and `git reset -- <the same
 paths>` after each (`INC-68`).
 
-**(9) `tests/goldens/` UNTOUCHED, PROVED RATHER THAN ASSERTED.** `git status --porcelain
+**(9) ⚠️ AND IT SWEPT THIS SESSION'S JOURNALS - `INC-82`.** That concurrent session's journal
+commit **`9498811`** carries this banner, the C8 chunk row below, `QUESTIONS.md`'s corrected token
+row and `Q-094` addendum, and `INCIDENTS.md`'s `INC-76` addendum and the whole of `INC-78`, under
+**`Session-Token: 6d1c8f37`** rather than this session's. **Nothing was lost or reworded** -
+`9498811`'s `Swept:` line names every foreign hunk by file and line count, and this session verified
+it independently: `git diff` over all five journals against `HEAD` **EMPTY**, `INC-78` present at
+its full 71 lines. `INC-82` records it as `INC-36`'s *"nothing can warn the session being swept"*,
+**measured from the swept side for the first time**.
+
+**(10) COUNTS.** `python -m whetstone_gate.tasks test`: **`1 failed, 925 passed, 1 skipped, 2
+deselected`** - the one failure is item (7). Raw `python -m pytest tests -q`: **`3 failed, 925
+passed, 1 skipped`**, adding the deselected camel sentinel and the object-store check, which passes
+once the journals are committed. `make check-roles`: **17 passed, 0 failed, 5 n/a, exit 0**.
+
+**(11) `tests/goldens/` UNTOUCHED, PROVED RATHER THAN ASSERTED.** `git status --porcelain
 tests/goldens/` **EMPTY**; `git diff` on **all six** goldens **EMPTY**.
 
 ---

@@ -6341,8 +6341,8 @@ quantity never changes.
 **Fix:** **`ae521f1`** — `refund_positions` in `whetstone_gate/scorer/invariants.py`, the zero
 recorded in `opening_state_from_payments`, and the two driving tests.
 
-**Systemic guardrail:** ⚠️ **NONE THAT CLOSES IT, and the honest version is that hard rule 3 does
-not reach this class.** *"Golden fixtures define done"* makes the answer key independent of the
+**Systemic guardrail (INC-78):** ⚠️ **NONE THAT CLOSES IT, and the honest version is that hard rule 3
+does not reach this class.** *"Golden fixtures define done"* makes the answer key independent of the
 code; it does nothing about a property **the answer key cannot express**, and this session's own
 done-when — *"reproduce all 29 pinned cells"* — was satisfied by the defective code. What partially
 covers it is the convention already in use here: **every predicate gets at least one test written
@@ -6550,3 +6550,68 @@ rather than in this repository**, since the offending tool is the session's own 
 honest statement is that this is an honour rule with a mechanical backstop**, and the backstop is the
 part that has actually held: **0 CR bytes across ten files, measured, on the session that broke the
 rule.**
+
+---
+
+## INC-82 — `INC-36`'s uncloseable half, MEASURED FROM THE SWEPT SIDE FOR THE FIRST TIME: this session's four journal edits were carried into another session's commit under another session's token, and this session learned of it only because it happened to run `git log` for an unrelated reason
+
+**Date:** 2026-09-03 (C8 BUILD 1, `2b6ee014`, **after** the first build commit)
+
+⚠️ **THE PROCESS WORKED AND NOTHING WAS LOST. THIS ENTRY IS NOT A COMPLAINT ABOUT THE OTHER
+SESSION**, which did everything `Q-063` asks and more. It is the first record of what the sweep
+looks like **from the session being swept**, which `INC-36` names as the half nothing can close and
+which no entry in this file has yet described from that side.
+
+**Event:** a concurrent **C14** session (`6d1c8f37`) shared this working tree throughout. Its
+journal commit **`9498811`** carried **four** of this session's uncommitted edits into itself:
+`PROGRESS.md`'s entire 178-line `## C8 — BUILD 1` entry, `STATUS.md`'s 73-line C8 banner **and**
+its rewritten C8 chunk row, `QUESTIONS.md`'s corrected token row and its 13-line `Q-094` addendum,
+and `INCIDENTS.md`'s `INC-76` addendum together with the whole of `INC-78`. **They are now in the
+history under `Session-Token: 6d1c8f37`, and nothing in this session's own log says so.** This
+session discovered it by running `git log --oneline -3` to check whether a test failure was its own.
+
+**Action:** nothing was re-committed and nothing was moved. **Verified first, then recorded:**
+`git diff` over all five journals against `HEAD` is **EMPTY**, `INC-78` is present in `HEAD` at its
+full 71 lines, the `INC-76` addendum is present, and every marker this session wrote resolves —
+`Q-094`…`Q-097`, `OF-182`…`OF-184`, `INC-76`…`INC-78`, the `C8 — BUILD 1` heading and eleven
+occurrences of `2b6ee014` in `QUESTIONS.md`. This session then corrected its own `PROGRESS.md`
+commit list, which named a journal commit **it never made**, to name `9498811` instead.
+
+**Expectation:** a session's own record names the commits that carry its own work. This session's
+`PROGRESS.md` entry was, for about twenty minutes, a **false statement about the history** — it
+listed a `STATUS.md + PROGRESS.md + INCIDENTS.md` commit under this session's token that does not
+exist.
+
+**Missing:** any signal **to the losing session**. `Q-063` clause (ii) puts a `Swept:` line in the
+**sweeping** session's commit message, and `9498811`'s is exemplary — it names every foreign hunk by
+file and line count, states the measurement was taken on the staged snapshot rather than the working
+tree (`INC-48`), and confirms not one foreign line was edited or reworded. **All of that is written
+where the swept session will never look.** `INC-36` says exactly this: *"nothing can warn the session
+being swept"*. What is missing is the one-line inverse — a check a session can run **before it
+commits** that says *"content you wrote is already in HEAD under somebody else's token"*.
+
+**Missed:** this session had already **measured the hazard and written it up** — `STATUS.md` item (8)
+and `PROGRESS.md`'s opening both record the concurrent session's untracked files by name — and then
+carried on holding four journal edits uncommitted across two long test runs, roughly forty minutes,
+because it wanted final test counts before writing them. **The window was self-inflicted and the
+warning was its own.** The prompt's own `⚠️ PRIVATE INDEX, BINDING (INC-68)` paragraph is about
+exactly this tree.
+
+**Diagnosis:** the private-index procedure protects the **index**, not the **working tree**; a
+session that writes a journal edit and then waits is exposed for the whole wait, because the other
+session's `git add -- <journal path>` reads the tree and cannot distinguish authorship.
+
+**Fix:** ⚠️ **NO FIX COMMIT FOR THE SWEEP ITSELF — there is nothing to repair.** The content is
+correct, complete and verbatim in `9498811`. What this session changed is its own record:
+**`<STATUS-SHA>`** rewrites `PROGRESS.md`'s commit list to name `9498811` as the commit that carries
+its journals, with this entry beside it.
+
+**Systemic guardrail:** ⚠️ **NONE, and it is accepted, because the one that would work was declined
+twice with the reason recorded.** `Q-063`'s ruling declined separate worktrees on 1 September — *"it
+is 1 September, C14 is imminent, and re-plumbing every session's tree now risks more than the
+mis-attribution costs"* — and `INC-36` records that a `Swept:` line *"tells the reader afterwards; it
+cannot tell the session losing its attribution at the time, and E6 will not either."* **The
+behavioural mitigation this session would give the next one, and did not follow itself: commit a
+journal edit within minutes of writing it, and never hold one across a long-running command.** That
+is a habit, not a guardrail, and calling it anything else would be the overclaim this file exists to
+prevent.

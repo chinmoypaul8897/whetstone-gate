@@ -194,8 +194,20 @@ self-certified.**
 **Commits, in order:** `6491ac5` `src/whetstone_gate/scorer/` (unreviewed) → `52dcbab`
 `tests/test_c8_scorer.py` (unreviewed) → `daf038a` `QUESTIONS.md` + `INCIDENTS.md` +
 `OPEN_FINDINGS.md` → `ae521f1` the `INC-78` fix (unreviewed) → `7b44ffd` the seed cross-check's two
-blind spots stated and pinned (unreviewed) → `STATUS.md` + `INCIDENTS.md` + this entry →
-`docs/sessions/c8-build-1.txt` → one further commit filling that file's `PUSHED SHA` placeholder.
+blind spots stated and pinned (unreviewed) → `docs/sessions/c8-build-1.txt` → one further commit
+filling that file's `PUSHED SHA` placeholder.
+
+⚠️ **THIS ENTRY, `STATUS.md`'s C8 BANNER AND ROW, `QUESTIONS.md`'s CORRECTED TOKEN ROW AND ITS
+`Q-094` ADDENDUM, AND `INCIDENTS.md`'s `INC-76` ADDENDUM AND THE WHOLE OF `INC-78` ARE CARRIED BY
+`9498811` — THE CONCURRENT C14 SESSION'S JOURNAL COMMIT, UNDER `Session-Token: 6d1c8f37`, NOT UNDER
+THIS SESSION'S.** They were uncommitted in the shared working tree when that session staged its own
+journals. **Nothing was lost, edited or reworded:** `9498811`'s `Swept:` line names every foreign
+hunk by file and line count, measured on the staged snapshot rather than the working tree
+(`INC-48`), and this session verified it independently — `git diff` over all five journals against
+`HEAD` **EMPTY**, `INC-78` present in `HEAD` at its full 71 lines, and every `Q-094`…`Q-097`,
+`OF-182`…`OF-184` and `INC-76`…`INC-78` marker resolving. **This paragraph replaces a commit list
+that named a journal commit this session never made**, and `INC-82` is the entry: `INC-36`'s
+*"nothing can warn the session being swept"*, measured from the swept side for the first time.
 
 ⚠️ **A CONCURRENT SESSION IS WRITING INTO THIS WORKING TREE, AND IT IS NOT THIS SESSION'S.**
 `HOLES.md`, `INVARIANTS.md`, `PROTOCOL.md` and `tests/test_c14_prereg.py` appeared **untracked**, and
@@ -334,8 +346,8 @@ truthiness**, so a probe that fires or stays silent by accident disagrees with a
 
 | | before | after |
 |---|---|---|
-| `python -m pytest tests -q` | `1 failed, 802 passed, 1 skipped` (371.74s) | `RAW_AFTER` |
-| `python -m whetstone_gate.tasks test` (`make test`) | not run before | `MAKE_AFTER` |
+| `python -m pytest tests -q` | `1 failed, 802 passed, 1 skipped` (371.74s) | **`3 failed, 925 passed, 1 skipped`** (462.62s) |
+| `python -m whetstone_gate.tasks test` (`make test`) | not run before | **`1 failed, 925 passed, 1 skipped, 2 deselected`** (552.89s) |
 | `make check-roles` | `17 passed, 0 failed, 5 n/a`, **exit 0** | `17 passed, 0 failed, 5 n/a`, **exit 0** |
 | `tests/test_c8_scorer.py` | — | **108 passed** |
 | golden 2 cells | — | **72 / 72 EXACT, 0 mismatches** (of which the 29 architect-stated ones) |
@@ -344,13 +356,26 @@ truthiness**, so a probe that fires or stays silent by accident disagrees with a
 concurrent session's untracked `tests/test_c14_prereg.py` present in it after 03:37**, which is why
 the two `after` figures are given by command rather than as one number.
 
-**FAILURES ATTRIBUTED BY FILE.** `tests/test_lanes_operator_placeholders.py::
-test_the_camel_branch_is_decided_before_any_camel_run` — the declared pre-existing red on the
-`TODO_C13_RUN1` sentinel, **not C8's, and it stays red**; `make test` deselects it, raw `pytest`
-does not, which is the whole difference between the two rows above.
-`tests/test_c7_ledger.py::test_Q069_nothing_in_this_repository_imports_the_ledger_yet` — **NEW, and
-it is C8's**, in the sense that C8's test file is what falsified its premise; it is the red that
-file's own docstring predicted, and `OF-183` carries it.
+**FAILURES ATTRIBUTED BY FILE. `make test` HAS EXACTLY ONE, AND IT IS THE PREDICTED ONE.**
+
+  * `tests/test_c7_ledger.py::test_Q069_nothing_in_this_repository_imports_the_ledger_yet` — **NEW,
+    and it is C8's**, in the sense that C8's *test file* is what falsified its premise. Three
+    offenders, **all in `tests/test_c8_scorer.py` (lines 42, 48, 49), none in `src/`**. Its own
+    docstring says *"IT WILL GO RED ON PURPOSE AT C8"*. Not weakened: that file is under **NOT** in
+    the fence and hard rule 6 forbids it regardless. `OF-183`.
+  * `tests/test_lanes_operator_placeholders.py::test_the_camel_branch_is_decided_before_any_camel_run`
+    — the declared **pre-existing** red on the `TODO_C13_RUN1` sentinel, **not C8's, and it stays
+    red**. `make test` **deselects** it; raw `pytest` does not, which is most of the difference
+    between the two rows above.
+  * `tests/test_repo_invariants.py::test_the_object_store_and_the_working_tree_agree` — **an
+    artefact of measuring a tree with uncommitted work in it**, naming this session's five journal
+    files. It **passes** in the `make test` row, which was taken after `9498811` committed them.
+  * ⚠️ **ONE TRANSIENT FAILURE, RECORDED RATHER THAN DROPPED.** An intermediate run produced
+    `tests/test_c1_fix_probes.py::test_every_config_pointer_in_the_oracle_resolves_to_a_real_key`,
+    which **passes when run on its own** and recurred in neither definitive run. It appeared while
+    the concurrent C14 session was writing `PROTOCOL.md` and `PROVENANCE.md`. **A run made in a tree
+    somebody else is editing is not a clean measurement**, and saying so costs less than the
+    alternative.
 
 ### GOLDENS
 
