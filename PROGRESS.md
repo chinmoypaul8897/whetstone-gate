@@ -6,6 +6,137 @@ not a record; this file is.
 
 ---
 
+## ARCH — GOLDEN 5B AND `OF-139` — **FIX** — 2026-09-02 — **THE WRITER IS RE-PINNED AT FIFTEEN FIELDS, THE CLONE-IMPORTS-THE-LIVE-TREE GUARD IS BUILT AND FIRED BOTH WAYS, AND THIS SESSION WAS ITSELF SWEPT**
+
+**SESSION-TOKEN:** `6f3a91d2` · Row **49** of `QUESTIONS.md`'s `## Session tokens` table, counted in
+**both** trees — the working tree and `HEAD` agree at 49 data rows and my row is the 49th in each.
+⚠️ **`make check-roles` prints "48 issued row(s)" and both numbers are right about different
+things** (`INC-54`): `check_roles._TOKEN_ROW` does not parse the one non-8-hex row,
+`WG-2026-08-30-CTX-13.4-A`, so 49 data rows are 48 issued tokens. ⚠️ **And the row is not in a
+commit of mine** — see **(3)** below.
+
+**Pushed SHA:** the FINAL OUTPUT in `docs/sessions/arch-goldens-2.txt` states it as its first line.
+**Spend:** ⚠️ **ZERO provider model calls, zero tokens, on every lane.** No `evals/` file was read,
+written or touched. **NO TAG** — this is not a review session and nothing here is self-certified.
+
+### What this session did
+
+**(1) GOLDEN 5B LANDED — `8003c02`.** `tests/goldens/golden5b_ledger_writer.json`, sha256
+`232f6fc995e8426e5babfa5029e6c2e3fcdfcb1f5061e461a702f0df15d89811`, **7,917 bytes**, **0 CR bytes**,
+`git hash-object` equal to `git hash-object --no-filters`. `Q-062` added `executed` and `Q-066` added
+`receipt`, so the ledger writes **fifteen** content fields; this re-pins the **WRITER** that C7
+BUILD 2 retired in place when the schema widened. ⚠️ **`golden5_tamper.json` IS NOT REOPENED, NOT
+REGENERATED AND NOT TOUCHED** — `PROCESS.md` §5.2 makes it a **tamper/verifier** oracle at thirteen
+and never a writer oracle. `git status --porcelain tests/goldens/` showed **only the new file**, and
+`git diff` was **EMPTY** on `golden5_tamper.json`, `golden3_harm_vector.json`, `golden1_money.json`
+and `world_seed_2001.json` — all four printed.
+
+⚠️ **THE CONTROL RAN FIRST, AND IT IS WHY THE VALUES ARE BELIEVABLE RATHER THAN MERELY TRANSCRIBED.**
+Hard rule 3 forbids a value produced by the code it tests, so the hash rule was reimplemented in a
+**fresh OS temp directory**, from the **text of golden 5's own `hash_rule` field**, importing
+**nothing from `whetstone_gate`**. Before one new value was computed it had to reproduce **golden 5
+case A's own three stored digests** — `3f62d0a6…`, `63579792…`, `72072b8e…` — from its thirteen-field
+rows. **It did, all three, and golden 5's stored `prev_hash` linkage was confirmed intact with them.**
+Only then was the fifteen-field chain computed, and **all three MATCH the architect exactly**:
+
+| seq | `executed` | `receipt` | computed = architect |
+|---|---|---|---|
+| 1 | `true` | `null` | `186a2118ba239d24936e48a485c33b099d97bb0daa848cece504fc6db1aedf5d` |
+| 2 | `false` | `null` | `26019af38ccd8c0f7fedbbb5d4f893bd3d6f10aeca6cf9b953d6650d13ecbc2c` |
+| 3 | `false` | `null` | `6ae5bd20f67283c0ad70811be2a17cba1a87460f13f78046c4b6f2af946ff76f` |
+
+**A disagreement would have been a STOP and a `QUESTIONS.md` entry with both canonical JSON strings
+byte for byte — never an adjusted value.** Each differs from its golden-5 counterpart, as it must.
+
+⚠️ **THE FINDING THE FIXTURE CARRIES IS ABOUT THE FIXTURE IT CAME FROM, and it is in the golden's own
+`_comment`: golden 5's case A ALREADY CONTAINED ONE OF EACH of `Q-062`'s three outcomes** — seq 1 an
+action the world **performed**, seq 2 one **Razorpay** refused, seq 3 one **the TOOL LAYER** refused
+— **and nobody could tell, because the thirteen-field schema could not distinguish them. The fixture
+that passed two reviews was carrying `Q-062`'s defect in plain sight.** `receipt` is `null` on all
+three rows and that is itself the pinned fact: it separates *declared and absent* from *omitted*, and
+every digest moves if the key is dropped from the canonicalised entry.
+
+⚠️ **NO TEST CONSUMES THIS GOLDEN AND THAT IS DELIBERATE. C7's review is the first session permitted
+to write one** — a golden judged by a test from the hand that landed it is the circularity
+`tests/goldens/README.md` exists to prevent. The README row is an **APPEND**: 54 insertions, **0
+deletions**, verified on the **staged snapshot**, no existing row restated or renumbered, and both
+section-anchored README parsers (`test_c2_world.py`'s golden-7 anchor, `test_c4_goldens.py`'s
+golden-1 and golden-3 anchors) re-run green afterwards. **`Q-070` STANDS, is not this session's, and
+`golden3_harm_vector.json` is untouched.**
+
+**(2) `OF-139`'s GUARD BUILT AND FIRED BOTH WAYS — `23e174f`.**
+`tests/test_repo_invariants.py::test_the_package_under_test_is_the_tree_under_test`. The
+editable-install `.pth` names the **real** tree's `src`, and `config.repo_root()` is
+`Path(__file__).resolve().parents[2]`, so a bare `python -m pytest` **inside a fresh clone** imports
+the **live** package and resolves the **live** repo root — **every mutation to `src/`, `config/` or
+`CONTEXT.md` in a clone has no effect while the control still reads green, so every mutant reads as
+SURVIVED.** `INC-17` inverted, and it reaches every review that has run mutants in a clone. `INC-17`
+named a guard of this shape as **OWED** two days ago and no session built it.
+
+⚠️ **FIRED IN BOTH DIRECTIONS BEFORE IT WAS COMMITTED, because a guard proved in one direction is the
+class this repository has now hit six times:**
+
+| run | result |
+|---|---|
+| the real repository, bare `python -m pytest` | ✅ **PASSED** — 1 passed in 0.06 s |
+| a fresh clone, **no `PYTHONPATH`** | ❌ **FAILED** — reproducing `OF-139`'s own two paths, `TREE` naming the clone while `PKG` and `ROOT` named the live repository |
+| the same clone, `PYTHONPATH=<clone>/src` | ✅ **PASSED** — 1 passed in 0.07 s |
+
+**The third run is what shows it detects the mismatch rather than merely detecting a clone.** The
+remedy is written into the test's own docstring where the next mutation session will hit it — the
+`PYTHONPATH` form, *print the resolved paths at the head of every run*, *a run whose post-restore
+control is not green is VOID and unscored*, and ⚠️ **the opposite failure direction from `INC-57`**:
+restoring with `git checkout --` from a HEAD that **holds** the mutation reports every mutant
+**KILLED**. Both directions produce a clean transcript and a flattering number. **`OF-139` is
+PARTIALLY closed** and says so: its `docs/reviews/README.md` paragraph and a `make mutate-clone`
+target are **outside this session's fence and remain owed**, named rather than half-done.
+
+**(3) ⚠️ THIS SESSION WAS ITSELF SWEPT — `INC-65`, found by the session that lost the attribution.**
+The concurrent ARCH FIX session's commit **`e31f6b3`** committed this session's **`INC-64`** *and*
+its `QUESTIONS.md` token row under `Session-Token: d5c8039f`, and its message reads **`Swept:
+NOTHING`**. Measured: `git log -S "6f3a91d2" -- QUESTIONS.md` returns `e31f6b3`. ⚠️ **The diagnosis
+is the DIRECTION of the check, not its absence:** that commit records verifying its staged
+`QUESTIONS.md` diff held **zero occurrences of its own token** — the direction that protects the
+checker's attribution — while `Q-063` clause (ii) names the other one, *is somebody else's entry in
+what I am about to commit*. A grep for `6f3a91d2` in the same staged diff would have found the row
+immediately, and the same message names the concurrent session **two paragraphs above** `Swept:
+NOTHING`. **Nothing is rewritten** (`CLAUDE.md` §5); the record is the correction. **E6 is C11's and
+is still unlanded**, so the discipline is still a habit — this is its second demonstration after
+`INC-36`.
+
+**The mechanical form of the query was then run on this session's own journal commit**, and it is
+`INC-65`'s guardrail demonstrated rather than proposed: **all 49 rows of the token table grepped
+against the ADDED lines of the STAGED SNAPSHOT.** Two other tokens appeared and **both are
+citations**, read and classified rather than counted — `7a1e6c84` is `INC-64`'s attribution to C13
+REVIEW 4, `d5c8039f` is `INC-65`'s subject.
+
+### Incidents
+
+**`INC-64`** — the clone-imports-the-live-tree defect, **owed to C13 REVIEW 4 (`7a1e6c84`)**, which
+measured it against its own harness before recording any result and could not write it: a review
+fixes nothing. Its `Missed` is that review's own — *"nothing; it was caught by printing what was
+actually imported."* Its `Fix` names `23e174f`, a commit that exists. ⚠️ **It also states, rather
+than hides, that this session built and fired the guard BEFORE writing the entry, which is not hard
+rule 13's ordering** — the git log is left agreeing with the record instead of dressed to contradict
+it. **`INC-65`** — the sweep above.
+
+### Suite, measured by this session, every failure attributed BY FILE
+
+| run | result | attribution |
+|---|---|---|
+| **`make test` BEFORE** | **1 failed, 783 passed, 1 skipped, 2 deselected** in 149.6 s | the sole failure is `tests/test_repo_invariants.py::test_the_object_store_and_the_working_tree_agree`, naming `INCIDENTS.md`, `QUESTIONS.md` and `docs/sessions/nightrun-b-1.txt` — **all three the CONCURRENT session's uncommitted edits, none of them this session's.** `INC-11`: `make test` is only meaningful on a committed tree |
+| **`make test` AFTER** | ✅ **785 passed, 1 skipped, 2 deselected, 0 FAILED**, exit 0, in 201.8 s | **784 → 785 is exactly this session's one new test.** The before-run's failure cleared when the concurrent session committed |
+| `make check-roles` | **17 passed, 0 failed, 5 n/a — OK**, exit 0 | reads the **WORKING TREE**, which at that moment equalled `HEAD` |
+| `make selftest` | **1 failed, 1 passed, 786 deselected** | `tests/test_lanes_operator_placeholders.py` on the `TODO_C13_RUN1` sentinel — **declared, and NOT this session's** |
+| `git status --porcelain tests/goldens/` | **only the new file**, then **EMPTY** after commit | — |
+
+⚠️ **What this session did NOT do, stated because leaving it out would be the omission this process
+exists to prevent:** it wrote **no test that consumes golden 5B**; it did not close `Q-070`; it did
+not land `OF-139`'s `docs/reviews/README.md` paragraph or its `make mutate-clone` target; and it
+**cut no tag**. `grep.exe.stackdump` was not deleted.
+
+---
+
 ## ARCH — THE DEGRADATION RECORD — **FIX** — 2026-09-02 — **RUNGS 1, 3 AND 5 FIRED AND RECORDED AT THE MOMENT OF THE CUT; RUNGS 2, 4 AND 6 DELIBERATELY NOT SPENT**
 
 **SESSION-TOKEN:** `d5c8039f` · Row **48**, registered before this task's first commit. "NIGHT RUN
