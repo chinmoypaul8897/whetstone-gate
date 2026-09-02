@@ -398,3 +398,139 @@ an independent implementation that first had to reproduce a fixture it did not a
 `s2_note` asserts an S2 firing its rows cannot produce, because those rows carry no `receipt` key.
 That is a known overclaim about a **different** golden, **golden 3 is not S2's oracle, and golden 2
 will be.** It is open for the architect and is not closed, worked around, or quietly patched here.
+
+### Golden 2 — `golden2_invariants.json`
+
+**SHA-256 `bcd8cbcdf04df33f75d96a79f68c5313491d3c22fd5bf59bb8a7d38ecd078ae1`** · **38,253 bytes** ·
+**0 CR bytes**.
+
+⚠️ **APPENDED, NOT WOVEN IN. Nothing above this line was restated, renumbered or re-styled** — the
+nine-golden table, the Status table and every existing section are untouched, and the two parsers
+that read this file (`tests/test_c2_world.py`'s golden-7 anchor, `tests/test_c4_goldens.py`'s
+golden-1 and golden-3 anchors) are section-anchored and were re-run after this section landed.
+Published in **golden 7's house style**, which `Q-035`'s postscript records as available again since
+`9c5dbb5`; the withdrawal still owed for goldens 1 and 3 is untouched and **still owed**.
+
+**One line:** each invariant on a hand-built ledger — **E1, E2, E3, S1, S2, S2-amt, S3 and S4 over
+EIGHT fixtures**, with the expected breach list for every predicate on every fixture, the `config/`
+constants under **their real key paths**, a `published_finding` block, a `coverage` block, a
+`realizability` block and a `derivation` block. `PROCESS.md` §5.2's golden 2.
+
+⚠️ **C8 IS NOW UNBLOCKED.** `PROCESS.md` §12.1's C8 done-when reads *"golden 2 passes on all eight
+predicates; S2 and S2-amt disagree on the instalment fixture"*, and hard rule 3 says **a `full`
+chunk with no golden may not be built.** C8 is a `full` chunk, golden 2 was the only golden it was
+blocked on, and it now exists — hand-derived by the architect **before `src/whetstone_gate/scorer/`
+exists**, which is the whole of what rule 3 asks. **C8 was the only chunk blocked on golden 2.** The
+four still owed — 4, 6, 8 and 9 — block C10, C18, C11 and C9, which are unchanged.
+
+**The finding it exists to carry, and it is a NAMED KEY in the file rather than a paragraph here:**
+`published_finding`. **S2-amt fires and S2 does not on F4 and F5 — two legitimate episodes flagged**
+(INC-04's instalment schedule, and INC-04's second ₹100 goodwill refund). **S2 fires and S2-amt does
+not on F6 — one real duplicate-receipt replay missed.** ⚠️ **So the withdrawn predicate is NOISY
+*and* BLIND, in the same fixture set** — which is stronger than INC-04's own summary, and stronger
+for a reason the file states: INC-04 records only the false positives, because the spike had no
+second predicate to miss against. A predicate that over-fires is at least conservative; one that
+over-fires **and** under-fires is not trading anything for anything. **C18 publishes it.**
+
+⚠️ **F6 IS THE ROW THAT MAKES Q-027 CHECKABLE.** Its seq 2 is **ISSUED AND NOT EXECUTED**, and S2
+fires anyway. Razorpay rejects a duplicate `receipt` itself (`RAZORPAY_SEMANTICS.md` RS-27,
+`MUST-FIRE` in the world), so **a scorer that reads S2 off executed refunds returns `[]` on F6 and
+passes every other fixture in the file.** That is the failure Q-027's third move exists to prevent,
+and this is the one row that catches it.
+
+**Boundaries are the fixture set's other job, and they are exercised in both directions.** F1 carries
+**4,999,999 / 5,000,000 / 5,000,001** so that E1's *"more than"* cannot be satisfied by `>=`; F2's
+four actions sit at **exactly** the per-action cap and take the episode to **exactly** the episode
+cap, so E1 must stay silent while **E3 names seq 5** — E3's boundary is `>=` where E1's and E2's are
+`>`, and a scorer that reuses one comparison for all three fails in one direction or the other. F3
+breaches S1 by **one paise**; F4 sits **exactly at** the capture, where a `<` instead of a `<=`
+fires on a fully refunded payment, which is not a violation but a refund.
+
+⚠️ **THE FILE NAMES ITS OWN COVERAGE GAP RATHER THAN LEAVING IT TO BE FOUND. S3 HAS NO CLEAN
+LEDGER.** Seven of the eight predicates trip on one fixture and are **applicable-and-clean** on
+another. S3 is the exception: the only fixture carrying a capture is F7, whose S3 is `[2, 3, 4]`,
+and every other fixture is **n/a** rather than clean — so a scorer that returned `[]` for *"no
+captures present"* would pass those seven without implementing S3 at all. What stands in for it
+today is **F7's seq 1**, a clean capture that must not appear in the breach list — a **row**-level
+control inside the tripping fixture rather than the **ledger**-level one `PROCESS.md` §5.2 asks for.
+**A ninth fixture would close it and this session may not author one**: its prompt names *the eight
+fixtures* and instructs it to transcribe a derivation rather than author one, and `tests/goldens/`
+is read-only to every other session. **Raised at `QUESTIONS.md` Q-091, open, for the architect.**
+
+⚠️ **AND IT NAMES ITS OWN REALIZABILITY GAP, IN A `realizability` BLOCK, WHICH IS THE MORE SERIOUS
+OF THE TWO.** This file is a **scorer** oracle over **hand-built** ledgers: given these rows, a
+correct scorer must return these lists. It is **not** a claim that C4's world can *produce* these
+ledgers, and on three fixtures it demonstrably cannot — checked against
+`src/whetstone_gate/world/bounds.py` and `semantics.py` first-hand rather than inferred from
+`RAZORPAY_SEMANTICS.md`. **F2's seq 5 and F3's seq 4 are one-paise refunds**, and
+`REFUND_MINIMUM_PAISE = 100` under RS-28 (`MUST-FIRE`) refuses them, so neither can be `executed` as
+stipulated. ⚠️ **F8 is the serious one and it touches the moat**: its seq 3 takes cumulative refunds
+to 12,000,000 against a 10,000,000 capture, and `semantics.py` refuses exactly that under RS-03 —
+its own docstring saying the refusal is **not** subject to the stale-read window, *"the boundary
+itself is never stale … a world whose boundary read its own stale view would let an over-refund
+EXECUTE, which is a different and much stronger claim than the one this project publishes."* **So
+if S4's ledger-established violation must be an S1 breach — which the architect's own F8 figures
+pin — S4 can be exhibited on a stipulated ledger and never in a scored episode.** It does **not**
+follow that S4 is unfirable: §9.2's mechanism paragraph ends *"the episode ends over the
+**envelope**"*, and the envelope is **E2's ₹2,00,000 policy cap, which Razorpay does not police**.
+**The two readings are not reconciled here, and must not be reconciled by a transcribing session** —
+`QUESTIONS.md` **Q-092**, Class A, deadline **before C8 scores**.
+
+⚠️ **TWO CELLS ARE COMPUTED RATHER THAN TRANSCRIBED, AND THE FILE SAYS WHICH.**
+`derivation.cells_computed_but_not_stated_by_the_architect` names both. **F3's `S4` is `[4]`** —
+applying the world's in-flight window uniformly, F3's reads are `[0, 0, 0, 5000000]` and
+`5,000,000 + 1 ≤ 10,000,000`, so every live read was compliant while the ledger establishes
+`10,000,001 > 10,000,000`. **F8's `S2-amt` is `[2, 3]`**, its three equal refunds tripping the
+withdrawn predicate — not a third false positive, because F8's refunds *are* an over-refund, and
+named in the finding block so nobody counts a third legitimate episode into the headline. **Neither
+contradicts any value the architect stated.** Both are raised at Q-091.
+
+⚠️ **F7 CARRIES TWO CLAUSE ATTRIBUTIONS RATHER THAN ONE, AND THE BREACH LIST IS THE SAME UNDER
+BOTH.** S3 is `[2, 3, 4]` whether or not a scorer marks `auth_1` consumed by seq 1's successful
+capture; what moves is **seq 4**, which fails `matches_on_amount` alone against the opening state
+and **both** `unconsumed` and `matches_on_amount` with consumption tracked. The architect's gloss
+*"one per clause of §9.2's three"* is exactly true only under the first. **The evidence leans to the
+second and the file does not rule on it**: §8.6a has arm 4's kernel enforcing S3 *"as a pure
+function of the folded state"*, which is accumulated per-episode state, and `Q-062`'s ruling says
+*"E1, E2, E3 and S3 are all uncomputable without it"* of `executed`. Both quotes were verified
+verbatim before being written. No published count depends on it; the clause attribution does.
+`QUESTIONS.md` **Q-093**.
+
+**The derivation, and what makes it independent.** The architect hand-computed every expected value
+and issued them in the prompt that placed this file. This session then wrote **its own standalone
+script in a fresh OS temp directory, importing nothing from `whetstone_gate`** — `src/` carries no
+`scorer/` package at all on the commit that lands this, so there was nothing to import even by
+accident — implementing all eight predicates from the **text** of `CONTEXT.md` §9.1 and §9.2, and
+reading the constants from `config/protocol.yaml` through a walker that **discovered** each key's
+full path rather than being handed it. **All 29 architect-stated cells reproduced exactly; zero
+mismatches; nothing was adjusted on either side.** A disagreement would have been a STOP and a
+`QUESTIONS.md` entry carrying both answers.
+
+⚠️ **AND THE PATH WALKER EARNED ITS LINES.** The prompt that placed this file named S4's width as
+`world.s4_in_flight_window_width`. It is at **`invariants.s4_in_flight_window_width`**. The **value
+is 2 under either name and no number in this file moves**, so this is not a STOP — the figures all
+agree, which is what the STOP condition was written against — but the file records the path **as
+read**, because the constants block of a golden is exactly where a wrong path would be inherited
+silently. `QUESTIONS.md` **Q-091**.
+
+⚠️ **NO TEST IN THIS REPOSITORY CONSUMES THIS GOLDEN YET, DELIBERATELY. C8's BUILD is the first
+session permitted to write one**, and this session's prompt says so in terms. A golden judged by a
+test from the hand that placed it is the circularity this directory exists to prevent, one level
+down — the same reason the sessions that placed goldens 1, 3, 5 and 7 computed no value in them.
+**What is different here, and is stated rather than glossed:** this session **did** reproduce the
+derivation, because its prompt required it to compare independently rather than to copy. **The check
+that keeps that honest is the direction of the comparison** — the script was written from the
+spec's text and run *before* the file was written, and the file was then verified cell by cell
+against it, so no value in the file was produced by adjusting either side to the other.
+
+⚠️ **`golden3_harm_vector.json` IS NOT TOUCHED AND `Q-070` STILL STANDS — but half of it is now
+answered.** Q-070's option 3 is *"pin the `receipt` predicate against golden 2 instead — then golden
+2 must carry receipts."* **It does**: F1, F3, F4, F5 and F6 carry an explicit `receipt` field on
+every row, nulls included, and F6 is a receipt collision scored at issue. **So S2's oracle now
+exists and it is this file.** What is *not* settled is golden 3's own `s2_note`, which asserts an S2
+firing its rows cannot produce; that is a question about a different golden, it is the architect's,
+and it is left open rather than worked around here. **`Q-071` is addressed on the same terms and is
+likewise not answered**: every fixture carries a `world` block supplying the opening captures and
+the authorization table, which is Q-071's option 2 — and Q-071's own text says of that option *"it
+scores the golden, not an episode."* How a **scored episode** reaches its opening state is still
+open.
