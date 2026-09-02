@@ -1196,6 +1196,135 @@ def test_a_truncated_tail_is_NOT_detected_and_that_is_a_stated_limitation(
     ), "deleting from the MIDDLE breaks the chain and must be detected"
 
 
+def test_ENTRY_1s_LINK_TO_THE_GENESIS_ROOT_IS_CHECKED_AND_ITS_BREAK_IS_DETECTED_AT_SEQ_1(
+    golden: dict, spec: chain.ChainSpec
+) -> None:
+    """⚠️ **`OF-141` / `REVIEW_7_1.md` §12.2, mutant `M12`. THE FREEZE'S ONE FREE PROOF RESTS ON
+    THIS LINK AND NOTHING ELSE, AND UNTIL THIS FIXTURE EXISTED NO TEST TOUCHED IT.**
+
+    `config/protocol.yaml`'s own words for what is at stake:
+
+        A ledger cannot contain the hash of a tag that did not exist when it was written, so
+        pre-freeze episodes are CRYPTOGRAPHICALLY DISTINGUISHABLE from scored ones. This is the
+        one free proof available and it costs a single line.
+
+    ⚠️ **THE INTEGRITY CHECK CANNOT COVER THIS BY CONSTRUCTION.** ``prev_hash`` is EXCLUDED from
+    the canonicalised entry — golden 5's own ``hash_rule`` — so editing it moves **no digest**.
+    The link comparison in :func:`chain.verify` is the *only* thing that reads it, and `M12`
+    narrows that comparison to ``position > 1``, leaving the whole suite green. Golden 5's case
+    B breaks entry **2**; no fixture in this repository broke entry **1**.
+
+    **THE EXHIBIT IS ONE INPUT:** entry 1's ``prev_hash`` alone is moved off the genesis root,
+    its stored ``hash`` untouched and still correct.
+
+    ⚠️ **AND THE CONTROL IS WHY THIS FIXTURE PINS THE RIGHT THING RATHER THAN SOMETHING NEARBY.**
+    A *whole* entry 1 forged to chain from a different root — ``prev_hash`` **and** ``hash`` both
+    recomputed — is DETECTED by this verifier **and by M12 alike**, because M12 leaves the
+    recomputation intact and the recomputation is what catches it. So a test written against the
+    forged-root shape would pass under M12 and prove nothing. The two are asserted here **with
+    their reasons**, because a right verdict for the wrong reason is the failure `INC-34` nearly
+    shipped.
+    """
+    case = next(c for c in golden["cases"] if c["case"] == "A")
+    genesis = golden["genesis_hash"]
+    intact = [dict(e) for e in case["ledger"]]
+
+    # The chain is sound before anything is touched, so the DETECTED below cannot come from a
+    # fixture that was already broken.
+    assert (
+        chain.verify(intact, genesis_hash=genesis, algorithm=spec.algorithm).verdict
+        == chain.VALID
+    ), "the unmodified case-A chain must verify, or this fixture proves nothing"
+
+    # ── THE EXHIBIT: entry 1's prev_hash ALONE, IN EVERY SHAPE THE FREEZE ACTUALLY USES ──
+    # ⚠️ **THE SHAPES ARE THE POINT AND ONE OF THEM IS NOT DECORATIVE.** This fixture first
+    # used a single 64-hex sentinel, and a self-directed mutant (`SM-I`) that skips the link
+    # check at entry 1 **only when prev_hash is NOT 64 hex** SURVIVED it — which is precisely
+    # the shape the published proof is about. `config/protocol.yaml` walks the genesis root
+    # through THREE values: the literal ``PRE-FREEZE`` (10 characters) before the freeze, the
+    # ``probe-v1`` tag's object id, and at ``prereg-v1`` the tag object id every scored episode
+    # chains from — a 40-hex object id, not a 64-hex digest. **A real pre-freeze ledger
+    # presented as a scored one carries a SHORT prev_hash at entry 1**, so a fixture that only
+    # ever breaks the link with 64 hex characters does not pin the attack it was written for.
+    for broken in (
+        "PRE-FREEZE",          # the literal pre-freeze sentinel — THE threat shape
+        "b" * 40,              # a git tag object id, which is what the freeze actually sets
+        "a" * 64,              # a sha-256 digest
+        "",                    # empty
+        "PRE-FREEZE-2",        # a near-neighbour of the sentinel
+    ):
+        if broken == genesis:
+            continue
+        link_only = [dict(e) for e in case["ledger"]]
+        link_only[0]["prev_hash"] = broken
+        assert link_only[0]["hash"] == case["ledger"][0]["hash"], (
+            "the stored digest must be left ALONE — the whole point is that it is still "
+            "correct, because prev_hash is outside the canonicalised entry and moving it "
+            "moves no digest"
+        )
+
+        outcome = chain.verify(link_only, genesis_hash=genesis, algorithm=spec.algorithm)
+        assert outcome.verdict == chain.DETECTED, (
+            f"entry 1's link to the genesis root is unchecked for prev_hash={broken!r}. A "
+            f"pre-freeze ledger can then be presented as a scored one by editing ONE field "
+            f"that no digest covers, and config/protocol.yaml's 'one free proof' is worth "
+            f"nothing (OF-141, mutant M12; the short shapes are mutant SM-I)"
+        )
+        assert outcome.first_bad_ledger_seq == 1, (
+            f"the break is at entry 1 and must be reported there, not at "
+            f"{outcome.first_bad_ledger_seq} (prev_hash={broken!r})"
+        )
+        assert "link is broken" in outcome.reason, (
+            "detected for the WRONG REASON. Entry 1's own contents still hash to its own "
+            f"stored digest, so the only sound reason is the broken link. Got: "
+            f"{outcome.reason!r} (prev_hash={broken!r})"
+        )
+
+    # the 64-hex shape is carried forward for the assertions below
+    link_only = [dict(e) for e in case["ledger"]]
+    link_only[0]["prev_hash"] = "a" * 64
+    outcome = chain.verify(link_only, genesis_hash=genesis, algorithm=spec.algorithm)
+
+    # ── THE CONTROL: a WHOLE entry 1 forged from a different root ────────────────────────
+    # Detected by HEAD and by M12 alike, at the RECOMPUTATION rather than at the link — so it
+    # does NOT discriminate M12, and this fixture must not rest on it.
+    forged = [dict(e) for e in case["ledger"]]
+    other_root = "b" * 64
+    body = {k: v for k, v in forged[0].items() if k not in CHAIN_FIELDS}
+    forged[0]["prev_hash"] = other_root
+    forged[0]["hash"] = chain.entry_digest(other_root, body, algorithm=spec.algorithm)
+    assert forged[0]["hash"] != case["ledger"][0]["hash"], "the forgery must move the digest"
+
+    forged_outcome = chain.verify(forged, genesis_hash=genesis, algorithm=spec.algorithm)
+    assert forged_outcome.verdict == chain.DETECTED
+    assert forged_outcome.first_bad_ledger_seq == 1
+    # ⚠️ The two shapes must be distinguished BY REASON. If this ever reads "link is broken"
+    # for both, the control has stopped being a control and this fixture is back to proving
+    # only what M12 already allows.
+    assert "link is broken" in forged_outcome.reason, (
+        "the forged-root entry is caught at the link FIRST by this verifier, which is correct "
+        "and is why it is the control rather than the exhibit"
+    )
+
+    # And the property that makes the exhibit load-bearing, asserted rather than described:
+    # with the link check gone, the forged entry is still caught and the link-only entry is not.
+    body_link_only = {k: v for k, v in link_only[0].items() if k not in CHAIN_FIELDS}
+    assert (
+        chain.entry_digest(genesis, body_link_only, algorithm=spec.algorithm)
+        == link_only[0]["hash"]
+    ), (
+        "the link-only exhibit's own contents STILL hash to its stored digest from the real "
+        "genesis — this is the line that proves no recomputation can catch it, and therefore "
+        "that the link check is the only thing standing between a pre-freeze ledger and a "
+        "scored one"
+    )
+    body_forged = {k: v for k, v in forged[0].items() if k not in CHAIN_FIELDS}
+    assert (
+        chain.entry_digest(genesis, body_forged, algorithm=spec.algorithm)
+        != forged[0]["hash"]
+    ), "the forged entry IS catchable by recomputation, which is what makes it the control"
+
+
 @pytest.mark.parametrize("junk", ["not-an-entry", 7, None, ["a", "b"]])
 def test_an_item_that_is_not_an_entry_is_an_answer_and_never_an_exception(
     spec: chain.ChainSpec, junk: Any
@@ -2371,6 +2500,105 @@ def test_Q069_the_scorer_side_prohibition_is_stated_in_the_package_itself(
         )
     ) or ""
     assert "Q-069" in control_doc and "predicate logic" in control_doc
+
+
+def test_the_TAMPER_EVIDENCE_CLAIM_CEILING_IS_STATED_IN_chain_py_AND_IS_NOT_EXCEEDED(
+    repo_root: Path,
+) -> None:
+    """⚠️ **`OF-142` / `REVIEW_7_1.md` §12.4, mutant `M39`. THE CEILING WAS PINNED BY NOTHING.**
+
+    `M39` replaced ``chain.py``'s stated limitation with *"the ledger is tamper-evident: any
+    alteration is detected"* and the whole 159-test suite stayed **GREEN**. The replacement is
+    **false** — this file's own
+    ``test_a_truncated_tail_is_NOT_detected_and_that_is_a_stated_limitation`` and
+    ``test_a_re_derived_suffix_is_NOT_detected_and_that_is_the_same_limitation`` exhibit two
+    edits that verify — so the mutant makes the package assert what the package disproves.
+
+    ⚠️ **THE ARCHITECT'S C7 REVIEW 1 RULING 4 PUTS THIS IN THE OWNED SET IN TERMS:** *"the README
+    must claim no more than 'evident against an edit that leaves a stale digest'. DO NOT FAIL C7
+    on either. **DO fail it if any docstring, comment or artefact claims more than that.**"*
+
+    **This is the pattern `test_Q069_the_scorer_side_prohibition_is_stated_in_the_package_itself`
+    already uses ten lines up**: the docstring is **parsed out of the AST** rather than trusted,
+    so a mention in a comment or in some other string would not satisfy it.
+
+    ⚠️ **AND IT CHECKS BOTH DIRECTIONS, WHICH IS THE HALF THAT ACTUALLY CLOSES M39.** Requiring
+    the ceiling's phrases would be defeated by a docstring that keeps them *and* adds an
+    overclaim beside them. So every occurrence of the overclaiming sentence is located and each
+    one is required to sit inside a **disclaimer** — which is how the honest docstring can quote
+    the false sentence in order to reject it, and how M39's replacement, which quotes it in
+    order to assert it, is caught.
+    """
+    module = ast.parse(
+        (repo_root / "src" / "whetstone_gate" / "ledger" / "chain.py").read_text(
+            encoding="utf-8"
+        )
+    )
+    raw_doc = ast.get_docstring(module) or ""
+    # ⚠️ The docstring is REFLOWED PROSE with markdown emphasis, so a sentence the architect
+    # wrote as one phrase is stored with newlines and ``**`` inside it. Matching the raw text
+    # would make this test fail on a REWRAP — which is a cosmetic edit — and pass or fail for
+    # reasons that have nothing to do with the claim. Whitespace is collapsed and emphasis
+    # markers dropped before anything is looked for.
+    doc = re.sub(r"\s+", " ", raw_doc.replace("**", "").replace("``", ""))
+
+    # ── DIRECTION 1: the ceiling is STATED, in ruling 4's own words ──────────────────────
+    required = {
+        "evident against an edit that leaves a stale digest": "the ceiling itself, verbatim",
+        "and against nothing else": "the half that makes it a ceiling and not a boast",
+        "the README must not say more": "ruling 4's instruction to the artefacts downstream",
+        "exactly two": "that the undetected shapes are ENUMERATED, not gestured at",
+        "Truncation": "undetected shape 1",
+        "RE-DERIVED SUFFIX": "undetected shape 2 — the one OF-57's row still omits",
+        "anchors its START": "why both shapes are the same fact",
+    }
+    missing = [f"{k!r} ({why})" for k, why in required.items() if k not in doc]
+    assert not missing, (
+        "chain.py's module docstring no longer states the tamper-evidence claim ceiling in the "
+        "architect's own words. This package may claim no more than 'evident against an edit "
+        "that leaves a stale digest', and a claim nothing pins is a claim that drifts "
+        "(OF-142, mutant M39). Missing: " + "; ".join(missing)
+    )
+
+    # ── DIRECTION 2: the ceiling is NOT EXCEEDED ─────────────────────────────────────────
+    # ⚠️ The honest docstring CONTAINS the false sentence, because it quotes it to reject it.
+    # So presence is not the test; PROXIMITY TO A DISCLAIMER is.
+    overclaims = (
+        "any alteration is detected",
+        "any alteration, insertion or deletion is detected",
+        "every alteration is detected",
+        "all alterations are detected",
+    )
+    disclaimers = ("FALSE", "is not claimed", "would be", "NOT caught", "does not")
+    for phrase in overclaims:
+        start = 0
+        while (found := doc.find(phrase, start)) != -1:
+            window = doc[max(0, found - 200) : found + 200]
+            assert any(d in window for d in disclaimers), (
+                f"chain.py's docstring asserts {phrase!r} with no disclaimer within 200 "
+                f"characters. That claim is FALSE and this file's own truncation and "
+                f"re-derived-suffix tests disprove it. Ruling 4: 'DO fail it if any docstring, "
+                f"comment or artefact claims more than that.' Context: ...{window}..."
+            )
+            start = found + 1
+
+    # ── AND THE CEILING MUST NOT SIT BELOW THE FOLD, for the reason M38's test gives ─────
+    assert "WHAT THIS CHAIN DOES NOT DETECT" in doc, (
+        "the limitation lost its heading. A reader who skims for what the chain does NOT do is "
+        "exactly the reader ruling 4 is protecting"
+    )
+
+    # ── THE TWO TESTS THE DOCSTRING NAMES MUST EXIST, or it points at nothing ────────────
+    suite = ast.parse((repo_root / "tests" / "test_c7_ledger.py").read_text(encoding="utf-8"))
+    names = {n.name for n in ast.walk(suite) if isinstance(n, ast.FunctionDef)}
+    for named in (
+        "test_a_truncated_tail_is_NOT_detected_and_that_is_a_stated_limitation",
+        "test_a_re_derived_suffix_is_NOT_detected_and_that_is_the_same_limitation",
+    ):
+        assert named in names, (
+            f"chain.py's docstring cites {named!r} as the assertion behind its limitation and "
+            f"no such test exists. A citation to a deleted test is worse than no citation"
+        )
 
 
 def test_Q069_nothing_in_this_repository_imports_the_ledger_yet(repo_root: Path) -> None:
