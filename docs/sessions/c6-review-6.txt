@@ -2,10 +2,9 @@ PUSHED SHA: e4a4058   (the journals commit; this file's own commit follows it an
             written into the line below by the commit immediately after that one - the same
             mechanism INC-71 records INC-58 promised and did not keep, and which c7-review-2.txt
             and c6-fix-5.txt both kept)
-PUSHED SHA, THIS FILE: NOT YET WRITTEN, AND NONE IS INVENTED.  A commit cannot carry its own
-            SHA.  The commit immediately following this one writes the real value into this
-            line and does nothing else, which is checkable with
-            `git log -p -- docs/sessions/c6-review-6.txt`.
+PUSHED SHA, THIS FILE: 712c3ed   (written into this line by the commit immediately following
+            712c3ed, and by nothing else - a commit cannot carry its own SHA.  Checkable with
+            `git log -p -- docs/sessions/c6-review-6.txt`.)
 
 C6 REVIEW 6 - THE ATTACKER LOOP.  SESSION-TOKEN 7f4b0e93.  2026-09-02 -> 2026-09-03.
 THIS WAS C6's LAST REVIEW.
