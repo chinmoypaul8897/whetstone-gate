@@ -1,11 +1,13 @@
 SESSION-TOKEN: a72f5d81   CHUNK ARCH   ROLE: FIX   2026-09-03
 FINAL OUTPUT. Committed to docs/sessions/arch-goldens-3.txt BEFORE it was printed.
 
-PUSHED SHA: this file was committed at <next> BEFORE it was printed, so the SHA of its own
-            commit could not be inside it. This line is filled by the commit that follows
-            <next>, and the printed FINAL OUTPUT states that follow-up commit's SHA as the
-            true final pushed SHA. The two differ by exactly this fill, which is why both
-            are named here rather than one being passed off as the other.
+PUSHED SHA: this file was committed at 7fd8cdb BEFORE it was printed, so the SHA of its
+            own commit could not be inside it. This line was filled by the commit that
+            FOLLOWS 7fd8cdb and does nothing else, and the printed FINAL OUTPUT states that
+            follow-up commit's SHA as the true final pushed SHA. The two differ by exactly
+            this fill, which is why both are named here rather than one being passed off as
+            the other.
+PUSHED SHA (this file's own commit): 7fd8cdb
 PUSHED SHA (the work, already pushed): 1f892fdce290df9c9d3b81d657b7d296add29617
 
 =====================================================================
@@ -270,10 +272,13 @@ this session names it here.
   1f892fd  Swept: NOTHING.  Staged snapshot MEASURED as exactly three paths -
            QUESTIONS.md, STATUS.md, PROGRESS.md. Q-063 clause (i)'s diff was run and READ:
            three added `Raised by:` lines, ALL THREE carrying THIS session's own token.
-  <this>   Swept: NOTHING.  Staged snapshot MEASURED as exactly one path -
+  7fd8cdb  Swept: NOTHING.  Staged snapshot MEASURED as exactly one path -
            docs/sessions/arch-goldens-3.txt. NAMED EXPLICITLY, NEVER `docs/sessions/`,
            because the other session's untracked record is sitting in that directory.
-  <next>   Swept: NOTHING.  One path, this same file, one line.
+  the fill Swept: NOTHING.  One path, this same file, one line - the placeholders above
+  commit   replaced by 7fd8cdb. ITS OWN SHA IS NOT IN THIS FILE AND CANNOT BE: a commit
+           cannot carry its own SHA. It is the first line of the printed FINAL OUTPUT, and
+           `git log -1 -- docs/sessions/arch-goldens-3.txt` settles any doubt.
 
 EVERY commit used a PRIVATE INDEX (GIT_INDEX_FILE under this session's own OS temp
 directory) with STEP 5 - the scoped `git reset -- <the same paths>` - INCLUDED.
@@ -368,6 +373,7 @@ and both are named so nobody has to rediscover them.
   QUESTIONS.md                            +213/-0 1f892fd   (token row + Q-091..Q-093)
   STATUS.md                               +66/-1  1f892fd   (UPDATE block + C8's row)
   PROGRESS.md                             +132/-0 1f892fd   (one entry, newest on top)
-  docs/sessions/arch-goldens-3.txt        NEW    <this>, then <next> for its own SHA line
+  docs/sessions/arch-goldens-3.txt        NEW    7fd8cdb, then the fill commit for its
+                                                 own PUSHED SHA line and nothing else
 
 NOTHING ELSE. No source, no config, no frozen artefact, no golden but the new one.
