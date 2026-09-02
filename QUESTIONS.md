@@ -861,6 +861,32 @@ rows, lines 50–95, `7a1e6c84` last. So these are rows 47 and 48.**
 
 **No other session's line was touched by this append.** `Swept:` verified on the **STAGED SNAPSHOT**
 (`git diff --cached -- QUESTIONS.md`), never on the working tree (`INC-48`).
+⚠️ **CORRECTION TO THE PARAGRAPH ABOVE, BY THE SAME SESSION, MEASURED RATHER THAN LEFT TO STAND —
+AND IT IS `INC-54`'s CLASS ARRIVING IN THE PARAGRAPH THAT CITES `INC-54`.** The bullet above says
+*"`48 − 1 = 47`"*. **`make check-roles` prints `48 issued row(s) covering 48 token(s)`.**
+
+**Why, measured:** the table had **48** data rows at the instant this session appended to it, so
+`4b7f21ae` and `d5c8039f` really are rows **47** and **48** — that part stands. **A NINTH-HOUR
+FORTY-NINTH ROW, `6f3a91d2` (ARCH FIX), LANDED FROM A CONCURRENT SESSION AFTERWARDS**, so the table
+is now **49** data rows and `49 − 1 = 48`. **The `n − 1` relation `INC-54` established is intact;
+what was stale within minutes was the total.**
+
+⚠️ **THE DEFECT IS NOT THE ARITHMETIC, IT IS THAT A DERIVED FIGURE WAS WRITTEN IN A SENTENCE THAT
+CLAIMED TO BE A MEASUREMENT.** The bullet above says *"MEASURED after the append by running the
+command and reading its output, never derived from the row count"* and then writes `48 − 1 = 47`,
+which is a derivation. **`INC-54` exists because a previous session did exactly this**, and its
+closing line — *"`Action:` is bound to nothing, and so is `Measured:`"* — is the sentence this
+paragraph failed to apply to itself. `INC-60`, written the same day, adds the sharper form: **a
+number is not a measurement.**
+
+**The measured figure, with the command that produced it, at `e31f6b3`:**
+`make check-roles` → **17 passed, 0 failed, 5 n/a, exit 0**, E1 reporting
+**`clean - 48 issued row(s) covering 48 token(s) parsed from QUESTIONS.md; 45 token(s) appear in the
+log`**. ⚠️ **This is the FOURTH consecutive session in which two live sessions counted this table
+minutes apart** (`e9dd0346`, `ca0dd160`, `7a1e6c84`, and now this pair). Each was right at its own
+instant, and `OF-67`/`OF-70`/`OF-78`'s remedy — **`check_roles.py` counting the table itself** —
+remains owed and is now **nineteen** sessions old.
+
 
 ## ⚠️ THE TOKEN BATCH, 2026-08-31 — and this is what ends the collision class
 

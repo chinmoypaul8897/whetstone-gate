@@ -90,7 +90,11 @@ puts C20 inside it. **That is a mitigation, not an equivalence, and it is publis
 first commit**. "NIGHT RUN B" held **two** chunk tokens — `4b7f21ae` for C6 FIX 4 (TASK 1) and
 `d5c8039f` for the ARCH degradation record (TASK 2), row 48 — and they are **never crossed**;
 `make check-roles` E3 is what would catch it. ⚠️ **Two numbers, and this session says which it
-counted:** **48 is the DATA-ROW count**; `make check-roles` prints **one fewer** (`INC-54`).
+counted:** **48 was the DATA-ROW count at the instant of the append**, so these are rows 47 and 48.
+⚠️ **CORRECTED, AND THE CORRECTION IS `INC-54`'s OWN CLASS:** a 49th row (`6f3a91d2`) landed from a concurrent
+session minutes later, so `make check-roles` **MEASURES `48 issued row(s) covering 48 token(s)`**,
+not the `47` this entry first derived. The `n − 1` relation holds; the total was stale within
+minutes. **A number is not a measurement** (`INC-60`).
 ⚠️ **The two rows were appended BENEATH `7a1e6c84`'s, not above it** — the first draft put them
 between `ca0dd160` and `7a1e6c84`, which would have silently renumbered a **concurrent** session's
 row from 46 to 48 while its own paragraph three lines below still read *"`7a1e6c84` IS ROW 46"*.
