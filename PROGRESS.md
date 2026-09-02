@@ -6,6 +6,143 @@ not a record; this file is.
 
 ---
 
+## C6 — THE ATTACKER LOOP — **REVIEW 5** — 2026-09-02 — ⚠️ **FAIL. NO TAG. ZERO BLOCKERS, THE SUBJECT MEASURED CLEAN, AND FOUR REQUIRED-SET MUTANT SURVIVORS — EVERY ONE IN COPY 2 OF CLAIM 4's GUARD**
+
+**SESSION-TOKEN:** `0ca97bbb` · Row **50** of `QUESTIONS.md`'s `## Session tokens` table, counted
+**from the table** in the operator's working tree at HEAD `0dfb6fb`: 49 rows stood, the last being
+`6f3a91d2`. ⚠️ **The count is checkable against `REVIEW_C6_4.md`'s own header**, which records
+`ca0dd160` as **row 45**, and `ca0dd160` is the 45th row by this count. **The row was registered
+BEFORE the Phase-1 seal.** ⚠️ A concurrent **C7 REVIEW 1** session (`472cdc4b`) shares this tree and
+took row 51.
+
+**Pushed SHA:** the FINAL OUTPUT in `docs/sessions/c6-review-5.txt` states it as its first line.
+**Spend:** ⚠️ **ZERO provider model calls, zero tokens, on every lane.** `evals/` **does not exist**
+in this repository. ⚠️ **NO TAG. `c6-pass` DOES NOT EXIST.**
+
+### The verdict, and what it rests on
+
+**FAIL**, and it rests on **four surviving required-set mutants** and on nothing else.
+`Q-082`'s ruling makes the **required set** the gate, so the set was enumerated and **argued from
+quoted clauses** in `docs/reviews/independent/c6_review5_criteria.md` §1 and **sealed at `615993d`
+before a single mutant was written** — sixteen owned properties, thirty-four planned mutants, and a
+pre-committed OWNED/NOT-OWNED rule whose clause 2 binds against my own convenience: *if I can quote
+the clause, the mutant gates.* Phase 2 **added** seven mutants and **removed** none.
+
+| | |
+|---|---|
+| BLOCKERS | **0** |
+| mutants | **45 run · 37 KILLED · 2 PROVEN EQUIVALENT · 6 non-equivalent survivors** |
+| survivors **OWNED** | **4** — `OF-146`…`OF-149`, all four in copy 2. **The FAIL.** |
+| survivors **NOT-OWNED** | 2 — `R-18`, `R-08`; the architect's own disposition |
+| the four blindness claims, my method | **0 AUTHORED hits of 110 needles**, seven turns, real assembled bytes |
+| clean-surface control | **0 of 110**, twice |
+| must-reach control | the note reaches FULL on turns 2–20 and AUTHORED on **none**; the door is OPEN |
+| my scoped reimplementation | **21 of 21 AGREE** |
+| `src/` moved under FIX 4 | **NO — not one byte** |
+
+### What FIX 4 got right, said first because it is true and it is large
+
+* **All three findings REVIEW 4's verdict rested on are closed**, and I re-ran each: `OF-124`
+  KILLED 4, `OF-125` KILLED 3, `OF-126` KILLED 1 — **FIX 4's own reported counts reproduce exactly.**
+* **`src/` is untouched.** Measured across its eight commits: zero `src/` paths. `tests/test_c6_attacker.py`
+  changed in **comments only**, so `R-05` and `R-12` — where HEAD is the stricter of the pair — are
+  verifiably left alone.
+* **`SM-B`'s repair holds.** `_sole_layer` survives none of four attacks (exclusivity deleted,
+  identity deleted, no-op, inverted); a fifth is proven equivalent. Its self-test fires in both
+  directions with two different single-layer shapes.
+* **`OF-126`'s fixture is the best single thing in the fix**: base derived from `config/`, both ends
+  of the range pinned, and the *other* direction pinned too, so it cannot be satisfied by widening
+  the range instead of keeping it.
+* **`INC-42`'s mutant M17** — the cap inside the label that once left **all 65 C6 tests green** —
+  now dies with **22 failures**.
+
+### What fails it
+
+**Four required-set mutants survive, all in copy 2, each exhibited on a concrete input:**
+
+| finding | mutant | exhibit |
+|---|---|---|
+| `OF-146` | copy 2's gate-VOCABULARY scan deleted | 40 / 20 / 20 findings → **0**, all from that scan alone |
+| `OF-147` | copy 2's denial-VALUE equality deleted | 19 → **0**, **no other layer fires** |
+| `OF-148` | copy 2's verbatim-CLAUSE scan deleted | 19 → **0**, **with no source mutation at all** |
+| `OF-149` | copy 2's probe-note-on-AUTHORED check disarmed | suite green |
+
+⚠️ **THE FACT THAT DECIDES EVERY DETERMINATION IS MEASURED, NOT ASSERTED: COPY 2 IS THE ONLY GUARD
+IN THIS REPOSITORY EVER FIRED AT A `run_episode` CONTEXT.** All 23 calls of copy 1's four guards take
+a hand-assembled context; the single `run_episode` call in that file never reaches a guard. **A
+copy-2 catcher with no fixture is not a duplicate lying idle — it is the only guard over that
+subject, unpinned.** Each of the four classes **is** pinned in copy 1, which is the same shape
+`OF-124` and `OF-125` had.
+
+### ⚠️ The risk is BOUNDED and published rather than left to inference
+
+Four combined experiments applied each survivor **together with a real leak in `src/`**, against a
+control planting the same leak with the guard intact:
+
+```
+E1   M-12 + a REAL gate-reason leak in LAST_REFUSAL_LABEL     RED, 19 failed
+E1c  the same leak, copy 2's vocabulary INTACT                RED, 29 failed
+E2   M-16 + a REAL drift in texts.generic_denial()            RED,  2 failed
+E2c  the same drift, copy 2's equality INTACT                 RED,  2 failed  <- the SAME two
+```
+
+**No real leak escapes the suite.** The survivors cost **depth**, not the kill. That does not lift
+them: `Q-082` rules a survivor on an owned property a FAIL *"even when the subject measures clean
+today"*, and **`R-14` — which the architect ruled OWNED and tag-holding — has the identical
+property.** ⚠️ **`Q-085` asks whether the bar should be narrowed once more, and names exactly which
+findings a ruling would lift.** `Q-084` asks the other half: copy 2 has **no residue layer at all**,
+and an absent catcher produces no mutant, so the strongest form of *unpinned* is the one form the
+gate cannot see.
+
+### `INC-47`'s test, applied a third time — and it fires
+
+`INC-56`'s `Systemic guardrail` claims *"the (class, copy) matrix … **is complete and a deletion in
+either copy meets a red test**"*. **Enumerated cell by cell: four copy-2 cells meet no red test and a
+fifth has no catcher to delete.** `OF-151`. And `INC-58`'s `Fix:` field never received the SHA it
+promised (`OF-152`) — `git log -L` over that block shows only `754a91a` ever touched it. ⚠️ **I also
+ran the mechanical check `INC-58` names as owed: 95 `Fix:` SHAs resolve, 8 strings do not, and none
+of the 8 is fabricated** — five are session tokens and two are vendor pins. **The naive form of that
+check has seven false positives today**, which is worth more to whoever builds it than the finding.
+
+### Harness, and this session's own defect
+
+Four fresh OS temp clones. `whetstone_gate.__file__` and `config.repo_root()` **printed at every
+slice head**; `tests/test_repo_invariants.py::test_the_package_under_test_is_the_tree_under_test`
+**run in both directions** — green with `PYTHONPATH` set to the clone, red without. Restore **writes
+the original bytes** and re-hashes; the harness never commits. Controls **121 / 121** before and
+after all eight slices.
+
+⚠️ **This session's FIRST parallel run was killed mid-mutant by a tool timeout and left a mutation
+applied in all four clones. The next launch's PRE-CONTROL read `117 passed, 4 failed` and the
+harness declared it VOID.** Nothing from it is reported; all four clones were reset and re-run.
+**That direction is the honest one** — it announces itself — where `INC-57`'s and `INC-64`'s both
+look clean. Recorded in `c6_mutants_5.md` §0.1.
+
+### Regressions, measured by me
+
+`make test` **784 passed / 1 failed** (measurement 1) — the one failure attributed **by file** to the
+concurrent C7 session's then-uncommitted `STATUS.md`, `OPEN_FINDINGS.md` and `REVIEW_7_1.md` — then
+**785 passed / 0 failed** (measurement 2) after that session committed. `git diff 615993d..a1973fa --
+src/ tests/` is **EMPTY**, so both numbers are against the same bytes. `make selftest` **RED on
+`camel_comparator.branch` only** — C13/RUN-1's, not C6's. `make check-roles` **17 passed, 0 failed,
+5 n/a, exit 0**. `git status --porcelain tests/goldens/` **EMPTY**. `git tag -l` shows neither
+`probe-v1` nor `prereg-v1`.
+
+### Owed and delivered
+
+**`docs/reviews/mutants/c6_mutants_5.md` is WRITTEN** — the file C6 FIX 4 could not write because
+that directory was outside its fence. It carries this review's 45 mutants, the four combined
+experiments, and **FIX 4's own thirteen transcribed from `docs/sessions/nightrun-b-1.txt`**, with the
+nine claims I could independently re-run reproducing exactly, failure counts included.
+
+### The remedy, bounded
+
+**Enumerate copy 1's catchers and give copy 2 a firing fixture for each**, through `_sole_layer`.
+**Five cells are missing** — the gate vocabulary, the verbatim clause scan, the denial equality, the
+probe-note check, and a residue catcher copy 2 does not have. `REVIEW_C6_5.md` §7.1 is the checklist.
+
+---
+
 ## C7 — THE LEDGER — **REVIEW 1** — 2026-09-02 — ⚠️ **FAIL. NO TAG. TWO BLOCKERS AND TWO OWNED-PROPERTY MUTANT SURVIVORS — AND THE CHUNK'S BEHAVIOUR MEASURED CORRECT ON EVERYTHING THIS REVIEW COULD DRIVE**
 
 **SESSION-TOKEN:** `472cdc4b` · Row **51** of `QUESTIONS.md`'s `## Session tokens` table — **50 8-hex
