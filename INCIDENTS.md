@@ -4173,3 +4173,171 @@ this is `INC-50`'s mirror move, and it is why the new fixtures assert their need
 **before** they degrade it. ⚠️ **The count for the underlying class is now FIVE, and the count for
 "a test written to close a finding was itself defective" is now THREE — `INC-50`, `INC-53` and this.**
 Recorded so that the ruling, when it comes, is made against a number and not against an impression.
+
+---
+
+## INC-56 — the fix that found copy 2 of the blindness guard defenceless applied its own discovery to ONE class of three and left the other two, so `REVIEW_C6_3`'s `N13` and `N15` came back alive in the twin of the function they were killed in
+
+**Date:** 2026-09-02 (**C6 FIX 4, `4b7f21ae`, writing this before it changes a line of code**, per
+hard rule 13. The failure is **C6 FIX 3**'s (`363a2e9f`); it was found by **C6 REVIEW 4**
+(`ca0dd160`), whose verdict is **FAIL with ZERO BLOCKERS**. Fix SHA recorded under **Fix**.)
+
+**Event:** `REVIEW_C6_3` failed C6 on six mutant survivors. **C6 FIX 3 killed all six, and killed
+them well** — REVIEW 4 re-ran every one in a fresh clone and each died to a test that *names the
+property its mutant attacks*, not to a byte-count fixture: `N4` 2 failed, `N9` 2, `N12` 4, `N13` 3,
+`N14` 4, `N15` 3. It went further than it was asked to: it ran **fourteen self-directed mutants on
+its own new surface**, found five survivors, and its own `N-M1b` established the sharpest fact in
+the chunk's history — **copy 2 of claim 4's blindness guard had never been fired at a leak at all**,
+so deleting its scan left the whole suite green. It closed that for `OF-104`'s shape.
+
+⚠️ **AND THEN IT DID NOT CARRY THE SAME MOVE TO THE OTHER TWO CLASSES IN THE SAME FUNCTION.**
+REVIEW 4 ran 28 mutants — 16 killed, 5 equivalent with the boundary named, **7 non-equivalent
+survivors**, of which three carry the FAIL and are all one-fixture repairs:
+
+| id | the mutant | HEAD vs mutant, on a concrete input | why it survived |
+|---|---|---|---|
+| `R-14` / `OF-124` | **copy 2**'s LAYER-1 exemption widened from the state **JSON** to the whole state **LINE** | `STATE_LABEL = "STATE SO FAR (5000000): "` over a real 20-turn episode → **HEAD 40 findings, mutant 0**; all 111 tests green | **`N15`'s class, in copy 2.** Copy 1 got `test_LAYER_1_scans_the_state_LABEL_and_exempts_only_the_state_JSON` with three cap formattings **and** the other-side test. Copy 2 got neither |
+| `R-15` / `OF-125` | **copy 2**'s `refusal_lines != 1` → `< 1` | a summary with **two** recognisable last-denial lines → **HEAD 20 findings, mutant 0**; suite green | **`N13`'s class, in copy 2.** Copy 1 got a three-count fixture (2, 3, 5). Copy 2 got none |
+| `R-20` / `OF-126` | `crossing()`'s `range(0, turn_budget + 1)` → `range(0, turn_budget)` | `full_listing_chars=1600`, `displaced=240`, `base=5,521` → `tokens_at(19)=57,277 ≤ 60,000 < tokens_at(20)=60,001`; **HEAD `20`, mutant `None`** | **`OF-108`'s class at the range's OTHER end.** The `k = 0` end is pinned (`SM-6`), the **target** boundary is pinned both ways (`N4`), the `turn_budget` end by nothing |
+
+**Action:** this entry, first. Then three one-fixture remedies, each mirroring the shape copy 1
+already carries, each re-run against the review's own mutant to show **KILLED**; then **this
+session's own self-directed mutants against the FULL suite**, on the code this session wrote, with
+any survivor named rather than a clean sweep claimed. **Nothing else in C6 is touched** — the four
+LOW survivors, `OF-127`, `OF-128` and `OF-133` are explicitly not fixed, under `Q-082`'s ruling and
+because two of them (`R-05`, `R-12`) are cases where **HEAD is the stricter of the pair** and a
+"fix" would install the wrong behaviour.
+
+**Expectation:** hard rule 6 and `docs/reviews/README.md`'s bar together say a guard's every
+assertion is load-bearing — *"every mutant killed or proven equivalent"*. The specific expectation
+that failed is narrower and is C6 FIX 3's own, in writing, in the docstring it added:
+*"the cause is not the scan; it is that **this copy had never been fired at a leak at all**."*
+**A session that writes that sentence has diagnosed a property of the COPY, not of the scan** — and
+the remedy that follows from its own diagnosis is to fire copy 2 at every class copy 1 is fired at,
+which is three, not one.
+
+**Missing:** ⚠️ **nothing in the repository can answer the question "which properties is copy 2
+fired at, and which is copy 1 fired at?"** The two copies are deliberately independent — hard rule
+8's anti-circularity shape one level down, and correctly so — but the consequence is that **their
+coverage can diverge silently and no artefact tracks the divergence.** REVIEW 4 had to establish it
+by grepping the file for `exempts_only_the_state_JSON` and finding it absent. A table naming each
+claim-4 layer against the fixtures that fire it **in each copy** would have made this a one-glance
+check, and there is none — not in the file, not in `docs/reviews/`, not in the card.
+
+**Missed:** ⚠️ **the signal was in C6 FIX 3's own hands and it published it.** `N-M1b` did not say
+"the `OF-104` scan is unpinned in copy 2"; it said copy 2 *"only ever ran over clean contexts"* —
+which is a statement about **every** predicate in the function, and the function has at least three
+that copy 1 pins with dedicated fixtures. **The session generalised the diagnosis correctly in prose
+and then applied it to exactly the one class the review had named**, which is `INC-53`'s own
+`Diagnosis` — *"it mutated exactly what the review had named and nothing else"* — recurring inside
+the session that was written to close it. ⚠️ **And there was a second signal, one line further on:**
+FIX 3's fixture list for copy 2 has three rows and all three are **arm/clause labels**; the moment a
+parametrize list for a *three-layer* guard carries three cases that all attack one layer, the other
+two layers are unfired by construction.
+
+**Diagnosis:** the guard exists twice on purpose, and a fix is written against a **finding**, which
+names one site. So the natural unit of repair is *the finding's class in the copy the finding
+named*, while the unit of exposure is *every class in every copy* — and nothing reconciles the two,
+so each review discovers the next unrepaired (class, copy) pair one at a time.
+
+**Fix:** ⚠️ **SHA NOT YET KNOWN AT THE MOMENT THIS ENTRY IS COMMITTED, AND IT IS NOT INVENTED —
+`INC-47`'s own diagnosis is that `Fix:` is bound to a commit and cannot be made up, and this entry
+is being written BEFORE the fix exists because hard rule 13 requires that order.** The commit that
+lands the remedy follows this one, and **its real SHA is written into this line by the immediately
+following commit of this same session (`4b7f21ae`)**, which is a fact a reader can check with
+`git log --follow -p -- INCIDENTS.md`. The remedy is three fixtures: a parametrised
+cap-in-`STATE_LABEL` case in copy 2 **with its other side** (`OF-124`), a two-denial-line episode
+driven through copy 2 (`OF-125`), and a `turn_budget`-end boundary fixture pinned in **both**
+directions (`OF-126`); plus this session's own self-directed mutants run against the **full** suite.
+The mutant re-runs and their KILLED counts are in `docs/sessions/nightrun-b-1.txt`.
+
+**Systemic guardrail:** ⚠️ **PARTIAL, AND THE HALF THAT IS MISSING IS NAMED RATHER THAN IMPLIED
+AWAY.** What is now closed **by construction**: each of the three classes is pinned in **both**
+copies, so the (class, copy) matrix for claim 4's three layers plus `crossing()`'s three boundaries
+is complete and a deletion in either copy meets a red test. What is **not** closed: nothing
+mechanically asserts that the two copies' coverage matches, and **a test that walked one copy's
+fixtures and demanded a twin in the other would be exactly the shared predicate hard rule 8 forbids
+them to have** — the two copies are supposed to be able to diverge, which is what makes them worth
+two. ⚠️ **So the honest count is what carries this field: this is the EIGHTH instance of `INC-42`'s
+class** (`INC-42`, `INC-51`, `REVIEW_C6_3`, `INC-53`, `OF-123`, `REVIEW_C6_4`, `INC-55`, this), and
+the first where the remedy is neither *"more care"* nor *"another mechanism"* but **a matrix small
+enough to enumerate**: three layers × two copies, and `crossing()`'s three boundaries, written down
+in this entry so the next session repairs against the matrix rather than against the finding.
+
+---
+
+## INC-57 — a mutation harness restored its subject with `git checkout --` from a HEAD that HELD the mutation, so every mutant re-applied its predecessor and the failure counts ran 2/4/8/11/15/18: the defeat direction was FLATTERING, and six kills would have been published unmeasured
+
+**Date:** 2026-09-02 (**the failure is `ca0dd160`'s** — C6 REVIEW 4's own mutation harness. It was
+caught, fixed and re-baselined by that session, which recorded it in `REVIEW_C6_4.md` §2 and
+`docs/reviews/mutants/c6_mutants_4.md` §0 but could **not** write here: `INCIDENTS.md` was outside
+its fence and a review session does not hold this file. **Written by C6 FIX 4 (`4b7f21ae`) on its
+behalf**, from that session's own published record, which is the mechanism `Q-033` leaves for a
+stranded entry.)
+
+**Event:** REVIEW 4's harness applied each mutant by exact-string replacement in a fresh OS temp
+clone, **committed the mutation inside the clone**, ran C6's three test files, and then restored the
+file with `git checkout -- <path>`. `git checkout --` restores from **HEAD** — and HEAD held the
+mutation, because the harness had just committed it. **So no mutant was ever removed.** Each
+successive run measured its own mutant *stacked on every predecessor*, and the six re-run survivors'
+failure counts came out **2, 4, 8, 11, 15, 18** where the true counts are **2, 2, 4, 3, 4, 3**.
+
+**Action:** the session caught it on the **monotone** shape of the counts — six independent mutants
+on six different properties producing a strictly increasing failure count is not a result, it is a
+signature — rewrote the restore to **write the original bytes back and commit them**, asserted the
+file digest **back** to its pre-mutation value and `git status --porcelain` **empty** after every
+mutant, reset the clone to the sealed content, **re-baselined at 111 passed**, and re-ran all 28.
+**Both runs are in its record and only the second is cited.**
+
+**Expectation:** `INC-17`'s standing rule is that a measurement names the tree it came from, and this
+harness did that — it printed `whetstone_gate.__file__` for every run. **What no rule covered is that
+a harness must prove its own RESTORE, not only its own APPLY.** The apply step was asserted three
+ways (the anchor matches exactly once, the digest changes, the mutation is committed); the restore
+step was asserted **zero** ways until this failure.
+
+**Missing:** ⚠️ **a post-restore assertion, which is one line and is now in the harness:** after
+restoring, the file's SHA-256 must equal the **pre-mutation** digest the apply step already
+computed. The apply step had the number. Nothing compared against it. ⚠️ **Also missing: a
+NEGATIVE control between mutants** — re-running the unmutated baseline after a restore would have
+printed `111 passed` on a clean tree and `2 failed` on a defeated one, on the very first restore.
+
+**Missed:** ⚠️ **`git checkout -- <path>` and `git commit` in the same loop is a self-cancelling
+pair, and the harness contained both, four lines apart.** The signal that was there and ignored is
+that the harness's own author had chosen to commit the mutation *precisely so the clone's git state
+was meaningful* — and then used a git-state-relative restore. ⚠️ **And one level up: the first
+run's counts were READ and not interrogated.** 2, 4, 8, 11, 15, 18 was printed, looked like six
+kills, and was believed for as long as it took to notice it was monotone. **It was believed because
+it was flattering:** a defeated restore reports **every** mutant as KILLED, which is the direction a
+mutation harness is least likely to question.
+
+**Diagnosis:** a restore defined relative to a mutable reference (HEAD) inside a loop that mutates
+that reference restores the mutation, and because a stacked mutant kills a superset of what it would
+have killed alone, **every failure mode of this defect points at "KILLED"** — so the harness cannot
+report its own defeat and the operator has only the counts to go on.
+
+**Fix:** **`ca0dd160`'s own second run**, cited in `REVIEW_C6_4.md` §2 and `c6_mutants_4.md` §0 —
+restore by **writing the original bytes and committing them**, digest asserted back,
+`git status --porcelain` asserted empty, clone re-baselined at **111 passed** before anything was
+re-measured. ⚠️ **This entry adds no code fix and does not claim one:** it is the record of a defect
+that was found and repaired inside another session, landed here because that session could not reach
+this file. ⚠️ **What C6 FIX 4 does with it is stated as an intention here and as a MEASUREMENT
+there, and the two are deliberately not confused:** this entry is committed **before** this session
+runs a mutant, so it can promise only that its own harness will carry the post-restore digest
+assertion, the empty-`git status` assertion **and** the negative control this entry names as
+missing — the unmutated baseline re-run after every restore. **Whether it did is in
+`docs/sessions/nightrun-b-1.txt` with the numbers, not here.**
+
+**Systemic guardrail:** ⚠️ **NONE IN CODE — ACCEPTED, AND THE REASON IS STRUCTURAL.** Mutation
+harnesses on this project are written fresh by each review session in a temp directory outside the
+repository, deliberately: a shared harness is a shared predicate, and hard rule 8's whole argument is
+that the thing checking and the thing checked must not share code. **So there is nothing committed to
+add an assertion to.** What is available and is done here is the written convention, stated so the
+next harness author meets it in the read order: **a mutation harness asserts its RESTORE — the file
+digest back to its pre-mutation value, `git status` empty, and the unmutated baseline re-run green —
+and a run whose per-mutant failure counts are MONOTONE is treated as a harness defect until proved
+otherwise.** ⚠️ **AND THE COUNT THAT MATTERS: this is the SIXTH STRANDED ENTRY** — an incident found
+by a session whose fence excluded `INCIDENTS.md`, carried here by a later one: `Q-029`, `Q-033`,
+`Q-049`, `OF-89`, `REVIEW_C6_2`'s `M-9`, and this. **Six is no longer an accident of fencing; it is
+the fencing.** The remedy is the architect's and is not taken here: either `INCIDENTS.md` is inside
+every session's fence (it is append-only, so the collision risk is the one `INC-48` already
+describes) or every prompt that fences it out names who will carry the entry.

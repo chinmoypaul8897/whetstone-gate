@@ -93,6 +93,8 @@ appears that was never issued**, or if a token is reused across roles.
 | `e9dd0346` | C13 | FIX | 2026-09-02 |
 | `ca0dd160` | C6 | REVIEW | 2026-09-02 |
 | `7a1e6c84` | C13 | REVIEW | 2026-09-02 |
+| `4b7f21ae` | C6 | FIX | 2026-09-02 |
+| `d5c8039f` | ARCH | FIX | 2026-09-02 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -814,6 +816,47 @@ row 46.**
 * ⚠️ **`check_roles.py` COUNTING THIS TABLE ITSELF IS STILL OWED — `OF-67`, `OF-70`, `OF-78`, the
   SEVENTEENTH consecutive session to carry the total by hand.** `check_roles.py` is named under
   **NOT** in this session's fence, and a REVIEW session fixes nothing in any case.
+
+**No other session's line was touched by this append.** `Swept:` verified on the **STAGED SNAPSHOT**
+(`git diff --cached -- QUESTIONS.md`), never on the working tree (`INC-48`).
+
+⚠️ **AND `4b7f21ae` IS ROW 47 AND `d5c8039f` IS ROW 48 — TWO ROWS, ONE OPERATOR SESSION, TWO
+CHUNKS, AND THEY ARE NEVER CROSSED.** "NIGHT RUN B", 2026-09-02, holding **two** chunk tokens:
+`4b7f21ae` for **C6 FIX 4** (TASK 1, the three survivors `REVIEW_C6_4` §14 names) and `d5c8039f`
+for **ARCH FIX** (TASK 2, the degradation record). Its prompt: *"TWO TOKENS, ONE PER TASK. Register
+each row in QUESTIONS.md before that task's first commit, NUMBERED FROM THE TABLE. Never put one
+task's token on the other's commit."* **This is `363a2e9f`/`9c7c5973`'s shape a second time** — one
+operator session, two chunk tokens, and `make check-roles` E3 is what would catch a crossing.
+⚠️ **RE-COUNTED FROM THE FILE AT THIS MOMENT, NOT INHERITED.** The paragraph immediately above
+counted **45 data rows** and made `7a1e6c84` row 46; that count was correct when it was taken and
+was stale by the time this session read it, because `7a1e6c84`'s own row had since landed **and is
+committed** (verified: `git diff -- QUESTIONS.md` before this append showed **only** this session's
+own two inserted lines). ⚠️ **THE TWO ROWS WERE APPENDED BENEATH `7a1e6c84`'s, NOT ABOVE IT** — the
+first draft of this append put them between `ca0dd160` and `7a1e6c84`, which would have silently
+renumbered a concurrent session's row from **46** to **48** while its own paragraph three lines
+below still read *"`7a1e6c84` IS ROW 46"*. Caught by reading the diff before staging, which is the
+`INC-48` remedy doing the thing it exists to do. **Counted immediately before this append: 46 data
+rows, lines 50–95, `7a1e6c84` last. So these are rows 47 and 48.**
+
+* ⚠️ **THE TWO NUMBERS ARE DIFFERENT AND THIS SESSION SAYS WHICH IT COUNTED — `INC-54`.** **48 is
+  the DATA-ROW count**, taken by counting the table's data lines. `make check-roles` prints **one
+  fewer**, because `check_roles._TOKEN_ROW` requires an 8-hex token **and** a `(C\d+|ARCH)` chunk
+  cell, and the `WG-2026-08-30-CTX-13.4-A` row matches neither. **MEASURED after the append by
+  running the command and reading its output, never derived from the row count:** the figure is
+  recorded in this session's `PROGRESS.md` entry and FINAL OUTPUT beside the command that produced
+  it. `48 − 1 = 47`, and it reconciles with `7a1e6c84`'s `46 − 1 = 45`, `ca0dd160`'s `45 − 1 = 44`
+  and `e9dd0346`'s `44 − 1 = 43`.
+* **Self-record ordinal, CARRIED rather than re-derived, and labelled so.** Using this section's own
+  stated constant — *"the 15 nobody self-recorded"* — `48 − 15 = 33`, so `d5c8039f` is the
+  **thirty-third self-recorded row** and `4b7f21ae` the thirty-second; this paragraph covers both,
+  so it is the **thirty-first paragraph**, the gap of exactly one still being `9c0c6734`'s uncounted
+  row. ⚠️ **This session did NOT independently re-derive the 15**; it counted the data rows and says
+  plainly which of the two it measured.
+* ⚠️ **ORDINALS 11, 12 AND 18 REMAIN ASSERTED BY NO PARAGRAPH** (`df238be6`, `0852ea56`,
+  `9c0c6734`) and are **not this session's to close.**
+* ⚠️ **`check_roles.py` COUNTING THIS TABLE ITSELF IS STILL OWED — `OF-67`, `OF-70`, `OF-78`, the
+  EIGHTEENTH consecutive session to carry the total by hand.** `check_roles.py` is named under
+  **NOT** in both of this session's fences.
 
 **No other session's line was touched by this append.** `Swept:` verified on the **STAGED SNAPSHOT**
 (`git diff --cached -- QUESTIONS.md`), never on the working tree (`INC-48`).
@@ -7459,5 +7502,48 @@ session without re-reading the review.
 **Applied by C13 REVIEW 4 (`7a1e6c84`), 2026-09-02**, to its own verdict: every survivor this
 session finds is marked **OWNED** or **NOT-OWNED**, the determination is argued rather than
 asserted, and the required set is enumerated before the mutants are written.
+
+### ⚠️ Q-082's RULING AS CARRIED TO C6 FIX 4 (`4b7f21ae`) — RECORDED VERBATIM, AND THE TWO RENDERINGS DIFFER
+
+**Recorded by C6 FIX 4 (`4b7f21ae`), 2026-09-02, BEFORE A LINE OF CODE WAS TOUCHED**, as its prompt
+requires and as hard rule 5 requires. ⚠️ **This session's prompt carried the ruling in a LONGER
+form than the one `7a1e6c84` recorded above, so BOTH are now in this file and NEITHER is
+edited.** The text above is not altered by one character; the text below is what `4b7f21ae` was
+given, verbatim, including its capitalisation:
+
+> "Q-082 is RULED. A surviving mutant on a property THE CHUNK OWNS is a FAIL even when the subject
+> measures clean today — because 'clean today' is exactly what an unpinned guard cannot promise
+> tomorrow, and C6's own history is the argument: copy 2 of the blindness guard had never been fired
+> at a leak at all, and every test stayed green while it was defenceless. REVIEW 4 APPLIED THIS LINE
+> CORRECTLY by failing on three owned-property survivors and explicitly declining to count the four
+> LOW ones.
+> AND THE QUESTION EXPOSED A DEFECT IN THE BAR ITSELF, WHICH IS RULED IN THE SAME BREATH:
+> 'every mutant killed or proven equivalent' HAS NO TERMINATION CONDITION, because the reviewer
+> chooses the mutant set — REVIEW 3 found six, REVIEW 4 found seven more, three of them on REVIEW 3's
+> own fixes, and REVIEW 5 would find more on REVIEW 4's. THE GATE IS THE REQUIRED SET: at least one
+> mutant per property or invariant the chunk owns, minimum eight (PROCESS.md S5.3). Survivors beyond
+> that set are MEDIUM findings in OPEN_FINDINGS.md and DO NOT hold the tag. Reviews keep generating
+> as many mutants as they judge useful and every survivor still ships; only which ones gate changes.
+> This does not lift anything from C6: OF-124, OF-125 and OF-126 are all on owned properties."
+
+⚠️ **THE DISCREPANCY IS NAMED RATHER THAN SMOOTHED, AND IT IS NOT A CONTRADICTION.** Rule 1 says a
+disagreement between the record and what a session is handed is a STOP. **This is not one, and the
+reason is checkable clause by clause:** both renderings state the same two operative holdings —
+(a) *a guard-side survivor on an owned property is a FAIL even when the subject is clean*, and
+(b) *the gate is `PROCESS.md` §5.3's required set, ≥1 mutant per owned property, minimum eight;
+survivors beyond it are MEDIUM findings that do not hold the tag.* The longer rendering adds only
+**reasons and an application**: why (a) holds (*"'clean today' is exactly what an unpinned guard
+cannot promise tomorrow"*, with copy 2 as the worked example), that `REVIEW_C6_4` applied it
+correctly, the regress spelled out as 6 → 7 → more, and the sentence that decides this session's
+own scope — *"This does not lift anything from C6: OF-124, OF-125 and OF-126 are all on owned
+properties."* **No clause of one negates a clause of the other, so there is nothing to STOP on and
+the work proceeded.**
+
+**Applied by C6 FIX 4 (`4b7f21ae`), 2026-09-02**, exactly as the last sentence directs: `OF-124`,
+`OF-125` and `OF-126` are fixed and their mutants re-run; **`OF-127`, `OF-128` and the four LOW
+survivors `R-18` / `R-08` / `R-12` / `R-05` are NOT fixed**, remain OPEN in `OPEN_FINDINGS.md`, and
+the reason is this ruling rather than this session's convenience. ⚠️ **`R-05` and `R-12` are the two
+where HEAD is the STRICTER of the pair** — "fixing" either would replace a correct behaviour with a
+wrong one, which is recorded here so a later session does not read *OPEN* as *owed*.
 
 ---
