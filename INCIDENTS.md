@@ -6615,3 +6615,165 @@ behavioural mitigation this session would give the next one, and did not follow 
 journal edit within minutes of writing it, and never hold one across a long-running command.** That
 is a habit, not a guardrail, and calling it anything else would be the overclaim this file exists to
 prevent.
+
+---
+
+## INC-83 — landing the fixture `INC-78` asked for turns a committed C8 test RED, because golden 2 carries a DERIVED INDEX over its own fixture list and nothing regenerates it when the list changes
+
+**Date:** 2026-09-03 (ARCH FIX — GOLDENS 4/8/9 + F9, `e1956729`, **after** the first build commit)
+
+**Event:** `INC-78`'s `Systemic guardrail` names the remedy in terms — *"what would actually close it
+is a **ninth golden-2 fixture** carrying a capture and a refund on one payment — and
+`tests/goldens/` is read-only to every session, so **only the architect can write it**."* This
+session appended that fixture, **F9**, as a pure textual append: `git diff --stat` reads **71
+insertions, 0 deletions**, and the whole file up to F8's closing brace hashes identically before and
+after (`35d476ba…da17de`, 22,149 bytes). **Appending it turns
+`tests/test_c8_scorer.py::test_golden2_coverage_block_reproduces` RED.**
+
+Measured rather than predicted: that test derives `FIXTURE_KEYS` **from the golden itself**,
+recomputes `trips_on` / `clean_on` / `not_applicable_on` over **every** fixture, and compares the
+result to the golden's stored `coverage.per_predicate` block, which describes **eight**. F9 lands in
+one bucket of each of the eight predicates, so **all eight comparisons mismatch.**
+
+⚠️ **AND THE SISTER TEST IS THE OPPOSITE CASE, WHICH IS WHY THIS IS NOT SIMPLY A BAD TEST.**
+`test_golden2_every_pinned_cell_reproduces` is `parametrize`d over the **same** derived
+`FIXTURE_KEYS`, so it picks F9 up and scores it automatically — which is exactly what the
+architect's instruction *"C8's fix `ae521f1` should make it pass"* relies on. **The same derivation
+is right in the per-fixture test and wrong in the aggregate one.**
+
+**Action:** the fixture landed and **nothing was weakened.** `tests/` is under **NOT** in this
+session's fence and hard rule 6 forbids weakening a test in any case; the `coverage` block was not
+extended either, because this session's fence reads **`golden2_invariants.json` (ONE FIXTURE
+APPENDED)** and because the block is the architect's transcribed measurement whose own opening
+sentence scopes it to *"WHAT THE EIGHT FIXTURES DO AND DO NOT COVER"*. What landed instead is F9's
+coverage delta in a new `f9_addendum.coverage_delta` key, this entry, and `QUESTIONS.md` **Q-103**
+carrying four options. **The red is attributed by file and test id in this session's FINAL OUTPUT
+and in `STATUS.md`, never presented as pre-existing.**
+
+**Expectation:** appending a fixture to an answer key adds a row to be checked. It should not
+falsify a claim the same file makes **about** its rows.
+
+**Missing:** anything that ties the two together. Golden 2 states its `coverage` block is *"MEASURED
+OVER THE TABLE ABOVE RATHER THAN ASSERTED"* — but the measurement was taken **once, by hand, on
+2026-09-03 at 8 fixtures**, and stored. **There is no mechanism, in the file or in the suite, that
+notices the table above has changed underneath it.** A `fixture_count` beside the block, or a bucket
+list keyed by fixture rather than a flat list, would each have turned a silent divergence into a
+legible one.
+
+**Missed:** ⚠️ **`INC-78`'s own `Systemic guardrail` — the sentence this session was executing —
+names the ninth fixture and says nothing about the four DERIVED blocks that describe the eight**
+(`coverage.per_predicate`, `coverage.the_one_gap_named_rather_than_left_to_be_found`,
+`published_finding`'s noisy/blind counts and `derivation.cells_computed_but_not_stated_by_the_architect`).
+Two of the four are unaffected by F9 and two are not, and **which is which was not asked before the
+append; it was discovered by running the suite.** Also missed: `Q-091`(ii) is *about* the coverage
+block and was in this session's mandatory read order, and its own text quotes the block's gap
+sentence — so the block's existence as a **derived** artefact was directly in front of this session
+and was read as content rather than as a dependency.
+
+**Diagnosis:** golden 2 contains a **derived index over its own fixture list** — a second answer key
+computed from the first — and a test recomputes that index over the live list, so extending the list
+without regenerating the index makes the file disagree with itself, whatever the extension's merit.
+
+**Fix:** ⚠️ **NO SHA, AND NONE IS OWED BY THIS SESSION.** The remedy is one of `Q-103`'s four options
+and every one of them lies outside this session's fence: extending `coverage` is the architect's
+(`tests/goldens/` is read-only to every other session and this session's fence permits one fixture),
+and re-scoping or removing the assertion is C8's review's or a C8 FIX session's. **The red is
+handed over open rather than closed by a session that would have had to breach a fence to close it.**
+
+**Systemic guardrail:** ⚠️ **ONE, AND IT IS A RULE ABOUT GOLDENS RATHER THAN ABOUT THIS FILE: A
+GOLDEN MAY NOT CARRY A DERIVED INDEX OVER ITS OWN FIXTURES UNLESS THE INDEX NAMES THE FIXTURE SET IT
+WAS DERIVED FROM.** A block that says *"S3 trips on F7 and is n/a on the other seven"* is checkable
+against any fixture list; a block that says *"S3 trips on F7 and is n/a on F1, F2, F3, F4, F5, F6,
+F8"* is only checkable against the list it was written for, and it is **silent about which list that
+was**. The same shape is already present elsewhere and is named here so it is not found twice more:
+golden 2's `published_finding` counts (**unaffected by F9, checked**), and golden 9's own
+`allowed_seqs` / `denied_seqs` / `indeterminate_seqs` — which this session **therefore re-read off
+the sixteen verdict fields and asserted to partition them 8 / 7 / 1**, rather than trusting the list
+it had just typed. **A derived index inside an answer key is a second answer key.**
+
+---
+
+## INC-84 — this session wrote a method claim INTO a golden before running the check that would have tested it, and the check then falsified it: seq 15 has THREE clauses firing, not one
+
+**Date:** 2026-09-03 (ARCH FIX — GOLDENS 4/8/9 + F9, `e1956729`, **found by this session, before any
+commit**)
+
+**Event:** `tests/goldens/golden9_arm4_kernel.json` was drafted with a `derivation` block reading, in
+full:
+
+```
+"check_order_within_a_row": "The kernel checks E3, then E1, then E2, then the sequence predicates.
+Seqs 3, 4, 6, 9, 11, 13 and 15 were each re-scored with EVERY OTHER clause disabled in turn, and in
+each case exactly ONE clause fires - so no row's reason depends on the order the clauses are
+evaluated in, and per_row_arithmetic states which clauses pass on each denied row."
+```
+
+**That sentence was written before the check it describes was run.** The check was then written and
+run — each of the eight non-`ALLOWED` rows re-scored eight ways, once per clause enabled alone,
+against the folded state replayed to that row — and **it is false of seq 15**:
+
+```
+   seq 3   E1 alone                                  seq 11  S1 alone
+   seq 4   S2 alone                                  seq 13  E2 alone
+   seq 6   S3 alone                                  seq 15  E3, E2 AND S1 EACH FIRE ALONE  <-- three
+   seq 7   S3 alone (INDETERMINATE)                  seq 9   S1 alone
+```
+
+At seq 15 the running total is exactly 20,000,000 so **E3** fires; `20,000,000 + 100 > 20,000,000` so
+**E2** fires; and `pay_B`'s refunds reached its 8,000,000 capture at seq 12, so a further 100 paise
+makes **S1** fire. Over all **720** orderings of the six clauses: **no row's verdict moves**, and
+**seq 15's reason is the architect's `E3 budget exhausted` in exactly 240 of the 720** — the third in
+which E3 precedes both E2 and S1.
+
+**Action:** the false block was **replaced by the measurement rather than reworded**, under a key
+that says so — `clause_isolation_measured_and_ONE_ROW_DOES_NOT_ISOLATE` — quoting the withdrawn
+sentence in full so the correction is legible as a correction. A `clause_precedence` block was added
+naming the order that reproduces every reason, arguing for `E3` first **and explicitly declining to
+rule**, and `per_row_arithmetic`'s seq-15 entry now names all three firing clauses. `QUESTIONS.md`
+**Q-105**. ⚠️ **No architect-stated cell moved:** all sixteen verdicts, all sixteen reasons, the
+seven-value moved series and the three totals reproduced exactly, before and after.
+
+**Expectation:** a claim written into a golden is read as law by every session that consumes it, so
+it should be a **measurement**, not a plausible sentence about a measurement that could be taken.
+
+**Missing:** ⚠️ **nothing in the process requires the ORDER — check first, then write.** Hard rule 3
+governs the **expected values** (*"hand-compute the expected outputs before writing the code"*) and
+says nothing about the **prose a golden carries about its own derivation**, which is exactly where
+this landed. Golden 5B's section already records the right discipline for values — *"the control ran
+before any new value was computed"* — and there is no equivalent sentence for method claims.
+
+**Missed:** ⚠️ **`INC-47` is precisely this rule, one artefact over, and this session had already
+applied it correctly elsewhere in the same hour.** `INC-47` ruled that *a claim bound to a command
+must be read off the command*, and `Q-087`'s recording session applied it to a **ruling**, publishing
+a table of the ruling's checkable claims and marking the one that did not reproduce (*"eleven real
+FAILs" → **measured: EIGHT***). This session read that entry as part of its mandatory read order,
+**wrote the same shape of unverified claim four files later**, and then found it only because it had
+decided — separately, and for a different reason — to drive the discriminators rather than assert
+them. **The find was a by-product of a good habit, not of the rule that should have prevented it.**
+Also missed: the file's own `per_row_arithmetic` for seq 13 already spells out *"E1 passes and E3
+passes, so E2 is the only clause that can produce this denial"* — **the session was already writing
+per-row clause analysis and did not run it on seq 15, the one row where it mattered.**
+
+**Diagnosis:** a method claim was composed as part of drafting the artefact rather than as a report
+of a check, so the claim's truth depended on the author's model of the fixture instead of on the
+fixture, and the one row where that model was wrong is the row with three simultaneous violations.
+
+**Fix:** the corrected `clause_isolation_measured_and_ONE_ROW_DOES_NOT_ISOLATE` and
+`clause_precedence` blocks in `tests/goldens/golden9_arm4_kernel.json`, landed in this session's
+first commit; **the file has never existed at any commit carrying the false sentence.**
+
+**Systemic guardrail:** ⚠️ **ONE, NARROW AND MECHANICAL: EVERY `derivation` CLAIM IN A GOLDEN THAT
+ASSERTS A PROPERTY OF THE FIXTURE — "exactly one clause fires", "the two readings agree on every
+fixture", "all eight reproduce" — MUST NAME THE SCRIPT THAT PRODUCED IT AND THE COUNT IT RETURNED,
+and a claim with no count beside it is not a claim.** Golden 2's `both_readings_measured` already
+does this correctly (*"computed over EXECUTED and over ISSUED on all eight fixtures — IDENTICAL on
+all eight"*) and golden 5B's control paragraph does too. **The three goldens this session placed now
+each carry counts: golden 9's clause isolation as `7 of 8 isolate, seq 15 does not, 240 of 720
+orderings`; golden 4's discriminators as driven numbers (`reach 4 vs 2`, `0 vs 1`); golden 8's
+withdrawn `30,000 x 3` vector as `pooled 90,000 <= 100,000, both readings agree, discriminates
+nothing`.** ⚠️ **What this does NOT close:** nothing prevents the next session writing the sentence
+first and the count second, and the count then being written to match. The only thing that closes
+that is the direction of the work — script, then run, then transcribe — which is what `PROCESS.md`
+§5.2 asks for on values and does not ask for on prose.
+
+---
