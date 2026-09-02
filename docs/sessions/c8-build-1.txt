@@ -35,7 +35,11 @@ COMMITS, IN ORDER
            journal edits into itself. INC-82. Nothing lost; see S13.
   db27c37  docs: INC-82 + the measured counts + STATUS.md and PROGRESS.md corrected
   cf08c9c  docs: this file, committed BEFORE it was printed
-  <WORK-SHA>  docs: this file's PUSHED SHA line filled - THE FINAL PUSHED SHA
+  c8527f8  docs: this file's "own commit" line filled with cf08c9c
+  (the commit landing THIS line)  docs: the last two placeholders filled. THE PRINTED
+           FINAL OUTPUT STATES ITS SHA as the true final pushed SHA. The chain terminates
+           here because this row is a DESCRIPTION and not a token - a file cannot name the
+           commit that lands it, and pretending otherwise is how a placeholder survives.
 
 =====================================================================
 1. ALL 29 ARCHITECT-STATED CELLS - FIXTURE BY FIXTURE
@@ -638,7 +642,8 @@ SWEPT LINES, ALL OF THEM:
             adds NO `Raised by:` line at all, and it stages only INCIDENTS.md, PROGRESS.md
             and STATUS.md by explicit path.
   cf08c9c   no Swept: line - docs/sessions/c8-build-1.txt only, by explicit path
-  <WORK-SHA>   no Swept: line - the same file, the two lines above
+  c8527f8   no Swept: line - the same file, one line
+  (this one) no Swept: line - the same file, the two rows above
 
 TRAILER BLOCK: ONE PARAGRAPH, `Session-Token:` ADJACENT TO `Co-Authored-By:` on every
 commit (INC-66).
