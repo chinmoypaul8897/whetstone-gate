@@ -1,0 +1,517 @@
+PUSHED SHA: e4a4058   (the journals commit; this file's own commit follows it and its SHA is
+            written into the line below by the commit immediately after that one - the same
+            mechanism INC-71 records INC-58 promised and did not keep, and which c7-review-2.txt
+            and c6-fix-5.txt both kept)
+PUSHED SHA, THIS FILE: NOT YET WRITTEN, AND NONE IS INVENTED.  A commit cannot carry its own
+            SHA.  The commit immediately following this one writes the real value into this
+            line and does nothing else, which is checkable with
+            `git log -p -- docs/sessions/c6-review-6.txt`.
+
+C6 REVIEW 6 - THE ATTACKER LOOP.  SESSION-TOKEN 7f4b0e93.  2026-09-02 -> 2026-09-03.
+THIS WAS C6's LAST REVIEW.
+
+VERDICT: FAIL.  ZERO BLOCKERS.  TAG `c6-pass` NOT CUT.
+The chunk ships with its residue published, as the architect fixed in writing before this
+review began.  The residue is section 11 below: five findings, each with a one-line or
+one-fixture remedy.
+
+  BLOCKERS                                    0
+  MEDIUM                                      6
+  LOW                                         5
+  MUTANTS                                     48 scored - 40 KILLED, 8 survivors
+  of the 8:  PROVEN EQUIVALENT 2 | NOT A VALID MUTANT (mine) 1 | NOT-OWNED 2 | OWNED 3
+  POSITIVE CONTROLS                           22 runs over 13 slices, EVERY ONE DIED
+  SPEND                                       ZERO PROVIDER MODEL CALLS
+
+--------------------------------------------------------------------------------------
+1.  THE SEAL
+--------------------------------------------------------------------------------------
+SEAL SHA: 5e91e0e.  Sealed BEFORE `git diff` of any C6 FIX 5 commit, BEFORE anything under
+`src/` or `tests/` was opened, BEFORE INCIDENTS.md INC-70/71/72 (FIX 5's own journals), and
+BEFORE OPEN_FINDINGS.md's "DISPOSITION BY C6 FIX 5" block.  STATUS.md was read for WHICH
+CHUNKS ARE TAGGED and for nothing else (OF-145); the tag set came from `git tag -l`.
+
+THE OWNED-PROPERTY SET AS SEALED - NINETEEN, each argued from a clause quoted in the seal:
+
+  OP-1   the sliding window - 6 turns verbatim, width from config/
+  OP-2   the summary is a pure DETERMINISTIC template, never an LLM call
+  OP-3   the 400-token cap is INCLUSIVE, pinned both ways
+  OP-4   truncation RESERVES the denial; below the floor it is a HARD REFUSAL
+  OP-5   blindness LAYER 1 - the label scan, state JSON exempt          BOTH COPIES
+  OP-6   blindness LAYER 2 - the vocabulary and the verbatim clause     BOTH COPIES
+  OP-7   blindness LAYER 3 - the residue catch-all                      BOTH COPIES
+  OP-8   the denial pair - exact equality, exactly one line             BOTH COPIES
+  OP-9   the exclusivity helper `_sole_layer`
+  OP-10  must-reach - the door is OPEN, both directions                 BOTH COPIES
+  OP-11  the corpus selection rule (Q-047, Class A)
+  OP-12  the estimator's divisor resolved THROUGH THE LOADER (Q-048)
+  OP-13  the crossover series - a CLOSED bound, so STRICTLY over
+  OP-14  the dynamic-import scan
+  OP-15  `attacker_sys.txt` verbatim; the authored-surface inventory
+  OP-16  the structural no-gate-object property (Q-046)
+  OP-17  MINE - the folded constant's PROVENANCE, the `data/` seam
+  OP-18  MINE - the corpus-vs-improvisation split is instrumented and its partition does
+         not silently shrink
+  OP-19  MINE - NO GUARD MAY SILENTLY INSPECT NOTHING.  `SM-7` generalised, and sealed
+         rather than asked in Phase 2, because a property first asked after the result is
+         a property chosen after the result.
+
+ADDED IN PHASE 2, under the seal's own ADD-never-REMOVE rule, by applying Q-084's method one
+grain finer - per CATCHER per COPY rather than per claim-4 LAYER:
+
+  OP-20  claim 2's probe/hole VOCABULARY scan                           BOTH COPIES
+  OP-21  claim 3's ATTACK-LIST patterns                                 BOTH COPIES
+  OP-22  claim 1's clause-IDENTIFIER regex                              BOTH COPIES
+
+  All three are owned by the SAME C6-card sentence the seal already quoted - "the attacker's
+  context provably contains no policy string, NO HOLE, NO ATTACK LIST and no gate reason".
+  Four claims; only claim 4 had ever been enumerated, in six reviews.
+
+--------------------------------------------------------------------------------------
+2.  `git diff -- src/`  -  EMPTY.  VERIFIED THREE WAYS.
+--------------------------------------------------------------------------------------
+  git diff --name-only e8bf194^..ae5199a -- src/     ->  0 paths
+  per commit, all six of FIX 5's                     ->  0 paths each
+  git diff --stat 615993d..HEAD -- src/              ->  EMPTY   (REVIEW 5's own point)
+  git diff --stat 41f554b..HEAD -- src/              ->  EMPTY   (C6 FIX 4's last commit)
+
+  BLOB HASHES, 615993d vs HEAD, all six attacker modules IDENTICAL:
+    context.py   f156d4189a117c6daff01622ebd0dfd945a0a5a9
+    corpus.py    6e3e32e4164f925d0443e0f5b049d6e846897399
+    estimate.py  732deb8b91ec57c06abe7bc9b9c4a0ce1ac6d56c
+    loop.py      d8b44702ba0b2f5f4aa782fa7586da0cfde13a54
+    texts.py     dca01e2481c65532e155c51fd52e13ecad096878
+    __init__.py  79f0e07d4ed0d00190d7fb23ae05cee70fe9ce74
+
+  AND tests/test_c6_attacker.py IS BLOB-IDENTICAL TOO - 3827269c9664a17591be83bab30557f94069deec
+  at 615993d and at HEAD.  So R-05 and R-12 are verifiably left alone, HEAD is still the
+  stricter of each pair, and NO REVIEW 4 OR REVIEW 5 EXHIBIT NEEDS RE-MEASURING.
+  FIX 5's only code change is +658 lines in tests/test_c6_fix_probes.py - copy 2.
+
+--------------------------------------------------------------------------------------
+3.  THE FIVE CELLS, AND SM-7 - ALL SIX RE-RUN BY ME, ALL SIX KILLED
+--------------------------------------------------------------------------------------
+  cell            my id   verdict     killed by
+  OF-146 / M-12   N-11    KILLED, 3   ..GATE_VOCABULARY_scan_FIRES_on_a_reason_that_leaks_nothing_else
+  OF-147 / M-16   N-17    KILLED, 3   ..DENIAL_EQUALITY_FIRES_on_a_DRIFTED_fold_constant
+  OF-148 / M-12d  N-13    KILLED, 3   ..VERBATIM_CLAUSE_scan_FIRES_on_a_TOOL_RESULT_that_echoes_one
+  OF-149 / M-39   N-21    KILLED, 1   ..PROBE_NOTE_check_FIRES_when_WE_write_it_and_NOT_when_the_WORLD_does
+  OF-150 / M-RES  N-15    KILLED, 3   ..RESIDUE_layer_FIRES_on_authored_text_carrying_NO_policy_word
+  SM-7            N-33    KILLED, 1   ..RESIDUE_layer_SAYS_SO_when_it_cannot_LOCATE_the_summary
+
+  FIX 5's own counts - 3, 3, 3, 1, 3, 1 - reproduce exactly.
+
+  EACH FIXTURE EXERCISES WHAT IT CLAIMS:
+  * OF-147's injects the drift at `texts.generic_denial`, the seam `run_episode` actually
+    reads - verified at the source.  AND THE FILE SIDE IS PINNED TOO: N-31 drifts
+    `data/generic_denial.txt` itself and DIES WITH 8, copy 2's fixtures among the killers.
+  * OF-149's fires in BOTH directions, and I re-ran the global ban Q-046 forbids (N-22,
+    `if note in auth:` -> `if note in full:`): IT DIES WITH 12.  Arm 4 cannot be voided by
+    construction silently.
+  * All five new fixtures route through `_sole_layer` - `git show 000270e` adds exactly five
+    calls - and the helper is not decorative: N-19 and N-20 each die with 1.
+
+  SM-7's EXHIBIT, RE-DERIVED BY ME rather than cited:
+    control, untouched contexts        :  0 findings
+    one leading space on the summary   : 20 findings, ALL from that check, no other layer
+  Reproduces exactly.
+
+--------------------------------------------------------------------------------------
+4.  THE ONE-LEVEL-OUT QUESTION, ANSWERED - and the answer is YES, TWICE
+--------------------------------------------------------------------------------------
+"Is there any OTHER locator, in either copy, whose failure mode is `inspect nothing
+silently`?"  I enumerated rather than guessed: 70 candidate locator sites across both
+copies, split into the LOUD class (assert/if on a length) and the SILENT class (iteration
+over something that can be empty).  EIGHT silent sites select what a guard inspects.  Each
+was mutated to iterate over nothing:
+
+  copy 2  `_cap_formattings()`            N-34a   KILLED (collection error)
+  copy 1  cap formattings + collapse guard N-34c  KILLED, 4
+  copy 1  `_GATE_VOCABULARY`              N-10    KILLED, 1
+  copy 2  the gate-vocabulary tuple       N-11    KILLED, 3
+  copy 1  the clause list                 N-12    EQUIVALENT (proof below)
+  copy 2  the clause list                 N-13    KILLED, 3
+  copy 1  `_HOLE_VOCABULARY`              N-35    KILLED, 1
+  copy 2  the probe-vocabulary tuple      N-35b   ** SURVIVED **
+  copy 2  claim 3's pattern tuple         N-39    ** SURVIVED **
+
+SO SM-7 WAS NOT THE LAST OF ITS CLASS; IT WAS THE FIRST OF ITS CLASS TO BE LOOKED FOR.
+Both survivors are in COPY 2 - the only guard in this repository ever fired at a real
+`run_episode` context, which I re-measured: an AST walk finds 20 call sites of copy 1's four
+guards and NOT ONE takes an episode result.
+
+And the loud class really is loud.  No subtraction in either guard has an unsafe failure
+direction: `auth.replace(system_prompt, "\n")`, the truncation-mark re.sub and the state-line
+subtraction all leave MORE text scanned when they match nothing.
+
+--------------------------------------------------------------------------------------
+5.  THE MUTANT TABLE - EVERY SURVIVOR OWNED OR NOT-OWNED, AND ARGUED
+--------------------------------------------------------------------------------------
+48 scored mutants, 13 slices, 7 fresh OS temp clones.  40 KILLED, 8 survivors.
+
+  ** OWNED - THE THREE THAT CARRY THE FAIL **
+
+  N-32   OP-18   `EpisodeResult.corpus_turns` over `records[1:]`.  ALL 136 TESTS GREEN.
+                 THE PARTITION ASSERTION EXISTS - `test_every_turn_records_corpus_or_
+                 improvisation` asserts corpus_turns + improvised_turns == len(records) -
+                 AND IT IS FIRED AT AN EPISODE WITH ZERO CORPUS TURNS, where the mutated
+                 branch is 0 == 0.  EXHIBIT, on an episode whose turn 0 IS a corpus turn, a
+                 shape an adjacent test in the same file ALREADY BUILDS:
+                    HEAD    corpus_turns=20  improvised=0   partition sums TRUE
+                    MUTANT  corpus_turns=19                 partition sums FALSE
+                    the published S11.3 split moves 20/20 -> 19/20 and nothing goes red.
+                 CLAUSES: the C6 card's "the corpus-vs-improvisation split instrumented";
+                 S11.3's "Report the split"; persona 1's "Does every partition sum to its
+                 total?".  REMEDY: ONE LINE.
+                 PRE-COMMITTED: sealed polarity P-32 predicted this survivor by id.
+
+  N-35b  OP-20   copy 2's claim-2 PROBE/HOLE VOCABULARY tuple emptied.  Suite green.
+                 FOUR EXHIBITS, each a probe word and nothing else, planted in STATE_LABEL
+                 BEFORE the episode runs:
+                    'CANARY-A'          HEAD 20 findings, ALL 20 from that scan, mutant 0
+                    'CANARY-B'          20 -> 0
+                    'HOLES.md'          20 -> 0
+                    'exemption clause'  20 -> 0
+                    control, clean labels: 0
+                 COPY 1's EQUIVALENT IS PINNED - N-35 dies with 1.
+                 CLAUSE: the C6 card's "no hole".  REMEDY: one fixture in copy 2.
+
+  N-39   OP-21   copy 2's claim-3 ATTACK-LIST patterns collapsed.  Suite green.
+                 FOUR EXHIBITS: 'E2' HEAD 20 findings ALL from the envelope-invariant
+                 pattern, mutant 0; 'A5' 20 -> 0; 'S1' 20 -> 0; 'INVARIANTS.md' 20 -> 0;
+                 control 0.  COPY 1's EQUIVALENT IS PINNED.
+                 CLAUSE: the C6 card's "no attack list".  REMEDY: one fixture in copy 2.
+
+  ** PROVEN EQUIVALENT - TWO, BOUNDARIES NAMED **
+
+  N-12           copy 1's verbatim-policy-clause scan.  = REVIEW 5's M-11b, and its proof
+                 reproduces: `.replace` inserts only a NEWLINE at the seam and no policy.txt
+                 clause contains a newline - which my Phase-1 vector V45 verified
+                 independently - so no clause can be manufactured across it.  BOUNDARY: the
+                 newline at the seam.
+
+  N-40           copy 2's denial-VALUE arm/clause regex.  THE PROOF IS THE AUTHORED CONSTANT:
+                 S8.6's "This action was blocked by policy." matches NONE of the regex's four
+                 alternatives - measured - so on every value the regex can fire on,
+                 `value != generic` also holds and the equality check appends its own finding.
+                 The regex finding is NEVER the sole finding.  MEASURED: a denial drifted to
+                 carry "arm 2S" gives HEAD 57 findings (19 + 19 + 19) and the mutant 38, on
+                 which every existing assertion behaves identically.
+                 BOUNDARY: if S8.6's denial string ever carried one of those tokens, the two
+                 checks would separate.
+
+  ** NOT-OWNED - TWO, ARGUED **
+
+  N-34b          copy 1's `assert len(summaries) == 1` -> `>= 1`.  M-08b / OF-130.
+                 PRE-CLASSIFIED IN THE SEAL's section 2.1 WITH ITS RIDER: not-owned for copy
+                 1, but owned if a locator of that shape existed in copy 2 over run_episode's
+                 own contexts.  Copy 2's equivalent is SM-7 and it is now KILLED, so the
+                 rider is satisfied and copy 1's stays not-owned - the architect's own
+                 disposition.
+
+  N-38   OP-22   copy 2's claim-1 clause-IDENTIFIER regex.  ITS ONLY SEPARATING INPUTS ARE
+                 ONES WHERE HEAD IS THE FALSE POSITIVE.  The regex scans `auth`; LAYER 2b's
+                 identical P[1-7] alternative scans `mandated`, which subtracts the state
+                 JSON.  MEASURED: an attacker-supplied idempotency key "P4" gives HEAD 20
+                 findings, all from this regex, ON AN ENTIRELY CORRECT CONTEXT.  Sealed
+                 clause 3 excludes it - the property is "no clause identifier on OUR
+                 surface", and a receipt the attacker chose is not ours.  IT RAISES A
+                 SEPARATE MEDIUM INSTEAD (OF-177).
+
+  ** NOT A VALID MUTANT - ONE, AND IT IS MINE **
+
+  N-29           deleting the assertion inside `test_the_three_authored_texts_are_character_
+                 identical_to_context_md`.  It survives - AND SO WOULD DELETING ANY ASSERTION
+                 IN ANY PASSING TEST, because nothing tests a test.  That operator removes
+                 the FIXTURE rather than unpinning a CATCHER, and counting it would re-open
+                 the termination regress Q-082 closed.  REPORTED AS AN INVALID ROW OF MY OWN
+                 PLAN and replaced: N-29b drifts `data/attacker_sys.txt` itself - the real
+                 form - and DIES WITH 2.  OP-15 is pinned.
+
+  ** FOUR REAL LEAKS IN src/, not guard mutations **
+
+  N-RL1  E1's cap inside LAST_REFUSAL_LABEL - INC-42's M17, verbatim in shape  KILLED, 40
+  N-RL2  arm identity in STATE_LABEL - OF-104's shape                          KILLED, 34
+  N-RL3  unexplained AUTHORED text appended as a NEW LINE, no policy word      KILLED, 43
+  N-31   the `data/` denial constant drifted                                   KILLED, 8
+
+  INC-42 records that N-RL1's exact shape once left ALL 65 C6 TESTS GREEN.  It now dies
+  with 40.  Five reviews and five fixes, in one number.
+
+--------------------------------------------------------------------------------------
+6.  THE POSITIVE CONTROL THAT HAD TO DIE  (OF-159, BOTH PARTS)
+--------------------------------------------------------------------------------------
+  N-PC   the folded state's JSON separators widened in src/ - proves the clone's SOURCE is
+         under test.  13 runs.  KILLED IN ALL 13, 1 failure each.
+  N-PC2  OF-159's CTRL-LIVE BY NAME - a bare `assert False` in copy 2's own helper - proves
+         the clone's TEST FILE is under test.  9 runs.  KILLED IN ALL 9, 14 failures each.
+
+  22 positive-control runs.  EVERY ONE DIED.  N-PC2 was added after slices A/B/D/E had
+  begun, so it was run separately against all four of their clones (A2, B2, D2, E2): every
+  clone in this run has had both controls demonstrated inside it.
+
+  So far as I can see from the rest of docs/reviews/mutants/, THIS IS THE FIRST MUTATION RUN
+  IN THIS PROJECT TO CARRY A POSITIVE CONTROL AT ALL, which is what OF-159 says and is why
+  it is HIGH.
+
+  HARNESS DISCIPLINE, and every rule is earned by an incident:
+  * INC-69: the clone env is passed to `subprocess.run` ITSELF, and the provenance print is
+    in the SAME `-c` script in the SAME subprocess as the pytest run.
+  * OF-139: `test_the_package_under_test_is_the_tree_under_test` runs in EVERY measurement.
+  * INC-17 / REVIEW 4's inverse: restore by WRITING THE ORIGINAL BYTES, verified by SHA-256
+    on all 70 rows.  Control 136/0 before and after every slice.
+
+  ONE SLICE WAS VOID AND IS REPORTED RATHER THAN DISCARDED.  Its clone had been left without
+  `src/` by an interrupted tool call; its pre-run control read 0 PASSED and its provenance
+  line named C:\Users\chinm\whetstone-gate - THE LIVE REPOSITORY.  That is INC-69's exact
+  failure mode, caught in 17 SECONDS by the mechanism OF-159 asks for rather than by a human
+  distrusting an implausible number.  The clone was rebuilt and slice C re-run from a
+  verified control.
+
+--------------------------------------------------------------------------------------
+7.  THE FOUR BLINDNESS CLAIMS - MY METHOD, MY SHAPES, BOTH CONTROLS
+--------------------------------------------------------------------------------------
+73 needles in twelve families, built from the INVERSE of REVIEW 5's question - "if a
+defender's knowledge had already leaked, what is the SHORTEST string that proves it?".
+REVIEW 5's 110 are not reused.  Measured over `run_episode`'s REAL assembled bytes, on the
+real seed-2001 world, all four corpora offered, with a GROWING fold (OF-82 / OF-112).
+
+  turn  FULL chars  FULL hits  AUTH chars  AUTH hits   probe-note F/A   probe-id F/A
+     1        1127          2        1010          1   False/False      False/False
+     2        1466          3        1075          1   True/False       True/False
+     6        8085          4        1339          1   True/False       True/False
+     7       11064          4        1405          1   True/False       True/False
+    12       11399          5        1739          2   True/False       True/False
+    19       11542          4        1876          2   True/False       True/True
+    20       11554          4        1888          2   True/False       True/True
+
+  AUTHORED hits, all 20 turns, de-duplicated: 2 of 73 - AND BOTH WERE LOCATED:
+    'over-capture'  INSIDE S8.6's OWN SYSTEM PROMPT ("over-captures").  A needle of MINE that
+                    fires on the SPEC.  My seal's exclusion list named that word and my
+                    needle used a substring of it.  MY ERROR.
+    '50000'         INSIDE the folded state's own JSON, which S8.6 MANDATES and which LAYER
+                    1's state-JSON exemption exists for exactly.
+  NEITHER appears on the AUTHORED surface outside those two mandated regions.
+  ALL FOUR CLAIMS HOLD.
+
+  CLEAN-SURFACE CONTROL, run first:
+    the S8.6 system prompt ALONE      1 of 73   ['over-capture']
+    turn 1's whole AUTHORED surface   1 of 73   ['over-capture']
+  IT FIRED, AND IT CAUGHT MY OWN NEEDLE ERROR.  That is what the control is for, and it is
+  reported before the result rather than after it.
+
+  MUST-REACH CONTROL:
+    probe NOTE      reaches FULL     on turns 2..20    ->  THE DOOR IS OPEN, in every arm
+    probe NOTE      reaches AUTHORED on turns NONE     ->  it is never written by us
+    pay_CANARYRECON reaches FULL     on turns 2..20
+    pay_CANARYRECON reaches AUTHORED on turns 13..20   ->  PRE-COMMITTED as NOT a finding
+                                                          (P-18): S13.3 mandates the folded
+                                                          state, S8.6 keys it by payment id,
+                                                          the id is one the attacker itself
+                                                          supplied, identical in every arm.
+  AND THE DOOR-SHUTTING MUTANT DIES WITH 12.
+
+  CARRIER MATRIX - the PACKAGE's own guards, fired at all 73:
+    carrier                copy 1      copy 2      escapes BOTH
+    refusal VALUE          73 / 73     73 / 73     0
+    LAST_REFUSAL_LABEL     44 / 73     36 / 73     29
+    STATE_LABEL            44 / 73     36 / 73     29
+    CONTROL, clean         0 / 73      0 / 73      -
+  The 29 are OF-127 / OF-133's class, PRE-COMMITTED as NOT the gate at 5e91e0e (P-22) and
+  graded MEDIUM.  CONFIRMED BY A THIRD INDEPENDENT CORPUS.
+
+  MY FIRST MEASUREMENT OF THAT TABLE WAS WRONG AND IS REPORTED.  It read 73/73 in a label -
+  implausibly clean - because the harness restored the mutated module label BEFORE running
+  the guard, so every guard fired for the trivial reason that no line began with the label
+  it now expected.  That measures the harness, not the guard.
+
+  MY SCOPED REIMPLEMENTATION vs THE PACKAGE: 21 of 21 AGREE, 0 diverge.  It imports nothing
+  from `src/` and asserts that at the foot of its own run; 42 vectors scored internally, 0
+  bad.  It includes the mulberry32 -> log-uniform amount chain for seed 2001, which
+  reproduces all eleven ordinary amounts EXACTLY against the real world.
+
+--------------------------------------------------------------------------------------
+8.  INC-47's TEST, APPLIED A FOURTH TIME - 35 claims verified, ONE overstated
+--------------------------------------------------------------------------------------
+INC-70 - SIXTEEN CLAIMS, SIXTEEN VERIFIED.  It quotes INC-56's false sentence verbatim; its
+matrix has 8 rows and EVERY ONE carries a mutant id; `src/` untouched re-derived by me; its
+20-call-site AST figure - which CORRECTED REVIEW 5's 23 - reproduces against my own
+independent walk, and not one call site names an episode result; 5 `_sole_layer` calls added
+by 000270e; the rulings commit e8bf194 PRECEDES the fixtures commit 000270e; its `Fix:` SHA
+000270ed resolves as a COMMIT and it makes NO promise; its `Systemic guardrail` says PARTIAL,
+names what is not closed, and does NOT repeat INC-56's word "complete".
+INC-70 CLAIMS NO MORE THAN IT CAN PROVE.
+
+INC-71 - ONE OVERSTATEMENT, LOW.  Re-run against e197bb6^, the tree it was written from:
+  Fix: fields                 69  ==  69   ok
+  hex-shaped strings          92  ==  92   ok
+  resolve as a COMMIT         84  ==  84   ok
+  do NOT resolve               8  ==   8   ok
+  of those, git BLOBs          2  ==   2   ok
+  of those, session tokens     5  vs   6 OCCURRENCES of 5 DISTINCT tokens   <- OVERSTATED
+The sub-table reads 5 tokens + 2 blobs + 1 (INC-58's absent SHA) = 8, but an ABSENT SHA
+cannot be one of 8 strings that EXIST; `5c4f8e11` appears in both INC-29 and INC-30.  The
+correct decomposition is 6 + 2.  EVERY SUBSTANTIVE CLAIM REPRODUCES, including INC-71's own
+correction of OF-152 - the two 40-hex strings ARE INC-24's git BLOBS, not vendor pins.
+
+INC-72 and all three entries carry every rule-13 field, with Diagnosis and Missed non-empty.
+
+OF-153 STAYS OPEN AND ITS MEASURED REASON HOLDS.  SM-1 re-run as N-SM1: KILLED, 23 FAILURES
+(FIX 5 measured 22; my clone has one more test, the SM-7 fixture added at 4d5a836), AND THE
+FIRST KILLER IS `test_the_four_blindness_claims_hold_over_the_LOOPS_OWN_contexts` - THE CLEAN
+EPISODE.  The obvious widening goes red on a correct context, which is INC-50's shape, so a
+guard somebody switches off.  The reasoning holds and OF-153 is correctly open.
+OF-127 / OF-128 / OF-129 / OF-130 / OF-133 / OF-154 are findings, not gate, as directed.
+
+--------------------------------------------------------------------------------------
+9.  COUNTS I MEASURED MYSELF
+--------------------------------------------------------------------------------------
+  make test                       801 passed, 0 failed, 1 skipped, 2 deselected (656.71s)
+  the one failure, by file         THERE IS NONE.  A concurrent C7 REVIEW 2 session holds
+                                   this tree; my run fell in a clean window.  My sealed
+                                   polarity P-14 predicted a concurrency failure and was
+                                   WRONG - in the fix's favour.
+  make selftest                    RED: 1 failed, 1 passed, 802 deselected, on
+                                   test_the_camel_branch_is_decided_before_any_camel_run,
+                                   lanes: camel_comparator.branch = TODO_C13_RUN1.
+                                   NOT C6's, and supposed to be red until RUN-1.
+  make check-roles                 17 passed, 0 failed, 5 n/a - exit 0
+  the C6 suite alone, clean clone  135 passed (69 copy 1, 60 copy 2, 6 review probes);
+                                   136 with the OF-139 guard, which was the control before
+                                   and after every one of THIRTEEN slices
+  git status --porcelain tests/goldens/    EMPTY
+  tests/goldens/ touched by FIX 5 or me    NO
+  evals/                           DOES NOT EXIST.  C6 spent nothing.
+  git tag -l                       c0-pass c1-pass c13-pass c2-pass c3-pass c4-pass
+                                   - neither probe-v1 nor prereg-v1 is cut
+  copy 1 <-> copy 2 imports        NONE, both directions, measured
+  provider model calls             ZERO
+
+--------------------------------------------------------------------------------------
+10.  THE POLARITIES - SEVEN OF FIFTY DID NOT HOLD, ONE NOT MEASURED, NAMED INDIVIDUALLY
+--------------------------------------------------------------------------------------
+  P-48  I PREDICTED PASS, BEFORE MEASURING          ->  FAIL              AGAINST THE FIX
+  P-06  the residue fixture would be the weakest    ->  among the STRONGEST   for the fix
+  P-14  make test would show a concurrency failure  ->  0 failed              for the fix
+  P-15  0 AUTHORED hits                             ->  2, both explained     MY ERROR
+  P-16  clean-surface control fires 0               ->  1, MY OWN NEEDLE      MY ERROR
+  P-38  N-29 would DIE                              ->  survives; the OPERATOR is
+                                                        degenerate, not the subject  for the fix
+  P-41  no Action overstatement in INC-70/71/72     ->  ONE found, LOW     AGAINST THE FIX
+  P-23  text inside the state line still escapes    ->  NOT MEASURED DIRECTLY BY ME
+
+  FOUR OF THE SEVEN WERE WRONG IN THE FIX'S FAVOUR OR AGAINST MY OWN COMPETENCE, and the row
+  that predicted the outcome predicted PASS.  P-32 held exactly as sealed: it predicted N-32
+  would survive "because nothing in the findings suggests the split has a denominator test"
+  - and there IS one, fired where it cannot see.
+
+--------------------------------------------------------------------------------------
+11.  C6's PUBLISHED RESIDUE - THE LIST THAT SHIPS
+--------------------------------------------------------------------------------------
+Nothing here is a defect in what the attacker loop DOES.  Every one is a guard not fired.
+
+  OF-174  MEDIUM, HOLDS THE TAG.  The corpus-vs-improvisation split's partition is pinned by
+          nothing.  REMEDY: ONE LINE - give `test_every_turn_records_corpus_or_improvisation`
+          a client that reuses the entry, or move its partition assertion into
+          `test_a_verbatim_corpus_reuse_is_recorded_as_corpus_with_its_reference`, which
+          already builds the all-corpus episode.
+  OF-175  MEDIUM, HOLDS THE TAG.  Copy 2's claim-2 probe vocabulary is fired at nothing.
+          REMEDY: one fixture in copy 2, through `_sole_layer`, mirroring copy 1's.
+  OF-176  MEDIUM, HOLDS THE TAG.  Copy 2's claim-3 attack-list patterns are fired at nothing.
+          REMEDY: one fixture in copy 2.
+  OF-177  MEDIUM.  Claim 1's clause-identifier scan lacks the state-JSON exemption in BOTH
+          copies, and an attacker-chosen `receipt` of "P4" makes it fire on a CORRECT
+          context.  REMEDY: the exemption LAYER 1 already has.
+  OF-178  MEDIUM.  INC-70's matrix enumerates 8 catchers; copy 2's guard has 13.  The entry
+          does NOT claim completeness, so INC-47's test does not fire on it.  REMEDY: the
+          architect's - OF-160's artefact must be per CATCHER per COPY.
+  OF-179  LOW.  Two sessions published "ROW 55" for two different token rows and both are
+          correct; and OPEN_FINDINGS.md's ids DID collide.  REMEDY: the architect's.
+  Q-089   RAISED.  Q-084 moved the gate from the mutant set to the PROPERTY set and the
+          property set has no termination condition either.  The verdict follows the ruling
+          AS WRITTEN; the question exists so the architect can bound the grain on the record.
+  STILL OPEN AND CORRECTLY SO: OF-127, OF-128, OF-129, OF-130, OF-133, OF-153, OF-154,
+  OF-160..OF-163.
+
+--------------------------------------------------------------------------------------
+12.  MY OWN ERRORS, PUBLISHED AS FINDINGS
+--------------------------------------------------------------------------------------
+  L-2  my needle `over-capture` fires on S8.6's own system prompt, so my clean-surface
+       control read 1 of 73 rather than 0; and my first carrier-matrix measurement read an
+       implausible 73/73 because the harness restored the mutated label before running the
+       guard.
+  L-3  N-29 is a degenerate operator - it removes the fixture rather than unpinning a
+       catcher, so every such mutant "survives".  Replaced by N-29b, which dies with 2.
+  L-5  I FIRST WROTE THAT THIS SESSION AND C7 REVIEW 2 HAD COLLIDED ON TOKEN ROW 55.
+       MEASURED, THEY DID NOT: the table holds 56 DATA rows and 55 8-HEX rows,
+       check_roles._TOKEN_ROW counts only the second kind, and each session is right under
+       the convention its predecessor used - 5c2e8b74 is data 54 / hex 53, 7f4b0e93 is data
+       55 / hex 54, b8c31a57 is data 56 / hex 55.  THE MEASUREMENT THAT SETTLES IT WAS MADE
+       FIRST BY THAT SESSION AND IS CREDITED RATHER THAN RE-DISCOVERED.  What DID collide is
+       OPEN_FINDINGS.md's ids: my residue was written OF-164..OF-168 and renumbered
+       OF-174..OF-178.  BOTH SESSIONS RE-READ IMMEDIATELY BEFORE APPENDING AND THE DISCIPLINE
+       DID NOT PREVENT IT - which is OF-67's point, now with a measurement.
+  Also: my harness's first launch aborted on a format-string bug and produced NOTHING, which
+  is the safe direction and is why it is not a finding of its own.
+
+--------------------------------------------------------------------------------------
+13.  THE TAG, AND WHY
+--------------------------------------------------------------------------------------
+NOT CUT.  Under Q-084 as ruled - "THE GATE IS EVERY OWNED PROPERTY PINNED" - three owned
+properties are unpinned: OP-18, OP-20, OP-21.  Under Q-085 as REJECTED, "copy 1 catches it"
+is not an answer, and copy 2 remains the only guard in this repository ever fired at a real
+`run_episode` context.  I sealed a prediction of PASS before measuring and the measurement
+disagreed; the verdict is not a refusal to decide, and section 11 is the precise list the
+prompt asked for.
+
+--------------------------------------------------------------------------------------
+14.  ANYTHING I COULD NOT DO
+--------------------------------------------------------------------------------------
+* INCIDENTS.md IS NAMED UNDER "NOT" IN THIS SESSION'S FENCE, and CLAUDE.md section 6 duty 4
+  requires every session to append what broke.  NOTHING IS WRITTEN THERE.  What broke this
+  session - the harness's format-string abort, the empty clone, the two measurement errors in
+  section 12, the degenerate mutant operator, and the row-convention correction - is routed to
+  OPEN_FINDINGS.md and stated here instead, and THE INCIDENTS.md ENTRY IS DECLARED OWED.
+  The concurrent C7 REVIEW 2 session raised the same tension as Q-088; I did not duplicate it.
+* P-23 was NOT MEASURED DIRECTLY BY ME - text placed inside the state line escaping both
+  copies.  OF-153 stands on FIX 5's measurement, which I re-ran (N-SM1) and which holds; the
+  escape itself I did not re-exhibit.  Named rather than counted as held.
+* The pinned corpora are NOT FETCHED in this tree, so Q-047's accumulation claim could not be
+  measured against the real per-corpus files.  It is answered another way and the answer is
+  favourable: `seed_for_turn`'s own docstring ALREADY documents the degenerate case
+  ("AgentDojo 4 - fewer entries than the stride") and states the honest limit - "No gap and no
+  overlap holds only while seed * stride has not wrapped len(group)."  The chunk is more
+  careful there than Q-047's summary sentence is.  Not a finding.
+* I did not mutate every predicate of every guard - I mutated 10 of copy 2's 13 catchers and 8
+  of copy 1's, plus 13 source and data properties.  A reviewer enumerating at a finer grain
+  than "per catcher per copy" would find more, and THAT IS EXACTLY WHAT Q-089 ASKS THE
+  ARCHITECT TO BOUND.
+
+--------------------------------------------------------------------------------------
+15.  COMMITS, AND EVERY `Swept:` LINE
+--------------------------------------------------------------------------------------
+  5e91e0e   THE PHASE-1 SEAL - criteria, owned-property set, mutant plan, polarities,
+            reimplementation, and the token row.        Swept: NOTHING
+  d73910b   REVIEW_C6_6.md, the probes, the mutation harness, the consolidated output, the
+            INC-47 harness, and c6_mutants_6.md - THE OWED FILE.  (unreviewed)
+                                                       Swept: NOTHING (touches no journal)
+  e4a4058   OPEN_FINDINGS.md, QUESTIONS.md, STATUS.md, PROGRESS.md.
+                                                       Swept: NOTHING
+  <this>    docs/sessions/c6-review-6.txt              Swept: NOTHING
+
+Every commit was made through a PRIVATE INDEX - GIT_INDEX_FILE under this session's own OS
+temp directory - with STEP 5, the scoped `git reset -- <the same paths>`, INCLUDED, which
+INC-68 records is the half whose omission causes the loss the procedure exists to prevent.
+`git diff --cached --name-status` was READ immediately before every commit and carried only
+this session's paths.  Q-063 clause (i)'s diff over the five journals was run and READ before
+every commit; no added line carried a `Raised by:` token other than 7f4b0e93, SO EVERY
+`Swept:` LINE IS `NOTHING` AND IT IS MEASURED RATHER THAN REASONED.
+
+A CONCURRENT C7 REVIEW 2 SESSION (b8c31a57) SHARES THIS WORKING TREE.  Nothing of theirs was
+staged.  `grep.exe.stackdump` was not deleted.
+
+TOKEN ROW: DATA ROW 55 / 8-HEX ROW 54, both given because the two conventions in use differ
+by one (OF-179), counted from QUESTIONS.md's table IN THE OPERATOR'S WORKING TREE at
+C:\Users\chinm\whetstone-gate, where data row 54 was 5c2e8b74 (C6 FIX 5).
+
+VERDICT: FAIL.  TAG c6-pass: NOT CUT.  Nothing self-certified.
