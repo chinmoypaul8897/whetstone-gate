@@ -3,10 +3,10 @@ ARCH - DISPOSITION 1 - FINAL OUTPUT
 SESSION-TOKEN 4d90c2e6   CHUNK ARCH   ROLE FIX   2026-09-03
 ======================================================================================
 PUSHED SHA: e0842e3
-PUSHED SHA, THIS FILE: <PENDING - THIS FILE'S OWN COMMIT DOES NOT EXIST YET.  The
-commit immediately following it writes the real SHA into this line and does nothing
-else, which is the promise INC-58 made and did not keep, kept.  NO SHA IS INVENTED
-HERE: an invented one is exactly what INC-71 measured this project's checks firing on.>
+PUSHED SHA, THIS FILE: e2ea8f8   (written into this line by the commit immediately
+following it and by nothing else - the promise INC-58 made and did not keep, kept.
+No SHA was ever invented here: this line held an explicit PENDING marker until the
+commit it names existed.)
 
 NO TAG CUT.  NO TAG MOVED.  `git tag -l` reads c0-pass, c1-pass, c2-pass, c3-pass,
 c4-pass, c13-pass - SIX, unchanged.  No c6-pass.  No c7-pass.
