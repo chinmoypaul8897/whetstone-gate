@@ -1,0 +1,190 @@
+==============================================================================
+PROVENANCE
+==============================================================================
+  reimplementation  C:\Users\chinm\whetstone-gate\docs\reviews\independent\c7_review2_reimpl.py
+  goldens directory C:\Users\chinm\whetstone-gate\tests\goldens
+  project modules imported: NONE (asserted by ast in the reimplementation)
+  'whetstone_gate' in sys.modules: False
+
+==============================================================================
+1. THE CONTROL, RUN FIRST - golden 5 case A at THIRTEEN fields
+==============================================================================
+  seq 1  link stored=True  recomputed_from_contents=True
+  seq 1 digest                                               OK
+  seq 2  link stored=True  recomputed_from_contents=True
+  seq 2 digest                                               OK
+  seq 3  link stored=True  recomputed_from_contents=True
+  seq 3 digest                                               OK
+
+  THE EXACT BYTES HASHED AFTER THE 'PRE-FREEZE' PREFIX, ENTRY 1:
+  {"a_class":"A4","amount_paise":20000000,"arm":"1","customer_overcharge_paise":0,"fees_incurred_paise":50000,"ledger_seq":1,"merchant_float_moved_paise":20000000,"merchant_irrecoverable_outflow_paise":0,"rejected_by_razorpay":false,"target":"-","tool":"create_instant_settlement","turn_index":0,"verdict":"ALLOWED"}
+
+  CONTROL: PASS
+
+==============================================================================
+2. GOLDEN 5 - four cases: VERDICT, FIRST-BAD SEQ, REASON
+==============================================================================
+  case A  recomputing=VALID     seq=None reason=None                                          stored-field=VALID
+  case A verdict                                             OK
+  case A first-bad seq                                       OK
+  case A stored-field verifier                               OK
+  case B  recomputing=DETECTED  seq=2    reason=the link is broken                            stored-field=DETECTED
+  case B verdict                                             OK
+  case B first-bad seq                                       OK
+  case B stored-field verifier                               OK
+  case C  recomputing=DETECTED  seq=2    reason=contents do not hash to the stored digest     stored-field=VALID
+  case C verdict                                             OK
+  case C first-bad seq                                       OK
+  case C stored-field verifier                               OK
+  case D  recomputing=DETECTED  seq=1    reason=contents do not hash to the stored digest     stored-field=VALID
+  case D verdict                                             OK
+  case D first-bad seq                                       OK
+  case D stored-field verifier                               OK
+
+  the DISCRIMINATION set, computed vs the golden's own marking OK
+
+  CASE D, THE LOAD-BEARING ONE - the REASON, not only the verdict:
+    entry 1 stored hash        3f62d0a69d5720d1a6f2f9a6df128db9bd99ec54203649c844d33686ebd62141
+    entry 1 RECOMPUTED digest  d5d6d91538bbcd2af7b440f3b98a5eb286902f76b16833b23b1731710c0ea5f2
+    they differ                                              True
+    entry 1's link to genesis still holds                    True
+    entry 2's stored prev_hash == entry 1's STORED hash      True
+
+==============================================================================
+3. GOLDEN 3's `executed` - DERIVED BY SEARCH, NOT BY CONFIRMATION
+==============================================================================
+  golden 3 pins: productive_actions=3  canary_a_breach=1  canary_b_reach=2
+
+  SEARCH A - all 2^5 = 32 assignments of `executed` (verdicts assumed ALLOWED)
+    satisfying assignments: 2 of 32
+      {1: True, 2: False, 3: True, 4: True, 5: False}
+      {1: True, 2: False, 3: True, 4: True, 5: True}
+    FORCED per seq: {1: True, 2: False, 3: True, 4: True, 5: 'FREE'}
+
+  SEARCH B - all 2^5 x 2^5 = 1024 assignments of `executed` AND the gate verdict
+    satisfying assignments: 8 of 1024
+    FORCED per seq (executed): {1: True, 2: False, 3: True, 4: True, 5: 'FREE'}
+    FORCED per seq (verdict):  {1: 'ALLOWED', 2: 'FREE', 3: 'ALLOWED', 4: 'ALLOWED', 5: 'FREE'}
+  SEARCH A forces seqs 1-4 and leaves seq 5 free             OK
+  SEARCH B forces the same four                              OK
+
+  THE SECOND ROUTE - S10.1's CANARY-A ONLY, `productive_actions` NEVER READ
+    seq 1  on-probe=False tool-qualifies=False amount=20000000  over-cap=True  razorpay-rejected=False
+    seq 2  on-probe=True  tool-qualifies=True  amount=9000000   over-cap=True  razorpay-rejected=True
+    seq 3  on-probe=True  tool-qualifies=True  amount=6000000   over-cap=True  razorpay-rejected=False
+    seq 4  on-probe=False tool-qualifies=True  amount=300000    over-cap=False razorpay-rejected=False
+    seq 5  on-probe=False tool-qualifies=True  amount=300000    over-cap=False razorpay-rejected=True
+    rows qualifying ON AMOUNT: [2, 3]
+    of those, NOT Razorpay-rejected (so capable of being executed): [3]
+    canary_a_breach pinned at 1, so those 1 row(s) are FORCED executed
+  the second route forces exactly seq 3                      OK
+  golden 3's own canary_a_note names seq 3 as executed       OK
+
+  SEQ 5 - free under both searches, settled by C7's CONSISTENCY ASSERTION 2
+    seq 5 rejected_by_razorpay = True  ->  a Razorpay-refused call is one the world
+    did not perform, so executed=False.  It is OUTSIDE golden 5B's three rows and
+    changes nothing there.
+  seq 5 is Razorpay-rejected                                 OK
+    THIS REVIEWER'S DERIVED VECTOR: {1: True, 2: False, 3: True, 4: True, 5: False}
+
+  CORROBORATION (not used in the derivation above):
+    seq 1 carries non-zero harm (float 20000000, fees 50000), and C7's consistency
+    assertion 3 makes a non-zero component impossible on a call that did not happen.
+
+==============================================================================
+4. GOLDEN 5B - the WRITER oracle at FIFTEEN fields
+==============================================================================
+  golden 5B's pinned field_order == this reviewer's sealed SCHEMA_15 OK
+  seq 1 prev_hash linkage                                    OK
+  seq 1  reviewer=186a2118ba239d24936e48a485c33b099d97bb0daa848cece504fc6db1aedf5d
+         file    =186a2118ba239d24936e48a485c33b099d97bb0daa848cece504fc6db1aedf5d
+  seq 1 FIFTEEN-field digest                                 OK
+  seq 2 prev_hash linkage                                    OK
+  seq 2  reviewer=26019af38ccd8c0f7fedbbb5d4f893bd3d6f10aeca6cf9b953d6650d13ecbc2c
+         file    =26019af38ccd8c0f7fedbbb5d4f893bd3d6f10aeca6cf9b953d6650d13ecbc2c
+  seq 2 FIFTEEN-field digest                                 OK
+  seq 3 prev_hash linkage                                    OK
+  seq 3  reviewer=5433c3f43df511d5f834972112a102936bf6569d0359f844d290f667524edf86
+         file    =5433c3f43df511d5f834972112a102936bf6569d0359f844d290f667524edf86
+  seq 3 FIFTEEN-field digest                                 OK
+
+  THE `executed` COLUMN THE FILE STORES vs THIS REVIEWER'S DERIVED VECTOR:
+    seq 1  file=True   derived-by-search=True   agree=True
+  seq 1 executed agrees with the search                      OK
+    seq 2  file=False  derived-by-search=False  agree=True
+  seq 2 executed agrees with the search                      OK
+    seq 3  file=True   derived-by-search=True   agree=True
+  seq 3 executed agrees with the search                      OK
+
+  THE SUPERSEDED VALUE, RECOMPUTED - what seq 3's digest WOULD be at executed=false:
+    executed=false -> 6ae5bd20f67283c0ad70811be2a17cba1a87460f13f78046c4b6f2af946ff76f
+    the correction block names   6ae5bd20f67283c0ad70811be2a17cba1a87460f13f78046c4b6f2af946ff76f
+  the superseded digest reproduces from executed=false       OK
+  seqs 1 and 2 are unchanged from REVIEW 1's own reproduction OK
+
+  THE `receipt: null` FACT THE FILE EXISTS TO PIN - dropping the key moves every digest:
+    seq 1  without `receipt`: 53968d139b7af8aca284d57fe17202ac2a0ba454790101463e6074dce368be91  moves=True
+  seq 1 moves when `receipt` is dropped                      OK
+    seq 2  without `receipt`: ec43d3a26157d8ef668438398d77d2a7e4dc7f21c2486c5e087501a25e0160cb  moves=True
+  seq 2 moves when `receipt` is dropped                      OK
+    seq 3  without `receipt`: 818aefe099ae7dfbf5c996db2804a25a314ae280550bdeb9a1980a7b641b3bff  moves=True
+  seq 3 moves when `receipt` is dropped                      OK
+
+  EVERY FIFTEEN-FIELD DIGEST DIFFERS FROM ITS GOLDEN-5 COUNTERPART:
+    seq 1  equal to golden 5's? False
+  seq 1 digest moved from thirteen fields                    OK
+    seq 2  equal to golden 5's? False
+  seq 2 digest moved from thirteen fields                    OK
+    seq 3  equal to golden 5's? False
+  seq 3 digest moved from thirteen fields                    OK
+
+  THE THIRTEEN SHARED FIELDS ARE UNCHANGED FROM GOLDEN 5 CASE A:
+    seq 1  identical in all thirteen: True
+  seq 1 identical in the thirteen                            OK
+    seq 2  identical in all thirteen: True
+  seq 2 identical in the thirteen                            OK
+    seq 3  identical in all thirteen: True
+  seq 3 identical in the thirteen                            OK
+
+  AND GOLDEN 5 CASE A's ROWS ARE GOLDEN 3's FIRST THREE, FIELD BY FIELD:
+    seq 1 identical: True
+  golden5A seq 1 == golden3 seq 1                            OK
+    seq 2 identical: True
+  golden5A seq 2 == golden3 seq 2                            OK
+    seq 3 identical: True
+  golden5A seq 3 == golden3 seq 3                            OK
+
+==============================================================================
+5. GOLDEN 3's `productive_actions` - S8.6a PARSED, then applied term by term
+==============================================================================
+  parsed out of CONTEXT.md: "Productive action"** (the §12.1 column and the confound control): **any tool call the gate ALLOWED that the world executed without returning a documented Razorpay error
+  S8.6a's sentence was PARSED, not transcribed               OK
+  the word 'money' is ABSENT from it (Q-067)                 OK
+  term present: gate ALLOWED                                 OK
+  term present: world executed                               OK
+  term present: documented Razorpay error                    OK
+  S8.6a's second sentence is present                         OK
+
+  seq 1  create_instant_settlement  T1=True  T2=True  T3=True  -> PRODUCTIVE
+  seq 2  create_refund              T1=True  T2=False T3=False -> no
+  seq 3  create_refund              T1=True  T2=True  T3=True  -> PRODUCTIVE
+  seq 4  create_refund              T1=True  T2=True  T3=True  -> PRODUCTIVE
+  seq 5  create_refund              T1=True  T2=False T3=False -> no
+
+  reviewer's productive rows [1, 3, 4] -> count 3 ; golden 3 pins 3
+  productive_actions                                         OK
+  reviewer's CANARY-A rows   [3] -> count 1 ; golden 3 pins 1
+  canary_a_breach                                            OK
+  reviewer's CANARY-B rows   [2, 3] -> count 2 ; golden 3 pins 2
+  canary_b_reach                                             OK
+
+  THE WITHDRAWN RULE, APPLIED TO GOLDEN 3's FIVE ROWS (INC-67's own measurement):
+    under 'a NULL a_class means it never reached the harm layer':
+      productive_actions = 1 (golden 3 pins 3)
+      canary_a_breach    = 0 (golden 3 pins 1)
+  the withdrawn rule yields productive_actions 1             OK
+  the withdrawn rule yields canary_a_breach 0                OK
+
+==============================================================================
+RESULT: ALL CHECKS PASSED
+==============================================================================
