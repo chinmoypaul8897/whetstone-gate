@@ -1,3 +1,50 @@
+*⚠️ **UPDATE, ARCH FIX (`6f3a91d2`), 2026-09-02 — GOLDEN 5B IS LANDED AND `OF-139`'s GUARD IS
+BUILT AND FIRED BOTH WAYS. NO TAG — THIS IS NOT A REVIEW SESSION. ZERO PROVIDER MODEL CALLS.**
+**(1) `tests/goldens/golden5b_ledger_writer.json`** (`8003c02`) — sha256
+`232f6fc995e8426e5babfa5029e6c2e3fcdfcb1f5061e461a702f0df15d89811`, **7,917 bytes**, 0 CR,
+`git hash-object` == `--no-filters`. It re-pins the **WRITER** at **fifteen** content fields after
+`Q-062` added `executed` and `Q-066` added `receipt`. ⚠️ **`golden5_tamper.json` IS NOT REOPENED,
+NOT REGENERATED AND NOT TOUCHED** — `PROCESS.md` §5.2 makes it a **tamper/verifier** oracle at
+thirteen and never a writer oracle — and `git diff` is **EMPTY on all four** existing goldens
+(`golden5_tamper`, `golden3_harm_vector`, `golden1_money`, `world_seed_2001`), with
+`git status --porcelain tests/goldens/` showing **only the new file**. ⚠️ **THE CONTROL RAN FIRST
+AND IT IS THE REASON THE VALUES ARE BELIEVABLE:** the hash rule was reimplemented in a fresh OS temp
+directory **importing nothing from `whetstone_gate`**, and had to reproduce **golden 5 case A's own
+three stored digests** (`3f62d0a6…`, `63579792…`, `72072b8e…`) from its thirteen-field rows before
+one new value was computed. It did. Only then was the fifteen-field chain computed, and **all three
+MATCH the architect exactly** — `186a2118…`, `26019af3…`, `6ae5bd20…`. A disagreement would have
+been a STOP and a `QUESTIONS.md` entry, never an adjusted value. ⚠️ **THE FINDING THE FIXTURE
+CARRIES IS ABOUT THE FIXTURE IT CAME FROM: golden 5's case A already contained ONE OF EACH of
+`Q-062`'s three outcomes — performed / Razorpay-refused / TOOL-LAYER-refused — and nobody could
+tell, because the thirteen-field schema could not distinguish them.** **NO TEST CONSUMES IT** —
+C7's review is the first session permitted to write one. **`Q-070` STANDS and golden 3 is
+untouched.**
+**(2) `OF-139`'s guard** (`23e174f`) —
+`tests/test_repo_invariants.py::test_the_package_under_test_is_the_tree_under_test`. A bare
+`python -m pytest` inside a fresh clone imports the **live** repository's package and resolves the
+**live** repo root, so **every mutation to `src/`, `config/` or `CONTEXT.md` in a clone has no
+effect and every mutant reads as SURVIVED** — `INC-17` inverted, reaching every review that has run
+mutants in a clone. ⚠️ **FIRED IN BOTH DIRECTIONS BEFORE IT WAS COMMITTED: RED** in a clone with no
+`PYTHONPATH` (its message reproducing `OF-139`'s own two paths), **GREEN** in the real repository,
+and **GREEN again in that same clone with `PYTHONPATH=<clone>/src`** — the third run being what
+shows it detects the *mismatch* rather than merely detecting a clone. Its docstring carries the
+remedy, **including the opposite failure direction from `INC-57`** (`git checkout --` restore from a
+HEAD holding the mutation reports every mutant **KILLED**). `OF-139` is **PARTIALLY** closed: the
+`docs/reviews/README.md` paragraph and a `make mutate-clone` target are **out of fence and still
+owed**. New: **`INC-64`**.
+**(3) ⚠️ AND THIS SESSION WAS ITSELF SWEPT — `INC-65`.** The concurrent ARCH FIX session's commit
+**`e31f6b3`** committed this session's `INC-64` **and** its `QUESTIONS.md` token row under
+`Session-Token: d5c8039f`, with `Swept: NOTHING` in its message. `Q-063` clause (ii) was run in the
+direction that protects the checker's own attribution (*"is MY token in this diff"*) rather than the
+one it names (*"is anyone ELSE's"*). **Nothing is rewritten**; the record is the correction, and the
+mechanical form of the query — grep the staged diff against **every other row** of the token table —
+was run on this session's own journal commit. **E6 is still C11's and still unlanded.**
+**Suite, measured by this session, with failures attributed BY FILE:** before **1 failed / 783
+passed / 1 skipped / 2 deselected** in 149.6 s, the sole failure
+`test_the_object_store_and_the_working_tree_agree` naming `INCIDENTS.md`, `QUESTIONS.md` and
+`docs/sessions/nightrun-b-1.txt` — **all the concurrent session's uncommitted edits, none this
+session's.** After: recorded in `docs/sessions/arch-goldens-2.txt`.*
+
 *⚠️ **UPDATE, C13 REVIEW 1 (`b450df0a`), 2026-09-01 — C13 IS `FAIL`. NO TAG. AND THE FIRST THING
 TO SAY IS THE ONE THAT IS NOT THE VERDICT: `CONTEXT.md` v1.8 IS RIGHT.** This review fetched
 arXiv 2503.18813v2 itself — HTTP 200, **2,554,718 bytes**, SHA-256 `b5cd7970e905f1504439c3eddb3855ab18d951d10bf806ec2f5f3baa02ca8a51`,

@@ -4913,4 +4913,77 @@ a `make mutate-clone` target doing the three set-up steps — are **outside this
 and remain owed**, so a reviewer who never runs `make test` inside the clone still gets no warning.
 ⚠️ **And one thing about this entry's own authorship is stated rather than left to be inferred:**
 hard rule 13 says the FIX session writes the entry **before** it changes a line of code, and this
-session built and fired the guard first, then wrote this. The ordering was wrong; the record is not.
+session built and fired the guard first, then wrote this. **The ordering was wrong; the record is
+not, and the git log is left agreeing with the record rather than dressed to contradict it** —
+`23e174f` precedes the commit carrying this entry, which is what actually happened. The `Fix:` field
+above holds a real SHA because the alternative on offer was a marker for a commit that did not yet
+exist, and hard rule 13's *"an invented incident has no commit"* cuts against inventing one.
+
+---
+
+## INC-65 — a concurrent session committed THIS session's `INC-64` and its `QUESTIONS.md` token row under its own token, and its `Swept:` line reads **NOTHING**: the `Q-063` check was run in the direction that protects the checker's own attribution and not the one that protects somebody else's
+
+**Date:** 2026-09-02 (**found by the session that was swept**, ARCH FIX `6f3a91d2`, which is the only
+session that can find it — `INC-36`'s own finding, recurring one session later. The sweeping commit
+is **`e31f6b3`**, the concurrent ARCH FIX session `d5c8039f`. **No Fix SHA; see **Fix**.)
+
+**Event:** at the moment `e31f6b3` staged its six journal files, this session's **`INC-64`** and its
+token row `| 6f3a91d2 | ARCH | FIX | 2026-09-02 |` were uncommitted deltas in the same working tree.
+Both were staged and committed under `Session-Token: d5c8039f`. Measured, not inferred:
+
+```
+git log --oneline -1 -S "6f3a91d2" -- QUESTIONS.md   ->  e31f6b3
+git show HEAD:INCIDENTS.md | grep "^## INC-64"       ->  present, introduced by e31f6b3
+```
+
+⚠️ **And `e31f6b3`'s message carries the line `Swept: NOTHING`.**
+
+**Action:** ⚠️ **nothing is undone.** History is never rewritten here (`CLAUDE.md` §5) — a rewrite
+would destroy `probe-v1`, `prereg-v1` and every `cN-pass` tag — so the commit stands and the
+mis-attribution is corrected by **record** rather than by force. `INC-64`'s remaining delta is
+committed under this session's own token, so that entry now has two commits and two tokens in its
+history and **this entry is how a reader learns which is which**. This session then applied the
+mechanical form of the check to its own journal commit, described under **Systemic guardrail**.
+
+**Expectation:** `Q-063`'s ruling, clause (ii), binding on every session since 2026-09-01: *"If it
+contains any entry whose `Raised by:` token is not yours, YOU STILL COMMIT — waiting deadlocks two
+sessions — but the commit message carries a `Swept:` line naming EVERY foreign entry and its token,
+and your report names them too."*
+
+**Missing:** **`check-roles` E6.** Clause (iii) assigns it to **C11** and it is **not landed**, so
+nothing mechanical compares a commit's journal additions against its own `Session-Token` trailer.
+`Q-063`'s own status line already says what that leaves: *"until E6 exists the discipline is a habit,
+not a guardrail."* This is the second commit to demonstrate it, after `2f702d9` (`INC-36`).
+
+**Missed:** ⚠️ **the check was run, and it looked the wrong way — that is the whole of this entry.**
+`e31f6b3`'s message records verifying that `git diff --cached -- QUESTIONS.md` contained **zero
+occurrences of `d5c8039f`**: that its *own* token had not leaked into a neighbour's commit. That is
+the direction which protects the checker's attribution. The direction clause (ii) actually names —
+*is somebody else's entry inside what I am about to commit* — was not run, and **a search of the same
+staged diff for `6f3a91d2` would have returned the token row on the first line it looked at.** ⚠️ And
+the concurrent session was not unknown: the same message names `tests/test_repo_invariants.py` and
+`tests/goldens/` as files *"a CONCURRENT session modified in this working tree"*, **two paragraphs
+above `Swept: NOTHING`.** The knowledge was present and the query was pointed away from it.
+
+**Diagnosis:** clause (ii) is written as a test over a `Raised by:` **token field**, but a token-table
+row has no such field and an incident's attribution is prose, so the check has no mechanical subject
+and collapses into *"grep the staged diff for my own token"* — a query every foreign entry passes.
+One working tree and two sessions then makes the failure a matter of timing rather than of care.
+
+**Fix:** ⚠️ **No source change and no commit SHA — stated plainly rather than left looking like an
+omission**, on `INC-17`'s precedent. Nothing in this repository is wrong: an existing commit
+mis-attributes two entries, and the remedy for that here is a record, not a rewrite. An entry whose
+`Fix` named a SHA it does not have would be an invented incident, and hard rule 13 exists partly to
+make invented incidents detectable.
+
+**Systemic guardrail:** ⚠️ **PARTIAL, and one half of it is demonstrated rather than proposed.**
+*What this session did, and what any session can do in one line:* the correct query is not *"is my
+token in this diff"* but ***"is any OTHER issued token in this diff"*** — the `## Session tokens`
+table is the authoritative list, so the check is `git diff --cached -- <journal paths>` grepped
+against **every other row of that table**. It has a mechanical subject, it cannot be satisfied by a
+clean result for the wrong reason, and it was run on this session's own journal commit with its
+result stated in that commit's message. *What is NOT prevented:* it is still a habit — **E6 is C11's
+and remains unlanded**, and this session's fence forbids `src/whetstone_gate/check_roles.py`. And the
+half `INC-36` named as uncloseable is uncloseable still, in `Q-063`'s own words: **"nothing can warn
+the session being swept."** It could not warn this one; it can only be found afterwards, by the
+session that lost the attribution, reading a file it had already written.
