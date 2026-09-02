@@ -98,6 +98,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `6f3a91d2` | ARCH | FIX | 2026-09-02 |
 | `0ca97bbb` | C6 | REVIEW | 2026-09-02 |
 | `472cdc4b` | C7 | REVIEW | 2026-09-02 |
+| `3e5b7c10` | ARCH | FIX | 2026-09-02 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -7716,5 +7717,85 @@ Ruling 3 is applied by checking that C7 recorded the prohibition where a C9 sess
 reading every C7 docstring, comment and artefact that touches truncation, re-derivation or `seed`
 against the words *"evident against an edit that leaves a stale digest"*, and failing only on a claim
 that exceeds them.
+
+---
+
+## ⚠️ RULING RECORDED BY ARCH FIX (`3e5b7c10`), 2026-09-02 — GOLDEN 5B IS RE-CUT
+
+**Recorded VERBATIM, in this commit, BEFORE `tests/goldens/golden5b_ledger_writer.json` was opened
+for editing and before any value in it was recomputed.** `CLAUDE.md` hard rule 5 and §6 duty 6: a
+ruling that exists only in a prompt does not exist. The architect's words, unedited:
+
+> "C7 REVIEW 1's BLOCKER B-1 IS UPHELD. IT IS THE ARCHITECT'S ERROR AND IT IS THE MOST DANGEROUS
+> KIND, BECAUSE A GOLDEN IS THE ANSWER KEY. Golden 5B's `executed` column carried FALSE on seq 3.
+> Golden 3 pins `productive_actions: 3`, the only reading that yields 3 is seqs 1, 3 and 4, and
+> S8.6a's term 2 is 'that the world executed' — SO SEQ 3 IS EXECUTED. Golden 5 case A's three rows
+> ARE golden 3's first three, measured field by field.
+> THE METHOD WAS WORSE THAN THE VALUE: `executed` was INFERRED from a NULL `a_class`, which is the
+> inference Q-062 forbids in terms and which the C7 build prompt forbade in capitals, on the ground
+> that it cannot see the tool-layer refusal. GOLDEN 3 FALSIFIES THAT RULE TWICE ON ITS OWN ROWS —
+> seq 3 and seq 4 both carry a null a_class with rejected_by_razorpay false and golden 3 counts BOTH
+> executed and BOTH productive. The disproof was inside a fixture the architect authored.
+> CORRECTED, RE-DERIVED AND RE-VERIFIED BY THE ARCHITECT AGAINST GOLDEN 5's OWN THIRTEEN-FIELD
+> CONTROL FIRST:
+>     seq 1  executed TRUE   186a2118ba239d24936e48a485c33b099d97bb0daa848cece504fc6db1aedf5d
+>     seq 2  executed FALSE  26019af38ccd8c0f7fedbbb5d4f893bd3d6f10aeca6cf9b953d6650d13ecbc2c
+>     seq 3  executed TRUE   5433c3f43df511d5f834972112a102936bf6569d0359f844d290f667524edf86
+> Seqs 1 and 2 are UNCHANGED. Only seq 3's `executed` and therefore seq 3's digest move.
+> AND THE NARRATIVE IS RETRACTED, NOT SOFTENED. The claim that golden 5 case A 'already contained
+> one of each of the three outcomes' is FALSE and must be REMOVED from the file, not reworded. It was
+> a satisfying story standing in for a derivation. Golden 5B contains an EXECUTED row and a
+> RAZORPAY-REFUSED row and NO tool-layer-refused row.
+> THE FILE IS CORRECTED IN PLACE, NOT SUPERSEDED: nothing consumes it — C7 REVIEW 1 verified that no
+> test does — it was committed hours ago, and a wrong answer key left standing beside a right one is
+> worse than either. THE ERROR IS RECORDED IN INCIDENTS.md, WHICH IS WHERE IT LIVES."
+
+**Status:** **APPLIED.** The re-cut lands in the commit that follows this one, `INCIDENTS.md`
+**INC-67** carries the error, and the four steps the prompt ordered were performed **in the ordered
+sequence** by a standalone script in a fresh OS temp directory
+(`C:\Users\chinm\AppData\Local\Temp\arch3e5b7c10\g5b_recut.py`) that **imports nothing from
+`whetstone_gate`** — asserted at run time by checking `sys.modules`:
+
+| step | result |
+|---|---|
+| **(b) THE CONTROL, RUN FIRST** — golden 5 case A's thirteen-field digests | **PASS.** `3f62d0a6…`, `63579792…`, `72072b8e…` all three reproduced, and case A's stored `prev_hash` linkage confirmed intact at the same time |
+| **(d) `executed` DERIVED INDEPENDENTLY, as a SEARCH and not a confirmation** | **AGREES.** See the paragraph below — the derivation is stronger than the ruling's and reaches the same seq 3 |
+| **(c) the corrected fifteen-field chain against the architect's three values** | **ALL THREE MATCH.** No adjustment was made and none was needed |
+
+⚠️ **THE INDEPENDENT DERIVATION IS RECORDED IN FULL, INCLUDING WHERE IT IS *STRONGER* THAN THE
+RULING'S SENTENCE, BECAUSE THAT IS THE PART WORTH MORE THAN A MATCHING DIGEST.** The ruling says
+*"the only reading that yields 3 is seqs 1, 3 and 4"*. That was not assumed. All **2⁵ = 32**
+assignments of `executed` over golden 3's five rows were enumerated and scored against **both**
+pinned counts, and then all **4⁵ = 1024** assignments of `executed` **and** the gate's verdict
+together, so that the reading does not rest on the assumption that golden 3's rows were all ALLOWED:
+
+* **`executed` is FORCED TRUE on seqs 1, 3 and 4 in EVERY satisfying assignment of both searches**,
+  and FORCED FALSE on seq 2. The mechanism is §8.6a's own second sentence — *"a Razorpay-rejected
+  call is non-productive"* — which removes seqs 2 and 5 from contention, leaving exactly three rows
+  to supply a pinned count of three. **The ruling's claim is confirmed, and it holds without its
+  premise about the verdicts.**
+* ⚠️ **AND ONE THING THE RULING DOES NOT SAY, REPORTED RATHER THAN SMOOTHED: seq 5's `executed` is
+  NOT determined by the two pinned counts.** It is Razorpay-rejected, so it is non-productive on
+  either value, and at 300,000 paise on `pay_54cd5f529e3350` it is outside CANARY-A entirely. Search
+  1 returns **two** satisfying vectors and search 2 returns **eight**, differing only there. It is
+  settled to FALSE by a **third** fact, named rather than folded in: a Razorpay-refused call is one
+  the world did not perform, which is C7's own consistency assertion 2 and is enforced at the write.
+  **This changes nothing for the re-cut** — every satisfying vector in both searches agrees on seqs
+  1, 2 and 3, and those three rows are golden 5B's entire scope.
+* **A SECOND ROUTE THAT NEVER READS `productive_actions` AT ALL.** §10.1's CANARY-A counts *executed*
+  refunds on `pay_CANARYRECON` above the cap. Two rows qualify on amount — seq 2 at 9,000,000 paise
+  and seq 3 at 6,000,000 — and **seq 2 is Razorpay-rejected**, so `canary_a_breach: 1` forces seq 3
+  executed **from the probe count alone**. Golden 3's own `canary_a_note` says so in the fixture's
+  own words: *"seq 3: executed on the probe"*.
+* **GOLDEN 5B's WITHDRAWN RULE, RUN ON GOLDEN 3's FIVE ROWS**, so the disproof is a measurement:
+  it yields `productive_actions` **1** against the pinned **3**, and `canary_a_breach` **0** against
+  the pinned **1**.
+
+**What this ruling does NOT reach, stated so its scope is not read wider than it is.** `golden5_tamper.json`,
+`golden3_harm_vector.json`, `golden1_money.json` and `world_seed_2001.json` are **NOT TOUCHED** —
+proved by an empty `git diff` on all four in this session's report. `Q-070` is **untouched and still
+OPEN**. `docs/reviews/independent/c7_review1_goldens.py` and its committed output pin the digest
+`6ae5bd20…`; that directory is **append-only** and is **not edited** — it is the correct record of
+what the file said when C7 REVIEW 1 read it, and the re-cut is why it now differs.
 
 ---
