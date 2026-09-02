@@ -1,0 +1,123 @@
+C13 REVIEW 4 - PHASE 2 PROBES  (written AFTER the seal 9e16d87)
+repo: C:\Users\chinm\whetstone-gate
+
+-- A. THE PROJECT'S PREDICATE vs THE PHASE-1 LAW-DERIVED ONE -----------------
+   law-derived requirements (Phase 1): 4
+     the diagnosed-cause requirement                'on a cause that has been diagnosed'
+     the it-errored-is-not-a-cause clause           'it errored is not a cause'
+     the harness-defect-is-never-branch-b clause    'a harness defect is never branch b'
+     the PROTOCOL.md-before-the-branch requirement  'protocol.md'
+   project's BRANCH_B_REQUIREMENTS   : 4
+     the diagnosis requirement                      'on a cause that has been diagnosed'
+     the words that make 'it errored' insufficient  'is not a cause'
+     the harness-defect exclusion                   'a harness defect is never branch b'
+     where the diagnosed cause is recorded before a branch is selected 'protocol.md'
+
+   XX V12  mine=4 theirs=5  the empty condition
+   XX V13  mine=4 theirs=5  whitespace only
+   sealed vectors: 22 agree, 2 disagree (of 24)
+
+   -- the DISCRIMINATING vectors, added in Phase 2 to separate the two derivations --
+   D1  DIVERGE mine=1 theirs=0  the law's clause replaced by a DIFFERENT 'is not a cause' sentence
+        mine  : branch_b_condition does not carry the it-errored-is-not-a-cause clause (expected the phrase 'it errored is not
+        theirs: (accepted)
+   D2  DIVERGE mine=1 theirs=0  the law's clause replaced by 'a slow network is not a cause'
+        mine  : branch_b_condition does not carry the it-errored-is-not-a-cause clause (expected the phrase 'it errored is not
+        theirs: (accepted)
+   D3  DIVERGE mine=1 theirs=0  'it errored' deleted, the rest of the sentence kept
+        mine  : branch_b_condition does not carry the it-errored-is-not-a-cause clause (expected the phrase 'it errored is not
+        theirs: (accepted)
+
+-- B. S-5 - THE INC-50/INC-55 SHAPE, SCANNED RATHER THAN EYEBALLED -----------
+   Looking for: an assertion in tests/test_c13_camel_comparator.py whose EXPECTED
+   side reads a module-level object of `invocation`/`branch_b` that also produced
+   the ACTUAL side - so both move together and the assertion cannot fail.
+   RESULT: 4 candidate hit(s) from a DELIBERATELY OVER-BROAD scanner.
+   Each is judged individually below; a candidate is not a finding.
+     line 2346  call(s)=['branch_b.p2_holds_for'] const(s)=['branch_b.CITED_TABLE_FIGURES']
+        assert branch_b.p2_holds_for(branch_b.CITED_TABLE_FIGURES, "Table 7", "Claude 3.5 Sonnet") is True
+     line 2359  call(s)=['branch_b.banking_rows'] const(s)=['branch_b.CITED_TABLE_FIGURES']
+        assert branch_b.banking_rows(branch_b.CITED_TABLE_FIGURES, "Table 5", "Claude 3.5 Sonnet")
+     line 2283  call(s)=[] const(s)=['branch_b.banking_rows']
+        assert branch_b.banking_rows(reversed_figures, table, model) == branch_b.banking_rows(
+     line 2289  call(s)=[] const(s)=['branch_b.p2_holds_for']
+        assert branch_b.p2_holds_for(reversed_figures, table, model) == branch_b.p2_holds_for(
+
+   And the two assertions INC-55 is about, searched for by their own text:
+     len(undiagnosed) == len(invocation.BRANCH_B_REQUIREMENTS   live=[] quoted-in-a-comment=[1152]
+     for what, _ in invocation.BRANCH_B_REQUIREMENTS:           live=[] quoted-in-a-comment=[1153]
+
+-- C. OF-115, OF-117, OF-118, OF-119 -----------------------------------------
+   OF-115  'OF-104' occurrences in the C13 test file : 2  (F-115a expected 0)
+   OF-115  'OF-62' occurrences                        : 2
+   OF-115  'Q-079' occurrences                        : 8
+
+   OF-119  window NOW  ('### 8.5.2 ' or '## ')  :  3646 chars, ends at line 617 ('### 8.5.2 The pre-registered CaMeL')
+   OF-119  window BEFORE ('## ' only)           :  6817 chars, ends at line 655 ('## 8.6 THE AUTHORED ARTEFACTS ? ev')
+   OF-119  narrowing                            :  3171 chars removed (47% of the old)
+   F-119b  SEALED PREDICTION was ~3,592 chars, 'within 10% of 3,592'  ->  measured 3646, delta +1.5%
+   F-119c  all four phrases inside the narrowed window: True
+   OF-119  'policy coverage' (S8.5.2's P3) in the narrowed window: False  (must be False)
+
+   OF-118  the pre-committed rule of decision, part by part:
+     (a) exported            : True
+     (a) export IS the thing : True
+     (b) result BOUND        : ['stale']
+     (b) reaches say()       : ['stale']
+     (c) an input on which the printed line CHANGES:
+         real config -> 0 problem(s) -> prints 'OK - both keys agree with the law'
+         a broken pair -> 5 problem(s) -> prints '5 PROBLEM(S)' and then each one
+     ? RESIDUAL, stated rather than glossed: main()'s RETURN CODE is unchanged by
+       `stale`. `python -m whetstone_gate.camel_comparator` exits 0 with a stale
+       condition; only the printed line moves. FIX 3 names that omission in terms.
+
+-- D. STANDING PROPERTIES (T-1..T-10) ----------------------------------------
+   T-3  git status --porcelain tests/goldens/  : ''
+   T-4  CONTEXT.md blob  : 8e820384afbb1de7de3892eb6b90a8e6dce1f378
+        REVIEW 3 measured: 8e820384afbb1de7de3892eb6b90a8e6dce1f378  -> IDENTICAL
+        bytes 224645  LF 2361  CR 0  TAB 0  (REVIEW 3: 224,645 / 2,361 / 0 / 0)
+        version line says : v1.9
+   T-5  git tag -l       : c0-pass c1-pass c2-pass c3-pass c4-pass
+        prereg-v1 resolves: False
+   T-6  files under evals/: 0
+   T-7  branch_a_condition  carries a diagnosis word: False
+   T-7  branch_b_condition  carries a diagnosis word: True 
+   T-9  Q-074's fifth site - 'Tables 5-7' in tests/test_lanes_operator_placeholders.py:
+        PROCESS.md:1204:| **C13** | 15:00?16:30 | **`src/camel_comparator/`** ? vendor CaMeL at its pinned SHA and invoke it **UNMODIFIED** on AgentDojo banki
+        PROCESS.md:1313:| **6** | **C13 / CaMeL live run ? Branch B citation** | The comparator ships as CaMeL's published **Table 2, Appendix B, `o3 High`, `
+        config/lanes.yaml:196:# one-line reason verbatim. NOT Tables 5-7: those are Appendix C, Claude 3.5 Sonnet, where
+        config/lanes.yaml:212:  branch_b_action: "ship as a citation of Table 2, Appendix B ('Full results tables'), the o3 High block, banking column of arXi
+        src/whetstone_gate/camel_comparator/BRANCH_B.md:59:### 2b. What **Tables 5?7** actually say ? **Appendix C, Claude 3.5 Sonnet**
+        src/whetstone_gate/camel_comparator/BRANCH_B.md:87:?? In Tables 5 and 6's banking column CaMeL is **behind** the undefended model ?
+        src/whetstone_gate/camel_comparator/BRANCH_B.md:88:75.00 vs 81.25 and 70.83 vs 84.03. A Branch-B artefact citing *"Tables 5?7, banking
+        src/whetstone_gate/camel_comparator/__init__.py:64:  * **Q-058 (Class A) ? the *"Tables 5?7"* citation names the wrong table.** The
+        src/whetstone_gate/camel_comparator/__init__.py:66:    Appendix B, `o3 High`**. Tables 5?7 are Appendix C, **Claude 3.5 Sonnet**, where
+        src/whetstone_gate/camel_comparator/branch_b.py:34:  * **Tables 5?7 are Appendix C, "Baseline results"**, a comparison of CaMeL against *other
+        src/whetstone_gate/camel_comparator/branch_b.py:39:So a Branch-B artefact that says *"cite Tables 5?7, banking column"* would point a panelist
+        src/whetstone_gate/camel_comparator/branch_b.py:59:figure missing one; **truthiness cannot tell `Table 2` from `Tables 5-7`**, and the whole
+        src/whetstone_gate/camel_comparator/branch_b.py:98:#: `Tables 5-7` is precisely the citation shape Q-058 records, and a check that accepted it
+        src/whetstone_gate/camel_comparator/branch_b.py:181:                f"Q-058: a RANGE - 'Tables 5-7' - is the exact citation shape that pointed "
+        src/whetstone_gate/camel_comparator/branch_b.py:199:                f"names no base model anywhere, so a Tables 5-7 figure must say WHERE its "
+        src/whetstone_gate/camel_comparator/branch_b.py:246:#: ?? Appendix C states NO base model. Tables 5 and 7 are tied to `Claude 3.5 Sonnet` by
+        src/whetstone_gate/camel_comparator/branch_b.py:359:    earlier draft keyed on the base model alone; `CITED_TABLE_FIGURES` carries Tables 5, 6
+        src/whetstone_gate/camel_comparator/branch_b.py:509:    # CITED_TABLE_FIGURES holds Tables 5, 6 and 7 under one base model ? only Table 7 is a
+        src/whetstone_gate/camel_comparator/branch_b.py:609:        "### 2b. What **Tables 5?7** actually say ? **Appendix C, Claude 3.5 Sonnet**",
+        src/whetstone_gate/camel_comparator/branch_b.py:618:        "?? In Tables 5 and 6's banking column CaMeL is **behind** the undefended model ?",
+        src/whetstone_gate/camel_comparator/branch_b.py:619:        "75.00 vs 81.25 and 70.83 vs 84.03. A Branch-B artefact citing *\"Tables 5?7, banking",
+        tests/test_c13_camel_comparator.py:1886:      * publishing Tables 5?7 as the headline pair ? the defect the ruling corrects;
+        tests/test_c13_camel_comparator.py:1894:    assert rest, "S2b - what Tables 5-7 actually say - has been dropped from the artefact"
+        tests/test_c13_camel_comparator.py:1896:    # The HEADLINE section carries Table 2 and o3 High, and none of Tables 5-7.
+        tests/test_c13_camel_comparator.py:1931:    catching its own finding**: `"Tables 5-7"` is truthy, and it is exactly the citation
+        tests/test_c13_camel_comparator.py:1967:        # "Tables 5-7" is truthy. It is also Q-058, exactly.
+        tests/test_c13_camel_comparator.py:1968:        ({"table": "Tables 5-7"}, "RANGE"),
+        tests/test_c13_camel_comparator.py:2039:        branch_b.assert_provenance((_figure(table="Tables 5-7"),))
+        tests/test_c13_camel_comparator.py:2056:        ({"table": "Tables 5-7"}, "RANGE"),
+        tests/test_c13_camel_comparator.py:2123:    """?? **Q-058.** The headline pair is Table 2 (`o3 High`), not Tables 5?7.
+        tests/test_c13_camel_comparator.py:2126:    into a sentence nobody checks: in Tables 5 and 6's banking column CaMeL is **behind**
+        tests/test_c13_camel_comparator.py:2241:    across **Tables 5, 6 and 7** under one base model (`Claude 3.5 Sonnet`, since Appendix C
+        tests/test_lanes_operator_placeholders.py:147:    ! **NOT Tables 5-7.** Those are Appendix C ("Baseline results"), base model
+        tests/test_repo_invariants.py:465:#      *So a Branch-B artefact that says "cite Tables 5-7, banking column" would point a
+        tests/test_repo_invariants.py:469:# not the words *Tables 5-7*; it is *citing* them for the CaMeL/native banking pair. Live
+        tests/test_repo_invariants.py:508:            "Calling API 62.5% +/- 23.7. Tables 5-7 are Appendix C, `Claude 3.5 Sonnet`, "
+        tests/test_repo_invariants.py:583:    `Q-058` ruled that citing Tables 5-7 for the CaMeL/native banking pair *"would point a
+        tests/test_repo_invariants.py:685:        "Q-058's ruling RETAINS Tables 5-7 where they are right: Table 7 is CONTEXT.md "

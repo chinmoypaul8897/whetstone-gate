@@ -1522,3 +1522,103 @@ also discharges the `c6_mutants_4.md` debt C6 FIX 3 named and could not pay.
 
 **No other session's line was touched by this append.** `Swept:` verified on the **STAGED SNAPSHOT**
 (`git diff --cached -- docs/reviews/OPEN_FINDINGS.md`), never on the working tree (`INC-48`).
+
+---
+
+## ⚠️ APPENDED BY C13 REVIEW 4 (`7a1e6c84`), 2026-09-02 — **PASS, `c13-pass` CUT**, `OF-115`…`OF-119` ALL CLOSED, and FIVE new rows of which only one is C13's guard
+
+**APPEND-ONLY. No existing row was altered and no `Status` cell above this block was touched.**
+⚠️ **The ids start at `OF-136` because this file was re-read immediately before the append and the
+highest present anywhere in the repository was `OF-135`**, landed by C6 REVIEW 4 (`ca0dd160`) minutes
+earlier. Measured with `git grep -ho` over `*.md` and `*.py`, sorted numerically — not assumed,
+because `OF-115` is precisely the defect of taking a number another session then takes.
+
+**VERDICT: PASS. ZERO BLOCKERS. `c13-pass` IS CUT.** All **five** of `REVIEW_13_3`'s survivors are
+KILLED; the **shape** behind them is removed and the whole C13 test file was re-scanned for it;
+**FIX 3's own three self-directed mutants (`SD-11`, `SD-13`, `SD-14`) are re-run here and all three
+are dead**; `OF-118` is judged **GENUINELY REALISED** against a rule of decision pre-committed in the
+seal. **27 mutants ran: 25 KILLED, 1 SURVIVOR, 1 NEGATIVE CONTROL (which had to survive and did),
+0 VOID.** Seventeen are new-surface, covering **all ten** properties C13 owns — a required set fixed
+**in the Phase-1 seal before any mutant was written**, because `Q-082`'s termination condition is
+worthless otherwise. Full table: `docs/reviews/mutants/c13_mutants_4.md`.
+
+| ID | Chunk | Severity | Finding | Spec citation | Raised by | Status | Closed by (SHA) |
+|---|---|---|---|---|---|---|---|
+| **OF-136** | C13 | **MEDIUM** | ⚠️ **`BRANCH_B_REQUIREMENTS`'s SECOND PHRASE IS THE 14-CHARACTER FRAGMENT `'is not a cause'` WHILE THE OTHER THREE ARE PINNED NEAR-EXACTLY, AND THE EXPORTED PREDICATE IS THE LOOSE ONE.** `CONTEXT.md` v1.9 §8.5.1 states the clause as ***"It errored" is not a cause***. Three exhibits on which this review's law-derived reimplementation **rejects** and `invocation.branch_condition_problems` **accepts**: a `branch_b_condition` saying *"A provider timeout is not a cause"*, *"a slow network is not a cause"*, or the content-free *"that is not a cause"*. ⚠️ **The property IS defended today — but by the wrong guard and with the wrong message.** The decisive experiment was run rather than reasoned about: the config drift goes **1 failed, 99 passed**, and the failure is at `tests/test_c13_camel_comparator.py:1202`, the **fixture-integrity** assertion, whose message reads *"…so this fixture degrades nothing. **Re-derive the weak form from the value as written.**"* — i.e. it tells the reader to weaken the test. Meanwhile `python -m whetstone_gate.camel_comparator`, the line the operator reads on RUN-1 night, prints *"OK — both keys agree with the law"*. **The finding is the ASYMMETRY**, not looseness as such: the other three requirements permit no paraphrase at all, so this is not a policy — it is the one requirement no review had ever mutated. **No mutant survives on it** (`NS-3` weakens it further and is KILLED), so under `Q-082` it does **not** hold the tag. **Remedy: requirement 2's phrase becomes `"it errored"`; the weak-form fixture's `required` literal moves with it.** | `CONTEXT.md` §8.5.1 (v1.9); `Q-057`; `Q-082` | **C13 REVIEW 4 (`7a1e6c84`)** | ⚠️ **OPEN — MEDIUM, does not hold the tag** | — |
+| **OF-137** | **C14**, RUN-1 | **MEDIUM** | ⚠️ **NOTHING TIES A *DECIDED* `camel_comparator.branch` TO A `PROTOCOL.md` THAT RECORDS ITS CAUSE BEFOREHAND.** Mutant **`NS-9`** — `branch: TODO_C13_RUN1` → `branch: "A"` in `config/lanes.yaml` — **survives the FULL suite (776 passed, 1 skipped)** and flips `make selftest` from **1 failed** to **2 passed, 775 deselected**: **RED → GREEN**. Non-equivalent by exhibit. ⚠️ **DETERMINATION UNDER `Q-082`: NOT-OWNED BY C13**, argued in `REVIEW_13_4.md` §6 in three checkable steps — (1) the mutation edits the one key C13 is **forbidden** to write and RUN-1 is **required** to write, so it is byte-identical to RUN-1 doing its job; (2) the artefact that would distinguish them is `PROTOCOL.md`'s diagnosed cause, and `make check-prereg` reports **NOT-YET-FROZEN** — it is **C14's** deliverable, and failing C13 for not building C14's guard is the regress `Q-082` was ruled to stop; (3) the half C13 **does** own is defended — `NS-9b`, making *this package* write `config/`, is **KILLED** by `test_this_chunk_does_not_decide_the_branch`, whose own docstring already draws the same line (*"so this test does not invert the moment RUN-1 legitimately writes it"*). **Remedy, for the session whose fence holds `PROTOCOL.md`: one conditional guard — if `camel_comparator.branch` resolves, `PROTOCOL.md` must exist and record the branch and its diagnosed cause.** Vacuous today, firable at a constructed state exactly as `OF-117`'s test is. | `CONTEXT.md` §8.5.1; `PROCESS.md` §12.1 RUN-1, §6b; `Q-057`; `Q-079` | **C13 REVIEW 4 (`7a1e6c84`)** | ⚠️ **OPEN — for C14 / RUN-1** | — |
+| **OF-139** | **process** | **MEDIUM** | ⚠️ **A FRESH CLONE'S `pytest` IMPORTS THE *REAL* REPOSITORY'S PACKAGE, AND NOTHING IN THIS REPOSITORY SAYS SO.** `.venv/Lib/site-packages/__editable__.whetstone_gate-0.1.0.pth` holds one line — `C:\Users\chinm\whetstone-gate\src` — and `config.repo_root()` is `Path(__file__).resolve().parents[2]`, so **both** the package **and** the repo root resolve to the real tree. Measured in this review's own first clone before the fix: `PKG : C:\Users\chinm\whetstone-gate\src\whetstone_gate\__init__.py` / `ROOT: C:\Users\chinm\whetstone-gate`. **Every `src/`, `config/` and `CONTEXT.md` mutation would have had NO EFFECT, and the control still read `100 passed`, so nothing would have looked wrong.** ⚠️ **This is a finding about the REVIEW METHOD, not about C13.** `REVIEW_13_3`'s driver sets `PYTHONPATH` and junctions `vendor/`; **that knowledge exists only inside that one script** — no `docs/reviews/README.md` line, no `Makefile` target and no test would have warned the next reviewer, and this one wrote a fresh driver and walked straight into it. **Remedy: one paragraph in `docs/reviews/README.md`, or a `make mutate-clone` target doing the three set-up steps — `PYTHONPATH=<clone>/src`, the `vendor/` junctions, and printing `repo_root()` so the run aborts if it is not the clone's.** | `docs/reviews/README.md` (the two sealed phases); `PROCESS.md` §5.3 | **C13 REVIEW 4 (`7a1e6c84`)** | ⚠️ **OPEN — for the architect / the next review prompt** | — |
+| **OF-138** | C13, **C14** | LOW | **`vendor.pinned_sha()` RETURNS WHATEVER YAML MADE OF THE VALUE, WITH NO SHAPE CHECK.** A `camel_sha` of all digits parses as an **int** and surfaces as `TypeError: expected str, bytes or os.PathLike object, not int` from inside `subprocess`, rather than as a refusal naming the key. **Measured — it is how mutant `NS-13`'s first form died**, which is why it was re-run as `NS-13b` with a string SHA one hex digit from the pin (that form dies correctly, on a typed `VendorError` naming the bad object). ⚠️ **`camel_sha` is a 40-hex value in a `config/` file that becomes a FROZEN pre-registration artefact at C14**, so the cheapest moment to shape-check it is before the freeze. Hard rule 9 says a *missing* value is a hard refusal; a **mistyped** one should be too. **Remedy: one `re.fullmatch` on 40 hex characters in `pinned_sha`, refusing with the key's name.** | `CLAUDE.md` hard rule 9; `PROCESS.md` §6a.1 | **C13 REVIEW 4 (`7a1e6c84`)** | ⚠️ **OPEN — LOW** | — |
+| **OF-140** | C13 | LOW | **`main()`'s RETURN CODE IS UNCHANGED BY A STALE PRE-REGISTERED CONDITION.** `python -m whetstone_gate.camel_comparator` **exits 0** while printing *"N PROBLEM(S)"* and each problem; only `verify_all_claims`'s failures move the exit code. ⚠️ **FIX 3 names this omission in terms** — *"`main()`'s return contract is **not** changed — that is more than `OF-118` asked for, and it is named so the absence is not read as an oversight"* — which is the correct call for a fix session acting on a scoped finding, and is why this is LOW rather than MEDIUM. **Remedy, for whichever session owns it: fold `stale` into `main()`'s non-zero return beside `failed`.** | `REVIEW_13_3.md` `OF-118`; `REVIEW_13_1.md` B-2 | **C13 REVIEW 4 (`7a1e6c84`)** | ⚠️ **OPEN — LOW** | — |
+
+### Dispositions of the rows this review was asked to judge
+
+* **`OF-115`** — ✅ **CLOSED by `9084422`.** The docstring cites `OF-62` / `Q-079` and explains what
+  happened. ⚠️ **This reviewer's own sealed criterion `F-115a` — `grep -c "OF-104"` = 0 — DID NOT
+  HOLD: the count is 2.** Both occurrences are inside the **correction prose** that records what the
+  docstring used to say. **The probe was mis-specified, not the fix**: a `grep` count cannot express
+  *"does it cite `OF-104` as its own finding"*, and the convention of keeping the superseded number
+  with a dated explanation is this project's everywhere else (`Q-057` fact 4, `INC-39`'s `Action`,
+  `INC-54`'s figure). **Recorded as this review's own mis-prediction.**
+* **`OF-116`** — ✅ **CLOSED by `9084422`.** `N-B`, `N-C`, `N-D`, `N-E` **all re-run here and all
+  KILLED**, each in a fresh clone with the mutation committed inside it. ⚠️ **`N-C`'s kill is on the
+  right exhibit** — the fixture is the real `branch_b_condition` with *"a harness defect is **NEVER**
+  Branch B"* replaced by *"a harness defect is **SOMETIMES** Branch B"*, the direct inversion of
+  `Q-057`'s ruling that passed the whole repository under REVIEW 3. **And the SHAPE is gone, not only
+  the instances:** an AST scan of every `assert` in the file for *"expected side read from the same
+  module-level object that produced the actual side"* returns **zero true instances** (four candidates
+  from a deliberately over-broad scanner, all four judged and rejected in `REVIEW_13_4.md` §4.1). The
+  class count stays at **five**.
+* **`OF-117`** — ✅ **CLOSED by `9084422`.** `N-I2` **KILLED**. Exercised directly as well as by
+  mutation: a **sentinel** `branch_b_condition` yields exactly **one** item,
+  `UndeterminedValue: lanes.yaml: 'camel_comparator.branch_b_condition' is not determined yet
+  (sentinel 'TODO_C14_PENDING')`; a **missing key** yields exactly one `MissingRequiredValue`; the
+  real config yields **0**. Hard rule 9's hard refusal, not a silent fallback, and `config/` never
+  holds either state.
+* **`OF-118`** — ✅ **CLOSED by `9084422` and `73de008`, and judged GENUINELY REALISED** against the
+  three-part rule of decision pre-committed in the Phase-1 seal (deliberately with **no** polarity,
+  because pre-committing an answer to a judgement question is pre-committing the judgement):
+  **(a)** exported and the export *is* the predicate ✅ · **(b)** a non-test caller **uses** the
+  result — `stale` is bound in `__main__.py` and `stale` itself reaches a `say(...)` call, and both
+  `SD-13` (`del stale`) and `SD-14` (`_n = len(stale)`, never reaching `say`) are **KILLED** ✅ ·
+  **(c)** an input on which the printed line changes — real config → 0 problems → *"OK — both keys
+  agree with the law"*; a broken pair → 5 problems → *"5 PROBLEM(S)"* and each one ✅. **The residual
+  is `OF-140` and the fix named it first.**
+* **`OF-119`** — ✅ **CLOSED by `9084422`.** The window ends at `### 8.5.2 ` (line 617) and the
+  boundary is pinned **twice** — structurally and by content (`"policy coverage"` is §8.5.2's P3).
+  **Measured: 6,817 → 3,646 characters, 3,171 removed (47 % of the old window); all four phrases stay
+  inside it; `"policy coverage"` is out.** The seal predicted *"~3,592, within 10 %"* — **+1.5 %**,
+  and it is labelled a prediction because `INC-54` is about a derivation formatted as a measurement.
+* **`Q-074` / `OF-62`'s fifth site** — ✅ **CLOSED, and never C13's.**
+  `tests/test_lanes_operator_placeholders.py:147` now reads *"⚠️ **NOT Tables 5-7.** Those are
+  Appendix C ("Baseline results"), base model `Claude 3.5 Sonnet` … **Table 7 is RETAINED as §8.5.2's
+  P2 citation**"*, above a corrected citation of **Table 2, Appendix B, `o3 High`, banking**. Landed
+  by **NIGHT RUN SESSION A / C0 FIX (`ea3bd12`)**. `git grep "Tables 5"` over `tests/`, `src/`,
+  `config/` and `PROCESS.md` returns **five hits and every one is the corrected form.**
+* **`OF-99`** — ✅ **CLOSED, and never C13's.** `ea3bd12`'s subject names `OF-110`'s source-text moat
+  scan, and `tests/test_lanes_operator_placeholders.py:154-155` states the superseded-string tripwire
+  *"now scans for it, and was fired at this docstring's previous text to prove it would have caught
+  it."*
+
+### ⚠️ FIX 3's two self-found defects — the numbers were allocable and are DELIBERATELY NOT ALLOCATED
+
+This review's prompt asked it to **allocate `OF-` numbers to `SD-11` and `SD-13` if it judged them
+worth rows, and to say that it did.** ⚠️ **It judged them NOT worth rows, and says so rather than
+leaving the question unanswered.** `OPEN_FINDINGS.md`'s own contract is *"every MEDIUM and LOW a
+review could not close"*; **both were found and closed inside one session**, by the session that
+wrote the code, in the same hour. Giving them rows would put two `CLOSED`-at-birth entries into the
+file whose purpose is the opposite, three hours after `OF-115` — a finding about **taking a number
+another session then takes** — was closed. **What matters is that they were re-runnable from the
+record alone, and this review verified that they were: `SD-11`, `SD-13` and `SD-14` were reconstructed
+from `73de008`'s message and this file's prose, re-applied in a fresh clone, and all three are
+KILLED.** FIX 3's decision to open no id is upheld on the merits, not waved through.
+
+### Re-stated, and explicitly NOT closed by this session
+
+* **`OF-67` / `OF-70` / `OF-78`** — `check_roles.py` counting the session-token table's rows itself.
+  **The seventeenth consecutive session to carry the total by hand.** `check_roles.py` is named under
+  **NOT** in this fence, and a review session fixes nothing in any case.
+* **`OF-103`** — the `140-145` / `139-146` spans. Addressed by `Q-057`'s correction note and
+  re-derived by REVIEW 3; not re-opened here.
+
+**No other session's line was touched by this append.** `Swept:` verified on the **STAGED SNAPSHOT**
+(`git diff --cached -- docs/reviews/OPEN_FINDINGS.md`), never on the working tree (`INC-48`).

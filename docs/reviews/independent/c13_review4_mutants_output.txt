@@ -1,0 +1,111 @@
+C13 REVIEW 4 - MUTATION RUN
+clone : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\01bb20c8-0e32-4b71-a774-f3b0ee2e0e7c\scratchpad\c13r4clone
+whetstone_gate.__file__ = C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\01bb20c8-0e32-4b71-a774-f3b0ee2e0e7c\scratchpad\c13r4clone\src\whetstone_gate\__init__.py
+config.repo_root()      = C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\01bb20c8-0e32-4b71-a774-f3b0ee2e0e7c\scratchpad\c13r4clone
+HEAD  : 9e16d87b843e4d67d7e5242a8e47f298e6520fd5
+
+[CONTROL, before any mutation] rc=0  100 passed in 9.26s  (13s)
+
+[N-B   ] OWN-3   KILLED    invocation.py                      1 failed, 33 passed in 5.06s  (17s)
+[N-C   ] OWN-3   KILLED    invocation.py                      1 failed, 33 passed in 5.77s  (16s)
+[N-D   ] OWN-3   KILLED    invocation.py                      1 failed, 33 passed in 5.86s  (15s)
+[N-E   ] OWN-3   KILLED    invocation.py                      1 failed, 33 passed in 6.83s  (17s)
+[N-I2  ] OWN-6   KILLED    invocation.py                      1 failed, 34 passed in 6.72s  (18s)
+[SD-11 ] OWN-3   KILLED    invocation.py                      1 failed, 33 passed in 3.61s  (14s)
+[SD-13 ] OWN-6   KILLED    __main__.py                        1 failed, 35 passed in 6.45s  (21s)
+[SD-14 ] OWN-6   KILLED    __main__.py                        1 failed, 35 passed in 5.80s  (17s)
+[NS-1  ] OWN-1   KILLED    invocation.py                      1 failed, 21 passed in 4.23s  (14s)
+[NS-2  ] OWN-2   KILLED    lanes.yaml                         1 failed, 33 passed in 8.90s  (19s)
+[NS-3  ] OWN-3   KILLED    invocation.py                      1 failed, 33 passed in 6.97s  (16s)
+[NS-4  ] OWN-3   KILLED    invocation.py                      1 failed, 33 passed in 4.73s  (24s)
+[NS-5  ] OWN-3   KILLED    invocation.py                      1 failed, 33 passed in 6.97s  (24s)
+[NS-6  ] OWN-4   KILLED    CONTEXT.md                         1 failed, 33 passed in 14.01s  (25s)
+[NS-7  ] OWN-5   KILLED    invocation.py                      1 failed, 33 passed in 11.05s  (24s)
+[NS-8  ] OWN-6   KILLED    invocation.py                      1 failed, 34 passed in 7.99s  (18s)
+[NS-9  ] OWN-7   SURVIVED  lanes.yaml                         100 passed in 8.31s  (21s)
+[NS-10 ] OWN-8   KILLED    branch_b.py                        1 failed, 62 passed in 6.62s  (19s)
+[NS-11 ] OWN-8   KILLED    branch_b.py                        1 failed, 65 passed in 6.00s  (21s)
+[NS-12 ] OWN-9   KILLED    branch_b.py                        1 failed, 56 passed in 6.62s  (18s)
+[NS-13 ] OWN-10  KILLED    protocol.yaml                      1 error in 0.70s  (13s)
+
+SUMMARY
+id      own      verdict   file
+N-B     OWN-3    KILLED    src/whetstone_gate/camel_comparator/invocation.py
+N-C     OWN-3    KILLED    src/whetstone_gate/camel_comparator/invocation.py
+N-D     OWN-3    KILLED    src/whetstone_gate/camel_comparator/invocation.py
+N-E     OWN-3    KILLED    src/whetstone_gate/camel_comparator/invocation.py
+N-I2    OWN-6    KILLED    src/whetstone_gate/camel_comparator/invocation.py
+SD-11   OWN-3    KILLED    src/whetstone_gate/camel_comparator/invocation.py
+SD-13   OWN-6    KILLED    src/whetstone_gate/camel_comparator/__main__.py
+SD-14   OWN-6    KILLED    src/whetstone_gate/camel_comparator/__main__.py
+NS-1    OWN-1    KILLED    src/whetstone_gate/camel_comparator/invocation.py
+NS-2    OWN-2    KILLED    config/lanes.yaml
+NS-3    OWN-3    KILLED    src/whetstone_gate/camel_comparator/invocation.py
+NS-4    OWN-3    KILLED    src/whetstone_gate/camel_comparator/invocation.py
+NS-5    OWN-3    KILLED    src/whetstone_gate/camel_comparator/invocation.py
+NS-6    OWN-4    KILLED    CONTEXT.md
+NS-7    OWN-5    KILLED    src/whetstone_gate/camel_comparator/invocation.py
+NS-8    OWN-6    KILLED    src/whetstone_gate/camel_comparator/invocation.py
+NS-9    OWN-7    SURVIVED  config/lanes.yaml
+NS-10   OWN-8    KILLED    src/whetstone_gate/camel_comparator/branch_b.py
+NS-11   OWN-8    KILLED    src/whetstone_gate/camel_comparator/branch_b.py
+NS-12   OWN-9    KILLED    src/whetstone_gate/camel_comparator/branch_b.py
+NS-13   OWN-10   KILLED    config/protocol.yaml
+
+21 mutant(s): 20 KILLED, 1 SURVIVED, 0 VOID, 0 ANCHOR-MISSING
+  SURVIVOR NS-9 (OWN-7) config/lanes.yaml - the branch is DECIDED from a chair - RUN-1's single-shot decision pre-empted
+
+=====================================================================================
+ROUND 2 - a SECOND fresh clone (c13r4clone2), same harness, same restore rule.
+NS-14 is the harness's own NEGATIVE CONTROL: a mutant that changes no behaviour and
+MUST survive. It did. A harness in which every mutant dies is not measuring anything.
+=====================================================================================
+
+[CONTROL, before any mutation] rc=0  100 passed in 12.32s
+
+[NS-13 ] OWN-10  KILLED    protocol.yaml   1 error in 0.50s
+[NS-9b ] OWN-7   KILLED    invocation.py   1 failed, 36 passed in 17.76s
+[NS-14 ] CONTROL SURVIVED  invocation.py   100 passed in 9.43s   <-- REQUIRED to survive
+[NS-15 ] OWN-1   KILLED    invocation.py   1 failed, 21 passed in 3.53s
+[NS-16 ] OWN-9   KILLED    branch_b.py     1 failed, 56 passed in 9.85s
+[NS-17 ] OWN-8   KILLED    branch_b.py     1 failed, 63 passed in 8.26s
+
+6 mutant(s): 5 KILLED, 1 SURVIVED (the negative control), 0 VOID, 0 ANCHOR-MISSING
+
+=====================================================================================
+NS-13 RE-RUN AS NS-13b, because the first form's kill was the WRONG SHAPE and saying
+so is the point. `camel_sha: 0000...0` is parsed by YAML as an INT, so the kill was a
+TypeError deep inside subprocess, not the pin check refusing. Re-run with a STRING SHA
+one hex digit away from the pin:
+  VendorError: `git diff f083b6b396399d3b3c7f2ddaf613a5945eaf32d9` failed in
+  vendor/camel-prompt-injection (exit 128): fatal: bad object ...
+  -> KILLED by a TYPED REFUSAL naming the bad object. OWN-10 is defended.
+  -> and the first form is itself a LOW finding: `vendor.pinned_sha()` returns whatever
+     YAML made of the value, with no shape check, so a mistyped 40-hex SHA in a FROZEN
+     pre-registration artefact surfaces as `TypeError: expected str ... not int` inside
+     subprocess rather than as a refusal naming the key (hard rule 9's spirit).
+
+=====================================================================================
+NS-9 CHARACTERISED AGAINST THE WHOLE REPOSITORY, because the C13 file alone cannot see it
+=====================================================================================
+config/lanes.yaml `branch: TODO_C13_RUN1` -> `branch: "A"`
+  tests/test_c13_camel_comparator.py : 100 passed
+  bare `python -m pytest` (FULL)     : 776 passed, 1 skipped in 335.45s
+  `-m operator_gate` (make selftest) : 2 passed, 775 deselected   <-- WAS 1 failed
+  => the whole repository goes GREEN and `make selftest` flips RED -> GREEN.
+     NON-EQUIVALENT. See REVIEW_13_4.md S6 for the OWNED / NOT-OWNED argument.
+
+=====================================================================================
+D1 - THE CONFIG-DRIFT EXPERIMENT behind OF-136, run in clone 2
+=====================================================================================
+config/lanes.yaml branch_b_condition:
+  "'It errored' is not a cause"  ->  "A provider timeout is not a cause"
+  tests/test_c13_camel_comparator.py : 1 failed, 99 passed
+  the failure is at test_c13_camel_comparator.py:1202 --
+    assert needle in condition_b
+    "config/lanes.yaml's branch_b_condition no longer contains ... so this fixture
+     degrades nothing. Re-derive the weak form from the value as written."
+  => CAUGHT, and caught by the FIXTURE-INTEGRITY assertion, whose message directs the
+     reader to RE-DERIVE THE FIXTURE rather than to restore the law's clause. The
+     EXPORTED predicate accepts the same value silently. That split is OF-136.
+  restored by writing the ORIGINAL BYTES back; post-restore control 100 passed.
