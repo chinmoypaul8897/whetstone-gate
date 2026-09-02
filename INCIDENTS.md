@@ -5271,11 +5271,41 @@ export GIT_INDEX_FILE=<a path in this session's own OS temp directory>
 git read-tree HEAD           # seed the private index from HEAD
 git add -- <this session's explicit paths>
 git commit                   # commits HEAD plus THIS session's paths, and nothing else
+unset GIT_INDEX_FILE
+git reset -- <the same explicit paths>    # <-- STEP 5. NOT OPTIONAL. See below.
 ```
 
-**Measured here, before it was written down:** with a private index seeded from `HEAD`, staging one
-file left `git diff --cached --name-only` reading that one file under the private index and
-**EMPTY** under the shared index — the two are genuinely independent. ⚠️ **This is what `INC-36` and
+⚠️ **STEP 5 IS A CORRECTION TO THIS ENTRY, MADE BY THIS SESSION, AFTER USING THE RECIPE AND WATCHING
+IT MISFIRE — AND IT IS RECORDED AS A CORRECTION RATHER THAN SILENTLY FOLDED IN, BECAUSE THE FIRST
+FOUR LINES WERE PUBLISHED IN THIS FILE WITHOUT IT AND WOULD HAVE CAUSED THE LOSS THEY EXIST TO
+PREVENT.** A private-index commit moves `HEAD` and **leaves the shared index still holding the
+PRE-COMMIT blobs**. Measured in this repository immediately after `eef654e` landed:
+
+```
+git diff --cached --stat        (the SHARED index, against the new HEAD)
+  INCIDENTS.md                  | 115 -----------------------------
+  PROGRESS.md                   | 141 ------------------------------------
+  docs/reviews/OPEN_FINDINGS.md |  21 -------
+  3 files changed, 277 deletions(-)
+```
+
+⚠️ **A bare `git commit` by ANY session at that moment would have DELETED all 277 lines — `INC-68`,
+`OF-156` and this session's `PROGRESS.md` entry — as a clean, silent, verifying revert.** So the
+remedy as first written traded a mis-attribution for a **data loss**, which is worse, and it was
+found only because this session ran `git status` after using it rather than trusting it.
+
+**The scoped form of step 5 was then measured in a throwaway git repository rather than reasoned
+about**, because an unscoped `git reset` would unstage a concurrent session's work and that is the
+same failure pointed the other way: with `theirs.txt` staged by a second session and `mine.txt`
+committed through a private index, `git reset -- mine.txt` re-synced **only** `mine.txt` and
+`theirs.txt` **survived staged**. ⚠️ **This session used the UNSCOPED `git reset` on its own commit,
+after first confirming the shared index held only its own three now-committed paths and nothing of
+anybody else's**, and verified SHA-256 on all three files as **unchanged** across it. **The scoped
+form is what the rule should say.**
+
+**And the isolation itself, measured before it was written down:** with a private index seeded from
+`HEAD`, staging one file left `git diff --cached --name-only` reading that one file under the private
+index and **EMPTY** under the shared index — the two are genuinely independent. ⚠️ **This is what `INC-36` and
 `Q-063` were reaching for and did not find.** `Q-063` records that separate **worktrees** were
 declined **twice**, with the reason — *"it is 1 September, C14 is imminent, and re-plumbing every
 session's tree now risks more than the mis-attribution costs"*. **A private index is not a worktree.**

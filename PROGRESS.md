@@ -128,7 +128,14 @@ direction it was never built for. **`INC-68` carries it, `OF-156` carries the re
 **new, mechanical, costs nothing and was MEASURED in this tree rather than proposed**: a **private
 index** per session — `GIT_INDEX_FILE` pointed at the session's own temp path, seeded with
 `git read-tree HEAD`. Verified here: staging into a private index left the **shared** index's
-`git diff --cached --name-only` **EMPTY**. ⚠️ **A private index is not a worktree** — `Q-063`
+`git diff --cached --name-only` **EMPTY**. ⚠️ **AND THE RECIPE AS FIRST PUBLISHED WAS INCOMPLETE AND
+DANGEROUS, WHICH THIS SESSION FOUND BY USING IT AND HAS CORRECTED IN `INC-68` AND `OF-156` RATHER
+THAN FOLDED IN SILENTLY:** a private-index commit moves `HEAD` and leaves the **shared** index
+holding the pre-commit blobs, so measured immediately after `eef654e` the shared index stood at
+**`3 files changed, 277 deletions(-)`** and a bare `git commit` by any session would have silently
+reverted `INC-68`, `OF-156` and this very entry in a commit that verifies clean. **A fifth step is
+required** — `git reset -- <the same explicit paths>` — and its **scoped** form was measured in a
+throwaway repository, where a concurrent session's staged file survived intact. ⚠️ **A private index is not a worktree** — `Q-063`
 records worktrees declined **twice** as too much re-plumbing; this is one environment variable and one
 `read-tree`, changes no path or checkout, and is invisible to other sessions. **This session's
 remaining commits use it.** It is **not sufficient alone** and that is said rather than oversold: it
