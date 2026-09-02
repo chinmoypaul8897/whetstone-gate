@@ -6,7 +6,7 @@ ZERO PROVIDER MODEL CALLS, EITHER TASK. NO TAG CUT. 2026-09-02.
 ================================================================================
 
 PUSHED SHA, TASK 1 : 1c597d42572b8936f99a363dfc5fcdf6ca5bd722
-PUSHED SHA, TASK 2 : <PENDING - the push follows this file's commit; filled below>
+PUSHED SHA, TASK 2 : 4bf8c17df6f7cf7c68e9528ea32a7652b15f51a8
 
 THE HARD GATE BETWEEN THE TASKS: IT HELD. NO UNDECLARED RED.
   make test                        786 passed, 1 FAILED, 1 skipped (160.62 s)
