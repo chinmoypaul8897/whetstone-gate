@@ -1606,6 +1606,46 @@ def test_the_crossing_returns_ZERO_when_the_base_alone_already_exceeds_the_targe
 # ======================================================================================
 
 
+def _sole_layer(findings: list[str], fragment: str, shape: str) -> None:
+    """Assert ``findings`` fired, and that **exactly one** of copy 2's layers produced them.
+
+    ⚠️ **THIS EXISTS BECAUSE THIS SESSION MUTATED ITS OWN NEW CODE AND THE MUTANT SURVIVED.**
+    The first form of `OF-124`'s and `OF-125`'s fixtures asserted exclusivity **inline**
+    (``off_target = [f for f in findings if <fragment> not in f]``). Replacing that list with
+    ``[]`` — deleting the exclusivity check outright — left the **whole 783-test suite
+    green** (this session's self-directed mutant `SM-B`), because nothing anywhere fired the
+    check at a shape that two layers catch.
+
+    ⚠️ **That is the exact defect `REVIEW_C6_4` praised copy 1 for NOT having**, one copy
+    over: copy 1's `_sole_killer` has
+    ``test_the_sole_killer_helper_REJECTS_a_shape_that_two_layers_catch``, and four separate
+    mutations of it all die on that one test. So this is `INC-56`'s own (class x copy) matrix
+    catching a cell that `INC-56` itself did not list — **found by the mechanism the ruling
+    exists to require, inside the session that wrote the entry.**
+
+    ``assert findings`` alone is satisfied by *any* layer firing, so a leak caught two ways
+    leaves each individual catcher deletable while the suite stays green — which is precisely
+    `REVIEW_C6_3`'s survivors `N12`/`N13`/`N14`/`N15`.
+
+    ⚠️ **NOT imported from ``tests/test_c6_attacker.py``'s `_sole_killer`, deliberately**, and
+    the wording of its failures is this copy's own: a probe that borrows the predicate it is
+    checking cannot find a defect in the predicate, and that argument covers the *helper* as
+    much as the scan. Pinned in both directions by
+    :func:`test_the_sole_layer_helper_REJECTS_a_shape_that_TWO_of_copy_2s_layers_catch`.
+    """
+    assert findings, (
+        f"the LOOP copy of claim 4's guard did not fire on {shape!r} at all. That is a "
+        f"policy-revealing leak on the AUTHORED surface with every blindness layer silent."
+    )
+    matched = [f for f in findings if fragment in f]
+    assert matched, f"the guard fired on {shape!r}, but not via {fragment!r}: {findings[:4]}"
+    assert len(matched) == len(findings), (
+        f"{shape!r} is caught by more than one layer, so it does NOT pin {fragment!r} - "
+        f"deleting that layer would leave the suite green, which is exactly REVIEW_C6_3's "
+        f"survivors N12/N13/N14/N15. findings: {findings[:6]}"
+    )
+
+
 def _cap_label_shapes() -> list[tuple[str, str]]:
     """Three renderings of a real `config/` ceiling, for planting inside ``STATE_LABEL``.
 
@@ -1684,23 +1724,10 @@ def test_the_LOOP_copys_LAYER_1_scans_the_state_LABEL_and_exempts_only_the_state
         ctx.STATE_LABEL = original
     assert ctx.STATE_LABEL == original, "the label was not restored; later tests are unsafe"
 
-    assert findings, (
-        f"the LOOP copy of claim 4's guard did NOT fire on {shape!r} ({value!r}) planted in "
-        f"STATE_LABEL. A config/ money ceiling on the AUTHORED surface is a policy value the "
-        f"attacker must not learn (CONTEXT.md section 10.1), and LAYER 1 is the only layer "
-        f"that can see it in a label carrying no gate vocabulary (REVIEW_C6_4 R-14; "
-        f"OPEN_FINDINGS OF-124)."
-    )
-    # ⚠️ EXCLUSIVITY, which is what makes the mutant die rather than merely the suite go red.
-    # `assert findings` is satisfied by ANY layer firing, and a leak caught two ways leaves
-    # each catcher individually deletable - REVIEW_C6_3's survivors N12/N13/N14/N15 exactly.
-    # Copy 1 spells this with its `_sole_killer` helper; this copy asserts it directly rather
-    # than importing that helper, for the reason at the head of this block.
-    off_target = [f for f in findings if "money ceiling" not in f]
-    assert not off_target, (
-        f"{shape!r} is caught by a layer OTHER than LAYER 1, so it does not pin LAYER 1 and "
-        f"widening the exemption would leave the suite green: {off_target[:4]}"
-    )
+    # ⚠️ EXCLUSIVITY, which is what makes the mutant die rather than merely the suite go red,
+    # and it goes through :func:`_sole_layer` so that the check ITSELF is pinned - see that
+    # helper's docstring for the self-directed mutant (`SM-B`) that survived the inline form.
+    _sole_layer(findings, "money ceiling", f"{shape} ({value!r}) planted in STATE_LABEL")
     firing = {f.split(":")[0] for f in findings}
     assert len(firing) == len(result.contexts), (
         f"the ceiling is in STATE_LABEL, which every turn's deterministic summary carries, "
@@ -1818,17 +1845,11 @@ def test_the_LOOP_copys_denial_line_COUNT_fires_on_a_summary_carrying_MORE_than_
     findings = _loop_blindness_findings(
         result.contexts, generic=generic, note=note, clauses=clauses
     )
-    assert findings, (
-        f"the LOOP copy of claim 4's guard did NOT fire on {shape!r}. CONTEXT.md section "
-        f"13.3 mandates exactly one last-denial line, and a summary offering "
-        f"{extra_lines + 1} of them offers two histories as one (REVIEW_C6_4 R-15; "
-        f"OPEN_FINDINGS OF-125)."
-    )
-    off_target = [f for f in findings if "recognisable last-denial line(s), not 1" not in f]
-    assert not off_target, (
-        f"{shape!r} is caught by a layer OTHER than the denial-line COUNT, so it does not "
-        f"pin the count and weakening it to '< 1' would leave the suite green: "
-        f"{off_target[:4]}"
+    _sole_layer(
+        findings,
+        "recognisable last-denial line(s), not 1",
+        f"{shape} - CONTEXT.md section 13.3 mandates exactly one, and this offers "
+        f"{extra_lines + 1} (REVIEW_C6_4 R-15; OPEN_FINDINGS OF-125)",
     )
     # ⚠️ THE FINDING MUST PRINT THE COUNT IT SAW, or a reader cannot tell 0 from 2, and the
     # count printed must be the one the fixture built - not merely "more than one".
@@ -1899,16 +1920,12 @@ def test_the_LOOP_copys_denial_line_COUNT_ALSO_fires_when_the_summary_carries_NO
         "the label was not restored; later tests are unsafe"
     )
 
-    assert findings, (
-        "no line in any context is recognisable as CONTEXT.md section 13.3's mandated last "
-        "denial line, and the LOOP copy of claim 4's guard reported nothing. A guard that "
-        "cannot find the line it is scanning must SAY SO, not print 'no findings' "
-        "(REVIEW_C6_2's import-walk diagnosis; OPEN_FINDINGS OF-125)."
-    )
-    off_target = [f for f in findings if "recognisable last-denial line(s), not 1" not in f]
-    assert not off_target, (
-        f"a layer other than the denial-line COUNT fired, so this does not pin the '< 1' "
-        f"half: {off_target[:4]}"
+    _sole_layer(
+        findings,
+        "recognisable last-denial line(s), not 1",
+        "a summary in which NO line is recognisable as the mandated last-denial line - a "
+        "guard that cannot find the line it is scanning must SAY SO rather than print 'no "
+        "findings' (REVIEW_C6_2's import-walk diagnosis; OPEN_FINDINGS OF-125)",
     )
     counts = {
         int(m.group(1))
@@ -1919,6 +1936,78 @@ def test_the_LOOP_copys_denial_line_COUNT_ALSO_fires_when_the_summary_carries_NO
     assert len({f.split(":")[0] for f in findings}) == len(result.contexts), (
         "every turn's summary is unparseable under the substituted label, so every turn "
         "must report it"
+    )
+
+
+def test_the_sole_layer_helper_REJECTS_a_shape_that_TWO_of_copy_2s_layers_catch(repo_root):
+    """⚠️ **THIS SESSION'S OWN SURVIVOR `SM-B`, AND IT IS THE UNCOMFORTABLE ONE AGAIN.**
+
+    `INC-56` diagnoses C6 FIX 3 as having applied its own discovery to one class of three.
+    This session then wrote three fixtures whose exclusivity check was **inline** — and
+    mutating that check away (``off_target = []``) left **all 783 tests green**. So the
+    session that wrote the entry about not sweeping the mechanism had, in its own new code,
+    the very cell `REVIEW_C6_4` singled out as copy 1's strongest work: copy 1's
+    `_sole_killer` has a self-test, and copy 2's exclusivity had none.
+
+    ⚠️ **Fired in BOTH directions, and with TWO different single-layer shapes** — `INC-50`'s
+    *"fire it at BOTH"*, and one better than copy 1's own self-test, which uses a single
+    positive shape. A helper that always raises fails the second half; a helper that only
+    ever accepts *"money ceiling"* fails the third.
+
+    The three shapes, measured against `run_episode`'s real output before being written down:
+
+    ======================================  ========  ==========================
+    ``STATE_LABEL``                         findings  layers that fire
+    ======================================  ========  ==========================
+    ``STATE SO FAR (<cap>): ``                    40  ONE - LAYER 1
+    ``STATE SO FAR (DENIED <cap>): ``             60  TWO - LAYER 1 and LAYER 2b
+    ``STATE SO FAR (DENIED once): ``              20  ONE - LAYER 2b
+    ======================================  ========  ==========================
+    """
+    generic = _generic_denial_from_spec(repo_root)
+    note = _probe_note()
+    policy = repo_root.joinpath("data/policy.txt").read_bytes().decode("utf-8")
+    clauses = [line.strip() for line in policy.split("\n") if line.strip()]
+    cap = cfg.load("protocol").require("money.per_action_cap_paise")
+    # Captured, never written down: a literal "STATE SO FAR: " here would be a second copy
+    # of a module constant, drifting silently the day `context.py` changes it.
+    module_default = ctx.STATE_LABEL
+
+    def findings_for(label: str) -> list[str]:
+        original = ctx.STATE_LABEL
+        ctx.STATE_LABEL = label
+        try:
+            _settings, result = _episode(
+                [_short_probe_read(), generic],
+                [f"fetch_payment('{_probe_id()}')", "create_refund(pay_CANARYRECON, 8000000)"],
+            )
+            return _loop_blindness_findings(
+                result.contexts, generic=generic, note=note, clauses=clauses
+            )
+        finally:
+            ctx.STATE_LABEL = original
+
+    # ── THE SHAPE TWO LAYERS CATCH: the helper must REJECT it. ───────────────────────
+    both = findings_for(f"STATE SO FAR (DENIED {cap}): ")
+    assert any("money ceiling" in f for f in both) and any(
+        "arm or clause identity" in f for f in both
+    ), (
+        f"the fixture no longer exercises DOUBLE coverage, so it cannot pin _sole_layer's "
+        f"exclusivity clause at all. findings: {both[:4]}"
+    )
+    with pytest.raises(AssertionError, match="caught by more than one layer"):
+        _sole_layer(both, "money ceiling", "a shape two layers catch")
+
+    # ── AND BOTH SINGLE-LAYER DIRECTIONS: the helper must ACCEPT them, or it could be
+    # satisfied by one that always raises, or by one hard-wired to a single fragment.
+    _sole_layer(findings_for(f"STATE SO FAR ({cap}): "), "money ceiling", "LAYER 1 alone")
+    _sole_layer(
+        findings_for("STATE SO FAR (DENIED once): "),
+        "arm or clause identity",
+        "LAYER 2b alone",
+    )
+    assert ctx.STATE_LABEL == module_default, (
+        "the label was not restored to its module default; later tests are unsafe"
     )
 
 
