@@ -342,4 +342,23 @@ WHAT I COULD NOT DO
      the replacement paragraph says so rather than reading as though it had always
      been complete.
 
+TWO CORRECTIONS, MADE BY THIS SESSION AGAINST ITSELF BEFORE PRINTING
+-----------------------------------------------------------------
+  1. THE check-roles FIGURE ABOVE IS A MEASUREMENT, NOT A CURRENT STATE, AND IT
+     HAS SINCE MOVED. "E1: 43 issued row(s) covering 43 token(s)" was measured
+     immediately after MY append, when the table held 44 data rows. The concurrent
+     C6 REVIEW 4 session (ca0dd160) then appended ROW 45. RE-MEASURED AT THE FINAL
+     HEAD: make check-roles = 17 passed, 0 failed, 5 n/a - OK, E1 reporting
+     44 ISSUED ROW(S) COVERING 44 TOKEN(S), from 45 DATA ROWS. The relationship is
+     unchanged and is the point: check-roles prints ONE FEWER than the data-row
+     count, because the WG-2026-08-30-CTX-13.4-A row matches neither the 8-hex
+     token pattern nor the (C\d+|ARCH) chunk cell (INC-54). MY ROW IS STILL ROW 44
+     and no counter collided. Both figures are stated rather than the earlier one
+     being overwritten, because a measurement that silently becomes a claim about
+     now is the defect INC-54 is about.
+  2. make test WAS RUN A THIRD TIME, AT THE FINAL HEAD WITH THE JOURNALS COMMITTED:
+     774 passed, 0 failed, 1 skipped, 2 deselected in 198.41s - identical to the
+     195.06s run reported above. Recorded because a count measured once is a
+     count that has not been checked.
+
 END OF FINAL OUTPUT
