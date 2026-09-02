@@ -1,0 +1,469 @@
+PUSHED SHA: 0d74fdf6cffe814e2a5c1a09100e44682ca26490   (tag c13-pass points here; pushed)
+   ^ this file is committed AFTER that commit, so the pushed head is one further.
+     A commit cannot contain its own hash. The head after this session is the commit
+     whose subject is "docs: C13 REVIEW 4 FINAL OUTPUT, committed verbatim before it is
+     printed", and it contains only this file.
+
+=====================================================================================
+VERDICT: PASS.  ZERO BLOCKERS.  TAG c13-pass IS CUT, on 0d74fdf, and pushed.
+C13 failed three times and every fail was right. This is not a fourth, and the reason
+is argued below rather than felt: under Q-082's ruling the REQUIRED SET is the gate,
+that set was enumerated and argued IN THE SEAL BEFORE ANY MUTANT WAS WRITTEN, and it
+came out clean. The one survivor is NOT-OWNED on a three-step argument (section 6).
+=====================================================================================
+
+SESSION-TOKEN: 7a1e6c84 - C13, REVIEW, attempt 4, 2026-09-02.
+
+COMMITS, IN ORDER, ALL FULL SHAs SO NO READER HAS TO TRUST AN ABBREVIATION:
+  token row 46 + Q-082 ruling   2a86849bcce91855ddcc95fb9b580fee9b447efb
+  PHASE-1 SEAL                  9e16d87b843e4d67d7e5242a8e47f298e6520fd5
+  VERDICT + artefacts (TAGGED)  0d74fdf6cffe814e2a5c1a09100e44682ca26490
+  this FINAL OUTPUT             (the commit that follows; see the head-pointer above)
+
+-------------------------------------------------------------------------------------
+0. Q-082 IS RULED AND IT WAS RECORDED VERBATIM BEFORE ANYTHING ELSE WAS READ OR TOUCHED
+-------------------------------------------------------------------------------------
+Recorded at 2a86849 (hard rule 5), in QUESTIONS.md beneath Q-082, with the entry's own
+HEADER STATUS LINE KEPT AS ca0dd160 WROTE IT and a SUPERSEDED marker directly beneath
+it - not at the end - because CLAUDE.md S1 makes QUESTIONS.md item 6 of every session's
+read order and a reader who stops at the status line would act on a superseded one.
+
+THE RULING TAKES A FOURTH POSITION Q-082's OWN ENTRY DID NOT ENUMERATE, and that is
+said rather than smoothed into the nearest listed option. Option 1 is KEPT for the
+required set (a guard-side survivor on an OWNED property still FAILs); option 2's
+"scoped to the subject" is REJECTED; what is ADDED is the TERMINATION CONDITION the
+entry identified as missing - PROCESS.md S5.3's required set, one mutant per owned
+property, minimum eight, with survivors outside it MEDIUM findings that do not hold
+the tag.
+
+NOT applied to C6 here: this is a C13 session whose fence names every earlier
+REVIEW_*.md under NOT. OF-124..OF-130 untouched, no C6 finding re-dispositioned.
+
+-------------------------------------------------------------------------------------
+1. THE SEAL - 9e16d87 - AND WHAT WAS NOT OPENED
+-------------------------------------------------------------------------------------
+docs/reviews/independent/c13_review4_criteria.md + c13_review4_reimpl.py + its output,
+committed BEFORE: FIX 3's commits (no git show / diff / log -p / log --stat),
+docs/sessions/c13-fix-3.txt (open in the operator's editor; NOT read),
+tests/test_c13_camel_comparator.py, src/whetstone_gate/camel_comparator/,
+OPEN_FINDINGS.md at HEAD, PROGRESS.md's FIX 3 entry, STATUS.md's C13 row, INC-55 on.
+
+THE BOUNDARY WAS DRAWN TIGHTER THAN OF-80 REQUIRED, IN ONE PLACE, AND IT IS NAMED:
+NOTHING UNDER src/ OR tests/ WAS OPENED AT ALL. The ruling fences only the fix's own
+surface; docs/reviews/README.md's own Phase-1 rule is stricter, and where the two
+differ this session took the stricter one. CONSEQUENCE, STATED: the UndeterminedValue
+refusal shape was re-derived from CLAUDE.md hard rule 9 and the two tracebacks
+REVIEW_13_3.md prints, NOT from reading the loader.
+
+SEVEN LEAKS DECLARED IN THE SEAL, and L-2 is the largest this project has had to
+declare: the prompt does not merely NAME SD-11/SD-13/SD-14, it DESCRIBES THEIR
+MECHANISM, naming an identifier (repr(required)), a data shape (problems[0]) and the
+existence of an AST call-site check. Every criterion touched by it is written as "does
+it do the thing it was for", never "was it done" - which is already known.
+
+THE REQUIRED SET WAS FIXED IN THE SEAL, BEFORE ANY MUTANT EXISTED. Q-082's termination
+condition is worthless if the reviewer picks the set after seeing the result - that is
+the same regress with an extra step. TEN properties C13 owns (OWN-1..OWN-10), each
+ARGUED from the C13 card and CONTEXT.md S8.5.1, so the floor is TEN, above PROCESS.md
+S5.3's eight. Phase 2 could ADD a member with an argument; it could not remove one.
+
+-------------------------------------------------------------------------------------
+2. EVERY PRE-COMMITTED POLARITY: 36 OF 38 HELD. THE TWO THAT DID NOT ARE MINE.
+-------------------------------------------------------------------------------------
+HELD:
+  N-B, N-C, N-D, N-E, N-I2                     expected KILLED     -> KILLED
+  N-C on its own SOMETIMES exhibit             expected RED        -> RED
+  S-1  len(BRANCH_B_REQUIREMENTS) vs a LITERAL expected YES        -> YES, :1173
+  S-2  mutate the literal / delete an entry    expected RED        -> RED (N-E)
+  S-3  a weak-form fixture PER requirement     expected 4          -> 4, :1177-1195
+  S-4  each load-bearing individually          expected RED each   -> RED each
+  S-5  no output-vs-its-own-input assertion    expected NONE       -> 0 true instances
+  S-6  the class count repository-wide         reported not predicted -> FIVE
+  SD-11, SD-13, SD-14                          expected KILLED     -> KILLED
+  F-115b cites OF-62 / Q-079                   expected one        -> BOTH (2 and 8)
+  F-117a/b/c sentinel -> a REFUSAL             expected REFUSAL    -> UndeterminedValue
+  F-119a window ends at "### 8.5.2 "           expected YES        -> YES, line 617
+  F-119b the window WIDTH                      expected ~3,592 +-10% -> 3,646 (+1.5%)
+  F-119c all four phrases still inside it      expected YES        -> YES
+  T-1  make selftest RED, and FOR THAT REASON  expected RED        -> RED, the sentinel
+  T-2  three vendored pins clean               expected clean      -> clean, 0-byte diffs
+  T-3  tests/goldens/ status                   expected empty      -> empty
+  T-4  CONTEXT.md v1.9 byte-identical          expected 8e820384.. -> IDENTICAL
+  T-5  check-prereg NOT-YET-FROZEN             expected NOT-YET    -> NOT-YET, exit 0
+  T-6  evals/ empty                            expected 0 files    -> 0
+  T-7  what each branch key carries            no polarity, state it -> stated, sec 7
+  T-8  the law asserted BEFORE the config      expected YES        -> YES (NS-6)
+  T-9  Q-074 fifth site / OF-99                no polarity          -> both CLOSED
+  T-10 zero provider calls, model id unchecked expected zero       -> zero
+  R-1..R-9 the reimplementation's own checks   expected all        -> 24/24, 0 failed
+
+DID NOT HOLD, BOTH THIS REVIEWER'S OWN AND REPORTED AS SUCH:
+  F-115a  grep -c "OF-104" in the C13 test file. Expected 0; MEASURED 2. Both are
+          inside the CORRECTION PROSE at :1049-1050 recording what the docstring used
+          to say - this project's convention everywhere else (Q-057 fact 4, INC-39's
+          Action, INC-54's figure). THE PROBE WAS MIS-SPECIFIED, NOT THE FIX: a count
+          cannot express "does it cite OF-104 AS ITS OWN FINDING". OF-115 is CLOSED.
+  THE REIMPLEMENTATION AGREEMENT. 22 of the 24 sealed vectors agree; the 2 that differ
+          differ ONLY because the project reports one MORE problem (both reject). But
+          three Phase-2 DISCRIMINATORS diverge -> OF-136, section 5.
+
+-------------------------------------------------------------------------------------
+3. THE FIVE SURVIVORS - 5/5 KILLED - AND THE RESTORE METHOD, STATED
+-------------------------------------------------------------------------------------
+RESTORE METHOD: the ORIGINAL BYTES, captured before each mutation and written back
+after it, then re-hashed, then THE FULL CONTROL RE-RUN. `git checkout --` is NEVER
+called. C6 REVIEW 4's harness was defeated exactly that way and THE FAILURE DIRECTION
+IS FLATTERING: a defeated restore reports EVERY mutant as KILLED. A run whose
+post-restore control is not green is printed VOID and is not scored.
+  27 mutations, 29 control runs, every one 100 passed, 0 VOID.
+
+  N-B   requirement 1 phrase -> "cause"                 KILLED  1 failed, 33 passed
+  N-C   requirement 3 phrase -> "harness"               KILLED  1 failed, 33 passed
+  N-D   requirement 4 phrase -> "md"                    KILLED  1 failed, 33 passed
+  N-E   one whole BRANCH_B_REQUIREMENTS entry deleted   KILLED  1 failed, 33 passed
+  N-I2  lanes.require(...) -> lanes.data.get(..., "")   KILLED  1 failed, 34 passed
+
+N-C WAS CHECKED HARDEST, AS THE PROMPT DIRECTED, AND ITS KILL IS ON THE RIGHT EXHIBIT.
+The fixture is the REAL branch_b_condition with "a harness defect is NEVER Branch B"
+replaced by "a harness defect is SOMETIMES Branch B" - the direct inversion of Q-057's
+ruling, the string that passed the entire repository under REVIEW 3. Under N-C the
+weakened phrase "harness" still occurs in that inverted string, so the guard raises
+ZERO complaints and `assert len(problems) == 1` fires. The kill is ON THE INVERSION.
+
+AND THE OTHER HARNESS FAILURE DIRECTION, WHICH THIS REVIEW HIT FIRST-HAND AND WHICH
+WOULD HAVE REPORTED EVERY MUTANT AS *SURVIVED*: the editable-install .pth under .venv
+holds one line - the REAL repository's src - and config.repo_root() is
+Path(__file__).resolve().parents[2], so a bare `python -m pytest` INSIDE A FRESH CLONE
+imports the REAL package and resolves the REAL repo root. MEASURED before the fix:
+  PKG : C:\Users\chinm\whetstone-gate\src\whetstone_gate\__init__.py
+  ROOT: C:\Users\chinm\whetstone-gate
+Every src/, config/ and CONTEXT.md mutation would have had NO EFFECT, AND THE CONTROL
+STILL READ 100 passed, so nothing would have looked wrong. Fixed with PYTHONPATH; the
+resolved paths are PRINTED at the head of every run; the driver ABORTS if the package
+is not the clone's. Recorded as OF-139. AND A NEGATIVE CONTROL (NS-14, a no-op
+restructure) HAD TO SURVIVE AND DID - a harness in which every mutant dies is not
+measuring anything.
+
+The clone's vendored trees are NTFS junctions (vendor/*/ is gitignored, so a clone has
+none), and CONSEQUENTLY NO MUTANT WRITES INTO vendor/ - a write there would land in the
+operator's repository. OWN-10 is attacked through the PIN instead.
+
+-------------------------------------------------------------------------------------
+4. THE SHAPE - REMOVED, AND THE FILE RE-SCANNED TO SAY SO
+-------------------------------------------------------------------------------------
+YES, THE SHAPE IS REMOVED, NOT ONLY ITS INSTANCES.
+
+  - len(invocation.BRANCH_B_REQUIREMENTS) == 4 AGAINST A LITERAL (:1173).
+  - FOUR weak-form fixtures, one per requirement, each the REAL branch_b_condition with
+    exactly one phrase degraded, each asserted REJECTED with exactly ONE complaint that
+    QUOTES that requirement - against a literal written in the test.
+  - the needle asserted PRESENT before it is degraded (INC-50's mirror move).
+  - the undegraded value asserted ACCEPTED - the control without which four rejections
+    are also what a guard that refuses everything looks like.
+  - and FIX 3's own SD-11 remedy: the complaint must quote the failed requirement AND
+    NOT the other three.
+
+BOTH of INC-55's assertions are GONE FROM LIVE CODE - searched by their own text,
+live=[] for each - surviving only as QUOTED TEXT inside the comment at :1152-1153 that
+explains why they were removed.
+
+AND THE SAME SHAPE WAS LOOKED FOR ELSEWHERE IN THE FILE, BY AN AST WALK OVER EVERY
+assert, NOT BY EYE. Four candidates from a deliberately over-broad scanner; ALL FOUR
+JUDGED AND REJECTED:
+  :2346, :2359  p2_holds_for(CITED_TABLE_FIGURES, "Table 7", ...) is True
+                -> the constant is an INPUT; the expected side is a LITERAL. Not it.
+  :2283, :2289  banking_rows(reversed_figures, ...) == banking_rows(figures, ...)
+                -> a METAMORPHIC assertion (OF-102's remedy). It CAN fail. Not it.
+And one NEAR-INSTANCE the scanner did not flag, judged by hand and NAMED rather than
+skipped: :1146, `assert any(SUPERSEDED_BRANCH_TRIGGER in problem ...)`. IT IS NOT
+VACUOUS, AND THAT WAS MEASURED: NS-7 (make the constant unreachable) is KILLED, because
+the fixture two lines above is a LITERAL containing the trigger, so weakening the
+constant empties `stale` and `assert stale` fires first.
+
+S-5's pre-committed polarity HOLDS. THE CLASS COUNT STAYS AT FIVE; no sixth was found.
+
+-------------------------------------------------------------------------------------
+5. FIX 3's OWN THREE SELF-DIRECTED MUTANTS - RE-RUN HERE - 3/3 KILLED
+-------------------------------------------------------------------------------------
+Reconstructed from 73de008's commit message and OPEN_FINDINGS.md's prose ALONE - which
+is the property that makes "this session opens no OF- id" acceptable rather than
+convenient, and this review verified it rather than assuming it.
+
+  SD-11  {phrase!r} -> {BRANCH_B_REQUIREMENTS!r} in the guard's message  KILLED
+  SD-13  keep the OF-118 call, `del` its result, print a constant        KILLED
+  SD-14  `_n = len(stale)` - the result is READ but never reaches say()  KILLED
+
+SD-11's NEW ASSERTION IS NOT VACUOUS, VERIFIED CHARACTER BY CHARACTER RATHER THAN
+ASSUMED. The guard's message ends with prose spelling all four requirements. If any
+matched repr(other), the assertion would be satisfied by accident. It is not: repr
+requires the quote characters, the prose spells every phrase UNQUOTED AND IN OTHER CASE
+(PROTOCOL.md, DIAGNOSED, Branch B), and "'it errored' is not a cause" puts a SPACE
+between the closing quote and `is`.
+
+OF-118: **GENUINELY REALISED**, NOT MERELY SYNTACTICALLY SATISFIED.
+Judged against the THREE-PART RULE OF DECISION pre-committed in the seal - deliberately
+with NO polarity, because pre-committing an answer to a judgement question is
+pre-committing the judgement:
+  (a) exported, and the export IS the predicate .................... BOTH TRUE
+  (b) a non-test caller USES the result, and deleting the USE while
+      keeping the CALL goes RED ................................... bound as `stale`;
+      `stale` itself reaches a say(...) call; SD-13 and SD-14 BOTH DIE on exactly that
+  (c) an input on which the non-test path BEHAVES DIFFERENTLY ...... real config -> 0
+      problems -> "OK - both keys agree with the law"; a broken pair -> 5 problems ->
+      "5 PROBLEM(S)" and then each one
+THE RESIDUAL, STATED RATHER THAN GLOSSED: main()'s RETURN CODE is unchanged by `stale`.
+`python -m whetstone_gate.camel_comparator` EXITS 0 with a stale condition; only the
+printed line moves. FIX 3 NAMES THAT OMISSION IN TERMS ("that is more than OF-118 asked
+for"), which is the correct call for a fix session and is why it is OF-140, LOW.
+
+-------------------------------------------------------------------------------------
+6. NEW-SURFACE MUTANTS - EACH SURVIVOR MARKED OWNED / NOT-OWNED UNDER Q-082
+-------------------------------------------------------------------------------------
+id     OWN      file               verdict    what
+NS-1   OWN-1    invocation.py      KILLED     pass 2 drops --replay-with-policies
+NS-15  OWN-1    invocation.py      KILLED     pass 1 stops declaring the pipeline name
+NS-2   OWN-2    config/lanes.yaml  KILLED     Branch A re-acquires the model-id clause
+NS-3   OWN-3    invocation.py      KILLED     requirement 2's phrase weakened further
+NS-4   OWN-3    invocation.py      KILLED     the complaint quotes the LABEL not the PHRASE
+NS-5   OWN-3    invocation.py      KILLED     the case fold dropped
+NS-6   OWN-4    CONTEXT.md         KILLED     THE LAW ALONE amended -> RED AT THE LAW
+NS-7   OWN-5    invocation.py      KILLED     the superseded-trigger constant unreachable
+NS-8   OWN-6    invocation.py      KILLED     the loader's refusal SWALLOWED
+NS-9   OWN-7    config/lanes.yaml  SURVIVED   <-- see below. NOT-OWNED.
+NS-9b  OWN-7    invocation.py      KILLED     THIS PACKAGE writes config/
+NS-10  OWN-8    branch_b.py        KILLED     provenance stops requiring an appendix
+NS-17  OWN-8    branch_b.py        KILLED     provenance stops requiring a base model
+NS-11  OWN-8    branch_b.py        KILLED     TABLE_NUMBER accepts the range "Tables 5-7"
+NS-12  OWN-9    branch_b.py        KILLED     headline pair re-attributed to Table 5
+NS-16  OWN-9    branch_b.py        KILLED     headline pair moved to Appendix C
+NS-13  OWN-10   config/protocol.yaml KILLED   the pinned CaMeL SHA no longer matches
+NS-14  control  invocation.py      SURVIVED   REQUIRED TO SURVIVE - the negative control
+
+EVERY ONE OF OWN-1..OWN-10 CARRIES AT LEAST ONE MUTANT. THE REQUIRED SET IS COMPLETE:
+seventeen new-surface mutants against a floor of ten.
+
+THE ONE REAL SURVIVOR, NS-9: config/lanes.yaml branch: TODO_C13_RUN1 -> branch: "A".
+  tests/test_c13_camel_comparator.py 100 passed
+  bare python -m pytest (FULL)       776 passed, 1 skipped
+  -m operator_gate (make selftest)   2 passed, 775 deselected   <-- WAS 1 failed
+  => make selftest flips RED -> GREEN. NON-EQUIVALENT BY EXHIBIT.
+
+DETERMINATION: **NOT-OWNED**. It does not hold the tag. THREE CHECKABLE STEPS:
+  (1) The mutation edits the ONE KEY C13 IS FORBIDDEN TO WRITE AND RUN-1 IS REQUIRED TO
+      WRITE. PROCESS.md S12.1's RUN-1 row: "at 18:00 the branch is decided either way
+      and written into PROTOCOL.md". Q-079 and INC-46 both record the sentinel as
+      deliberate BECAUSE a session that decided it would be inventing a result from a
+      chair. A mutant that writes "A" there is BYTE-IDENTICAL TO RUN-1 DOING ITS JOB.
+  (2) THE ARTEFACT THAT WOULD TELL THE TWO APART DOES NOT EXIST, AND IT IS NOT C13's.
+      That artefact is PROTOCOL.md's diagnosed cause, recorded BEFORE a branch is
+      selected. make check-prereg reports NOT-YET-FROZEN; PROTOCOL.md does not exist;
+      git rev-parse prereg-v1 does not resolve. PROTOCOL.md IS C14's DELIVERABLE.
+      Failing C13 for not building C14's guard is the regress Q-082 was ruled to stop.
+  (3) THE HALF OF OWN-7 THAT C13 *DOES* OWN IS DEFENDED, AND NS-9b PROVES IT rather
+      than asserting it: making THIS PACKAGE write config/lanes.yaml is KILLED by
+      test_this_chunk_does_not_decide_the_branch, which walks the package's AST. AND
+      THAT TEST IS STRUCTURAL ON PURPOSE - its own docstring says "so this test does not
+      invert the moment RUN-1 legitimately writes it". THE BUILDER DREW THE SAME LINE
+      THIS DETERMINATION TURNS ON, FIRST, AND WROTE DOWN WHY.
+  Filed as OF-137, addressed to C14 / RUN-1, with a one-guard remedy.
+
+NS-14 SURVIVED BY DESIGN and is marked NOT-OWNED trivially: it is the harness's own
+negative control and changes no behaviour. If it had been reported KILLED, every other
+row in the table would have been void.
+
+-------------------------------------------------------------------------------------
+7. THE SCOPED REIMPLEMENTATION, AND THE ONE MEDIUM IT FOUND (OF-136)
+-------------------------------------------------------------------------------------
+c13_review4_reimpl.py: stdlib only, asserts at import that whetstone_gate is not in
+sys.modules, parses config/lanes.yaml with its OWN reader, and DERIVES the four
+requirements from CONTEXT.md S8.5.1 AT RUN TIME rather than transcribing them - so its
+expectations move with the law instead of becoming a third copy. 24 vectors, 24/24,
+0 checks failed. The sentinel refusal path is implemented TWICE (a require-shaped read
+that RAISES, a get-shaped read that hands the sentinel back AS A VALUE) so N-I2's
+exhibit is reproducible without the project's loader.
+
+THE TWO DERIVATIONS, SIDE BY SIDE:
+  law-derived (Phase 1)                    the project's BRANCH_B_REQUIREMENTS
+  'on a cause that has been diagnosed'     'on a cause that has been diagnosed'
+  'it errored is not a cause'         <->  'is not a cause'          <-- THE DIVERGENCE
+  'a harness defect is never branch b'     'a harness defect is never branch b'
+  'protocol.md'                            'protocol.md'
+
+Three Phase-2 discriminators; the project ACCEPTS all three, Phase 1 REJECTS all three:
+  D1  "...A provider timeout is not a cause..."   mine 1 problem / theirs 0
+  D2  "...a slow network is not a cause..."       mine 1 problem / theirs 0
+  D3  "...that is not a cause..."                 mine 1 problem / theirs 0
+
+OF-136, MEDIUM. What is RIGHT about the project's choice, said first: a looser phrase
+permits PARAPHRASE, and a requirement about a concept arguably should. THE FINDING IS
+THE ASYMMETRY - the other three requirements permit no paraphrase at all, so this is not
+a policy; it is the one requirement no review had ever mutated.
+THE DECISIVE EXPERIMENT WAS RUN, NOT REASONED ABOUT: drifting config/lanes.yaml the D1
+way goes 1 failed, 99 passed. THE DRIFT IS CAUGHT. But it is caught at :1202 by the
+FIXTURE-INTEGRITY assertion, whose message reads "...so this fixture degrades nothing.
+Re-derive the weak form from the value as written." - i.e. IT TELLS THE READER TO WEAKEN
+THE TEST - while the EXPORTED predicate, the one the operator reads on RUN-1 night,
+prints "OK - both keys agree with the law". The two guards disagree about what the
+requirement is and the operator-facing one is the weaker.
+NO MUTANT SURVIVES ON IT (NS-3 is KILLED), so under Q-082 IT DOES NOT HOLD THE TAG.
+Remedy is one line: requirement 2's phrase becomes "it errored".
+
+T-7, AND THE PROMPT'S OWN PHRASING CORRECTED: the prompt asks whether config/lanes.yaml
+"carries the diagnosis requirement in BOTH branch conditions". MEASURED: branch_b_condition
+YES; branch_a_condition NO - it reads "IT RUNS: both passes ... complete inside the
+90-minute box...". THAT IS EXACTLY WHAT Q-079's RULING REQUIRES: Branch A's condition is
+"it runs", and the diagnosis requirement belongs to Branch B and is there. NO FINDING.
+The seal pre-committed that this would be stated as measured rather than asserted from
+the prompt's wording, and it is.
+
+-------------------------------------------------------------------------------------
+8. FINDINGS: OF-136..OF-140. NONE HOLDS THE TAG UNDER Q-082.
+-------------------------------------------------------------------------------------
+Ids re-read from the repository immediately before the append (git grep over *.md and
+*.py, sorted numerically); the highest present was OF-135, landed by C6 REVIEW 4
+minutes earlier - measured, not assumed, because OF-115 is precisely the defect of
+taking a number another session then takes.
+
+  OF-136 MEDIUM  C13        requirement 2 pinned to a 14-char fragment; the EXPORTED
+                            predicate accepts a condition the law does not license
+  OF-137 MEDIUM  C14/RUN-1  nothing ties a DECIDED branch to a PROTOCOL.md that
+                            records its cause beforehand (mutant NS-9)
+  OF-139 MEDIUM  process    a fresh clone's pytest imports the REAL repository's
+                            package, and nothing in this repository says so
+  OF-138 LOW     C13/C14    vendor.pinned_sha() has no shape check; a mistyped SHA in
+                            a soon-to-be-FROZEN artefact surfaces as a TypeError
+  OF-140 LOW     C13        main()'s exit code is unchanged by a stale condition
+                            (declared by FIX 3 itself, which is why it is LOW)
+
+DISPOSED: OF-115, OF-116, OF-117, OF-118, OF-119 - ALL CLOSED, each with the SHA and
+each re-measured rather than accepted on report.
+Q-074's FIFTH SITE AND OF-99: BOTH CLOSED, by Session A's ea3bd12, and NEITHER WAS EVER
+C13's - that file is named under NOT in every C13 fence. Verified: git grep "Tables 5"
+over tests/, src/, config/ and PROCESS.md returns FIVE hits and EVERY ONE is the
+corrected "NOT Tables 5-7" form.
+
+FIX 3's SD-11 AND SD-13 ARE DELIBERATELY GIVEN NO OF- ROW, AND THIS SESSION SAYS SO
+BECAUSE THE PROMPT ASKED. Both were found and closed INSIDE ONE SESSION;
+OPEN_FINDINGS.md's own contract is "every MEDIUM and LOW a review COULD NOT CLOSE".
+Giving them rows would put two CLOSED-at-birth entries into the file whose purpose is
+the opposite, three hours after OF-115 - a finding about taking a number another session
+then takes - was closed. WHAT MATTERS IS THAT THEY WERE RE-RUNNABLE FROM THE RECORD
+ALONE, AND THIS REVIEW VERIFIED THAT THEY WERE. FIX 3's decision is upheld ON THE
+MERITS, not waved through.
+
+-------------------------------------------------------------------------------------
+9. COUNTS MEASURED BY THIS SESSION, EVERY FAILURE ATTRIBUTED BY FILE
+-------------------------------------------------------------------------------------
+A concurrent SESSION A (C6 FIX 4, tokens 4b7f21ae / d5c8039f) is editing this tree, so
+every figure is stated as measured at its moment.
+
+  tests/test_c13_camel_comparator.py at HEAD ....... 100 passed, 0 failed
+  the same file in each unmutated clone ............ 100 passed  x 29 control runs
+  make selftest .................................... 1 failed, 1 passed, 784 deselected
+      sole failure: tests/test_lanes_operator_placeholders.py::
+      test_the_camel_branch_is_decided_before_any_camel_run, on
+      "UndeterminedValue: lanes.yaml: 'camel_comparator.branch' is not determined yet
+      (sentinel 'TODO_C13_RUN1')" - THE LOADER REFUSING, NOT DEFAULTING. DELIBERATE.
+  bare python -m pytest in a clone, unmutated ...... 776 passed, 1 skipped
+  make test ........................................ 1 failed, 782 passed, 1 skipped,
+      2 deselected, 441s. THE SOLE FAILURE IS
+      tests/test_repo_invariants.py::test_the_object_store_and_the_working_tree_agree
+      AND IT NAMES ITS OWN CAUSE: assert not ['INCIDENTS.md'].
+      INCIDENTS.md IS THE CONCURRENT SESSION A's UNCOMMITTED EDIT. Verified by READING
+      the test: it walks `git ls-files` and compares TRACKED working-tree bytes to
+      HEAD:<path>, so untracked files - this review's own artefacts and
+      grep.exe.stackdump - CANNOT cause it. NOT C13's AND NOT THIS REVIEW's.
+  make check-roles ................................. 17 passed, 0 failed, 5 n/a - OK
+  make check-prereg ................................ NOT-YET-FROZEN, exit 0
+  vendored pins .................................... CaMeL f083b6b396399d3b3c7f2ddaf613a5945eaf32d8
+                                                     AgentDojo 928bbae820a89556b03de5cf818eb350cd6082d1
+                                                     tau2 a2c024725189473d2d7cea3a5cfdbcc67478e41f
+                                                     all status EMPTY, all diffs 0 bytes
+  git status --porcelain tests/goldens/ ............ EMPTY
+  CONTEXT.md ....................................... v1.9, blob
+      8e820384afbb1de7de3892eb6b90a8e6dce1f378, 224,645 bytes, LF 2,361, CR 0, TAB 0
+      - REVIEW 3's and REVIEW 2's figures EXACTLY
+  git tag -l before the tag ........................ c0-pass c1-pass c2-pass c3-pass
+                                                     c4-pass; prereg-v1 does NOT resolve
+  evals/ ........................................... 0 files - C13 spent nothing
+
+THE TOKEN-TABLE COUNT, WITH ITS TREE NAMED, BECAUSE INC-54 IS EXACTLY ABOUT NOT DOING
+SO: 46 is the DATA-ROW count at THIS SESSION's commit 2a86849, where check_roles'
+_TOKEN_ROW parses 45 (the WG-2026-08-30-CTX-13.4-A row matches neither the 8-hex token
+pattern nor the (C\d+|ARCH) chunk cell). make check-roles PRINTED "47 issued row(s)" -
+AND THAT IS RIGHT ABOUT A DIFFERENT TREE: it reads the WORKING TREE, which at that
+moment held Session A's TWO UNCOMMITTED rows (4b7f21ae, d5c8039f), landed minutes later
+at 6b9af8f. Both figures are correct about the tree each measured.
+
+TOKEN SPEND: ZERO. ZERO PROVIDER CALLS. CaMeL was not run, not installed, not imported.
+WHETHER THE MODEL ID IS STILL SERVED WAS NOT CHECKED - Branch A's condition, RUN-1's
+alone.
+
+-------------------------------------------------------------------------------------
+10. THE TAG - CUT, AND WHY
+-------------------------------------------------------------------------------------
+git tag -a c13-pass on 0d74fdf, pushed. CUT BECAUSE:
+  - the five survivors are dead, by changes that go red when reverted;
+  - the SHAPE is gone, and the file was re-scanned for it rather than assumed clean;
+  - FIX 3's own three self-directed mutants are dead, re-run from the record alone;
+  - the REQUIRED SET - seventeen new-surface mutants across ALL TEN owned properties,
+    enumerated and argued IN THE SEAL BEFORE ANY MUTANT WAS WRITTEN - is CLEAN;
+  - the one survivor is NOT-OWNED on a three-step argument the builder's own docstring
+    had already drawn;
+  - the reimplementation agrees except on one MEDIUM that no mutant survives;
+  - ZERO BLOCKERS.
+NOT cut because the project is behind schedule. The clean result was reached by a set
+fixed in advance, and the seal's own rule of decision 4 said in writing, before any
+measurement, that a clean required set IS a PASS - so that a clean result could not be
+talked into a fourth FAIL either.
+
+-------------------------------------------------------------------------------------
+11. EVERY `Swept:` LINE THIS SESSION WROTE
+-------------------------------------------------------------------------------------
+2a86849  Swept: nothing. Verified on the STAGED SNAPSHOT (git diff --cached --numstat):
+         one path, 75 insertions, 0 DELETIONS - no other session's line was touched.
+         git status --porcelain read immediately before git add and held only this file
+         and grep.exe.stackdump, which belongs to no session and was not touched.
+9e16d87  Swept: nothing. Verified on the STAGED SNAPSHOT: three paths, all new, 742
+         insertions, 0 DELETIONS. A concurrent SESSION A committed 6b9af8f between this
+         session's token-row commit and this one; it touched QUESTIONS.md, not
+         docs/reviews/, and nothing of this session's was in flight when it landed.
+0d74fdf  Swept: nothing. Verified on the STAGED SNAPSHOT: nine paths, 1,724 insertions,
+         1 deletion - and that ONE deletion is C13's OWN STATUS row, replaced by the
+         appended version of itself. INCIDENTS.md is modified in the working tree by the
+         concurrent Session A and is DELIBERATELY NOT STAGED; git diff --cached
+         --name-only was read to confirm its absence.
+(this)   Swept: nothing. One path, this file, 0 deletions.
+
+STATUS.md's C13 review-history cell is APPENDED to, never erased. VERIFIED MECHANICALLY
+BY RECONSTRUCTION before committing: undoing exactly the three edits reproduces the
+previous row BYTE-IDENTICALLY. The row grew 47,507 -> 51,269 characters and exactly one
+line of the file changed.
+
+-------------------------------------------------------------------------------------
+12. WHAT THIS SESSION COULD NOT DO
+-------------------------------------------------------------------------------------
+1. INCIDENTS.md IS OWED AND IS DECLARED HERE RATHER THAN LEFT TO BE NOTICED. It is named
+   under NOT in this fence and the concurrent Session A holds it (it is the file the one
+   `make test` failure names). OF-139 IS THE ENTRY OWED: a mutation harness that
+   silently measures the wrong tree, caught by this session against itself BEFORE any
+   result was recorded. Diagnosis: an editable-install .pth puts the real repository's
+   src on sys.path and config.repo_root() follows __file__, so a clone is not isolated
+   by being a clone. Missed: nothing - it was caught by printing what was actually
+   imported, which is the habit this repository already has and this reviewer nearly
+   skipped. It is carried in REVIEW_13_4.md S3, mutants/c13_mutants_4.md S0,
+   OPEN_FINDINGS.md and here.
+2. Q-082's ruling was NOT applied to C6. This is a C13 session whose fence names every
+   earlier REVIEW_*.md under NOT; OF-124..OF-130 are untouched and no C6 finding is
+   re-dispositioned. REVIEW_C6_4.md S14 already names which three findings its verdict
+   rests on, which is what makes the ruling applicable by a C6 session.
+3. Whether gemini-2.0-flash-lite-001 is still served was NOT checked, by instruction.
+4. No `INC-` number was allocated for the harness finding, for the same reason FIX 3
+   opened no OF- id: the file is held by another session. The content is complete and
+   the number is the architect's to allocate.
+5. OF-136, OF-137, OF-138, OF-139 and OF-140 are RAISED, not fixed. A REVIEW SESSION
+   FIXES NOTHING.
+
+=====================================================================================
+END. VERDICT: PASS. c13-pass CUT ON 0d74fdf AND PUSHED.
+=====================================================================================
