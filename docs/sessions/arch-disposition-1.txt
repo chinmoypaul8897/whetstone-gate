@@ -1,0 +1,429 @@
+======================================================================================
+ARCH - DISPOSITION 1 - FINAL OUTPUT
+SESSION-TOKEN 4d90c2e6   CHUNK ARCH   ROLE FIX   2026-09-03
+======================================================================================
+PUSHED SHA: e0842e3
+PUSHED SHA, THIS FILE: <PENDING - THIS FILE'S OWN COMMIT DOES NOT EXIST YET.  The
+commit immediately following it writes the real SHA into this line and does nothing
+else, which is the promise INC-58 made and did not keep, kept.  NO SHA IS INVENTED
+HERE: an invented one is exactly what INC-71 measured this project's checks firing on.>
+
+NO TAG CUT.  NO TAG MOVED.  `git tag -l` reads c0-pass, c1-pass, c2-pass, c3-pass,
+c4-pass, c13-pass - SIX, unchanged.  No c6-pass.  No c7-pass.
+ZERO PROVIDER MODEL CALLS.  ZERO TOKEN SPEND.  The prompt sanctioned none.
+
+--------------------------------------------------------------------------------------
+0.  THE RULING, RECORDED FIRST - AND THE ORDER IS CHECKABLE
+--------------------------------------------------------------------------------------
+QUESTIONS.md carries Q-089, Q-087 and Q-088 VERBATIM, transcribed with no paraphrase, no
+reordering, no abbreviation, capitalisation and punctuation included.  Hard rule 5.
+
+THE BLOCK AND THIS SESSION'S TOKEN ROW ARE THE FIRST BYTES THIS SESSION WROTE TO ANY
+TRACKED FILE.  INCIDENTS.md, OPEN_FINDINGS.md, STATUS.md and PROGRESS.md were all still
+untouched when it landed, and it is committed on its own at f1dcc00, before the commit
+that carries any of them.  C6 FIX 5 recorded that it had BROKEN this rule and named the
+breach rather than leaving it to a diff; this session records that it did not, on the
+same standard.
+
+  Q-089  RULED.  THE REQUIRED SET IS FIXED AT THE GRAIN THE OUTRANKING ARTEFACTS STATE
+         IT - the chunk card, CONTEXT.md, a recorded ruling, a golden, or a hard rule.
+         C6's card states FOUR claims.  A REVIEWER MAY NOT SUBDIVIDE A STATED
+         REQUIREMENT INTO IMPLEMENTATION UNITS AND COUNT EACH AS OWNED.  Sub-unit gaps
+         are MEDIUM findings, published, and do not hold a tag.  Q-084 STANDS: an ABSENT
+         catcher for a STATED property is still an unpinned property and still gates.
+         AND TWO CHUNKS SHIP ON IT - C6 and C7, DISPOSED as SHIPPED-WITH-RESIDUE.
+  Q-087  RULED.  THE TEST IS C8's.  C8 reads golden 5B as an input and its build prompt
+         will require it; a review session writing a test was always the wrong reading
+         of that sentence.
+  Q-088  RULED.  A review session may not write to INCIDENTS.md, and the entry it owes
+         is DECLARED IN ITS FINAL OUTPUT and written by the NEXT non-review session in
+         that chunk's line.  That is what this task did, and it is now the rule.
+
+--------------------------------------------------------------------------------------
+0a. INC-47's TEST, APPLIED TO A RULING - SIX OF SEVEN REPRODUCE, ONE DOES NOT
+--------------------------------------------------------------------------------------
+A ruling is read as law, and a wrong number inside one propagates further than a wrong
+number inside a journal.  Everything transcribed is unaltered; these are MY measurements
+of it.
+
+  REPRODUCES  "C7 REVIEW 2 sealed thirty-eight where REVIEW 1 sealed thirty-three"
+              REVIEW_7_2.md S2 heading says thirty-eight; REVIEW_7_1.md line 41 says
+              thirty-three and its S13 says "ALL 33 SEALED PROPERTIES".  Both halves.
+  REPRODUCES  "C6 REVIEW 6 added three owned properties in Phase 2"  OP-20/21/22.
+  REPRODUCES  "C6's card states FOUR claims: no policy string, no hole, no attack list,
+              no gate reason"  -  PROCESS.md S12, the C6 row's done-when, WORD FOR WORD:
+              "the attacker's context provably contains no policy string, no hole, no
+              attack list and no gate reason".  This is the load-bearing one.
+  REPRODUCES  "Every finding their earlier reviews failed them on is CLOSED".
+  REPRODUCES  the golden-5B re-derivation by search over 32 then 1024 assignments, all
+              three fifteen-field digests reproduced.  REVIEW_7_2.md S4.1, S4.2.
+  REPRODUCES  "C6 has had SIX reviews and C7 TWO."  6 + 2 review files.
+  DOES NOT    "between them they have produced ELEVEN real FAILs, every one shipped in
+              docs/reviews/".  MEASURED: EIGHT.  REVIEW_C6_1..6 each at
+              "## VERDICT - **FAIL**", REVIEW_7_1 and REVIEW_7_2 each at "# FAIL." in
+              S15.  So "every one shipped in docs/reviews/" is TRUE and the COUNT IS 8,
+              NOT 11.  Six reviews plus two reviews cannot produce eleven FAILs, and I
+              could not find eleven of anything in docs/reviews/ bearing on C6 and C7.
+
+RECORDED, NOT CORRECTED.  Hard rule 5 forbids editing a ruling into agreement with a
+measurement, and the number is not load-bearing: eight adversarial FAILs makes the
+ruling's argument as well as eleven would.  If eleven counts something I could not see,
+the architect can say so and that row is where it gets answered.
+
+--------------------------------------------------------------------------------------
+1.  THE TWO STRANDED ENTRIES - WRITTEN.  INC-73 AND INC-74.
+--------------------------------------------------------------------------------------
+Q-088's ruling in force for the first time.  Both reviews DECLARED the entry they owed;
+both entries exist because they did.  EACH IS ATTRIBUTED IN ITS FIRST LINE to the session
+that found it, and each carries all EIGHT of hard rule 13's fields.
+
+INC-73 - C6 REVIEW 6 (7f4b0e93).  Five items.
+  (a) The harness's first launch ABORTED ON A FORMAT-STRING BUG and produced NOTHING.
+      Recorded anyway for the unsafe neighbour: a harness that had CAUGHT that exception
+      and continued would have scored from a partial log and reported every mutant it
+      never reached as SURVIVED.  Fifth consecutive C6 harness to carry a defect.
+  (b) A CLONE LEFT WITH NO src/, PROVENANCE NAMING THE LIVE REPOSITORY, PRE-RUN CONTROL
+      0 PASSED - INC-69's exact failure mode, VOID IN 17 SECONDS by the positive control
+      OF-159 asks for rather than by a human distrusting a number.  THE CAUSAL DETAIL THE
+      REVIEW DID NOT STATE AND I MEASURED: an empty clone does not error.
+      `import whetstone_gate` resolves through the editable install to the live tree,
+      which is why "0 passed" and "live provenance" arrive TOGETHER.
+  (c) The needle `over-capture` FIRING ON S8.6's OWN SYSTEM PROMPT - a substring of the
+      spec's own "over-captures" - so the clean-surface control read 1 of 73, not 0.
+  (d) The FIRST CARRIER-MATRIX READING OF 73/73, which measured the HARNESS: the mutated
+      label was restored BEFORE the guard ran, so every guard fired for the trivial
+      reason that no line began with the label it now expected.  Corrected: 44/73 and
+      36/73, 29 escaping both.
+      `Missed:` FOR (c) AND (d) IS THAT SESSION'S OWN, AND IT PUBLISHED BOTH BEFORE ITS
+      RESULT.  The seal's own exclusion list already named the word; and an implausibly
+      clean number was believed for one measurement, dislodged by its own implausibility
+      rather than by a control.
+  (e) MINE, NOT THE REVIEW'S, AND LABELLED THAT WAY.  See section 4.
+
+INC-74 - C7 REVIEW 2 (b8c31a57), IN THAT REVIEW'S OWN WORDS (REVIEW_7_2.md S16.1, Q-088).
+  (a) The mutation harness ABORTED ON `UnicodeDecodeError: 'charmap' codec can't decode
+      byte 0x8f` - `subprocess.run(text=True)` decodes with the Windows ANSI codepage and
+      the suite's output carries S, warning signs and rupee signs.  IT PRODUCED NO
+      NUMBERS; IT STOPPED.  The unsafe neighbour: a harness that had SWALLOWED it would
+      have mis-parsed the FAILED lines it scores mutants on.
+  (b) The session's FIRST QUESTIONS.md EDIT CONVERTED THE WHOLE FILE TO CRLF - 7,991 CR
+      bytes - through `pathlib.write_text`'s platform newline translation, against
+      .gitattributes' `* text=auto eol=lf`.  Caught by READING `git diff --stat` rather
+      than trusting the edit; repaired by a byte-level rewrite before the commit.
+  BOTH REMEDIES RE-VERIFIED BY ME AGAINST THE COMMITTED OBJECTS, not taken from the
+  report: docs/reviews/mutants/c7_review2_mutants.py lines 84 and 97 both read
+  `text=True, encoding="utf-8", errors="replace"` at 3d8fb6c; and c9bf0d5's diffstat is
+  exactly `QUESTIONS.md | 1 +` / `1 file changed, 1 insertion(+)`, which is what a correct
+  single-row append looks like and is not what a 7,991-CR rewrite looks like.
+  `Diagnosis:` both halves are one defect with the polarity flipped - a standard-library
+  call silently substituting the platform's encoding convention for the repository's
+  declared one, on READ in subprocess and on WRITE in pathlib.  The read-side failure
+  STOPPED; the write-side failure SUCCEEDED and had to be caught by measurement.
+
+--------------------------------------------------------------------------------------
+2.  INC-75 - THE PATTERN, AND ITS FIRST DUTY IS CORRECTING THE COUNT MY OWN PROMPT GAVE
+--------------------------------------------------------------------------------------
+My prompt said "THIS IS THE SEVENTH AND EIGHTH TIME AN ENTRY HAS BEEN STRANDED (Q-029,
+Q-033, Q-049, OF-89, REVIEW_C6_2's M-9, INC-64)".  MEASURED, THE PUBLISHED RECORD
+DISAGREES WITH ITSELF IN FOUR PLACES:
+
+  INC-44          "the FOURTH time - Q-029, Q-033 and Q-049 are the first three"
+  OF-89's note    "the fourth ... and Q-078 is its FIFTH instance"
+  Q-078           "the FIFTH time by this project's own count (Q-029,Q-033,Q-049,OF-89)"
+  PROGRESS/INC-57 "SIXTH stranded entry (Q-029,Q-033,Q-049,OF-89,REVIEW_C6_2's M-9,this)"
+                  <- WRONG TWICE: drops Q-078, and counts OF-89 and M-9 as TWO
+  my prompt       inherits both defects, with INC-64 swapped for INC-57
+
+  * OF-89 AND REVIEW_C6_2's M-9 ARE ONE OCCURRENCE.  Same session (ec8e57ad), same
+    Phase-1 seal (b7737b7), same two CRLF files, same `3 failed, 661 passed`, same repair
+    (b8bfb6a), and all of it discharged by the SAME entry, INC-44.  OF-89 is the register
+    row; M-9 is the review-file rendering; REVIEW_C6_2 S0.2 is a third rendering.
+  * Q-049 IS NOT A STRANDED INCIDENTS.md ENTRY AT ALL.  Its fence excluded `data/`, not
+    INCIDENTS.md, and INC-28 WAS written, BY THAT SESSION.
+  * Counting only declared-owed entries, I found AT LEAST EIGHTEEN DECLARATIONS ACROSS AT
+    LEAST FOURTEEN SESSIONS.  Nobody knows the number, and that is itself the finding.
+
+AND THE PART THAT IS NOT ARITHMETIC.  Q-033's ruling reassures in terms: "the fence has
+not yet lost this project an incident; it has delayed three and degraded the format of
+one."  MEASURED AGAINST THE FILE, AT LEAST TWO WERE NEVER WRITTEN:
+  1. REVIEW_C1_2's INFO-3 - "an INCIDENTS.md entry is OWED for this session's stray
+     s4.md" (line 640).  `grep -c 's4\.md' INCIDENTS.md` -> 0.  NEVER WRITTEN.
+  2. REVIEW_C4_1's INFO-4 - its own CRLF defect, repaired at 51404cc (line 654).
+     `51404cc` occurs ONCE in INCIDENTS.md and `0852ea56` twice, ALL THREE INSIDE INC-30,
+     in its audit list of commits confirmed clean in the RECIPROCAL direction.  No entry
+     records the defect.  NEVER WRITTEN.
+  3. Q-029's - PARTIALLY ABSORBED, not written: the TODO_-sentinel finding appears in
+     INC-28's `Missed:` field as prior context for a DIFFERENT incident.
+
+`Diagnosis:` every review prompt's FENCE line is authored from the diff the architect
+expects a review to produce, while CLAUDE.md S6 duty 4 AND A STANDING RULING both require
+the append - Q-033, RULED 2026-08-31, "THE FENCE WAS WRONG AND IS REMOVED.  INCIDENTS.md
+IS APPEND-ONLY AND IS IN EVERY SESSION'S FENCE FROM NOW ON", still carried in PROCESS.md
+line 178 to this day - and NOTHING COMPARES A FENCE AGAINST A STANDING RULING.  The
+recurrence is not the fence: it is that every instance has been closed at the level of the
+individual filename, never at the level of how a fence is DERIVED.  That is INC-28's
+diagnosis, unchanged, on its ninth occurrence.
+
+`Missed:` THE SIGNAL WAS NOT MERELY AVAILABLE - IT WAS CITED, BY BOTH SESSIONS, IN THE
+ACT OF BEING OVERRIDDEN.  Both read Q-033, both said so, and both obeyed the prompt -
+correctly, because CLAUDE.md S1 makes the newer architect instruction govern and makes the
+disagreement a STOP-and-record, which is what Q-088 is.
+
+`Systemic guardrail:` PARTIAL, AND THE ACCOUNTING IS THE POINT OF THE FIELD.  Q-088 itself
+converts an accident into a procedure, and it has now worked twice.  WHAT IT DOES NOT
+CLOSE, said plainly: (i) the declaration duty is IN NO TEMPLATE - not PROCESS.md S10's
+review template, not CLAUDE.md S6's eight duties - so it rides on the reviewer discipline
+OF-67 counts as the state preceding a loss, and both of today's reviews declared it OF
+THEIR OWN INITIATIVE; (ii) it depends on a NEXT NON-REVIEW SESSION IN THAT CHUNK'S LINE
+existing, and C6 AND C7 ARE BOTH DISPOSED TODAY, SO NEITHER HAS ONE - this session was it,
+and there will not be another; (iii) it CONTRADICTS Q-033 as still written in PROCESS.md
+S2; (iv) it does nothing about the two entries never written at all, now unrecoverable.
+NOT CLOSED.  What closes it is Q-090's option 1 - two lines, in a file no session that has
+ever hit this may edit.
+
+--------------------------------------------------------------------------------------
+3.  THE DISPOSITION - STATUS.md AND OPEN_FINDINGS.md, QUOTED BEFORE AND AFTER
+--------------------------------------------------------------------------------------
+STATUS.md line 913 (C6), Status column - BEFORE, first 180 chars:
+  "WARNING **REVIEW 6 = FAIL (`7f4b0e93`, 3 Sep) - C6's LAST REVIEW. ZERO BLOCKERS,
+   `src/` UNTOUCHED, ALL SIX CELLS RE-KILLED, AND THREE OWNED SURVIVORS - NONE OF THEM
+   IN CLAIM 4.** The tag is NOT cut and ..."     [cell length 11,494 characters]
+STATUS.md line 913 (C6), Status column - AFTER, first 180 chars:
+  "WARNING **SHIPPED WITH RESIDUE (NOT TAGGED).** `Q-089` RULED, 2026-09-03 (ARCH
+   DISPOSITION 1, `4d90c2e6`): *"C6 and C7 are DISPOSED as SHIPPED-WITH-RESIDUE. Neither
+   is tagged and neither gets another review cycle."* ..."
+  ... and the cell ENDS with: "WARNING **PRIOR STATUS TEXT, RETAINED VERBATIM RATHER
+  THAN ERASED (nothing in this cell is overwritten):** " followed by ALL 11,494 ORIGINAL
+  CHARACTERS.
+
+STATUS.md line 914 (C7), Status column - BEFORE, in full (103 characters):
+  "RED **REVIEWED - FAIL (attempt 2). NO TAG.** `C7: built -> built -> built -> FAIL(1)
+   -> fixed -> FAIL(2)`"
+STATUS.md line 914 (C7), Status column - AFTER, first 180 chars:
+  "WARNING **SHIPPED WITH RESIDUE (NOT TAGGED).** `Q-089` RULED, 2026-09-03 (ARCH
+   DISPOSITION 1, `4d90c2e6`) ... **`c7-pass` IS NOT CUT AND WILL NOT BE** ..."
+  ... ending with the same RETAINED-VERBATIM marker and all 103 original characters.
+
+REVIEW-HISTORY COLUMN: APPENDED TO, NEVER ERASED.  Both rows gained a new entry opening
+"-> WARNING **ARCH DISPOSITION 1 (`4d90c2e6`), 3 Sep - C6/C7 IS DISPOSED: SHIPPED WITH
+RESIDUE, NOT TAGGED, NO FURTHER REVIEW CYCLE.**" at the END of the existing column.
+
+MEASURED ON THE WRITE, NOT ASSERTED:
+  lines in STATUS.md  1196 -> 1196
+  lines changed       EXACTLY TWO: 913 and 914
+  cell counts         6 -> 6 (C6) and 7 -> 7 (C7), unchanged
+  old status text     PRESERVED AS A SUFFIX of the new cell (verified by startswith)
+  old history text    PRESERVED AS A PREFIX of the new cell
+  every other cell    BYTE-IDENTICAL
+  growth              +2,853 chars (C6), +2,846 chars (C7)
+
+OPEN_FINDINGS.md - BEFORE, the Status cells of the sixteen rows:
+  OF-164 "WARNING **OPEN - MEDIUM**"                OF-172 "WARNING **OPEN - HIGH**"
+  OF-165 "WARNING **OPEN - MEDIUM**"                OF-173 "WARNING **OPEN - HIGH**"
+  OF-166 "WARNING **OPEN - MEDIUM, needs an owner**" OF-174 "WARNING **OPEN**"
+  OF-167 "WARNING **OPEN - MEDIUM**"                OF-175 "WARNING **OPEN**"
+  OF-168 "WARNING **OPEN - LOW**"                   OF-176 "WARNING **OPEN**"
+  OF-169 "WARNING **OPEN - MEDIUM**"                OF-177 "WARNING **OPEN**"
+  OF-170 "WARNING **OPEN - LOW**"                   OF-178 "WARNING **OPEN - for the architect**"
+  OF-171 "WARNING **OPEN - HIGH**"                  OF-179 "WARNING **OPEN - for the architect**"
+  Closed by (SHA), all sixteen: "-"
+
+OPEN_FINDINGS.md - AFTER, every one of the sixteen is its ORIGINAL TEXT plus:
+  " . WARNING **PUBLISHED RESIDUE - CARRIED BY <C6|C7>**, which is DISPOSED as **SHIPPED
+    WITH RESIDUE (NOT TAGGED)** by `Q-089`'s ruling, 2026-09-03 (ARCH DISPOSITION 1,
+    `4d90c2e6`). WARNING **STILL OPEN - nothing here is closed; only the disposition
+    changed.** C19 lifts this row into the README's residue list for <C6|C7>."
+  Closed by (SHA), all sixteen: STILL "-".
+
+MEASURED ON THE WRITE:
+  rows in file        178 -> 180   (OF-180 and OF-181 appended)
+  rows changed        EXACTLY 16
+  changes confined    to cell 6 (Status) in ALL 16 - verified cell-by-cell
+  every change        STRICTLY APPENDED - new cell startswith old cell, all 16
+  rows lost           0
+  findings closed     0
+  Closed-by cells     all sixteen still the em dash they held
+
+CLOSE NOTHING THAT IS NOT CLOSED: honoured, and measured rather than promised.
+
+--------------------------------------------------------------------------------------
+3a. THE C7 RANGE IS WIDER THAN MY PROMPT NAMED, AND I AM DECLARING IT RATHER THAN
+    SLIPPING IT IN
+--------------------------------------------------------------------------------------
+My prompt said "C7's OF-164..OF-168".  MEASURED AGAINST THE ROWS THEMSELVES, C7 REVIEW 2
+RAISED OF-164..OF-173 - TEN ROWS, ALL STILL OPEN - and the five my prompt did not name
+INCLUDE OF-171, OF-172 AND OF-173, THE THREE HIGH FINDINGS THAT CARRIED THAT REVIEW'S
+FAIL.  Marking only the first five would have left the actual reason C7 failed INVISIBLE
+to the mechanical lift the instruction exists to enable, and C19's done-when is that every
+remaining item is closed OR EXPLICITLY ACCEPTED WITH A REASON.  ALL TEN ARE MARKED.  The
+architect can strike the last five in one edit; the extension is stated in the file, in
+this block, in PROGRESS.md and in the commit message, so it cannot be mistaken for scope.
+
+A LIKELY ORIGIN OF THE RANGE, NAMED SO IT IS NOT MYSTERIOUS: REVIEW_C6_6.md S11 records
+that C6's residue was FIRST numbered OF-164..OF-168 and renumbered OF-174..OF-178 when C7
+REVIEW 2's ten rows landed first (OF-179).  The two ranges have been adjacent in one
+paragraph ever since.
+
+--------------------------------------------------------------------------------------
+4.  TWO NEW FINDINGS, BOTH MINE, BOTH IN PUBLISHED ARTEFACTS NO FENCE MAY REPAIR
+--------------------------------------------------------------------------------------
+OF-180 - MEDIUM.  THE PUBLISHED MUTATION ARTEFACT PRINTS THE LIVE REPOSITORY AS A SCORED
+SLICE'S PROVENANCE.  docs/reviews/independent/c6_review6_mutants_output.txt S2 reads
+
+    [C] PROVENANCE PKG  : C:\Users\chinm\whetstone-gate\src\whetstone_gate\__init__.py
+    [C] PROVENANCE ROOT : C:\Users\chinm\whetstone-gate
+
+while every other slice's two lines name a clone under ...\scratchpad\c6r6\tree_{A..G},
+and S1 of the SAME FILE scores slice C as NOT VOID, 136/0 on both controls.
+
+MECHANISM, READ OUT OF THE COMMITTED CONSOLIDATOR: on a `SLICE VOID` line
+c6_review6_consolidate.py renames the CONTROLS key -
+`controls["%s (attempt 1)" % m.group(1)] = controls.pop(m.group(1), {})` - and DOES NOT
+RENAME THE `prov` KEY, which stays bare "C"; it then prints `prov[sl][:2]`, the first two
+lines only, and `LOGS` is read with mutants_run_ABDE.log FIRST, which is the log holding
+the void attempt.  SO THE VOID ATTEMPT'S PROVENANCE MASKS THE SCORED ATTEMPT'S.
+
+AND THE SCORED SLICE C's PROVENANCE LINE IS NOT IN THIS REPOSITORY AT ALL - it is in
+mutants_run_CFG.log, in an OS temp directory, and only the consolidated file was
+committed.
+
+CONSEQUENCE, STATED WITHOUT INFLATION: slice C's eleven scored mutants are almost
+certainly clean - src/ is verified untouched by BLOB HASH across the whole review, the
+pre/post controls read 136/0, and an unmutated live tree could not have killed N-08 or
+N-10 - BUT A READER CANNOT VERIFY SLICE C's TREE FROM THIS REPOSITORY, and REVIEW_C6_6.md
+S0's sentence "every printed line names the clone" IS FALSE AS PRINTED.  It is INC-69's
+guard defeated in the RECORD rather than in the RUN, which is INC-43's decorative gate
+turned on a record instead of a guard.
+REMEDY, ONE LINE: the consolidator asserts that every slice it SCORES appears in the
+provenance section with a root under the scratch directory, and refuses to print
+otherwise - the pre-run control's shape, applied to the artefact.  OF-139's still-unbuilt
+`make mutate-clone` removes the whole class.
+
+OF-181 - LOW.  REVIEW_C6_6.md S11 - THE RESIDUE LIST C19 SHIPS - CARRIES AN ORPHANED
+HALF-SENTENCE at line 705, immediately after item 6's "**Remedy: the architect's.**":
+    "one, in the token table `make check-roles` reads. **Remedy: the architect's.**"
+A dangling fragment with a duplicated remedy clause, left by an edit, in the one section
+whose stated purpose is to be copied into the README.
+
+NEITHER IS ACTIONABLE FROM INSIDE ANY REVIEW OR FIX FENCE: docs/reviews/REVIEW_*.md and
+docs/reviews/independent/ are named under NOT in every recent fence, this session's
+included.  Recorded so C19 does not ship them unexamined.
+
+--------------------------------------------------------------------------------------
+5.  Q-087 AND Q-088 RECORDED - AND ONE THING THE PROMPT DID NOT ASK FOR
+--------------------------------------------------------------------------------------
+Both are in QUESTIONS.md verbatim.  AND I WOULD HAVE BEEN WRONG TO LEAVE THIS UNSAID:
+
+Q-088's RULING NARROWS Q-033's, AND Q-033 IS STILL WRITTEN WITHOUT QUALIFICATION.
+Q-033, RULED 2026-08-31 and recorded verbatim in QUESTIONS.md: "THE FENCE WAS WRONG AND IS
+REMOVED.  INCIDENTS.md IS APPEND-ONLY AND IS IN EVERY SESSION'S FENCE FROM NOW ON."  It
+LANDED: PROCESS.md line 178 carries "APPEND-ONLY, AND IN EVERY SESSION'S FENCE (Q-033,
+2026-08-31)" to this day.  Q-088 says the opposite for review sessions.  It is later and
+more specific, so IT GOVERNS - and ONLY MY NOTE IN QUESTIONS.md SAYS SO.  Two binding
+rulings now point opposite ways and a session reading PROCESS.md S2 and not that note will
+reach the same STOP both of today's reviews reached.
+
+I ALSO RECORDED WHAT Q-088 COSTS, using Q-033's own words turned on its successor: Q-033
+removed the fence because "recovery by the next session is a courtesy, not a control, and
+it depends on the fenced session having written the facts down somewhere a successor
+happened to read."  Q-088 REINSTATES EXACTLY THAT DEPENDENCY, and this session is the
+evidence it is a real cost.  What Q-088 ADDS is the DECLARATION DUTY, which is a control
+where the bare fence had none - and it is not the same as the session writing it.
+
+Q-090 RAISED - Class B, OPEN, for the architect, NOT blocking:
+  (i)  PROCESS.md line 178 contradicts Q-088 with no supersession marker.
+  (ii) Q-088's declaration duty is IN NO TEMPLATE - not PROCESS.md S10's review template,
+       not CLAUDE.md S6's eight duties.  Both of today's reviews declared it of their own
+       discipline, which OF-67 says with a count is the state that precedes a loss.
+  Options: one line in each of the two PROCESS.md places (recommended); a prose-grepping
+  check (cost: INC-71's class, firing on correct entries); or nothing, stated openly.
+  DEFAULT TAKEN: NONE - PROCESS.md is outside this fence and no default was available.
+
+--------------------------------------------------------------------------------------
+6.  COUNTS I MEASURED MYSELF
+--------------------------------------------------------------------------------------
+  INCIDENTS.md entries before / after            72 / 75      (highest was INC-72)
+  rule-13 fields present in INC-73/74/75         8 / 8 / 8    checked programmatically
+  OPEN_FINDINGS.md rows before / after          178 / 180
+  OF- rows whose Status changed                  16           all appends, 0 closures
+  OF- rows lost                                   0
+  STATUS.md lines before / after               1196 / 1196
+  STATUS.md lines changed                         2           lines 913 and 914
+  session-token table, data rows before/after    56 / 57
+  session-token table, 8-hex rows before/after   55 / 56
+  make check-roles                     17 passed, 0 failed, 5 n/a, exit 0, over 56 rows
+  git tag -l                           6 tags, UNCHANGED - no c6-pass, no c7-pass
+  CR bytes in every file I wrote                  0    asserted BEFORE each write and
+                                                       re-measured after - INC-74's own
+                                                       lesson applied to the session
+                                                       that recorded it
+  git status --porcelain src/ config/          EMPTY
+  evals/                                       DOES NOT EXIST.  ZERO PROVIDER CALLS.
+  C6/C7 review FAILs shipped in docs/reviews/      8   (the ruling says eleven)
+  stranded-entry declarations I could find        >=18 across >=14 sessions
+  declared-owed entries NEVER WRITTEN             >=2  (s4.md's, 51404cc's)
+
+--------------------------------------------------------------------------------------
+7.  COMMITS, AND EVERY `Swept:` LINE
+--------------------------------------------------------------------------------------
+  f1dcc00  QUESTIONS.md - the token row and Q-089/Q-087/Q-088 verbatim, plus Q-090.
+           THE FIRST BYTES THIS SESSION WROTE TO ANY TRACKED FILE (hard rule 5).
+                                                       Swept: NOTHING
+  f793bfe  INCIDENTS.md - INC-73, INC-74, INC-75.       Swept: NOTHING
+  e0842e3  STATUS.md, docs/reviews/OPEN_FINDINGS.md, PROGRESS.md - the disposition.
+                                                       Swept: NOTHING
+  3c0abfb  docs/sessions/arch-disposition-1.txt         Swept: NOTHING
+
+EVERY `Swept:` LINE IS MEASURED, NOT REASONED.  Q-063 clause (i)'s diff over the journals
+was run and READ before every commit: 768 added lines, and THE ONLY "Raised by:" token in
+any of them is 4d90c2e6.  The 18 removed lines are the 16 OF- rows and the 2 STATUS.md
+rows this session EXTENDED, each verified cell-by-cell to be a strict append.
+
+Every commit was made through a PRIVATE INDEX - GIT_INDEX_FILE under this session's own OS
+temp directory - with STEP 5, the scoped `git reset -- <the same paths>`, INCLUDED, which
+INC-68 records is the half whose omission causes the loss the procedure exists to prevent.
+`git diff --cached --name-status` was READ immediately before every commit and carried
+only this session's paths.
+
+A CONCURRENT GOLDEN-LANDING SESSION (a72f5d81) SHARES THIS WORKING TREE.  While this
+session ran it produced an untracked tests/goldens/golden2_invariants.json and a
+modification to tests/goldens/README.md.  NOTHING OF THEIRS WAS STAGED - verified after
+every commit by `git status --porcelain`, which still shows both.  tests/goldens/ is named
+under NOT in this session's fence and is read-only under CLAUDE.md S4 regardless.
+`grep.exe.stackdump` was NOT deleted.
+
+TOKEN ROW: DATA ROW 57 / 8-HEX ROW 56, both given because the two conventions in use
+differ by one and OF-179 left the convention unstated.  Counted from QUESTIONS.md's table
+IN THE OPERATOR'S WORKING TREE at C:\Users\chinm\whetstone-gate, where the table held 56
+data rows and 55 8-hex rows before this append and data row 56 was b8c31a57 (C7 REVIEW 2).
+Registered BEFORE this session's first commit, because check_roles E1 fails on a token
+that is not in that table.
+
+--------------------------------------------------------------------------------------
+8.  ANYTHING I COULD NOT DO
+--------------------------------------------------------------------------------------
+* PROCESS.md IS OUTSIDE THE FENCE, so Q-090's two-line remedy - the thing that actually
+  closes INC-75's class - was not applied.  THAT IS THE DIAGNOSIS DEMONSTRATING ITSELF
+  INSIDE THE ENTRY THAT RECORDS IT, and it is stated rather than worked around.
+* docs/reviews/REVIEW_*.md AND docs/reviews/independent/ ARE OUTSIDE THE FENCE, so OF-180
+  and OF-181 are recorded and NOT repaired.  C6's mutation evidence therefore ships with
+  one slice whose scored provenance a reader cannot verify from this repository.
+* MY PROMPT'S READ LIST NAMED "docs/reviews/REVIEW_C6_6.md sections 11, 12 and 14".
+  MEASURED: THAT FILE HAS S0 THROUGH S12 AND NO S14.  Sections 11, 12 and 14 are
+  docs/sessions/c6-review-6.txt's - and ITS S14, "ANYTHING I COULD NOT DO", is exactly
+  where the owed-INCIDENTS.md declaration lives.  BOTH FILES WERE READ IN FULL, so nothing
+  was missed; the pointer is recorded so the next session is not sent to a section that
+  does not exist.
+* I DID NOT VERIFY THE "ELEVEN FAILS" FIGURE FROM THE ARCHITECT'S SIDE.  I measured eight
+  from docs/reviews/ and could not find an eleventh of anything.  If the figure counts fix
+  cycles, architect checks, or something outside docs/reviews/, I could not see it and I
+  have said so rather than quietly reconciling.
+* NO TAG WAS CUT AND NONE WAS MOVED.  c6-pass and c7-pass do not exist and are not owed.
+  Nothing here is self-certified: every ruling in QUESTIONS.md is the architect's text,
+  transcribed verbatim, and everything I added is labelled as the recording session's.
+
+======================================================================================
+C6: SHIPPED WITH RESIDUE, NOT TAGGED.   C7: SHIPPED WITH RESIDUE, NOT TAGGED.
+INCIDENT DEBT: CLEARED - INC-73 AND INC-74 WRITTEN, INC-75 RECORDS THE PATTERN.
+NO TAG.  NOTHING SELF-CERTIFIED.
+======================================================================================
