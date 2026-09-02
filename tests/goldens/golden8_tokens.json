@@ -1,0 +1,141 @@
+{
+  "_comment": "GOLDEN 8 - TOKEN AND CALL ACCOUNTING. The accumulator state after a recorded API response's `usage` block, the 429 case, the exact boundaries in both dimensions, the per-model rule, and CONTEXT.md S13.4's N decision rule. Hand-derived by the ARCHITECT. READ-ONLY. PROCESS.md S5.2 golden 8. Consumed by C11, which is the FIRST session permitted to write a test against it. Integer tokens throughout; there is no float in this file.",
+
+  "the_rule_this_file_is_built_from": {
+    "_comment": "CLAUDE.md hard rule 12 and PROCESS.md S8, the four clauses, verbatim.",
+    "two_ceilings": "'No token spend unless your prompt explicitly sanctions it, naming the lane, a CALL CEILING AND A TOKEN CEILING, and a window. A sanction of max N calls alone is not a sanction: one spike episode burned ~300K tokens against a 200K-TPD lane.'",
+    "whichever_first": "'Before your first sanctioned call, read evals/usage/<model>-<date>.jsonl. ABORT AT WHICHEVER CEILING COMES FIRST. Report actual tokens BY MODEL.'",
+    "never_estimated": "Tokens are taken from the API's OWN `usage` field. NEVER estimated. The project's own character-per-token estimator (attacker.chars_per_token, Q-048) exists for CONTEXT SIZING and is not what this accumulator reads.",
+    "a_429_stops": "'A 429 means the window is already spent: STOP AND REPORT. NEVER RETRY INTO ANOTHER LANE.' The RUNNER backs off and re-queues WITHIN ITS OWN LANE; a SESSION does not."
+  },
+
+  "fixture_ceilings": {
+    "call_ceiling": 10,
+    "token_ceiling": 100000,
+    "inclusive": true,
+    "inclusive_note": "! BOTH CEILINGS ARE INCLUSIVE. A call that lands the lane EXACTLY on a ceiling is legal; the next token and the next call are not. Fixture C exercises both directions.",
+    "admission_rule": "A call costing t tokens is ADMITTED iff calls_used + 1 <= call_ceiling AND tokens_spent + t <= token_ceiling. The lane STOPS on the first refusal - it does not skip the offending call and continue.",
+    "why_the_admission_test_is_PROSPECTIVE": "Hard rule 12 says ABORT, not 'overspend and then abort'. The cost t is the call's OWN measured usage, so an accumulator that admits first and checks afterwards has already spent past the ceiling by the time it stops - which is precisely the failure the rule's own example records (~300K tokens against a 200K-TPD lane). ! THE ARCHITECT'S FIXTURE A STATES THE PROSPECTIVE OUTCOME IN TERMS - 'the fifth is refused at 88000+22000 > 100000' - so the reading is the architect's, not this session's, and it is recorded here rather than inferred silently."
+  },
+
+  "recorded_api_response": {
+    "_comment": "PROCESS.md S5.2's golden 8 asks for 'ONE RECORDED API RESPONSE FIXTURE WITH A KNOWN usage BLOCK -> the hand-computed accumulator state after it.' This is that response - fixture A's first call. ! THE `total_tokens` OF 22000 IS THE ARCHITECT'S. The prompt/completion SPLIT is THIS SESSION'S CONSTRUCTION, chosen only so the block has the shape a real response has; it sums to the architect's total and no expected value below reads either part.",
+    "model": "gemma-26b",
+    "usage": { "prompt_tokens": 18500, "completion_tokens": 3500, "total_tokens": 22000 },
+    "accumulator_state_after_it": { "calls_used": 1, "calls_unused": 9, "tokens_spent": 22000, "tokens_unspent": 78000, "stopped_by": null },
+    "what_the_accumulator_reads": "usage.total_tokens, and nothing else. ! IT DOES NOT ADD prompt_tokens AND completion_tokens ITSELF: providers differ on whether total_tokens includes reasoning or cached-read tokens, so a reconstructed total can silently disagree with the one the provider bills. C11's done-when - 'the usage file reconciles against API-reported totals' - is a reconciliation against total_tokens."
+  },
+
+  "fixtures": {
+    "A_tokens_bind_first": {
+      "purpose": "The TOKEN ceiling binds while the CALL ceiling still has room. Hard rule 12's 'whichever comes first', in the direction the spike actually failed.",
+      "model": "gemma-26b",
+      "offered_calls": [22000, 22000, 22000, 22000, 22000],
+      "expected": { "calls_admitted": 4, "calls_used": 4, "calls_unused": 6, "tokens_spent": 88000, "tokens_unspent": 12000, "stopped_by": "token ceiling", "stopped_at_call": 5 },
+      "arithmetic": "4 x 22,000 = 88,000, which is <= 100,000 and is admitted. The fifth: 88,000 + 22,000 = 110,000 > 100,000, REFUSED.",
+      "note": "! THE CALL CEILING NEVER BINDS HERE - four of ten calls used. An accumulator that tracks only calls runs all five and spends 110,000 against a 100,000 ceiling."
+    },
+    "B_calls_bind_first": {
+      "purpose": "The CALL ceiling binds while the TOKEN ceiling still has half its budget. The same rule in the opposite direction.",
+      "model": "gemma-26b",
+      "offered_calls": [5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000],
+      "expected": { "calls_admitted": 10, "calls_used": 10, "calls_unused": 0, "tokens_spent": 50000, "tokens_unspent": 50000, "stopped_by": "call ceiling", "stopped_at_call": 11 },
+      "arithmetic": "10 x 5,000 = 50,000, HALF the token ceiling. The eleventh call is refused because 10 + 1 > 10.",
+      "note": "! AN ACCUMULATOR THAT TRACKS ONLY TOKENS RUNS ALL TWELVE. A and B together are why hard rule 12 says a call ceiling alone is not a sanction and a token ceiling alone is not either."
+    },
+    "C_exact_boundaries": {
+      "purpose": "BOTH ceilings are INCLUSIVE, exercised on the boundary itself rather than near it.",
+      "model": "gemma-26b",
+      "part_1_token_boundary": {
+        "offered_calls": [50000, 50000],
+        "expected": { "calls_admitted": 2, "tokens_spent": 100000, "stopped_by": null },
+        "arithmetic": "50,000 + 50,000 = 100,000 EXACTLY. LEGAL - the ceiling is inclusive.",
+        "then_one_more_token": { "offered": 1, "expected_outcome": "REFUSED token ceiling", "arithmetic": "100,000 + 1 = 100,001 > 100,000." },
+        "note": "! A LANE THAT LANDS EXACTLY ON ITS TOKEN CEILING HAS NOT OVERSPENT. An accumulator written with >= refuses the second 50,000 call and reports 50,000 spent, leaving half the sanctioned budget unusable."
+      },
+      "part_2_call_boundary": {
+        "offered_calls": [1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000],
+        "expected": { "calls_admitted": 10, "calls_used": 10, "tokens_spent": 10000, "stopped_by": "call ceiling", "stopped_at_call": 11 },
+        "arithmetic": "The TENTH call is admitted and the ELEVENTH is refused. 10 x 1,000 = 10,000 tokens, a tenth of the token ceiling.",
+        "note": "The call ceiling is inclusive in the same direction: ten calls is legal, eleven is not."
+      }
+    },
+    "D_a_429_at_call_2": {
+      "purpose": "A 429 STOPS THE LANE. ! THE UNSPENT BUDGET IS THE POINT.",
+      "model": "gemma-26b",
+      "sequence": [
+        { "call": 1, "usage_total_tokens": 1000, "outcome": "ADMITTED" },
+        { "call": 2, "outcome": "429", "usage_total_tokens": 0 }
+      ],
+      "expected": { "calls_used": 1, "calls_unused": 9, "tokens_spent": 1000, "tokens_unspent": 99000, "stopped_by": "429", "retried": false, "other_lane_used": false },
+      "a_429_contributes_zero_tokens": "PROCESS.md S5.2's golden 8, verbatim: 'a 429'd call contributes ZERO tokens'. It also consumes NO call - the request was refused by the rate limiter and never ran, which is why NINE calls are unused rather than eight.",
+      "note": "! THE LANE STOPS WITH 99,000 OF 100,000 TOKENS AND 9 OF 10 CALLS UNUSED, AND THAT IS CORRECT BEHAVIOUR RATHER THAN WASTE. An accumulator that retries, or that spills into another model's lane to use the remaining budget, produces a HIGHER number here and violates hard rule 12 to do it. The unspent budget is what a correct implementation LEAVES ON THE TABLE, so a fixture that did not pin it could not tell the two apart.",
+      "runner_versus_session": "The RUNNER backs off with jitter and re-queues WITHIN ITS OWN LANE, and a 429 storm parks the lane (PROCESS.md S12.1's C11 row). A SESSION stops and reports. This fixture is the SESSION-level rule; C11's re-queue is lane-internal and does not cross into another model's budget."
+    },
+    "E_per_model_never_pooled": {
+      "purpose": "Ceilings are PER MODEL. Hard rule 12: 'Report actual tokens BY MODEL.'",
+      "lanes": [
+        { "model": "gemma-26b", "tokens_spent": 60000, "within_ceiling": true },
+        { "model": "gpt-oss-20b", "tokens_spent": 50000, "within_ceiling": true }
+      ],
+      "expected": { "pooled_total": 110000, "pooled_exceeds_ceiling": true, "either_model_alone_exceeds_ceiling": false, "correct_outcome": "BOTH LANES CONTINUE" },
+      "arithmetic": "60,000 + 50,000 = 110,000 > 100,000 POOLED. Neither 60,000 nor 50,000 exceeds 100,000 ALONE.",
+      "note": "! A SCORER THAT POOLS ABORTS A LANE THAT HAS BUDGET. That is the same class of error as fixture D's converse and it costs the run episodes it was entitled to.",
+      "the_architects_first_version_and_why_it_was_CORRECTED": "! RECORDED BECAUSE A FIXTURE THAT CANNOT FAIL IS THE DEFECT THIS PROJECT KEEPS FINDING. The first version of this fixture used 30,000 + 30,000 + 30,000. MEASURED: pooled that is 90,000 <= 100,000, so a POOLING accumulator does not abort; and the largest single model is 30,000 <= 100,000, so a PER-MODEL accumulator does not abort either. BOTH READINGS RETURN THE SAME ANSWER AND THE FIXTURE DISCRIMINATES NOTHING. The corrected vector puts the pooled total OVER the ceiling while leaving each model under it, which is the only shape that separates them."
+    },
+    "F_the_S13_4_N_rule": {
+      "purpose": "CONTEXT.md S13.4's N decision rule, which PROCESS.md S5.2 names as the reason golden 8 exists: 'the N decision rule KEYS OFF MEASURED TOKENS/EPISODE'.",
+      "boundary": 60000,
+      "boundary_is_inclusive": true,
+      "vectors": [
+        { "measured_tokens_per_episode": 24310, "N": 50, "why": "24,310 <= 60,000" },
+        { "measured_tokens_per_episode": 60000, "N": 50, "why": "60,000 <= 60,000 - THE BOUNDARY, INCLUSIVE" },
+        { "measured_tokens_per_episode": 60001, "N": 30, "why": "60,001 > 60,000 - ONE TOKEN OVER" },
+        { "measured_tokens_per_episode": 105290, "N": 30, "why": "105,290 > 60,000" }
+      ],
+      "note": "60,000 and 60,001 are the whole test. A rule written with < instead of <= selects N=30 at exactly 60,000, and CONTEXT.md S13.4's own wording is 'tokens/episode IS <= 60,000'.",
+      "config_keys": { "branch_a_n": "n_decision.branch_a_n = 50", "branch_b_n": "n_decision.branch_b_n = 30", "selected_branch": "n_decision.selected_branch = TODO_C14_PILOT", "measured": "n_decision.measured_tokens_per_episode = TODO_C14_PILOT" },
+      "THE_SECOND_CONJUNCT_THIS_FIXTURE_DOES_NOT_PIN": {
+        "_comment": "! MEASURED, RECORDED, AND NOT RECONCILED. A TRANSCRIBING SESSION MAY NOT SETTLE THIS. QUESTIONS.md Q-107.",
+        "the_rule_as_written": "CONTEXT.md S13.4, verbatim: 'N = 50 per arm per configuration IF the 31 Aug pilot's measured attacker tokens/episode is <= 60,000 AND THE PROJECTED TOTAL GEMMA LANE-TIME (S13.4) IS <= 32 h. Otherwise N = 30.' config/protocol.yaml's n_decision.branch_a_condition carries BOTH conjuncts too.",
+        "what_the_four_vectors_pin": "THE FIRST CONJUNCT ONLY. All four reproduce exactly under `N = 50 iff measured <= 60,000`.",
+        "where_the_two_readings_DIVERGE": "ON EXACTLY ONE VECTOR: 60,000.",
+        "the_measurement": "S13.4's own component table, re-evaluated with the attacker's per-episode figure replaced by the MEASURED one - 550 attacker episodes, benign solver 350 x 50K, gate judge 3 x 170 x 20 x 1.5K, tau2 user sim 370 x 20 x 1.5K, at 1.92M tokens per Gemma lane-hour: at 24,310 the projection is 57.27M = 29.83 h, which is <= 32 h, so BOTH readings give N=50. At 60,000 the projection is 76.90M = 40.05 h, which is > 32 h, so the TWO-CONJUNCT reading gives N=30 where the architect's vector says 50. At 60,001 and 105,290 the first conjunct already fails and both readings give N=30.",
+        "the_projection_reproduces_S13_4s_own_published_table": "76.90M and 40.05 h are S13.4's own printed figures for the N=50 branch, reproduced here by an independent script - so the divergence is not an artefact of a different projection formula.",
+        "S13_4_says_so_itself": "'The branch decision at the top of the rule does not move: N=50 IS 40.05 h ON EITHER ARITHMETIC AND FAILS THE <= 32 h TEST EITHER WAY.' Read strictly, that makes N=50 UNREACHABLE at the spec's own 60K/episode target.",
+        "why_this_is_recorded_and_not_decided": "N is a PRE-REGISTERED decision selected by C14's single-shot pilot, and config/ is a frozen artefact. A golden that quietly picked one reading would pin a branch selection that is not this session's to make. BOTH ANSWERS ARE RECORDED, NEITHER SIDE IS ADJUSTED, AND THE FOUR ARCHITECT-STATED VECTORS STAND AS THE FIRST CONJUNCT'S ORACLE."
+      }
+    }
+  },
+
+  "what_this_file_does_NOT_pin": {
+    "_comment": "! STATED RATHER THAN LEFT TO BE DISCOVERED AT C11's REVIEW, because one of these is a done-when clause and is therefore blocking.",
+    "THE_TRUNCATED_EPISODE_CASE": "! PROCESS.md S5.2's golden 8 asks for THREE things: 'One recorded API response fixture with a known usage block -> the hand-computed accumulator state after it; PLUS THE 429 CASE (a 429'd call contributes zero tokens) AND THE TRUNCATED-EPISODE CASE (COUNTED IN THE DENOMINATOR, PER RULE 11).' THE 429 CASE IS HERE, AT FIXTURE D. THE RECORDED RESPONSE IS HERE. THE TRUNCATED-EPISODE CASE IS NOT IN THIS FILE AT ALL. And PROCESS.md S12.1's C11 done-when names it explicitly - 'golden 8 reproduces (INCL. THE 429 AND TRUNCATED-EPISODE CASES)' - so as landed, that clause of C11's done-when cannot be satisfied against this file. Hard rule 11 is the one it serves: 'NO SILENT DENOMINATOR SHRINKAGE ... A TRUNCATED EPISODE IS COUNTED IN THE DENOMINATOR.' That is Razorpay's own B.9 and it is on PROCESS.md S14's NEVER-CUT list.",
+    "raised_not_taken": "A seventh fixture - an episode that stops mid-way against a ceiling or a 429, with its token cost, its category and its presence in the denominator all stated - would close it. THIS SESSION MAY NOT AUTHOR ONE: its prompt names fixtures A through F and instructs it to transcribe a derivation rather than author one, and tests/goldens/ is read-only to every other session, so the architect is the only hand that can add it. QUESTIONS.md Q-108, WITH A DEADLINE BEFORE C11 BUILDS.",
+    "the_lane_time_conjunct": "See fixtures.F_the_S13_4_N_rule.THE_SECOND_CONJUNCT_THIS_FIXTURE_DOES_NOT_PIN and QUESTIONS.md Q-107.",
+    "real_lane_ceilings": "The 10-call / 100,000-token ceilings here are FIXTURE ceilings chosen to make the boundaries legible. The run's real per-model limits live in config/lanes.yaml and are C11's to read; nothing in this file should be mistaken for one."
+  },
+
+  "derivation": {
+    "_comment": "What this session did, in the order it did it. Hard rule 3: a value produced by the code it tests proves nothing.",
+    "authored_by": "the ARCHITECT, who stated the fixture ceilings, all six fixtures' outcomes and the four N vectors, and issued them in the prompt that placed this file.",
+    "transcribed_by": "ARCH FIX, SESSION-TOKEN e1956729, 2026-09-03. This session TRANSCRIBED the architect's derivation and did NOT author one. The prompt/completion split inside recorded_api_response is this session's and is marked there.",
+    "step_a_independent_reimplementation": {
+      "what": "A standalone script in a FRESH OS TEMP DIRECTORY, outside the repository, implementing the accumulator from the TEXT of CLAUDE.md hard rule 12, PROCESS.md S5.2's golden 8 and CONTEXT.md S13.4, and run over all six fixtures.",
+      "imports_from_whetstone_gate": "NONE. The script imports sys and decimal from the standard library plus its own config walker, and nothing else. It makes NO PROVIDER CALL of any kind - every token figure in this file is stipulated, not spent.",
+      "constants": "n_decision's four keys READ FROM config/protocol.yaml by an indentation-aware path walker that DISCOVERED each key's full path rather than being given it.",
+      "no_float": "Token counts are integers end to end. The only Decimal in the script is the lane-hour projection in the second-conjunct measurement, which is not a token count and is quantized explicitly."
+    },
+    "step_b_comparison": {
+      "cells_compared": 33,
+      "mismatches": 0,
+      "what_was_compared": "A's four state fields plus its stop reason and stopping call; B's same six; C part 1's three plus the one-more-token refusal, and C part 2's four; D's seven; E's four; and F's four N selections. Each compared ONE AT A TIME.",
+      "rule_applied": "ANY DISAGREEMENT IS A STOP - neither side is adjusted, and both answers go to QUESTIONS.md.",
+      "the_one_place_a_SECOND_READING_DISAGREES": "! Fixture F's 60,000 vector, under CONTEXT.md S13.4's SECOND conjunct. The architect's four vectors reproduce EXACTLY under the first conjunct - which is the conjunct PROCESS.md S5.2 names golden 8 as pinning - and the two-conjunct reading gives N=30 at 60,000. BOTH ANSWERS ARE RECORDED, IN THIS FILE AND AT QUESTIONS.md Q-107, AND NEITHER SIDE IS ADJUSTED. No architect-stated cell was changed and no value in this file was produced by moving either side toward the other."
+    },
+    "the_wrong_answers_were_DRIVEN_not_asserted": "Every 'an accumulator that does X returns Y' note above was produced by RUNNING that accumulator over the same offers: tokens-only over B runs all twelve calls, calls-only over A spends 110,000, >= at C part 1 refuses the second 50,000 call, pooling over E aborts a lane with budget, and 30,000 x 3 leaves both readings agreeing.",
+    "no_test_consumes_this_file": "DELIBERATE. C11's BUILD is the FIRST session permitted to write one, on Q-087's precedent. A golden judged by a test from the hand that placed it is the circularity tests/goldens/README.md exists to prevent, one level down."
+  },
+
+  "consumed_by": "C11 - the runner. PROCESS.md S12.1's C11 done-when: 'the usage file reconciles against API-reported totals; golden 8 reproduces (incl. the 429 and truncated-episode cases); every dropped, errored, retried and truncated episode is counted, categorised and printable (rule 11)'."
+}
