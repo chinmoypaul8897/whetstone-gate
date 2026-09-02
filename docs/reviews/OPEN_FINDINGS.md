@@ -1622,3 +1622,97 @@ KILLED.** FIX 3's decision to open no id is upheld on the merits, not waved thro
 
 **No other session's line was touched by this append.** `Swept:` verified on the **STAGED SNAPSHOT**
 (`git diff --cached -- docs/reviews/OPEN_FINDINGS.md`), never on the working tree (`INC-48`).
+
+---
+
+## ⚠️ DISPOSITIONS BY C6 FIX 4 (`4b7f21ae`), 2026-09-02
+
+**APPEND-ONLY. No existing row was altered and no `Status` cell above this block was touched** — the
+convention this file has followed since `OF-65`: a row's `Status` stays as the raising review wrote
+it, and the closing session records the disposition beneath. **No new `OF-` id is raised by this
+session**, deliberately: the one defect it found in its own new code is `INC-59`, and an incident
+found and closed inside one session belongs in `INCIDENTS.md`, not in the open-findings register.
+⚠️ **That also avoids colliding with the concurrent C13 REVIEW 4 session (`7a1e6c84`), which holds
+`docs/reviews/` and is raising ids of its own** — the `INC-48` hazard, avoided by not needing a
+number rather than by racing for one.
+
+**`Q-082`'s ruling is what scopes this session**, and its last sentence is the operative one:
+*"This does not lift anything from C6: OF-124, OF-125 and OF-126 are all on owned properties."*
+
+### Closed
+
+* **`OF-124`** (`R-14`, `N15`'s class in COPY 2) — ✅ **CLOSED `7cbe908`.** One parametrised case in
+  copy 2 mirroring copy 1's, over a **real 20-turn episode**: three renderings read from `config/`
+  (bare paise, Indian-grouped rupees, and the **EPISODE** cap comma-grouped, so neither the number
+  nor the formatting is what is pinned), each asserted to be **inside the guard's own vocabulary**
+  so a fixture that drifted out of `_cap_formattings()` fails loudly instead of proving nothing.
+  ⚠️ **AND ITS OTHER SIDE**, which copy 1 has and copy 2 did not: `_AtTheEpisodeCapFolder` moves
+  **exactly** the §8.6 episode ceiling through `run_episode`'s own fold and the guard must stay
+  **silent** — without it the remedy is satisfied by deleting the exemption, which makes the guard
+  fire on a **correct** context, which is how a guard gets switched off (`INC-50`).
+  **The finding's exhibit was re-derived here before the fixture was written: `STATE SO FAR
+  (5000000): ` → HEAD 40 findings, all via LAYER 1 — `REVIEW_C6_4`'s figure exactly.**
+* **`OF-125`** (`R-15`, `N13`'s class in COPY 2) — ✅ **CLOSED `7cbe908`.** A two-, three- and
+  five-denial-line episode **driven through `run_episode`**, where the extra lines arrive as a
+  **WORLD tool result** that copy 2's counter walks (it iterates `context.parts`, not only the
+  authored ones) — this copy's own route, not copy 1's hand-built helper. Each finding is asserted
+  to **print the count it saw**, and turn 0 — which carries no history and therefore exactly one
+  line — is asserted **silent**, so the fixture cannot pass by leaking everywhere.
+  ⚠️ **AND THE OTHER HALF OF THE SAME CONDITION**, which nothing pinned in either copy through this
+  route: a summary carrying **zero** recognisable denial lines. *"A guard that cannot find the line
+  it is scanning must SAY SO rather than print 'no findings'"* — `REVIEW_C6_2`'s own import-walk
+  diagnosis, applied to `refusal_lines`.
+* **`OF-126`** (`R-20`, `OF-108`'s class at the range's other end) — ✅ **CLOSED `7cbe908`.** One
+  fixture at a **paginated** read (`full_listing_chars = 1600`; `Q-037` makes pagination mandatory),
+  with the base **derived, never written** — a literal `5521` would drift the moment
+  `config/protocol.yaml` moved, which is the discipline `N4`'s fixture already follows. Pinned
+  **both ways**: one token over at exactly `turn_budget` reads → `20`; exactly **on** the target →
+  `None`, which is the honest answer and is what stops the range being "repaired" by widening it.
+  **Re-derived here before the fixture was written, and it reproduces `REVIEW_C6_4` digit for
+  digit:** `per_read = 2,724`, `base = 5,521`, `tokens_at(19) = 57,277 ≤ 60,000 < tokens_at(20) =
+  60,001`, HEAD `crossing = 20`.
+* **`OF-132`** (a comment calling a substituted shape *"verbatim"*) — ✅ **CLOSED `7cbe908`.** The
+  comment now says what it is: the refusal-label case **is** `REVIEW_C6_3`'s exhibit verbatim; the
+  state-label case is `OF-104`'s **remedy** line, not its measurement table, and the substitution
+  (`arm 4` for `this arm`) is named as **exactly the digit the regex requires**. ⚠️ **`OF-104`'s
+  actual third exhibit is NOT added to the parametrize list and the comment says why** — it still
+  escapes both copies, so a row asserting a catch that does not happen would be red for a defect
+  outside this session's fence. It is `OF-127`, and it stays **OPEN**.
+
+### Raised and closed inside this session — recorded here as a pointer, not as a new id
+
+* ⚠️ **`INC-59` — this session's own self-directed mutant `SM-B` SURVIVED the full 783-test suite
+  against `7cbe908`.** The exclusivity check inside its three new fixtures — the half that makes a
+  mutant *die* rather than merely makes the suite go red — was written **inline** and was therefore
+  itself deletable with everything green. **That is the cell `REVIEW_C6_4` singled out as copy 1's
+  strongest work** (`_sole_killer`'s self-test, *"four separate mutations of it all die on that one
+  test"*), missing from copy 2. **CLOSED `da9fc96`** by `_sole_layer` — copy 2's own helper, not
+  imported from copy 1's — pinned by a self-test fired in **both** directions and with **two
+  different** single-layer shapes, so neither an always-raising helper nor one hard-wired to a
+  single fragment satisfies it. ⚠️ **`INC-56`'s matrix is one dimension short and `INC-59` supplies
+  it: for every fixture TWO things are deletable — the layer it fires, and the check that makes that
+  layer the SOLE firer. Both need a mutant.**
+
+### ⚠️ NOT fixed by this session, each with the reason — `Q-082`'s ruling, not convenience
+
+* **`OF-127`** (two of `OF-104`'s own three measured exhibits still escape **both** copies) —
+  🔶 **OPEN.** The ruled remedy was implemented faithfully and its regex requires a **digit** after
+  `arm`, so *"this arm runs a live judge"* and *"arm one"* reach it in neither copy. Closing it
+  means widening the surface scan's vocabulary, which is a behaviour change to a guard on
+  `REVIEW_C6_4`'s **MEDIUM** list and not among the three its §14 rests the verdict on.
+* **`OF-128`** (authored text appended to the STATE **line** escapes all three layers) —
+  🔶 **OPEN.** `R-06`'s by-construction proof is the mechanism: `state_json` **is** the whole body,
+  so the state line can never contribute residue. Not one of the three.
+* **`OF-133`** (46 of 118 needles escape when carried in `LAST_REFUSAL_LABEL`) — 🔶 **OPEN**, and it
+  is `OF-127`'s measured superset.
+* **`R-18` / `OF-129`** (`rglob` → `glob`) — 🔶 **OPEN**, latent: `attacker/` is flat today.
+* **`R-08` / `OF-130`** (`len(summaries) == 1` → `>= 1`) — 🔶 **OPEN.** No code path builds two.
+* ⚠️ **`R-12` and `R-05` / `OF-130` — OPEN, AND THEY ARE NOT MERELY UNFIXED, THEY MUST NOT BE
+  "FIXED".** In both, **HEAD is the STRICTER of the pair**: `R-12`'s mutant reports *fewer* findings
+  and its surface is §8.6's folded state, which **C7's ledger fills**; `R-05`'s mutant reports the
+  §8.6 system prompt's own tradecraft words as a leak, i.e. it is a **false-positive generator**.
+  **Changing either would install a wrong behaviour**, and this line exists so a later session does
+  not read *OPEN* as *owed*.
+
+**No other session's line was touched by this append.** `Swept:` verified on the **STAGED SNAPSHOT**
+(`git diff --cached -- docs/reviews/OPEN_FINDINGS.md`), never on the working tree (`INC-48`).

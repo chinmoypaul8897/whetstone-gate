@@ -6,6 +6,141 @@ not a record; this file is.
 
 ---
 
+## C6 — THE ATTACKER LOOP — **FIX** attempt 4 — 2026-09-02 — **THE THREE THAT CARRIED THE FAIL ARE CLOSED AND RE-MUTATED KILLED; ONE OF THIS SESSION'S OWN MUTANTS SURVIVED AND IS REPORTED**
+
+**SESSION-TOKEN:** `4b7f21ae` · **NOT in the batch.** Row **47**, registered **before this task's
+first commit**. "NIGHT RUN B" held **two** chunk tokens — `4b7f21ae` for C6 FIX 4 (TASK 1) and
+`d5c8039f` for the ARCH degradation record (TASK 2), row 48 — and they are **never crossed**;
+`make check-roles` E3 is what would catch it. ⚠️ **Two numbers, and this session says which it
+counted:** **48 is the DATA-ROW count**; `make check-roles` prints **one fewer** (`INC-54`).
+⚠️ **The two rows were appended BENEATH `7a1e6c84`'s, not above it** — the first draft put them
+between `ca0dd160` and `7a1e6c84`, which would have silently renumbered a **concurrent** session's
+row from 46 to 48 while its own paragraph three lines below still read *"`7a1e6c84` IS ROW 46"*.
+Caught by reading the diff before staging, which is `INC-48`'s remedy doing its job.
+
+**Pushed SHA:** see the FINAL OUTPUT in `docs/sessions/nightrun-b-1.txt`.
+**Verdict:** ⚠️ **NO TAG. A fix session does not certify its own work**; `git tag -l` gains nothing
+from this session. A fresh adversarial review follows.
+
+### What this session did
+
+**`Q-082` RECORDED VERBATIM BEFORE A LINE OF CODE CHANGED**, as hard rule 5 and the prompt require.
+⚠️ **And it arrived in a LONGER rendering than the one the concurrent C13 REVIEW 4 (`7a1e6c84`) had
+already recorded**, so **both now stand in `QUESTIONS.md` and neither is edited.** The discrepancy is
+named rather than smoothed and argued clause by clause: both carry the same two operative holdings
+(a guard-side survivor on an **owned** property is a FAIL even when the subject is clean; the gate is
+`PROCESS.md` §5.3's **required set**, survivors beyond it are MEDIUM findings), and the longer one
+adds only reasons plus the sentence that scopes this session — *"This does not lift anything from
+C6: OF-124, OF-125 and OF-126 are all on owned properties."* **No clause of one negates a clause of
+the other, so it is not a rule-1 STOP, and that judgement is recorded rather than assumed.**
+
+**`INC-56` WRITTEN BEFORE THE FIX** (hard rule 13's order), diagnosing the shape: C6 FIX 3 found
+copy 2 of claim 4's guard had never been fired at a leak **at all**, closed that for `OF-104`'s
+class, and did not carry `N13`'s or `N15`'s fixtures across — **the unit of repair is (class × copy),
+not (finding)**. **`INC-57` carried on REVIEW 4's behalf** — its harness restored with
+`git checkout --` from a HEAD that *held* the mutation, so every mutant re-applied its predecessor
+and **a defeated restore reports every mutant as KILLED**, the flattering direction. It is the
+**SIXTH stranded entry** (`Q-029`, `Q-033`, `Q-049`, `OF-89`, `REVIEW_C6_2`'s `M-9`, this).
+
+**THE THREE REMEDIES (`7cbe908`), each mirroring in copy 2 a fixture copy 1 already had, and each
+including the other side copy 1 has and copy 2 did not.** ⚠️ **`src/` IS UNTOUCHED: all three were
+COVERAGE defects, not wrong values, so this fix changes ZERO production behaviour** — and every
+exhibit reproduces identically afterwards, which is the check that proves it.
+
+* **`OF-124`** — three ceiling renderings read from `config/` (bare paise, Indian-grouped rupees,
+  the **EPISODE** cap comma-grouped) planted in `STATE_LABEL` over a **real 20-turn episode**, each
+  asserted to be **inside the guard's own vocabulary** so a drifted fixture fails loudly instead of
+  proving nothing. **Other side:** a fold moving **exactly** the §8.6 episode ceiling must leave the
+  guard **silent** — without it the remedy is satisfied by deleting the exemption, which makes the
+  guard fire on a **correct** context.
+* **`OF-125`** — a 2/3/5-denial-line episode driven through `run_episode`, the echo arriving as a
+  **WORLD** part because copy 2's counter walks `context.parts` — **this copy's own route**, not
+  copy 1's hand-built helper. **Other side:** a summary carrying **zero** recognisable lines, which
+  nothing pinned in either copy.
+* **`OF-126`** — a **paginated** read (`full_listing_chars = 1600`), base **derived, never
+  written**. Pinned **both ways**: one token over at exactly `turn_budget` reads → `20`; exactly
+  **on** the target → **`None`**, the honest answer, which is what stops the range being "repaired"
+  by widening it.
+* **`OF-132`** closed: the comment no longer calls a substituted shape *"verbatim"*.
+
+⚠️ **AND THE PART THAT MATTERS MORE THAN THE THREE: `SM-B` SURVIVED.** Mutating its **own** new
+code, as the ruling requires, this session neutered the **inline** exclusivity check inside its three
+new fixtures — the half that makes a mutant *die* rather than merely makes the suite go red — and
+**all 783 tests stayed green against the published `7cbe908`.** That is the exact cell `REVIEW_C6_4`
+singled out as copy 1's strongest work (`_sole_killer`'s self-test), missing from copy 2, **in the
+session that wrote `INC-56` diagnosing precisely that pattern in somebody else.** Reported before
+repair, then closed in `da9fc96` by `_sole_layer` — copy 2's own helper, **not** imported from
+copy 1's — pinned by a self-test fired in **both** directions with **two different** single-layer
+shapes, so neither an always-raising helper nor one hard-wired to a single fragment satisfies it.
+The three shapes were **measured against `run_episode`'s real output before being written down**.
+`INC-59`, whose `Missing` field supplies the dimension `INC-56`'s matrix lacked: **for every fixture
+TWO things are deletable — the layer it fires, and the check that makes that layer the SOLE firer.**
+
+### Mutation — on the SHIPPED subject, 12 run, 12 KILLED, plus the one that survived
+
+Fresh OS temp clones, `whetstone_gate.__file__` printed, baseline **784**, every restore by
+**writing the original bytes** (never `git checkout --`), digest asserted **back**, `git status`
+asserted **empty**, and a **full unmutated control asserted back to 784 after every restore**.
+
+| id | what | verdict | kills inside C6's files |
+|---|---|---|---|
+| `R-14` | copy 2 LAYER 1's exemption widened to the state LINE | ✅ KILLED | **4** — 3 cap shapes + the new self-test |
+| `R-15` | copy 2's `refusal_lines != 1` → `< 1` | ✅ KILLED | **3** |
+| `R-20` | `crossing()`'s `turn_budget` end narrowed | ✅ KILLED | **1** |
+| `SM-A` | a cap shape drifted OUT of the guard's vocabulary | ✅ KILLED | collection-time abort |
+| **`SM-B`** | **the INLINE exclusivity check neutered** | 🔴 **SURVIVED** at `7cbe908` | **0 — the finding** |
+| `SM-B2` | `_sole_layer`'s exclusivity clause dropped | ✅ KILLED | **1** |
+| `SM-B3` | `_sole_layer`'s identity clause dropped | ✅ KILLED | **1** |
+| `SM-B4` | `_sole_layer` inverted, always raises | ✅ KILLED | **8** — load-bearing at every call site |
+| `SM-C` | copy 2's state-JSON exemption deleted outright | ✅ KILLED | the new other-side test |
+| `SM-D` | `crossing()`'s range widened past the budget | ✅ KILLED | **1** |
+| `SM-E` | copy 2's denial count narrowed to AUTHORED parts | ✅ KILLED | **3** |
+| `SM-F` | copy 2's `refusal_lines != 1` → `> 1` | ✅ KILLED | **1** |
+| `SM-G` | copy 1's `_sole_killer` identity half deleted | ✅ KILLED | **1** — regression control, reproduces REVIEW 4's `R-02` |
+
+### ⚠️ THREE DEFECTS IN THIS SESSION'S OWN HARNESS — `INC-58`, each failing a different way
+
+1. **It printed `SURVIVED` for runs it could not read.** The parser took the last line mentioning
+   `passed`/`failed`/`error` — on a red run a traceback line — and defaulted `failed = 0`, so
+   *"I could not measure"* and *"nothing failed"* were the same value. `R-14` printed
+   `SURVIVED (expected: KILLED)`. **Caught only by the pre-declared expectation column**, which is
+   why that column, not the parser fix, is the guardrail worth recording. First run **discarded**.
+2. **Count-based verdicts would have reported a survivor as KILLED.** Most failures under any mutant
+   are `tests/test_repo_invariants.py`, not C6's. **Measured:** those tests run **alone** under a
+   live mutant give **18 passed, 0 failed**; paired with C6's file they fail; `git status` after is
+   **EMPTY**, so it is **in-process** state pollution, not the filesystem — and it appears **only
+   when a C6 test fails**, so it never touches a green run. Verdicts are therefore decided on
+   failures **inside C6's three files, BY NAME**. The polluting call was **not** isolated and is not
+   guessed at; the isolation weakness is named as somebody's to own.
+3. **It hung**, twice, at **0% CPU** — 24 minutes on a 3-minute run — producing no number at all.
+   `stdin=DEVNULL` added; the likely blocker (a test that spawns its own subprocess) is **named but
+   not proved**, since a third lane ran the same path four times without hanging.
+
+⚠️ **AND TWICE THIS SESSION WROTE A FABRICATED SHA INTO A `Fix:` FIELD WHILE DRAFTING**, catching
+both before staging. `INC-47`'s own diagnosis — *`Fix:` is bound to a commit and cannot be invented*
+— is a rule a session breaks by reflex precisely because hard rule 13 mandates writing the entry
+**before** the commit. The mechanical remedy is named as owed: **`check-roles` could resolve every
+`Fix:` SHA with `git cat-file` and fail on one that does not exist.**
+
+### Measured by this session, at the boundary
+
+| check | result |
+|---|---|
+| `make test` before the fix | **774 passed, 1 skipped, 2 deselected** |
+| `make test` after (and in every clone baseline) | **784 passed, 1 skipped, 2 deselected — 0 FAILED** |
+| `make check-roles` | **17 passed, 0 failed, 5 n/a — exit 0**; E2/E3 clean |
+| `git status --porcelain tests/goldens/` | **EMPTY** |
+| `src/` changed by TASK 1 | **nothing** |
+| provider model calls | **ZERO.** `evals/` does not exist and no commit touches an `evals/` path |
+
+**NOT fixed, and said so rather than left to be noticed** — `Q-082`'s ruling, not convenience:
+`OF-127`, `OF-128`, `OF-133` and the four LOW survivors. ⚠️ **`R-05` and `R-12` are cases where HEAD
+is the STRICTER of the pair — "fixing" either installs a wrong behaviour**, so *OPEN* must not be
+read as *owed*. **`docs/reviews/mutants/` is outside this session's fence, so `c6_mutants_5.md` is
+OWED to the next review**; the full table is in `docs/sessions/nightrun-b-1.txt` rather than skipped.
+
+---
+
 ## C13 — THE CaMeL COMPARATOR — **REVIEW** attempt 4 — 2026-09-02 — ✅ **PASS. ZERO BLOCKERS. `c13-pass` CUT.**
 
 **SESSION-TOKEN:** `7a1e6c84` · **NOT in the batch.** Row **46**, registered **before the Phase-1

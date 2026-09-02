@@ -1,0 +1,345 @@
+SESSION: "NIGHT RUN B" - TWO TASKS, TWO CHUNKS, TWO TOKENS
+  TASK 1  SESSION-TOKEN: 4b7f21ae   CHUNK C6    ROLE: FIX   ATTEMPT 4
+  TASK 2  SESSION-TOKEN: d5c8039f   CHUNK ARCH  ROLE: FIX   (the degradation record)
+
+PUSHED SHA: <written by the commit that follows this file; a commit cannot contain its
+            own hash. The journals commit is the last of TASK 1's content commits.>
+            TASK 1 commits, in order:
+              6b9af8f  Q-082 verbatim (BOTH renderings), token rows 47+48, INC-56 and
+                       INC-57 written BEFORE a line of code changed
+              7cbe908  the three remedies + OF-132's comment            (unreviewed)
+              da9fc96  SM-B's remedy: _sole_layer + its self-test       (unreviewed)
+
+!! NO TAG. A fix session does not certify its own work. A fresh adversarial review follows.
+!! SPEND: ZERO PROVIDER MODEL CALLS, EITHER TASK. `evals/` does not exist in this
+   repository and no commit of this session touches an `evals/` path - measured, not
+   asserted. Every client and every world in every run here is a mock.
+
+======================================================================================
+TASK 1 - C6 FIX 4 (4b7f21ae)
+======================================================================================
+
+VERDICT ON THE WORK ASKED FOR: the three findings REVIEW_C6_4 section 14 rests its FAIL
+on are CLOSED, and each one's mutant is re-run and KILLED on the SHIPPED subject. In
+addition this session's own mutants found ONE REAL DEFECT IN THE CODE IT HAD JUST
+WRITTEN; it SURVIVED the full suite, it is reported here before it was repaired, and it
+is closed. Twelve mutants now run on the shipped subject and twelve are KILLED.
+
+-- 0. Q-082, AND A DISCREPANCY THAT IS NAMED RATHER THAN SMOOTHED --------------------
+
+Recorded VERBATIM before a line of code changed, as hard rule 5 and the prompt require.
+!! The ruling arrived in a LONGER rendering than the one the concurrent C13 REVIEW 4
+   (`7a1e6c84`) had ALREADY recorded in QUESTIONS.md an hour earlier. BOTH NOW STAND IN
+   THE FILE AND NEITHER IS EDITED.
+   Checked clause by clause: both carry the same two operative holdings - (a) a
+   guard-side survivor on a property THE CHUNK OWNS is a FAIL even when the subject
+   measures clean, and (b) the gate is PROCESS.md S5.3's REQUIRED SET, survivors beyond
+   it being MEDIUM findings that do not hold the tag. The longer rendering adds only
+   REASONS and an APPLICATION, including the sentence that scopes this session:
+   "This does not lift anything from C6: OF-124, OF-125 and OF-126 are all on owned
+   properties."
+   No clause of one negates a clause of the other, so this is NOT a rule-1 STOP, and
+   that judgement is written down rather than left implicit.
+
+-- 1. THE INCIDENTS, WRITTEN BEFORE THE CODE (hard rule 13's order) -------------------
+
+INC-56  the fix that found copy 2 defenceless applied its own discovery to ONE class of
+        three. Diagnosis: the unit of repair is (class x copy), not (finding). Its
+        Missing field carries the matrix so the next session repairs against the matrix.
+INC-57  CARRIED ON REVIEW 4's BEHALF, attributed to `ca0dd160` in its first line. Its
+        harness restored with `git checkout -- <path>` from a HEAD that HELD the
+        mutation, so every mutant re-applied its predecessor and the counts ran
+        2/4/8/11/15/18 instead of 2/2/4/3/4/3. THE FAILURE DIRECTION WAS FLATTERING: a
+        defeated restore reports EVERY mutant as KILLED. This is the SIXTH STRANDED
+        ENTRY - Q-029, Q-033, Q-049, OF-89, REVIEW_C6_2's M-9, and this.
+INC-58  THREE defects in THIS session's own harness. Section 5 below.
+INC-59  SM-B - this session's own surviving mutant. Section 4 below.
+
+-- 2. THE THREE REMEDIES (7cbe908) ---------------------------------------------------
+
+!! src/ IS UNTOUCHED BY TASK 1. All three findings were COVERAGE defects - an assertion
+   deletable with the suite green - not wrong values. THIS FIX CHANGES ZERO PRODUCTION
+   BEHAVIOUR, and every exhibit reproduces identically afterwards, which is the check
+   that proves it rather than the claim that asserts it.
+
+Each remedy mirrors in COPY 2 a fixture COPY 1 already had, AND INCLUDES THE OTHER SIDE
+that copy 1 has and copy 2 did not.
+
+OF-124 (R-14, N15's class in copy 2)
+  Three ceiling renderings READ FROM config/ - bare paise, Indian-grouped rupees, and
+  the EPISODE cap comma-grouped, so neither the number nor the formatting is what is
+  pinned - planted in STATE_LABEL over a REAL 20-turn episode. Each shape is asserted to
+  be INSIDE the guard's own vocabulary, so a fixture that drifts out of the set the scan
+  searches for fails LOUDLY instead of proving nothing.
+  OTHER SIDE: `_AtTheEpisodeCapFolder` moves EXACTLY the S8.6 episode ceiling through
+  run_episode's own fold, and the guard must stay SILENT. Without it the remedy is
+  satisfied by DELETING the exemption, which makes the guard fire on a CORRECT context -
+  which is how a guard gets switched off. (Mutant SM-C proves this is load-bearing.)
+  EXHIBIT RE-DERIVED BEFORE THE FIXTURE WAS WRITTEN: STATE_LABEL="STATE SO FAR
+  (5000000): " -> HEAD 40 findings, all via LAYER 1. REVIEW_C6_4's figure exactly.
+
+OF-125 (R-15, N13's class in copy 2)
+  A 2/3/5-denial-line episode driven THROUGH run_episode, the extra lines arriving as a
+  WORLD tool result because copy 2's counter walks context.parts - this copy's own
+  route, not copy 1's hand-built helper. Each finding is asserted to PRINT the count it
+  saw, and turn 0 (no history, exactly one line) is asserted SILENT so the fixture
+  cannot pass by leaking everywhere.
+  OTHER SIDE: a summary carrying ZERO recognisable denial lines - the other half of
+  `refusal_lines != 1`, which nothing pinned in EITHER copy through this route. "A guard
+  that cannot find the line it is scanning must SAY SO rather than print 'no findings'"
+  is REVIEW_C6_2's own import-walk diagnosis, applied to refusal_lines.
+  !! MEASURED HONESTLY: this session's exhibit gives 6 findings where REVIEW_C6_4
+     reported 20. THE ROUTE DIFFERS AND THAT IS NOT GLOSSED - the echoed line lives in
+     the verbatim window for exactly verbatim_turns=6 later contexts. The finding's
+     polarity is what reproduces, not its magnitude.
+
+OF-126 (R-20, OF-108's class at the range's other end)
+  One fixture at a PAGINATED read (full_listing_chars=1600; Q-037 makes pagination
+  mandatory), with the base DERIVED, NEVER WRITTEN - a literal 5521 would drift the
+  moment config/protocol.yaml moved.
+  PINNED BOTH WAYS: one token over at exactly turn_budget reads -> 20; exactly ON the
+  target -> None, which is the honest answer and is what stops the range being
+  "repaired" by widening it. (Mutant SM-D proves the widening direction is pinned.)
+  EXHIBIT RE-DERIVED, AND IT REPRODUCES REVIEW_C6_4 DIGIT FOR DIGIT:
+    per_read = 6 x (ceil(1600/3) - ceil(240/3)) = 6 x (534 - 80) = 2,724
+    base = target - turn_budget x per_read + 1 = 60,000 - 54,480 + 1 = 5,521
+    tokens_at(19) = 57,277 <= 60,000 < tokens_at(20) = 60,001   HEAD crossing = 20
+
+OF-132 (a comment calling a substituted shape "verbatim")
+  The comment now says what it is: the refusal-label case IS REVIEW_C6_3's exhibit
+  verbatim; the state-label case is OF-104's REMEDY line, not its measurement table, and
+  the substitution (`arm 4` for `this arm`) is named as EXACTLY the digit the regex
+  requires. OF-104's actual third exhibit is deliberately NOT added, and the comment says
+  why: it still escapes both copies, so a row asserting a catch that does not happen
+  would be red for a defect outside this session's fence. That is OF-127, still OPEN.
+
+-- 3. MUTATION - ON THE SHIPPED SUBJECT, 12 RUN, 12 KILLED ---------------------------
+
+Method, and it is INC-57's remedy made mechanical:
+  - fresh OS temp clones; `whetstone_gate.__file__` PRINTED for every lane; this
+    repository was NEVER mutated;
+  - every anchor asserted to match EXACTLY ONCE, so a mutant that applied nowhere is
+    impossible; the file digest asserted CHANGED after applying;
+  - RESTORE BY WRITING THE ORIGINAL BYTES and committing them - NEVER
+    `git checkout -- <path>`, which is precisely INC-57's defect;
+  - after every restore: digest asserted BACK, `git status --porcelain` asserted EMPTY,
+    and a FULL UNMUTATED CONTROL asserted equal to the baseline (784 passed, 0 failed).
+    Every control in this session returned exactly 784/0.
+
+  id     target                                              verdict   kills in C6 files
+  -----  --------------------------------------------------  --------  -----------------
+  R-14   copy 2 LAYER 1's exemption widened to the state LINE KILLED    4
+  R-15   copy 2's `refusal_lines != 1` -> `< 1`               KILLED    3
+  R-20   crossing()'s turn_budget end narrowed                KILLED    1
+  SM-A   a cap shape drifted OUT of the guard's vocabulary    KILLED    collection abort
+  SM-B   THE INLINE EXCLUSIVITY CHECK NEUTERED                SURVIVED  0  <-- SECTION 4
+  SM-B2  _sole_layer's EXCLUSIVITY clause dropped             KILLED    1
+  SM-B3  _sole_layer's IDENTITY clause dropped                KILLED    1
+  SM-B4  _sole_layer INVERTED (always raises)                 KILLED    8
+  SM-C   copy 2's state-JSON exemption DELETED outright       KILLED    1
+  SM-D   crossing()'s range WIDENED past the budget           KILLED    1
+  SM-E   copy 2's denial count narrowed to AUTHORED parts     KILLED    3
+  SM-F   copy 2's `refusal_lines != 1` -> `> 1`               KILLED    1
+  SM-G   copy 1's _sole_killer identity half deleted          KILLED    1
+
+Killers, BY NAME rather than by count (section 5 explains why that distinction matters):
+  R-14  -> the three LAYER_1_scans_the_state_LABEL cases AND the new _sole_layer
+           self-test (blinding LAYER 1 also breaks the two-layer shape it asserts)
+  R-15  -> denial_line_COUNT_fires_on_a_summary_carrying_MORE_than_one[2, 3, 5]
+  R-20  -> the_crossing_is_pinned_at_the_TURN_BUDGET_END_of_its_range_BOTH_WAYS
+  SM-A  -> a COLLECTION error: the vocabulary assertion runs inside the parametrize
+           decorator, so a drifted cap shape takes the whole file down in 0.69s
+  SM-B2 -> the_sole_layer_helper_REJECTS_a_shape_that_TWO_of_copy_2s_layers_catch
+  SM-B3 -> the same self-test
+  SM-B4 -> EIGHT tests: every call site of the helper. It is load-bearing everywhere it
+           is used, not merely where it was introduced.
+  SM-C  -> the_LOOP_copys_LAYER_1_still_EXEMPTS_a_cap_LEGITIMATELY_inside_the_state_JSON
+           AND NOTHING ELSE IN 784 TESTS. !! This is the most valuable single result: it
+           proves the OTHER SIDE is load-bearing. Without it, a future session could
+           "fix" a red LAYER 1 by deleting the exemption.
+  SM-D  -> the_crossing_is_pinned_at_the_TURN_BUDGET_END_of_its_range_BOTH_WAYS
+  SM-E  -> denial_line_COUNT_fires_on_a_summary_carrying_MORE_than_one[2, 3, 5]
+  SM-F  -> the_LOOP_copys_denial_line_COUNT_ALSO_fires_when_the_summary_carries_NONE
+  SM-G  -> tests/test_c6_attacker.py::test_the_sole_killer_helper_REJECTS_a_shape_that_
+           two_layers_catch - a REGRESSION CONTROL on a surface this session did not
+           touch, reproducing REVIEW_C6_4's R-02 exactly.
+
+!! SUPERSEDED MEASUREMENTS, DISCARDED RATHER THAN CITED. An earlier three-lane run
+   measured the subject at `7cbe908`, BEFORE SM-B's remedy. Its verdicts are not
+   published here, because publishing a verdict against a subject that no longer exists
+   is the thing this project criticises. THE ONE NUMBER CARRIED FORWARD FROM IT IS
+   SM-B's SURVIVED - and it is carried because it was measured against a REAL PUBLISHED
+   COMMIT and it is the finding.
+
+-- 4. INC-59: THE MUTANT OF THIS SESSION'S OWN THAT SURVIVED --------------------------
+
+SM-B: the exclusivity check inside the three NEW fixtures - the half that makes a mutant
+DIE rather than merely makes the suite go RED - was written INLINE at three call sites:
+
+    off_target = [f for f in findings if "money ceiling" not in f]
+    assert not off_target, ...
+
+Replacing that comprehension with `[]` - deleting the check outright - left
+783 passed, 1 skipped, 2 deselected, ZERO FAILURES against the published `7cbe908`.
+
+!! AND THE SHAPE IS THE ONE INC-56 IS ABOUT, IN THE SESSION THAT WROTE INC-56.
+   REVIEW_C6_4 singled out copy 1's `_sole_killer` self-test as "the strongest single
+   thing in this fix" - four separate mutations of it all die on it. Copy 2's
+   exclusivity had NO self-test, and INC-56's own (class x copy) matrix did not contain
+   that cell. It was found by the MECHANISM the ruling exists to require, not by a
+   reviewer, which is the entire argument for the ruling.
+
+REMEDY (da9fc96), deliberately stronger than copy 1's:
+  - `_sole_layer(findings, fragment, shape)` - copy 2's OWN helper, NOT imported from
+    tests/test_c6_attacker.py's `_sole_killer`, with its own failure wording. A probe
+    that borrows the predicate it is checking cannot find a defect in the predicate, and
+    that argument covers the HELPER as much as the scan.
+  - Pinned by a self-test fired in BOTH directions and with TWO DIFFERENT single-layer
+    shapes - one better than copy 1's own self-test, which carries a single positive
+    shape. A helper that always raises fails the second half; a helper hard-wired to
+    "money ceiling" fails the third. Mutants SM-B2/B3/B4 all die on it.
+  - The three shapes were MEASURED against run_episode's real output BEFORE being
+    written into the docstring:
+        STATE SO FAR (<cap>):          -> 40 findings, ONE layer  (LAYER 1)
+        STATE SO FAR (DENIED <cap>):   -> 60 findings, TWO layers (LAYER 1 + LAYER 2b)
+        STATE SO FAR (DENIED once):    -> 20 findings, ONE layer  (LAYER 2b)
+  - The restore assertion CAPTURES ctx.STATE_LABEL's module default rather than writing
+    "STATE SO FAR: " down, so it cannot drift when context.py changes.
+
+INC-59 supplies the dimension INC-56's matrix lacked, stated so the next session repairs
+against it: FOR EVERY FIXTURE, TWO THINGS ARE DELETABLE - the layer it fires, and the
+check that makes that layer the SOLE firer. BOTH NEED A MUTANT.
+
+-- 5. INC-58: THREE DEFECTS IN THIS SESSION'S OWN HARNESS, EACH FAILING DIFFERENTLY ---
+
+(1) IT PRINTED "SURVIVED" FOR RUNS IT COULD NOT READ.  The parser took the last line
+    containing passed/failed/error - on a RED run that is a traceback line carrying
+    "AssertionError" - and defaulted `failed = 0`. So "I could not measure this run" and
+    "nothing failed" were THE SAME VALUE. R-14 printed:
+        R-14 MUTANT: NO SUMMARY LINE  [335s, exit 1]
+        R-14 => SURVIVED  (expected: KILLED)
+    Note `exit 1` and zero parsed failures four characters apart, and nothing compared
+    them. CAUGHT ONLY BECAUSE EVERY MUTANT CARRIES A PRE-DECLARED EXPECTED VERDICT.
+    That column - not the parser fix - is the guardrail worth recording. The whole first
+    run was DISCARDED, not patched up.
+    DIRECTION: unflattering. It INVENTS SURVIVORS. Which is exactly why it is dangerous
+    here: a session under a ruling that says "report every survivor" has every incentive
+    to believe one it did not measure.
+
+(2) COUNT-BASED VERDICTS WOULD HAVE REPORTED A SURVIVOR AS KILLED.  Reading killer NAMES
+    rather than counts showed most failures under any mutant are not C6's at all: R-14
+    reported 11 failed of which 4 are C6's; SM-D 11 of which 1; SM-B2 6 of which 1. The
+    rest are tests/test_repo_invariants.py. MEASURED, with R-14 applied AND COMMITTED in
+    a fresh clone:
+        tests/test_repo_invariants.py ALONE          -> 18 passed, 1 skipped, 0 FAILED
+        C6's file THEN the invariants                -> 5 failed, 56 passed, 3 ERRORS
+        the full suite after RESTORE (the control)   -> 784 passed, 0 failed
+        `git status --porcelain` after the paired run-> EMPTY
+    The empty git status is the informative one: NO TEST WROTE A TRACKED FILE, so this is
+    IN-PROCESS state pollution, not the filesystem. It appears ONLY WHEN A C6 TEST FAILS,
+    i.e. only under a mutant, so it can never affect a green run.
+    !! THE POLLUTING CALL WAS NOT ISOLATED AND IS NOT GUESSED AT. What is established is
+       the four measurements above. It is nonetheless a real test-isolation weakness in
+       this repository and is named as somebody's to own; tests/test_repo_invariants.py
+       is outside this session's fence in both directions.
+    REMEDY IN PLACE: the verdict is decided on failures whose test id is inside C6's own
+    three files, BY NAME, with the full-suite total reported BESIDE it rather than
+    instead of it. REVIEW_C6_1 set this precedent when it excluded the tau-2 tests for
+    the same reason - "they would kill every mutant including the control".
+    DIRECTION: flattering. It INVENTS KILLS.
+
+(3) IT HUNG.  Two lanes stopped dead on their second mutant - 24 minutes on a run that
+    takes three - with their pytest child at 0% CPU and a sub-megabyte working set.
+    Lanes stopped, processes cleared, `stdin=subprocess.DEVNULL` added, clones
+    `git reset --hard` back to the shipped subject and verified clean, six outstanding
+    mutants re-run. The likely blocker is NAMED BUT NOT PROVED: one test in
+    test_c6_fix_probes.py spawns its OWN subprocess, so a grandchild inherited a stdin
+    the harness never closed. A third lane ran the identical path four times without
+    hanging, so it is intermittent and "likely" is the honest word.
+    DIRECTION: neither. It produces NO NUMBER AT ALL while looking like a slow run. A
+    harness needs a timeout and a per-run duration sanity check; this one had neither.
+
+Three measurement defects in one harness in one session, NONE of them in the mutation
+logic and ALL THREE in the plumbing around it. That is the argument for INC-57's
+convention: a mutation harness is a MEASURING INSTRUMENT and is calibrated before it is
+believed.
+
+!! AND TWICE THIS SESSION WROTE A FABRICATED SHA INTO A `Fix:` FIELD WHILE DRAFTING -
+   once in INC-56, once in INC-58 - catching both before anything was staged and
+   replacing them with a statement of the fact. INC-47's own diagnosis is that `Fix:` is
+   bound to a commit and cannot be invented; it is a rule a session breaks BY REFLEX
+   precisely because hard rule 13 mandates writing the entry BEFORE the commit exists.
+   THE MECHANICAL REMEDY IS NAMED AS OWED, not built, because check_roles.py is outside
+   this fence: `check-roles` could parse every `Fix:` field and FAIL on an eight-hex
+   string `git cat-file` cannot resolve. That is a cheap whole-corpus check.
+
+-- 6. WHAT WAS DELIBERATELY NOT FIXED, AND WHY ---------------------------------------
+
+Under Q-082's ruling - not convenience, and each is in OPEN_FINDINGS with its reason:
+  OF-127  two of OF-104's own three exhibits still escape BOTH copies. The ruled remedy
+          was implemented faithfully; its regex requires a DIGIT after `arm`, so "this
+          arm runs a live judge" and "arm one" reach it in neither copy. Closing it is a
+          behaviour change to a guard, on REVIEW 4's MEDIUM list, not among its three.
+  OF-128  authored text appended to the STATE LINE escapes all three layers. R-06's
+          by-construction proof is the mechanism.
+  OF-133  46 of 118 needles escape in LAST_REFUSAL_LABEL - OF-127's measured superset.
+  R-18    rglob -> glob. Latent: attacker/ is flat today.
+  R-08    `len(summaries) == 1` -> `>= 1`. No code path builds two.
+  !! R-12 and R-05 ARE NOT MERELY UNFIXED - THEY MUST NOT BE "FIXED". In both, HEAD is
+     the STRICTER of the pair. R-12's mutant reports FEWER findings and its surface is
+     S8.6's folded state, which C7's ledger fills. R-05's mutant reports the S8.6 system
+     prompt's own tradecraft words as a leak - a FALSE-POSITIVE GENERATOR. Changing
+     either installs a wrong behaviour. Written down so a later session does not read
+     OPEN as OWED.
+
+OWED AND NAMED RATHER THAN SKIPPED: docs/reviews/mutants/ is outside this session's
+fence, so `c6_mutants_5.md` is OWED to the next review. Section 3's table is the record
+until then - the same debt C6 FIX 3 named and REVIEW 4 discharged for it.
+
+-- 7. MEASURED AT THE BOUNDARY, BY THIS SESSION ---------------------------------------
+
+  make test, clean tree BEFORE the fix      774 passed, 1 skipped, 2 deselected
+  make test / every clone baseline AFTER    784 passed, 1 skipped, 2 deselected, 0 FAILED
+  every post-restore control                784 passed, 1 skipped, 2 deselected, 0 FAILED
+  tests/test_c6_fix_probes.py alone         46 passed (45 before _sole_layer's self-test)
+  make check-roles                          17 passed, 0 failed, 5 n/a, exit 0; E2/E3 clean
+  git status --porcelain tests/goldens/     EMPTY
+  src/ changed by TASK 1                    NOTHING
+  provider model calls                      ZERO
+
+  The +10 from 774 to 784 is this session's: 3 cap shapes + 1 other side (OF-124),
+  3 denial counts + 1 zero-line (OF-125), 1 crossing boundary (OF-126), 1 _sole_layer
+  self-test. The concurrent C13 REVIEW 4 session landed only docs/ files
+  (testpaths = ["tests"], so its independent/*.py is not collected) - checked, not
+  assumed.
+
+  CRLF CHECKED, NOT ASSUMED (INC-44): both test files were ALREADY CRLF in the HEAD blob,
+  confirmed with `git cat-file` (which applies no filters), and every staged blob's CR
+  count equals its worktree's. No file has mixed endings.
+
+  !! THE cp1252 HAZARD HIT THIS SESSION TOO, for the SIXTH time on this machine
+     (INC-08/INC-25/OF-89/INC-45): a plain `print` of a STATUS.md cell died on
+     UnicodeEncodeError: 'charmap' codec can't encode '→'. Everything after that
+     went through PYTHONIOENCODING=utf-8.
+
+-- 8. CONCURRENCY, AND WHAT WAS NOT SWEPT --------------------------------------------
+
+A C13 REVIEW 4 session (`7a1e6c84`) ran concurrently and shared these journals; it has
+since PASSED and cut c13-pass. INC-48's hazard was live throughout and was handled by
+reading the STAGED SNAPSHOT every time, never the working tree:
+  - the token rows were appended BENEATH `7a1e6c84`'s, after a first draft put them
+    ABOVE it - which would have silently renumbered a concurrent session's row from 46
+    to 48 while its own paragraph still read "7a1e6c84 IS ROW 46";
+  - OPEN_FINDINGS.md changed on disk between this session's read and its edit; the edit
+    applied as a pure append (1 hunk, 94 insertions, ZERO deletions, at end of file) and
+    their block was verified intact;
+  - `git diff --cached --name-only` was checked before every commit. The concurrent
+    session's untracked docs/reviews/independent/c13_review4_mutants.py was NEVER staged.
+  - grep.exe.stackdump was left untouched, as instructed.
+
+======================================================================================
+TASK 2 - THE DEGRADATION RECORD (d5c8039f)
+======================================================================================
+
+<This section is written after TASK 1's hard gate is measured. If the gate did not hold,
+this section says so and TASK 2 was not started.>

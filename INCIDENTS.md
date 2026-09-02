@@ -4240,16 +4240,18 @@ names one site. So the natural unit of repair is *the finding's class in the cop
 named*, while the unit of exposure is *every class in every copy* — and nothing reconciles the two,
 so each review discovers the next unrepaired (class, copy) pair one at a time.
 
-**Fix:** ⚠️ **SHA NOT YET KNOWN AT THE MOMENT THIS ENTRY IS COMMITTED, AND IT IS NOT INVENTED —
-`INC-47`'s own diagnosis is that `Fix:` is bound to a commit and cannot be made up, and this entry
-is being written BEFORE the fix exists because hard rule 13 requires that order.** The commit that
-lands the remedy follows this one, and **its real SHA is written into this line by the immediately
-following commit of this same session (`4b7f21ae`)**, which is a fact a reader can check with
-`git log --follow -p -- INCIDENTS.md`. The remedy is three fixtures: a parametrised
-cap-in-`STATE_LABEL` case in copy 2 **with its other side** (`OF-124`), a two-denial-line episode
-driven through copy 2 (`OF-125`), and a `turn_budget`-end boundary fixture pinned in **both**
-directions (`OF-126`); plus this session's own self-directed mutants run against the **full** suite.
-The mutant re-runs and their KILLED counts are in `docs/sessions/nightrun-b-1.txt`.
+**Fix:** **`7cbe908`** — three fixtures: a parametrised cap-in-`STATE_LABEL` case in copy 2 **with
+its other side** (`OF-124`), a two/three/five-denial-line episode driven through copy 2 **plus the
+zero-line half nothing pinned either** (`OF-125`), and a `turn_budget`-end boundary fixture pinned
+in **both** directions (`OF-126`); plus `OF-132`'s comment. The mutant re-runs and their KILLED
+counts are in `docs/sessions/nightrun-b-1.txt`.
+⚠️ **THIS FIELD WAS EMPTY OF A SHA WHEN THIS ENTRY WAS FIRST COMMITTED, AND IT SAID SO RATHER THAN
+CARRYING A PLAUSIBLE ONE.** Hard rule 13 requires the entry before the code, so at that moment no
+fix commit existed; the first draft of this line held an **invented** eight-hex string, which was
+caught and replaced with a statement of the fact before anything was staged. **That is `INC-47`'s
+own defect — *`Fix:` is bound to a commit and cannot be invented* — very nearly landing inside the
+entry that cites it.** The history is checkable: `git log -p -- INCIDENTS.md` shows the placeholder
+commit and this one.
 
 **Systemic guardrail:** ⚠️ **PARTIAL, AND THE HALF THAT IS MISSING IS NAMED RATHER THAN IMPLIED
 AWAY.** What is now closed **by construction**: each of the three classes is pinned in **both**
@@ -4341,3 +4343,231 @@ by a session whose fence excluded `INCIDENTS.md`, carried here by a later one: `
 the fencing.** The remedy is the architect's and is not taken here: either `INCIDENTS.md` is inside
 every session's fence (it is append-only, so the collision risk is the one `INC-48` already
 describes) or every prompt that fences it out names who will carry the entry.
+
+---
+
+## INC-58 — the mutation harness written to fix `INC-57` printed `SURVIVED` for a run it could not read: "0 tests failed" and "I failed to parse the output" were the same value, and the only thing that caught it was a pre-declared expectation
+
+**Date:** 2026-09-02 (**C6 FIX 4, `4b7f21ae`. The failure is this session's own**, in the harness it
+wrote **to carry `INC-57`'s remedy**, roughly ninety minutes after committing `INC-57`. Caught by
+this session on the first mutant. Fix SHA under **Fix**.)
+
+**Event:** attempt 1 of this session's harness computed each run's verdict from a summary line it
+located as *"the last line containing `passed`, `failed` or `error`"*. On a **red** run that line is
+not pytest's counts line — it is a traceback line carrying `AssertionError`. The regex
+`(\d+) failed` then matched nothing and the code read
+`failed = int(m.group(1)) if (m := re.search(...)) else 0`, so **`failed` fell to `0` and the
+verdict printed `SURVIVED`.** The first mutant run was `R-14` — the very survivor this session had
+just written three fixtures to kill — and it printed:
+
+```
+[09:23:15]     R-14 MUTANT: NO SUMMARY LINE  [335s, exit 1]
+[09:23:15] R-14 => SURVIVED  (expected: KILLED)
+```
+
+**Action:** the run was stopped after that single verdict. The parser was rewritten to read
+**pytest's own last non-empty line** and to **`raise` when it cannot parse it** — *"REFUSING to
+report a verdict that was not measured"* is the assertion's own text. The clone was reset to the
+sealed subject commit, and every verdict from attempt 1 was **discarded rather than cited**; the
+only number carried forward from it is `R-14`'s, and it is carried forward as *"an artefact of my
+parser"*, not as a result. Re-run from scratch on three fresh clones.
+
+**Expectation:** `INC-57`, written by this same session that morning, says a mutation harness must
+prove its **restore**. It proved the restore and did not prove that it could **read its own
+output** — and `INC-57`'s own `Diagnosis` had already stated the general form: *"the harness cannot
+report its own defeat and the operator has only the counts to go on."*
+
+**Missing:** ⚠️ **an assertion reconciling the parsed counts with the process EXIT CODE**, which is
+one line and is now present. pytest exits `1` when tests fail and `0` when they pass; the log line
+above carries **`exit 1`** and **zero parsed failures** side by side, four characters apart, and
+nothing compared them. ⚠️ **Also missing, and cheaper still: a distinct sentinel.** `failed = None`
+for *"unparsed"* would have made the verdict unprintable; `failed = 0` made it printable and wrong.
+
+**Missed:** ⚠️ **the harness printed the words `NO SUMMARY LINE` and the session read past them.**
+That string was written *by this session, deliberately*, as the fallback for exactly this case — and
+it was emitted, logged, and treated as decoration rather than as an alarm, because the line after it
+carried a confident verdict. **A diagnostic that is printed beside a verdict is read as a footnote
+to the verdict.** ⚠️ **And one level up: `2.38s` and `335s` in the same table.** `SM-A`'s run took
+2.38 s (a collection error) and `R-14`'s 335 s; a harness whose per-mutant runtimes span two orders
+of magnitude is reporting two different kinds of event under one heading.
+
+**Diagnosis:** defaulting *"how many tests failed"* to `0` collapses *"I measured zero failures"*
+and *"I could not measure"* into the single verdict `SURVIVED`, so the harness's failure mode is
+indistinguishable from its most consequential result. ⚠️ **Unlike `INC-57`'s, this defect's direction
+is UNFLATTERING — it invents survivors, not kills — which is precisely why it is dangerous in this
+project: a session under a ruling that says "report every survivor" has every incentive to believe a
+survivor it did not measure.**
+
+⚠️ **A SECOND, INDEPENDENT MEASUREMENT DEFECT IN THE SAME HARNESS, FOUND WHILE THE RE-RUN WAS IN
+FLIGHT, AND IT RUNS THE OTHER WAY — IT INVENTS KILLS.** Reading the re-run's *killer names* rather
+than its counts showed that **most failures under any mutant are not in C6's files at all**: `R-14`
+reported **11 failed**, of which **4** are C6's; `SM-D` reported **11**, of which **1** is; `SM-B2`
+reported **6**, of which **1** is. The remainder are `tests/test_repo_invariants.py` — repository-
+hygiene checks. **Measured, not assumed:**
+
+| what was run, with `R-14` applied AND COMMITTED in a fresh clone | result |
+|---|---|
+| `tests/test_repo_invariants.py` **alone** | **18 passed, 1 skipped, 0 FAILED** |
+| `tests/test_c6_fix_probes.py` **then** `tests/test_repo_invariants.py` | **5 failed, 56 passed, 1 skipped, 3 ERRORS** — the 4 real C6 kills, plus `test_gitattributes_is_correct_and_in_the_first_commit` FAILED and three CRLF-check tests ERRORED |
+| the **full** suite | the same shape, at larger scale |
+| the full suite after RESTORE (the control) | **784 passed, 0 failed** — back to baseline exactly |
+| `git status --porcelain` after the paired run | **EMPTY** |
+
+So they are an **interaction effect inside one pytest process**, not a property of the mutant's
+subject, and they vanish on restore. ⚠️ **THE EMPTY `git status` IS THE INFORMATIVE ONE AND IT RULES
+OUT THE OBVIOUS EXPLANATION:** no test wrote a tracked file, so this is **in-process state
+pollution** — a module-level cache or a `check_roles` result computed once — and **not** the
+filesystem. ⚠️ **The precise polluting call was NOT isolated and is NOT guessed at here**; what is
+established is the five measurements above, and the one that matters for every other number in this
+session: **it appears only when a C6 test FAILS, which is to say only under a mutant, so it can
+never affect a green run** — the unmutated suite is `784 passed, 0 failed` every time it is
+measured. ⚠️ **It is nonetheless a real test-isolation weakness in this repository, it is somebody's
+to own, and it is named here rather than left inside a mutation log**: `tests/test_repo_invariants.py`
+is outside this session's fence in both directions. **The consequence is what matters: a
+verdict computed from the FAILURE COUNT would have reported a genuine survivor as KILLED**, because
+every mutant carries five to nine failures that have nothing to do with it. That is the flattering
+direction, and it is `INC-57`'s exact class arriving a second time in this session's own harness.
+**The remedy, already in place: the verdict is decided on failures whose test id is inside C6's own
+three files, BY NAME, and the full-suite total is reported beside it rather than instead of it.**
+`REVIEW_C6_1` set the precedent when it excluded the τ² tests from mutation scoring for the same
+reason — *"they would kill every mutant including the control."*
+
+⚠️ **AND A THIRD DEFECT IN THE SAME HARNESS, DIFFERENT IN KIND: IT HUNG.** Two of the three lanes
+stopped dead on their second mutant — **24 minutes on a run that takes three** — with their `pytest`
+child at **0% CPU and a sub-megabyte working set**, i.e. blocked rather than working. The lanes were
+stopped, the processes cleared, `sh()` was given **`stdin=subprocess.DEVNULL`**, the clones were
+`git reset --hard` back to the shipped subject and verified clean, and the six outstanding mutants
+were re-run. ⚠️ **The likely blocker is named but NOT proved: `tests/test_c6_fix_probes.py` contains
+one test that spawns its OWN subprocess** (the config-divisor probe, `subprocess.run([sys.executable,
+"-c", script], capture_output=True)`), so under the harness that grandchild inherited a stdin the
+harness never closed. **Lane F ran the identical code path four times without hanging, so it is
+intermittent, and "likely" is the honest word.**
+⚠️ **THIS ONE'S DIRECTION IS NEITHER FLATTERING NOR UNFLATTERING — IT IS SILENT**, and that is the
+point worth recording: the first defect invented survivors, the second would have invented kills,
+and the third produces **no number at all** while looking exactly like a slow run. **A harness needs
+a timeout and a per-run duration sanity check** — the same run had taken 3 minutes six times
+already — **and this one had neither.** Three measurement defects in one harness in one session,
+none of them in the mutation logic and all three in the plumbing around it, is the argument for the
+convention `INC-57` states: **a mutation harness is a measuring instrument and is calibrated before
+it is believed.**
+
+**Fix:** ⚠️ **NO SHA IS WRITTEN HERE YET AND NONE IS INVENTED.** The harness rewrite (parser reads
+pytest's own last line; an unparseable summary **raises**; killer names captured from the short
+summary) and the re-run of all twelve mutants on three fresh clones at `da9fc96` are what fixed it;
+the commit that lands this entry together with the re-measured numbers is the one that binds them,
+and **its real SHA is written into this line by the commit immediately following it**, checkable
+with `git log -p -- INCIDENTS.md`. ⚠️ **The harness itself is a throwaway temp-directory script and
+is deliberately NOT committed** (`CLAUDE.md` §4: *"throwaway work goes to a fresh OS temp directory,
+never into the repository"*), so what that SHA binds is the **record and the numbers** in
+`docs/sessions/nightrun-b-1.txt`, not the script — stated rather than left for a reader to discover
+a `Fix:` pointing at no code.
+⚠️ **AND THIS FIELD WAS FABRICATED ONCE WHILE BEING DRAFTED, WHICH IS RECORDED BECAUSE IT IS THE
+SECOND TIME TONIGHT.** `INC-56`'s `Fix:` carried an invented eight-hex string in its first draft and
+so did this one; both were caught before staging, by re-reading the field against `INC-47`'s rule
+rather than by any check. **`INC-47`'s diagnosis — *`Fix:` is bound to a commit and cannot be
+invented* — is a rule a session breaks by reflex when the entry is written BEFORE the commit, which
+is the order hard rule 13 mandates for exactly the entries that matter most.** The mechanical
+remedy, not taken here because `check_roles.py` is outside this session's fence: **`check-roles`
+could parse every `Fix:` field and fail on an eight-hex string `git cat-file` cannot resolve.** That
+is a real, cheap, whole-corpus check and it is named here as owed.
+
+**Systemic guardrail:** ⚠️ **ONE, AND IT IS THE THING THAT ACTUALLY WORKED, WHICH IS WHY IT IS
+WRITTEN DOWN RATHER THAN THE PARSER FIX.** Every mutant in this harness carries a **pre-declared
+expected verdict** in its own table row — `"KILLED"`, `"KILLED by my new OTHER-SIDE test"`,
+`"UNKNOWN - copy 2 has no self-test"` — and the harness prints `expected:` beside every result.
+**`R-14 => SURVIVED (expected: KILLED)` is the entire reason this was caught within one mutant
+rather than at the end of nineteen runs**, and the same column is what made `SM-B`'s genuine
+survival immediately legible as a *result* rather than as another parser fault. **A mutation table
+without an expectation column is a list of numbers with nothing to contradict them.** ⚠️ **The
+narrower mechanical guardrail is now also in place** — counts reconciled against the exit code, and
+an unparseable summary raising instead of defaulting — but it is the weaker of the two, because it
+closes this parser and not the class. ⚠️ **AND THE COUNT: this is the SECOND mutation-harness
+defect in one day** (`INC-57`'s, found in `REVIEW_C6_4`'s harness by this session; this one, in this
+session's own), **both in the restore-or-report path, and both invisible to every test in the
+repository because a mutation harness is by design not committed.** `INC-57`'s
+`Systemic guardrail` says a shared harness would be a shared predicate and hard rule 8 forbids it;
+that argument still holds, and the cost of it is now measured at two defects per day.
+
+---
+
+## INC-59 — the session that wrote `INC-56` — whose whole diagnosis is "the mechanism was applied once and not swept" — left the identical cell open in the code it wrote that hour, and its own mutant found it
+
+**Date:** 2026-09-02 (**C6 FIX 4, `4b7f21ae`. The failure is this session's own**, in `7cbe908`.
+Found by this session's own self-directed mutant `SM-B`, run against the full suite as its prompt
+and `Q-082`'s parent ruling require. Fix SHA under **Fix**.)
+
+**Event:** `7cbe908` closed `REVIEW_C6_4`'s three FAIL-carrying survivors with three fixtures in
+copy 2 of claim 4's guard. Each asserted exclusivity **inline**:
+
+```python
+off_target = [f for f in findings if "money ceiling" not in f]
+assert not off_target, ...
+```
+
+That check is the load-bearing half — `assert findings` alone is satisfied by *any* layer firing, so
+a leak caught two ways leaves every individual catcher deletable while the suite stays green, which
+is `REVIEW_C6_3`'s survivors `N12`/`N13`/`N14`/`N15` exactly. **Mutant `SM-B` replaced the list
+comprehension with `[]` — deleting the exclusivity check outright — and the full suite returned
+`783 passed, 1 skipped, 2 deselected`, ZERO failures.** Nothing anywhere fired that check at a shape
+two layers catch, so it could not tell the difference.
+
+**Action:** reported before repair (this entry, and `da9fc96`'s message, name the survival against
+`7cbe908` explicitly). Then: the inline check extracted into `_sole_layer`, **written by copy 2's
+own route and NOT imported from copy 1's `_sole_killer`**, and pinned by
+`test_the_sole_layer_helper_REJECTS_a_shape_that_TWO_of_copy_2s_layers_catch` — fired in **both**
+directions and with **two different** single-layer shapes, so neither a helper that always raises
+nor one hard-wired to a single fragment can satisfy it. The three shapes were **measured against
+`run_episode`'s real output before being written into the docstring**: `STATE SO FAR (<cap>): ` → 40
+findings, one layer; `STATE SO FAR (DENIED <cap>): ` → 60 findings, **two** layers;
+`STATE SO FAR (DENIED once): ` → 20 findings, one layer.
+
+**Expectation:** `INC-56`, committed by this session **three commits earlier**, states the remedy as
+a matrix — *"three layers × two copies, and `crossing()`'s three boundaries, written down in this
+entry so the next session repairs against the matrix rather than against the finding."* The matrix
+it wrote down covers the **layers**. It does not contain a row for **the helper that makes a layer's
+fixture load-bearing**, which is the cell `REVIEW_C6_4` had singled out as copy 1's strongest work:
+*"`_sole_killer` survives nothing … four separate mutations of it all die on that one test."*
+
+**Missing:** ⚠️ **the matrix in `INC-56` is one dimension short, and this entry supplies the missing
+one.** It reads (layer × copy). What it needs is **(layer × copy × *is the exclusivity of that
+fixture itself pinned?*)** — because for every fixture there are two deletable things, the layer it
+fires and the check that makes that layer the *sole* firer, and only the first was enumerated.
+⚠️ **Also missing: nothing lists, for either copy, which helpers exist and which have self-tests.**
+Copy 1 has `_sole_killer` with a self-test; copy 2 had an inline check with none, and establishing
+that took a mutant rather than a glance.
+
+**Missed:** ⚠️ **`REVIEW_C6_4` names the exact remedy, in the exact words, and this session quoted
+those words while writing `INC-56` and did not apply them to itself.** Its §3.1 is titled *"First,
+what did NOT survive — because it is the fix's strongest work"* and says the self-test *"fires it in
+the other direction too so it cannot be satisfied by a helper that always raises (`INC-50`)"*.
+`INC-56`'s own `Missed` field says of C6 FIX 3: *"the session generalised the diagnosis correctly in
+prose and then applied it to exactly the one class the review had named."* ⚠️ **That sentence
+describes this session, written by this session, about somebody else, in the same hour it was true
+of itself.** ⚠️ **And there was a mechanical signal too:** copy 1's fixtures call a **named helper**
+and copy 2's had a **copy-pasted three-line comprehension repeated at three call sites** — the
+duplication was visible in the diff.
+
+**Diagnosis:** a fix session repairs *against the finding*, and a finding names the property that
+leaked, never the assertion that makes the new test able to detect the leak — so the new test's own
+exclusivity check is created outside the scope of everything the session is reasoning about, and is
+unpinned by construction on the day it is written.
+
+**Fix:** **`da9fc96`** — `_sole_layer` plus its three-way self-test, and the three call sites routed
+through it. Re-mutated afterwards in three further forms mirroring `REVIEW_C6_4`'s own `R-01`/`R-02`/
+`R-03` against copy 1's helper — exclusivity clause dropped, identity clause dropped, helper
+inverted — with the verdicts in `docs/sessions/nightrun-b-1.txt`.
+
+**Systemic guardrail:** ⚠️ **PARTIAL, AND THE HONEST PART IS THE COUNT.** What is closed by
+construction: copy 2's exclusivity now lives in one named helper with a self-test fired three ways,
+so it is no longer deletable with the suite green — the same standing copy 1 has had since
+`f03d359`. What is **not** closed: nothing mechanically requires a *new* helper to arrive with a
+self-test, and a test asserting that would have to walk the test files' own call graphs, which is a
+predicate about the guards written in the guards' own repository — the shape hard rule 8 spends its
+whole argument refusing. ⚠️ **What this entry adds instead is the second dimension of `INC-56`'s
+matrix, stated so the next session repairs against it: FOR EVERY FIXTURE, TWO THINGS ARE DELETABLE —
+the layer it fires, AND the check that makes that layer the sole firer. Both need a mutant.**
+⚠️ **AND THE COUNT: this is the FOURTH consecutive C6 session to leave a live mutant in the code it
+had just written** — `4e1c8a92` (six, found by `REVIEW_C6_3`), `363a2e9f` (five of its own fourteen,
+found by itself), `ca0dd160`'s harness (`INC-57`), and this. ⚠️ **Two of the four were found by the
+author**, which is the ruling working; **`INC-53`'s `Systemic guardrail` said a ruling is not a
+mechanism, and four sessions later that is still true and still the best available.**
