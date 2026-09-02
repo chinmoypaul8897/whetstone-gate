@@ -376,7 +376,7 @@ Q-090 RAISED - Class B, OPEN, for the architect, NOT blocking:
            printed (CLAUDE.md S6 duty 1).                Swept: NOTHING
   73b2f6e  the `PUSHED SHA, THIS FILE` line filled with e2ea8f8, and nothing else.
                                                        Swept: NOTHING
-  <next>   THIS SECTION'S OWN CORRECTION - see below.   Swept: NOTHING
+  71be426  THIS SECTION'S OWN CORRECTION - see below.   Swept: NOTHING
 
 CORRECTION, RECORDED AGAINST THIS SESSION RATHER THAN SMOOTHED.  The line above read
 `3c0abfb` in the first draft of this file - A SHA THIS SESSION INVENTED as a
