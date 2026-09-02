@@ -1,0 +1,67 @@
+C13 REVIEW 4 - SCOPED REIMPLEMENTATION (Phase 1 seal)
+repo: C:\Users\chinm\whetstone-gate
+imports from src/: NONE (asserted at import time; sys.modules clean)
+
+-- R-1  requirements DERIVED from CONTEXT.md S8.5.1 (never transcribed) --
+   S8.5.1 window: '### 8.5.1' .. '### 8.5.2'  ->  3647 chars
+   [derived] the diagnosed-cause requirement                 phrase='on a cause that has been diagnosed'
+   [derived] the it-errored-is-not-a-cause clause            phrase='it errored is not a cause'
+   [derived] the harness-defect-is-never-branch-b clause     phrase='a harness defect is never branch b'
+   [derived] the PROTOCOL.md-before-the-branch requirement   phrase='protocol.md'
+   R-1 expected 4, derived 4  ->  PASS
+
+-- config/lanes.yaml camel_comparator, read by THIS FILE'S own parser --
+   branch               = TODO_C13_RUN1
+   branch_a_condition   = IT RUNS: both passes of the two-pass protocol complete inside the 90-minute box, from the same w ...
+   branch_b_action      = ship as a citation of Table 2, Appendix B ('Full results tables'), the o3 High block, banking co ...
+   branch_b_condition   = THE RUN DOES NOT COMPLETE, ON A CAUSE THAT HAS BEEN DIAGNOSED AND RECORDED IN PROTOCOL.md BEFORE ...
+   model_string         = google:gemini-2.0-flash-lite-001
+
+-- R-2  HEAD's branch_b_condition against the predicate --
+   expected 0 problems, got 0  ->  PASS
+
+-- R-3  HEAD's branch_a_condition carries the SUPERSEDED trigger? --
+   expected NO, got NO  ->  PASS
+
+-- R-4/R-5/R-6  the vectors --
+   OK  V01  exp=0 got=0  HEAD's own strong condition
+   OK  V02  exp=0 got=0  the strong condition, lower-cased
+   OK  V03  exp=0 got=0  the strong condition, upper-cased
+   OK  V04  exp=0 got=0  the strong condition with collapsed whitespace
+   OK  V05  exp=0 got=0  the strong condition with double quotes for single
+   OK  V06  exp=1 got=1  diagnosed-cause weakened to bare 'cause' (REVIEW 3's N-B)
+   OK  V07  exp=1 got=1  it-errored clause deleted
+   OK  V08  exp=1 got=1  harness clause INVERTED to SOMETIMES (REVIEW 3's N-C exhibit)
+   OK  V09  exp=1 got=1  PROTOCOL.md replaced by CONTEXT.md (REVIEW 3's N-D)
+   OK  V10  exp=2 got=2  two requirements weakened at once
+   OK  V11  exp=4 got=4  REVIEW 3's single fixture - the run does not complete
+   OK  V12  exp=4 got=4  the empty condition
+   OK  V13  exp=4 got=4  whitespace only
+   OK  V14  exp=4 got=4  an unrelated sentence
+   OK  V15  exp=0 got=0  extra prose appended
+   OK  V16  exp=0 got=0  extra prose prepended
+   OK  V17  exp=0 got=0  the phrase order permuted
+   OK  V18  exp=0 got=0  protocol.md in lower case
+   OK  V19  exp=0 got=0  backticks around PROTOCOL.md
+   OK  V20  exp=0 got=0  smart quotes around It errored
+   OK  V21  exp=1 got=1  'diagnosed' present but not 'on a cause that has been diagnosed'
+   OK  V22  exp=1 got=1  'harness' present, the clause absent
+   OK  V23  exp=1 got=1  'md' present, PROTOCOL.md absent
+   OK  V24  exp=1 got=1  'cause' present three times, the requirement absent
+   24 / 24 vectors agree  (docs/reviews/README.md asks for >= 20)
+
+-- R-5 restated as the property it exists for --
+   vectors weakening EXACTLY ONE requirement: 8
+   of those, vectors on which the predicate names EXACTLY ONE problem: 8
+   -> PASS - one weakening, one problem
+
+-- R-7/R-8  the sentinel refusal path, both readers --
+   R-7 require-shaped read RAISED: lanes.yaml: 'camel_comparator.branch_b_condition' is not yet determined (sentinel 'TODO_C14_PENDING')  ->  PASS
+   R-8 get-shaped read RETURNED 'TODO_C14_PENDING'  ->  PASS - this is N-I2's exhibit
+   and under the get-shaped read the sentinel yields 4 CONTENT complaints instead of a
+   refusal - which is exactly the difference REVIEW 3's N-I2 rested on.
+
+-- R-9  the branch VALUE itself is undecided, and the refusal is the answer --
+   branch: lanes.yaml: 'camel_comparator.branch' is not yet determined (sentinel 'TODO_C13_RUN1')  ->  PASS
+
+RESULT: ALL AGREE  (0 check(s) failed)
