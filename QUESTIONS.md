@@ -103,6 +103,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `5c2e8b74` | C6 | FIX | 2026-09-02 |
 | `7f4b0e93` | C6 | REVIEW | 2026-09-02 |
 | `b8c31a57` | C7 | REVIEW | 2026-09-02 |
+| `4d90c2e6` | ARCH | FIX | 2026-09-03 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -8219,3 +8220,162 @@ any chunk inherits a bounded set or chooses one again.**
 
 ⚠️ **THE ARCHITECT HAS ALSO FIXED THAT C6 SHIPS AFTER THIS REVIEW WHATEVER IT RETURNS**, so a ruling
 here changes no C6 outcome. It changes what C7, C13 and every chunk after them are measured against.
+
+---
+
+## ⚠️ RULINGS RECORDED BY ARCH DISPOSITION 1 (`4d90c2e6`), 2026-09-03 — Q-089 RULED, Q-087 RULED, Q-088 RULED, AND C6 AND C7 DISPOSED
+
+**All three are the text of this session's prompt, transcribed VERBATIM** — no paraphrase, no
+reordering, no abbreviation, capitalisation and punctuation included. `CLAUDE.md` hard rule 5.
+
+⚠️ **RECORDED FIRST, BEFORE ANYTHING ELSE WAS TOUCHED, AND THE ORDER IS STATED SO IT IS CHECKABLE.**
+Hard rule 5 says a ruling is recorded *"before anything else is touched"*. This block and this
+session's token row are the **first** bytes this session wrote to any tracked file: `INCIDENTS.md`,
+`docs/reviews/OPEN_FINDINGS.md`, `STATUS.md` and `PROGRESS.md` were all still untouched when it
+landed. **`C6 FIX 5` recorded that it had broken this rule and named the breach rather than leaving
+it to a diff; this session records that it did not, on the same standard.**
+
+⚠️ **NUMBERED FROM THIS FILE, RE-READ IMMEDIATELY BEFORE THIS APPEND.** The highest entry is
+**`Q-089`**, raised by **C6 REVIEW 6** (`7f4b0e93`). `INC-54` requires a session to say which tree it
+counted: **the operator's, at `C:\Users\chinm\whetstone-gate`**, at `HEAD` = `1b9cdc5`.
+**Token row: `4d90c2e6` · ARCH · FIX · 2026-09-03, appended as DATA ROW 57 / 8-HEX ROW 56**, both
+figures given because `OF-179` measured that the two conventions in use differ by one and left the
+convention unstated; the row beneath which it was appended is `b8c31a57` (C7 REVIEW 2). The row is
+written **before this session's first commit**, because `check_roles` **E1** fails on a token that is
+not in that table.
+
+⚠️ **A CONCURRENT GOLDEN-LANDING SESSION (`a72f5d81`) SHARES THIS WORKING TREE AND THESE JOURNALS.**
+Every commit of this session is made through a **PRIVATE INDEX** (`GIT_INDEX_FILE` under this
+session's own OS temp directory) with **step 5 — the scoped `git reset -- <the same paths>` —
+INCLUDED**, which `INC-68` records is the half whose omission causes the loss the procedure exists to
+prevent.
+
+---
+
+### Q-089 — RULED. The required set is fixed at the grain the outranking artefacts state it.
+
+> "Q-089 IS RULED, AND IT CLOSES A REGRESS THE ARCHITECT OPENED. Q-082 bounded the MUTANT set;
+> Q-084 moved the gate to the PROPERTY set; and the property set has no termination condition
+> either — C6 REVIEW 6 added three owned properties in Phase 2 by moving from PER CLAIM to PER
+> CATCHER PER COPY, and C7 REVIEW 2 sealed thirty-eight where REVIEW 1 sealed thirty-three. Each
+> step was defensible and the sequence does not converge.
+> RULED: THE REQUIRED SET IS FIXED AT THE GRAIN THE OUTRANKING ARTEFACTS STATE IT — the chunk card,
+> CONTEXT.md, a recorded ruling, a golden, or a hard rule. C6's card states FOUR claims: no policy
+> string, no hole, no attack list, no gate reason. That is FOUR owned properties, not thirteen
+> catchers across two copies. A REVIEWER MAY NOT SUBDIVIDE A STATED REQUIREMENT INTO IMPLEMENTATION
+> UNITS AND COUNT EACH AS OWNED. Sub-unit gaps are MEDIUM findings, published, and do not hold a tag.
+> This does not weaken Q-084, which stands: an ABSENT catcher for a STATED property is still an
+> unpinned property and still gates.
+>
+> AND TWO CHUNKS SHIP ON IT. C6 and C7 are DISPOSED as SHIPPED-WITH-RESIDUE. Neither is tagged and
+> neither gets another review cycle. Both returned ZERO BLOCKERS. Every finding their earlier
+> reviews failed them on is CLOSED and was verified independently — C7 REVIEW 2 re-derived the
+> architect's golden 5B correction by exhaustive search over 32 and then 1024 assignments and
+> reproduced all three digests. What remains in each is guard COVERAGE at sub-unit grain, published
+> in full. C6 has had SIX reviews and C7 TWO; between them they have produced eleven real FAILs,
+> every one shipped in docs/reviews/. THE REVIEW TRAIL IS THE EVIDENCE, AND IT IS STRONGER THAN A
+> TAG WOULD HAVE BEEN. C19's README states, for every chunk, whether it was adversarially reviewed,
+> how many times, and what residue is open — and states plainly that C6 and C7 carry open MEDIUMs."
+
+### Q-087 — RULED. The test is C8's.
+
+> "Q-087 — golden 5B is consumed by NO TEST, and tests/goldens/README.md designates C7's review as
+> the first session permitted to write one, which every review fence forbids. RULED: THE TEST IS
+> C8's. C8 reads golden 5B as an input and its build prompt will require it; a review session
+> writing a test was always the wrong reading of that sentence."
+
+### Q-088 — RULED. A review session declares the entry; the next non-review session writes it.
+
+> "Q-088 — the INCIDENTS.md tension above. RULED: a review session may not write to INCIDENTS.md,
+> and the entry it owes is DECLARED IN ITS FINAL OUTPUT and written by the NEXT non-review
+> session in that chunk's line. That is what this task is doing, and it is now the rule."
+
+---
+
+## ⚠️ THE RECORDING SESSION'S OWN MEASUREMENTS OF THE RULING'S CHECKABLE CLAIMS — AND ONE THAT DOES NOT REPRODUCE
+
+**`INC-47`'s test, applied to a RULING rather than to an incident, because a ruling is read as law and
+a wrong number inside one propagates further than a wrong number inside a journal.** Everything below
+`>` above is verbatim and unaltered; everything here is this session's measurement of it.
+
+| claim in the ruling | measured | verdict |
+|---|---|---|
+| *"C7 REVIEW 2 sealed thirty-eight where REVIEW 1 sealed thirty-three"* | `REVIEW_7_2.md` §2 heading: **"THE REQUIRED SET, AS SEALED — thirty-eight properties"**; `REVIEW_7_1.md` line 41 and §2: **"the REQUIRED SET: thirty-three properties"**, and its §13 reads **"39 REQUIRED-SET MUTANTS ACROSS ALL 33 SEALED PROPERTIES"** | ✅ **REPRODUCES, both halves** |
+| *"C6 REVIEW 6 added three owned properties in Phase 2 by moving from PER CLAIM to PER CATCHER PER COPY"* | `REVIEW_C6_6.md` §1: nineteen sealed, **three added in Phase 2 (`OP-20`, `OP-21`, `OP-22`)**; `Q-089`'s own text says the same and names the method | ✅ **REPRODUCES** |
+| *"C6's card states FOUR claims: no policy string, no hole, no attack list, no gate reason"* | `PROCESS.md` §12 (`plan.md`), the **C6** row's done-when, verbatim: *"the attacker's context provably contains **no policy string, no hole, no attack list and no gate reason**"* — **four, in that order, that wording** | ✅ **REPRODUCES EXACTLY** |
+| *"Every finding their earlier reviews failed them on is CLOSED"* | `REVIEW_C6_6.md` §3: **all six cells re-run and re-killed**; `REVIEW_7_2.md` §6–§8: **`B-2`/`OF-157` closed on eight of eight terms, `M12` KILLED, `M41` KILLED**. Both reviews' FAILs rest on properties **their own seals added**, not on unrepaired predecessors | ✅ **REPRODUCES** |
+| *"C7 REVIEW 2 re-derived the architect's golden 5B correction by exhaustive search over 32 and then 1024 assignments and reproduced all three digests"* | `REVIEW_7_2.md` §4.1 **SEARCH A — all 2⁵ = 32 assignments**, and the 1024-way second route; §4.2 **all three fifteen-field digests recomputed and matching**; §15 records it as obtained | ✅ **REPRODUCES** |
+| *"C6 has had SIX reviews and C7 TWO"* | `docs/reviews/` holds `REVIEW_C6_1`…`REVIEW_C6_6` (**6**) and `REVIEW_7_1`, `REVIEW_7_2` (**2**) | ✅ **REPRODUCES** |
+| ⚠️ *"between them they have produced eleven real FAILs, every one shipped in docs/reviews/"* | **MEASURED: EIGHT.** Every one of the eight review files above carries a FAIL verdict — C6 1–6 at `## VERDICT — **FAIL**`, C7 1 and 2 at `§15` / `# ⚠️ FAIL.` — so *"every one shipped in `docs/reviews/`"* is TRUE and the **count is 8, not 11**. Six reviews plus two reviews cannot produce eleven FAILs unless something other than a review file is being counted, and this session could not find eleven of anything in `docs/reviews/` bearing on C6 and C7 | ⚠️ **DOES NOT REPRODUCE — the ruling's own claim, transcribed unaltered above and measured here** |
+
+⚠️ **THE DISCREPANCY IS RECORDED, NOT CORRECTED, AND IT CHANGES NOTHING IN THE RULING.** Hard rule 5
+forbids editing a ruling into agreement with a measurement, and the number is not load-bearing: it is
+an argument that the review trail is long, and **eight adversarial FAILs across two chunks makes that
+argument as well as eleven would**. It is recorded because `INC-47`'s whole point is that an
+unverified number in a document read as authoritative is how this project's other overstatements got
+in — and because the architect is the one party in this repository whose claims no review session is
+fenced to check. **If eleven counts something this session could not see, the architect can say so
+and this row is the place it gets answered.**
+
+---
+
+## ⚠️ Q-088's RULING NARROWS `Q-033`'s, AND THAT IS SAID HERE RATHER THAN LEFT TO BE INFERRED FROM TWO FILES
+
+**This is the recording session's, not the architect's**, and it is the reason `Q-090` below exists.
+
+`Q-033`, **RULED 2026-08-31** and recorded verbatim in this file, reads: *"**THE FENCE WAS WRONG AND
+IS REMOVED. `INCIDENTS.md` IS APPEND-ONLY AND IS IN EVERY SESSION'S FENCE FROM NOW ON**"* — and it
+landed: `PROCESS.md` §2's `INCIDENTS.md` row carries **"⚠️ APPEND-ONLY, AND IN EVERY SESSION'S FENCE
+(Q-033, 2026-08-31)"** to this day, at line 178, quoting its reason.
+
+`Q-088`'s ruling above says *"a review session may not write to `INCIDENTS.md`"*. **That is the
+opposite instruction for review sessions**, and it is the later and more specific one, so it governs.
+**Both now stand in this file, and only this paragraph says which.** `PROCESS.md` is outside this
+session's fence and its §2 row still states the superseded rule without qualification.
+
+⚠️ **AND THE HONEST STATEMENT OF WHAT `Q-088` COSTS**, because a ruling that oversells itself is
+worse than the fence — `Q-033`'s own words, turned on its successor. `Q-033` removed the fence for a
+measured reason: *"recovery by the next session is a courtesy, not a control, and it depends on the
+fenced session having written the facts down somewhere a successor happened to read."* **`Q-088`
+reinstates exactly that dependency for review sessions, and this session is the evidence it is a real
+cost: the two entries it writes today were owed on 2026-09-03 and 2026-09-03 and are being written by
+the third session to hold the file.** What `Q-088` adds over the old fence is the **declaration duty**
+— the review must state the owed entry in its FINAL OUTPUT — and both reviews did that, which is why
+both entries could be written at all. **That is a control where the bare fence had none. It is not the
+same as the session writing it.**
+
+---
+
+### Q-090 — ⚠️ `PROCESS.md` §2 STILL CARRIES `Q-033`'s SUPERSEDED RULE, AND THE DECLARATION DUTY `Q-088` CREATES IS WRITTEN IN NO PROMPT TEMPLATE
+**Raised by:** ARCH DISPOSITION 1 (`4d90c2e6`) · **Date:** 2026-09-03 · **Status:** ⚠️ **OPEN — for
+the architect; NOT blocking, and the ruling was applied as written** · **Class:** **B** — it is about
+where a rule is written, not about a number.
+
+**Two mechanical gaps, both outside this session's fence, both stated as measurements.**
+
+1. **`PROCESS.md` line 178 contradicts `Q-088`.** Measured: the string
+   `APPEND-ONLY, AND IN EVERY SESSION'S FENCE` occurs there once, attributed to `Q-033`, with no
+   supersession marker. A session that reads `PROCESS.md` §2 and not this block will conclude its
+   fence is wrong when it names `INCIDENTS.md` under **NOT** — which is what `Q-088` and `OF-89`
+   record eight sessions concluding, correctly, under the old rule. **`CLAUDE.md` §1 makes this a
+   STOP-and-record; it is recorded here.** `PROCESS.md` is the architect's.
+2. **`Q-088`'s declaration duty is in no template.** The ruling makes an owed entry's survival depend
+   on the review DECLARING it in its FINAL OUTPUT. `PROCESS.md` §10's review template does not ask
+   for that line, and `CLAUDE.md` §6's eight end-of-session duties do not contain it. **Both reviews
+   this session serves declared it anyway, of their own discipline** — which `OF-67` says, with a
+   count, is exactly the state that precedes a loss.
+
+**Options seen:**
+  1. **One line in `PROCESS.md` §2's `INCIDENTS.md` row** — *"superseded for REVIEW sessions by
+     Q-088, 2026-09-03"* — and **one line in §10's review template**: *"declare any owed
+     `INCIDENTS.md` entry in the FINAL OUTPUT."* Cheapest, and it makes the ruling enforceable.
+  2. **A check.** `check_roles`-style: a review session's FINAL OUTPUT that names a defect of its own
+     must carry the word OWED. ⚠️ Cost: it greps prose, which is the class of check `INC-71`
+     measured firing on seven correct entries.
+  3. **Nothing** — accept that the duty rides on reviewer discipline, and say so in `PROCESS.md`
+     rather than leaving it unstated. ⚠️ Cost: this is the status quo `INC-75` measures at eight
+     occurrences.
+
+**Default taken pending a ruling: NONE — `PROCESS.md` is outside this session's fence and no default
+was available.** The gap is recorded in `INCIDENTS.md` **`INC-75`**'s `Systemic guardrail` as the
+thing that would close the class, and named there as **not done**.
