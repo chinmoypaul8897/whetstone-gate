@@ -6,7 +6,7 @@ SESSION-TOKEN: 6d1c8f37   ROLE: BUILD   DATE: 2026-09-03
 PUSHED SHA: 9498811   (this session's last content commit; both of its commits
                        are on origin/main - verified with
                        `git branch -r --contains`, both return `origin/main`)
-PUSHED SHA, THIS FILE: <next>
+PUSHED SHA, THIS FILE: 4bce9ed
 
   Note on HEAD: `git rev-parse HEAD` reads db27c379 rather than 9498811. That is
   the CONCURRENT C8 BUILD 1 session (`2b6ee014`) committing on top, and it pushed
@@ -16,7 +16,8 @@ PUSHED SHA, THIS FILE: <next>
 COMMITS, IN ORDER
   3680c91  feat: the four artefacts + tests/test_c14_prereg.py   (unreviewed)
   9498811  docs: the journals - Q-098..Q-101, INC-79..INC-81, OF-185..OF-187
-  <next>   docs: this file
+  4bce9ed  docs: this file
+  <this>   docs: this file's PUSHED SHA placeholder filled with 4bce9ed
 
 TOKEN SPEND: ZERO PROVIDER MODEL CALLS. ZERO TOKENS OF ANY KIND. NO LANE TOUCHED.
              `evals/usage/` not read because nothing was spent and nothing was
