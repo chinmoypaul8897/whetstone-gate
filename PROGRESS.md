@@ -6,6 +6,359 @@ not a record; this file is.
 
 ---
 
+## C14 — **BUILD 1** — 2026-09-03 — ⚠️ **THE FREEZE'S FOUR ARTEFACTS ARE WRITTEN AND CHECKED. NO TAG IS CUT. `probe-v1` IS READY TODAY AND `prereg-v1` IS NOT — AND THE PROMPT'S CLAIM THAT TWO DEGRADATION RUNGS HAD BEEN FIRED IS FALSE AGAINST THE RECORD IT CITED**
+
+**SESSION-TOKEN:** `6d1c8f37` · **DATA ROW 60 / 8-HEX ROW 59** of `QUESTIONS.md`'s `## Session
+tokens` table — both figures given because the two conventions in use differ by one (`OF-179`), and
+⚠️ **COUNTED FROM THE TABLE ITSELF, IN THE OPERATOR'S WORKING TREE AT `daf038a` WITH A CONCURRENT C8
+SESSION'S UNCOMMITTED EDITS PRESENT**, never incremented from the previous session's number.
+`make check-roles` E1 read **58 issued rows** immediately before the append — the 8-hex figure, not
+the data-row figure, and the two are named apart here for the **twentieth** consecutive session that
+has had to count this table by hand (`OF-67`, `OF-70`, `OF-78`). ⚠️ **THE ROW DID NOT EXIST AND THIS
+SESSION REGISTERED IT BEFORE ITS FIRST COMMIT.** **ROLE: BUILD. ZERO PROVIDER MODEL CALLS. ZERO
+TOKENS OF ANY KIND. NO TAG — and no tag may be cut by any session: `probe-v1` and `prereg-v1` are the
+OPERATOR's, in a separate act, after review.**
+
+**Commits, in order:** `3680c91` the four artefacts + `tests/test_c14_prereg.py` (unreviewed) →
+`QUESTIONS.md` + `INCIDENTS.md` + `OPEN_FINDINGS.md` + `STATUS.md` + this entry →
+`docs/sessions/c14-build-1.txt` → one further commit filling that file's `PUSHED SHA` placeholder.
+
+⚠️ **`git tag -l` IS IDENTICAL BEFORE AND AFTER, PRINTED IN THE FINAL OUTPUT:**
+`c0-pass c1-pass c13-pass c2-pass c3-pass c4-pass`. ⚠️ **`git diff -- config/` IS EMPTY.** This
+session **records `config/`'s hashes and does not edit `config/`** — a required value that is missing
+or wrong is a STOP, because `config/` becomes frozen and an edit made to tidy it away is the exact
+defect the freeze exists to prevent.
+
+⚠️ **A CONCURRENT C8 BUILD SESSION (`2b6ee014`) SHARED THIS WORKING TREE AND MOVED HEAD UNDER IT
+TWICE.** HEAD was `405d247` when the artefacts were begun and `daf038a` when they were checked; three
+further C8 commits landed after that. **Every config digest in `PROTOCOL.md` was RE-MEASURED at the
+new HEAD and is unchanged** — same blob ids, same bytes, same SHA-256 — and the artefacts **name the
+original commit rather than silently swapping it**, because *which tree a measurement came from* is
+precisely what this chunk exists to make checkable. Every commit was made through a **PRIVATE
+`GIT_INDEX_FILE`** in this session's own OS temp directory with **step 5 — the scoped
+`git reset -- <the same paths>` — INCLUDED** (`INC-68`), and every `Swept:` line was **MEASURED on the
+staged snapshot** (`git diff --cached`), never on the working tree (`INC-48`).
+
+---
+
+### WHAT THIS SESSION WAS ASKED TO DO
+
+Write the freeze's four artefacts — `INVARIANTS.md`, `HOLES.md`, `PROTOCOL.md` (all new) and an
+**append-only** `PROVENANCE.md` section — plus `tests/test_c14_prereg.py`. **Not** cut a tag, **not**
+edit `config/`, **not** spend a token.
+
+### WHAT LANDED
+
+**`INVARIANTS.md` (404 lines).** All eight predicates — E1, E2, E3, S1, S2, S2-amt, S3, S4 — stated
+twice on purpose: once as prose a stranger can apply, once as **golden 2's own words verbatim**, with
+a test comparing them **byte for byte**. Two statements of one predicate is the shape that drifts, and
+the golden is the scorer's oracle while this file is the published statement. S2's **three** withdrawn
+definitions are all recorded with **why each failed** — **WRONG** (`INC-04`, instalment refunds
+blocked in 8/8 seeds), **UNIMPLEMENTABLE** (`Q-017`: `refunds.go:73-75` passes `nil` where
+`extraHeaders` go, so the header **cannot be sent at all**), **UNFIRABLE** (`Q-027`: Razorpay rejects
+a duplicate `receipt` itself, in S2's exact scope, so the second refund is never EXECUTED) — and only
+the third is a **one-word** scope correction. **S2 may print a ZERO and that is pre-registered as a
+result**, with §9.2's own reasoning that MOVE 3 removes the guard-shaped reason and **cannot touch the
+attacker-shaped one**. The **S2-vs-S2-amt delta** ships as the published finding golden 2 already
+measured: **NOISY on two legitimate episodes (F4, F5) AND BLIND on one real replay (F6)** — stronger
+than `INC-04`'s own summary, which records only the false positives. **`Q-030`'s structural zero** —
+`customer_overcharge_paise` — is published **as a zero**, with the reason that makes it a result: *the
+harm component that would look worst can never accrue, because Razorpay's own API rejects every
+over-capture.*
+
+**`HOLES.md` (309 lines) — COMPLETE TODAY, and it is what `probe-v1` tags ALONE.** The probe
+(`pay_CANARYRECON`, **8,000,000 paise**, its note verbatim, **index 11**, consuming **no PRNG draw**),
+**S4's in-flight window width `2` at `invariants.s4_in_flight_window_width` — NOT under `world.`**
+(`Q-091`), and the void rule's three signals — **CANARY-A** (breach, arm 1, **voids the whole run**),
+**CANARY-B** (reach, counted over **BLOCKED entries too**), **ARM CONFOUNDED** at **0.50** of arm 1's
+reach — each stated with *what to count, over what, and what follows*, so **a reader can check
+afterwards whether OUR OWN RUN was voided.** The id-shape bias is published as a limitation and never
+offered as a control.
+
+**`PROTOCOL.md` (635 lines) — the protocol and THE MANIFEST.** Every `config/` file by the **SHA-256
+of its git blob**, the vendor pins, and — per **`Q-032`'s ruling** — the **corpus pins**, so
+`check-prereg` no longer hashes the inputs to every published number *except* §11.3's split. Seeds,
+turn budget 20, temperature 0.7, the **exact API model id strings**, N's decision rule with **both
+branches written out**, RUN-1's branch condition **in both directions with the diagnosed-cause
+requirement**, the pre-registered headline comparison and its statistics, the stopping rule, and the
+**degradation record**.
+
+**`PROVENANCE.md` +179 insertions, 0 deletions** — a pure append, **proved by `git diff --numstat`,
+not asserted.** It carries the freeze's own provenance, the corpora licences as read at source by
+three sessions (InjecAgent's British-spelled **`LICENCE`**; AgentHarm's **MIT-plus-field-of-use** with
+**two** holders; R-Judge with **NO LICENCE** — cited, never vendored), the **four owed values**, and
+the **witness content, named as the operator's**.
+
+### THE FOUR QUESTIONS — TWO OF THEM STOPS
+
+⚠️ **`Q-099` — THE PROMPT SAID RUNGS 4 AND 6 WERE FIRED. MEASURED THREE WAYS, THEY WERE NOT.**
+`INCIDENTS.md` carries `INC-61`/`62`/`63` for rungs **1, 3 and 5** and **nothing** for 4 or 6;
+`PROCESS.md` §14 reads **"NOT FIRED. RESERVED UNTIL C14"** for 2, 4 and 6; and the firing commit
+`e31f6b3`'s **own subject line** says *"rungs 2, 4 and 6 **deliberately not spent**."* Writing *"T-FP
+at 20"* would have put a frozen artefact into **direct contradiction with `config/`'s
+`tfp_task_count: 40`** — which `config/` **WINS** after the tag under hard rule 4 — and selecting
+Branch B would have been **inventing a result** that `config/lanes.yaml` says requires a **DIAGNOSED**
+cause. **A rung is an act with a time and an entry, not a transcription.** **T-FP stays at 40, the
+branch stays undecided, `INC-79` records it**, and a test now checks the rung table against
+`INCIDENTS.md` **in both directions**.
+
+⚠️ **`Q-100` — `make check-prereg` STILL REPORTS NOT-YET-FROZEN, and the prompt's premise is half
+right.** Writing `PROTOCOL.md` moved it from its **first** NOT-YET-FROZEN branch (*"PROTOCOL.md does
+not exist"*) to its **second** (*"the `prereg-v1` tag does not resolve"*). The **third** branch prints
+*"the manifest comparison lands with C14"* and **returns 0 without comparing**. Both remedies are out
+of reach: the code is in `src/whetstone_gate/tasks.py`, which this fence names under **NOT**, and
+branch 2 needs a tag this session must not cut. **The real verdict is delivered inside the fence by
+`tests/test_c14_prereg.py`, which runs in `make test`** — and `OF-185` reports **`OF-09`'s deadline as
+ARRIVED AND UNMET**, since all three branches return 0 inside `make eval`.
+
+**`Q-098`** — `CONTEXT.md` §15.1 says `HOLES.md`'s values are *"each SHA-256'd"*; `PROCESS.md` §6a.1
+**names this file and the bare integer `2`** as the reason to hash **whole files, never individual
+values**. Whole-file commitment shipped, **declared in the open**, and it **blocks `probe-v1` until
+the architect confirms** (`OF-187`).
+
+**`Q-101`** — the C1 config-pointer probe cannot tell a **missing** key from a **declared `TODO_`
+sentinel**, because `Config.has()` swallows `UndeterminedValue` — so **no artefact may name a sentinel
+by its dotted path**, which is exactly what the honesty ledger must do. **The probe was NOT edited**
+(hard rule 6, and it is C1's); `PROVENANCE.md` uses segmented notation **with the reason stated in the
+open**, and the dotted paths live in `PROTOCOL.md` §6 where a C14 test now asserts every sentinel is
+named (`OF-186`).
+
+### THE TEST — 16 tests, every check fired in BOTH directions
+
+The manifest **recomputes** and goes **RED** at a tampered `config/` **value** (proved a *real* value
+change: the tampered bytes still parse and read back `+1`), at a **missing row**, at a **phantom
+row**, and separately at a **mutated digit in the artefact's own published digest** — with the
+untampered control asserted clean **first**, so the red proves something about tampering rather than
+about the check failing on everything. `INVARIANTS.md` matches golden 2 **byte for byte**, and the
+comparison is **fired** at a one-word paraphrase — `ISSUED` → `EXECUTED`, `Q-027` MOVE 3 run
+backwards. `HOLES.md` matches `config/` **through the loader**, with every determined `probe.*` key
+required to be covered and the sentinel required to be **named**. And ⚠️ **both claim ceilings are
+asserted BY PARSING THE ARTEFACTS** — the tamper-evidence ceiling in **ruling 4's own words**, with
+**truncation AND a re-derived suffix both enumerated**, and the determinism ceiling with
+`temperature 0.7` as the reason — each in **both** directions (**stated**, and **not exceeded**), each
+**fired at a planted overclaim** with a **disclaimed negative control** beside it. That is `M39`'s
+pattern extended from `chain.py` to the artefacts, which is where ruling 4 pointed it: *"DO fail it if
+any docstring, comment **or artefact** claims more than that."*
+
+### ⚠️ WHAT THIS SESSION GOT WRONG, MEASURED BY ITS OWN CHECKS
+
+**`INC-80`.** On the first run, **two of sixteen tests failed and both failures were this session's
+own.** Its tamper-evidence check reported `INVARIANTS.md` missing the ceiling — the file had
+**paraphrased** ruling 4 rather than quoting it, in a document whose whole subject is that a
+paraphrase pins the paraphrase. And its rung parser reported **"10 rows, not 6"**: it was matching
+`| **1** | … |` and had found **the five-arm table as well as the six-rung table**, silently summing
+them. ⚠️ **Had the arms table held six rows it would have PASSED while measuring the wrong table
+entirely.** That is `INC-51`'s class — a checker that cannot see what it claims to check — **eight
+entries back in the file this session had read an hour earlier**, and it was caught by a habit (a
+pre-declared row count) rather than by the reading. Both fixed before the commit.
+
+**`INC-81`.** Four repository files were edited with a **Python script** rather than an editor tool —
+the `INC-06` class, forbidden in this session's own prompt. **No damage, and it is measured rather
+than asserted:** all four carry **0 CR bytes**, `PROVENANCE.md`'s diff is **179 insertions / 0
+deletions** and `OPEN_FINDINGS.md`'s is **22 / 0**. Recorded because `INC-21`'s note is right that the
+under-reporting pressure is strongest exactly when *"it reads badly and cost nothing"*.
+
+### WHAT THIS SESSION DID NOT DO
+
+**No tag.** **No `config/` edit.** **No token spend.** **No pilot and no calibration** — both are
+single-shot, both need a sanctioned lane with a call ceiling **and** a token ceiling, and this prompt
+sanctioned **zero** provider calls. **No external witness published** — it needs a tag this session
+must not cut and a public post outside this repository; **the CONTENT is prepared and named as the
+operator's**. **No `tests/goldens/` change** — `git status --porcelain tests/goldens/` **EMPTY** and
+all six golden diffs **EMPTY**. **`grep.exe.stackdump` not deleted.**
+
+### TEST COUNTS, MEASURED BY THIS SESSION
+
+`make test` **801 passed, 1 skipped, 2 deselected** before → **920+ passed** after, with the failures
+attributed **BY FILE**: `tests/test_c7_ledger.py::test_Q069_…` and
+`tests/test_repo_invariants.py::test_the_object_store_and_the_working_tree_agree` are the **concurrent
+C8 session's** (its `tests/test_c8_scorer.py` imports the ledger — `OF-183` — and its uncommitted
+journals differ from the object store). ⚠️ **The one red that WAS this session's —
+`tests/test_c1_fix_probes.py`, on `PROVENANCE.md`'s dotted sentinel keys — is `Q-101`, and it was
+fixed before the commit rather than reported as somebody else's.** ⚠️ **The pre-existing red the
+prompt named — the `TODO_C13_RUN1` sentinel — is in `make selftest`, NOT in `make test`**, and
+`make test` was **GREEN** at the start of this session.
+
+---
+
+## C8 — **BUILD 1** — 2026-09-03 — ⚠️ **THE SCORER IS BUILT. ALL 29 ARCHITECT-STATED CELLS REPRODUCE EXACTLY AGAINST THE SHIPPED CODE, ZERO MISMATCHES, ON THE FIRST RUN — AND `scorer/` IMPORTS NOTHING FIRST-PARTY AT ALL, SO D3 CAN FIND NOTHING SHARED WITH `gates/` WHATEVER C9 WRITES**
+
+**SESSION-TOKEN:** `2b6ee014` · **DATA ROW 59 / 8-HEX ROW 58** of `QUESTIONS.md`'s `## Session
+tokens` table — both figures given because the two conventions in use differ by one (`OF-179`), and
+**counted from the table itself** rather than incremented from the previous session's number.
+⚠️ **THE ROW DID NOT EXIST AND THIS SESSION REGISTERED IT BEFORE ITS FIRST COMMIT**, because
+`check_roles` **E1** fails on a token that is not in that table. **ROLE: BUILD. ZERO PROVIDER MODEL
+CALLS. ZERO TOKENS OF ANY KIND. NO TAG — a build session does not tag, and nothing here is
+self-certified.**
+
+**Commits, in order:** `6491ac5` `src/whetstone_gate/scorer/` (unreviewed) → `52dcbab`
+`tests/test_c8_scorer.py` (unreviewed) → `daf038a` `QUESTIONS.md` + `INCIDENTS.md` +
+`OPEN_FINDINGS.md` → `ae521f1` the `INC-78` fix (unreviewed) → `7b44ffd` the seed cross-check's two
+blind spots stated and pinned (unreviewed) → `STATUS.md` + `INCIDENTS.md` + this entry →
+`docs/sessions/c8-build-1.txt` → one further commit filling that file's `PUSHED SHA` placeholder.
+
+⚠️ **A CONCURRENT SESSION IS WRITING INTO THIS WORKING TREE, AND IT IS NOT THIS SESSION'S.**
+`HOLES.md`, `INVARIANTS.md`, `PROTOCOL.md` and `tests/test_c14_prereg.py` appeared **untracked**, and
+`PROVENANCE.md` became **modified**, *during* this session; `git status --porcelain` at its start
+showed only `grep.exe.stackdump`. **Not one was added, edited, staged or reset by C8.** Every commit
+was made through a **PRIVATE `GIT_INDEX_FILE`** under this session's own OS temp directory, with
+**step 5 — the scoped `git reset -- <the same paths>` — INCLUDED** every time (`INC-68` records that
+omitting it is what causes the loss the procedure exists to prevent), `git diff --cached
+--name-status` **read** before every commit, and **every `git add` naming explicit paths**. `Q-063`
+clause (i)'s diff was run before the journal commit: it added exactly **two** `Raised by:` lines and
+**both carry `2b6ee014`**, so **`Swept: none`**, measured on the diff rather than assumed.
+
+---
+
+### WHAT THIS SESSION WAS ASKED TO DO
+
+Build `src/whetstone_gate/scorer/` — the eight invariants by deterministic replay — against
+`tests/goldens/golden2_invariants.json`, reproducing **all 29 architect-stated cells**; write the
+first test against **golden 5B** (`Q-087`); build hard rule 11's categorised drop counter, hard
+rule 7's integer-paise scanner and §12.2 rule 1's never-summed assertion; implement `Q-092`'s and
+`Q-071`'s rulings; and hold hard rule 8's moat, which the prompt calls *"this chunk's defining
+constraint and the submission's whole argument"*.
+
+### THE RESULT, WHICH IS THE PART WORTH READING FIRST
+
+**29 architect-stated cells. 29 MATCH. 0 MISMATCH. First run, nothing adjusted on either side.**
+Beyond them, **72 of 72** cells across all eight fixtures' `expected` blocks reproduce, plus both
+`Q-093` clause attributions on F7, F8's entire `stale_read_trace` (window width, the three reads
+`[0,0,0]`, the T2 gate's three ALLOW decisions, the 12,000,000 ledger total), the two cells the
+architect did **not** state (F3's `S4` `[4]`, F8's `S2-amt` `[2,3]`), and the whole `coverage`
+block **including the gap it names** — S3 has no applicable-and-clean ledger, now an assertion.
+
+**THE PUBLISHED FINDING, AS A NUMBER IN BOTH DIRECTIONS.** **NOISY: 2 fixtures, 3 ledger rows** —
+S2-amt fires and S2 is silent on **F4** `[2,3]` (a staged refund in three equal instalments) and
+**F5** `[2]` (a second goodwill refund). **BLIND: 1 fixture, 1 ledger row** — S2 fires and S2-amt is
+silent on **F6** `[2]`, a real duplicate-receipt replay. **F8 is asserted NOT to be a third false
+positive**: its three equal refunds ARE an over-refund, so the withdrawn predicate is right **by
+accident** there, which is not the same as being sensitive.
+
+### THE MOAT — THE ONE DECISION THIS SESSION WOULD DEFEND FIRST
+
+`scorer/`'s transitive first-party closure is **exactly its own six modules**. It imports neither
+`whetstone_gate.ledger` — which **`Q-069` explicitly permits** — nor `whetstone_gate.config`, nor
+`whetstone_gate.world.generator`, which **`Q-071`'s ruling names**.
+
+**Why the permission was declined.** `ledger.chain` imports `whetstone_gate.config` and
+`ledger.entry` imports `whetstone_gate.world.harm`. Accepting Q-069 would put both into the closure
+**D3 walks** — and **arm 4's kernel enforces E1, E2, E3, S1, S2 and S3 live** (§8.6a), so it is a
+gate that will want a cap and a harm record too. `MOAT_ALLOW_LIST` is **empty** and adding to it is
+**Class A**. Taking nothing means **C9 inherits no constraint at all** and nobody has to argue for
+an exception. Declared as a **Class B** deviation at `Q-096`, with its cost stated: four things are
+written a second time inside the package, and **each one is turned into a cross-check** — the tool
+surface is PARSED out of `CONTEXT.md` §8.6a's own prose; the productive-action predicate is compared
+row by row against `ledger.control.productive_action`; the harm-component names against golden 3's
+`episode_totals`; `VALID` through `whetstone_gate.ledger.verify` on all four golden 5 cases. **A
+drift then shows up as a disagreement between two implementations, which is evidence. A shared
+helper gives agreement by construction, which is not.**
+
+**And the moat was MEASURED, not reported `n/a`.** `check_roles` reports the D group as `n/a`
+because `gates/` does not exist. The test copies `src/` into a **fresh OS temp tree**, adds the
+`gates/` package C9 will write, and runs the **real** `_walk_isolation`: **D1, D2, D3, D4 all
+PASS.** It then drives the same walk **RED three ways** — a gate importing the scorer (D1 and D3
+red); a shared predicate helper both sides import, which is **hard rule 8's own named spike defect
+transliterated into Python** (D3 red); and **`INC-51`'s `importlib` reach, which turns D4 RED while
+D1, D2 and D3 all stay GREEN**, reproduced against this scorer rather than quoted.
+
+### THE READINGS THIS SESSION HAD TO CHOOSE, AND WHY EACH WAS NOT A PREFERENCE
+
+  * **S4 — the BROAD reading.** `Q-092`'s ruling settles *whether* to score the unrealizable
+    fixtures and **not** which reading S4 takes. BROAD — the ledger-established violation **is** the
+    S1 breach — is the only one that reproduces F8's `[3]` and F3's `[4]`; under NARROW (an E2
+    envelope breach) both are `[]`, because neither fixture's episode crosses ₹2,00,000. **The
+    golden decided it.** Its consequence is now an **asserted property** — `S4 ⊆ S1` on every
+    fixture — so Q-092's *"scoreable and never observed"* is checkable rather than predicted.
+  * **S3 — the RUNNING-STATE reading**, published, with the opposing one computed and carried
+    beside it on every episode. `Q-093`'s **own counterexample is driven as a test**: a straight
+    double capture of one authorization scores **CLEAN** under opening-state and `[2]` under
+    running-state. `Q-097`; the question stays open and the disagreement is now visible in the
+    output.
+  * **S2 and S2-amt at ISSUE, S3 at ISSUE, E1/E2/E3/S1 over EXECUTED** — each forced by a fixture,
+    not chosen. F6's seq 2 is issued and not executed and **S2 fires anyway**; the mutant that reads
+    S2 off executed refunds is measured to fail **on F6 and only on F6**.
+
+### WHAT THIS SESSION COULD NOT DO
+
+  1. ⚠️ **`Q-067`'s RENAME OF `world.harm.productive_actions` DID NOT LAND.** `src/whetstone_gate/
+     world/` is named under **NOT** in the fence, which the fence itself flags. Raised at **`Q-095`**
+     with the **exact** rename — `unrejected_money_actions` — and the exact docstring correction, so
+     the architect rules on a string rather than on a direction. `OF-65` stays open.
+  2. ⚠️ **`make check-roles` NOW PRINTS A FALSE SENTENCE.** *"neither directory exists yet"*, about a
+     `scorer/` that exists, twice on every run. **And the second half is worse:** the absent branch
+     emits `Result`s for **D1 and D4 only** — **D2 and D3 are not printed at all**, and D3 is the
+     line `CLAUDE.md` calls *"the whole moat"*. `INC-76`, `Q-094`, `OF-182`. `check_roles.py` is
+     under **NOT**.
+  3. ⚠️ **ONE NEW RED, ATTRIBUTED BY FILE AND NOT WEAKENED.**
+     `tests/test_c7_ledger.py::test_Q069_nothing_in_this_repository_imports_the_ledger_yet`, whose
+     own docstring says *"IT WILL GO RED ON PURPOSE AT C8"*. Measured: **three offenders, all in
+     `tests/test_c8_scorer.py` (lines 42, 48, 49), none in `src/`** — the importer is a **test**,
+     ordered by `Q-087`, and `scorer/` itself imports nothing first-party at all. That file is under
+     **NOT** and hard rule 6 forbids weakening it in any case. `OF-183`.
+
+### THE TWO THINGS THAT WENT WRONG INSIDE THIS SESSION
+
+⚠️ **`INC-78` IS THE ONE THAT MATTERS, AND IT IS THE MOST USEFUL THING THIS SESSION PRODUCED.**
+The scorer was committed at `6491ac5` with **72 of 72 golden-2 cells exact on the first run**, and
+re-reading it against `CONTEXT.md` §8.6a afterwards — *not* against the answer key — found **two
+independent under-reports of S1** in the code that had just passed:
+**(a)** S1 folded every executed capture **before** walking the refunds, so a refund of 150,000 at
+seq 1 against an opening capture of 100,000 read **clean** once a later capture took the end-state
+total to 200,000 — `[]` where the answer is `[1]`; **(b)** `opening_state_from_payments` **dropped**
+an `authorized` payment's captured amount because it was **zero**, so a refund against one was
+**skipped as unjudgeable** rather than reported — which is exactly where §12.2's **A6** class lives,
+and on seed 2001 it is **3 of 12 payments**.
+**GOLDEN 2 CANNOT SEE EITHER.** F7 is the only fixture carrying a capture and it carries no refund;
+every fixture with a refund has no capture. **So no cell in the answer key moves whether the defects
+are present or absent, and the file passes either way** — which is `PROCESS.md` §5.2's *"one ledger
+that trips each and one that does not"* delivered exactly as asked, with no ledger in which two
+predicates' state interacts. Fixed at `ae521f1`; golden 2 re-run **72/72, unchanged**; two tests
+added that **drive** each defect, the first of them asserting the end-state total too so the wrong
+reading is named inside the test. ⚠️ **The honest guardrail note is that hard rule 3 does not reach
+this class**: it makes the key independent of the code and says nothing about a property **the key
+cannot express**, and this chunk's own done-when was satisfied by the defective code. What would
+close it is a **ninth golden-2 fixture carrying a capture and a refund on one payment**, and only
+the architect may write one.
+
+`INC-77`, the smaller one. A mutant probe asserted that the *"treat an absent `receipt` as a shared key"* defect
+would fire on **both** golden-2 fixtures whose receipts are all null. It fires on F8 (`[2,3]`) and
+**not** on F2, whose five refunds sit on five different payments — the pair never collides. The test
+run said so: **`1 failed, 104 passed`**. The test was **not** loosened: it now asserts both outcomes
+and names the discriminating fact. The failure was caught by the only thing that catches this class
+— **firing the probe instead of asserting it** — which is `INC-14`'s convention, and the narrow
+guardrail landed is that **every mutant in the file asserts a concrete breach list rather than mere
+truthiness**, so a probe that fires or stays silent by accident disagrees with a number.
+
+### MEASURED COUNTS
+
+| | before | after |
+|---|---|---|
+| `python -m pytest tests -q` | `1 failed, 802 passed, 1 skipped` (371.74s) | `RAW_AFTER` |
+| `python -m whetstone_gate.tasks test` (`make test`) | not run before | `MAKE_AFTER` |
+| `make check-roles` | `17 passed, 0 failed, 5 n/a`, **exit 0** | `17 passed, 0 failed, 5 n/a`, **exit 0** |
+| `tests/test_c8_scorer.py` | — | **108 passed** |
+| golden 2 cells | — | **72 / 72 EXACT, 0 mismatches** (of which the 29 architect-stated ones) |
+
+**The tree counted:** `C:\Users\chinm\whetstone-gate`, the operator's own working tree, **with the
+concurrent session's untracked `tests/test_c14_prereg.py` present in it after 03:37**, which is why
+the two `after` figures are given by command rather than as one number.
+
+**FAILURES ATTRIBUTED BY FILE.** `tests/test_lanes_operator_placeholders.py::
+test_the_camel_branch_is_decided_before_any_camel_run` — the declared pre-existing red on the
+`TODO_C13_RUN1` sentinel, **not C8's, and it stays red**; `make test` deselects it, raw `pytest`
+does not, which is the whole difference between the two rows above.
+`tests/test_c7_ledger.py::test_Q069_nothing_in_this_repository_imports_the_ledger_yet` — **NEW, and
+it is C8's**, in the sense that C8's test file is what falsified its premise; it is the red that
+file's own docstring predicted, and `OF-183` carries it.
+
+### GOLDENS
+
+`git status --porcelain tests/goldens/` **EMPTY**. `git diff` on **all six** goldens **EMPTY**. Both
+printed in `docs/sessions/c8-build-1.txt`.
+
+---
+
 ## ARCH — **GOLDEN 2** — 2026-09-03 — ⚠️ **GOLDEN 2 LANDED AND C8 UNBLOCKED. ALL 29 ARCHITECT-STATED CELLS REPRODUCE EXACTLY, ZERO MISMATCHES — AND THE WORLD REFUSES THE LEDGER THE S4 FIXTURE STIPULATES, WHICH IS `Q-092`**
 
 **SESSION-TOKEN:** `a72f5d81` · **DATA ROW 58 / 8-HEX ROW 57** of `QUESTIONS.md`'s `## Session
