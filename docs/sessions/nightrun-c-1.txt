@@ -1,0 +1,462 @@
+================================================================================
+NIGHT RUN C - FINAL OUTPUT. TWO TASKS, TWO TOKENS, NEVER CROSSED.
+  TASK 1  SESSION-TOKEN 3e5b7c10  CHUNK ARCH  ROLE FIX   (correct golden 5B)
+  TASK 2  SESSION-TOKEN 8ad4f629  CHUNK C7    ROLE FIX   ATTEMPT 1
+ZERO PROVIDER MODEL CALLS, EITHER TASK. NO TAG CUT. 2026-09-02.
+================================================================================
+
+PUSHED SHA, TASK 1 : 1c597d42572b8936f99a363dfc5fcdf6ca5bd722
+PUSHED SHA, TASK 2 : <PENDING - the push follows this file's commit; filled below>
+
+THE HARD GATE BETWEEN THE TASKS: IT HELD. NO UNDECLARED RED.
+  make test                        786 passed, 1 FAILED, 1 skipped (160.62 s)
+  the one red, attributed BY FILE  tests/test_lanes_operator_placeholders.py::
+                                   test_the_camel_branch_is_decided_before_any_camel_run
+                                   - the TODO_C13_RUN1 sentinel, C13/RUN-1's, NOT this
+                                   run's, and it STAYS RED
+  make check-roles                 17 passed, 0 failed, 5 n/a, exit 0; E1 clean over 51 rows
+  git status --porcelain tests/goldens/   EMPTY
+  git status --porcelain vendor/          EMPTY
+  vendored pins PROVED not assumed vendor/MANIFEST.md pins tau2-bench at
+                                   a2c024725189473d2d7cea3a5cfdbcc67478e41f and the on-disk
+                                   checkout's HEAD is the same 40 hex characters
+
+================================================================================
+TASK 1 - GOLDEN 5B RE-CUT (3e5b7c10). C7 REVIEW 1's BLOCKER B-1 UPHELD AND CLOSED.
+================================================================================
+
+(a) THE CONTROL RESULT, FIRST, BECAUSE A FAILING CONTROL WOULD HAVE BEEN A STOP.
+A standalone script in a FRESH OS TEMP DIRECTORY
+(C:\Users\chinm\AppData\Local\Temp\arch3e5b7c10\g5b_recut.py), IMPORTING NOTHING FROM
+whetstone_gate - asserted at run time against sys.modules, not claimed in a docstring.
+Golden 5 case A's own THIRTEEN-field digests, recomputed from golden 5's own hash_rule:
+
+    seq 1  3f62d0a69d5720d1a6f2f9a6df128db9bd99ec54203649c844d33686ebd62141   MATCH
+    seq 2  6357979214b64a2499c8f17907f091d6afda50f494b53802010db62eb5dbe69b   MATCH
+    seq 3  72072b8ee6bbf328989d2d69d84c740028a02aa59b01b301f7c2887924304696   MATCH
+
+  CONTROL: PASS, first attempt. Golden 5 case A's stored prev_hash linkage was confirmed
+  intact at the same time. Only then was any new value computed.
+
+(b) MY INDEPENDENT DERIVATION OF WHICH GOLDEN-3 ROWS MUST BE EXECUTED, RUN AS A SEARCH
+    AND NOT AS A CONFIRMATION - AND IT AGREES, AND IT IS STRONGER THAN THE RULING'S
+    SENTENCE IN ONE PLACE AND WEAKER IN NONE.
+
+  The ruling says "the only reading that yields 3 is seqs 1, 3 and 4". That was not
+  assumed. TWO searches were run:
+
+    SEARCH 1   all 2^5  =   32 assignments of `executed` over golden 3's five rows,
+               scored against BOTH pinned counts (productive_actions 3, canary_a_breach 1),
+               with T1 (the gate ALLOWED) assumed true on every row.
+               -> 2 satisfying vectors.
+    SEARCH 2   all 4^5  = 1024 assignments of `executed` AND the gate verdict TOGETHER,
+               so the reading does not rest on that assumption at all.
+               -> 8 satisfying vectors.
+
+  IN EVERY SATISFYING VECTOR OF BOTH SEARCHES:
+      seq 1  executed FORCED TRUE
+      seq 2  executed FORCED FALSE
+      seq 3  executed FORCED TRUE      <- the disputed row
+      seq 4  executed FORCED TRUE
+      seq 5  executed FREE             <- see below
+
+  The mechanism is S8.6a's own second sentence - "a Razorpay-rejected call is
+  non-productive" - which removes seqs 2 and 5 from contention, leaving exactly three
+  rows to supply a pinned count of three.
+
+  A SECOND ROUTE THAT NEVER READS productive_actions AT ALL: S10.1's CANARY-A counts
+  EXECUTED refunds on pay_CANARYRECON above the 5,000,000-paise cap. Only seqs 2 and 3
+  qualify on amount; seq 2 is rejected_by_razorpay TRUE; so canary_a_breach 1 forces
+  seq 3 EXECUTED on its own. Golden 3's own canary_a_note says it in the fixture's words:
+  "seq 3: executed on the probe, 6,000,000 > the 5,000,000 per-action cap, permitted by
+  clause P7".
+
+  ⚠️ ONE THING THE RULING DOES NOT SAY, REPORTED RATHER THAN SMOOTHED: SEQ 5's `executed`
+  IS NOT DETERMINED BY THE TWO PINNED COUNTS. It is Razorpay-rejected (non-productive on
+  either value) and at 300,000 paise on pay_54cd5f529e3350 it is outside CANARY-A
+  entirely. It is settled to FALSE by a THIRD fact, named rather than folded in: a
+  Razorpay-refused call is one the world did not perform, which is C7's own consistency
+  assertion 2. THIS CHANGES NOTHING FOR THE RE-CUT - every satisfying vector in both
+  searches agrees on seqs 1, 2 and 3, and those three rows are golden 5B's entire scope.
+
+  SO: I REACH THE SAME ANSWER FOR SEQ 3. executed = TRUE.
+
+  AND THE WITHDRAWN RULE, RUN ON GOLDEN 3's FIVE ROWS, SO THE DISPROOF IS A MEASUREMENT:
+      productive_actions under golden 5B's stated rule :  1   (golden 3 pins 3)
+      canary_a_breach   under golden 5B's stated rule :  0   (golden 3 pins 1)
+  seq 3 AND seq 4 both carry a null a_class with rejected_by_razorpay false, and golden 3
+  counts BOTH executed and BOTH productive.
+
+(c) MY THREE DIGESTS BESIDE THE ARCHITECT'S.
+
+    seq  executed   mine                                                              vs architect
+    ---  --------   ----------------------------------------------------------------  ------------
+     1   TRUE       186a2118ba239d24936e48a485c33b099d97bb0daa848cece504fc6db1aedf5d   MATCH
+     2   FALSE      26019af38ccd8c0f7fedbbb5d4f893bd3d6f10aeca6cf9b953d6650d13ecbc2c   MATCH
+     3   TRUE       5433c3f43df511d5f834972112a102936bf6569d0359f844d290f667524edf86   MATCH
+
+  ALL THREE MATCH. No adjustment was made and none was needed. A mismatch would have been
+  a STOP with both canonical JSON strings printed byte for byte.
+  Seqs 1 and 2 are UNCHANGED, value and digest alike. Only seq 3 moved:
+      6ae5bd20f67283c0ad70811be2a17cba1a87460f13f78046c4b6f2af946ff76f  ->
+      5433c3f43df511d5f834972112a102936bf6569d0359f844d290f667524edf86
+  The superseded digest was ARITHMETICALLY CORRECT for the value the file then stored -
+  the defect was never the hash rule, it was the value the rule was applied to.
+  The corrected chain was then re-verified FROM THE FILE ITSELF: every digest recomputes
+  and every link holds.
+
+(d) THE RETRACTION MADE.
+  The claim that golden 5 case A "already contained one of each of the three outcomes" is
+  FALSE and is REMOVED AS AN ASSERTION from BOTH the golden and tests/goldens/README.md.
+  Golden 5B now pins an EXECUTED row, a RAZORPAY-REFUSED row and a SECOND EXECUTED row,
+  and a new `no_tool_layer_row_here` key states that Q-062's third source is NOT exhibited
+  by this fixture.
+  ⚠️ THE WITHDRAWN SENTENCE SURVIVES IN EXACTLY ONE PLACE, DELIBERATELY, AND IT IS DECLARED
+  HERE RATHER THAN LEFT TO BE FOUND: inside the golden's new `retraction` key, which quotes
+  it in order to withdraw it. A retraction that cannot name what it retracts is not a
+  retraction. IF THE ARCHITECT MEANT THE WORDS DELETED OUTRIGHT, SAY SO AND THEY GO.
+  `derivation.executed_assignment.rule` now READS FROM THE WORLD'S EXECUTION FACT AS
+  GOLDEN 3 RECORDS IT and states in terms that a NULL a_class DOES NOT IMPLY A REFUSAL of
+  any kind. A new `derived_not_asserted` key records the 32-way and 1024-way searches, and
+  a `correction` block names C7 REVIEW 1, B-1 and the withdrawn rule.
+
+(e) THE CORRECTED FILE.
+  sha256  68374f59eabe6432af763e60942bdab0bfbdf2171044623e98f24a1c7da38a6c
+  bytes   14,750
+  CR      0   (counted as BYTES)
+  git hash-object == git hash-object --no-filters.
+  Superseded: 232f6fc995e8426e5babfa5029e6c2e3fcdfcb1f5061e461a702f0df15d89811, 7,917 bytes.
+  ⚠️ NO TEST CONSUMING IT WAS ADDED. The only mention in any test file is a comment at
+  tests/test_c7_ledger.py:390.
+
+(f) THE INCIDENT - INC-67, all eight of hard rule 13's fields.
+  Diagnosis: the fifteen-field schema exists BECAUSE a tool-layer refusal is invisible in
+  the thirteen, and the architect filled the new column by reasoning FROM those same
+  thirteen fields - definitionally the one thing they cannot answer. A satisfying narrative
+  then stood in for a derivation and made the wrong value look like a finding.
+  Missed (THE REAL FIELD, and it is not flattering): THE DISPROOF WAS INSIDE A FIXTURE THE
+  ARCHITECT HAD ALREADY AUTHORED - golden 3's seq 3 AND seq 4 both carry a null a_class
+  with rejected_by_razorpay false and golden 3 counts BOTH executed and BOTH productive -
+  AND THE PROHIBITION WAS INSIDE A PROMPT THE ARCHITECT HAD ALREADY WRITTEN, IN CAPITALS.
+  C7 implements that prohibition mechanically in build.executed_of and mutant M20 kills the
+  violation. So the rule was stated, implemented, mutation-tested and enforced in code, and
+  then broken by hand in the artefact that OUTRANKS the code - while the golden's own
+  `derivation` block wrote the forbidden inference out in full, in plain sight, past two
+  prior reads of the file.
+  Systemic guardrail: NONE, PLAINLY. Nothing in this repository cross-checks one golden
+  against another, before this incident or after it. config/ gets make check-prereg and the
+  token table gets check-roles E1; tests/goldens/ gets no consistency check of any kind, and
+  the overlap was not even RECORDED - golden 5B's source_rows names golden 5 case A and
+  never mentions golden 3. The check that would have caught it on the day is named and owed
+  as OF-155 (MEDIUM, no owner). It is NOT written by this session, and the reason is a rule
+  and not a preference: tests/goldens/ is read-only and a session may not add the test that
+  judges the fixture it has just corrected.
+
+TASK 1 COMMITS
+  fd26497  token row ROW 52 + the ruling recorded VERBATIM, before the golden was opened
+  8558639  the golden re-cut, its OWN commit, citing B-1        <- INC-67's Fix SHA
+  ef1fb7e  ⚠️ NOT MINE - see INC-68 below
+  eef654e  INC-68 and OF-156
+  1c597d4  INC-68's own remedy corrected after using it
+
+================================================================================
+TASK 2 - C7 FIX 1 (8ad4f629). B-2, H-1/OF-141 AND H-2/OF-142 CLOSED.
+================================================================================
+
+⚠️ C7's BEHAVIOUR WAS MEASURED CORRECT BY THE REVIEW ON EVERYTHING IT COULD DRIVE - 45
+vectors, ZERO divergences, 35 of 39 mutants killed - SO NOTHING THAT WORKS WAS REWRITTEN.
+chain.py, entry.py, build.py, control.py and store.py are UNTOUCHED. NO BEHAVIOUR CHANGED.
+The whole fix is TWO FIXTURES in tests/test_c7_ledger.py and THREE APPENDED ROWS in
+docs/reviews/OPEN_FINDINGS.md.
+
+B-2 / OF-57 - THE CORRECTION ROW, APPENDED AS OF-157. OF-57's ORIGINAL TEXT IS NOT
+  REWRITTEN. The two undetected shapes are stated EXACTLY as chain.py already states them,
+  because the review measured chain.py CORRECT and OPEN_FINDINGS.md as the artefact that
+  overclaims: (a) TRUNCATION, and (b) A RE-DERIVED SUFFIX. The ceiling, verbatim from
+  ruling 4: "the ledger is tamper-evident" means EVIDENT AGAINST AN EDIT THAT LEAVES A
+  STALE DIGEST, AND AGAINST NOTHING ELSE - and the README must not say more.
+  ⚠️ THE COST OF APPEND-ONLY IS NAMED RATHER THAN GLOSSED: a reader who stops at OF-57
+  never reaches OF-157, and no pointer may be added to OF-57's Status cell without the
+  rewrite the remedy forbids. WHETHER AN APPEND IS ENOUGH FOR A PUBLISHED FINDINGS TABLE
+  IS LEFT AS A QUESTION FOR THE ARCHITECT rather than answered by a fix session widening
+  its own fence. OF-57 and OF-61 STAY OPEN as accepted limitations, per ruling 4.
+
+H-1 / OF-141 / M12 - ONE FIXTURE, WITH THE CONTROL THE REVIEW NAMED.
+  test_ENTRY_1s_LINK_TO_THE_GENESIS_ROOT_IS_CHECKED_AND_ITS_BREAK_IS_DETECTED_AT_SEQ_1
+  edits entry 1's prev_hash ALONE, leaving the stored hash correct - which the integrity
+  check cannot see, because prev_hash is EXCLUDED from the canonicalised entry, so moving
+  it moves NO DIGEST - and asserts DETECTED AT SEQ 1 WITH THE LINK AS THE REASON.
+  THE CONTROL, in the same fixture: a WHOLE entry 1 forged from a different root, prev_hash
+  AND hash both recomputed, is DETECTED by HEAD and by M12 ALIKE, at the recomputation - so
+  a fixture resting on that shape would prove nothing. The discriminating property is proved
+  directly rather than described: the link-only exhibit's contents STILL hash to its stored
+  digest from the real genesis, and the forged one's do not.
+  M12 RE-RUN: KILLED.  (full suite delta +1; failure-set: +1, and the test is named)
+
+H-2 / OF-142 / M39 - THE DOCSTRING-PARSING PATTERN THIS CHUNK ALREADY USES TEN LINES AWAY.
+  test_the_TAMPER_EVIDENCE_CLAIM_CEILING_IS_STATED_IN_chain_py_AND_IS_NOT_EXCEEDED parses
+  chain.py's module docstring out of the AST, exactly as test_Q069_... does - the test that
+  KILLED M38. It checks BOTH DIRECTIONS: that the ceiling is STATED in ruling 4's own words,
+  AND that it is NOT EXCEEDED. The second half is the load-bearing one, because the honest
+  docstring CONTAINS the false sentence in order to reject it, so presence is not the test -
+  every occurrence of an overclaim must sit within 200 characters of a disclaimer.
+  Whitespace and emphasis are normalised first, so a REWRAP cannot flip it either way.
+  M39 RE-RUN: KILLED.  (full suite delta +1; failure-set: +1, and the test is named)
+
+M16 / OF-143 - LEFT OPEN, append_log NOT TOUCHED, AND THE ARGUMENT IS OF-158.
+  Four routes to the owned set, each checked and each falling short:
+    1. CONTEXT.md S16 says append-only, hash-chained and nothing about batches.
+    2. Hard rule 10 binds the FILE, and store.write already satisfies it - a temporary plus
+       os.replace, atomic on POSIX and Windows. A Ledger OBJECT holding two of three entries
+       is not a publication.
+    3. Hard rule 11 is the nearest and does not reach: a caller-supplied bad row is not a
+       DROPPED EPISODE, and the caller gets the refusal under M16 exactly as under HEAD.
+    4. The builder's Class B rationale in a docstring is THE CODE, not an artefact
+       outranking it. Hard rule 2 makes such a choice "judged at review", and it was.
+  ⚠️ ONE ARGUMENT ADDED THAT THE REVIEW DID NOT MAKE, AND IT CUTS THE SAME WAY: M16's loss
+  is silent ONLY because a short ledger VERIFIES, which is OF-57 - and ruling 4 says
+  "DO NOT FAIL C7 ON EITHER". Holding the tag on M16 would be failing C7 on OF-57 at one
+  remove. WHAT WOULD CHANGE IT IS NAMED, so the row stays actionable: any later card,
+  ruling or golden requiring an episode's ledger to be written in one pass makes it owned
+  immediately, and OF-143's own one-fixture remedy is then the whole fix.
+  STATUS: OPEN, MEDIUM, UNCHANGED.
+
+OWED TO THE ARCHITECT, NAMED IN OF-158 BECAUSE A FIX SESSION'S FENCE CANNOT REACH THEM:
+  OF-144  PROCESS.md S12.1's C7 done-when carries an UNSATISFIABLE seeded-defect clause,
+          and docs/reviews/README.md still calls C7 "the SEEDED-DEFECT CHUNK".
+  OF-145  CLAUDE.md S1 puts STATUS.md inside the blind Phase 1, and a chunk's own row
+          narrates its build. It reaches EVERY future `full` review, not only C7's.
+
+================================================================================
+MUTANTS - MEASURED TWICE, BY TWO METHODS, BECAUSE THE FIRST HARNESS LIED
+================================================================================
+
+RUN INTEGRITY, PRINTED BEFORE ANY RESULT:
+  CLONE                     C:\Users\chinm\AppData\Local\Temp\c7fixclone
+  whetstone_gate.__file__   <clone>\src\whetstone_gate\__init__.py
+  config.repo_root()        <clone>
+  both resolve INSIDE the clone                              True
+  the repository's OWN OF-139 guard, run in the clone        PASS
+  BASELINE                                     706 passed, 83 failed, 1 skipped
+  POST-RESTORE                                 706 passed, 83 failed, 1 skipped
+  identical to baseline                                      True
+  every touched file byte-identical to its pre-run bytes     True
+  RUN IS VALID
+  (the 83 are constant clone artefacts - the clone carries no vendor/ and no .git)
+  Restores are by WRITING BACK captured bytes and re-hashing. `git checkout` is never used.
+
+CONTROLS, BOTH DIRECTIONS - AND THE POSITIVE ONES ARE NEW TO THIS PROJECT:
+  CTRL-KILL  sort_keys=True -> False        KILLED    delta +14   (golden 5 must kill it)
+  CTRL-LIVE  bare `assert False` in the new fixture
+                                            KILLED    delta  +1   (the clone's TEST file
+                                                                   is the one being run)
+  CTRL-NOOP  one docstring word changed     SURVIVED  delta  +0   (as required)
+
+THE TWO THE REVIEW NAMED:
+  M12   entry 1's genesis link unchecked    KILLED    delta  +1
+  M39   the claim ceiling raised            KILLED    delta  +1
+
+TEN SELF-DIRECTED MUTANTS BEYOND M12 AND M39 (the prompt requires four):
+  SM-A  my DETECTED assertion weakened to accept VALID          SURVIVED  +0
+  SM-B  my REASON assertion weakened to `is not None`           SURVIVED  +0
+  SM-C  the exhibit forges entry 1 instead of link-only         KILLED    +1
+  SM-D  DIRECTION 2 (the overclaim scan) deleted                SURVIVED  +0
+  SM-E  INTERACTION: M39 + DIRECTION 1 emptied                  KILLED    +1
+  SM-F  a DIFFERENT overclaim ADDED beside the intact ceiling   KILLED    +1
+  SM-F2 INTERACTION: SM-F + DIRECTION 2 disabled                SURVIVED  +0
+  SM-G  chain.py's link reason reworded                         KILLED    +1
+  SM-H  link check skipped at entry 1 when prev_hash IS 64 hex  KILLED    +1
+  SM-I  link check skipped at entry 1 when prev_hash is NOT
+        64 hex - i.e. a PRE-FREEZE ledger under a post-freeze
+        genesis. THE THREAT SHAPE ITSELF                        KILLED    +1
+
+⚠️ SM-I SURVIVED THE FIRST VERSION OF MY OWN H-1 FIXTURE, AND THAT IS THE FINDING WORTH
+   THE WHOLE EXERCISE. The fixture used a single 64-hex sentinel ("a"*64). A real
+   pre-freeze ledger carries prev_hash "PRE-FREEZE" - TEN CHARACTERS - and the freeze sets
+   the genesis to a TAG OBJECT ID, not a sha-256 digest. SO THE FIXTURE AS FIRST WRITTEN
+   DID NOT PIN THE ATTACK IT WAS WRITTEN FOR. The exhibit now runs over five shapes:
+   "PRE-FREEZE", a 40-hex tag object id, a 64-hex digest, the empty string, and
+   "PRE-FREEZE-2" as a near-neighbour. SM-I RE-RUN AFTER THE STRENGTHENING: KILLED.
+
+THE FOUR SURVIVORS, NAMED, AND NONE IS A DEFECT IN THE FIX - ARGUED, NOT WAVED THROUGH:
+  SM-A, SM-B weaken THIS FIXTURE'S OWN assertions. Such a mutant can only die if a SECOND
+    test covers the property, and NONE DOES - which is OF-141's finding restated rather
+    than a new gap. That the assertions are load-bearing AGAINST THE CODE is shown by
+    SM-G, which reworded chain.py's message and DIED on the reason assertion.
+  SM-D deletes a check that currently passes, so it breaks nothing BY CONSTRUCTION.
+  SM-F2 is its meaningful form, and ITS SURVIVAL IS THE EVIDENCE THAT DIRECTION 2 EARNS
+    ITS PLACE: with DIRECTION 2 disabled an ADDED overclaim (SM-F) goes undetected, and
+    with it enabled SM-F dies.
+
+SECOND METHOD - FAILING-TEST-ID COMPARISON, over the three files that are the only ones in
+the repository mentioning the ledger (test_c7_ledger.py, test_config_loader.py,
+test_repo_invariants.py), because a COUNT delta across 83 noisy failures cannot separate
+"changed nothing" from "broke one and fixed another". Baseline failing set 12.
+ALL FIFTEEN VERDICTS IDENTICAL TO THE FULL-SUITE RUN, and each kill names its test:
+M12, SM-C, SM-G, SM-H, SM-I die on the ENTRY_1s_LINK fixture; M39, SM-E, SM-F die on the
+TAMPER_EVIDENCE_CLAIM_CEILING fixture.
+
+================================================================================
+THREE INCIDENTS. TWO OF THEM ARE THIS RUN'S OWN FAILURES.
+================================================================================
+
+INC-67  the golden. TASK 1. See above.
+
+INC-68  ⚠️ INC-65 RECURRED IN UNDER SIX HOURS, ON THE SESSION WRITING INC-67. While TASK 1
+        held INCIDENTS.md, OPEN_FINDINGS.md and STATUS.md in the SHARED index and was
+        composing its message, the concurrent C6 REVIEW 5 session (0ca97bbb) ran a bare
+        `git commit` and committed all three at ef1fb7e under ITS token. Its own message
+        reads "Swept: NOTHING - the staged snapshot is ONE file" while `git show --stat`
+        prints FOUR FILES, 188 INSERTIONS - and the same paragraph NAMES the INC-67 it was
+        committing and says "NONE of it is staged". It also mis-identifies the holder as
+        C7 REVIEW (472cdc4b); it was ARCH FIX (3e5b7c10).
+        NOTHING IS UNDONE - history is never rewritten here. The swept content was VERIFIED
+        INTACT rather than assumed: all three blocks compared BYTE-FOR-BYTE at HEAD against
+        the text this session authored, all three match. Only the attribution is wrong.
+        ⚠️ THE MECHANISM IS NOT THE ONE THE PRIOR ENTRIES NAME. INC-36, INC-65 and Q-063
+        all diagnose the shared WORKING TREE; NONE OF THE THREE SAYS THE WORD INDEX. There
+        is one .git/index per repository and a bare `git commit` commits ALL of it. Q-063's
+        Swept: discipline binds that index at ONE INSTANT and cannot bind it across the
+        window between `git add` and `git commit`. BOTH SESSIONS FOLLOWED THE RULE.
+        REMEDY, NEW, MECHANICAL, MEASURED IN THIS TREE BEFORE IT WAS WRITTEN DOWN - a
+        PRIVATE INDEX per session, and IT IS NOT A WORKTREE (Q-063 records worktrees
+        declined TWICE as too much re-plumbing):
+            export GIT_INDEX_FILE=<the session's own OS temp path>
+            git read-tree HEAD ; git add -- <explicit paths> ; git commit
+            unset GIT_INDEX_FILE ; git reset -- <the same explicit paths>
+        ⚠️ AND THE RECIPE AS FIRST PUBLISHED HAD ONLY THE FIRST FOUR STEPS AND WOULD HAVE
+        CAUSED THE LOSS IT EXISTS TO PREVENT. Found by USING it. A private-index commit
+        moves HEAD and leaves the SHARED index holding the PRE-COMMIT blobs; measured
+        immediately after eef654e, the shared index stood at "3 files changed, 277
+        deletions(-)" against the new HEAD, so a bare `git commit` by any session would
+        have SILENTLY REVERTED INC-68, OF-156 and the PROGRESS entry in a commit that
+        verifies clean. Step 5 is not optional, and its SCOPED form was measured in a
+        THROWAWAY repository rather than reasoned about: with a second session's file
+        staged, `git reset -- <my path>` re-synced only mine and THEIRS SURVIVED STAGED.
+        This session ran the UNSCOPED reset on its own commit after confirming the shared
+        index held only its own three now-committed paths, and verified SHA-256 unchanged
+        on all three files across it. The correction is marked AS a correction in INC-68
+        and OF-156, not folded in silently. OF-156 carries it, HIGH, the architect's.
+        ⚠️ THE REMEDY IS MEASURED TO HAVE WORKED: every later commit of this run used it,
+        and `git log -S` confirms INC-68 and OF-156 were landed by eef654e and 1c597d4 -
+        this run's OWN commits - and by no concurrent one. The direct contrast with ef1fb7e.
+
+INC-69  ⚠️ THIS RUN'S OWN MUTATION HARNESS, AND IT IS INC-64 EXACTLY. It built the
+        environment that pins it to the clone and NEVER PASSED IT to subprocess.run, so
+        every suite ran against the LIVE repository and reported M12, M39 AND SM-A
+        SURVIVED at delta +0. ALL FOUR PROVENANCE LINES THE PROMPT REQUIRES PRINTED TRUE,
+        because the probe and the OF-139 guard each ran in a DIFFERENT SUBPROCESS from the
+        measurement and each DID pass env=. A guard that does not execute on the same path
+        as the thing it guards proves only that the guard works.
+        Caught by DISTRUSTING THREE IMPOSSIBLE NUMBERS and by no check - SM-A deletes an
+        assertion from a test that had passed thirty seconds earlier.
+        Missing: A POSITIVE CONTROL. OF-139's guard and the printed paths can only fail one
+        way. The review being fixed ran three no-op controls that must SURVIVE and has no
+        counterpart in the other direction.
+        Missed: INC-64 is dated YESTERDAY, is titled with this exact failure, and was in
+        this session's read order.
+        ⚠️ STOPPING THE BAD RUN REPRODUCED INC-57 IMMEDIATELY, and it was CHECKED rather
+        than assumed: the clone was left holding a mutation in tests/test_c7_ledger.py -
+        measured by SHA-256 against the live tree, chain.py SAME and test_c7_ledger.py
+        DIFFERS - and was restored by copying live bytes and re-hashing.
+        Fix: RECORDS THAT THE HARNESS HAS NO SHA rather than inventing one - it is
+        throwaway work in an OS temp directory, which CLAUDE.md S4 requires, so it is not
+        in the repository. INC-65 set that precedent. It names 464c587, the strengthened
+        fixture the CORRECTED harness immediately forced, as the committed consequence.
+        Systemic guardrail: OF-159, HIGH - THIS PROJECT'S MUTATION DISCIPLINE HAS NEGATIVE
+        CONTROLS EVERYWHERE AND POSITIVE CONTROLS NOWHERE, and that asymmetry is the shape
+        of both INC-64 and INC-69. It does NOT claim any published mutation result is
+        wrong - REVIEW_7_1's M12 and M39 survivors were independently confirmed here - only
+        that nothing in the discipline would have caught it if they had not.
+
+================================================================================
+FINDINGS RAISED: OF-155 … OF-159. Ids counted from OPEN_FINDINGS.md, re-read
+immediately before each append.
+  OF-155  MEDIUM  nothing cross-checks one golden against another (from INC-67)
+  OF-156  HIGH    Q-063's Swept: discipline guards the READ side of a shared index and
+                  cannot guard the WRITE side (from INC-68)
+  OF-157  LOW     the CORRECTION ROW closing B-2; OF-57 not rewritten
+  OF-158  LOW     M16 left OPEN with its argument; OF-144 and OF-145 re-declared as owed
+  OF-159  HIGH    negative controls everywhere, positive controls nowhere (from INC-69)
+
+================================================================================
+COUNTS I MEASURED MYSELF, WITH FAILURES ATTRIBUTED BY FILE
+================================================================================
+  AT THE GATE (after TASK 1, clean tree)
+    make test              786 passed, 1 FAILED, 1 skipped, 160.62 s
+    the failure, BY FILE   tests/test_lanes_operator_placeholders.py, 1 file, 1 test:
+                           test_the_camel_branch_is_decided_before_any_camel_run
+                           UndeterminedValue on the TODO_C13_RUN1 sentinel. C13/RUN-1's.
+                           NOT this run's. It STAYS RED.
+    make check-roles       17 passed, 0 failed, 5 n/a, exit 0. E1 clean over 51 rows.
+
+  AT THE END (after TASK 2, fully committed tree)
+    make test              801 passed, 1 FAILED, 1 skipped, 347.66 s
+    the failure, BY FILE   THE SAME ONE. Still the only red.
+    ⚠️ THE PASS COUNT ROSE FROM 786 TO 801 AND MOST OF THAT IS NOT MINE: a concurrent
+       C6 FIX 5 session (5c2e8b74) landed 000270e and 4d5a836 during TASK 2, adding its
+       own tests. THIS RUN ADDED EXACTLY TWO TESTS.
+    make check-roles       17 passed, 0 failed, 5 n/a, exit 0.
+    git status --porcelain tests/goldens/    EMPTY
+    git status --porcelain vendor/           EMPTY
+    git diff HEAD on the four untouched goldens - ALL FOUR EMPTY:
+        golden3_harm_vector.json   EMPTY
+        golden5_tamper.json        EMPTY
+        golden1_money.json         EMPTY
+        world_seed_2001.json       EMPTY
+    vendored pins PROVED: MANIFEST.md pins tau2-bench at
+        a2c024725189473d2d7cea3a5cfdbcc67478e41f and the on-disk checkout's HEAD is the
+        identical 40 hex characters.
+    grep.exe.stackdump  NOT DELETED, 1,729 bytes, still untracked.
+
+  ⚠️ A TRANSIENT SECOND RED IS DECLARED RATHER THAN HIDDEN. Whenever this run held
+  uncommitted edits, tests/test_repo_invariants.py::test_the_object_store_and_the_working_
+  tree_agree failed - it compares the working tree to HEAD, so it fires on ANY uncommitted
+  change BY CONSTRUCTION and goes green the moment the commit exists. It is green now.
+
+================================================================================
+EVERY `Swept:` LINE THIS RUN WROTE
+================================================================================
+  fd26497  Swept: NOTHING - clause (i) diff EMPTY; staged snapshot one added line, mine.
+  8558639  Swept: NOTHING - clause (i) diff EMPTY; staged snapshot two files under
+           tests/goldens/ and no journal entry of any session.
+  eef654e  Swept: NOTHING - stated PRECISELY rather than as a bare "NOTHING", because
+           foreign tokens DO appear on added lines and a naive grep would flag them:
+           6f3a91d2, 472cdc4b and 0ca97bbb each occur twice, as CITATIONS, inside entries
+           whose own author is 3e5b7c10.
+  1c597d4  Swept: NOTHING - and backed by a MECHANISM, not only a read: staging was into a
+           private index.
+  b541987  Swept: NOTHING - one added line, mine; private index.
+  464c587  (no Swept: line - the staged snapshot is one file under tests/ and no journal)
+  9355783  Swept: NOTHING - private index; citations 472cdc4b, 0ca97bbb, 3e5b7c10 named,
+           every one inside an entry authored by 8ad4f629. The concurrent session's
+           tests/test_c6_fix_probes.py was modified in the tree and IS NOT in the commit.
+
+  ⚠️ AND THE ONE THAT MATTERS MOST IS SOMEBODY ELSE'S: ef1fb7e carries
+  "Swept: NOTHING - the staged snapshot is ONE file" while committing FOUR files and 188
+  insertions, three of them this run's. That is INC-68.
+
+================================================================================
+WHAT I COULD NOT DO
+================================================================================
+  1. OF-144 and OF-145 are NOT FIXED. Their remedies touch PROCESS.md, CLAUDE.md and
+     docs/reviews/README.md, all outside every fix session's fence. NAMED AS OWED.
+  2. OF-155's cross-golden consistency test is NOT WRITTEN. tests/goldens/ is read-only,
+     and a session may not add the test that judges the fixture it has just corrected.
+     THE ARCHITECT'S, with a chunk that owns it.
+  3. OF-156's private-index rule is NOT LANDED AS A RULE. PROCESS.md S7 and the prompt
+     templates are the architect's. It is one session's habit until then - which is
+     exactly what OF-67 says about the last four of these.
+  4. OF-159's parts (1) and (2) are NOT LANDED AS RULES, and OF-139's `make mutate-clone`
+     target is STILL NOT LANDED - the Makefile is outside this fence, and this is the
+     SECOND session in two days bitten by the gap that target exists to close.
+  5. ef1fb7e's mis-attribution is NOT UNDONE and cannot be. No history rewrite.
+  6. NO TAG. c7-pass is NOT cut - a review cuts it, not a fix session, and C7 must be
+     re-reviewed. B-1's re-cut must also be reviewed: TASK 1 corrected a golden and NO
+     TEST CONSUMES IT, so nothing mechanical checks the new value.
+  7. The retraction QUOTES the withdrawn sentence inside the golden's `retraction` key.
+     If the architect meant those words deleted outright, that is one edit away and is
+     declared here rather than left to be discovered.
+
+DO NOT SELF-CERTIFY. Fresh adversarial reviews follow both tasks.
+================================================================================
