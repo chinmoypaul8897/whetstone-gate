@@ -8,12 +8,16 @@ Same code, two entry points — not two implementations.
 from __future__ import annotations
 
 import dataclasses
+import os
 import re
 import subprocess
+from pathlib import Path
 
 import pytest
 
+import whetstone_gate
 from whetstone_gate import check_roles
+from whetstone_gate import config as cfg
 
 
 def _results(group):
@@ -684,4 +688,110 @@ def test_the_tripwire_would_have_caught_q074s_site_and_that_site_is_now_correct(
     assert "Table 7" in now, (
         "Q-058's ruling RETAINS Tables 5-7 where they are right: Table 7 is CONTEXT.md "
         "8.5.2's P2 citation and C13 verified it exactly. Dropping it would over-correct."
+    )
+
+
+# -- ⚠️ THE PACKAGE UNDER TEST IS THE TREE UNDER TEST (OF-139, INC-17) -----------------
+
+
+def _tree_under_test() -> Path:
+    """The repository **this test file** belongs to.
+
+    ``<tree>/tests/test_repo_invariants.py`` → up two parents. This is the one anchor that
+    cannot lie: the file being executed *is* the tree being exercised, by definition. Every
+    other candidate — the working directory, ``config.repo_root()``, the imported package —
+    is exactly what this check exists to doubt.
+    """
+    return Path(__file__).resolve().parents[1]
+
+
+def _same_path(a: Path, b: Path) -> bool:
+    """Case-insensitive on Windows, exact elsewhere. Both sides are already resolved."""
+    return os.path.normcase(str(a)) == os.path.normcase(str(b))
+
+
+def test_the_package_under_test_is_the_tree_under_test(pytestconfig):
+    """⚠️ A mutation run inside a clone measures the LIVE repository unless told not to.
+
+    ``.venv/Lib/site-packages/__editable__.whetstone_gate-0.1.0.pth`` holds one line — the
+    **real** repository's ``src`` — and :func:`whetstone_gate.config.repo_root` is
+    ``Path(__file__).resolve().parents[2]``, so it follows the package wherever the package
+    resolves. A bare ``python -m pytest`` inside a fresh clone therefore imports the real
+    tree's package **and** resolves the real tree's root. C13 REVIEW 4 measured exactly that
+    in its own first clone, before it recorded any result::
+
+        PKG : C:/Users/chinm/whetstone-gate/src/whetstone_gate/__init__.py
+        ROOT: C:/Users/chinm/whetstone-gate
+
+    **Every mutation to ``src/``, ``config/`` or ``CONTEXT.md`` inside that clone would have
+    had no effect, and the control would still have read green — so every mutant would have
+    been reported as SURVIVED.** It is `INCIDENTS.md` **INC-17** inverted, and it reaches
+    every review that has run mutants in a clone. `INC-17` named a guard of this shape as
+    **OWED** and left it unbuilt; this is it, and `docs/reviews/OPEN_FINDINGS.md` **OF-139**
+    is the finding that re-raised it.
+
+    ⚠️ **THE REMEDY, WRITTEN WHERE THE NEXT MUTATION SESSION WILL HIT IT.**
+
+      1. **Point the interpreter at the tree you are actually testing.** POSIX shell::
+
+             PYTHONPATH=<clone>/src python -m pytest <clone>/tests/<file>
+
+         PowerShell::
+
+             $env:PYTHONPATH = "<clone>/src"; python -m pytest <clone>/tests/<file>
+
+         Forward slashes are accepted by Python on Windows. ``vendor/`` is reached by
+         junction in a clone; create it before the first run, not after the first red.
+
+      2. **PRINT the resolved paths at the head of EVERY mutation run** — the package's
+         ``__file__``, ``config.repo_root()`` and the tree the suite is running from — into
+         the run's own committed output. A transcript that *shows* which tree was loaded is
+         evidence; a harness that *asserts* it is a claim. This is `INC-17`'s own procedure.
+
+      3. **A run whose POST-RESTORE CONTROL is not green is VOID and is not scored.**
+         Restore each mutant by **WRITING BACK THE ORIGINAL BYTES** captured before the
+         mutation, re-hash to confirm, and re-run the full control before the next mutant.
+
+      4. ⚠️ **AND THE OTHER FAILURE DIRECTION, WHICH IS FLATTERING IN THE OPPOSITE WAY.**
+         C6 REVIEW 4's harness restored with ``git checkout --`` from a HEAD that **already
+         held the mutation**, so every restore re-applied its predecessor and **every mutant
+         was reported KILLED**. Both defects produce a clean-looking transcript: this one
+         reports 0 killed, that one reports 100%. Neither is measuring anything. **Re-baseline
+         before measuring** — capture the bytes, write them back, prove the control green.
+
+    What this test asserts is only the first of the four, because it is the only one a test
+    can see: the package under test, the repo root it resolves, and pytest's own rootdir all
+    name the tree this file lives in. Fired in **both** directions before it was committed —
+    RED in a clone with no ``PYTHONPATH``, GREEN in the real repository.
+    """
+    tree = _tree_under_test()
+    package = Path(whetstone_gate.__file__).resolve()
+    root = cfg.repo_root().resolve()
+    rootdir = Path(pytestconfig.rootpath).resolve()
+
+    observed = (
+        f"\n    TREE    (this test file's own repository) : {tree}"
+        f"\n    PKG     (whetstone_gate.__file__)         : {package}"
+        f"\n    ROOT    (config.repo_root())              : {root}"
+        f"\n    ROOTDIR (pytest)                          : {rootdir}"
+    )
+    remedy = (
+        "\n\n  REMEDY: run with PYTHONPATH=<tree>/src so the interpreter imports the tree "
+        "you are\n  testing, and print these four paths at the head of the run. See this "
+        "test's docstring,\n  INCIDENTS.md INC-17 and its OF-139 entry."
+    )
+
+    assert _same_path(package, tree / "src" / "whetstone_gate" / "__init__.py"), (
+        "⚠️ THE PACKAGE UNDER TEST IS NOT THE TREE UNDER TEST. `import whetstone_gate` "
+        "resolved OUTSIDE the repository this test file belongs to, so every edit to `src/` "
+        "in this tree — a mutant included — is invisible to this run." + observed + remedy
+    )
+    assert _same_path(root, tree), (
+        "⚠️ `config.repo_root()` DOES NOT NAME THE TREE UNDER TEST, so every read of "
+        "`config/`, `CONTEXT.md` and every other repository artefact is coming from a "
+        "different repository than the one whose tests are running." + observed + remedy
+    )
+    assert _same_path(rootdir, tree), (
+        "⚠️ pytest's rootdir is not the tree this test file belongs to. The suite and the "
+        "file disagree about which repository is under test." + observed + remedy
     )
