@@ -1888,3 +1888,24 @@ that `Q-062`'s third refusal source is **not** exhibited by that fixture. So the
 golden 5B inherits a derivation instead of a story. **What is open is the mechanism, not the
 record** — and a record that depends on the next reader being adversarial is what `OF-67` calls *a
 habit rather than a guardrail*.
+
+---
+
+## ⚠️ Appended by ARCH FIX (`3e5b7c10`), 2026-09-02 — `OF-156`, the write-side half of `Q-063`
+
+**ONE ROW, `OF-156`. The id is counted from THIS FILE, re-read immediately before the append** — the
+highest entry at that moment was **`OF-155`**, this session's own, landed in `ef1fb7e`. ⚠️ **AND
+`ef1fb7e` IS NOT THIS SESSION'S COMMIT: it is the concurrent C6 REVIEW 5 session's (`0ca97bbb`),
+which swept `OF-155` along with `INC-67` and `STATUS.md`'s update block.** That is `INCIDENTS.md`
+**INC-68**, and it is the finding this row exists for.
+
+| ID | Chunk | Severity | Finding | Spec citation | Raised by | Status | Closed by (SHA) |
+|---|---|---|---|---|---|---|---|
+| **OF-156** | *(process)* | ⚠️ **HIGH** | **`Q-063`'s `Swept:` DISCIPLINE GUARDS THE READ SIDE OF A SHARED INDEX AND CANNOT GUARD THE WRITE SIDE, AND `INC-65` RECURRED IN UNDER SIX HOURS BECAUSE OF IT.** Two sessions in one working tree share one `.git/index`. Session A's `git add` places A's files there; session B's **bare `git commit`** commits the whole index under B's token. `Q-063` clause (ii) requires B to read the staged snapshot and name what it sweeps — **which binds the index at ONE instant and cannot bind it while B composes a commit message.** Measured at `ef1fb7e`: its message reads *"Swept: NOTHING — the staged snapshot is ONE file"* while `git show --stat` prints **four files, 188 insertions**, and the same paragraph **names** the `INC-67` it was committing and says *"NONE of it is staged"*. ⚠️ **BOTH SESSIONS FOLLOWED THE RULE.** ⚠️ **`INC-36`, `INC-65` and `Q-063` all diagnose the shared WORKING TREE and none of the three says the word INDEX**, so the remedy each reached for could not have closed it; `Q-063` clause (iii)'s **E6** (still OPEN, **C11**) is a post-hoc check on a pushed commit and prevents nothing. **REMEDY, NEW, MECHANICAL, AND MEASURED IN THIS TREE RATHER THAN PROPOSED: a PRIVATE INDEX per session** — `export GIT_INDEX_FILE=<the session's own OS temp path>`, then `git read-tree HEAD`, then `git add -- <explicit paths>`, then `git commit`. Verified here: staging into a private index left the shared index's `git diff --cached --name-only` **EMPTY**, so the two are genuinely independent. ⚠️ **A PRIVATE INDEX IS NOT A WORKTREE** — `Q-063` records that separate worktrees were declined **twice** on the ground that re-plumbing every session's tree risks more than the mis-attribution costs, and this costs one environment variable and one `read-tree`, changes no path, no checkout and no tooling, and is invisible to other sessions. ⚠️ **NOT SUFFICIENT ALONE, stated so it is not oversold:** it protects the session that uses it; a session that does not still commits the shared index. **It must become a RULE in `PROCESS.md` §7 and a line in every prompt's GIT section — and both are the ARCHITECT'S**, `PROCESS.md` being outside every recent fence. Until then it is one session's habit, which is what `OF-67` says about the last four of these. | `QUESTIONS.md` Q-063 clauses (ii) and (iii); `INCIDENTS.md` INC-36, INC-65, INC-68; `PROCESS.md` §7 | **ARCH FIX (`3e5b7c10`)**, from being swept | ⚠️ **OPEN — HIGH, architect's** | — |
+
+⚠️ **AND WHAT THIS ROW DOES NOT CLAIM.** The private index closes the **write-side** window only. It
+does not give a session any warning that it is **being** swept — `INC-65`'s *"nothing can warn the
+session being swept"* stands, and remains unclosed. It does not remove the need for **E6**, which
+catches after the fact what the index closes before it. And this session's own three commits swept
+nothing by the read-side check, so the discipline `Q-063` installed is **working in the direction it
+was built for** and is not weakened here; what is added is the direction it was never built for.

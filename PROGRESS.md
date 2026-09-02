@@ -5,6 +5,147 @@ Each entry opens with that session's `SESSION-TOKEN` (`PROCESS.md` §7a). Chat h
 not a record; this file is.
 
 ---
+## ARCH — **FIX** — GOLDEN 5B RE-CUT — 2026-09-02 — ⚠️ **C7 REVIEW 1's BLOCKER `B-1` UPHELD AND CLOSED. THE ARCHITECT'S OWN ANSWER KEY CARRIED A VALUE INFERRED BY THE RULE THIS PROJECT FORBIDS IN CAPITALS**
+
+**SESSION-TOKEN:** `3e5b7c10` · Row **52** of `QUESTIONS.md`'s `## Session tokens` table, counted
+**from the table** in the operator's working tree (`c:\Users\chinm\whetstone-gate` — **not** a clone
+and **not** a worktree) at HEAD `a1973fa`, with `git status --porcelain QUESTIONS.md` **EMPTY** at
+the moment of counting: **51** data rows stood, the last being `472cdc4b` — C7 — REVIEW. ⚠️ **The
+count is checkable against `e22fc3d`'s own message**, which records `0ca97bbb` as **row 50**, and
+`0ca97bbb` is the 50th row by this count. ⚠️ **AND THE SECOND FIGURE IS MEASURED, NOT DERIVED
+(`INC-54`):** `check_roles._TOKEN_ROW` parses **50** issued tokens from those 51 rows before the
+append and **51** after — the first row (`WG-2026-08-30-CTX-13.4-A`) matches neither the 8-hex token
+nor the `(C\d+|ARCH)` chunk cell. Both figures came from running the repository's own parser.
+**The row was registered BEFORE this task's first commit**, at `fd26497`. **ZERO PROVIDER MODEL
+CALLS. NO TAG — this is not a review session.**
+
+**Commits:** `fd26497` (token row + the ruling verbatim) · `8558639` (the golden re-cut) ·
+this entry's own. ⚠️ **AND A THIRD BODY OF THIS SESSION'S WORK CARRIES SOMEBODY ELSE'S TOKEN, WHICH
+IS `INC-68`:** `INC-67`, `OF-155` and `STATUS.md`'s update block were staged by this session and then
+committed by the concurrent **C6 REVIEW 5** session (`0ca97bbb`) in **`ef1fb7e`**, whose own message
+reads *"Swept: NOTHING — the staged snapshot is ONE file"* while `git show --stat` prints **four
+files, 188 insertions** — and whose same paragraph **names** the `INC-67` it was committing. **The
+content is INTACT at `HEAD`, verified byte-for-byte against what this session authored, all three
+blocks.** Only the attribution is wrong, nothing is undone (`CLAUDE.md` §5), and this paragraph is
+how a reader learns which is which.
+
+**WHAT WAS WRONG.** `tests/goldens/golden5b_ledger_writer.json` is `PROCESS.md` §5.2's **WRITER**
+oracle at fifteen fields — a hand-derived answer key, read-only to every build, fix and review
+session. Its **seq 3** carried `executed: false`. **It should have carried `true`.** Golden 5 case
+A's three rows are `golden3_harm_vector.json`'s first three rows **field by field** — re-measured
+here across all thirteen shared fields, all three rows identical — and golden 3 records that same
+seq 3 as **EXECUTED, twice over**: its `canary_a_note` reads *"seq 3: **executed** on the probe"*,
+§10.1's CANARY-A counts **executed** refunds only so `canary_a_breach: 1` requires it, and §8.6a's
+term 2 is *"that the world executed"* so `productive_actions: 3` requires it independently.
+
+⚠️ **THE METHOD WAS WORSE THAN THE VALUE, AND THAT IS WHY IT IS AN INCIDENT AND NOT A TYPO.**
+`executed` had been **inferred** from a NULL `a_class` plus four zero harm components. That is the
+inference **`Q-062` forbids in terms**, and the C7 build prompt — written by the same hand —
+forbade it **in capitals**, on the ground that it cannot see a tool-layer refusal. C7 implements the
+prohibition mechanically in `build.executed_of` and mutant **M20** kills the violation. **The rule
+was stated, implemented, mutation-tested and enforced in code, and then broken by hand in the
+artefact that outranks the code.** And the disproof was already in the repository: golden 3's seq 3
+**and** seq 4 both carry a null `a_class` with `rejected_by_razorpay` false, and golden 3 counts
+**both** executed and **both** productive. Run on golden 3's five rows, the withdrawn rule yields
+`productive_actions` **1** against the pinned **3** and `canary_a_breach` **0** against the pinned
+**1**.
+
+**HOW IT WAS RE-DERIVED, IN THE ORDER THE PROMPT ORDERED.** A standalone script in a **fresh OS temp
+directory** (`C:\Users\chinm\AppData\Local\Temp\arch3e5b7c10\g5b_recut.py`), **importing nothing from
+`whetstone_gate`** — asserted at run time against `sys.modules`, not claimed in a docstring:
+
+| step | result |
+|---|---|
+| **THE CONTROL, RUN FIRST** — golden 5 case A's own three thirteen-field digests | **PASS.** `3f62d0a6…`, `63579792…`, `72072b8e…` all three reproduced, and case A's stored `prev_hash` linkage confirmed intact at the same time. A failing control would have been a STOP |
+| **`executed` DERIVED INDEPENDENTLY, as a SEARCH** | **AGREES with the ruling** — see below |
+| **the corrected fifteen-field chain vs the architect's three values** | **ALL THREE MATCH.** No adjustment was made and none was needed |
+
+⚠️ **THE DERIVATION WAS A SEARCH, NOT A CONFIRMATION, AND IT CAME OUT STRONGER THAN THE RULING'S
+SENTENCE.** The ruling says *"the only reading that yields 3 is seqs 1, 3 and 4"*. That was not
+assumed. **All 32** assignments of `executed` over golden 3's five rows were enumerated and scored
+against **both** pinned counts; then **all 1024** assignments of `executed` **and** the gate verdict
+together, so that the reading does not rest on assuming golden 3's rows were all ALLOWED. **`executed`
+is FORCED TRUE on seqs 1, 3 and 4 and FORCED FALSE on seq 2 in EVERY satisfying assignment of BOTH
+searches.** A **second route** reaches seq 3 without reading `productive_actions` at all: only seqs 2
+and 3 qualify for CANARY-A on amount, seq 2 is Razorpay-rejected, so `canary_a_breach: 1` forces seq
+3 on its own.
+⚠️ **AND ONE THING THE RULING DOES NOT SAY, REPORTED RATHER THAN SMOOTHED: seq 5's `executed` is NOT
+determined by the two pinned counts.** It is Razorpay-rejected (non-productive either way) and at
+300,000 paise on `pay_54cd5f529e3350` it is outside CANARY-A entirely, so search 1 returns **two**
+satisfying vectors and search 2 returns **eight**, differing only there. It is settled to FALSE by a
+**third** fact, named rather than folded in — a Razorpay-refused call is one the world did not
+perform, which is C7's own consistency assertion 2. **It changes nothing for the re-cut:** every
+satisfying vector in both searches agrees on seqs 1, 2 and 3, and those are golden 5B's entire scope.
+
+**WHAT MOVED, AND ONLY THIS.** seq 1 `186a2118…` **UNCHANGED** · seq 2 `26019af3…` **UNCHANGED** ·
+seq 3 `executed` false → **true**, hash `6ae5bd20…` → **`5433c3f4…`**. The corrected chain was then
+re-verified **from the file itself**: every digest recomputes and every link holds.
+
+**THE NARRATIVE IS RETRACTED, NOT SOFTENED.** The claim that case A *"already contained one of each
+of the three outcomes"* is **false** and is removed as an assertion from **both** the golden and
+`tests/goldens/README.md`. Golden 5B holds an **EXECUTED** row, a **RAZORPAY-REFUSED** row and a
+**second EXECUTED** row, and **no tool-layer-refused row at all** — a new `no_tool_layer_row_here`
+key says so. ⚠️ **THE WITHDRAWN SENTENCE SURVIVES IN EXACTLY ONE PLACE, DELIBERATELY AND DECLARED
+HERE:** inside the golden's new `retraction` key, which quotes it in order to withdraw it. **A
+retraction that cannot name what it retracts is not a retraction.** If the architect meant the words
+deleted outright, they go on the next word.
+`derivation.executed_assignment.rule` now **reads from the world's execution fact as golden 3 records
+it** and states in terms that **a NULL `a_class` does NOT imply a refusal** — it records which harm
+class an executed action fell into, and its absence is byte-for-byte what an executed, harmless money
+action looks like.
+
+**`INCIDENTS.md` INC-67** carries the error with all eight of hard rule 13's fields.
+⚠️ **`Missed:` has a real answer and it is not flattering:** the disproof was inside a fixture the
+architect authored, the prohibition was inside a prompt the architect wrote, in capitals, and the
+golden's own `derivation` block wrote the forbidden inference out in full, in plain sight, past two
+prior reads. ⚠️ **`Systemic guardrail:` says NONE, plainly** — nothing in this repository
+cross-checks one golden against another, before this incident or after it — and the check that would
+have caught it is named and owed as **`OF-155`** (MEDIUM, no owner). It is **not** written by this
+session because `tests/goldens/` is read-only and a session may not add the test that judges the
+fixture it just corrected.
+
+**MEASURED AT THE BOUNDARY, BY THIS SESSION, ON A CLEAN TREE.**
+`PYTHONPATH=src python -m pytest tests/ -q`: **786 passed, 1 failed, 1 skipped** in **160.62 s**.
+**The one red is
+`tests/test_lanes_operator_placeholders.py::test_the_camel_branch_is_decided_before_any_camel_run`**
+on the `TODO_C13_RUN1` sentinel — the expected pre-existing red, C13/RUN-1's, **not this session's**,
+and it stays red. ⚠️ **A SECOND RED WAS OBSERVED MID-TASK AND IS DECLARED RATHER THAN HIDDEN:**
+`tests/test_repo_invariants.py::test_the_object_store_and_the_working_tree_agree` failed while the
+corrected golden was **edited but not yet committed** — the invariant compares the working tree to
+HEAD, so it fires on any uncommitted edit by construction. It went green the moment `8558639`
+existed. `make check-roles`: **17 passed, 0 failed, 5 n/a, exit 0**, E1 clean over **51** token rows.
+`git status --porcelain tests/goldens/`: **EMPTY**. `git diff` on the four untouched goldens:
+**EMPTY, all four**. `git status --porcelain vendor/`: **EMPTY**.
+
+⚠️ **`INC-65` RECURRED IN UNDER SIX HOURS AND THE MECHANISM IT NAMES IS NOT THE ONE THAT FIRED.**
+`INC-36`, `INC-65` and `Q-063` all diagnose the shared **working tree**; **none of the three says the
+word INDEX**. Two sessions in one tree also share one `.git/index`, so session A's `git add` and
+session B's bare `git commit` put A's files in B's commit — and `Q-063`'s `Swept:` discipline binds
+that index at **one instant** and cannot bind it while B composes a message. **Both sessions followed
+the rule.** This session ran clause (i)'s diff and clause (ii)'s staged-snapshot read before every
+commit it made and swept nothing; the guard works in the direction it was built for and this is the
+direction it was never built for. **`INC-68` carries it, `OF-156` carries the remedy**, which is
+**new, mechanical, costs nothing and was MEASURED in this tree rather than proposed**: a **private
+index** per session — `GIT_INDEX_FILE` pointed at the session's own temp path, seeded with
+`git read-tree HEAD`. Verified here: staging into a private index left the **shared** index's
+`git diff --cached --name-only` **EMPTY**. ⚠️ **A private index is not a worktree** — `Q-063`
+records worktrees declined **twice** as too much re-plumbing; this is one environment variable and one
+`read-tree`, changes no path or checkout, and is invisible to other sessions. **This session's
+remaining commits use it.** It is **not sufficient alone** and that is said rather than oversold: it
+protects the session that uses it, `INC-65`'s *"nothing can warn the session being swept"* still
+stands, and **E6 is still OPEN and still C11's** — E6 catches the sweep afterwards, a private index
+prevents it. Making it a rule is the **architect's**: `PROCESS.md` §7 is outside this fence.
+
+**WHAT THIS SESSION DID NOT DO.** It added **no test** consuming golden 5B — the only mention in any
+test file is a comment at `tests/test_c7_ledger.py:390`. It did **not** touch `golden3_harm_vector`,
+`golden5_tamper`, `golden1_money` or `world_seed_2001`; `Q-070` is untouched and still **OPEN**. It
+did **not** edit `docs/reviews/independent/c7_review1_goldens.py` or its committed output, which
+still pin the superseded digest `6ae5bd20…` — that directory is **append-only**, and it is the
+correct record of what the file said when C7 REVIEW 1 read it. **No tag was cut and none is owed
+here.**
+
+---
+
 
 ## C6 — THE ATTACKER LOOP — **REVIEW 5** — 2026-09-02 — ⚠️ **FAIL. NO TAG. ZERO BLOCKERS, THE SUBJECT MEASURED CLEAN, AND FOUR REQUIRED-SET MUTANT SURVIVORS — EVERY ONE IN COPY 2 OF CLAIM 4's GUARD**
 

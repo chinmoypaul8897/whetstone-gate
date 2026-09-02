@@ -5174,3 +5174,118 @@ searches, so the **next** reader of this fixture inherits the derivation rather 
 sources was published without being driven** — `INC-35` records a *term by term* test that could not
 discriminate two of its three terms — **and both were found by an adversarial reader rather than by
 any check.**
+
+---
+
+## INC-68 — `INC-65` RECURRED IN UNDER SIX HOURS, ON THE ENTRY THAT WAS BEING WRITTEN ABOUT IT: a concurrent session's commit named this session's uncommitted `INC-67`, said *"NONE of it is staged"*, and committed 187 of its lines under the wrong token — because two sessions in one working tree also share ONE INDEX, which `INC-65`'s diagnosis never mentions
+
+**Date:** 2026-09-02 (**found by the session that was swept**, ARCH FIX `3e5b7c10` — which is again
+the only session that can find it, exactly as `INC-65` predicted. The sweeping commit is **`ef1fb7e`**,
+the concurrent **C6 REVIEW 5** session `0ca97bbb`. **No Fix SHA; see `Fix`.**)
+
+**Event:** at the moment `ef1fb7e` ran `git commit`, this session had already run
+`git add -- INCIDENTS.md docs/reviews/OPEN_FINDINGS.md STATUS.md` and was composing its commit
+message. All three files were sitting in the shared index. `ef1fb7e` committed them. Measured, not
+inferred:
+
+```
+git log --oneline -S "## INC-67"  -- INCIDENTS.md                  ->  ef1fb7e
+git log --oneline -S "OF-155"     -- docs/reviews/OPEN_FINDINGS.md ->  ef1fb7e
+git log --oneline -S "3e5b7c10"   -- STATUS.md                     ->  ef1fb7e
+git log -1 --format=%B ef1fb7e | git interpret-trailers --parse    ->  Session-Token: 0ca97bbb
+git show ef1fb7e --stat  ->  4 files changed, 188 insertions(+), 1 deletion(-)
+```
+
+⚠️ **AND ITS OWN MESSAGE SAYS THE OPPOSITE, IN THE SAME PARAGRAPH THAT NAMES THE ENTRY IT SWEPT:**
+
+```
+Swept: NOTHING - the staged snapshot is ONE file, `docs/sessions/c6-review-5.txt`.
+!! The concurrent C7 REVIEW session (`472cdc4b`) still holds an UNCOMMITTED `INC-67` in
+`INCIDENTS.md` and uncommitted journal edits in this shared tree. NONE of it is staged.
+```
+
+**Three claims, three falsehoods, all mechanically checkable at the moment they were written:** the
+staged snapshot was **four** files and not one; `INC-67` **was** staged; and the session holding it
+was **ARCH FIX `3e5b7c10`**, not `472cdc4b` — that token belongs to C7 REVIEW 1, which had finished
+and pushed hours earlier.
+
+**Action:** ⚠️ **nothing is undone.** History is never rewritten here (`CLAUDE.md` §5) — a rewrite
+would destroy `probe-v1`, `prereg-v1` and every `cN-pass` tag — so `ef1fb7e` stands and the
+mis-attribution is corrected by **record**, which is `INC-65`'s own handling one iteration on. **The
+swept content was first verified INTACT rather than assumed intact:** each of the three blocks was
+compared byte-for-byte against the text this session had authored, at `HEAD`, and all three match.
+So `INC-67`, `OF-155` and `STATUS.md`'s update block are **in the repository and correct**; what is
+wrong is only whose token the log says put them there, and **this entry is how a reader learns which
+is which.**
+
+**Expectation:** `Q-063`'s ruling, clause (ii), and this session's own prompt, which restates it in
+capitals: *"`git add -- <explicit paths>` then a BARE `git commit`. Verify `Swept:` on the STAGED
+SNAPSHOT, AND in the direction Q-063 clause (ii) names — is somebody ELSE's entry inside what you are
+about to commit (INC-65)."* ⚠️ **BOTH SESSIONS FOLLOWED THAT RULE AND IT DID NOT HELP.** This session
+ran the clause-(i) diff and the clause-(ii) staged-snapshot read before **every** commit it made, and
+its three commits swept nothing. The rule is sound and it is **directional**: it protects the
+*reader* of the index from committing somebody else's work **at the instant it is read**. It cannot
+protect the *writer* of the index during the window between `git add` and `git commit`, and that
+window is exactly where this landed.
+
+**Missing:** ⚠️ **`INC-65`'s diagnosis names the shared WORKING TREE and never names the shared
+INDEX, so the remedy it reached for could not have worked.** `INC-36` concluded that *"a pathspec
+cannot fix it: it limits a commit by PATH, not by AUTHORSHIP"*, and `Q-063` answered with a
+**discipline** — read the diff, name what you sweep — plus **E6**, assigned to **C11** and still not
+landed. **Every one of those addresses the tree.** But `git add` writes to `.git/index`, there is
+exactly **one** of those per repository, and a bare `git commit` commits **the whole index** and not
+the paths its author had in mind. **No amount of reading a diff closes a race on a shared file**, and
+nothing in `INC-36`, `INC-65` or `Q-063` says the word *index*. Even **E6**, when it lands, is a
+*post-hoc* check on a pushed commit: it would have flagged `ef1fb7e` after the fact, which is this
+entry, not a prevention.
+
+**Missed:** ⚠️ **`INC-65` was written YESTERDAY-INTO-TODAY about this exact class, it is the entry
+immediately above `INC-66`, and both were in this session's mandatory read order and were read.**
+Its own closing sentence is the signal: *"nothing can warn the session being swept … A `Swept:` line
+tells the READER afterwards; it cannot tell the session losing its attribution at the time, and E6
+will not either."* **That sentence describes this incident in advance and was read as a limitation to
+be accepted rather than as a live hazard to be routed around** — by both sessions, on the same day,
+in the same tree. ⚠️ **And the sharper miss is whose it is: the sweeping session wrote `Swept:
+NOTHING` while its own `git show --stat` would have printed four files.** The check that fails here
+is not subtle and is not new; it is the one `INC-47` already ruled on one field over — *a claim bound
+to a command must be read off the command*. **`Swept:` was reasoned rather than measured**, which is
+the fourth instance of that class this week (`INC-54`, `INC-58`, `INC-60`, and this).
+
+**Diagnosis:** two sessions in one working tree share one `.git/index`, so session A's `git add`
+places A's files into the same staging area that session B's bare `git commit` then commits wholesale
+under B's token. `Q-063`'s `Swept:` discipline reads that index at one instant and cannot bind it for
+the duration of composing a commit message, so the guard is correct and simply arrives too late.
+
+**Fix:** ⚠️ **NO SHA, AND NONE IS OWED FOR THE SWEEP ITSELF — `ef1fb7e` IS NOT AMENDED AND NOT
+REVERTED.** The content is correct at `HEAD` and only its attribution is wrong; the correction is
+this record, `CLAUDE.md` §5, and the same reasoning `INC-65` closed on. **What this session did
+change is its own remaining commits**, and the mechanism is under **Systemic guardrail** because it
+is a general remedy rather than a repair of this instance.
+
+**Systemic guardrail:** ⚠️ **ONE, IT IS NEW, IT IS MECHANICAL, IT COSTS NOTHING, AND IT WAS MEASURED
+IN THIS TREE RATHER THAN PROPOSED — `GIT_INDEX_FILE` GIVES EVERY SESSION A PRIVATE INDEX IN THE
+SHARED WORKING TREE.**
+
+```
+export GIT_INDEX_FILE=<a path in this session's own OS temp directory>
+git read-tree HEAD           # seed the private index from HEAD
+git add -- <this session's explicit paths>
+git commit                   # commits HEAD plus THIS session's paths, and nothing else
+```
+
+**Measured here, before it was written down:** with a private index seeded from `HEAD`, staging one
+file left `git diff --cached --name-only` reading that one file under the private index and
+**EMPTY** under the shared index — the two are genuinely independent. ⚠️ **This is what `INC-36` and
+`Q-063` were reaching for and did not find.** `Q-063` records that separate **worktrees** were
+declined **twice**, with the reason — *"it is 1 September, C14 is imminent, and re-plumbing every
+session's tree now risks more than the mis-attribution costs"*. **A private index is not a worktree.**
+It is one environment variable and one `read-tree`, it changes no path, no checkout and no tooling, it
+is invisible to every other session, and it closes the write-side window that the `Swept:` discipline
+provably cannot. ⚠️ **AND IT IS NOT SUFFICIENT ON ITS OWN, WHICH IS STATED SO IT IS NOT OVERSOLD:** it
+protects a session that **uses** it. A session that does not still commits the shared index, and can
+still sweep a session that does not use it either. **It wants to be a rule in `PROCESS.md` §7 and a
+line in every prompt's GIT section, and both are the ARCHITECT'S** — `PROCESS.md` is outside this
+session's fence. Until it is a rule it is one session's habit, which is precisely what `OF-67` says
+about the last four of these. ⚠️ **`Q-063` clause (iii)'s E6 remains OPEN and assigned to C11**, and
+this incident does not close it: E6 catches the sweep afterwards, a private index prevents it.
+**Recorded as `OF-156`.**
