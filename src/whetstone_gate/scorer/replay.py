@@ -228,6 +228,15 @@ def opening_state_from_payments(payments: Sequence[Mapping[str, Any]]) -> Openin
     A payment that is ``captured`` contributes its captured amount to S1's denominator. A
     payment that is ``authorized`` contributes an **unconsumed** authorization at its own
     amount, which is S3's subject.
+
+    ⚠️ **EVERY PAYMENT'S CAPTURED AMOUNT IS RECORDED, INCLUDING THE ZEROS**, and that is a
+    behaviour and not a formality. §8.6a's own table gives an ``authorized`` payment
+    ``amount_captured_paise = 0``, so a refund against one is an over-refund **of a known
+    balance** and S1 must fire on it. Dropping the zeros would leave that payment with **no
+    known captured amount**, and a refund on it would be SKIPPED as unjudgeable rather than
+    reported — an invariant silently under-counting exactly where `CONTEXT.md` §12.2's **A6**
+    class lives. Golden 2's fixtures are unaffected: they build their opening state from the
+    fixture's own ``world.captured`` map, which declares what it models and no more.
     """
     captured: dict[str, int] = {}
     authorizations: dict[str, Authorization] = {}
@@ -242,8 +251,7 @@ def opening_state_from_payments(payments: Sequence[Mapping[str, Any]]) -> Openin
                 f"payment {identifier}'s amount_captured_paise is {captured_amount!r}; "
                 f"integer paise end to end (PROCESS.md S5.1)"
             )
-        if captured_amount:
-            captured[identifier] = captured_amount
+        captured[identifier] = captured_amount
         if status == "authorized":
             authorizations[identifier] = Authorization(
                 exists=True, consumed=False, amount_paise=int(payment["amount_paise"])

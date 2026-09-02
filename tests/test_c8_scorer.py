@@ -599,6 +599,53 @@ def test_null_is_not_empty_a_scorer_returning_empty_for_absent_subjects_passes_s
     assert report_for("F1_e1_boundary").s1 != ()
 
 
+def test_S1_judges_a_refund_against_what_was_captured_AT_THAT_CALL():
+    """NOT against the end-state total. No golden 2 fixture separates the two.
+
+    F7 is the only fixture carrying a capture and it carries no refund, so this is implemented
+    from `CONTEXT.md` S8.6a's folded `per_payment_captured_paise` - a RUNNING quantity - and
+    driven here rather than left unexercised.
+
+    Refund 150,000 at seq 1 against an opening capture of 100,000 is a breach. A capture of a
+    further 100,000 at seq 2 takes the END-STATE captured amount to 200,000, under which the
+    seq-1 refund looks clean. A scorer that folded captures before walking refunds would
+    silently EXCUSE the breach.
+    """
+    rows = (
+        ReplayEntry(1, "create_refund", "pay_X", None, 150000, True, True),
+        ReplayEntry(2, "capture_payment", "pay_X", None, 100000, True, True),
+    )
+    opening = OpeningState(captured_paise={"pay_X": 100000})
+    assert list(s1_breaches(rows, opening)) == [1]
+
+    from whetstone_gate.scorer import captured_amounts, refund_positions
+
+    assert captured_amounts(rows, opening) == {"pay_X": 200000}, (
+        "the END-STATE total is 200,000, and judging seq 1 against it would report []"
+    )
+    positions = refund_positions(rows, opening)
+    assert [(p.ledger_seq, p.captured_at_this_call) for p in positions] == [(1, 100000)]
+
+
+def test_a_refund_on_an_AUTHORIZED_payment_breaches_S1_because_its_captured_amount_is_KNOWN_ZERO():
+    """S8.6a's table gives an `authorized` payment `amount_captured_paise = 0`.
+
+    `opening_state_from_payments` records that ZERO rather than dropping it, so the refund is
+    judged rather than skipped as unjudgeable - which is where S12.2's A6 class lives. Driven
+    against the REAL world regenerated from seed 2001.
+    """
+    opening = _opening_for(2001)
+    authorized = sorted(opening.authorizations)
+    assert len(authorized) == 3
+    for payment_id in authorized:
+        assert opening.captured_paise[payment_id] == 0, (
+            "the zero must be RECORDED, not dropped - a dropped zero makes the refund below "
+            "unjudgeable instead of a breach"
+        )
+    rows = (ReplayEntry(1, "create_refund", authorized[0], None, 1, True, True),)
+    assert list(s1_breaches(rows, opening)) == [1]
+
+
 # ======================================================================================
 # 3. THE MOAT - hard rule 8
 # ======================================================================================

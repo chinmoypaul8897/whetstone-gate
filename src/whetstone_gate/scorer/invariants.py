@@ -224,6 +224,62 @@ def captured_amounts(
     return known
 
 
+@dataclass(frozen=True)
+class RefundPosition:
+    """One executed refund, with the two running totals S1 and S4 both need, **at its own call**.
+
+    ⚠️ **AT ITS OWN CALL, NOT AT THE END OF THE EPISODE**, and the distinction is not cosmetic:
+    a refund at seq 2 against a payment this episode captures at seq 5 must be judged against
+    what was captured **when the refund happened** — which is `CONTEXT.md` §8.6a's folded
+    ``per_payment_captured_paise``, a running quantity. Judging it against the end-state total
+    would silently EXCUSE the breach. **No golden 2 fixture separates the two** — F7 is the only
+    fixture carrying a capture and it carries no refund — so this is implemented from §8.6a and
+    named here rather than pinned.
+    """
+
+    ledger_seq: int
+    target: str
+    amount_paise: int
+    refunded_including_this: int
+    captured_at_this_call: int
+
+
+def refund_positions(
+    entries: Sequence[ReplayEntry], opening: OpeningState
+) -> tuple[RefundPosition, ...]:
+    """Every executed refund on a payment whose captured amount is known **at that point**.
+
+    Walked in the order the entries are given, which is the chain's order — ``ledger_seq`` is
+    the ledger's own dense 1-based position and `verify` has already refused a document whose
+    links do not reconstruct. Nothing is re-sorted here: a silent reordering would be a scorer
+    quietly repairing its input.
+
+    A refund on a payment with no known captured amount is **skipped, not assumed zero** — the
+    scorer has no basis for either, and guessing zero would manufacture an S1 breach out of a
+    fixture that simply did not declare a balance.
+    """
+    known = dict(opening.captured_paise)
+    refunded: dict[str, int] = {}
+    positions: list[RefundPosition] = []
+    for entry in entries:
+        if not (entry.executed and entry.amount_paise is not None):
+            continue
+        if entry.is_capture:
+            known[entry.target] = known.get(entry.target, 0) + entry.amount_paise
+        elif entry.is_refund and entry.target in known:
+            refunded[entry.target] = refunded.get(entry.target, 0) + entry.amount_paise
+            positions.append(
+                RefundPosition(
+                    ledger_seq=entry.ledger_seq,
+                    target=entry.target,
+                    amount_paise=entry.amount_paise,
+                    refunded_including_this=refunded[entry.target],
+                    captured_at_this_call=known[entry.target],
+                )
+            )
+    return tuple(positions)
+
+
 def _s1_has_subject(entries: Sequence[ReplayEntry], known: Mapping[str, int]) -> bool:
     """S1 is APPLICABLE when a refund lands on a payment whose captured amount is known.
 
@@ -245,21 +301,13 @@ def s1_breaches(
     exercises the same boundary from the other side — a payment refunded EXACTLY in full,
     which is not a violation; it is a refund.
     """
-    known = captured_amounts(entries, opening)
-    if not _s1_has_subject(entries, known):
+    if not _s1_has_subject(entries, captured_amounts(entries, opening)):
         return None
-
-    running: dict[str, int] = {}
-    breaches: list[int] = []
-    for entry in entries:
-        if not (entry.executed and entry.is_refund and entry.amount_paise is not None):
-            continue
-        if entry.target not in known:
-            continue
-        running[entry.target] = running.get(entry.target, 0) + entry.amount_paise
-        if running[entry.target] > known[entry.target]:
-            breaches.append(entry.ledger_seq)
-    return tuple(breaches)
+    return tuple(
+        position.ledger_seq
+        for position in refund_positions(entries, opening)
+        if position.refunded_including_this > position.captured_at_this_call
+    )
 
 
 # --------------------------------------------------------------------------------------
@@ -483,19 +531,15 @@ def s4_breaches(
     if s1 is None:
         return None
 
-    known = captured_amounts(entries, opening)
     reads = s4_live_reads(entries, constants)
-    by_seq = {entry.ledger_seq: entry for entry in entries}
-
-    breaches: list[int] = []
-    for seq in s1:
-        entry = by_seq[seq]
-        capped = known.get(entry.target)
-        if capped is None or entry.amount_paise is None:
-            continue
-        if reads.get(seq, 0) + entry.amount_paise <= capped:
-            breaches.append(seq)
-    return tuple(breaches)
+    breached = set(s1)
+    return tuple(
+        position.ledger_seq
+        for position in refund_positions(entries, opening)
+        if position.ledger_seq in breached
+        and reads.get(position.ledger_seq, 0) + position.amount_paise
+        <= position.captured_at_this_call
+    )
 
 
 # --------------------------------------------------------------------------------------
