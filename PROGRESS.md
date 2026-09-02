@@ -6,6 +6,139 @@ not a record; this file is.
 
 ---
 
+## C6 — THE ATTACKER LOOP — **REVIEW** attempt 4 — 2026-09-02 — **FAIL, ZERO BLOCKERS. ALL SIX SURVIVORS KILLED; SEVEN NON-EQUIVALENT MUTANT SURVIVORS, THREE OF WHICH CARRY THE FAIL**
+
+**SESSION-TOKEN:** `ca0dd160` · **NOT in the batch.** Row **45**, registered **before the Phase-1
+seal** (`daefb31`, then `11193bd`) from a table **re-counted at the moment of the append** — because
+the paragraph above it counted 43 data rows and was already stale: the concurrent **C13 FIX 3**
+session (`e9dd0346`) landed row 44 at `bd2107f` while this session was reading `CONTEXT.md`.
+⚠️ **Two numbers, and this session says which it counted:** **45 is the DATA-ROW count**;
+`make check-roles` prints **one fewer** (**44 issued row(s) covering 44 token(s)**, MEASURED by
+running the command, not derived) because the `WG-2026-08-30-CTX-13.4-A` row matches neither the
+8-hex token pattern nor the `(C\d+|ARCH)` chunk cell — `INC-54`.
+
+**Pushed SHA:** see the FINAL OUTPUT in `docs/sessions/c6-review-4.txt`.
+**Verdict:** ⚠️ **FAIL. `c6-pass` NOT CUT.** `git tag -l` remains `c0-pass c1-pass c2-pass c3-pass
+c4-pass`. Neither `probe-v1` nor `prereg-v1` exists.
+
+### What this session did
+
+**PHASE 1, SEALED AT `11193bd` BEFORE ANY FIX COMMIT WAS OPENED.** `OF-80`'s ruling: *on a
+re-review, Phase 1 is blind to the FIX, not to the FINDINGS.* `OF-104`…`OF-114` and `STATUS.md`'s C6
+row were read at **`2be75b1`** — REVIEW 3's own commit, the finding **without** the disposition —
+because `6bcc15a` filled the `Closed by` cells. `INC-53` and the `PROGRESS.md` entry were deferred
+to Phase 2. ⚠️ **`INC-54` WAS read, and that is the one place the boundary was drawn looser than
+REVIEW 3 drew its own**: it was written by the fix session, but this prompt directs Phase 1 to it
+**for the token-row count**. Named in the criteria file rather than left to be inferred.
+
+* `independent/c6_review4_criteria.md` — **55 numbered probes**, each with its **polarity fixed in
+  advance**, plus **the verdict rule itself, written before any measurement** so it could not be
+  adjusted to the result. **Six rows deliberately predicted failure or escape**; one stated a prior
+  against the fix. A criteria file whose every row predicts success is a wish list.
+* `independent/c6_review4_reimpl.py` — the **scoped reimplementation** the recorded ruling
+  authorises: **the blindness scan's three layers and the `_sole_killer` exclusivity helper**,
+  re-derived from `CONTEXT.md` §8.6/§8.6a/§10.1/§13.3 and `config/protocol.yaml` alone, importing
+  **nothing** from `src/`. Its `sole_catcher()` **returns the SET of layers that fire**, so
+  exclusivity is *measured* rather than asserted. **Ten families, 118 needles**, and a
+  **clean-surface control at 0 of 118**.
+
+**PHASE 2.** 28 mutants in a fresh OS temp clone (baseline **111 passed**), every mutation committed
+inside the clone, every restore digest-verified, `whetstone_gate.__file__` printed.
+
+### The result, in one table
+
+| | |
+|---|---|
+| **BLOCKERS** | **0** |
+| MEDIUM / LOW | 5 / 7 |
+| Mutants | **28 run · 16 KILLED · 5 EQUIVALENT (boundary named) · 7 NON-EQUIVALENT SURVIVORS** |
+| REVIEW 3's six survivors | **all six KILLED**, by tests that name the property they attack |
+| Sealed polarities | **55 · 39 held exactly · 11 partial · 3 MISSES, all in the fix's favour · 1 held AGAINST the fix · 1 miss of this review's own** |
+| The four blindness claims, my method | **0 AUTHORED hits of 118** at turns 1, 6, 7, 12, 20 |
+| Clean-surface control | **0 of 118** |
+| `make test`, measured **twice** | **774 passed, 1 skipped, 2 deselected — 0 FAILED**, both times |
+| `make check-roles` | **17 passed, 0 failed, 5 n/a — exit 0** |
+| `make selftest` | RED on `camel_comparator.branch` — **not C6's** |
+| Spend | **ZERO provider model calls.** `evals/` does not exist |
+
+### What fails it, and what does not
+
+**THE FAIL RESTS ON THREE MUTANTS, EACH WITH A CONCRETE DISTINGUISHING INPUT AND A ONE-FIXTURE
+REMEDY.** Two of them are **REVIEW 3's own `N15` and `N13` classes, unclosed in COPY 2 of the
+guard** — the copy C6 FIX 3 itself found under-fired (`N-M1b` / `OF-123`), closed for `OF-104`'s
+shape, and did not carry `N13`'s or `N15`'s fixtures across. The third is **`OF-108`'s class at the
+other end of the same loop**: `crossing()`'s `turn_budget` end is pinned by nothing while its `k = 0`
+end and its target boundary both are.
+
+**FOUR OF THE SEVEN ARE NAMED AS NOT CARRYING THE FAIL** — `R-18` is latent (`attacker/` is flat),
+`R-08` and `R-12` lose no protection under HEAD, and `R-05`'s **mutant is the stricter and wrong
+one**. Recorded that way so the count is not padded.
+
+⚠️ **AND A PRE-COMMITTED POLARITY FAILED AGAINST THE FIX, WHICH IS THE SHARPEST RESULT HERE.**
+**Two of `OF-104`'s own three measured exhibits still escape both copies**: the ruled remedy's regex
+requires a **digit** after `arm`, so *"this arm runs a live judge"* and *"…the gate judge rejected
+it; arm one…"* each produce **0 findings from all four guards in both copies**. ⚠️ **The defect is in
+the remedy the review ruled, not in the fix's execution of it** — C6 FIX 3 implemented it exactly and
+it goes red when reverted. Graded **MEDIUM**, because `REVIEW_C6_3` graded a strictly worse state
+(coverage **zero**) as its own `M-1`, and grading it a BLOCKER now would be manufacturing a fourth
+FAIL.
+
+### What is right, said first because it is true
+
+The behaviour is right. The four claims hold over the **real assembled bytes**. The door is open —
+the probe note is `FULL=True / AUTHORED=False` at every turn. `_sole_killer` survives **none** of
+four attacks, and its self-test fires it in **both** directions (`INC-50`). `OF-110`'s C6 half fires
+on all five dynamic forms **and on a sixth this review invented** — my sealed prediction that a split
+target name would escape was **wrong**, because the scan refuses the *mechanism* vocabulary rather
+than the target. Copy 2 is now fired at leaks and deleting its scan goes red. **Three of the six
+rows that predicted failure were wrong, and all three were wrong in the fix's favour.**
+
+### Owed, and paid
+
+**`docs/reviews/mutants/c6_mutants_4.md` is WRITTEN**, and it discharges C6 FIX 3's debt as well: its
+own fourteen self-directed mutants are transcribed there from `docs/sessions/nightrun-a-1.txt`, and
+**every one of the six claims this session could independently re-run reproduces, including the
+failure counts.** The one that does not survive audit is `SM-1`'s **equivalence argument** — not its
+verdict; the sound proof (*identical or louder, never silently different*) is supplied.
+
+### Two things this session got wrong, recorded rather than repaired quietly
+
+1. ⚠️ **Its own mutation harness was invalid on the first run.** The restore step ended with
+   `git checkout -- <path>`, which restores from a HEAD that **held** the mutation, so mutants
+   stacked and the failure counts ran **2, 4, 8, 11, 15, 18** instead of **2, 2, 4, 3, 4, 3**.
+   Caught by the monotone count, fixed by restoring **by writing the original bytes and committing
+   them**, the clone reset to the sealed content and re-baselined at 111 before anything was
+   published. **The failure direction was flattering** — everything reports KILLED — which is why it
+   is in `REVIEW_C6_4.md`, in `c6_mutants_4.md` and here.
+2. **`OF-135`, this review's own finding against itself.** Sealed probe `P-44` predicted ≥1
+   FULL-surface hit; this review measures **0**, because its hole-descriptor family carries the
+   **defender-side descriptions** of the door and deliberately not the note text §10.1 requires to
+   reach the attacker. The property is measured separately by the must-reach columns. `OF-114`'s
+   class landing on the next review.
+
+### Concurrency, handled rather than survived
+
+When this session began reading, **`e9dd0346`'s token row and a staged `INCIDENTS.md` (INC-55) were
+uncommitted in the shared working tree.** Staging `QUESTIONS.md` then would have swept 31 lines of
+another session's row into a commit under this token — **`INC-48`'s exact defect.** Nothing was
+staged until `git status --porcelain` read clean for `QUESTIONS.md` and `git diff --cached` read
+empty; that session committed both at `bd2107f` first. Every `Swept:` line in this session's commits
+was verified on the **STAGED SNAPSHOT**, never on the working tree.
+
+### Not this session's to do, and named rather than skipped
+
+* **A REVIEW SESSION FIXES NOTHING.** `src/`, `tests/`, `CONTEXT.md`, `PROCESS.md`, `config/`,
+  `check_roles.py`, `INCIDENTS.md` and every earlier `REVIEW_C6_*.md` are under **NOT** in this
+  fence. The seven survivors are exhibited, not closed.
+* **An `INCIDENTS.md` entry is owed** for the harness defect above and for the `OF-127` class, and
+  this session may not write it — the **fifth** time a fence has excluded the file a task required
+  (`Q-029`, `Q-033`, `Q-049`, `REVIEW_C6_2`'s `M-9`).
+* `OF-110`'s **C2 / C3 / C13 halves** remain open and routed to `OF-99`'s address.
+* `check_roles.py` counting the session-token table itself — `OF-67` / `OF-70` / `OF-78`, and this is
+  the **sixteenth** consecutive session to carry that total by hand.
+
+---
+
 ## C13 — THE CaMeL COMPARATOR — **FIX** attempt 3 — 2026-09-02 — **REVIEW 3's FIVE ITEMS CLOSED, AND THIS SESSION'S OWN MUTANTS FOUND TWO MORE DEFECTS IN ITS OWN REMEDY**
 
 **SESSION-TOKEN:** `e9dd0346` · **NOT in the batch.** Row **44**, registered **before this

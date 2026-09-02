@@ -1433,3 +1433,92 @@ wants them carried as numbered rows, the numbers are theirs to allocate.
 
 **No other session's line was touched by this append.** `Swept:` verified on the **STAGED SNAPSHOT**
 (`git diff --cached -- docs/reviews/OPEN_FINDINGS.md`), never on the working tree (`INC-48`).
+
+---
+
+## ⚠️ APPENDED BY C6 REVIEW 4 (`ca0dd160`), 2026-09-02 — SEVEN NON-EQUIVALENT MUTANT SURVIVORS, `OF-114` CLOSED, and `OF-104`'s RESIDUE RE-RAISED
+
+**APPEND-ONLY. No existing row was altered and no `Status` cell above this block was touched.**
+Dispositions are recorded **here, beneath the rows**, in the shape `OF-65`, `OF-78` and C6 FIX 3's
+own block were. ⚠️ **The ids start at `OF-124` because this file was re-read immediately before the
+append** and the highest present was **`OF-123`**, landed by C6 FIX 3 (`363a2e9f`).
+
+**VERDICT: FAIL, ZERO BLOCKERS.** All six of `REVIEW_C6_3`'s survivors are KILLED, by tests that name
+the property they attack. **28 mutants ran; 16 KILLED; 5 EQUIVALENT with the boundary named; 7
+NON-EQUIVALENT SURVIVORS, of which THREE carry the FAIL.** Baseline on the unmutated clone:
+**111 passed**. Every mutation ran in a fresh OS temp clone with its `whetstone_gate.__file__`
+printed; this repository was never mutated. Full table: `docs/reviews/mutants/c6_mutants_4.md`, which
+also discharges the `c6_mutants_4.md` debt C6 FIX 3 named and could not pay.
+
+| ID | Chunk | Severity | Finding | Spec citation | Raised by | Status | Closed by (SHA) |
+|---|---|---|---|---|---|---|---|
+| **OF-124** | C6 | **MEDIUM** | ⚠️ **MUTANT `R-14`, SURVIVOR: `N15` / `OF-107`'s CLASS IS UNCLOSED IN COPY 2 OF THE GUARD.** Widen **copy 2**'s LAYER-1 exemption from the state **JSON** to the whole state **LINE** — `mandated.replace(line[len(STATE_LABEL):], …)` → `replace(line, …)` — and **all 111 tests stay green**. **Non-equivalent by exhibit:** with `STATE_LABEL = "STATE SO FAR (5000000): "` over a real 20-turn episode, **HEAD returns 40 findings and the mutant returns 0**. Copy 1 got `test_LAYER_1_scans_the_state_LABEL_and_exempts_only_the_state_JSON` with three cap formattings **and** the other-side test (`INC-50`'s *"fire it at BOTH"*); **copy 2 got neither** — measured over the file, `exempts_only_the_state_JSON` is absent and no copy-2 test plants a cap in `STATE_LABEL`. ⚠️ **This is `OF-123`'s own class one step on: the fix found copy 2 under-fired, closed that for `OF-104`'s shape, and did not carry `N15` across.** **Remedy: one parametrised case in copy 2, mirroring copy 1's.** | `CONTEXT.md` §8.6, §10.1; `OF-107`, `OF-123`; `INCIDENTS.md` INC-42, INC-53 | **C6 REVIEW 4 (`ca0dd160`)** | ⚠️ **OPEN** | — |
+| **OF-125** | C6 | **MEDIUM** | ⚠️ **MUTANT `R-15`, SURVIVOR: `N13` / `OF-111`'s CLASS IS UNCLOSED IN COPY 2.** Copy 2's `refusal_lines != 1` → `< 1` leaves the suite green. **Non-equivalent by exhibit:** a summary carrying **two** recognisable last-denial lines gives **HEAD 20 findings and the mutant 0**. Copy 1 got a three-count fixture (2, 3, 5); copy 2 got none. **Remedy: one two-denial-line episode driven through copy 2.** | `CONTEXT.md` §13.3; `OF-111`, `OF-123` | **C6 REVIEW 4 (`ca0dd160`)** | ⚠️ **OPEN** | — |
+| **OF-126** | C6, **C14** | **MEDIUM** | ⚠️ **MUTANT `R-20`, SURVIVOR: `CrossoverSeries.crossing()`'s `turn_budget` END OF THE RANGE IS PINNED BY NOTHING**, while the **k = 0** end is pinned (`SM-6` / `R-19` dies) and the **target** boundary is pinned in both directions (`OF-108` / `N4` dies). `range(0, turn_budget + 1)` → `range(0, turn_budget)` leaves the suite green. **Non-equivalent by exhibit, all values positive and realistic:** a series with `full_listing_chars = 1600` (a **paginated** read, not the 12-payment listing), `displaced_result_chars = 240`, `base_tokens = 5,521` gives `tokens_at(19) = 57,277 ≤ 60,000 < tokens_at(20) = 60,001`. **HEAD returns `20`; the mutant returns `None`** — and `None` makes `crossover_note()` print *"NO number of full-listing reads inside 20 turns crosses 60,000"*, **a sentence instead of a number**, which the method's own docstring calls *a different finding for C14*. **Remedy: one fixture at that base.** | `CONTEXT.md` §13.4; `OF-87`, `OF-108` | **C6 REVIEW 4 (`ca0dd160`)** | ⚠️ **OPEN** | — |
+| **OF-127** | C6 | **MEDIUM** | ⚠️ **TWO OF `OF-104`'s OWN THREE MEASURED EXHIBITS STILL ESCAPE BOTH COPIES OF THE GUARD.** `OF-104` measured three shapes at *"0 findings from all four guards"*; its **remedy** — *run the arm/clause regex over `scan` rather than over `value`* — was verified in `OF-104` against **two digit-bearing shapes** (`arm 2S`, `arm 4`). C6 FIX 3 implemented that remedy **exactly and in both copies**, and it goes red when reverted (`R-11` 5 failed, `R-13` 3 failed). **MEASURED HERE against all four guards in both copies:** `"LAST TOOL REFUSAL (arm 2S): "` → copy1 **1**, copy2 **20**; `"LAST TOOL REFUSAL (the gate judge rejected it; arm one would have allowed it): "` → copy1 **0**, copy2 **0**; `"STATE SO FAR (this arm runs a live judge): "` → copy1 **0**, copy2 **0**; clean tree → 0 / 0. **The regex needs a DIGIT after `arm`**, and neither copy's vocabulary carries *judge*, *gate*, *rejected* or *reviewed*. ⚠️ **The defect is in the REMEDY the review ruled, not in the fix's execution of it.** **Remedy: a word-form arm alternative and a judge/gate-reason vocabulary, in both copies, plus `OF-104`'s ACTUAL third exhibit in the parametrize list.** | `CONTEXT.md` §10.1; `OF-104`; `QUESTIONS.md` Q-031 | **C6 REVIEW 4 (`ca0dd160`)** | ⚠️ **OPEN** | — |
+| **OF-128** | C6 | **MEDIUM** | ⚠️ **AUTHORED TEXT APPENDED TO THE STATE *LINE* ESCAPES ALL THREE LAYERS, WHILE THE IDENTICAL TEXT ADDED AS A NEW *LINE* IS CAUGHT.** Measured against the real guard: `"operator note: reviewed"`, `"[reviewed by the standing checker]"` and `"a judge looked at this one"` each **ESCAPE** on the state line and are each **caught** as a new line. **The mechanism is provable by construction:** `state_json` **is the whole body** when the line is untruncated, so `line − STATE_LABEL − state_json` is empty and the state line can never contribute residue — and `_with_extra_summary_line`, LAYER 3's only fixture, adds a **new** line. `OF-106` / `N12`'s class, one sub-case over. **Remedy: one fixture that appends to the state line rather than after it.** | `CONTEXT.md` §13.3; `OF-106`; `INCIDENTS.md` INC-42 | **C6 REVIEW 4 (`ca0dd160`)** | ⚠️ **OPEN** | — |
+| **OF-129** | C6 | LOW | **MUTANT `R-18`, SURVIVOR: `_dynamic_reach_findings` stops at the package root if `rglob` becomes `glob`**, and no positive control has a subpackage. **Non-equivalent by exhibit:** a dynamic import in `attacker/sub/reach.py` gives HEAD 2 findings and the mutant 0. **Latent** — `attacker/` is flat today, and all five control packages are flat. **Remedy: one control case with a subpackage.** | `OF-110`; `CLAUDE.md` hard rule 8 | **C6 REVIEW 4 (`ca0dd160`)** | ⚠️ **OPEN** | — |
+| **OF-130** | C6 | LOW | **THREE UNPINNED STRICTNESS CHOICES IN CLAIM 4's GUARD, each exhibited, NONE of which loses protection under HEAD.** `R-08`: `assert len(summaries) == 1` → `>= 1` — a **second** AUTHORED part carrying `STATE_LABEL` turns a loud raise into silence; no code path builds two. `R-12`: LAYER 2b run over `values_scan` instead of `scan` — `idempotency_keys_seen = ("arm 2S",)` gives HEAD `["2b 'arm 2S'"]` and the mutant `[]`; **HEAD is the stricter one and the surface is the §8.6 folded state, which C7's ledger fills.** `R-05`: LAYER 2's system-prompt subtraction, all occurrences → one — with the prompt present twice, HEAD `[]` and the **mutant** `["vocab 'limits'"]`, i.e. **the mutant is stricter and WRONG**. **Named individually so the survivor count is not padded.** | `CONTEXT.md` §8.6, §13.3 | **C6 REVIEW 4 (`ca0dd160`)** | ⚠️ **OPEN** | — |
+| **OF-131** | C6, **process** | LOW | **`SM-1`'s EQUIVALENCE PROOF STATES A CONCLUSION THAT IS FALSE IN GENERAL, AND THE VERDICT IS STILL RIGHT.** C6 FIX 3: *"the number of parts containing `STATE_LABEL` is 1 WITH the origin filter and 1 WITHOUT it, EVERY TIME, **so the helper returns a byte-identical context either way**."* **Measured: an `ATTACKER` part echoing `"STATE SO FAR: "`, or a `WORLD` tool result carrying it, gives HEAD `replaced=1` and the mutant `replaced=2` — different bytes.** ⚠️ **The sound proof is different and stronger, and is supplied in `c6_mutants_4.md` §3.2: on every separating input the mutant's own `assert replaced == 1` RAISES, so it is IDENTICAL OR LOUDER, never silently different — and the AUTHORED surface is byte-identical even then.** `REVIEW_C6_3`'s own `N6` proof states its boundary; this one does not. **Remedy: state the boundary.** | `docs/reviews/README.md`; `REVIEW_C6_3` §8 (`N6`) | **C6 REVIEW 4 (`ca0dd160`)** | ⚠️ **OPEN — wording of a proof** | — |
+| **OF-132** | C6, **process** | LOW | **A COMMENT CALLS A SUBSTITUTED SHAPE *"verbatim"*, AND THE SUBSTITUTION IS THE DISCRIMINATOR.** `tests/test_c6_attacker.py`'s `OF-104` parametrize list is introduced by *"`REVIEW_C6_3`'s own two exhibits, verbatim"* and its state-label case reads **`"STATE SO FAR (arm 4 runs a judge): "`** — not `OF-104`'s measured `"STATE SO FAR (this arm runs a live judge): "`. The substituted words are `arm 4` for `this arm`, **which is exactly the digit the regex requires**. The shape is defensible (it appears in `OF-104`'s *remedy* line); the word *"verbatim"* is not. **`INC-47`'s own diagnosis one level down: `Fix:` is bound to a commit and cannot be invented; a COMMENT is bound to nothing.** | `CLAUDE.md` hard rule 13; `INCIDENTS.md` INC-47; `OF-113` | **C6 REVIEW 4 (`ca0dd160`)** | ⚠️ **OPEN — wording** | — |
+| **OF-133** | C6 | LOW | **46 OF 118 NEEDLES ESCAPE WHEN CARRIED IN `LAST_REFUSAL_LABEL`; ALL 118 ARE CAUGHT IN THE REFUSAL VALUE AND ALL 118 AS A NEW-LINE RESIDUE.** Measured with this review's own ten-family corpus (`independent/c6_review4_reimpl.py`), which scores **0 of 118 on a clean authored surface**. The escaping classes: **config key names 6/6**, **extra folded-state field names 8/8**, hole descriptors 7/14, digit-free arm forms 6/12, answer-key vocabulary 5/15, verdict vocabulary 5/8, paraphrases 5/7, and **F1's four word-rendered ceilings — `2 lakh`, `half a lakh`, `0.5 lakh`, `2L`**. ⚠️ **The label is the weak surface BY DESIGN, and the mechanism was derivable before any code was read:** subtraction by identity subtracts the label's **current** bytes, so a leak inside a label subtracts itself and leaves no residue; only a content-matching layer can see it. Superset of `OF-127`. | `CONTEXT.md` §10.1, §8.6 | **C6 REVIEW 4 (`ca0dd160`)** | ⚠️ **OPEN** | — |
+| **OF-134** | **process** | LOW | **THERE IS NO `docs/sessions/c6-fix-3.txt`.** C6 FIX 3's FINAL OUTPUT is inside **`docs/sessions/nightrun-a-1.txt`** under token `363a2e9f`, because one operator "Night Run A" session held **two** chunk tokens (`9c7c5973` for C0, `363a2e9f` for C6) and wrote one combined block. `CLAUDE.md` §6.1 names the file `docs/sessions/<chunk>-<role>-<attempt>.txt`. **The record exists, is complete, and was read in full by this review** — it is simply not where the constitution says to look, and a reader grepping `c6-fix-3` finds nothing. **Not a defect in the content. The remedy is the architect's:** either a naming rule for multi-chunk sessions, or a stub that points at the real file. | `CLAUDE.md` §6.1; `PROCESS.md` §11 | **C6 REVIEW 4 (`ca0dd160`)** | ⚠️ **OPEN — for the architect** | — |
+| **OF-135** | **process** | LOW | ⚠️ **THIS REVIEW'S OWN, AND IT IS RECORDED RATHER THAN ADJUSTED.** Sealed probe **P-44** predicted *"the FULL surface carries ≥ 1 hit, and it is the probe's own note arriving as a WORLD tool result"* — which is what `REVIEW_C6_3` measured. **This review measures 0 FULL-surface hits**, because its `F5` family carries the **defender-side descriptions** of the door (`CANARY-A`, `EXEMPTION:`, `void threshold`) and deliberately **not the note text**, which §10.1 requires to reach the attacker. **The property is still measured** — the must-reach columns check the note and `pay_CANARYRECON` directly, and the note is `FULL=True / AUTHORED=False` at every turn. **The sealed polarity was wrong about this reviewer's own file**, which is `OF-114`'s class landing on the next review. | `QUESTIONS.md` Q-031; `OF-114` | **C6 REVIEW 4 (`ca0dd160`)** | ⚠️ **OPEN — a note against this review, not against C6** | — |
+
+### Dispositions of the rows this review was asked to judge
+
+* **`OF-104`** — ✅ **CLOSED `f03d359` FOR THE SHAPE ITS REMEDY RULED**, in **both** copies, fixed
+  independently, silent on the clean tree, and it goes red when reverted (`R-11` 5 failed; `R-13`
+  3 failed). **Its residue is re-raised as `OF-127`** rather than left inside a closed row.
+* **`OF-105`** (`N14`) — ✅ **CLOSED `f03d359`.** Re-run here: **KILLED, 4 failed**, on
+  `test_the_denial_equality_is_the_SOLE_killer_of_a_value_that_leaks_nothing_else`.
+* **`OF-106`** (`N12`) — ✅ **CLOSED `f03d359`.** **KILLED, 4 failed.** The sub-case is `OF-128`.
+* **`OF-107`** (`N15`) — 🟡 **CLOSED `f03d359` FOR COPY 1** — **KILLED, 3 failed**, with the
+  other-side test as well — **and unclosed in COPY 2**, re-raised as `OF-124`.
+* **`OF-108`** (`N4`) — 🟡 **CLOSED `f03d359`** — **KILLED, 2 failed**, and its base is **derived
+  from `config/`** (`target − 8 × per_read = 17,616`, recomputed independently here) rather than
+  written down — **and the same boundary class at the range's other end is re-raised as `OF-126`.**
+* **`OF-109`** (`N9`) — ✅ **CLOSED `f03d359`.** **KILLED, 2 failed**; the control gained **three**
+  relative forms, one more than the finding asked for.
+* **`OF-110`** — ✅ **C6's HALF CLOSED `f03d359`**, and it is stronger than the finding asked: fired
+  at **five** dynamic forms (the three `OF-110` named plus `sys.modules` and `exec`), each asserting
+  **both** that the AST walk stays silent **and** that the text scan fires; verified here on all five
+  **plus a sixth this review invented** (`import_module("open" + "ai")`, which **fires** — the scan
+  refuses the *mechanism* vocabulary, not the target name). Zero hits on the package. The refusal
+  list is itself pinned name-by-name (`R-17` dies). ⚠️ **The C2 / C3 / C13 halves remain OPEN and
+  routed to whichever chunk owns the repository-wide tripwires — `OF-99`'s address.**
+* **`OF-111`** (`N13`) — 🟡 **CLOSED `f03d359` FOR COPY 1** — **KILLED, 3 failed** — **and unclosed
+  in COPY 2**, re-raised as `OF-125`.
+* **`OF-112`** — 🔶 **STAYS OPEN, and C6 FIX 3's reason is right.** The glob `tests/test_c6_*.py` did
+  put `tests/test_c6_review_probes.py` inside its fence, so it **could** have reached it — and
+  `INC-30`/`INC-31` are a named hazard about a **fix** session editing a **reviewer's** evidence,
+  which is the stronger consideration. ⚠️ **Confirmed first-hand:** this review used a **growing**
+  fold in its own episode driver for exactly `OF-82`'s reason. **Owner: a session that owns that file.**
+* **`OF-113`** — 🔶 **STAYS OPEN, CORRECTLY.** Verified: `_denial_findings` subtracts only
+  `authored.attacker_system_prompt()`; the tool schemas stay in `scan` and are scanned by LAYERS 1–2,
+  which is what the guard's own docstring says. **The direction is SAFE.** `INCIDENTS.md` is
+  append-only (`Q-033`) and rule 13 fixes the format, so a written `Action` is not rewritten.
+* **`OF-114`** — ✅ **CLOSED by this commit.** C6 FIX 3's reason — *"a fix session does not close a
+  review's self-record"* — is right **and does not bind a REVIEW session**, which is the right author.
+  The corrected `ast`-based result is already in `REVIEW_C6_3` §2.3 and in
+  `independent/c6_review3_probes_output.txt`. Nothing is owed and nothing is actionable.
+* **`OF-123`** — ✅ **CLOSED FOR THE INSTANCE `f03d359`**: `R-13` kills it, 3 failed, and copy 2 is
+  now fired at three leaky labels **through `run_episode`'s real output**. ⚠️ **THE CLASS STAYS OPEN,
+  and this review is the SEVENTH instance** — `INC-42`'s `Systemic guardrail` counted four sessions,
+  `REVIEW_C6_3` made it five, `INC-53` six. **For the first time the instances are not new blind spots
+  but the same three classes not carried from one copy of a guard to its twin** (`OF-124`, `OF-125`,
+  `OF-127`). The mechanism that found the defect — *mutate your own new surface* — works; what is owed
+  is applying it to **both copies**.
+
+### Re-stated from earlier C6 reviews, and explicitly NOT closed by this session
+
+* **`OF-47`** (the estimate omits completion tokens) — **OPEN by design**; disclosure verified in
+  `TokenEstimate.method` and `BudgetComparison.render()`.
+* **`OF-49`** (the split's bias is wider than "paraphrase") — **OPEN**, widened; five bias classes named.
+* **`OF-53`** (`data/generic_denial.txt` is not in `spec_constants.AUTHORED_TEXTS`) — **OPEN**,
+  verified again: the tuple still holds exactly three paths.
+* **`OF-90` / `OF-92` / `OF-94` / `OF-95`** — **OPEN**, outside every C6 fence in both directions;
+  `Q-076` and `Q-078` carry two of them.
+
+**No other session's line was touched by this append.** `Swept:` verified on the **STAGED SNAPSHOT**
+(`git diff --cached -- docs/reviews/OPEN_FINDINGS.md`), never on the working tree (`INC-48`).

@@ -7314,3 +7314,75 @@ gloss **(a)** is to be shipped with its 74-commit blind spot accepted and publis
 print a false statement about commits that do carry a trailer, and this time the number is 74.
 
 **RULING (architect, \<date>):** *\<pending>*
+
+---
+
+## ⚠️ RAISED BY C6 REVIEW 4 (`ca0dd160`), 2026-09-02 — Q-082
+
+### Q-082 — ⚠️ `docs/reviews/README.md`'s bar says *"every mutant killed or proven equivalent"* without qualification, and C6 is now failing on mutants in the GUARD while the guard's SUBJECT is provably clean. Is that what the bar means?
+
+**Raised by:** C6 REVIEW 4 (`ca0dd160`) · **Date:** 2026-09-02 · **Status:** ⚠️ **OPEN — NOT
+blocking; the written bar was applied as written and the verdict is FAIL** · **Class:** **A** — it
+decides a `cN-pass` tag, and it will decide C6's next one and every re-review after it.
+
+**Context, stated as a measurement rather than as a worry.** `docs/reviews/README.md`: *"PASS
+requires ALL of: every golden reproduced by the reviewer's own computation; **every mutant killed or
+proven equivalent**; the reimplementation agreeing on all ≥20 vectors; **zero BLOCKER findings**; and
+no reported figure contradicting `prereg-v1`."*
+
+Three consecutive C6 reviews have now returned **FAIL WITH ZERO BLOCKERS**, each on mutant survivors
+and on nothing else. In all three the chunk's **behaviour** was measured correct:
+
+| review | blockers | what actually failed it | was the subject clean? |
+|---|---|---|---|
+| `REVIEW_C6_2` | 3 | three BLOCKERs **plus** four survivors | no — B-1 printed a wrong figure |
+| `REVIEW_C6_3` | **0** | six survivors, four inside the blindness guard | **yes** — *"the four blindness claims hold today over the package's own assembled bytes"* |
+| `REVIEW_C6_4` | **0** | seven survivors, three of them carrying the FAIL | **yes** — 0 AUTHORED hits of 118 needles, clean-surface control 0/118, must-reach holds |
+
+⚠️ **AND THE SHAPE HAS NARROWED EACH TIME, WHICH IS THE PART WORTH RULING ON.** REVIEW 3's six
+survivors were assertions *inside the guard* that could be deleted with the suite green. REVIEW 4's
+three are the **same two classes not carried from COPY 1 of the guard to COPY 2**, plus one boundary
+of a loop whose other two boundaries are pinned. **Every one is a mutation of a TEST**, and every one
+leaves the thing the test is about — the attacker's authored surface — measurably clean.
+
+**The question, exactly.** Is *"every mutant killed or proven equivalent"*:
+
+1. **as written** — a mutant is a mutant, and an unkilled non-equivalent mutant anywhere in the
+   chunk's surface (source **or** its guards) is a FAIL; or
+2. **scoped to the SUBJECT** — a surviving mutant on a **test-side guard** is a MEDIUM finding when
+   the guarded property is independently measured to hold, and only a survivor that lets a **wrong
+   value or a real leak** through is a FAIL?
+
+**Options seen:**
+
+1. **The bar as written (TAKEN, and it is what this review applied).** Consistent with the two
+   preceding reviews, which is the strongest argument for it: **a bar that moves when the project is
+   behind schedule is not a bar**, and `PROCESS.md` §5.4's whole subject is a gate that has never
+   gone red. ⚠️ Cost: C6 has now failed four times on progressively narrower ground, and the fix
+   cycle is consuming the days before the 4 September deadline.
+2. **Scope it to the subject.** Cheaper, and defensible on the ground that a guard is a tripwire and
+   `OPEN_FINDINGS.md` exists precisely to carry unclosed tripwire coverage. ⚠️ Cost, and it is the
+   serious one: **this project's entire thesis is that other people's numbers are unsound because
+   nothing adversarial was pointed at them.** *"The guard has a hole but the thing it guards is clean
+   today"* is the sentence a Track 01 entrant reporting *100% blocked* would write. `INC-42`'s own
+   `Diagnosis` — *"a check written against the shape the author imagined, which is silent on the
+   shape that actually occurs"* — has now produced **seven** instances in three days, and every one
+   was found by a mutant surviving, never by the subject being dirty.
+3. **A middle rule: a surviving guard-side mutant is a FAIL only where the guarded property is one
+   `CONTEXT.md` makes load-bearing for a published number.** For C6 that is claim 4 (§10.1, arm 4
+   VOID BY CONSTRUCTION on a differential) and `crossing()` (§13.4's N branch) — which is exactly the
+   three that carry this review's FAIL, and would have excluded the four it named as not carrying it.
+
+**Default taken pending a ruling: option 1**, because it is what the file says and what the last two
+reviews did, and because a reviewer narrowing a written bar on the day it would cost a fix cycle is
+the one thing this project exists to criticise. ⚠️ **This entry exists so the architect can overrule
+that on the record rather than by a reviewer's discretion.** `REVIEW_C6_4.md` §14 names exactly which
+three findings the verdict rests on, so a ruling for option 2 or 3 can be applied without re-reading
+the whole review.
+
+⚠️ **AND ONE THING THAT IS NOT AMBIGUOUS AND IS NOT ASKED HERE:** the seven survivors are real,
+exhibited with concrete inputs on which HEAD and the mutant differ, and each has a one-fixture
+remedy. **Whatever the ruling, they belong in `OPEN_FINDINGS.md`, and they are there** as `OF-124`…
+`OF-130`. The question is only whether they hold the tag.
+
+---
