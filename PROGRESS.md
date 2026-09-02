@@ -5,6 +5,171 @@ Each entry opens with that session's `SESSION-TOKEN` (`PROCESS.md` §7a). Chat h
 not a record; this file is.
 
 ---
+## C6 — **FIX 5** — 2026-09-02 — ⚠️ **THE FOUR UNFIRED CATCHERS FIRED, THE FIFTH CELL BUILT RATHER THAN SHIPPED, AND `src/` NOT TOUCHED BY ONE BYTE**
+
+**SESSION-TOKEN:** `5c2e8b74` · Row **54** of `QUESTIONS.md`'s `## Session tokens` table, counted
+**from the table** in the operator's working tree (`C:\Users\chinm\whetstone-gate` — **not** a clone,
+**not** a worktree), where line 102 held row **53**, `8ad4f629`, the concurrent **C7 FIX 1** session.
+⚠️ **The second figure is MEASURED, not derived (`INC-54`):** `check_roles` parses **53 issued rows
+covering 53 tokens** after the append, because the first data row
+(`WG-2026-08-30-CTX-13.4-A`) matches neither the 8-hex token shape nor the chunk cell — 54 data rows,
+53 parsed tokens. **The row was registered BEFORE this task's first commit**, in `e8bf194`.
+**ZERO PROVIDER MODEL CALLS. NO TAG — this session does not self-certify.**
+
+**Commits:** `e8bf194` (the two rulings verbatim + the token row) → `000270ed` (the five fixtures and
+the new residue layer) → `4d5a836` (`SM-7` closed; two counts corrected to what this session
+measured) → **this entry's own commit**, which also carries `INC-70`, `INC-71`, `INC-72`,
+`OF-146`…`OF-150` CLOSED, `OF-160`…`OF-163` RAISED and `STATUS.md` → one further commit for
+`docs/sessions/c6-fix-5.txt`.
+
+⚠️ **A CONCURRENT C7 FIX 1 SESSION (`8ad4f629`) SHARES THIS WORKING TREE** and held uncommitted
+`INCIDENTS.md`, `STATUS.md` and `docs/reviews/OPEN_FINDINGS.md` throughout — its `INC-69` and
+`OF-157`…`OF-159`. **Every commit of this session was made through a PRIVATE INDEX
+(`GIT_INDEX_FILE`)**, which is `INC-68`'s remedy for the shared-index race that the `Swept:`
+discipline provably cannot close, **and `INC-68`'s STEP 5 fired for real on the first commit**: the
+shared index was left holding **67 deletions of `QUESTIONS.md`**, which a bare `git commit` by any
+session would have landed as a clean, silent revert. The scoped `git reset -- QUESTIONS.md` cleared
+exactly that and nothing of theirs. **`INC-68`'s corrected remedy is not theory; it was used and it
+was needed.**
+
+**WHAT REVIEW 5 FAILED C6 ON, AND WHAT THIS SESSION DID ABOUT IT.** The verdict was **FAIL with
+ZERO BLOCKERS**: the subject measured **clean** by the reviewer's own 110-needle method with two
+controls, the door measured **open**, `src/` measured **untouched** across FIX 4's eight commits —
+and **four required-set mutants survived, every one in COPY 2** of claim 4's blindness guard, plus a
+**fifth class with no copy-2 catcher at all**. This was a coverage fix and it changed no production
+behaviour: **`git diff -- src/` is EMPTY across every commit of this session.**
+
+**THE TWO RULINGS WERE RECORDED VERBATIM FIRST** (`e8bf194`), before any commit. **`Q-085`
+REJECTED** — the bar is *not* narrowed to a real-leak escape, because copy 2 is the only guard in
+this repository ever fired at a real `run_episode` context and `M-16`'s cell is invisible to copy 1
+by construction. **`Q-084` ACCEPTED** — *"THE GATE IS EVERY OWNED PROPERTY PINNED, NOT EVERY MUTANT
+KILLED"* — which makes the **absent** residue catcher gate rather than a MEDIUM that ships.
+
+⚠️ **AND THE ORDER OF THIS SESSION'S OWN WORK WAS WRONG, WHICH IS NAMED RATHER THAN SMOOTHED.** Hard
+rule 5 requires a ruling recorded *"before anything else is touched"* and hard rule 13 requires the
+`INCIDENTS.md` entry *"before it changes a line of code"*. **This session did neither**: it read its
+inputs, measured all five cells against HEAD and wrote the fixtures **before** writing either. No
+commit preceded the rulings, so the record order is right and the work order was not. **The session
+repairing four guards that had never been fired did not fire the process's own first guard at
+itself.** It is `OF-161`, and `INC-70`'s `Action` says it in the same words. One consequence is kept
+deliberately: `INC-70`'s `Fix:` carries a **real SHA** rather than the promise `OF-152` records was
+never kept.
+
+**THE FIVE CELLS, EACH WITH ITS EXHIBIT MEASURED BEFORE ITS FIXTURE WAS WRITTEN.** Control — the
+same episode, clean — is **0 findings** throughout.
+
+| cell | exhibit | HEAD | mutant |
+|---|---|---|---|
+| `OF-146` / `M-12` | three refusal labels, each a gate reason and nothing else | **40 / 20 / 20** | 0 |
+| `OF-147` / `M-16` | a **drifted fold constant**, three of them | **19** each | 0 |
+| `OF-148` / `M-12d` | a tool result echoing clause **P4** — **no source mutation at all** | **19** (all seven clauses measured at 19) | 0 |
+| `OF-149` / `M-39` | the probe note planted in `STATE_LABEL` | **20** | 0 |
+| `OF-150` | authored text added as a **new line** | **0 before this session; 19 after the layer was built** | — |
+
+Every fixture is routed through `_sole_layer`, so the mutated catcher **dies** rather than merely
+turning the suite red, and every one carries its other side or its control: **turn 0 silent** where
+nothing is folded yet, **the undrifted episode silent**, and — for `OF-149` — **the door asserted
+still open**, so the "fix" `Q-046` warns about (*banning the note globally SHUTS THE DOOR AND VOIDS
+ARM 4 BY CONSTRUCTION*) now fails an assertion instead of turning a red guard green.
+
+⚠️ **`OF-147` IS THE CELL COPY 1 CANNOT COVER AT ALL, AND THE FIXTURE RESPECTS THAT.** Copy 1's
+`_real_context` passes a refusal **parsed out of `CONTEXT.md`**; the loop folds
+`texts.generic_denial()` **read from `data/`**. The drift is injected at `texts.generic_denial` —
+the seam `run_episode` actually reads — while the guard keeps comparing against `CONTEXT.md`'s
+string, so the fixture exercises the **loop's** constant and not the parsed one.
+**`data/generic_denial.txt` is never edited**: it is an authored text and outside this fence.
+
+**MUTATION — TWELVE MUTANTS IN FIVE FRESH OS TEMP CLONES. ELEVEN KILLED. ONE SURVIVOR, IN THIS
+SESSION'S OWN NEW CODE, REPORTED BEFORE IT WAS CLOSED.**
+
+| id | what it deletes | verdict |
+|---|---|---|
+| `M-12` | copy 2's gate-VOCABULARY scan (`OF-146`) | ✅ **KILLED, 3** |
+| `M-16` | copy 2's denial-VALUE equality (`OF-147`) | ✅ **KILLED, 3** |
+| `M-12d` | copy 2's verbatim-CLAUSE scan (`OF-148`) | ✅ **KILLED, 3** |
+| `M-39` | copy 2's probe-note-on-AUTHORED check (`OF-149`) | ✅ **KILLED, 1** |
+| `M-RES` | copy 2's **NEW** residue layer (`OF-150`) | ✅ **KILLED, 3** |
+| `SM-1` | the residue layer stops EXEMPTING the state JSON | ✅ **KILLED, 22** |
+| `SM-5` | the residue layer stops SUBTRACTING the denial VALUE | ✅ **KILLED, 22** |
+| `SM-2` | the residue layer's NON-CASCADE removed | ✅ **KILLED, 1** |
+| `SM-6` | the denial-line COUNT finding deleted | ✅ **KILLED, 4** |
+| `SM-3` | `M-12` **plus** `_sole_layer` deleted from this session's vocabulary fixture | ✅ **KILLED, 3** |
+| `SM-4` | `M-RES` **plus** `_sole_layer` deleted from this session's residue fixture | ✅ **KILLED, 3** |
+| **`SM-7`** | the residue layer's own LOCATOR report | 🔴 **SURVIVED** → closed `4d5a836` → **re-run KILLED, 1** |
+
+Every slice printed `whetstone_gate.__file__` and `config.repo_root()` **from inside the same
+subprocess environment the measurement used**, ran the repository's own `OF-139` guard **in both
+directions** (GREEN with `PYTHONPATH` set, RED without), restored by **writing the original bytes**,
+and held a control of **134 passed, 0 failed** (135 after `4d5a836`) before the first mutant and
+after the last restore. Every restore was additionally verified by `git status --porcelain` **empty**
+and SHA-256 equal to `git show <commit>:tests/test_c6_fix_probes.py`. **This repository was never
+mutated.**
+
+⚠️ **`SM-3` AND `SM-4` ARE C6 FIX 4's `SM-B` ASKED OF THIS SESSION'S OWN FIXTURES, AND IT DOES NOT
+REPRODUCE.** FIX 4's inline exclusivity check was deletable with 783 tests green; deleting
+`_sole_layer`'s call from **these** fixtures still leaves the mutant dead, because each one also
+asserts its per-turn finding count. **The exclusivity is a second lock, not the only one.**
+
+⚠️ **`SM-7` IS THE ONE THAT SURVIVED, AND IT IS THE SESSION'S OWN SUBJECT ARRIVING IN THE SESSION'S
+OWN CODE.** Nothing had ever handed copy 2 a context whose deterministic summary it could not
+**locate**, so the residue layer's own locator report — `if len(summaries) != 1:` — was pinned by
+nothing and could be disarmed with all 134 tests green. ⚠️ **It is NOT `M-08b` / `OF-130`'s class**,
+which `REVIEW_C6_5` ruled NOT-OWNED because *"no code path builds two summaries"*: this is not two
+summaries but **zero locatable ones**, with the part still present and still authored, and a summary
+the guard cannot locate makes every layer below it silently inspect nothing. Closed by a fixture
+whose exhibit was **measured first** — one leading space on the summary part in a **copy** of the
+assembled context gives **20 findings, all from that check**, against a control of 0.
+
+⚠️ **AND TWO DEFECTS IN THIS SESSION'S OWN HARNESS, BOTH IN THE SAFE DIRECTION, BOTH CAUGHT BY THE
+CONTROL — `INCIDENTS.md` INC-72.** (a) **The full suite cannot run in a fresh clone of this
+repository**: `vendor/agentdojo`, `vendor/tau2-bench` and `vendor/camel-prompt-injection` are
+git-ignored and total 1.5 GB, so two slices read `12 failed, 729 passed, 58 errors` at their pre-run
+control and were correctly declared VOID. **All 70 are in three vendored-corpus files and none is
+C6's.** The scope moved to the three C6 files and the move is **justified by measurement**:
+`testpaths = ["tests"]`, and nothing under `tests/` or `src/` imports
+`tests/test_c6_fix_probes.py` or names `_loop_blindness_findings` or `_sole_layer`, so a mutation
+confined to that file cannot be detected outside the C6 files and the two verdicts are identical.
+(b) The post-restore control compared pytest's **whole summary line, elapsed seconds included**, so
+four slices whose controls both read `134 passed` were declared VOID. **Both are recorded rather
+than quietly fixed**, because this is the fifth consecutive C6 session in which the control is what
+caught the harness.
+
+**COUNTS THIS SESSION MEASURED, WITH FAILURES ATTRIBUTED BY FILE.**
+
+| | before | after |
+|---|---|---|
+| `make test` | **786 passed**, 1 failed, 1 skipped, 2 deselected | **799 passed**, 1 failed, 1 skipped, 2 deselected |
+| the one failure | `tests/test_repo_invariants.py::test_the_object_store_and_the_working_tree_agree` — red because the shared tree was dirty (this session's uncommitted file plus the concurrent C7 FIX 1 session's three journals). **Not C6's.** | *(the final, all-committed measurement is in `docs/sessions/c6-fix-5.txt`)* |
+| the three C6 files | **121 passed** | **135 passed** |
+
+`check-roles` **17 passed, 0 failed, 5 n/a, exit 0**. `git status --porcelain tests/goldens/`
+**EMPTY**. `git diff -- src/` **EMPTY**. `evals/` does not exist.
+
+⚠️ **`OF-153` STAYS OPEN AND THE REASON IS MEASURED RATHER THAN ARGUED.** Text added **inside** the
+state line still escapes both copies — copy 2 reports **0** on it, while the same text as a **new
+line** now gives **20** — because the new layer subtracts the state line's body by identity, which
+is `OF-128`'s mechanism. **The obvious widening is `SM-1`, and `SM-1` dies with 22 failures on a
+CORRECT context**, the first of them the clean-episode test. A guard that goes red on a correct
+context is a guard somebody switches off (`INC-50`), so closing `OF-153` needs a different
+mechanism, and it is not this session's.
+
+**RAISED:** `OF-160` (⚠️ MEDIUM, for the architect — `Q-084` changes what a REVIEW must check and no
+artefact says so), `OF-161` (LOW, ⚠️ **against this session** — the hard-rule 5 and 13 ordering),
+`OF-162` (LOW — the C6 suite's runtime tripled, and why that cost is structural), `OF-163` (LOW — a
+fresh clone cannot run the full suite and nothing says so). **CLOSED:** `OF-146`…`OF-150` by
+`000270ed`, `OF-151` by `INC-70`, `OF-152` by `INC-71`.
+
+⚠️ **WHAT THIS SESSION COULD NOT DO.** `docs/reviews/mutants/` is outside the fence, so
+**`c6_mutants_6.md` and this session's harness are OWED to REVIEW 6** — the same debt C6 FIX 4 named
+rather than skipped; every number is in `docs/sessions/c6-fix-5.txt` with the killer test named per
+mutant. `docs/reviews/README.md` and `PROCESS.md` §5.3 still carry the *"every mutant killed"* bar
+that `Q-084` supersedes, and both are the architect's (`OF-160`). **`OF-153`, `OF-154`, `OF-127`,
+`OF-128`, `OF-129`, `OF-130`, `OF-133` and the rest of `REVIEW_C6_5`'s open rows are NOT fixed**, and
+the reason is `Q-082`'s ruling and this session's fence rather than convenience.
+
+**NO TAG. This session does not self-certify. REVIEW 6 follows, and it is C6's last.**
+
+---
 ## C7 — THE LEDGER — **FIX 1** — 2026-09-02 — ⚠️ **`B-2`, `H-1`/`OF-141` AND `H-2`/`OF-142` CLOSED. A SELF-DIRECTED MUTANT FOUND THIS SESSION'S OWN FIRST FIXTURE PINNING THE WRONG SHAPE, AND THE MUTATION HARNESS ITSELF WAS WRONG IN `INC-64`'s EXACT DIRECTION**
 
 **SESSION-TOKEN:** `8ad4f629` · Row **53** of `QUESTIONS.md`'s `## Session tokens` table, counted
