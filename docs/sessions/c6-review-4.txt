@@ -2,10 +2,18 @@ SESSION-TOKEN: ca0dd160   CHUNK C6 - THE ATTACKER LOOP   ROLE: REVIEW   ATTEMPT 
 
 PUSHED SHA: 8cdfa6423b62f17b5824df9254c4426a349d8cef
             - the journals commit, the last of this session's content commits.
-            verdict + artefacts: ce16a7f8... (see `git log`), Phase-1 seal: 11193bd,
-            token row: daefb31.
+            verdict + artefacts: ce16a7f4c775f5d320d5e5c392bfb71d9cd61935
+            Phase-1 seal:        11193bd903a1d90cbcb19b8feddbae5eb112cd47
+            token row 45:        daefb3146370e0d2ea87dc8d8732aaf795ebfe47
             !! THIS BLOCK IS ITSELF INSIDE A LATER COMMIT, so the pushed head is one
                further than the SHA above: a commit cannot contain its own hash.
+            !! CORRECTED, AND THE CORRECTION IS NAMED RATHER THAN MADE QUIETLY. The
+               first commit of this file wrote the verdict commit as "ce16a7f8..." -
+               its eighth character is 4, not 8. Full SHAs are written out here so no
+               reader has to trust an abbreviation. The commit carrying the wrong
+               abbreviation is NOT amended (CLAUDE.md S5, no history rewrite); this
+               line is the correction, in the shape 3d13ba4 used for the same defect
+               one session earlier.
 
 =====================================================================
 VERDICT: FAIL
