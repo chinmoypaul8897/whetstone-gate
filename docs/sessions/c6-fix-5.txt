@@ -1,8 +1,9 @@
 C6 FIX 5 - THE ATTACKER LOOP. SESSION-TOKEN 5c2e8b74. 2026-09-02. NO TAG.
 =========================================================================
-PUSHED SHA: <THIS FILE'S OWN COMMIT - filled by the commit that follows it, which is
-             the only way a file can carry its own hash.  The printed FINAL OUTPUT
-             states the HEAD that was actually pushed.>
+PUSHED SHA: fea846a7144c137e7874933bebbed4ef7bcbd14c  <- THIS FILE'S OWN COMMIT, written
+             in by the commit that follows it, which is the only way a file can carry its
+             own hash.  The printed FINAL OUTPUT states the HEAD that was actually pushed,
+             which is that following commit.
 
 git diff -- src/   ->  EMPTY.  Printed below, in full, because it is the strongest single
 line in this report and it is what lets REVIEW 6 skip re-measuring every REVIEW_C6_4 and
