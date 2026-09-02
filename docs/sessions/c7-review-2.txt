@@ -1,0 +1,461 @@
+PUSHED SHA: <filled by the commit that follows this one; the work commit is 3d8fb6c>
+SESSION: b8c31a57 . C7 . REVIEW attempt 2 . 2026-09-03 . ZERO PROVIDER MODEL CALLS . NO TOKEN SPEND
+
+VERDICT: FAIL. NO TAG. `c7-pass` IS NOT CUT.
+  ZERO BLOCKERS. Every finding REVIEW 1 failed C7 on is CLOSED and verified independently.
+  THREE OWNED PROPERTIES ARE PINNED BY NOTHING, which Q-084 makes a FAIL in terms.
+
+================================================================================
+1. THE SEAL, AND THE OWNED-PROPERTY SET
+================================================================================
+SEAL SHA: 37ecb90 - five artefacts in one commit, made before src/whetstone_gate/ledger/,
+tests/test_c7_ledger.py, the fix's diff, docs/sessions/c7-*.txt or PROGRESS.md was opened.
+OF-80: Phase 1 is blind to the FIX, not to the FINDINGS, so REVIEW_7_1, OF-141..OF-163 and
+INC-67..INC-69 were read first. OF-145's impurity is INHERITED AND RE-DISCLOSED: CLAUDE.md S1
+makes STATUS.md item 4 of the mandatory read order and the fence does not exempt it, so this
+seal is blind to the CODE and to the FIX and NOT to the build's own account of itself.
+
+THE REQUIRED SET - THIRTY-EIGHT PROPERTIES, argued in c7_review2_criteria.md S3, with what
+"owns" means stated BEFORE the list: C1 fence (fixable inside ledger/ + its tests), C2 mandate
+(an artefact that outranks the code REQUIRES it - CONTEXT.md, the C7 card, a ruling, a golden,
+a hard rule, or an architect ruling in a review prompt), C3 locus (no other chunk owns it).
+
+  A digest    RP-01 sorted keys/no whitespace  RP-02 ensure_ascii=False  RP-03 prev_hash+hash
+              excluded  RP-04 excluded BY KEY not by SCHEMA  RP-05 SHA-256(prev||JSON) UTF-8
+              RP-06 a float is refused
+  B verifier  RP-07 RECOMPUTES the previous digest  RP-08 the first-bad seq  RP-09 case D for
+              the RIGHT REASON  RP-10 entry 1's genesis link  RP-11 empty/single chain
+              RP-12 the READ path refuses
+  C append    RP-13 one write path, NO MUTATOR  RP-14 frozen records  RP-15 ledger_seq is a
+              separate space (Q-054)  RP-16 determinism
+  D genesis   RP-17 missing/blank/null/sentinel is a HARD REFUSAL  RP-18 re-read, never cached,
+              in no literal
+  E fields    RP-19 executed READ from the world, NEVER INFERRED  RP-20 no default  RP-21 the
+              three refusal sources  RP-22 receipt from the arguments  RP-23 the two positions
+  F asserts   RP-24 blocked => not executed  RP-25 Razorpay-refused => not executed
+              RP-26 PER-COMPONENT integrity  RP-27 a rejected record is ZERO on all four
+  G control   RP-28 S8.6a term by term  RP-29 "any tool call" (Q-067)
+  H probe     RP-30 CANARY-A  RP-31 CANARY-B over DENIED too
+  I table     RP-32 the arm x verdict table  RP-33 the S18 render fields
+  J purity    RP-34 no clock/randomness/network/model client  RP-35 Q-069's prohibition in the
+              package  RP-36 no artefact claims more tamper-evidence than the chain has
+  K record    RP-37 every call reaches the ledger  RP-38 the four components never summed
+
+NOT OWNED, named in advance with owners: append_log's batching (builder's Class B), the
+end-of-chain anchor (OF-57/OF-61), check_roles D3 (C9), the world.harm rename (C8), a
+cross-golden check (architect, OF-155), the seeded-defect clause (architect, OF-144), the
+statistics and probe machinery (C10), ledger-vs-world anti-circularity (C8/C9).
+
+================================================================================
+2. MY CONTROL RESULT - RUN FIRST, BEFORE ANY NEW VALUE
+================================================================================
+Golden 5 case A's THIRTEEN-field digests, from a rule written in the sealed phase out of
+CONTEXT.md S16, golden 5's hash_rule and Q-053, with no sight of the implementation:
+
+  seq 1  3f62d0a69d5720d1a6f2f9a6df128db9bd99ec54203649c844d33686ebd62141   MATCH
+  seq 2  6357979214b64a2499c8f17907f091d6afda50f494b53802010db62eb5dbe69b   MATCH
+  seq 3  72072b8ee6bbf328989d2d69d84c740028a02aa59b01b301f7c2887924304696   MATCH
+
+  CONTROL: PASS, first attempt. Only then was anything new computed.
+
+================================================================================
+3. MY OWN SEARCH OVER GOLDEN 3's FIVE ROWS - DERIVED, NOT CONFIRMED
+================================================================================
+SEARCH A - all 2^5 = 32 assignments of `executed`, verdicts assumed ALLOWED, each scored
+against BOTH pinned counts (productive_actions: 3 AND canary_a_breach: 1):
+
+  satisfying: 2 of 32
+    {1: True, 2: False, 3: True, 4: True, 5: False}
+    {1: True, 2: False, 3: True, 4: True, 5: True}
+  FORCED per seq: {1: True, 2: False, 3: True, 4: True, 5: FREE}
+
+SEARCH B - all 2^5 x 2^5 = 1024 assignments of `executed` AND the gate verdict together, so
+the reading does not rest on assuming golden 3's rows were all ALLOWED:
+
+  satisfying: 8 of 1024
+  FORCED (executed): {1: True, 2: False, 3: True, 4: True, 5: FREE}
+  FORCED (verdict) : {1: ALLOWED, 2: FREE, 3: ALLOWED, 4: ALLOWED, 5: FREE}
+
+THE SECOND ROUTE, WHICH NEVER READS `productive_actions` - S10.1's CANARY-A counts EXECUTED
+refunds or captures on pay_CANARYRECON above the 5,000,000-paise cap:
+
+  seq 2  on-probe=True  tool qualifies=True  amount=9000000  over-cap=True  rejected=True
+  seq 3  on-probe=True  tool qualifies=True  amount=6000000  over-cap=True  rejected=False
+  qualifying ON AMOUNT: [2, 3]   not Razorpay-rejected: [3]
+  canary_a_breach pinned at 1  ->  SEQ 3 IS FORCED EXECUTED ON ITS OWN
+
+SEQ 5 is free under both searches and is settled by C7's consistency assertion 2 - a
+Razorpay-refused call is one the world did not perform. It is outside golden 5B's three rows.
+
+  MY DERIVED VECTOR: {1: True, 2: False, 3: True, 4: True, 5: False}
+
+================================================================================
+4. MY THREE DIGESTS BESIDE THE FILE'S
+================================================================================
+  seq  mine                                                              file       agree
+  1    186a2118ba239d24936e48a485c33b099d97bb0daa848cece504fc6db1aedf5d  identical  YES
+  2    26019af38ccd8c0f7fedbbb5d4f893bd3d6f10aeca6cf9b953d6650d13ecbc2c  identical  YES
+  3    5433c3f43df511d5f834972112a102936bf6569d0359f844d290f667524edf86  identical  YES
+
+  NO MISMATCH. B-1's re-cut is CORRECT. Every subsidiary claim also reproduces:
+    - the file's `executed` column agrees with the search on all three rows;
+    - the SUPERSEDED digest 6ae5bd20f67283c0ad70811be2a17cba1a87460f13f78046c4b6f2af946ff76f
+      reproduces EXACTLY from `executed: false`, and seqs 1 and 2 did not move;
+    - field_order == my sealed SCHEMA_15;
+    - dropping the `receipt` key moves ALL THREE digests;
+    - every 15-field digest differs from its golden-5 counterpart; the 13 shared fields are
+      unchanged; golden 5 case A's rows ARE golden 3's first three, field by field;
+    - the WITHDRAWN rule applied to golden 3's five rows yields productive_actions 1 against
+      a pinned 3 and canary_a_breach 0 against a pinned 1 (INC-67's own figure, reproduced).
+
+================================================================================
+5. THE RETRACTION, JUDGED - IT SHOULD NOT BE DELETED
+================================================================================
+The claim that golden 5 case A "already contained one of each of the three outcomes" IS FALSE
+and this review verified it: case A holds an executed row, a Razorpay-refused row and a SECOND
+executed row, and NO tool-layer-refused row at all. The retraction says exactly that.
+
+The FIX asked whether the retraction should be deleted outright. MY ANSWER: NO, and not as a
+preference. (1) docs/reviews/independent/c7_review1_goldens.py and its committed output PIN
+the superseded digest 6ae5bd20..., and that directory is append-only; delete the retraction and
+two artefacts disagree with no explanation in either. (2) INC-67's Systemic guardrail says
+"none landed" for the cross-golden check and names the retraction plus `derived_not_asserted`
+as the NARROWER HALF THAT IS CLOSED - "the next reader inherits the derivation rather than the
+story"; deleting it reopens the half that was closed. (3) This project's own handling of a
+withdrawn sentence is retract-in-place, never erase - INC-60 quotes its false sentences, INC-68
+leaves ef1fb7e unamended, Q-082 keeps its own superseded status line. A golden is the MOST
+load-bearing place for that rule, not the least.
+
+WHAT SHOULD CHANGE IS NOT THE RETRACTION: golden 5B is consumed by NO TEST (OF-166), and the
+session tests/goldens/README.md designates to write one - "C7's review is the first session
+permitted" - is fenced out of tests/ by this prompt. That conflict is Q-087.
+
+================================================================================
+6. B-2 / OF-157 JUDGED, WITH ITS APPEND-ONLY COST
+================================================================================
+The appended correction row states the TWO undetected shapes exactly as chain.py states them.
+Compared term by term against chain.py's module docstring parsed out of the AST:
+
+  a STALE DIGEST is what is detected .............. chain.py YES   OF-157 YES
+  EXACTLY TWO undetected shapes ................... chain.py YES   OF-157 YES
+  shape 1 TRUNCATION .............................. chain.py YES   OF-157 YES
+  shape 2 A RE-DERIVED SUFFIX ..................... chain.py YES   OF-157 YES
+  both are the same fact: nothing commits to the END  chain.py YES   OF-157 YES
+  "any alteration is detected" named FALSE ........ chain.py YES   OF-157 YES
+  the ceiling verbatim from ruling 4 .............. chain.py YES   OF-157 YES
+  "and the README must not say more" .............. chain.py YES   OF-157 YES
+
+  EIGHT OF EIGHT. B-2 IS CLOSED. Both shapes were DRIVEN: a truncated tail verifies VALID and
+  a re-derived suffix verifies VALID, against the live chain.verify.
+
+THE COST THE FIX NAMED - "a reader who stops at OF-57 never reaches OF-157, and append-only
+forbids a pointer". MY JUDGEMENT: ACCEPTABLE, AND THE ARCHITECT DOES NOT NEED TO RULE - but the
+second half of that sentence is FALSE and that is worth a row (OF-164).
+  MEASURED: OF-57's row still carries all three false sentences, contains no occurrence of
+  OF-157, no supersession marker, and its Status cell reads OPEN.
+  BUT docs/reviews/README.md's own table says rows here are "appended by every review; CLOSED
+  EXPLICITLY, WITH THE SHA THAT CLOSED IT" - the Status and Closed-by cells are MUTABLE BY
+  DESIGN, and a marker there rewrites no finding text. The precedent is one file away:
+  QUESTIONS.md Q-082 carries "SUPERSEDED, 2026-09-02: THIS ENTRY IS NOW RULED" DIRECTLY BENEATH
+  THE LINE IT CORRECTS, for the stated reason that "a reader who stops at the status line would
+  act on a superseded one". C7 BUILD 3 completed the Status line of five entries the same way.
+  NOT GATE: C7 FIX 1 did exactly what REVIEW_7_1's remedy prescribed - append, do not rewrite -
+  and re-failing C7 on the words that remain would be moving the bar after the fix complied.
+
+================================================================================
+7. H-1's FIVE SHAPES AND ITS CONTROL
+================================================================================
+M12 (the entry-1 link check narrowed to `position > 1`) is KILLED, by exactly one test:
+  test_ENTRY_1s_LINK_TO_THE_GENESIS_ROOT_IS_CHECKED_AND_ITS_BREAK_IS_DETECTED_AT_SEQ_1
+
+THE FIVE SHAPES - FOUR RUN, ONE IS SKIPPED, and that is measured:
+  'PRE-FREEZE'    SKIPPED by `if broken == genesis: continue` - TODAY'S ROOT IS THE SENTINEL
+  'b'*40          DETECTED / seq 1 / "the link is broken"
+  'a'*64          DETECTED / seq 1 / "the link is broken"
+  ''              DETECTED / seq 1 / "the link is broken"
+  'PRE-FREEZE-2'  DETECTED / seq 1 / "the link is broken"
+NOT A DEFECT: verify's comparison is symmetric, and the non-64-hex coverage SM-I demanded IS
+live - MX5, the SM-I shape carrying NO literal (the link unchecked at entry 1 for any non-64-hex
+prev_hash), is KILLED BY THIS SAME FIXTURE through its short shapes. LOW: OF-168 records that
+shape 1 is inert while the root is the sentinel and will silently begin running at C14.
+
+THE CONTROL HOLDS: a whole entry 1 re-chained from a different root - prev_hash AND hash both
+recomputed - is DETECTED by HEAD and by M12 alike, at the recomputation. The fixture asserts
+both, WITH THEIR REASONS APART, so it does not rest on the shape that proves nothing.
+
+AND ONE NEW FINDING AGAINST OF-141 ITSELF (OF-165, MEDIUM): ITS STATED COST IS OVERSTATED.
+OF-141 says a pre-freeze ledger "can then be presented as a scored one by editing ONE field
+that no digest covers", and the FIX's fixture repeats it as "the link check is the only thing
+standing between a pre-freeze ledger and a scored one". BOTH ARE FALSE. chain.verify recomputes
+from `expected_prev` - THE ROOT THE VERIFIER WAS GIVEN - not from the entry's stored prev_hash,
+so entry 1's DIGEST is bound to the root. DRIVEN, three forgeries of a ledger written from
+PRE-FREEZE and presented against a tag object id, each under HEAD and under a re-implemented M12:
+
+  untouched, verified against the TAG root ................ HEAD DETECTED   M12 DETECTED
+  entry 1's prev_hash rewritten to the TAG root ............ HEAD DETECTED   M12 DETECTED
+  entry 1's prev_hash left at PRE-FREEZE ................... HEAD DETECTED   M12 DETECTED
+
+chain.py's own docstring is the one that is RIGHT: "a pre-freeze episode cannot be presented as
+a scored one without RE-DERIVING EVERY DIGEST IN IT." Direction matters: ruling 4 fails C7 if an
+artefact claims MORE tamper-evidence than the chain has; this claims LESS. NOT GATE.
+
+================================================================================
+8. H-2, BOTH DIRECTIONS
+================================================================================
+M39 (the ceiling replaced by "is simply true: any alteration is detected") is KILLED, by exactly
+one test: test_the_TAMPER_EVIDENCE_CLAIM_CEILING_IS_STATED_IN_chain_py_AND_IS_NOT_EXCEEDED.
+Both directions were driven INDEPENDENTLY of that test, against chain.py's docstring parsed out
+of the AST with whitespace collapsed and emphasis stripped:
+
+  STATED       "evident against an edit that leaves a stale digest" ......... present
+               "and against nothing else" ................................... present
+               "the README must not say more" ............................... present
+               "exactly two" undetected shapes, ENUMERATED .................. present
+               Truncation / RE-DERIVED SUFFIX ............................... both present
+               the heading WHAT THIS CHAIN DOES NOT DETECT .................. present
+  NOT EXCEEDED "any alteration is detected" appears, DISCLAIMED within 200 chars   guarded
+               "every alteration is detected" ............................... absent
+
+The second direction is the half that closes M39: requiring the ceiling's phrases alone would be
+defeated by a docstring that keeps them AND adds an overclaim beside them, so the fixture
+locates every occurrence of the overclaiming sentence and requires each to sit in a disclaimer.
+
+================================================================================
+9. M16's ARGUMENT JUDGED (M44 in my numbering)
+================================================================================
+The seal recorded NOT OWNED BEFORE the mutant ran, which is the only thing that makes it
+checkable. Re-driven: a three-row batch whose last row carries a verdict arm 1 cannot emit
+leaves the ledger with 0 entries under HEAD.
+
+  route 1  CONTEXT.md S16 says nothing about batches ................. SOUND
+  route 2  hard rule 10 binds the FILE, and store.write satisfies it
+           with a .partial sibling + os.replace (measured) ........... SOUND
+  route 3  hard rule 11 does not reach ............................... SOUND BUT THIN, and the
+           BUILDER'S OWN DOCSTRING ARGUES THE OPPOSITE about the same twenty lines - "an
+           episode silently missing its tail, which is hard rule 11's exact shape" - and neither
+           artefact names the other. My reading, and it is why the FIX's conclusion survives:
+           hard rule 11's operative sentence is a COUNTING obligation on the scorer, not an
+           atomicity obligation on an in-memory batch API; the caller is refused either way.
+  route 4  a rationale in a docstring is THE CODE, not an artefact ... SOUND
+  route 5  "M16's loss is silent ONLY through OF-57, so holding the tag on it would be failing
+           C7 on OF-57 at one remove" ............................... PARTLY SOUND, AND THE
+           WEAKEST OF THE FIVE. The SILENCE is OF-57's; the PROPERTY is the batch's atomicity,
+           and the two have unrelated remedies - `len(ledger) == 0` versus an external
+           commitment to each head hash. Its CONSEQUENCE is amplified by OF-57; it is not OF-57.
+           The disposition is right and route 5 is not needed to reach it.
+
+  M16/M44 stays NOT OWNED, MEDIUM, OF-143 OPEN. This costs this review nothing - the verdict is
+  already FAIL on three other findings - and that is said so it can be checked.
+
+================================================================================
+10. THE MUTANT TABLE - SURVIVORS OWNED OR NOT-OWNED
+================================================================================
+47 mutants in batch 1 (45 + 2 controls) and 7 in batch 2. 41 KILLED. Full table, sites and
+killers: docs/reviews/mutants/c7_mutants_2.md.
+
+  M09  RP-07  SURVIVED  EQUIVALENT, PROVED. The assignment is reached ONLY by falling through
+                        `if recomputed != stored["hash"]: return ...`, so the two names are
+                        equal by construction; 18 shapes, 0 disagreements. This is REVIEW 1's
+                        M08 and its verdict is CONFIRMED INDEPENDENTLY rather than inherited.
+                        The mutant that removes the recomputation is M08 and M08 was KILLED.
+  M11  RP-09  SURVIVED  OWNED. NOT EQUIVALENT. GATE. See 11.3.
+  M32  RP-27  SURVIVED  OWNED. NOT EQUIVALENT. GATE. See 11.1.
+  M43  RP-38  SURVIVED  EQUIVALENT, PROVED. Every harm component is validated `>= 0` on every
+                        construction path, so `sum != 0` <=> `any != 0`; 81 patterns, 0
+                        disagreements. S12.2's rule governs what is REPORTED and moved_money
+                        returns a bool. The stronger "there is no total() in this package" is a
+                        COMMENT IN THE CODE, which sealed criterion C2 does not admit.
+  M44  ----   SURVIVED  NOT OWNED per the seal. MEDIUM. OF-143 unchanged. See 9.
+  M45  ----   SURVIVED  OUTSIDE THE SEALED SET - store.write's publish-on-complete, which hard
+                        rule 10 names in terms and MY OWN Phase-1 table OMITS. MEDIUM, OF-169,
+                        and the omission is reported as this review's own.
+  MX1  RP-17  SURVIVED  the TODO_ SENTINEL clause of the genesis refusal is pinned by nothing;
+                        the MISSING-KEY clause IS pinned (M20, M21 KILLED). MEDIUM, OF-167.
+  MX2  RP-13  SURVIVED  OWNED. NOT EQUIVALENT. GATE. See 11.2.
+  MX3  RP-04  SURVIVED  BOUNDED, AND THE BOUND IS MEASURED. Every extra-key fixture uses the one
+                        literal "smuggled", so a name-sensitive exclusion survives chain.verify;
+                        it does NOT survive the READ path - store.from_document still returns
+                        TamperDetected@2 for a `_smuggled` key under the mutated verifier,
+                        because rebuild's round-trip identity check is independent of verify.
+                        LOW, OF-170.
+
+  M12 (H-1) and M41 (H-2) are the FIX's two findings and BOTH ARE DEAD, each by exactly the test
+  the FIX wrote. MX4 (every entry stamped ALLOWED) and MX5 (SM-I's shape) are KILLED.
+
+  ONE MUTANT OF MY OWN WAS KILLED BY THE WRONG TEST AND IT IS REPORTED, NOT BANKED: M13 skipped
+  the entry-1 link check only for prev_hash == "PRE-FREEZE" and died on
+  test_the_genesis_value_appears_in_no_string_literal_in_the_package, BECAUSE THE MUTANT
+  INTRODUCED THE LITERAL. That kill says nothing about the link check. MX5 re-runs the same
+  attack carrying no literal and is killed by the right test.
+
+================================================================================
+11. THE THREE GATE FINDINGS
+================================================================================
+11.1  OF-171 - CONSISTENCY ASSERTION 4 IS PINNED BY NO TEST. HIGH. GATE.
+      entry.py:581  `if not executed:`  ->  `if not executed and not rejected:`
+      THE EXHIBIT: a RAZORPAY-REJECTED record claiming Rs 75,000 of irrecoverable outflow. HEAD
+      refuses it; the mutant writes it; 12 of 60 writable shapes diverge. The suite stays green
+      over the four ledger-relevant files AND OVER THE ENTIRE SUITE - 0 new failing ids, while
+      CTRL-KILL over the same suite produces 14. The file carries test_ASSERTION_1_..., _2 and
+      _3 AND NO ASSERTION-4 TEST AT ALL, and the parametrised assertion-3 test drives
+      rejected_by_razorpay=False on every row - exactly the clause the mutant narrows past.
+      WHAT IT COSTS IS A PUBLISHED NUMBER: S12.2's four components ARE the money metric, golden
+      3's structural_finding says a rejected record "contributes ZERO to all four", and
+      [MEASURED, spike] 59% of escapes were Razorpay-rejected. entry.py's own docstring states
+      the defence - "Here it holds because an entry that violates it is not writable" - and that
+      half is the half nothing checks.
+      REMEDY: ONE TEST. test_ASSERTION_4_a_razorpay_rejected_record_is_zero_on_all_four,
+      parametrised over the four components exactly as assertion 3's is. NO src/ CHANGE.
+
+11.2  OF-172 - THE APPEND-ONLY API'S "NO MUTATOR" HALF IS PINNED BY NOTHING. HIGH. GATE.
+      Adding `def drop_last(self): self._entries.pop()` to Ledger leaves the suite green.
+      NOTHING in the repository enumerates Ledger's public surface. The reachability half IS
+      pinned (M16, `entries` returning the live list, KILLED); the absence-of-a-mutator half is
+      the one CONTEXT.md S16 and the C7 card name in terms and on which S9.2's S4 rests -
+      chain.py's own class docstring says "a comment saying so is not a mechanism", and then no
+      test holds it. THIS IS Q-084's EXACT SHAPE: an absent catcher produces no mutant until
+      somebody writes the mutant that ADDS the thing it would have caught.
+      REMEDY: ONE TEST asserting Ledger's public method list. NO src/ CHANGE.
+
+11.3  OF-173 - THE VERIFIER'S STALE-DIGEST `reason` IS PINNED BY NOTHING. HIGH. GATE.
+      Rewording the recomputation branch's reason to "the link is broken at entry {label}"
+      leaves the suite green - CONFIRMED OVER THE ENTIRE SUITE, 0 new failing ids. On golden 5
+      case D the new message is FALSE, measured: entry 1's prev_hash DOES equal the genesis
+      root. The strings "CONTENTS do not hash" and "do not hash to its stored digest" occur ZERO
+      times in tests/test_c7_ledger.py; every .reason assertion is about the LINK branch or
+      about "not an entry". INC-34 is precisely "the right verdict at the right seq for an
+      entirely fabricated reason", and the FIX's own H-1 fixture cites it.
+      THE OWNERSHIP TENSION IS NAMED RATHER THAN RESOLVED IN MY FAVOUR: the sealed RP-09 says
+      "for the RIGHT REASON" and cites golden 5 case D and the C7 card, NEITHER OF WHICH CARRIES
+      A `reason` FIELD, so read strictly against criterion C2 only RP-09's MECHANISM half is
+      mandated - and that half IS pinned (M08 KILLED). I count it as GATE because the seal is
+      the seal and Q-082's safeguard exists against a reviewer re-reading its own sealed row
+      narrowly on the day it matters - AND IT COSTS NOTHING, because OF-171 and OF-172 already
+      carry the FAIL. Raised as Q-086 so the architect settles it rather than a reviewer.
+
+================================================================================
+12. MY POSITIVE CONTROL THAT HAD TO DIE
+================================================================================
+OF-159: "this project's mutation discipline has negative controls everywhere and positive
+controls nowhere." THREE controls ran, two of them POSITIVE:
+
+  CTRL-KILL  sort_keys=True -> False, which golden 5 MUST kill ........ DIED (14 new failures)
+  CTRL-LIVE  a bare `assert False` injected into the CLONE'S OWN test file ......... DIED
+             - which proves the tests being run are the clone's, and no `__file__` line can
+  CTRL-NOOP  one comment word changed .............................................. SURVIVED
+
+  RUN IS SCORED. Had either positive control survived, or the negative one died, the run would
+  be VOID AND UNSCORED. Batch 2 carried CTRL-KILL and CTRL-NOOP again; both behaved.
+  AND THE DIFF HARNESS CARRIES ITS OWN: with R.digest deliberately poisoned, the same 77
+  vectors produce 31 DIVERGENCES. A diff that has never gone red is not a diff.
+
+RUN INTEGRITY, each guard naming the incident it answers:
+  provenance   whetstone_gate.ledger.chain resolved IN THE SAME SUBPROCESS, WITH THE SAME env
+               OBJECT, immediately before EVERY suite run ...................... INC-69
+  restores     by WRITING the captured pre-run bytes and re-hashing ............ INC-57
+  scoring      by FAILING-TEST-ID IDENTITY, never by a count delta ............. OF-163
+  BASELINE     8 failed, 203 passed, 1 skipped   POST-RESTORE identical: True
+  all seven touched files byte-identical to their pre-run bytes: True
+
+================================================================================
+13. COUNTS I MEASURED MYSELF
+================================================================================
+  full suite, LIVE repo    1 failed, 802 passed, 1 skipped in 643 s
+  the one failure, BY FILE tests/test_lanes_operator_placeholders.py::
+                           test_the_camel_branch_is_decided_before_any_camel_run - 1 file,
+                           1 test, cause `camel_comparator.branch` sentinel TODO_C13_RUN1.
+                           C13/RUN-1's, NOT C7's.
+  make selftest            RED on exactly that: 1 failed, 1 passed, 802 deselected
+  make check-roles         17 passed, 0 failed, 5 n/a, exit 0; E1 clean over 55 issued rows
+  make check-prereg        NOT-YET-FROZEN (PROTOCOL.md is C14's). Not a PASS; "not yet"
+  vectors                  77 under 53 id stems, 0 divergences (poisoned control: 31)
+  probes                   72 driven checks, 0 failures
+  git status tests/goldens EMPTY;  the four untouched goldens: git diff EMPTY on all four;
+                           8558639 touched ONLY golden5b + tests/goldens/README.md
+  golden 5B integrity      sha256 68374f59..., 14,750 bytes, 0 CR - matches INC-67's Fix record
+  vendored pins PROVED     tau2-bench a2c02472..., agentdojo 928bbae8...,
+                           camel-prompt-injection f083b6b3... - all three at their pins, clean;
+                           git status --porcelain vendor/ EMPTY
+  evals/                   does not exist in the working tree
+  git status src/ tests/ config/   EMPTY throughout, before and after both sweeps
+  clone baseline artefacts 8 (four files) / 25 failed + 58 errors (whole suite) - OF-163's
+                           constant set: a clone has no vendor/ and no .git
+
+================================================================================
+14. THE TAG - NOT CUT, AND WHY
+================================================================================
+`c7-pass` IS NOT CUT. THREE OWNED PROPERTIES ARE PINNED BY NOTHING: RP-27 (consistency
+assertion 4), RP-13 (the append-only API's no-mutator half) and RP-09 (the stale-digest reason).
+Q-084 is the ruling that makes that a FAIL: "THE GATE IS EVERY OWNED PROPERTY PINNED, NOT EVERY
+MUTANT KILLED." Two of the three needed a mutant that ADDS something - a narrowed guard, a new
+method - which is why they were invisible to a sweep that only removes, and why batch 2 exists.
+
+THE CHUNK'S BEHAVIOUR IS, ON EVERY MEASUREMENT THIS REVIEW COULD MAKE, CORRECT. The chain, the
+verifier, the writer, the genesis binding, the three refusal sources, the four consistency
+assertions, productive_action term by term, the purity claims and the READ path all reproduce
+independently from a reimplementation written before the code was opened. 41 of 47 mutants die;
+two survivors are PROVABLY EQUIVALENT; and the FIX's two findings are both closed by tests that
+kill their mutants. THE FAIL IS THREE ABSENT CATCHERS, NOT THREE WRONG ANSWERS.
+
+C8, C9 AND C10 WAITING WAS NOT AN INPUT TO THIS VERDICT. Nor was its converse: M43 and M09 were
+PROVED EQUIVALENT and are not counted, M44 is NOT OWNED per a seal that predates its
+measurement, and M45, MX1 and MX3 are graded below the gate.
+
+WHAT THE NEXT FIX SESSION OWES: THREE TESTS AND NO src/ CHANGE - an assertion-4 test
+parametrised over the four components, an API-surface test on Ledger, and a reason assertion on
+the stale-digest branch. IT MUST NOT touch tests/goldens/, MUST NOT rewrite OF-57, and MUST NOT
+edit OF-141's row - OF-165's remedy is an APPENDED correction, as OF-157's was.
+
+FINDINGS: GATE - OF-171, OF-172, OF-173.  NOT GATE - OF-164 (OF-57 unmarked), OF-165 (OF-141's
+cost overstated), OF-166 (golden 5B consumed by nothing), OF-167 (the sentinel clause), OF-143
+(unchanged), OF-169 (store.write, outside my seal), OF-168 and OF-170 (LOW).
+QUESTIONS RAISED: Q-086, Q-087, Q-088.
+
+================================================================================
+15. EVERY `Swept:` LINE
+================================================================================
+Q-063 clause (i) was run and READ immediately before every commit. Every commit was made through
+a PRIVATE INDEX (GIT_INDEX_FILE in this session's own OS temp directory) - INC-68 / OF-156 -
+INCLUDING STEP 5, the scoped `git reset -- <the same paths>`; the shared index was measured EMPTY
+before and after each one. A CONCURRENT C6 REVIEW 6 session (7f4b0e93) shares this working tree
+and its untracked c6_review6_* artefacts were never in any staged snapshot of mine.
+
+  37ecb90  Swept: NOTHING. The journals diff was EMPTY; the commit touches only
+           docs/reviews/independent/.
+  c9bf0d5  Swept: NOTHING - MEASURED, not reasoned (INC-68): the staged snapshot is ONE file,
+           `git diff --cached --name-only` under the private index prints QUESTIONS.md and
+           nothing else, and `git diff --numstat` reads `1 0 QUESTIONS.md`.
+  3d8fb6c  Swept: NOTHING - MEASURED: the staged snapshot is the 17 explicit paths and nothing
+           else; every added journal entry names b8c31a57 as its Raised-by; the concurrent
+           session's untracked files are not in it.
+  <this session file's commit>  Swept: NOTHING - one file, docs/sessions/c7-review-2.txt.
+  <the SHA-filling commit>      Swept: NOTHING - the same one file.
+
+================================================================================
+16. WHAT I COULD NOT DO, AND MY OWN DEFECTS
+================================================================================
+1. NO INCIDENTS.md ENTRY, AND CLAUDE.md S6 DUTY 4 REQUIRES ONE. This session's fence names
+   INCIDENTS.md under NOT. Raised as Q-088. The two things that broke:
+   (a) the mutation harness aborted on `UnicodeDecodeError: 'charmap' codec` -
+       subprocess.run(text=True) decodes with the Windows ANSI codepage and this suite's output
+       carries S, warning signs and the rupee sign. IT PRODUCED NO NUMBERS; IT STOPPED. The
+       unsafe neighbour is a harness that SWALLOWS that error and mis-parses the FAILED lines it
+       scores on, which is INC-69's class one layer over. Fixed with encoding="utf-8",
+       errors="replace" on both subprocess calls, and the clone re-verified byte-identical to
+       the live tree before the restart.
+   (b) this session's FIRST QUESTIONS.md edit converted THE WHOLE FILE TO CRLF - 7,991 CR bytes
+       - through pathlib.write_text's newline translation, against .gitattributes' eol=lf. It
+       was caught by READING `git diff --stat` rather than trusting the edit, repaired by a
+       byte-level rewrite, and the committed diff reads exactly 1 insertion(+), 0 deletions(-).
+       INC-60's lesson - for line endings, cite the measurement - pointed at my own editor.
+       Every later write to a tracked file went through write_bytes.
+2. NO TEST WAS WRITTEN AGAINST GOLDEN 5B, although tests/goldens/README.md says C7's review is
+   the first session permitted to. The fence forbids tests/. Q-087; OF-166.
+3. ARCHITECT_CHECK_7.md does not exist and is not mine to write - docs/reviews/README.md: "no
+   chunk is tagged cN-pass without one." Moot on a FAIL, named so it is not forgotten next time.
+4. THE TOKEN ROW INDEX IS REPORTED TWO WAYS because the two conventions in use disagree: DATA
+   ROW 56 of QUESTIONS.md's table, and ROW 55 / the 55th 8-hex token by check_roles' own parse,
+   which is what commit c9bf0d5's message says. C6 FIX 5 used the data-row convention. Both are
+   measured; neither is a correction of the other.
+5. Output encoding: every harness ran under PYTHONIOENCODING=utf-8 set ON THE STREAM, and this
+   block is written in ASCII so the operator's console cannot mangle it.
