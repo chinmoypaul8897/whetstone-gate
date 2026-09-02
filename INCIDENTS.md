@@ -5779,3 +5779,387 @@ those in `tests/test_c13_camel_comparator.py`, `tests/test_c3_review_probes.py` 
 failures and errors and no other file contributes one — because `vendor/` is git-ignored and
 1.5 GB.** `PROCESS.md` is outside this session's fence; it is raised as
 `OF-163`.
+
+---
+
+## INC-73 — C6 REVIEW 6's OWN HARNESS CARRIED FOUR DEFECTS AND EVERY ONE FAILED SAFE: an abort that produced nothing, a clone with no `src/` whose provenance named the LIVE REPOSITORY and whose control read 0 PASSED, a needle that fired on the spec, and a carrier matrix that measured the harness — and the published artefact STILL shows the live repository as a scored slice's provenance
+
+⚠️ **THE SESSION AT FAULT AND THE SESSION THAT FOUND IT IS C6 REVIEW 6 (`7f4b0e93`), NOT THE SESSION
+WRITING THIS.** Written by **ARCH DISPOSITION 1 (`4d90c2e6`)** on that review's behalf, under
+`Q-088`'s ruling of 2026-09-03 — *"a review session may not write to INCIDENTS.md, and the entry it
+owes is DECLARED IN ITS FINAL OUTPUT and written by the NEXT non-review session in that chunk's
+line."* The review declared it: `docs/sessions/c6-review-6.txt` §14, verbatim — *"`INCIDENTS.md` IS
+NAMED UNDER ‘NOT’ IN THIS SESSION'S FENCE, and `CLAUDE.md` section 6 duty 4 requires every session to
+append what broke. NOTHING IS WRITTEN THERE … and THE INCIDENTS.md ENTRY IS DECLARED OWED."*
+Items **(a)–(d)** are the review's own, published by it **before** its verdict; item **(e)** is
+**this session's**, found while verifying (b) against the committed artefact, and is labelled as such
+rather than folded in as though the review had caught it. **Date:** 2026-09-03.
+
+⚠️ **NUMBERED FROM THE WORKING TREE, RE-READ IMMEDIATELY BEFORE THIS APPEND** (`OF-67`; `INC-64`'s
+own preamble records the hazard). The highest entry on disk and at `HEAD` = `1b9cdc5` is **`INC-72`**;
+a concurrent golden-landing session (`a72f5d81`) holds this tree and has **no** uncommitted change to
+this file. `INC-54` requires a session to say which tree it counted: the operator's, at
+`C:\Users\chinm\whetstone-gate`.
+
+**Event:** five defects, four of them the review's own instruments and one of them its published
+artefact.
+
+**(a) THE MUTATION HARNESS'S FIRST LAUNCH ABORTED ON A FORMAT-STRING BUG AND PRODUCED NOTHING.**
+`docs/sessions/c6-review-6.txt` §12, verbatim: *"my harness's first launch aborted on a
+format-string bug and produced NOTHING, which is the safe direction and is why it is not a finding of
+its own."* ⚠️ **It is recorded here anyway, and the reason is the unsafe neighbour, not the event:**
+a harness that had *caught* that exception and continued would have scored slices from a partial log,
+and every mutant it never reached would have been reported **SURVIVED** — `INC-64` and `INC-69`'s
+direction, which is the one that publishes a wrong number. **This is the FIFTH consecutive C6
+mutation harness to carry a defect** (`INC-57`, `INC-58`, `INC-64`, `INC-72`, this), and `INC-72`
+already said so about the fourth.
+
+**(b) A CLONE WAS LEFT WITH NO `src/`, ITS PROVENANCE LINE NAMED THE LIVE REPOSITORY, AND ITS PRE-RUN
+CONTROL READ 0 PASSED — `INC-69`'s EXACT FAILURE MODE, CAUGHT IN 17 SECONDS BY A MECHANISM RATHER THAN
+BY A HUMAN DISTRUSTING A NUMBER.** `REVIEW_C6_6.md` finding **L-4**, verbatim: *"A CLONE OF THIS
+REPOSITORY CANNOT BE BUILT BY A TOOL CALL THAT MAY TIME OUT, AND THE FAILURE IS INVISIBLE UNTIL THE
+PROVENANCE LINE IS READ. My first `tree_C` was left with no `src/` by an interrupted clone; its
+pre-run control read **0 passed** and its provenance named the **live repository**. The harness
+declared the slice VOID in 17 seconds. That is `INC-69`'s exact failure mode, caught by the mechanism
+`OF-159` asks for."* The consolidated artefact carries the row:
+
+```
+  C (attempt 1) no     0/0/0          -/-/-          -
+  C (attempt 1, mutants_run_ABDE.log) YES    -/-/-          -/-/-          -
+```
+
+⚠️ **THE CAUSAL DETAIL THE REVIEW DID NOT STATE, AND IT IS THE WHOLE POINT OF THE PROVENANCE PRINT:**
+with no `src/` in the clone, `import whetstone_gate` did not fail — it **resolved through the editable
+install to `C:\Users\chinm\whetstone-gate`**, the live tree. **An empty clone does not error; it
+silently becomes the live repository.** That is why *0 passed* and *live provenance* arrived together,
+and why the pre-run control — not the provenance line alone — is what made the slice VOID rather than
+wrong.
+
+**(c) A NEEDLE OF THE REVIEWER'S OWN FIRED ON §8.6's OWN SYSTEM PROMPT, SO THE CLEAN-SURFACE CONTROL
+READ 1 OF 73 RATHER THAN 0.** `REVIEW_C6_6.md` §5.2: *"`'over-capture'` — **INSIDE §8.6's own system
+prompt** — *‘over-captures’*, the GOAL paragraph. **A needle of mine that fires on the spec.** My
+seal's exclusion list named that word; my needle used the singular, which is a substring. **My error,
+and the clean-surface control caught it.**"* Polarity **P-16** had pre-committed *"my clean-surface
+control fires 0"* and it did not.
+
+**(d) THE FIRST CARRIER-MATRIX READING WAS 73/73 IN A LABEL FOR BOTH COPIES — AND IT MEASURED THE
+HARNESS.** `REVIEW_C6_6.md` §5.5: *"AND MY FIRST MEASUREMENT OF THIS TABLE WAS WRONG, IN THE STRICTER
+DIRECTION, AND IS REPORTED RATHER THAN QUIETLY CORRECTED. It read 73/73 in a label for both copies —
+implausibly clean — because the harness restored the mutated module label **before** running the
+guard, so every guard fired for the trivial reason that no line began with the label it now expected.
+**That measures the harness, not the guard.**"* Corrected reading: copy 1 catches **44 of 73**, copy 2
+**36 of 73**, 29 escape both.
+
+**(e) ⚠️ MEASURED BY THIS SESSION, NOT BY THE REVIEW: THE PUBLISHED CONSOLIDATED OUTPUT STILL PRINTS
+THE LIVE REPOSITORY AS SLICE C's PROVENANCE, NEXT TO SLICE C's SCORED MUTANTS.**
+`docs/reviews/independent/c6_review6_mutants_output.txt` §2, verbatim:
+
+```
+  [C] PROVENANCE PKG  : C:\Users\chinm\whetstone-gate\src\whetstone_gate\__init__.py
+  [C] PROVENANCE ROOT : C:\Users\chinm\whetstone-gate
+```
+
+**Every other slice's two lines name a clone under `…\scratchpad\c6r6\tree_{A..G}`; `[C]`'s name the
+operator's live repository.** The mechanism, read out of the committed consolidator
+(`c6_review6_consolidate.py`): on a `SLICE VOID` line it renames the **controls** key —
+`controls["%s (attempt 1)" % m.group(1)] = controls.pop(m.group(1), {})` — and **does not rename the
+`prov` key**, which stays bare `"C"`; it then prints `prov[sl][:2]`, **the first two lines only**, and
+`LOGS` is read with `mutants_run_ABDE.log` **first**, which is the log holding the void attempt. **So
+the void attempt's provenance masks the scored attempt's, in the one artefact a reader has.**
+⚠️ **AND THE SCORED SLICE C's PROVENANCE LINE IS NOT IN THIS REPOSITORY AT ALL** — it is in
+`mutants_run_CFG.log`, in an OS temp directory, and only the consolidated file was committed. **The
+review's own §0 sentence — *"every printed line names the clone"* — is FALSE AS PRINTED, and it is the
+one sentence a reader of `INC-69` would go to that artefact to check.** Raised as **`OF-180`**.
+
+**Action:** **(a)** the format string was repaired and the harness relaunched; **(b)** the clone was
+rebuilt, slice C re-run from a verified control, and the void attempt reported rather than dropped —
+`docs/reviews/mutants/c6_mutants_6.md` carries it as *"VOID, and nothing from it is reported"*;
+**(c)** the false positive was **located** rather than counted, named as the reviewer's own error, and
+its polarity row published as not-holding; **(d)** the harness was changed to **keep the patch in
+force while the guards run** and the table re-measured. **All four instruments are committed as
+corrected at `d73910b`.** **(e)** **NOT ACTIONED** — `docs/reviews/independent/` and
+`docs/reviews/REVIEW_*.md` are both outside this session's fence, and the artefact is published.
+
+**Expectation:** a mutation harness's own provenance record should make the tree under test
+**unambiguous for every scored slice**, which is the entire remedy `INC-69` installed and `OF-159`
+asked for; a needle corpus's clean-surface control should read **0**; a carrier matrix should measure
+the **guard**; and a harness that cannot start should say so rather than half-start. Three of the four
+behaved as designed. **The provenance record did not, and it is the one whose failure is silent.**
+
+**Missing:** ⚠️ **nothing in this repository states that an editable install makes a clone with no
+`src/` resolve to the LIVE tree instead of failing.** `INC-64` and `INC-69` both record the wrong-tree
+class and both prescribe the provenance print; **neither says what an EMPTY clone does**, and the
+answer — *it imports the live package and reports 0 collected* — is the reason a session reads the two
+symptoms as one. `OF-139`'s `make mutate-clone` is still unbuilt and would end it in one line, which
+is L-4's own second argument for it. **And for (e): nothing checks that a published provenance table
+has one row per SCORED slice** — the consolidator prints whatever key it happens to hold, and no
+control compares the two sections it prints.
+
+**Missed:** ⚠️ **FOR (c) AND (d), THE MISS IS THIS REVIEW'S OWN, AND IT PUBLISHED BOTH BEFORE ITS
+RESULT.** The `over-capture` needle: **the seal's own exclusion list already named the word**, and the
+needle was written with a substring of it — the reviewer had the answer in its own Phase-1 artefact
+and did not apply it to its own corpus. The 73/73 matrix: **an implausibly clean number was read and
+believed for one measurement**, and what dislodged it was its own implausibility, not a control —
+`INC-60`'s class exactly, *the conclusion was right, the evidence was ceremony*, one field over.
+⚠️ **FOR (b), THE SIGNAL WAS THERE AND WAS TAKEN, AND THAT IS WHY IT IS 17 SECONDS AND NOT A
+PUBLISHED NUMBER:** `INC-69` was written by a **concurrent** session the previous day, its remedy was
+implemented in this harness, and the remedy fired on its first real opportunity. **This is the first
+run in this project where the wrong-tree class was caught by a mechanism rather than by a human
+distrusting an implausible result, and that is stated as a positive.**
+⚠️ **FOR (e), THE MISS IS THE REVIEW'S TOO, AND IT IS THE SHARPEST OF THE FIVE:** the session wrote
+*"every printed line names the clone"* in §0 while its own artefact printed
+`C:\Users\chinm\whetstone-gate` on the very next screen. **It checked the claim against the harness
+it had written and not against the file it was committing** — which is `INC-43`'s decorative gate
+turned on a record instead of a guard: a provenance table nobody read is not a provenance check.
+
+**Diagnosis:** four of the five are the harness asserting on the **wrong observable** — a guard fired
+after its subject was restored, a needle matched as a substring, a suite launched from a tree whose
+package resolves elsewhere — and all four fail toward **refusing to score** rather than toward scoring
+a dirty run, which is why none produced a wrong published number. **(e) is different in kind and is
+the one that matters: the consolidator renames a slice's CONTROLS on VOID but not its PROVENANCE, so
+the void attempt's line is the only one printed** — an attribution defect in the record rather than an
+error in the measurement, and the record is all that survives the session.
+
+**Fix:** **`d73910b`** — the corrected harness, probes, consolidator and their outputs, plus
+`c6_mutants_6.md`, the file two prior C6 sessions owed. The four measurement defects are corrected in
+the instruments that commit carries, and each is published as a finding in `REVIEW_C6_6.md` §9
+(`L-2`, `L-3`, `L-4`) rather than repaired silently. ⚠️ **(e) IS NOT FIXED BY ANY COMMIT.** The
+artefact is published and outside this session's fence; **`OF-180`** carries it, and the honest
+statement is that C6's mutation evidence now has **one slice whose scored provenance a reader cannot
+verify from this repository** — slice C, which holds `N-08`, `N-10` and nine other scored mutants.
+
+**Systemic guardrail:** ⚠️ **NONE THAT IS NEW FOR (a)–(d), AND CLAIMING ONE WOULD BE THIS ENTRY'S OWN
+SUBJECT.** The mechanism that caught all four is the one this project already has and already trusts —
+**a control run before the harness believes itself, a pre-committed polarity that can fail, and a
+provenance line printed from inside the measuring subprocess** — and `INC-72` said the same about the
+session before this one. It has now been the thing that caught the harness in **six consecutive C6
+sessions**. **For (e) there IS a guardrail and it is one line, and it is not built:** the consolidator
+should assert that **every slice it scores appears in the provenance section with a root under the
+scratch directory**, and refuse to print otherwise — the same shape as the pre-run control, applied to
+the record rather than to the run. It is `OF-180`'s remedy and it belongs to whoever next writes a
+mutation harness; **`OF-139`'s `make mutate-clone`, still unbuilt after being asked for three times,
+would remove the whole class by making the clone the thing that is verified instead of the log.**
+
+---
+
+## INC-74 — C7 REVIEW 2's MUTATION HARNESS ABORTED ON `UnicodeDecodeError: 'charmap'` AND PRODUCED NO NUMBERS, AND THE SAME SESSION'S FIRST `QUESTIONS.md` EDIT CONVERTED THE WHOLE FILE TO CRLF: one Windows platform default on the READ side of `subprocess`, one on the WRITE side of `pathlib`, in a repository whose `.gitattributes` has said `eol=lf` since its first commit
+
+⚠️ **THE SESSION AT FAULT AND THE SESSION THAT FOUND IT IS C7 REVIEW 2 (`b8c31a57`), NOT THE SESSION
+WRITING THIS.** Written by **ARCH DISPOSITION 1 (`4d90c2e6`)** on that review's behalf, under
+`Q-088`'s ruling. The review declared it twice and in terms — `REVIEW_7_2.md` §16.1: *"**No
+`INCIDENTS.md` entry, and `CLAUDE.md` §6 duty 4 requires one.** This session's fence names
+`INCIDENTS.md` under **NOT**. Two things broke and are recorded here and in `Q-088` instead"* — and
+`Q-088` carries the full account. **Every fact below is that session's own, taken from its words.**
+**Date:** 2026-09-03.
+
+⚠️ **NUMBERED FROM THE WORKING TREE, RE-READ IMMEDIATELY BEFORE THIS APPEND**, where the highest
+entry is `INC-73`, this session's own, appended above. Counted in the operator's tree at
+`C:\Users\chinm\whetstone-gate` (`INC-54`).
+
+**Event:** two defects, on opposite sides of the same platform assumption.
+
+**(a) THE MUTATION HARNESS ABORTED ON `UnicodeDecodeError: 'charmap' codec can't decode byte 0x8f`.**
+`Q-088`, verbatim: *"`subprocess.run(..., text=True)` decodes with the Windows ANSI codepage and this
+suite's output carries `§`, `⚠` and `₹`. ⚠️ **It produced NO numbers; it stopped** — which is the safe
+direction, and the reason it is worth recording anyway is the unsafe neighbour: a harness that had
+*swallowed* that error would have mis-parsed the `FAILED` lines it scores mutants on, which is
+`INC-69`'s class one layer over."*
+
+**(b) THE SESSION'S FIRST `QUESTIONS.md` EDIT CONVERTED THE WHOLE FILE TO CRLF — 7,991 CR BYTES.**
+`Q-088`, verbatim: *"against `.gitattributes`' `* text=auto eol=lf`, because
+`pathlib.Path.write_text` applies platform newline translation on Windows. **It was caught by reading
+`git diff --stat` rather than by trusting the edit**, repaired by a byte-level rewrite, and the
+committed diff reads exactly `1 insertion(+), 0 deletions(-)` with 0 CR bytes in the file. `INC-60`'s
+lesson — *for line endings, cite the measurement* — pointed at this session's own editor, and every
+subsequent write this session made to a tracked file went through `write_bytes`."*
+
+**Action:** **(a)** `encoding="utf-8", errors="replace"` on both `subprocess.run` calls, and **the
+clone re-verified byte-identical to the live tree before the restart** — the harness was not merely
+restarted, its subject was re-proved first. **(b)** a byte-level rewrite before the commit, and every
+later write through `write_bytes`.
+
+**Expectation:** a tool invoked to measure a repository should not decide the repository's encoding
+from the console's codepage, and an editor writing a tracked file should not decide its line endings
+from the operating system — **especially not in a repository whose `.gitattributes` states `eol=lf`
+and was put in the FIRST commit for exactly this reason** (`PROCESS.md` §6a, C0's done-when).
+
+**Missing:** ⚠️ **nothing in this repository tells a session that `pathlib.Path.write_text` and
+`subprocess.run(text=True)` are unsafe here, and BOTH have now bitten more than once.** `INC-08`,
+`INC-16`, `INC-25`, `INC-45` and `INC-60` each record one instance of the encoding/line-ending class
+from a different direction; **none of them names the two API calls**, which is the only form of the
+lesson a session can act on before it makes the mistake. A four-line "writing files on this machine"
+note in `PROCESS.md` §6a — *write bytes, set `encoding="utf-8"` on every `subprocess.run`, cite
+`git diff --stat`* — would have prevented both halves of this entry and at least three earlier ones.
+**A `check-crlf`-style tripwire already exists in the suite as `A3`/`A4`** and it is what would have
+caught (b) at `make test`; it did not run between the edit and the commit because the edit and the
+commit were the same minute.
+
+**Missed:** ⚠️ **THE SIGNAL WAS ONE FILE AWAY AND HAD BEEN READ.** `INC-60`'s lesson — *for line
+endings, cite the measurement* — is in this session's own prescribed read order, and the session
+**applied it correctly one step later**, by reading `git diff --stat` instead of trusting the write.
+**What it did not do is apply it BEFORE the write**, to the editor it had chosen. And the concurrent
+**C6 REVIEW 6** session hit the SAME platform class in its own consolidator the same afternoon — that
+script's own docstring says *"this script's first form died on a `UnicodeEncodeError` mid-write"* —
+so **two sessions in one working tree on one day were each defeated by this machine's cp1252 default,
+in opposite directions, and neither could see the other's**. That is `INC-72`'s `Missed` field
+repeating one day later with different sessions.
+
+**Diagnosis:** both halves are the same defect with the polarity flipped — **a Python standard-library
+call that silently substitutes the platform's encoding convention for the repository's declared one**,
+on read in `subprocess.run(text=True)` and on write in `Path.write_text` — and the repository's own
+declaration (`.gitattributes`, `eol=lf`) is enforced only by a test that runs later than the mistake.
+**The read-side failure stopped; the write-side failure succeeded and had to be caught by measurement,
+which is why (b) is the more dangerous of the two despite being the one that was repaired.**
+
+**Fix:** **`3d8fb6c`** carries the corrected harness — verified in the committed file:
+`docs/reviews/mutants/c7_review2_mutants.py` lines 84 and 97 both read
+`text=True, encoding="utf-8", errors="replace"`. **`c9bf0d5`** is the CRLF repair's proof: its diffstat
+is exactly `QUESTIONS.md | 1 +` / `1 file changed, 1 insertion(+)`, which is what a correct
+single-row append looks like and is not what a 7,991-CR rewrite looks like. **Both were re-measured by
+this session against the committed objects rather than taken from the review's report.**
+
+**Systemic guardrail:** ⚠️ **NONE IS INSTALLED, AND THE ONE THAT WOULD CLOSE IT IS NAMED HERE
+RATHER THAN CLAIMED.** The class now has **six** entries (`INC-08`, `INC-16`, `INC-25`, `INC-45`,
+`INC-60`, this) and every remedy so far has been *"that session was more careful afterwards"*, which
+`OF-67` says with a count is the state that precedes a loss. **What closes it is four lines in
+`PROCESS.md` §6a naming the two API calls and the one measurement** — `PROCESS.md` is the architect's
+and is outside every recent fence, which is `Q-090`'s subject and `INC-75`'s. **What does NOT close it
+is the existing `A3`/`A4` tests**: they run at `make test`, and both defects here happened between an
+edit and a commit, which is a window `make test` does not cover. A pre-commit hook would; this
+repository has none, and adding one is the architect's.
+
+---
+
+## INC-75 — THE PATTERN, MEASURED: two more `INCIDENTS.md` entries were stranded by review fences that a STANDING ARCHITECT RULING HAD ALREADY REMOVED — and the project's published count of this pattern is wrong in four places, double-counts one occurrence, omits at least eight, and at least two stranded entries were NEVER WRITTEN AT ALL, which is the loss `Q-033` said had not yet happened
+
+⚠️ **FOUND AND WRITTEN BY ARCH DISPOSITION 1 (`4d90c2e6`), 2026-09-03**, while discharging
+`INC-73` and `INC-74` above — the two entries `C6 REVIEW 6` (`7f4b0e93`) and `C7 REVIEW 2`
+(`b8c31a57`) declared owed and could not write. **This entry is about the mechanism that stranded
+them, and its first duty is to correct the count its own prompt inherited.**
+
+**Event:** on 2026-09-03 two review sessions, in the same working tree, each finished with defects of
+their own instruments recorded nowhere in `INCIDENTS.md`, each having declared the entry OWED in its
+FINAL OUTPUT, each because its prompt's `FENCE:` line named `INCIDENTS.md` under **NOT**. Measured
+before this session wrote anything: **`b8c31a57` occurred 0 times in `INCIDENTS.md`; `7f4b0e93`
+occurred 0 times.**
+
+⚠️ **AND THE COUNT, WHICH THIS SESSION'S OWN PROMPT GOT WRONG AND WHICH IS CORRECTED HERE RATHER
+THAN TRANSCRIBED.** The prompt said *"THIS IS THE SEVENTH AND EIGHTH TIME AN ENTRY HAS BEEN
+STRANDED (Q-029, Q-033, Q-049, OF-89, REVIEW_C6_2's M-9, INC-64)."* **Measured, that list is wrong
+twice and the published record disagrees with itself four ways:**
+
+| where | what it says | measured |
+|---|---|---|
+| `INC-44` (1 Sep) | *"That is the FOURTH time an entry has been stranded this way — `Q-029`, `Q-033` and `Q-049` are the first three."* | consistent with itself |
+| `OPEN_FINDINGS.md`, `OF-89`'s closing note | *"this is the fourth stranded entry after `Q-029`, `Q-033` and `Q-049` — and `Q-078` is its **fifth** instance"* | consistent with `INC-44`; **adds `Q-078` as the fifth** |
+| `Q-078` (`QUESTIONS.md`) | *"arriving for the **fifth** time by this project's own count (`Q-029`, `Q-033`, `Q-049`, `OF-89`)"* | consistent |
+| `PROGRESS.md` (`INC-57`, 2 Sep) | *"**SIXTH stranded entry** (`Q-029`, `Q-033`, `Q-049`, `OF-89`, `REVIEW_C6_2`'s `M-9`, this)."* | ⚠️ **WRONG TWICE** — it **drops `Q-078`**, which the two records above both name as the fifth, and it **counts `OF-89` and `M-9` as two** |
+| **this session's prompt** | *"the SEVENTH AND EIGHTH … (Q-029, Q-033, Q-049, OF-89, REVIEW_C6_2's M-9, INC-64)"* | ⚠️ **inherits both defects** from the row above, with `INC-64` swapped for `INC-57` |
+
+⚠️ **`OF-89` AND `REVIEW_C6_2`'s `M-9` ARE ONE OCCURRENCE, NOT TWO, AND IT IS CHECKABLE IN ONE
+LINE.** Both name **C6 REVIEW 2 (`ec8e57ad`)**, the **same** Phase-1 seal `b7737b7`, the **same** two
+CRLF files, the **same** `3 failed, 661 passed`, the **same** repair at `b8bfb6a`; `OF-89` is the
+register row, `M-9` is the review-file rendering, `REVIEW_C6_2` §0.2 is a third rendering of the same
+event, and **all three were discharged by the same entry, `INC-44`.** Counting the row and the
+finding as two inflates every later count by one.
+⚠️ **AND `Q-049` IS NOT A STRANDED `INCIDENTS.md` ENTRY AT ALL.** Its fence excluded **`data/`**, not
+`INCIDENTS.md`; its own text records that **`INC-28` was written, by that session**, because `Q-033`'s
+ruling had already put the file in every fence. `Q-049` belongs to the parent class `INC-28` names —
+*"a scope fence excluded the exact file the session's own ruling told it to write"* — and the project
+has been carrying it in the child class since `INC-44`.
+
+**On this project's own consistent enumeration — `Q-029`, `Q-033`, `OF-89`(=`M-9`), `Q-078`,
+`INC-57`'s, `INC-64`'s — today's two are the SEVENTH and EIGHTH only if `Q-049` is kept and the
+double-count is kept; they are the SEVENTH and EIGHTH by the prompt's arithmetic and by coincidence,
+because its two errors cancel.** Counting only *declared-owed `INCIDENTS.md` entries*, this session
+found **at least eighteen declarations across at least fourteen sessions** (`Q-032`, `Q-057`,
+`Q-058`, `Q-061`, `Q-063`, `Q-064`, `Q-078`, `Q-079`, `Q-088`, `OF-89`, `OF-151`/`OF-152`,
+`REVIEW_C1_2`'s `INFO-3`, `REVIEW_C4_1`'s `INFO-4`, `REVIEW_C2_1` §5, `docs/sessions/c13-build-2.txt`'s
+*"FOUR ENTRIES ARE OWED"*, and today's two). **The honest statement is that nobody knows the number,
+which is itself the finding.**
+
+⚠️ **AND THE PART THAT IS NOT A COUNTING ARGUMENT: AT LEAST TWO DECLARED-OWED ENTRIES WERE NEVER
+WRITTEN, WHICH IS THE LOSS `Q-033` EXPLICITLY SAID HAD NOT YET HAPPENED.** `Q-033`'s ruling, recorded
+verbatim in `QUESTIONS.md`, reassures in terms: *"**the fence has not yet lost this project an
+incident; it has delayed three and degraded the format of one.**"* Measured by this session against
+the file:
+
+1. **`REVIEW_C1_2`'s `INFO-3`** — *"an `INCIDENTS.md` entry is **OWED** for this session's stray
+   `s4.md`"* (`REVIEW_C1_2.md` line 640, C1 REVIEW 2 / `df238be6`). **`grep -c 's4\.md' INCIDENTS.md`
+   → `0`.** **NEVER WRITTEN.**
+2. **`REVIEW_C4_1`'s `INFO-4`** — *"this review's own CRLF defect"*, repaired at `51404cc`
+   (`REVIEW_C4_1.md` line 654, C4 REVIEW 1 / `0852ea56`). **`51404cc` occurs once in `INCIDENTS.md`
+   and `0852ea56` twice — all three inside `INC-30`, in its audit list of commits confirmed clean in
+   the reciprocal direction.** **No entry records the defect.** **NEVER WRITTEN.**
+3. **`Q-029`'s** — partially absorbed rather than written: the `TODO_`-sentinel finding appears in
+   `INC-28`'s **`Missed:`** field as prior context for a **different** incident, and the RS-16 paise
+   correction it asked to have *"recorded as an `INCIDENTS.md` entry in its own right"* appears in
+   `INC-18`. **Recorded, but not as the entry it asked for.**
+
+**Action:** `INC-73` and `INC-74` written above, each attributed in its first line to the session that
+found it, each in hard rule 13's eight fields. `Q-087` and `Q-088` recorded verbatim in `QUESTIONS.md`.
+`Q-090` raised for the two mechanical gaps this entry cannot close from inside its fence. **Nothing
+was closed that is not closed.**
+
+**Expectation:** `CLAUDE.md` §6 duty 4 — *"Append to `INCIDENTS.md` anything that broke, in rule 13's
+format, with `Diagnosis` and `Missed` filled in"* — binds **every** session. Hard rule 13 adds that
+*"an entry with an empty `Diagnosis` or `Missed` is not an entry."* **A session that cannot write one
+at all is that defect at full strength, which is `Q-033`'s own sentence, ruled ten days before the two
+fences that stranded these two entries.**
+
+**Missing:** ⚠️ **there is no artefact in this repository that lists the owed entries.** Each
+declaration lives in the FINAL OUTPUT of the session that made it, in `docs/sessions/`, and is found
+only by a successor who reads that file — which is exactly the dependency `Q-033` named when it
+removed the fence. **A four-line `docs/reviews/OWED.md`, or one `Status: OWED` row in
+`OPEN_FINDINGS.md` per declaration, would make the debt countable**; without one, the count is
+recomputed by hand every time and has been wrong in four published places. **And nothing compares a
+prompt's `FENCE:` line against the standing rulings** — `make check-roles` reads the token table and
+would not notice a fence that contradicts `Q-033`.
+
+**Missed:** ⚠️ **`Q-033` RULED THIS FENCE AWAY ON 2026-08-31, IT LANDED, AND IT HAS BEEN READ BY
+EVERY SESSION SINCE.** `PROCESS.md` line 178 carries the result to this day —
+*"⚠️ **APPEND-ONLY, AND IN EVERY SESSION'S FENCE** (Q-033, 2026-08-31)"* — and `QUESTIONS.md` is item
+6 of `CLAUDE.md` §1's read order, where a ruling *binds*. **Both reviews read it, both said so, and
+both obeyed the prompt instead** — correctly, because `CLAUDE.md` §1 makes the newer architect
+instruction govern and makes the disagreement a STOP-and-record, which is what `Q-088` is. **So the
+signal was not merely available: it was cited, by both sessions, in the act of being overridden.**
+⚠️ **AND THE SHARPER MISS IS `INC-28`'s, ONE LEVEL UP, WRITTEN 2026-09-01 AND UNACTED ON SINCE:**
+*"the failing pattern is not ‘`INCIDENTS.md` is fenced out’, it is ‘the fence is written from the diff
+the architect expects, not from the tasks the architect wrote.’ Q-033 fixed one filename."* **Nine
+fences later, it is still one filename.**
+
+**Diagnosis:** every review prompt's `FENCE:` line is authored from the diff the architect expects a
+review to produce — a review edits no journals but its own — while `CLAUDE.md` §6 duty 4 and `Q-033`'s
+standing ruling both require every session to append what broke, and **nothing in this repository
+compares a prompt's fence against a standing ruling**, so the contradiction is invisible until the
+session hits it and can then only record it. **The recurrence is not the fence: it is that each
+instance has been closed at the level of the individual filename or the individual session, never at
+the level of how a fence is derived** — `INC-28`'s diagnosis, unchanged and now on its ninth
+occurrence.
+
+**Fix:** ⚠️ **THIS ENTRY HAS NO FIX SHA AND SAYS SO, BECAUSE THE THING THAT WOULD FIX IT IS OUTSIDE
+EVERY FENCE THAT HAS EVER HIT IT.** What this session could do it did, in the commit that carries this
+file: the two stranded entries are written, and `Q-090` records the two mechanical gaps. **What would
+actually fix it — one line in `PROCESS.md` §2 marking `Q-033`'s rule superseded for review sessions by
+`Q-088`, and one line in `PROCESS.md` §10's review template requiring the owed entry to be DECLARED —
+is the architect's, and `PROCESS.md` is named under NOT in this session's fence too.** That is the
+diagnosis demonstrating itself inside the entry that records it, and it is stated rather than worked
+around.
+
+**Systemic guardrail:** ⚠️ **ONE EXISTS AS OF TODAY AND IT IS PARTIAL, AND THE HONEST ACCOUNTING OF
+WHAT IT DOES AND DOES NOT CLOSE IS THE POINT OF THIS FIELD.** `Q-088`'s ruling of 2026-09-03 — *"a
+review session may not write to `INCIDENTS.md`, and the entry it owes is DECLARED IN ITS FINAL OUTPUT
+and written by the NEXT non-review session in that chunk's line"* — **converts an accident into a
+procedure**: the fence stays, and the declaration duty is what makes recovery possible. **Both entries
+above exist only because both reviews declared them**, so the mechanism has now worked twice.
+⚠️ **WHAT IT DOES NOT CLOSE, said plainly:** (i) the declaration duty is **in no template** — not in
+`PROCESS.md` §10's review template, not in `CLAUDE.md` §6's eight duties — so it rides on the same
+reviewer discipline that `OF-67` counts as the state preceding a loss, and both of today's reviews
+declared it **of their own initiative**; (ii) it depends on a **next non-review session in that
+chunk's line** existing, and **C6 and C7 are both DISPOSED as shipped-with-residue by today's ruling,
+so neither has one** — this session is it, and there will not be another; (iii) it **contradicts
+`Q-033` as still written in `PROCESS.md` §2**, so the next session to read `PROCESS.md` and not this
+entry will reach the same STOP; and (iv) **it does nothing about the two entries that were never
+written at all**, which predate the duty and are now unrecoverable — `s4.md`'s and `51404cc`'s
+sessions are closed and their facts survive only in two review files. ⚠️ **So: NOT CLOSED. What would
+close it is `Q-090`'s option 1, two lines, in a file no session that has ever hit this may edit.**
