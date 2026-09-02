@@ -1,0 +1,101 @@
+==============================================================================
+C6 REVIEW 4 - PHASE 2 PROBES.  SESSION-TOKEN ca0dd160
+==============================================================================
+whetstone_gate.__file__ = C:\Users\chinm\whetstone-gate\src\whetstone_gate\__init__.py
+config root             = C:\Users\chinm\whetstone-gate
+
+needle families: 10  needles: 118
+
+------------------------------------------------------------------------------
+P-42/43/44  THE FOUR BLINDNESS CLAIMS, MY METHOD, THE PACKAGE'S REAL BYTES
+------------------------------------------------------------------------------
+  turns assembled : 20  model calls : 20
+
+  turn   FULL chars  FULL hits   AUTH chars  AUTH hits   probe_id F/A   note F/A
+     1         1214          0         1123          0   False/False  False/False
+     6        10590          0         1476          0    True/False   True/False
+     7        10719          0         1529          0    True/False   True/False
+    12        10987          0         1796          0    True/False   True/False
+    20        11035          0         1844          0    True/True    True/False
+
+  FULL-surface hits, itemised at turn 7 (they are EXPECTED - S10.1 requires the
+  probe note to reach the attacker on the WORLD surface, in every arm):
+
+------------------------------------------------------------------------------
+P-18  THE CLEAN-SURFACE CONTROL, against the PACKAGE's own authored surface
+------------------------------------------------------------------------------
+  needles firing on an UNLEAKED authored surface: 0 of 118
+  CONTROL HOLDS.  0 of 118 - so the needles are about LEAKS, not about the spec.
+
+------------------------------------------------------------------------------
+P-19..P-30  MY NEEDLE FAMILIES PLANTED ON THE AUTHORED SURFACE
+  copy1 = tests/test_c6_attacker.py::_denial_findings
+------------------------------------------------------------------------------
+  family                          n in VALUE in LABEL as RESIDUE
+  F1-cap-renderings              27       27       23        27   <<< GAP
+  F10-live-clause-bodies          7        7        7         7
+  F2-clause-ids                  14       14       14        14
+  F3-paraphrases                  7        7        2         7   <<< GAP
+  F4-arm-identity                12       12        6        12   <<< GAP
+  F5-hole-descriptors            14       14        7        14   <<< GAP
+  F6-verdict-vocabulary           8        8        3         8   <<< GAP
+  F7-answer-key                  15       15       10        15   <<< GAP
+  F8-extra-state-fields           8        8        0         8   <<< GAP
+  F9-config-keys                  6        6        0         6   <<< GAP
+
+------------------------------------------------------------------------------
+P-28/P-29  THE SHAPES PHASE 1 PREDICTED WOULD ESCAPE
+------------------------------------------------------------------------------
+  P-28a a gate reason in the LABEL, no ceiling / no id / no arm digit copy1: ESCAPES  copy2: ESCAPES
+  P-28b the same, phrased as a running-total reason              copy1: ESCAPES  copy2: ESCAPES
+  P-28c a gate reason in the STATE label                         copy1: ESCAPES  copy2: ESCAPES
+
+------------------------------------------------------------------------------
+OF-104's OWN THREE EXHIBITS - the shapes the REMEDY was ruled against
+------------------------------------------------------------------------------
+  LAST_REFUSAL_LABEL = "LAST TOOL REFUSAL (arm 2S): "        copy1   1  copy2  20
+        copy1: arm or clause identity 'arm 2S' on the AUTHORED surface
+  LAST_REFUSAL_LABEL = "... the gate judge rejected ...; arm copy1   0  copy2   0   <<< ESCAPES
+  STATE_LABEL = "STATE SO FAR (this arm runs a live judge):  copy1   0  copy2   0   <<< ESCAPES
+
+------------------------------------------------------------------------------
+P-30/P-32/P-33  OF-104's SHAPES, AND COPY 2 FIRED INDEPENDENTLY
+------------------------------------------------------------------------------
+  arm identity in the refusal LABEL                copy1   1   copy2  20
+  arm prose in the STATE label                     copy1   0   copy2   0   <<< A COPY IS SILENT
+  clause id in the refusal LABEL                   copy1   2   copy2  40
+  a cap value in the refusal LABEL                 copy1   2   copy2  40
+  a cap value, Indian-grouped, in the STATE label  copy1   1   copy2  20
+  a paraphrase in the refusal VALUE                copy1   1   copy2  20
+  CONTROL, clean tree:            copy1   0   copy2   0
+
+------------------------------------------------------------------------------
+P-31/P-35  THE TWO COPIES ARE INDEPENDENT - BY AST, NEVER BY GREP
+------------------------------------------------------------------------------
+  test_c6_fix_probes imports test_c6_attacker : False
+  test_c6_attacker imports test_c6_fix_probes : False
+  shared first-party non-package imports      : ['__future__.annotations', 'ast', 'dataclasses', 'json', 'pathlib', 'pathlib.Path', 'pytest', 're']
+  raw text occurrences of 'test_c6_attacker' in the fix-probe file: 5 (prose, per the AST result above)
+  copy1 cap formattings : 11
+  copy2 cap formattings : 11
+  copy1 gate vocabulary : 31
+  copy2 gate vocabulary : 5 (inline: ceiling / per-action / per action / exceeded / not permitted)
+
+------------------------------------------------------------------------------
+P-38..P-41  OF-110's C6 HALF - THE AST WALK AND THE SOURCE-TEXT SCAN
+------------------------------------------------------------------------------
+  synthetic packages under: C:\Users\chinm\AppData\Local\Temp\c6r4of110-r7of677o
+  form                                           AST walk    text scan
+  importlib.import_module                          silent        FIRES
+  __import__                                       silent        FIRES
+  getattr on the package root                      silent        FIRES
+  sys.modules                                      silent        FIRES
+  exec of an import statement                      silent        FIRES
+  a split target name                              silent        FIRES
+  builtins.__dict__ with a split key               silent       SILENT
+
+  the real package, scanned: ZERO HITS
+
+==============================================================================
+END - c6_review4_probes.py
+==============================================================================
