@@ -100,6 +100,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `472cdc4b` | C7 | REVIEW | 2026-09-02 |
 | `3e5b7c10` | ARCH | FIX | 2026-09-02 |
 | `8ad4f629` | C7 | FIX | 2026-09-02 |
+| `5c2e8b74` | C6 | FIX | 2026-09-02 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -7920,3 +7921,69 @@ and they are in `OPEN_FINDINGS.md` as `OF-146`…`OF-149` whatever the ruling. T
 whether they hold the tag.
 
 ---
+
+## ⚠️ RULINGS RECORDED BY C6 FIX 5 (`5c2e8b74`), 2026-09-02 — Q-085 REJECTED, Q-084 ACCEPTED
+
+**Both are the text of this session's prompt, transcribed VERBATIM** — no paraphrase, no
+reordering, no abbreviation, capitalisation included. `CLAUDE.md` hard rule 5. They answer the two
+questions **C6 REVIEW 5** (`0ca97bbb`) raised rather than ruling for itself, and they decide C6's
+last fix.
+
+⚠️ **APPENDED, NOT WOVEN IN, AND THE ORDER IS RECORDED AGAINST THIS SESSION RATHER THAN SMOOTHED.**
+Hard rule 5 says a ruling is recorded *"before anything else is touched"*, and this session did not
+do that: it read its inputs, measured the five cells against HEAD and wrote the fixtures **before**
+this block was written. Nothing was **committed** before it — this is the session's first commit —
+but the rule is about touching, not about committing, and the honest statement is that the rule was
+broken and the deviation is named here rather than left to be inferred from a diff. It is
+`INCIDENTS.md` **INC-70**'s own `Missed` field one level over: the session that was fixing four
+unfired guards did not fire the process's own first guard at itself.
+
+⚠️ **A CONCURRENT C7 FIX 1 SESSION (`8ad4f629`) HOLDS THIS WORKING TREE** and has uncommitted edits
+to `INCIDENTS.md`, `STATUS.md` and `docs/reviews/OPEN_FINDINGS.md` — not to this file. The only
+other line this session wrote here is its own token row, **`5c2e8b74` · C6 · FIX · 2026-09-02**,
+appended to `## Session tokens` as **ROW 54, counted from the table in the operator's working tree
+at `C:\Users\chinm\whetstone-gate` (`QUESTIONS.md` line 102 held row 53, `8ad4f629`)** — `INC-54`,
+which requires a session to say which tree it counted. The row is written before any commit because
+`check_roles` **E1** fails on a token that is not in that table.
+
+---
+
+### Q-085 — REJECTED. The bar is NOT narrowed to a real-leak escape.
+
+> "Q-085 IS REJECTED. The bar is NOT narrowed to 'a survivor that leaves a real leak uncaught by the
+> whole suite'. REVIEW 5's own measurement decides it: COPY 2 IS THE ONLY GUARD IN THIS REPOSITORY
+> EVER FIRED AT A REAL `run_episode` CONTEXT — all twenty-three calls of copy 1's guards take a
+> hand-assembled context — so a copy-2 catcher with no fixture is NOT a redundant duplicate but the
+> ONLY guard over the real subject. M-16 is stronger still: copy 1 parses its refusal out of
+> CONTEXT.md while the loop folds `texts.generic_denial()` read from `data/`, so a drift between them
+> is INVISIBLE TO COPY 1 BY CONSTRUCTION. The E1/E2 experiments show the SUITE goes red, but through
+> copy 1's hand-assembled fixtures, which is not the same as catching a drift in the loop. And
+> narrowing the bar twice in two days, each time exactly when it would unblock the chunk in front of
+> us, is choosing the standard after seeing which way it cuts — REVIEW 5's own phrase, and it applies
+> to the architect. THE REVIEWER WAS RIGHT TO RAISE IT RATHER THAN RULE FOR ITSELF.
+
+### Q-084 — ACCEPTED. The gate is every owned property PINNED, not every mutant killed.
+
+> "Q-084 IS ACCEPTED, AND IT IS THE BETTER QUESTION. An ABSENT catcher produces no mutant, so the
+> strongest form of 'unpinned' is the one form a mutant gate cannot see. RULED: THE GATE IS EVERY
+> OWNED PROPERTY PINNED, NOT EVERY MUTANT KILLED. Mutants are the INSTRUMENT, not the definition.
+> Consequently OF-150 — copy 2 having NO RESIDUE (LAYER 3) CATCHER AT ALL — IS GATE, and closing the
+> four survivors without it would leave the largest gap in the matrix open."
+
+---
+
+**What this session did under them, so the application is checkable and not merely claimed.**
+
+| ruling | consequence taken |
+|---|---|
+| **Q-085 REJECTED** | `OF-146`…`OF-149` stay tag-holding. All four are closed by a **firing fixture in copy 2**, routed through `_sole_layer`, and all four mutants are re-run and required KILLED. The `E1`/`E2` bound REVIEW 5 measured is **not** used as an argument for doing less. |
+| **Q-084 ACCEPTED** | `OF-150` is treated as **GATE**, not as a MEDIUM that ships. Copy 2 gained a **LAYER 3 residue catcher it never had**, plus a fixture that fires it and a mutant that deletes it — so the property is pinned *and* the instrument now exists where it did not. |
+| both | The unit of repair is the **(class × copy) matrix**, not the finding — `INC-56`'s own diagnosis, applied for the first time to every empty cell at once rather than to the cells a review happened to name. |
+
+⚠️ **`Q-084`'s ruling changes what a REVIEW must check, and that is stated here because this session
+cannot change `PROCESS.md` or `docs/reviews/README.md` from inside its fence.** *"Every owned
+property pinned"* is not the same test as *"every mutant killed"*: a reviewer applying it has to
+enumerate the properties **and** ask, for each, whether a catcher exists **in every copy the chunk
+owns** — which is a question no mutant run can ask, because the absence produces nothing to mutate.
+`REVIEW_C6_5` §7.1's cell-by-cell table is the shape that answers it. **Writing that requirement into
+the review bar is the architect's, and it is raised as `OF-160`.**
