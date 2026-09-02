@@ -1482,7 +1482,26 @@ def _with_extra_summary_line(context: ctx.AssembledContext, extra: str) -> ctx.A
 @pytest.mark.parametrize(
     ("shape", "refusal_label", "state_label"),
     [
-        # REVIEW_C6_3's own two exhibits, verbatim.
+        # ⚠️ THE FIRST IS `REVIEW_C6_3`'s MEASURED EXHIBIT VERBATIM. THE SECOND IS NOT, AND
+        # SAYING SO IS `OF-132` — `REVIEW_C6_4` L-4, and `INC-47`'s diagnosis one level down:
+        # `Fix:` is bound to a commit and cannot be invented; **a COMMENT is bound to
+        # nothing**, so a comment that says "verbatim" about a substituted string is the same
+        # class of unchecked claim, in the file whose whole job is checking.
+        #
+        # `OF-104`'s measurement table lists THREE shapes. Its third is
+        #     "STATE SO FAR (this arm runs a live judge): "
+        # and the row below carries `"STATE SO FAR (arm 4 runs a judge): "` instead — which
+        # is the form `OF-104`'s own REMEDY line verified, not the form its measurement
+        # table exhibited. **The substituted words are `arm 4` for `this arm`, and that is
+        # exactly the digit `\barms?\s*[1-4]S?\b` requires**, so the substitution is the
+        # discriminator rather than a paraphrase of one.
+        #
+        # ⚠️ **THE ACTUAL THIRD EXHIBIT STILL ESCAPES BOTH COPIES AND IS NOT SILENTLY
+        # DROPPED: it is `OF-127`, OPEN**, with `OF-133` as its measured superset (46 of 118
+        # needles escape when carried in a label). It is deliberately NOT added to this list,
+        # because a row asserting a catch that does not happen would be red for a defect this
+        # session's fence does not cover — `Q-082`'s ruling puts it in `OPEN_FINDINGS.md`,
+        # not in the gate.
         ("the arm in the refusal LABEL", "LAST TOOL REFUSAL (arm 2S): ", None),
         ("the gate judge named in the state LABEL", None, "STATE SO FAR (arm 4 runs a judge): "),
         # ⚠️ TWO FURTHER SHAPES OF THIS SESSION'S OWN, beyond the review's.
