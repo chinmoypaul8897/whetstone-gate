@@ -6163,3 +6163,109 @@ entry will reach the same STOP; and (iv) **it does nothing about the two entries
 written at all**, which predate the duty and are now unrecoverable — `s4.md`'s and `51404cc`'s
 sessions are closed and their facts survive only in two review files. ⚠️ **So: NOT CLOSED. What would
 close it is `Q-090`'s option 1, two lines, in a file no session that has ever hit this may edit.**
+
+---
+
+## INC-76 — `make check-roles` began printing *"neither directory exists yet"* about a directory that exists, on the run that created it, and the sentence is inside the group `CLAUDE.md` calls "the whole moat"
+
+**Date:** 2026-09-03 (C8 BUILD 1, `2b6ee014`, **after** the first build commit)
+
+**Event:** `check_roles.check_gate_scorer_isolation` reports the whole **D** group — the
+gate/scorer moat — as `n/a` unless **both** `gates/` and `scorer/` exist, with this detail, verbatim:
+*"neither directory exists yet — gates/ is built by C9, scorer/ by C8."* This session created
+`src/whetstone_gate/scorer/`. From its first commit onward `make check-roles` prints that sentence
+**twice on every run** — once under `D1`, once under `D4` — and it is **false**. Measured after the
+package landed: `python -m whetstone_gate.tasks check-roles` exits **0**, `17 passed, 0 failed,
+5 n/a`, and two of those five `n/a` lines assert that `scorer/` does not exist.
+
+**Action:** the sentence was **not** edited. `src/whetstone_gate/check_roles.py` is named under
+`NOT` in this session's fence. Instead this session (i) recorded the defect at `QUESTIONS.md`
+**Q-094** with the one-line remedy, (ii) opened `OF-182`, and (iii) **replaced the missing
+measurement rather than the missing sentence**: `tests/test_c8_scorer.py` copies `src/` into a fresh
+OS temp tree, adds the `gates/` package C9 will write, and runs the **real** `_walk_isolation`
+against the **real** scorer — D1, D2, D3 and D4 all **PASS** — then drives the same walk **RED three
+ways** (a gate importing the scorer; a shared predicate helper both sides import; `INC-51`'s dynamic
+import, which turns D4 red while D1–D3 stay green).
+
+**Expectation:** a check's `n/a` line states **why** it did not run, and `check_roles.py`'s own
+`Result` docstring is emphatic that *"`ok is None` means not applicable yet, never passed"*. The
+reason is load-bearing precisely because the verdict is not a pass — it is the only thing the line
+tells a reader. It should have said *which half* was missing, computed, rather than asserting both
+were.
+
+**Missing:** a reason string built from what was **measured** instead of from what was **true when
+it was written**. The branch had exactly one message for four possible states of the pair
+(`neither`, `gates only`, `scorer only`, `both`), so three of the four render a false sentence and
+nothing in the code can notice.
+
+**Missed:** `INC-14` is this repository's own entry about three C0 checks that *"reported PASS over
+input built to break them"*, and its `Expectation` field is the exact rule this breaks — *"A check
+that cannot fail is not a weak check; it is a **false statement printed on every run**."* The
+signal was there, in this file, under the heading of the same check group. `OF-03`'s doctrine — an
+absent check and a passing check must never be the same thing to a caller — was applied to the
+**verdict** and not to the **reason**.
+
+**Diagnosis:** the message was written as a constant at a moment when it was true, so it encodes a
+fact about **2026-08-31** rather than a fact about the tree being checked, and the first commit to
+create either directory falsified it silently.
+
+**Fix:** ⚠️ **NOT FIXED, AND THAT IS RECORDED RATHER THAN SOFTENED. NO COMMIT SHA, BECAUSE THERE IS
+NO FIX COMMIT.** `check_roles.py` is out of C8's fence; the remedy is `Q-094`'s option 1 — report
+which half is present, computed — and it belongs to C9 or to a one-file FIX session. What C8 landed
+at **`52dcbab`** is the missing measurement, not the missing sentence.
+
+**Systemic guardrail:** none yet — accepted for C8, because the fence is the guardrail that stopped
+this session editing a file it was not asked to. ⚠️ **The class is not new and it is not closed:**
+a reason string that states a fact about the world rather than about the input is the same shape as
+`INC-32`'s checker-reading-its-input-through-the-schema-it-expects. The narrow guardrail that would
+close it is a test asserting every `n/a` detail in `check_roles` names a condition **recomputed from
+the tree**, and it can only be written by a session whose fence holds that file.
+
+---
+
+## INC-77 — a mutant probe in C8's own test file asserted that a defect would fire on a fixture where it structurally cannot, and the assertion was written before the measurement
+
+**Date:** 2026-09-03 (C8 BUILD 1, `2b6ee014`, **after** the first build commit)
+
+**Event:** `test_S2_without_the_non_empty_clause_rebuilds_INC_04s_false_positive` was written to
+fire the *"treat an absent `receipt` as a shared key"* mutant at the two golden-2 fixtures whose
+rows all carry `receipt: null` — **F2** and **F8** — asserting the mutant reports a false positive
+on both. On the first run of the file it **failed on F2**: `1 failed, 104 passed`. The mutant keys
+on `(payment_id, receipt)`, and **F2's five refunds sit on five different payments**, so the null
+receipts never collide and the mutant is correctly silent. The claim was true of F8 (`[2, 3]`) and
+false of F2 (`[]`).
+
+**Action:** the test was **not** loosened, deleted or reduced to F8 alone. It now asserts **both**
+outcomes and says which fixture exhibits the defect and which does not, with the reason — *"it
+shows the defect needs the SAME payment and is not simply 'nulls collide'"*. The mutant itself was
+lifted into a named helper so the two assertions are visibly the same predicate on different input.
+
+**Expectation:** a mutant probe is a **measurement** of what a wrong scorer does, so its expected
+value is computed from the fixture's rows before it is asserted — exactly the discipline hard rule
+3 imposes on goldens, applied to the mutants that judge them.
+
+**Missing:** nothing in the harness. The information needed was in the fixture the assertion was
+about: golden 2's F2 note says *"the four equal amounts sit on FIVE DIFFERENT PAYMENTS"* in terms,
+about `S2-amt`, and the same fact governs the `S2` mutant.
+
+**Missed:** that note, which this session had already read and had already used correctly one test
+earlier — `test_S2_amt_as_an_amount_only_pair_fires_on_five_different_payments` is built on it. The
+fact was in hand and was not carried across two functions.
+
+**Diagnosis:** the assertion generalised *"every fixture whose receipts are all null exhibits the
+null-collision defect"* from one fixture that does to another that does not, because the mutant's
+key is a **pair** and only the receipt half was being thought about.
+
+**Fix:** **`52dcbab`** — the test now asserts both outcomes and names the discriminating fact.
+⚠️ **The failure and the fix are inside ONE commit and that is stated rather than dressed up**: the
+probe was written, run, found wrong and corrected before anything was committed, so there is no
+"broken" SHA to point at. The `1 failed, 104 passed` run that caught it is recorded in
+`docs/sessions/c8-build-1.txt` §8 and in `PROGRESS.md`, which is the only place it survives.
+
+**Systemic guardrail:** partial, and its limit is stated. ⚠️ **The failure was caught by the only
+thing that catches this class: firing the probe instead of asserting it**, which is `INC-14`'s
+convention and is why the probe existed at all. What it does **not** give is a guarantee that a
+mutant which happens to be silent is silent *for the reason its author believes*. The narrow
+guardrail actually landed is that **every mutant in `tests/test_c8_scorer.py` asserts a concrete
+breach list rather than mere truthiness** — `== [2, 3]`, `== [1, 2, 3, 4]`, `== []` — so a probe
+that fires by accident, or is silent by accident, disagrees with a number rather than passing.

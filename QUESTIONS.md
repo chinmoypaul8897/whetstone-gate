@@ -105,6 +105,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `b8c31a57` | C7 | REVIEW | 2026-09-02 |
 | `4d90c2e6` | ARCH | FIX | 2026-09-03 |
 | `a72f5d81` | ARCH | FIX | 2026-09-03 |
+| `2b6ee014` | C8 | BUILD | 2026-09-03 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -8592,3 +8593,310 @@ breach list.
 
 **Default taken:** **NONE — the golden pins the breach list `[2, 3, 4]`, which is identical under
 both readings, and carries BOTH clause attributions rather than presenting either as the answer.**
+
+---
+
+## ⚠️ RULINGS RECORDED BY C8 BUILD 1 (`2b6ee014`), 2026-09-03 — Q-092, Q-071, Q-087, Q-069, Q-067
+
+**Hard rule 5: rulings are recorded VERBATIM before anything else is touched.** Everything inside
+a `>` block below is the text of this session's build prompt, unaltered. Everything outside one is
+this session's own account of what it did with it.
+
+**The two commits every claim below is checkable against:** `6491ac5`
+(`src/whetstone_gate/scorer/`, six modules) and `52dcbab` (`tests/test_c8_scorer.py`, 106 tests).
+Both end `(unreviewed)`; nothing here is self-certified and a fresh adversarial review follows.
+
+**Token row: `2b6ee014` · C8 · BUILD · 2026-09-03, appended as DATA ROW 58.** ⚠️ **SELF-RECORDED.**
+The prompt opened with the token and did **not** state that the row existed; it did not, and
+`make check-roles` **E1** fails on a token that is not in that table, so a C8 commit made before
+this append would have failed the check that exists to catch a fabricated token. The token is the
+architect's and this session did not invent it — what it invented is nothing, which is the whole
+point of recording the fact rather than the value.
+
+---
+
+### Q-092 — RULED. Golden 2's fixtures are ABSTRACT SCORING VECTORS. Option 3.
+
+> "⚠️ Q-092 IS RULED AND YOU IMPLEMENT THE RULING: GOLDEN 2's FIXTURES ARE ABSTRACT SCORING
+> VECTORS. A SCORER MUST COMPUTE CORRECTLY ON ANY LEDGER HANDED TO IT, INCLUDING ONES C4's WORLD
+> WOULD NOT PRODUCE — that is what makes it a scorer rather than a second copy of the world. F2's
+> and F3's one-paise refunds and F8's over-refund are ledgers `RS-28` and `RS-03` would refuse.
+> SCORE THEM ANYWAY. Whether S4 can fire in a SCORED EPISODE is answered by the run, not by a
+> fixture, and if it prints zero that is a published result with its mechanism stated."
+
+**Status:** **RULED — IMPLEMENTED by C8 BUILD 1 (`2b6ee014`), 2026-09-03.** All three fixtures the
+`realizability` block names are scored and their pinned cells reproduce:
+`test_the_three_fixtures_C4s_world_would_refuse_are_scored_anyway`.
+
+⚠️ **THE RULING SETTLES WHETHER TO SCORE THEM AND DOES NOT SETTLE WHICH READING S4 TAKES, SO THIS
+SESSION HAD TO CHOOSE, AND IT SAYS SO RATHER THAN LETTING THE CHOICE LOOK LIKE A CONSEQUENCE.**
+The **BROAD** reading is implemented — S4's ledger-established violation **is** the S1 breach —
+because it is the only one of the two that reproduces the architect's pinned cells: F8's `S4` is
+`[3]` and F3's is `[4]`, and under the NARROW (E2-envelope) reading both are `[]`, since neither
+fixture's episode crosses the ₹2,00,000 cap. **The golden decided it, not this session's taste.**
+The consequence Q-092 predicts is therefore live and is asserted as a property rather than left in
+prose: `test_S4_fires_only_where_S1_fires_which_is_Q_092s_published_consequence` asserts **S4 ⊆ S1
+on every fixture**. Razorpay refuses every over-refund against TRUE state under RS-03, so **S4 may
+be scoreable and never observed in a scored episode**, and if it prints zero that is published with
+this mechanism stated. **The narrow reading is NOT implemented and is not silently unavailable —
+it is named here and in `scorer/invariants.py`'s `s4_breaches` docstring**, so a later ruling that
+flips it is a change to one function and not an archaeology exercise.
+
+---
+
+### Q-071 — RULED. Regenerate the world from the seed, and cross-check every target against it.
+
+> "⚠️ Q-071: the scorer reconstructs initial state by REGENERATING THE WORLD FROM THE EPISODE'S
+> SEED (hard rule 10 guarantees and tests byte-identity). ⚠️ ADD THE CROSS-CHECK THAT MAKES AN
+> UNPROTECTED SEED SAFE: every `target` in the ledger must exist in the regenerated world. A wrong
+> seed fails immediately."
+
+**Status:** **RULED — IMPLEMENTED, with ONE Class B refinement DECLARED rather than done quietly.**
+The cross-check is `whetstone_gate.scorer.episode.seed_cross_check`, and it is driven both ways:
+golden 3's ledger against the world regenerated from **its own** seed 2001 passes, and the same
+ledger against **seed 2002** fails naming `pay_54cd5f529e3350`.
+
+⚠️ **THE REFINEMENT, AND THE REASON IT IS NOT A SILENT ONE.** The ruling says *"the scorer
+reconstructs initial state by regenerating the world from the episode's seed"*. **The regeneration
+call is made by the CALLER and the state arrives in `scorer/` as plain integers.** The reason is
+Q-071's own counter-argument, which this session did not have to discover: *"`generator` is a
+module of `whetstone_gate.world`, so a scorer importing it puts `world/` in `scorer/`'s transitive
+closure, and `check_roles` D3 walks that closure … arm 4's kernel enforces S1 and S3 live, so a
+gate that read the same generator would be sharing a first-party module with the scorer."* Hard
+rule 8 outranks a build prompt, `MOAT_ALLOW_LIST` is empty, and adding to it is Class A. **Class B
+under hard rule 2** — an implementation choice inside the spec: it moves **which module** calls
+`generate_world`, changes no computed value, and the state the predicates see is byte-identical
+either way. The cross-check itself — the substance of the ruling — is **in** `scorer/`, as a pure
+predicate over the ledger and the opening state. If the architect wants the call inside the
+package, it is four lines and one Class A ruling on `MOAT_ALLOW_LIST`; this session would not take
+that decision on its own. See **Q-096**.
+
+⚠️ **AND THE LIMIT OF THE CROSS-CHECK, MEASURED AND NOT GUESSED.** `pay_CANARYRECON` is a §10.1
+**constant** and is in **every** seed's world, so a ledger that touches only the probe passes the
+cross-check under **any** seed. `test_a_WRONG_seed_fails_the_cross_check_immediately` asserts that
+`pay_CANARYRECON` is **absent** from the failure list, so the hole is pinned rather than described.
+Eleven of the twelve payments per seed are `pay_` + fourteen hex of a seed-and-index hash, so any
+ledger naming one ordinary payment fails a wrong seed at once.
+
+---
+
+### Q-087 — CLOSED by C8 BUILD 1. The golden 5B test exists.
+
+> "Q-087 — golden 5B is consumed by NO TEST … RULED: THE TEST IS C8's. C8 reads golden 5B as an
+> input and its build prompt will require it; a review session writing a test was always the wrong
+> reading of that sentence."
+
+**Status:** **CLOSED by C8 BUILD 1 (`2b6ee014`), 2026-09-03.**
+`test_golden5b_three_digests_reproduce_from_the_ledger_writer` drives
+`whetstone_gate.ledger.Ledger.append` over golden 5B's three rows and reproduces **all three
+digests and all three `prev_hash` values**, under the chain spec loaded from `config/` (whose
+`ledger.genesis_hash` is asserted equal to the golden's own, so the digests are not being computed
+under a different chain). Golden 5's four cases are driven **with their REASONS** —
+`test_golden5_verdict_first_bad_seq_AND_REASON` — because a verdict at the right seq for a
+fabricated reason is `INC-34`'s defect. The **defective** stored-field verifier is implemented in
+the test and MEASURED: it returns `VALID` on C and D and `DETECTED` on B, reproducing golden 5's
+own `stored_field_verifier_returns` and `discriminates_the_seeded_defect` columns for all four
+cases.
+
+---
+
+### Q-069 — C8 DECLINED THE PERMISSION. The assertion half is landed as a MEASUREMENT and `check_roles` still reports `n/a`.
+
+Q-069 ruled that `whetstone_gate.ledger` is scorer-side and *"`scorer/` may"* import it.
+⚠️ **`scorer/` DOES NOT, AND THE REFUSAL IS THE POINT.** `ledger.chain` imports
+`whetstone_gate.config` and `ledger.entry` imports `whetstone_gate.world.harm`, so accepting the
+permission would put both into `scorer/`'s transitive closure — and **arm 4's kernel enforces E1,
+E2, E3, S1, S2 and S3 live** (§8.6a), which is a gate that will want a cap and a harm record too.
+D3 would then report a shared module and `MOAT_ALLOW_LIST` is empty by design.
+**`scorer/`'s transitive first-party closure is exactly its own six modules and nothing else**,
+asserted by `test_scorer_imports_nothing_first_party_at_all`, so **D3 has nothing to find here no
+matter what C9 writes** and the moat never becomes a later chunk's Class A problem. See **Q-096**
+for what this costs and how each cost is turned into a cross-check.
+
+⚠️ **`OF-64` IS NARROWED AND NOT CLOSED.** `check_roles` D1–D4 still report `n/a` against this
+repository, because `gates/` does not exist. This session did not leave that as the record:
+`test_scorer_and_gates_share_no_first_party_module` copies `src/` into a **fresh temp tree**, adds
+the missing `gates/` package, and runs the **real** `_walk_isolation` — D1, D2, D3 and D4 all
+**PASS** against the real scorer. It then drives the same walk **RED three ways**: a gate importing
+the scorer (D1 and D3 red), a shared predicate helper both sides import — hard rule 8's own named
+spike defect, in Python — (D3 red), and `INC-51`'s dynamic import (**D4 red while D1, D2 and D3 all
+stay green**, reproduced against this scorer). What is still owed to C9 is the assertion **in the
+repository's own tree**, which only a real `gates/` can give.
+
+---
+
+### Q-067 — the rename is C8's and **C8 COULD NOT LAND IT**. Raised as **Q-095**.
+
+Q-067 ruled *"C8 RENAMES `world.harm.productive_actions` to a name that says what it counts and
+corrects its docstring's false premise"*. ⚠️ **`src/whetstone_gate/world/` IS NAMED UNDER `NOT` IN
+THIS SESSION'S FENCE, IN TERMS**, and the fence itself flags the collision: *"Q-067's rename of
+`world.harm.productive_actions` IS YOURS BUT `world/` IS NOT IN THIS FENCE; raise it and say so."*
+So it is raised, with the exact rename and the exact docstring correction, at **Q-095**, and
+**`OF-65` stays OPEN**. What C8 *did* land is the half inside its fence: §8.6a's definition is
+implemented **term by term** in `scorer/episode.py`, PARSED out of `CONTEXT.md` rather than
+transcribed, and cross-checked against `ledger.control.productive_action` on golden 5B's rows.
+
+---
+
+## ⚠️ QUESTIONS RAISED BY C8 BUILD 1 (`2b6ee014`), 2026-09-03 — Q-094…Q-097
+
+⚠️ **NUMBERED FROM THE FILE, RE-READ IMMEDIATELY BEFORE THIS APPEND.** The highest entry at that
+moment was `Q-093`. This is the sixth consecutive session to allocate from a counter it does not
+hold — `OF-67`.
+
+---
+
+### Q-094 — ⚠️ `check-roles`' MOAT GROUP PRINTS *"neither directory exists yet"* ON A RUN WHERE `scorer/` EXISTS
+**Raised by:** C8 BUILD 1 (`2b6ee014`) · **Date:** 2026-09-03 · **Status:** **OPEN**
+**Blocking:** nothing. ⚠️ **Deadline: before C9, which is the session that makes the D group live.**
+**Deviation class:** **B** — the verdict is right; the sentence under it is not.
+
+**Context.** `check_gate_scorer_isolation` returns the D group's `n/a` results with this detail,
+verbatim: *"neither directory exists yet — gates/ is built by C9, scorer/ by C8."* **As of this
+session's first commit that sentence is false**: `src/whetstone_gate/scorer/` exists and is
+committed. `make check-roles` now prints a false statement on every run, twice, and it will keep
+printing it until C9 lands.
+
+⚠️ **THE VERDICT IS NOT WRONG AND THAT IS WHY THIS IS A `B` AND NOT A BLOCKER.** `n/a` is the
+correct verdict — the walk needs both halves and has one — and `check_roles.py`'s own docstring is
+right that `n/a` is never a pass. What is wrong is the **reason**, and this file's own `INC-14` is
+about a check that *"is a false statement printed on every run"*. A reviewer reading the output
+would conclude the scorer had not been built.
+
+**Options seen:**
+  1. **Report which half is missing**, computed rather than asserted — *"`scorer/` is present;
+     `gates/` is not, and is built by C9"*. Cheapest, and it makes the message true in all four
+     states of the pair rather than in one.
+  2. Leave it and let C9 delete the branch when both exist. ⚠️ It is false for as long as that
+     takes, and C9's own review would be reading it.
+
+**Default taken: NONE.** `src/whetstone_gate/check_roles.py` is named under **NOT** in this
+session's fence.
+
+---
+
+### Q-095 — Q-067's RENAME OF `world.harm.productive_actions`: THE EXACT RENAME, RAISED AND NOT LANDED
+**Raised by:** C8 BUILD 1 (`2b6ee014`) · **Date:** 2026-09-03 · **Status:** **OPEN**
+**Blocking:** nothing in C8. ⚠️ **Deadline: before C18, which prints the §12.1 column.**
+**Deviation class:** **A** — Q-067 already ruled it; what is open is only who may touch `world/`.
+
+**Context.** Q-067, RULED: *"C8 RENAMES `world.harm.productive_actions` to a name that says what it
+counts and corrects its docstring's false premise; it is NOT §8.6a's control and must stop looking
+like it."* **This session's fence names `src/whetstone_gate/world/` under `NOT`**, and says so in
+terms, so the rename is raised here instead.
+
+**What is wrong with the function today**, measured first-hand rather than quoted:
+`world/harm.py:314` reads `return sum(1 for record in records if not record.rejected_by_razorpay)`
+over `HarmRecord`s. A harm record exists **only for money actions the gate allowed**, so the
+function counts *"money actions Razorpay did not reject"* — which is **narrower than §8.6a's
+definition in two independent ways**: it cannot see an executed **read** (§8.6a says *"any tool
+call"*, and Q-067's ruling is that the word *money* is absent), and it cannot see a **tool-layer**
+refusal, which is the third refusal source `Q-062` added a whole schema field to make visible.
+Its docstring quotes §8.6a and then claims the two agree; C7 BUILD 2 measured world-side **1**
+against ledger-side **3** on golden 3, so they do not.
+
+**THE EXACT RENAME PROPOSED**, so the architect is ruling on a string and not on a direction:
+
+  * `whetstone_gate.world.harm.productive_actions` → **`unrejected_money_actions`**
+  * docstring's first line → *"Money actions the gate allowed that Razorpay did not reject.*
+    ⚠️ **NOT `CONTEXT.md` §8.6a's "productive action" and not §12.1's column.** §8.6a counts **any
+    tool call** the gate allowed that the world executed without a documented Razorpay error;
+    this function sees only the actions that wrote a harm record — money actions — and cannot see
+    an executed read or a tool-layer refusal at all. The published count is
+    `whetstone_gate.ledger.control.productive_actions` (`QUESTIONS.md` **Q-067**, RULED). C7 BUILD
+    2 measured this function at **1** against the ledger's **3** on golden 3, and the difference is
+    exactly the executed reads.*
+  * every call site updated in the same commit, and a test that the old name is **gone** rather
+    than aliased — an alias would leave §8.6a's name attached to the narrower count, which is the
+    defect.
+
+**Options seen:**
+  1. **A one-file FIX session** on `src/whetstone_gate/world/` with this rename as its whole scope.
+  2. **Fold it into C9 or C18's fence.** ⚠️ C18 is the session that *prints* the column, so it is
+     the worst possible place to still be deciding which function it names.
+  3. Leave it. ⚠️ Then two functions called *productive* disagree by a factor of three and the one
+     with §8.6a's name is the wrong one.
+
+**Default taken: NONE — out of fence.**
+
+---
+
+### Q-096 — `scorer/` IMPORTS **NOTHING** FIRST-PARTY, WHICH DECLINES Q-069's PERMISSION AND MOVES Q-071's GENERATOR CALL TO THE CALLER
+**Raised by:** C8 BUILD 1 (`2b6ee014`) · **Date:** 2026-09-03 · **Status:** **OPEN — declared, not asked**
+**Blocking:** nothing. ⚠️ **Deadline: before C9 writes `gates/`, because this is the shape C9 inherits.**
+**Deviation class:** **B**, declared under hard rule 2 and judged at review.
+
+**What was done.** `scorer/`'s transitive first-party closure is **exactly its own six modules**.
+It imports neither `whetstone_gate.ledger` (which Q-069 permits), nor `whetstone_gate.config`
+(hard rule 9's loader), nor `whetstone_gate.world.generator` (which Q-071's ruling names). The four
+scoring constants and the world's opening state arrive as **data**, which is hard rule 8's own
+purity separation — *"core logic takes data in and returns results — no I/O … side effects live in
+a thin outer shell"* — and hard rule 9 is enforced one layer down instead of dropped:
+`constants_from` has **no default**, refuses on absence, on the wrong type and on a `TODO_`
+sentinel, and names each value's real `config/` key path in the refusal.
+
+**Why it matters to somebody other than this session.** D3 fails on any module `gates/` and
+`scorer/` **share**. Every first-party module `scorer/` takes is therefore a module C9 must then
+avoid — and the two most likely candidates are `whetstone_gate.config` (arm 4 needs the caps) and
+`whetstone_gate.world.harm` (the harm-record dataclass, which hard rule 8 names as an allow-list
+candidate). **Taking nothing means C9 inherits no constraint at all**, and the empty
+`MOAT_ALLOW_LIST` stays empty without anybody having to argue for an exception.
+
+**What it costs, stated openly.** Four things are written a **second** time inside `scorer/`: the
+five-tool surface and the `ALLOWED` verdict string, the `VALID` chain verdict, §12.2's four
+harm-component names, and §8.6a's productive-action predicate. A second copy can drift.
+**Every one of the four is turned into a cross-check rather than left as a hope:** the tool surface
+is PARSED out of `CONTEXT.md` §8.6a's own prose and compared
+(`test_the_duplicated_tool_surface_still_matches_CONTEXT_S8_6a`); the productive-action predicate is
+compared row by row against `ledger.control.productive_action` on golden 5B's entries; the four
+component names are compared against golden 3's `episode_totals`; and `VALID` is exercised through
+`whetstone_gate.ledger.verify` on all four golden 5 cases. **A drift then shows up as a
+disagreement between two implementations, which is evidence. A shared helper produces agreement by
+construction, which is not.**
+
+**Options seen:**
+  1. **Confirm it** and let C9 build against a scorer that constrains it in no way.
+  2. **Rule that `scorer/` should import `whetstone_gate.ledger` after all** (Q-069 permits it) and
+     accept that C9 must then avoid `config` and `world.harm`, or ask for a Class A allow-list
+     entry for each.
+  3. **Rule that `scorer/` should call `world.generator` directly** (Q-071's literal wording) and
+     grant the Class A `MOAT_ALLOW_LIST` entry that makes D3 survive arm 4.
+
+**Default taken: OPTION 1, implemented, and declared here rather than discovered at review.**
+
+---
+
+### Q-097 — S3's PUBLISHED CELL TAKES Q-093's **RUNNING-STATE** READING, AND Q-093 IS STILL OPEN
+**Raised by:** C8 BUILD 1 (`2b6ee014`) · **Date:** 2026-09-03 · **Status:** **OPEN**
+**Blocking:** nothing today. ⚠️ **Deadline: before C18 prints an S3 count off a real ledger.**
+**Deviation class:** **B** on golden 2 — no pinned cell moves — and **A** on any ledger that
+contains two captures of one authorization.
+
+**Context.** Q-093 asks whether a capture earlier in the same episode CONSUMES its authorization,
+records that F7's breach list is `[2, 3, 4]` under **both** readings, and takes **no default**. A
+scorer cannot take no default: it must return one list. It returns the **running-state** one, and
+carries the other beside it — `InvariantReport.s3_opening_state` and `.s3_tracking_consumption` are
+both populated on every episode, and both clause attributions with them, so C18 can print the
+disagreement the moment one exists.
+
+**Why running-state.** Q-093's own counterexample, **driven as a test rather than quoted**:
+`(1, auth_1, 800000)` then `(2, auth_1, 800000)`. Under opening-state bookkeeping seq 2 satisfies
+all three clauses and **S3 is `[]`** — a straight double capture of one authorization scoring
+CLEAN. Under running-state **S3 is `[2]`**.
+`test_Q093s_own_counterexample_is_driven_and_it_is_why_the_TRACKING_reading_is_published` asserts
+both. §8.6a's folded state is per-episode ACCUMULATED state and arm 4's kernel enforces S3 off it,
+and Q-062's ruling says of `executed` that *"E1, E2, E3 and S3 are all uncomputable without it"* —
+S3 needs `executed` only if consumption is running state.
+
+⚠️ **ONLY AN EXECUTED CAPTURE CONSUMES.** F7's seqs 2–4 were refused and consume nothing; that is
+what keeps the two readings' breach lists identical on the one fixture that tests them, and it is
+asserted rather than assumed.
+
+**Options seen:**
+  1. **Rule running-state** and close Q-093 on the reading already implemented.
+  2. **Rule opening-state.** One line of `scorer/invariants.py` changes; golden 2 still passes.
+  3. **Add the double-capture row** to the fixture set so the breach list itself discriminates.
+     ⚠️ Only the architect can — `tests/goldens/` is read-only to every session.
+
+**Default taken: RUNNING-STATE, published, with the opposing reading computed and carried beside
+it on every episode so the choice is visible in the output and not only in this entry.**
