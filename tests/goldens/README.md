@@ -325,7 +325,16 @@ exception to it. The enforcement is that C1's **review** independently re-fetche
 
 ### Golden 5B — `golden5b_ledger_writer.json`
 
-**SHA-256 `232f6fc995e8426e5babfa5029e6c2e3fcdfcb1f5061e461a702f0df15d89811`** · **7,917 bytes**.
+**SHA-256 `68374f59eabe6432af763e60942bdab0bfbdf2171044623e98f24a1c7da38a6c`** · **14,750 bytes** ·
+**0 CR bytes**.
+
+⚠️ **BOTH FIGURES MOVED ON 2026-09-02 AND THE SUPERSEDED ONES ARE NAMED RATHER THAN OVERWRITTEN
+SILENTLY: `232f6fc9…` / 7,917 bytes was the file as first landed** (`8003c02`, ARCH FIX
+`6f3a91d2`), and it was **re-cut** by ARCH FIX `3e5b7c10` under the ruling recorded in
+`QUESTIONS.md`, closing **C7 REVIEW 1's BLOCKER `B-1`**. **Seq 3's `executed` was FALSE and is now
+TRUE**, so seq 3's digest moved from `6ae5bd20…` to `5433c3f4…`; **seqs 1 and 2 are unchanged, value
+and digest alike.** `INCIDENTS.md` **INC-67** carries the error and the golden's own `correction`
+block carries the derivation.
 
 ⚠️ **APPENDED, NOT WOVEN IN. Nothing above this line was restated, renumbered or re-styled** — the
 nine-golden table, the Status table and every existing section are untouched, and the two parsers
@@ -343,11 +352,26 @@ unchanged in all thirteen original fields**, widened by two: `receipt` immediate
 counterparts, as they must — a writer that reproduced the old ones under this schema would be
 ignoring one or both new fields.
 
-⚠️ **THE FINDING IT CARRIES IS ABOUT THE FIXTURE IT CAME FROM, AND IT IS WHY THE FILE IS WORTH ITS
-BYTES.** Golden 5's case A **already contained one of each of Q-062's three outcomes — an action the
-world performed, one Razorpay refused, and one the tool layer refused — and nobody could tell,
-because the thirteen-field schema could not distinguish them.** The fixture that passed two reviews
-was carrying Q-062's defect in plain sight. That sentence is in the golden's own `_comment`.
+⚠️ **THAT PARAGRAPH SAID SOMETHING FALSE AND IT IS RETRACTED HERE RATHER THAN REWORDED.** It read
+that golden 5's case A *"already contained one of each of Q-062's three outcomes — an action the
+world performed, one Razorpay refused, and one the tool layer refused"*. **It did not.** Case A's
+three rows are golden 3's first three rows field by field, and golden 3 records **seq 3 as
+EXECUTED** — its `canary_a_note` says so in terms and both `productive_actions: 3` and
+`canary_a_breach: 1` require it. So case A holds an **executed** row, a **Razorpay-refused** row and
+a **second executed** row, and **no tool-layer-refused row at all**. A thirteen-field row could not
+have *contained* `executed` in any case: there was nothing there to be told apart. **What golden 5B
+actually does is pin the writer at fifteen fields**, which is reason enough for its bytes.
+
+⚠️ **AND THE METHOD WAS WORSE THAN THE VALUE, which is why this is an incident and not a typo.**
+Seq 3's `executed` had been **inferred** from a NULL `a_class` plus four zero harm components —
+**the exact inference `Q-062` forbids in terms and the C7 build prompt forbade in capitals**, on the
+ground that it cannot see a tool-layer refusal. **The disproof was inside a fixture the architect had
+already authored:** golden 3's seq 3 **and** seq 4 both carry a null `a_class` with
+`rejected_by_razorpay` false, and golden 3 counts **both** executed and **both** productive. Applied
+to golden 3's five rows the withdrawn rule yields `productive_actions` **1** against the pinned
+**3**, and `canary_a_breach` **0** against the pinned **1**. Raised as **`B-1`** by **C7 REVIEW 1**
+(`472cdc4b`, `docs/reviews/REVIEW_7_1.md` §5), corrected by **ARCH FIX** (`3e5b7c10`), recorded as
+`INCIDENTS.md` **INC-67**.
 
 `receipt` is **null on all three rows** — none of the three calls carries one — and that is itself
 the pinned fact: a null receipt entering the digest as `null` and changing nothing else is what

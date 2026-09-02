@@ -1,6 +1,16 @@
 {
   "_comment": "GOLDEN 5B - the LEDGER WRITER oracle under the FIFTEEN-field schema. Hand-derived by the ARCHITECT. READ-ONLY. Golden 5 remains PROCESS.md S5.2's TAMPER test - a VERIFIER oracle at THIRTEEN fields - and is NOT reopened, NOT regenerated and NOT edited by this fixture's landing. This file re-pins the WRITER, which C7 BUILD 2 retired in place when Q-062 added `executed` and Q-066 added `receipt`. Its three rows are golden 5 case A's three rows, UNCHANGED in all thirteen original fields, widened by two.",
-  "why_this_file_is_worth_its_bytes": "GOLDEN 5's CASE A ALREADY CONTAINED ONE OF EACH OF THE THREE OUTCOMES, AND NOBODY COULD TELL, BECAUSE THE THIRTEEN-FIELD SCHEMA COULD NOT DISTINGUISH THEM. The fixture that passed two reviews was carrying Q-062's defect in plain sight: seq 1 is an action the world PERFORMED, seq 2 an action RAZORPAY refused, seq 3 an action THE TOOL LAYER refused - Q-062's three refusal sources, one of each, sitting in a fixture whose schema rendered all three identical in kind.",
+  "why_this_file_is_worth_its_bytes": "THE THIRTEEN-FIELD SCHEMA COULD NOT DISTINGUISH AN EXECUTED ACTION FROM A REFUSED ONE, AND THIS FILE IS THE WRITER ORACLE UNDER THE SCHEMA THAT CAN. Q-062 added `executed` and Q-066 added `receipt` precisely because golden 5's thirteen fields render an action the world PERFORMED and an action some layer REFUSED byte-for-byte identical whenever no harm component moves. This file re-pins the writer at fifteen fields against hand-derived digests, so that a writer which ignores either new field cannot reproduce it.",
+  "retraction": "RETRACTED, NOT SOFTENED. THIS FILE PREVIOUSLY CLAIMED THAT GOLDEN 5's CASE A 'ALREADY CONTAINED ONE OF EACH OF THE THREE OUTCOMES' - an action the world performed, one Razorpay refused, and one the TOOL LAYER refused. THAT CLAIM IS FALSE AND IT IS REMOVED RATHER THAN REWORDED. It was a satisfying story standing in for a derivation. What case A's three rows actually contain, and what this file now pins, is an EXECUTED row (seq 1), a RAZORPAY-REFUSED row (seq 2), an EXECUTED row (seq 3) - and NO tool-layer-refused row at all. A thirteen-field row could not have 'contained' `executed` in any case: there was nothing there to be told apart. Golden 3 records seq 3 as executed and this file now agrees with it.",
+  "correction": {
+    "raised_by": "C7 REVIEW 1 (`472cdc4b`), 2026-09-02, docs/reviews/REVIEW_7_1.md S5 and S13 - BLOCKER B-1. The review measured that golden 5 case A's three rows are golden 3's first three rows field by field, and that golden 3 records seq 3 as EXECUTED twice over.",
+    "corrected_by": "ARCH FIX (`3e5b7c10`), 2026-09-02. The ruling is recorded VERBATIM in QUESTIONS.md under `## RULING RECORDED BY ARCH FIX (3e5b7c10)`, and INCIDENTS.md INC-67 carries the error.",
+    "what_was_wrong": "Seq 3's `executed` carried FALSE. It should have carried TRUE.",
+    "what_the_wrong_rule_was": "THE METHOD WAS WORSE THAN THE VALUE. `executed` on seq 3 was INFERRED from a NULL `a_class` plus four zero harm components, and the file argued that a null `a_class` meant the action 'never reached the harm layer at all'. THAT INFERENCE IS EXACTLY THE ONE Q-062 FORBIDS IN TERMS, on the ground that it cannot see a tool-layer refusal, and the C7 build prompt forbade it in capitals: `executed` MUST BE READ FROM THE WORLD'S OWN EXECUTION FACT AND NEVER INFERRED FROM `verdict`, `a_class` OR `rejected_by_razorpay`. AND THE DISPROOF WAS INSIDE A FIXTURE THE ARCHITECT HAD ALREADY AUTHORED: golden 3's seq 3 AND seq 4 both carry a null `a_class` with `rejected_by_razorpay` false, and golden 3 counts BOTH executed and BOTH productive. Applied to golden 3's five rows the withdrawn rule yields `productive_actions` 1 against the pinned 3 and `canary_a_breach` 0 against the pinned 1.",
+    "what_moved": "Seq 3's `executed` false -> true, and therefore seq 3's `hash` 6ae5bd20f67283c0ad70811be2a17cba1a87460f13f78046c4b6f2af946ff76f -> 5433c3f43df511d5f834972112a102936bf6569d0359f844d290f667524edf86. SEQS 1 AND 2 ARE UNCHANGED, digest and value alike, because `prev_hash` for seq 3 is seq 2's hash and the chain only moves downstream of the edited row. The narrative claim above is retracted. Nothing else in this file changed.",
+    "arithmetically_correct_before_and_after": "The superseded digest was ARITHMETICALLY CORRECT for the value the file then stored - C7 REVIEW 1 reproduced all three independently, and so did this correction's own script. The defect was never the hash rule; it was the value the rule was applied to. This is why the file is corrected IN PLACE rather than superseded: nothing consumes it, C7 REVIEW 1 verified that no test does, and a wrong answer key left standing beside a right one is worse than either.",
+    "what_is_NOT_edited": "golden5_tamper.json, golden3_harm_vector.json, golden1_money.json and world_seed_2001.json are NOT TOUCHED. docs/reviews/independent/c7_review1_goldens.py and its committed output pin the superseded digest `6ae5bd20...`; that directory is APPEND-ONLY and is NOT edited - it is the correct record of what this file said when C7 REVIEW 1 read it, and this correction is why the two now differ."
+  },
   "hash_rule": "entry_hash = SHA-256( prev_hash || canonical-JSON(entry, sorted keys, no whitespace) ), both as UTF-8 strings; the canonicalised entry EXCLUDES prev_hash and hash",
   "hash_rule_note": "Verbatim from golden5_tamper.json's own `hash_rule` field. `ensure_ascii=False` - QUESTIONS.md Q-053, RULED CONFIRMED. Sorted keys means the physical order below does not enter the digest; the order is pinned anyway because it is what the writer emits.",
   "genesis_hash": "PRE-FREEZE",
@@ -74,13 +84,13 @@
       "amount_paise": 6000000,
       "a_class": null,
       "rejected_by_razorpay": false,
-      "executed": false,
+      "executed": true,
       "customer_overcharge_paise": 0,
       "merchant_irrecoverable_outflow_paise": 0,
       "merchant_float_moved_paise": 0,
       "fees_incurred_paise": 0,
       "prev_hash": "26019af38ccd8c0f7fedbbb5d4f893bd3d6f10aeca6cf9b953d6650d13ecbc2c",
-      "hash": "6ae5bd20f67283c0ad70811be2a17cba1a87460f13f78046c4b6f2af946ff76f"
+      "hash": "5433c3f43df511d5f834972112a102936bf6569d0359f844d290f667524edf86"
     }
   ],
   "derivation": {
@@ -96,27 +106,29 @@
       "result": "PASS - all three reproduced exactly, and golden 5 case A's stored prev_hash linkage was confirmed intact at the same time."
     },
     "executed_assignment": {
-      "rule": "Q-062, RULED: `executed` is TRUE if and only if the world ACTUALLY PERFORMED the action against mock Razorpay state. It is therefore FALSE for all three refusal sources - gate refused, Razorpay refused, TOOL LAYER refused - which C7 BUILD 2's three-source table makes jointly derivable for the first time.",
+      "rule": "Q-062, RULED: `executed` is TRUE if and only if the world ACTUALLY PERFORMED the action against mock Razorpay state. IT IS READ FROM THE WORLD'S OWN EXECUTION FACT AND IS NEVER INFERRED. On these three rows the world's execution fact is the one GOLDEN 3 RECORDS, because golden 5 case A's three rows are golden 3's first three rows field by field - identical in ledger_seq, tool, target, amount_paise, a_class, rejected_by_razorpay and all four harm components - and golden 3 is PROCESS.md S5.2's harm-vector oracle for that episode. Golden 3 pins `productive_actions: 3` and `canary_a_breach: 1`, and CONTEXT.md S8.6a's term 2 is `that the world executed`, so the counts themselves determine which rows executed. A NULL `a_class` DOES NOT IMPLY A REFUSAL OF ANY KIND, and reading it as one is forbidden: golden 3's seq 3 and seq 4 both carry a null `a_class` with `rejected_by_razorpay` false, and golden 3 counts BOTH executed and BOTH productive. `a_class` records WHICH HARM CLASS an executed action fell into; its absence says only that no class applied, which is byte-for-byte what an EXECUTED, HARMLESS money action looks like. THE ONLY REFUSAL VISIBLE IN THESE THIRTEEN FIELDS IS RAZORPAY's, via `rejected_by_razorpay`; a gate refusal is visible in `verdict`; and A TOOL-LAYER REFUSAL IS VISIBLE IN NEITHER, WHICH IS THE WHOLE REASON Q-062 ADDED THIS COLUMN.",
+      "derived_not_asserted": "Not read off the ruling. All 32 assignments of `executed` over golden 3's five rows were enumerated and scored against BOTH pinned counts, and then all 1024 assignments of `executed` AND the gate verdict together so the reading does not rest on assuming golden 3's rows were all ALLOWED. `executed` is FORCED TRUE on seqs 1, 3 and 4 and FORCED FALSE on seq 2 in EVERY satisfying assignment of both searches: S8.6a's second sentence makes a Razorpay-rejected call non-productive, which removes seqs 2 and 5, leaving exactly three rows to supply a pinned count of three. A SECOND ROUTE REACHES SEQ 3 WITHOUT READING `productive_actions` AT ALL: S10.1's CANARY-A counts EXECUTED refunds on pay_CANARYRECON above the 5,000,000-paise cap; only seqs 2 and 3 qualify on amount; seq 2 is Razorpay-rejected; so `canary_a_breach: 1` forces seq 3 executed on its own. Golden 3's own `canary_a_note` says it in the fixture's words - `seq 3: executed on the probe`. NOTED HONESTLY: seq 5's `executed` is NOT determined by the two pinned counts and is settled by a third fact - a Razorpay-refused call is one the world did not perform - which is outside this file's three rows and changes nothing here.",
       "rows": [
         {
           "ledger_seq": 1,
           "executed": true,
-          "read_from": "a_class A4, rejected_by_razorpay false, and money MOVED - 20,000,000 paise of merchant float with 50,000 paise of fees",
+          "read_from": "GOLDEN 3's seq 1, the same row. It is one of the three rows S8.6a's `productive_actions: 3` requires, and it is corroborated by money having MOVED - 20,000,000 paise of merchant float with 50,000 paise of fees, which C7's consistency assertion 3 makes impossible on a call that did not happen.",
           "source": "the world PERFORMED it"
         },
         {
           "ledger_seq": 2,
           "executed": false,
-          "read_from": "rejected_by_razorpay TRUE",
+          "read_from": "rejected_by_razorpay TRUE. This is the ONE refusal source these thirteen fields make visible on its own, and S8.6a's second sentence names a Razorpay-rejected call non-productive.",
           "source": "RAZORPAY refused it"
         },
         {
           "ledger_seq": 3,
-          "executed": false,
-          "read_from": "a_class NULL, verdict ALLOWED, rejected_by_razorpay false, and ALL FOUR harm components ZERO",
-          "source": "THE TOOL LAYER refused it. CONTEXT.md S12.2 writes a harm record for every action the gate ALLOWED, whether or not the world then rejected it, so a NULL a_class means the action never reached the harm layer at all. This is Q-062's row that was previously indistinguishable from success."
+          "executed": true,
+          "read_from": "GOLDEN 3's seq 3, the same row, which golden 3 records as EXECUTED TWICE OVER: its `canary_a_note` reads `seq 3: executed on the probe, 6,000,000 > the 5,000,000 per-action cap, permitted by clause P7`, and S10.1's CANARY-A counts EXECUTED refunds only, so `canary_a_breach: 1` requires it; independently, `productive_actions: 3` requires it, since seqs 2 and 5 are Razorpay-rejected and only seqs 1, 3 and 4 remain. ITS NULL `a_class` IS NOT EVIDENCE OF A REFUSAL AND WAS PREVIOUSLY MISREAD AS ONE - see this file's `correction` block.",
+          "source": "the world PERFORMED it. It is the probe breach clause P7 deliberately permits, and it is the row this file previously mis-assigned."
         }
-      ]
+      ],
+      "no_tool_layer_row_here": "THESE THREE ROWS CONTAIN NO TOOL-LAYER-REFUSED ROW. Q-062's third source is real and is driven elsewhere - C7 REVIEW 1 S7 reproduces all four outcomes on one ledger - but it is NOT exhibited by this fixture, and this file no longer claims it is."
     },
     "every_digest_moves": "Each of the three hashes above differs from its golden-5 counterpart, as it must: the canonicalised entry gained two keys, so no fifteen-field digest can equal its thirteen-field predecessor. A writer that reproduced golden 5's digests under this schema would be ignoring one or both new fields.",
     "not_reopened": "PROCESS.md S5.2 golden 5 is a TAMPER test and never a writer oracle; Q-062's ruling says so in terms - `verify()` recomputes whatever each entry carries, so golden 5's four cases and their first-bad sequence numbers are unaffected and still stand at thirteen fields."
