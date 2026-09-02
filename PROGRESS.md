@@ -6,6 +6,144 @@ not a record; this file is.
 
 ---
 
+## C13 — THE CaMeL COMPARATOR — **FIX** attempt 3 — 2026-09-02 — **REVIEW 3's FIVE ITEMS CLOSED, AND THIS SESSION'S OWN MUTANTS FOUND TWO MORE DEFECTS IN ITS OWN REMEDY**
+
+**SESSION-TOKEN:** `e9dd0346` · **NOT in the batch.** Row **44**, registered **before this
+session's first content commit** (`bd2107f`) from a **re-counted** table — because a concurrent
+**C6 REVIEW 4** session (`ca0dd160`) shares these journals and an inherited count would have been
+wrong, which is `OF-67`'s finding applied rather than quoted. ⚠️ **Two numbers, and this session
+says which it counted:** **44 is the DATA-ROW count**; `make check-roles` prints **one fewer**
+(43), because the `WG-2026-08-30-CTX-13.4-A` row matches neither the 8-hex token pattern nor the
+`(C\d+|ARCH)` chunk cell — `INC-54`.
+
+**Pushed SHA:** see the FINAL OUTPUT in `docs/sessions/c13-fix-3.txt`.
+**Verdict:** ⚠️ **NO TAG. Nothing is self-certified; a fresh adversarial re-review follows and only
+it may tag `c13-pass`.**
+
+---
+
+### 1. What REVIEW 3 said, and what this session did **not** touch
+
+**`REVIEW_13_3` returned ZERO BLOCKERS.** Both of REVIEW 2's are closed, all six of its survivors
+are killed, and **twenty of twenty pre-committed polarities held**. What failed C13 was **five
+non-equivalent mutant survivors in the fix's own new code, four of them one defect.**
+
+**Nothing that works was rewritten.** `config/lanes.yaml` was **not touched** — `B-3` is closed and
+the file is correct. `CONTEXT.md` was **not touched** — still v1.9, blob `8e820384…`, byte-identical,
+224,645 B, **CR 0 / LF 2,361 / TAB 0**. `PROCESS.md`, `check_roles.py`, `tests/goldens/`, `vendor/`
+and every other package and test file: **untouched**, and named here so the absence is deliberate.
+
+### 2. `INC-55`, written FIRST — and its `Missed` field is measured, not asserted
+
+Committed at **`86f21c2`**, before a line of code changed. The defect is at
+`tests/test_c13_camel_comparator.py:1116-1121`: `assert len(undiagnosed) ==
+len(invocation.BRANCH_B_REQUIREMENTS)` followed by a loop over that same tuple — **both compare the
+predicate's output against the predicate's own input list, so neither can fail when that list
+changes.** It is an identity, not a test.
+
+⚠️ **THE EXHIBIT, WHICH IS WHY IT IS AN INCIDENT AND NOT A TIDY-UP.** Weakening ONE requirement
+string lets a `branch_b_condition` reading **"a harness defect is SOMETIMES Branch B"** — the
+**direct inversion** of `Q-057`'s ruling — pass the **entire repository, green**. `config/` is a
+pre-registration artefact and hard rule 4 makes a frozen one **outrank `CONTEXT.md`**, so after C14
+cuts `prereg-v1` that inverted string would have been the higher authority on which branch RUN-1
+takes.
+
+⚠️ **`Missed:` — and this is the answer the entry had to give.** This is **`INC-50`'s class**, and
+`INC-50` was written **by C13 FIX 2, about its own test, in the same session and the same file**.
+Measured in the entry rather than recalled: **`4be0b86` (01:21:36)** landed the defective
+assertions; **`dfffba7` (01:42:43)** landed `INC-50`'s mirror; **`0df86a4` (01:51:48)** wrote
+`INC-50` itself. The two tests are **181 lines apart in one file** — `:935` and `:1046` — with
+**exactly two test functions between them**. The session diagnosed the class, wrote it up in its own
+words, and **did not carry it three functions along the same file**. `INC-50`'s own
+`Systemic guardrail` names the remedy in the imperative — *"vary the discriminating input and see
+whether the verdict moves"* — and the discriminating input here was never varied. **FIFTH appearance
+of the class here: `INC-26`, `INC-29`, `OF-82`, `INC-50`, this.**
+
+### 3. The five items (`9084422`)
+
+| item | what now pins it |
+|---|---|
+| **`OF-116`** | **One weak-form fixture per requirement**, each **derived from the real `branch_b_condition` read through the loader** by degrading exactly one phrase, the degradation **asserted to have happened first** (`INC-50`'s mirror move), each asserted **REJECTED with exactly ONE complaint quoting exactly that requirement against a literal** — plus the undegraded value asserted **ACCEPTED**, because four rejections and no acceptance is a guard that refuses everything. And **`len(BRANCH_B_REQUIREMENTS) == 4` against a LITERAL** |
+| **`OF-117`** | `test_a_SENTINEL_branch_condition_is_a_REFUSAL_and_never_flows_in_as_a_VALUE` — a **sentinel** comes back as one `UndeterminedValue` naming `TODO_C14_PENDING`, a **missing** key as `MissingRequiredValue`. Hard rule 9's two halves, with `config/` never holding either state (`INC-11`, `INC-17`) |
+| **`OF-118`** | `branch_conditions_are_stale` in `__all__`, **one non-test caller** in `__main__.py` §5 beside `branch_is_undecided`'s result — the line the operator reads on RUN-1 night. `main()`'s return contract deliberately **unchanged** |
+| **`OF-115`** | the docstring cites **`OF-62` / `Q-079`**, and states in place that `OF-104` was never allocated to `B-3` and was taken 55 minutes later by another session |
+| **`OF-119`** | the §8.5.1 window ends at `### 8.5.2 `, pinned **twice** — structurally (`end == subsection[0]`) and **by content** (`"policy coverage"` is §8.5.2's P3) — because a boundary asserted only by the rule that computed it asserts nothing |
+
+### 4. ⚠️ The mutation run — 19 mutants, and the two that mattered were this session's own
+
+Fresh OS temp clone; the clone's `whetstone_gate.__file__` **printed**; each mutation **committed
+inside the clone** on its own branch off the base (C13 REVIEW 1 records that editing without
+committing produced three FALSE survivors); control **first** and green — **100 passed, 0 failed**.
+The clone's `vendor/` is **NTFS junctions** to the real trees rather than copies — declared because
+it is a deviation from a pure copy — and the three real trees were re-measured **clean** afterwards.
+
+**REVIEW 3's five, re-run: `N-B` · `N-C` · `N-D` · `N-E` · `N-I2` — ALL FIVE KILLED**, each *1
+failed, 99 passed*.
+
+⚠️ **AND THEN THIRTEEN MUTANTS DIED ON THE FIRST PASS, WHICH WAS TOO CLEAN TO ACCEPT.** A second
+round was aimed at the **halves of the new assertions themselves**, and **two survived — both
+surviving the FULL SUITE: 1 failed, 775 passed, 1 skipped, the sole failure being the DELIBERATE
+`camel_comparator.branch` sentinel that `make test` deselects. Nothing anywhere killed them.**
+
+* **`SD-11`** — the guard's complaint quotes **every** requirement rather than the one that failed
+  (`{phrase!r}` → `{BRANCH_B_REQUIREMENTS!r}`), so `repr(required) in problems[0]` is satisfied for
+  all four at once. ⚠️ **Non-equivalent by exhibit: a gate that names every field on every failure
+  names NO field** — *"a gate whose only output is 'no'"*, one indirection along, which is the
+  sentence the assertion exists for. **CLOSED by `73de008`:** the complaint must quote the failed
+  requirement **and not the other three**, checked non-vacuous at HEAD first.
+* **`SD-13`** — keep `OF-118`'s call and **throw its result away** (`stale = …` then `del stale`).
+  The AST call-site check saw a call and passed. ⚠️ **Non-equivalent by exhibit: the operator is
+  told nothing** — the inert predicate `OF-118` is about, moved one line right. **A call is not a
+  reader.** **CLOSED by `73de008`:** `__main__` passes `stale` **directly into** `say()`, and the
+  test asserts the result is **bound** and that the name reaches a `say(...)` call. **`SD-14`**, the
+  follow-up keeping a *read* that never reaches `say()`, is killed too.
+
+**FINAL: 19 mutants, 19 KILLED, 0 SURVIVORS, 0 claimed equivalent.**
+
+### 5. Measured by this session
+
+| property | before | after |
+|---|---|---|
+| `make test` | **772 passed, 0 failed, 1 skipped, 2 deselected** (154.74s) | **774 passed, 0 failed, 1 skipped, 2 deselected** (195.06s) |
+| `tests/test_c13_camel_comparator.py` | 98 passed | **100 passed, 0 failed** |
+
+⚠️ **THERE IS NO FAILURE TO ATTRIBUTE BY FILE: BOTH RUNS ARE GREEN.** The **+2** are this session's
+two new tests. A concurrent **C6 REVIEW 4** session (`ca0dd160`) landed `daefb31` and `11193bd` in
+this tree during the work; neither adds a collected test and neither appears in any commit of mine.
+
+**Standing properties, proved not assumed:** `make selftest` **RED on `camel_comparator.branch` and
+FOR THAT REASON** — 1 failed, 1 passed, 775 deselected, sole failure
+`test_the_camel_branch_is_decided_before_any_camel_run` on `UndeterminedValue … (sentinel
+'TODO_C13_RUN1')`, the loader **refusing**. All three vendored trees at their pins — CaMeL
+`f083b6b3…`, AgentDojo `928bbae8…`, τ²-bench `a2c02472…` — **`status --porcelain` 0 bytes and `git
+diff <pin>` 0 bytes each.** `git status --porcelain tests/goldens/` **EMPTY**. `CONTEXT.md` still
+**v1.9**, blob `8e820384…`, 224,645 B, **CR 0 / LF 2,361 / TAB 0**. `make check-prereg`
+**NOT-YET-FROZEN**; `git tag -l` = `c0-pass`…`c4-pass`; **`prereg-v1` does not resolve**. **Zero
+`evals/` paths in any commit of this session.** **ZERO PROVIDER CALLS — CaMeL was not run, and
+whether `gemini-2.0-flash-lite-001` is still served was NOT checked: that is Branch A's condition
+and RUN-1's alone.**
+
+### 6. What this session could not do
+
+1. **It could not tag.** A fix session never tags, and `c13-pass` is not cut.
+2. **It did not check whether the model id is still served** — forbidden by the prompt, and RUN-1's.
+3. ⚠️ **It opened NO new `OF-` id for its own two self-found defects, and that is deliberate.** Both
+   were found and closed inside one session, and a concurrent **C6 REVIEW 4** is allocating ids
+   against this same file — **`OF-115` is precisely the defect of taking a number another session
+   then takes.** They are recorded in `OPEN_FINDINGS.md`'s disposition section, in `73de008`'s
+   message, here, and in the FINAL OUTPUT, with the mutants named so any reviewer can re-run them.
+   If the architect wants them as numbered rows, the numbers are theirs to allocate.
+4. **`Q-074` / `OF-62`'s fifth site** (`tests/test_lanes_operator_placeholders.py:141`) and
+   **`OF-99`** remain open. Both are outside this fence and both are the repository's.
+5. **`OF-67` / `OF-70` / `OF-78`** — `check_roles.py` counting the token table's rows itself — is
+   still owed. `check_roles.py` is named under **NOT** in this fence, so this is the **fifteenth**
+   consecutive session to carry that total by hand and it could not have written the mechanism.
+6. **`INC-55`'s `Fix:` field was written `PENDING`** and its SHAs filled in by a later commit of this
+   same session, because the entry precedes the code by hard rule 13 and a commit cannot contain its
+   own hash. That is the two-step `INC-46`/`INC-47` and `INC-53`/`INC-54` already took here.
+
+---
+
 ## C6 — THE ATTACKER LOOP — **FIX** attempt 3 — 2026-09-02 — **ALL SIX SURVIVORS KILLED, AND THIS SESSION'S OWN MUTANTS FOUND FIVE MORE IN THE CODE IT HAD JUST WRITTEN**
 
 **SESSION-TOKEN:** `363a2e9f` · **NOT in the batch.** NIGHT RUN SESSION A, **TASK 2 of 2**.

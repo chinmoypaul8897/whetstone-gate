@@ -1316,3 +1316,120 @@ an anecdote.
 | **OF-123** | **process**, C6 | **MEDIUM** | ⚠️ **THE FIX FOR `OF-104` WAS ITSELF UNPINNED IN ONE OF ITS TWO COPIES, AND ONLY A SELF-DIRECTED MUTANT FOUND IT — WHICH IS THE 2c RULING EARNING ITS KEEP ON THE FIRST SESSION BOUND BY IT.** This session added the surface-level arm/clause scan to **both** copies of claim 4's guard, then mutated its own work as the ruling requires. **Copy 1's removal killed 5 tests; copy 2's removal left ALL 99 GREEN** (`N-M1b`). The cause is not the scan: **copy 2 had never been fired at a leak at all** — `test_the_four_blindness_claims_hold_over_the_LOOPS_OWN_contexts` runs it only over *correct* contexts, so it could only ever report *"no findings"*, which is verbatim the state `REVIEW_C6_2` measured for the import walk (*"a walker that terminated at the package root looked identical to one that found nothing: both print `no findings`"*). ⚠️ **So `N12`/`N14`'s class reappeared INSIDE THE FIX FOR `N12`/`N14`'s CLASS, and nothing but a self-directed mutant could have found it** — no review had seen this code, and the review that named `OF-104` had by definition not seen its remedy. **CLOSED for this instance** by lifting copy 2's scan into `_loop_blindness_findings` and firing it at three leaky labels through `run_episode`'s real output. ⚠️ **WHAT IS NOT CLOSED IS THE CLASS**, and `INC-42`'s own field is the honest precedent: *"NONE THAT CLOSES THE CLASS — ACCEPTED, AND THE REASON IS THAT FOUR SESSIONS HAVE NOW TRIED."* **Six have now tried.** The narrower rule this session can offer, and does: ⚠️ **a guard that has only ever run over correct input is not a guard, and every new one lands with a fixture that makes it go red.** | `CLAUDE.md` hard rule 6; `PROCESS.md` §5.4; `Q-046`; `INC-42`, `INC-43`, `INC-53`; `OF-104` | **NIGHT RUN A / C6 FIX 3 (`363a2e9f`)** | ⚠️ **CLOSED for the instance by `f03d359`; the CLASS is OPEN and is re-declared rather than claimed shut** | `f03d359` (instance) |
 
 **No other session's line was touched by this append.** `Swept:` verified on the **STAGED SNAPSHOT**.
+
+---
+
+## ⚠️ APPENDED BY C13 FIX 3 (`e9dd0346`), 2026-09-02 — the disposition of `OF-115`…`OF-119`, and TWO defects this session found in its own remedy
+
+**APPEND-ONLY. Not one existing row was altered and no `Status` cell above this block was
+touched** — the closures are recorded **here**, beneath their rows, in the same shape
+`OF-99`/`OF-110` and `OF-65`/`OF-78` were, because a **concurrent C6 REVIEW 4** session
+(`ca0dd160`) holds this file and rewriting a line of it would be `INC-36`'s class.
+
+⚠️ **EVERY CLOSURE BELOW IS PROVED BY A MUTANT RE-RUN SHOWING `KILLED`, NOT BY THIS SESSION'S
+WORD.** Fresh OS temp clone; `whetstone_gate.__file__` **printed** and resolving inside the clone;
+each mutation **committed inside the clone** on its own branch off the base commit (C13 REVIEW 1
+records that editing without committing produced three FALSE survivors); control run **first** and
+green in every clone — **100 passed, 0 failed**. The clone's `vendor/` is **NTFS junctions** to the
+real trees rather than copies, declared because it is a deviation from a pure copy; the three real
+trees were re-measured **clean** afterwards (`status --porcelain` 0 bytes each).
+
+### Disposition of `OF-115`…`OF-119`
+
+* **`OF-115` — CLOSED by `9084422`.** The docstring at `tests/test_c13_camel_comparator.py:1047`
+  now cites **`OF-62` / `Q-079`**, and the paragraph beneath it **states what happened** — that
+  `OF-104` was never allocated to `B-3`, that `OF-104` at HEAD is C6 REVIEW 3's arm-identity
+  finding written **55 minutes after** the number went into this live file, and that a forward
+  reference to an unallocated number another session then takes is `Q-063`/`INC-36`'s
+  counter-collision class landing in a **source file**. The correction is legible rather than
+  silent, which is `INC-39`'s own lesson about a citation pointing at the wrong thing.
+  ⚠️ **AND IT IS APPLIED TO THIS SESSION IMMEDIATELY:** see *"why no new `OF-` id"* below.
+* **`OF-116` — CLOSED by `9084422`, and the closure is proved four ways plus a control.** The
+  single `"the run does not complete"` fixture is replaced by **one weak-form fixture per
+  requirement**, each **derived from the real `branch_b_condition` read through the loader** by
+  degrading **exactly one** phrase, each asserted **REJECTED with exactly one complaint quoting
+  exactly that requirement against a literal written in the test**; and
+  `len(BRANCH_B_REQUIREMENTS) == 4` is pinned **against a literal**. Re-run at the final base:
+  **`N-B` KILLED · `N-C` KILLED · `N-D` KILLED · `N-E` KILLED**, all four by
+  `test_the_pre_registered_branch_condition_carries_the_DIAGNOSIS_requirement`, each **1 failed,
+  99 passed**. ⚠️ **The `"a harness defect is SOMETIMES Branch B"` exhibit — the direct inversion
+  of `Q-057`'s ruling, which passed the whole repository — now goes red.** Written up as
+  **`INC-55`**, whose `Missed` field records that this is `INC-50`'s class, written by the same
+  session about the same file 181 lines and two test functions away, and the **fifth** appearance
+  of the class here.
+* **`OF-117` — CLOSED by `9084422`.** `test_a_SENTINEL_branch_condition_is_a_REFUSAL_and_never_
+  flows_in_as_a_VALUE` constructs a poisoned `Config` — `config/` never holds either state
+  (`INC-11`, `INC-17`) — and asserts that a **sentinel** `branch_b_condition` comes back as **one
+  `UndeterminedValue` refusal naming `TODO_C14_PENDING`**, and that a **missing** key comes back as
+  **`MissingRequiredValue`**, which is the state `Q-079` actually found and which a defaulting read
+  turns into a blank. **`N-I2` KILLED** (1 failed, 99 passed). Hard rule 9's *"a missing required
+  value is a hard refusal, never a silent fallback"* is now asserted for these two keys.
+* **`OF-118` — CLOSED by `9084422` and `73de008`.** `branch_conditions_are_stale` is in
+  `camel_comparator.__all__` and has **one non-test caller**: `__main__.py` §5, beside
+  `branch_is_undecided`'s result — the line the operator reads on RUN-1 night — which is the
+  precedent the review named. **`SD-5` (delete the caller) KILLED · `SD-8` (drop the export)
+  KILLED.** ⚠️ **AND THE FIRST FORM OF THIS FIX WAS NOT ENOUGH, WHICH THIS SESSION FOUND ITSELF:**
+  see `SD-13` below. `main()`'s return contract is **not** changed — that is more than `OF-118`
+  asked for, and it is named so the absence is not read as an oversight.
+* **`OF-119` — CLOSED by `9084422`.** The §8.5.1 window ends at `### 8.5.2 `, and the boundary is
+  pinned **twice**: structurally (`end == subsection[0]`, so the `"## "` alternative cannot fire
+  first) and **by content** (`"policy coverage"` is §8.5.2's **P3** and occurs nowhere in §8.5.1),
+  because a boundary asserted only by the rule that computed it asserts nothing. **`SD-4` (revert
+  the window) KILLED**, and each half was shown **independently load-bearing**: **`SD-9`** (neuter
+  the content pin, revert the window) **KILLED** and **`SD-10`** (neuter the structural pin, revert
+  the window) **KILLED**.
+
+### ⚠️ TWO DEFECTS THIS SESSION FOUND IN ITS OWN REMEDY, BOTH SURVIVING THE FULL SUITE
+
+**The standing ruling — *"every fix session runs mutants on the code it wrote, not only the mutants
+the review named"* — earned its place for the second consecutive night.** Thirteen mutants died on
+the first pass, which was **too clean to accept**, so a second round was aimed at the halves of the
+new assertions themselves. **Two survived, and both survived the FULL SUITE: 1 failed, 775 passed,
+1 skipped — the sole failure being the DELIBERATE `camel_comparator.branch` sentinel that
+`make test` deselects. Nothing anywhere killed them.**
+
+* **`SD-11` — the complaint quotes EVERY requirement instead of the one that failed.**
+  `{phrase!r}` → `{BRANCH_B_REQUIREMENTS!r}` in the guard's message. `assert repr(required) in
+  problems[0]` is then satisfied **for all four at once**, because the tuple's repr contains all
+  four phrases. ⚠️ **Non-equivalent by exhibit: a gate that names every field on every failure
+  names NO field** — the same thing as *"a gate whose only output is 'no'"*, one indirection along,
+  and that sentence is the reason the assertion exists. **CLOSED by `73de008`:** the complaint must
+  quote the failed requirement **and not the other three**. Checked at HEAD before relying on it —
+  none of the other three reprs occurs in a real complaint, because the message spells them
+  unquoted and in other case, so the new assertion is **not vacuous**. **Re-run: KILLED.**
+* **`SD-13` — keep `OF-118`'s call, throw its result away.** `stale = …` followed by `del stale`.
+  The AST call-site check saw a **call** and passed. ⚠️ **Non-equivalent by exhibit: the operator
+  running `python -m whetstone_gate.camel_comparator` on RUN-1 night is told nothing** — the inert
+  predicate `OF-118` is about, moved one line to the right. **A call is not a reader.** **CLOSED by
+  `73de008`:** `__main__` now passes `stale` **directly into** `say()`, and the test asserts (a)
+  the call's result is **bound** and (b) that name appears as a `Name`-load **inside a `say(...)`
+  call**. **Re-run: KILLED**, and so is **`SD-14`**, the follow-up that keeps a *read* of the
+  result but never lets it reach `say()`.
+
+**FINAL MUTATION RESULT: 19 mutants, 19 KILLED, 0 SURVIVORS, 0 claimed equivalent.** Five are
+REVIEW 3's (`N-B`, `N-C`, `N-D`, `N-E`, `N-I2`); fourteen are this session's own (`SD-1`…`SD-14`).
+
+### ⚠️ Why this section opens NO new `OF-` id, and that is `OF-115` applied to this session
+
+`SD-11` and `SD-13` are **found and closed inside one session**, so neither is an open finding. And
+a **concurrent C6 REVIEW 4** session (`ca0dd160`) is running against this file *right now* and will
+allocate its own ids when its Phase 2 lands. ⚠️ **`OF-115` is precisely the defect of taking a
+number that another session then takes** — a forward reference to an unallocated id — and the
+cheapest way to honour a finding is not to repeat it three hours after closing it. **The two
+defects are recorded here, in `PROGRESS.md`, in the commit message of `73de008`, and in this
+session's FINAL OUTPUT, with the mutants named so any reviewer can re-run them.** If the architect
+wants them carried as numbered rows, the numbers are theirs to allocate.
+
+### Carried forward, and explicitly NOT closed by this session
+
+* **`Q-074` / `OF-62`'s fifth site** — `tests/test_lanes_operator_placeholders.py:141` still says
+  *"a citation of Tables 5-7"*, still the only live-text site, still printed in full by every
+  `make selftest`. **Confirmed untouched by any C13 FIX 3 commit**, correctly: that file is named
+  under **NOT** in this session's fence. It belongs to whichever session's fence next includes it.
+* **`OF-67` / `OF-70` / `OF-78`** — `check_roles.py` counting the session-token table's rows
+  itself. `check_roles.py` is named under **NOT** in this fence in terms, so this is the
+  **fifteenth** consecutive session to carry that total by hand and could not have written the
+  mechanism under any reading of its role.
+
+**No other session's line was touched by this append.** `Swept:` verified on the **STAGED SNAPSHOT**
+(`git diff --cached -- docs/reviews/OPEN_FINDINGS.md`), never on the working tree (`INC-48`).
