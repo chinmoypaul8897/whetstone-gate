@@ -7,8 +7,11 @@ PUSHED SHA: 756f7fafc2b68bbce52c18341cb56ceeff4d9d6a
             the five items:    9084422900e1d1981264a179cb3a5bddf4b27e61
             my own 2 survivors:73de008e1b97018d4688381e78eca52123d947cf
             journals:          9a3b7afc51c0a50732385939911eaec01dc9ab89
-            !! THIS BLOCK IS ITSELF INSIDE A LATER COMMIT, so the pushed head is one
-               further than the SHA above: a commit cannot contain its own hash.
+            !! THIS BLOCK IS ITSELF INSIDE A LATER COMMIT, so the pushed head is
+               FURTHER than the SHA above - this block's own commit (b2a4387), the
+               correction appended to it before printing (0d2e05c), and the commit
+               carrying this very line. A commit cannot contain its own hash, which
+               is why the SHA named is the last CONTENT commit and not the head.
 
 =====================================================================
 WHAT THIS SESSION DID
