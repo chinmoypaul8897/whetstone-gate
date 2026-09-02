@@ -121,8 +121,8 @@ def main() -> int:
     # NOTHING READ THESE KEYS and a property enforced only in a test file holds only while
     # the tests run (REVIEW_13_1 B-2). This is the same shape as branch_is_undecided above.
     stale = invocation.branch_conditions_are_stale()
-    verdict = "OK - both keys agree with the law" if not stale else f"{len(stale)} PROBLEM(S)"
-    say(f"  pre-registered branch conditions vs CONTEXT.md S8.5.1: {verdict}")
+    say("  pre-registered branch conditions vs CONTEXT.md S8.5.1: "
+        + ("OK - both keys agree with the law" if not stale else f"{len(stale)} PROBLEM(S)"))
     for problem in stale:
         say(f"    ! {problem}")
     say("  Branch B's artefact is ALREADY COMPLETE, beside this module, so taking it on the")

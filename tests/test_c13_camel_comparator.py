@@ -1221,6 +1221,18 @@ def test_the_pre_registered_branch_condition_carries_the_DIAGNOSIS_requirement(c
             f"requirement failed; got {problems[0]!r}. A gate whose only output is 'no' is "
             f"a gate somebody edits out under time pressure"
         )
+        # ⚠️ AND IT MUST NAME **ONLY** THAT ONE. Found by this session's own mutant SD-11:
+        # a complaint that quotes the whole requirement tuple satisfies the assertion above
+        # for every requirement at once, and it survived the FULL SUITE. A gate that names
+        # every field on every failure names no field — the same thing as a gate whose only
+        # output is 'no', one indirection along.
+        for other, _, _ in weak_forms:
+            if other == required:
+                continue
+            assert repr(other) not in problems[0], (
+                f"the complaint about {required!r} also quotes {other!r}, which is NOT "
+                f"missing from this fixture. Got {problems[0]!r}"
+            )
 
     # ⚠️ AND THE CONTROL, WITHOUT WHICH THE FOUR ABOVE PROVE NOTHING: the undegraded value
     # is ACCEPTED. Four rejections and no acceptance is also what a guard that refuses
@@ -1367,6 +1379,44 @@ def test_the_branch_condition_predicate_is_EXPORTED_and_has_a_NON_TEST_CALLER(pa
         f"whetstone_gate.camel_comparator`, which is what the operator runs on RUN-1 "
         f"night, and which is where branch_is_undecided's result is already printed. "
         f"Found only: {callers}"
+    )
+
+    # ⚠️ AND THE RESULT MUST REACH THE OPERATOR, NOT MERELY BE COMPUTED. Found by this
+    # session's own mutant SD-13: keeping the call and throwing its value away
+    # (``stale = …`` then ``del stale``) passed the FULL SUITE, because a call-site check
+    # sees a call and not a report. A predicate nobody reads the output of is the same
+    # inert thing OF-118 is about, moved one line to the right.
+    main_tree = ast.parse((package_dir / "__main__.py").read_text(encoding="utf-8"))
+    bound: set[str] = set()
+    for node in ast.walk(main_tree):
+        if isinstance(node, ast.Assign) and isinstance(node.value, ast.Call):
+            called = node.value.func
+            called_name = (
+                called.attr if isinstance(called, ast.Attribute) else getattr(called, "id", None)
+            )
+            if called_name == "branch_conditions_are_stale":
+                bound |= {t.id for t in node.targets if isinstance(t, ast.Name)}
+    assert bound, (
+        "`__main__` calls branch_conditions_are_stale() but BINDS NOTHING, so its answer "
+        "cannot be reported. OF-118 asks for a reader, not a call."
+    )
+
+    said: set[str] = set()
+    for node in ast.walk(main_tree):
+        if not isinstance(node, ast.Call):
+            continue
+        func = node.func
+        if (func.attr if isinstance(func, ast.Attribute) else getattr(func, "id", None)) != "say":
+            continue
+        said |= {
+            inner.id
+            for inner in ast.walk(node)
+            if isinstance(inner, ast.Name) and isinstance(inner.ctx, ast.Load)
+        }
+    assert bound & said, (
+        f"the result of branch_conditions_are_stale() ({sorted(bound)}) never reaches a "
+        f"_console.say() call, so the operator is never told. Names that do reach one: "
+        f"{sorted(said)}"
     )
 
 
