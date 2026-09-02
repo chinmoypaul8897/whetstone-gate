@@ -2162,11 +2162,17 @@ def test_the_crossing_is_pinned_at_the_TURN_BUDGET_END_of_its_range_BOTH_WAYS():
 # matrix complete in the same breath.
 #
 # ⚠️ **AND COPY 2 IS NOT A REDUNDANT DUPLICATE OF COPY 1 — THAT IS MEASURED, NOT ASSUMED.**
-# `REVIEW_C6_5` §6.0: all **23** calls of copy 1's four guards take a hand-assembled context
-# (`_real_context`, `_assemble`, or a `leaky` built from one), and the one `run_episode` call
-# in that file never reaches a guard. **So copy 2 is the only guard in this repository ever
-# fired at what the loop actually assembles**, and a copy-2 catcher with no fixture is not a
+# An AST walk over `tests/test_c6_attacker.py` finds **20 call sites** of copy 1's four guards
+# and **every one takes a hand-assembled context** — `_real_context(...)`, `_assemble(...)`, or a
+# `leaky` / `real` / `at_the_cap` built from one — while that file's **single** `run_episode`
+# call, at line 832, is never handed to a guard. **So copy 2 is the only guard in this repository
+# ever fired at what the loop actually assembles**, and a copy-2 catcher with no fixture is not a
 # spare — it is the only guard over that subject, unpinned.
+#
+# ⚠️ **`REVIEW_C6_5` §6.0 GIVES THAT COUNT AS 23 AND C6 FIX 5 MEASURES 20** (24 textual
+# occurrences of the four names, minus their four `def` lines). **The substantive claim reproduces
+# exactly and the count does not, so the measured figure is the one written here** — `INC-54` is
+# about exactly this: a session writing a count it had not measured.
 #
 # ⚠️ **EVERY FIXTURE BELOW GOES THROUGH :func:`_sole_layer`**, which is what makes a mutated
 # catcher DIE rather than merely make the suite go red, and which is itself pinned in three
@@ -2407,10 +2413,12 @@ def test_the_LOOP_copys_VERBATIM_CLAUSE_scan_FIRES_on_a_TOOL_RESULT_that_echoes_
     scan is what sees it. Delete that scan and **the suite stays green**.
 
     ⚠️ **AND THE MUTANT REMOVES THE SUITE'S ONLY CHECK OF THIS KIND OVER A REAL EPISODE.**
-    Copy 1's ``_policy_findings`` would catch the same string — but `REVIEW_C6_5` §6.0
-    measured that copy 1's four guards are **never fired at a `run_episode` context anywhere
-    in the suite**: all 23 of their calls take a hand-assembled context. So this is not a
-    duplicate of copy 1's coverage; it is the only coverage of the composed context.
+    Copy 1's ``_policy_findings`` would catch the same string — but copy 1's four guards are
+    **never fired at a `run_episode` context anywhere in the suite**: all **20** of their call
+    sites take a hand-assembled context, measured by an AST walk and not cited (see this
+    section's header comment for the count and for where it differs from `REVIEW_C6_5` §6.0).
+    So this is not a duplicate of copy 1's coverage; it is the only coverage of the composed
+    context.
 
     ⚠️ **THE SCAN IS GLOBAL AND MUST BE** — ``if clause in full`` — because the C6 card says
     *"no policy string"* without qualification, and a clause the world hands back is a policy
@@ -2577,13 +2585,14 @@ def test_the_LOOP_copys_RESIDUE_layer_FIRES_on_authored_text_carrying_NO_policy_
     about the defender that §13.3 does not mandate the summary to say, and §10.1 forbids the
     attacker to learn anything of ours at all.
 
-    ⚠️ **THE CARRIER IS THE FOLD CONSTANT, AND IT IS THE ONE ROUTE THAT ADDS A LINE TO A REAL
-    EPISODE'S SUMMARY.** :func:`whetstone_gate.attacker.context.render_summary` emits exactly
-    two lines — the state and the mandated denial — so no label mutation can add a third; the
-    extra line has to arrive inside the value the loop folds, which is `Q-046`'s constant.
-    That is also why this fixture cannot be satisfied by the equality check: the recognised
-    line still carries §8.6's exact string, so ``value == generic`` holds and only the
-    residue is left over.
+    ⚠️ **THE CARRIER IS THE FOLD CONSTANT, AND THE REASON IS STRUCTURAL RATHER THAN
+    CONVENIENT.** :func:`whetstone_gate.attacker.context.render_summary` builds
+    ``f"{STATE_LABEL}{state_json}\\n{LAST_REFUSAL_LABEL}{refusal}"`` — two lines, and both
+    labels are **prefixes**. So the only text that can appear **after** the mandated denial,
+    in a real episode, is text carried **inside the folded value itself**, and that value is
+    `Q-046`'s one authored constant. That is also why this fixture cannot be satisfied by the
+    equality check: the recognised line still carries §8.6's exact string, so
+    ``value == generic`` holds and only the residue is left over.
 
     ⚠️ **AND THE OTHER SIDE IS ASSERTED IN THE SAME TEST** (`INC-50`: *fire it at BOTH*): the
     identical episode with the constant undrifted must be **silent**, or the layer would be
@@ -2643,4 +2652,96 @@ def test_the_LOOP_copys_RESIDUE_layer_FIRES_on_authored_text_carrying_NO_policy_
     assert len(firing) == settings.turn_budget - 1, (
         f"the extra line is folded from the first tool result onwards, so exactly "
         f"{settings.turn_budget - 1} turns must report it; {len(firing)} did."
+    )
+
+
+# ── SM-7 — THIS SESSION'S OWN SURVIVOR, REPORTED BEFORE IT WAS CLOSED ─────────────────
+
+
+def test_the_LOOP_copys_RESIDUE_layer_SAYS_SO_when_it_cannot_LOCATE_the_summary(repo_root):
+    """⚠️ **THIS SESSION'S OWN SELF-DIRECTED MUTANT `SM-7`, AND IT SURVIVED.**
+
+    The residue layer above locates the deterministic summary as *the AUTHORED part that
+    starts with* :data:`ctx.STATE_LABEL`, and reports it when that finds anything other than
+    exactly one. **Disarming that report — ``if len(summaries) != 1:`` → ``if False:`` —
+    left all 134 C6 tests green**, because nothing in this file had ever handed the guard a
+    context whose summary it could not find. **That is the same shape this whole session is
+    about**, arriving in the code written to close it, and it is recorded here rather than
+    quietly repaired: `INC-53`'s *"it mutated exactly what the review had named and nothing
+    else"*, avoided only because the mutant was aimed at this session's own new lines.
+
+    ⚠️ **AND IT IS NOT THE SAME AS `M-08b` / `OF-130`, WHICH IS WHY IT IS CLOSED RATHER THAN
+    ARGUED AWAY.** Copy 1's equivalent is an ``assert``, and `REVIEW_C6_5` ruled its mutant
+    **NOT-OWNED** on the ground that *"no code path builds two summaries"*. **That ground
+    does not cover the case this fixture plants**, which is not two summaries but **zero
+    findable ones**: the part is still there and still authored, and only the byte the
+    locator keys on has moved. A summary the guard cannot locate makes **every layer below
+    it silently inspect nothing** — the residue check is skipped, and the scans run over a
+    surface the guard no longer recognises — which is `REVIEW_C6_2`'s own diagnosis of the
+    import walk: *"a walker that terminated at the package root looked identical to one that
+    found nothing: both print `no findings`."*
+
+    **The exhibit, measured before this fixture was written:** one leading space on the
+    summary part gives **20 findings, all from this check and no other layer**, against a
+    control of **0** on the untouched contexts. It is the cheapest possible drift and it is
+    a real one — a header prepended to the summary part, or `STATE_LABEL` moving by a byte,
+    produces it.
+
+    ⚠️ **THE PART IS SHIFTED IN A COPY OF THE ASSEMBLED CONTEXT, NEVER IN `src/`.** The
+    module is not touched, which is why this fixture can pin a locator failure without
+    changing production behaviour by one byte.
+    """
+    generic, note, clauses = _clean_episode_inputs(repo_root)
+    _settings, result = _episode(
+        [_short_probe_read(), generic],
+        [f"fetch_payment('{_probe_id()}')", "create_refund(pay_CANARYRECON, 8000000)"],
+    )
+
+    # THE CONTROL FIRST: the guard must be silent on the contexts as the loop built them.
+    assert not _loop_blindness_findings(
+        result.contexts, generic=generic, note=note, clauses=clauses
+    ), "the episode is not clean, so nothing below measures the locator"
+
+    def shifted(context):
+        parts = []
+        moved = 0
+        for part in context.parts:
+            if part.origin is ctx.Origin.AUTHORED and part.text.startswith(ctx.STATE_LABEL):
+                part = replace(part, text=" " + part.text)
+                moved += 1
+            parts.append(part)
+        assert moved == 1, (
+            f"expected exactly one deterministic summary part to shift, shifted {moved}; a "
+            f"helper that silently matches nothing makes this test vacuous"
+        )
+        return replace(context, parts=tuple(parts))
+
+    contexts = tuple(shifted(c) for c in result.contexts)
+    # The part is still AUTHORED and still carries the state - only the locator's key moved.
+    assert all(ctx.STATE_LABEL in c.authored_text() for c in contexts), (
+        "the shifted part no longer carries the state label at all, so this fixture is "
+        "measuring a deletion rather than a locator failure"
+    )
+
+    findings = _loop_blindness_findings(
+        contexts, generic=generic, note=note, clauses=clauses
+    )
+    _sole_layer(
+        findings,
+        "deterministic summary part(s) on the AUTHORED surface",
+        "a deterministic summary the guard cannot LOCATE - every layer below it then "
+        "inspects nothing and reports 'no findings', which is REVIEW_C6_2's import-walk "
+        "diagnosis (this session's self-directed mutant SM-7)",
+    )
+    counts = {
+        int(m.group(1))
+        for m in (re.search(r": (\d+) deterministic summary", f) for f in findings)
+        if m
+    }
+    assert counts == {0}, (
+        f"the finding must PRINT how many summary parts it found, or a reader cannot tell "
+        f"zero from two; reported {sorted(counts)}"
+    )
+    assert len({f.split(":")[0] for f in findings}) == len(result.contexts), (
+        "every turn's summary is unlocatable under the shift, so every turn must report it"
     )
