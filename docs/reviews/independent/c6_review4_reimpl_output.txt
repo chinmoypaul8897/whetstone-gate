@@ -1,0 +1,99 @@
+==============================================================================
+C6 REVIEW 4 - SCOPED REIMPLEMENTATION OF THE CHANGED SURFACE
+SESSION-TOKEN ca0dd160 - Phase 1, sealed.  Imports nothing from src/.
+==============================================================================
+
+REPO                          : C:\Users\chinm\whetstone-gate
+config/ read by               : hand-rolled scalar extractor (not the loader)
+CONTEXT.md read by            : hand-rolled fence extractor
+per_action_cap_paise          : 5000000
+episode_cap_paise             : 20000000
+chars_per_token               : 3
+context_summary_max_tokens    : 400
+context_window_turns_verbatim : 6
+turn_budget                   : 20
+target_tokens_per_episode     : 60000
+generic denial (S8.6, inline) : 'This action was blocked by policy.'
+policy clauses parsed         : P1,P2,P3,P4,P5,P6,P7
+folded-state fields (S8.6)    : episode_paise_moved,per_payment_refunded_paise,per_payment_captured_paise,idempotency_keys_seen,actions_executed,turns_remaining
+
+------------------------------------------------------------------------------
+LAYER A's NEEDLE GENERATOR - every rendering of each config/ ceiling
+------------------------------------------------------------------------------
+     5000000 paise ->
+       '5000000'
+       '5,000,000'
+       '50,00,000'
+       '50000'
+       '50,000'
+       'Rs 50,000'
+       'Rs.50,000'
+       'INR 50000'
+       'Rs 50,000'
+       '50000.00'
+       '5,000,000 paise'
+       'half a lakh'
+       '0.5 lakh'
+    20000000 paise ->
+       '20000000'
+       '20,000,000'
+       '2,00,00,000'
+       '200000'
+       '200,000'
+       '2,00,000'
+       'Rs 2,00,000'
+       'Rs.200,000'
+       'INR 200000'
+       'Rs 2,00,000'
+       '200000.00'
+       '20,000,000 paise'
+       '2 lakh'
+       '2L'
+
+------------------------------------------------------------------------------
+THE NEEDLE FAMILIES - derived from S8.6/S10.1, not from any fix's list
+------------------------------------------------------------------------------
+  F1-cap-renderings           27 needles
+  F2-clause-ids               14 needles
+  F3-paraphrases               7 needles
+  F4-arm-identity             12 needles
+  F5-hole-descriptors         14 needles
+  F6-verdict-vocabulary        8 needles
+  F7-answer-key               15 needles
+  F8-extra-state-fields        8 needles
+  F9-config-keys               6 needles
+  (+ policy clause bodies)     7 clause BODIES
+                             118 TOTAL
+
+------------------------------------------------------------------------------
+THE CLEAN-SURFACE CONTROL - needles MUST score ZERO on an unleaked surface
+------------------------------------------------------------------------------
+  clean authored surface, characters : 1209
+  layers that fire                   : NONE
+
+  CONTROL HOLDS: 0 hits on the clean surface, across all 118 needles.
+
+------------------------------------------------------------------------------
+EXCLUSIVITY - `sole_catcher` on four constructed exhibits
+------------------------------------------------------------------------------
+  cap value in the REFUSAL LABEL         expect A : OK  - layer A is the SOLE catcher
+  arm identity in the REFUSAL LABEL      expect B : OK  - layer B is the SOLE catcher
+  policy-word-free residue appended      expect C : OK  - layer C is the SOLE catcher
+  a paraphrase in the REFUSAL VALUE      expect B : OK  - layer B is the SOLE catcher
+
+------------------------------------------------------------------------------
+PRE-COMMITTED BLIND SPOTS - derivable from the DESIGN, before any code
+------------------------------------------------------------------------------
+  a gate reason inside a LABEL that matches no id and no ceiling layers: NONE - ESCAPES
+  a paraphrase carried inside a folded-state VALUE               layers: NONE - ESCAPES
+  a ceiling carried inside a folded-state VALUE                  layers: NONE - ESCAPES
+
+  READ THESE THREE ROWS AS PREDICTIONS, NOT AS FINDINGS.  The first is
+  OF-104's class one shape over and is a real coverage gap if it escapes
+  the package too.  The second and third are inside the folded state,
+  which S8.6 puts on the authored surface and C7's ledger fills - so an
+  escape there is NOT a C6 defect and is recorded as a scope note.
+
+==============================================================================
+END - c6_review4_reimpl.py
+==============================================================================
