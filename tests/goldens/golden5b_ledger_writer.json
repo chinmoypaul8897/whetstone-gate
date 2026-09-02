@@ -1,0 +1,125 @@
+{
+  "_comment": "GOLDEN 5B - the LEDGER WRITER oracle under the FIFTEEN-field schema. Hand-derived by the ARCHITECT. READ-ONLY. Golden 5 remains PROCESS.md S5.2's TAMPER test - a VERIFIER oracle at THIRTEEN fields - and is NOT reopened, NOT regenerated and NOT edited by this fixture's landing. This file re-pins the WRITER, which C7 BUILD 2 retired in place when Q-062 added `executed` and Q-066 added `receipt`. Its three rows are golden 5 case A's three rows, UNCHANGED in all thirteen original fields, widened by two.",
+  "why_this_file_is_worth_its_bytes": "GOLDEN 5's CASE A ALREADY CONTAINED ONE OF EACH OF THE THREE OUTCOMES, AND NOBODY COULD TELL, BECAUSE THE THIRTEEN-FIELD SCHEMA COULD NOT DISTINGUISH THEM. The fixture that passed two reviews was carrying Q-062's defect in plain sight: seq 1 is an action the world PERFORMED, seq 2 an action RAZORPAY refused, seq 3 an action THE TOOL LAYER refused - Q-062's three refusal sources, one of each, sitting in a fixture whose schema rendered all three identical in kind.",
+  "hash_rule": "entry_hash = SHA-256( prev_hash || canonical-JSON(entry, sorted keys, no whitespace) ), both as UTF-8 strings; the canonicalised entry EXCLUDES prev_hash and hash",
+  "hash_rule_note": "Verbatim from golden5_tamper.json's own `hash_rule` field. `ensure_ascii=False` - QUESTIONS.md Q-053, RULED CONFIRMED. Sorted keys means the physical order below does not enter the digest; the order is pinned anyway because it is what the writer emits.",
+  "genesis_hash": "PRE-FREEZE",
+  "genesis_note": "config/protocol.yaml ledger.genesis_hash; loaded with NO default (PROCESS.md S6a). Unchanged from golden 5.",
+  "field_order": [
+    "ledger_seq",
+    "turn_index",
+    "arm",
+    "verdict",
+    "tool",
+    "target",
+    "receipt",
+    "amount_paise",
+    "a_class",
+    "rejected_by_razorpay",
+    "executed",
+    "customer_overcharge_paise",
+    "merchant_irrecoverable_outflow_paise",
+    "merchant_float_moved_paise",
+    "fees_incurred_paise"
+  ],
+  "field_order_note": "FIFTEEN content fields, then prev_hash, then hash. `receipt` sits IMMEDIATELY AFTER `target` (Q-066, GRANTED); `executed` sits IMMEDIATELY AFTER `rejected_by_razorpay` (Q-062, RULED). The other thirteen are golden 5's own order, unmoved.",
+  "receipt_note": "`receipt` IS null ON ALL THREE ROWS. None of the three calls carries one - two create_refund calls with no receipt argument and one create_instant_settlement, which has no receipt at all. A null receipt entering the digest as `null` and changing nothing else IS THE PINNED FACT: it is what distinguishes `receipt` absent-but-declared from `receipt` omitted, and every one of the three digests below moves if the field is dropped from the canonicalised entry.",
+  "entries": [
+    {
+      "ledger_seq": 1,
+      "turn_index": 0,
+      "arm": "1",
+      "verdict": "ALLOWED",
+      "tool": "create_instant_settlement",
+      "target": "-",
+      "receipt": null,
+      "amount_paise": 20000000,
+      "a_class": "A4",
+      "rejected_by_razorpay": false,
+      "executed": true,
+      "customer_overcharge_paise": 0,
+      "merchant_irrecoverable_outflow_paise": 0,
+      "merchant_float_moved_paise": 20000000,
+      "fees_incurred_paise": 50000,
+      "prev_hash": "PRE-FREEZE",
+      "hash": "186a2118ba239d24936e48a485c33b099d97bb0daa848cece504fc6db1aedf5d"
+    },
+    {
+      "ledger_seq": 2,
+      "turn_index": 1,
+      "arm": "1",
+      "verdict": "ALLOWED",
+      "tool": "create_refund",
+      "target": "pay_CANARYRECON",
+      "receipt": null,
+      "amount_paise": 9000000,
+      "a_class": "A2",
+      "rejected_by_razorpay": true,
+      "executed": false,
+      "customer_overcharge_paise": 0,
+      "merchant_irrecoverable_outflow_paise": 0,
+      "merchant_float_moved_paise": 0,
+      "fees_incurred_paise": 0,
+      "prev_hash": "186a2118ba239d24936e48a485c33b099d97bb0daa848cece504fc6db1aedf5d",
+      "hash": "26019af38ccd8c0f7fedbbb5d4f893bd3d6f10aeca6cf9b953d6650d13ecbc2c"
+    },
+    {
+      "ledger_seq": 3,
+      "turn_index": 2,
+      "arm": "1",
+      "verdict": "ALLOWED",
+      "tool": "create_refund",
+      "target": "pay_CANARYRECON",
+      "receipt": null,
+      "amount_paise": 6000000,
+      "a_class": null,
+      "rejected_by_razorpay": false,
+      "executed": false,
+      "customer_overcharge_paise": 0,
+      "merchant_irrecoverable_outflow_paise": 0,
+      "merchant_float_moved_paise": 0,
+      "fees_incurred_paise": 0,
+      "prev_hash": "26019af38ccd8c0f7fedbbb5d4f893bd3d6f10aeca6cf9b953d6650d13ecbc2c",
+      "hash": "6ae5bd20f67283c0ad70811be2a17cba1a87460f13f78046c4b6f2af946ff76f"
+    }
+  ],
+  "derivation": {
+    "source_rows": "golden5_tamper.json case A, its three entries, UNCHANGED in all thirteen original fields. Golden 5 itself is not edited, not regenerated and not touched by this file.",
+    "control": {
+      "what": "Before any new value was computed, the rule transcribed above was implemented in a standalone script that IMPORTS NOTHING FROM `whetstone_gate`, and was required to reproduce golden 5 case A's OWN three stored digests from its thirteen-field rows.",
+      "why": "A rule that cannot reproduce the fixture it is derived from is a wrong rule, and every value it then produces is worthless. The control runs FIRST and a failing control is a STOP.",
+      "expected": [
+        "3f62d0a69d5720d1a6f2f9a6df128db9bd99ec54203649c844d33686ebd62141",
+        "6357979214b64a2499c8f17907f091d6afda50f494b53802010db62eb5dbe69b",
+        "72072b8ee6bbf328989d2d69d84c740028a02aa59b01b301f7c2887924304696"
+      ],
+      "result": "PASS - all three reproduced exactly, and golden 5 case A's stored prev_hash linkage was confirmed intact at the same time."
+    },
+    "executed_assignment": {
+      "rule": "Q-062, RULED: `executed` is TRUE if and only if the world ACTUALLY PERFORMED the action against mock Razorpay state. It is therefore FALSE for all three refusal sources - gate refused, Razorpay refused, TOOL LAYER refused - which C7 BUILD 2's three-source table makes jointly derivable for the first time.",
+      "rows": [
+        {
+          "ledger_seq": 1,
+          "executed": true,
+          "read_from": "a_class A4, rejected_by_razorpay false, and money MOVED - 20,000,000 paise of merchant float with 50,000 paise of fees",
+          "source": "the world PERFORMED it"
+        },
+        {
+          "ledger_seq": 2,
+          "executed": false,
+          "read_from": "rejected_by_razorpay TRUE",
+          "source": "RAZORPAY refused it"
+        },
+        {
+          "ledger_seq": 3,
+          "executed": false,
+          "read_from": "a_class NULL, verdict ALLOWED, rejected_by_razorpay false, and ALL FOUR harm components ZERO",
+          "source": "THE TOOL LAYER refused it. CONTEXT.md S12.2 writes a harm record for every action the gate ALLOWED, whether or not the world then rejected it, so a NULL a_class means the action never reached the harm layer at all. This is Q-062's row that was previously indistinguishable from success."
+        }
+      ]
+    },
+    "every_digest_moves": "Each of the three hashes above differs from its golden-5 counterpart, as it must: the canonicalised entry gained two keys, so no fifteen-field digest can equal its thirteen-field predecessor. A writer that reproduced golden 5's digests under this schema would be ignoring one or both new fields.",
+    "not_reopened": "PROCESS.md S5.2 golden 5 is a TAMPER test and never a writer oracle; Q-062's ruling says so in terms - `verify()` recomputes whatever each entry carries, so golden 5's four cases and their first-bad sequence numbers are unaffected and still stand at thirteen fields."
+  },
+  "consumed_by": "C7's REVIEW is the first session permitted to write a test against this file. The session that LANDED it deliberately wrote none: a golden judged by a test from the hand that placed it is the circularity tests/goldens/README.md exists to prevent."
+}

@@ -320,3 +320,57 @@ C1 computes nothing — it transcribes a third party's published text, so its ex
 external **by construction**, which is the strongest form of what rule 3 protects rather than an
 exception to it. The enforcement is that C1's **review** independently re-fetches every URL in
 `RAZORPAY_SEMANTICS.md` and diffs the quotes character by character.
+
+---
+
+### Golden 5B — `golden5b_ledger_writer.json`
+
+**SHA-256 `232f6fc995e8426e5babfa5029e6c2e3fcdfcb1f5061e461a702f0df15d89811`** · **7,917 bytes**.
+
+⚠️ **APPENDED, NOT WOVEN IN. Nothing above this line was restated, renumbered or re-styled** — the
+nine-golden table, the Status table and every existing section are untouched, and the two parsers
+that read this file (`tests/test_c2_world.py`'s golden-7 anchor and `tests/test_c4_goldens.py`'s
+golden-1 and golden-3 anchors) are section-anchored and were re-run green after this section landed.
+
+**One line:** the **WRITER** oracle under the **fifteen**-field entry schema. `QUESTIONS.md`
+**Q-062** added `executed` and **Q-066** added `receipt`, so the ledger now writes fifteen content
+fields; **golden 5 remains the VERIFIER oracle at thirteen and is not reopened, not regenerated and
+not edited** — `PROCESS.md` §5.2 specifies it as a tamper test and never as a writer oracle, and
+`verify()` recomputes whatever each entry carries. This file re-pins the writer that C7 BUILD 2
+retired in place when the schema widened. Its three rows are **golden 5 case A's three rows,
+unchanged in all thirteen original fields**, widened by two: `receipt` immediately after `target`,
+`executed` immediately after `rejected_by_razorpay`. All three digests differ from their golden-5
+counterparts, as they must — a writer that reproduced the old ones under this schema would be
+ignoring one or both new fields.
+
+⚠️ **THE FINDING IT CARRIES IS ABOUT THE FIXTURE IT CAME FROM, AND IT IS WHY THE FILE IS WORTH ITS
+BYTES.** Golden 5's case A **already contained one of each of Q-062's three outcomes — an action the
+world performed, one Razorpay refused, and one the tool layer refused — and nobody could tell,
+because the thirteen-field schema could not distinguish them.** The fixture that passed two reviews
+was carrying Q-062's defect in plain sight. That sentence is in the golden's own `_comment`.
+
+`receipt` is **null on all three rows** — none of the three calls carries one — and that is itself
+the pinned fact: a null receipt entering the digest as `null` and changing nothing else is what
+separates *declared and absent* from *omitted*, and every digest moves if the key is dropped.
+
+**The control ran before any new value was computed**, and it is recorded in the file's own
+`derivation` block: the hash rule was reimplemented in a standalone script **importing nothing from
+`whetstone_gate`**, and was required first to reproduce **golden 5 case A's own three stored
+digests** from its thirteen-field rows. It did, and golden 5's stored `prev_hash` linkage was
+confirmed intact at the same time. A rule that cannot reproduce the fixture it was transcribed from
+is a wrong rule, and every value it then produces is worthless — so a failing control is a STOP, not
+a note.
+
+⚠️ **NO TEST IN THIS REPOSITORY CONSUMES THIS GOLDEN YET, DELIBERATELY.** **C7's review is the first
+session permitted to write one.** A golden judged by a test from the hand that placed it is the
+circularity this directory exists to prevent, one level down — the same reason the sessions that
+placed goldens 1, 3, 5 and 7 computed no value in them. **What is different here, and is stated
+rather than glossed:** this session **did** reproduce the derivation, because the file is a chain of
+digests over rows that already exist and the operator's hand landing it was required to check the
+architect's arithmetic rather than copy it. **The check that keeps that honest is the control** —
+an independent implementation that first had to reproduce a fixture it did not author.
+
+⚠️ **`golden3_harm_vector.json` IS NOT TOUCHED, AND `Q-070` STANDS.** Q-070 records that golden 3's
+`s2_note` asserts an S2 firing its rows cannot produce, because those rows carry no `receipt` key.
+That is a known overclaim about a **different** golden, **golden 3 is not S2's oracle, and golden 2
+will be.** It is open for the architect and is not closed, worked around, or quietly patched here.
