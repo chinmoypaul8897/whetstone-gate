@@ -7799,3 +7799,123 @@ OPEN**. `docs/reviews/independent/c7_review1_goldens.py` and its committed outpu
 what the file said when C7 REVIEW 1 read it, and the re-cut is why it now differs.
 
 ---
+
+## ⚠️ RAISED BY C6 REVIEW 5 (`0ca97bbb`), 2026-09-02 — Q-084 and Q-085
+
+⚠️ **NUMBERED FROM THE FILE, RE-READ IMMEDIATELY BEFORE THIS APPEND.** The highest entry at that
+moment was `Q-083`. A concurrent **C7 REVIEW 1** session (`472cdc4b`) holds this tree and committed
+to `docs/reviews/` and to `PROGRESS.md`/`STATUS.md` at `ae5d600`/`a1973fa` while this session was
+measuring; it raised **no** `Q-` entry. **This is again a counter allocated by a session that does
+not hold it** — `OF-67`.
+
+**Both questions are about `Q-082`'s ruling, and both are raised BECAUSE this review applied it as
+written and it produced a FAIL.** Neither is a request to be let off: `REVIEW_C6_5`'s verdict is FAIL
+under the ruling as it stands, and these exist so the architect can narrow it **on the record**
+rather than by a reviewer's discretion — which is exactly why `REVIEW_C6_4` raised `Q-082` itself.
+
+---
+
+### Q-084 — ⚠️ `Q-082`'s GATE IS A *SURVIVING MUTANT*, SO THE STRONGEST FORM OF "UNPINNED" — A CATCHER THAT DOES NOT EXIST IN ONE COPY — CANNOT REACH THE GATE AT ALL
+**Raised by:** C6 REVIEW 5 (`0ca97bbb`) · **Date:** 2026-09-02 · **Status:** ⚠️ **OPEN — NOT
+blocking; the ruling was applied as written and the finding is graded MEDIUM** · **Class:** **A** —
+it decides a `cN-pass` tag, and it will decide one on every chunk whose guard exists twice.
+
+**Context, stated as a measurement rather than as a worry.** `Q-082`'s ruling: *"A surviving mutant
+on a property THE CHUNK OWNS is a FAIL … THE GATE IS THE REQUIRED SET: at least one mutant per
+property or invariant the chunk owns, minimum eight."*
+
+C6's claim-4 guard exists **twice**, on purpose — copy 1 over a hand-assembled context, copy 2 over
+`run_episode`'s own contexts — and the two are deliberately independent, which hard rule 8's
+anti-circularity argument requires. This review measured copy 1's catchers and copy 2's, cell by
+cell (`REVIEW_C6_5.md` §7.1). **Copy 2 has no residue (LAYER 3) catcher at all.** Copy 1's residue
+layer is the only thing in the repository that sees authored text carrying no policy word, and
+deleting it goes red with four failures (`M-13`). In copy 2 there is nothing to delete.
+
+**The asymmetry, exactly.** A copy-2 catcher that exists but is fired at nothing produces a
+**surviving mutant** and therefore **holds the tag** (`OF-146`…`OF-149`, four of them here). A
+copy-2 catcher that **does not exist at all** produces **no mutant**, so under the ruling as written
+it is a MEDIUM finding that does **not** hold the tag (`OF-150`). **The worse condition is graded
+lower than the better one.**
+
+**Options seen:**
+
+1. **The ruling as written (TAKEN, and it is what this review applied).** The gate is a surviving
+   mutant; an absent catcher is a MEDIUM finding in `OPEN_FINDINGS.md`. Consistent with what
+   `REVIEW_C6_3` did with `OF-104` — where copy 2's coverage of that class was **zero** and it was
+   graded `M-1`, MEDIUM — and with `REVIEW_C6_4`'s explicit statement that grading total absence
+   higher *"would be manufacturing a fourth FAIL"*. ⚠️ Cost: the gap that is hardest to notice is the
+   one the gate cannot see.
+2. **Extend the gate: a required-set property with no catcher to mutate, in a copy the chunk owns, is
+   also a FAIL.** ⚠️ Cost, and it is serious: it re-opens the regress `Q-082` closed, because the
+   reviewer would then decide **how many copies** a property must be caught in, and that number is
+   nowhere in the spec.
+3. **Require the two copies to be layer-for-layer symmetric.** ⚠️ Cost: `INC-56` argues against it in
+   its own hand — *"a test that walked one copy's fixtures and demanded a twin in the other would be
+   exactly the shared predicate hard rule 8 forbids them to have — the two copies are supposed to be
+   able to diverge, which is what makes them worth two."* That argument is correct.
+
+**Default taken pending a ruling: option 1**, because it is what the ruling says, and because the two
+preceding C6 reviews graded the identical shape the same way. ⚠️ **This entry exists so the architect
+can close the asymmetry on the record.** It does not change this review's verdict either way: the
+FAIL rests on four **surviving** mutants, not on `OF-150`.
+
+---
+
+### Q-085 — ⚠️ SHOULD A SURVIVOR WHOSE REAL-LEAK COVERAGE IS DUPLICATED ELSEWHERE IN THE SUITE STILL HOLD THE TAG? THIS REVIEW MEASURED THE ANSWER AND APPLIED THE RULING ANYWAY
+**Raised by:** C6 REVIEW 5 (`0ca97bbb`) · **Date:** 2026-09-02 · **Status:** ⚠️ **OPEN — NOT
+blocking; the written bar was applied and the verdict is FAIL** · **Class:** **A** — it decides
+C6's next tag and every re-review after it.
+
+**Context, and it is a measurement, not an argument.** A guard-side survivor matters only if it costs
+the suite the ability to catch a **real** leak. This review measured exactly that — each survivor
+applied **together with** an actual leak in `src/`, against a control that plants the same leak with
+the guard intact, in a fresh clone with controls at 121/121 before and after:
+
+```
+E1   M-12 (copy 2's vocabulary deleted) + a REAL gate-reason leak in LAST_REFUSAL_LABEL   RED, 19 failed
+E1c  the same leak, copy 2's vocabulary INTACT                                            RED, 29 failed
+E2   M-16 (copy 2's denial equality deleted) + a REAL drift in texts.generic_denial()      RED,  2 failed
+E2c  the same drift, copy 2's equality INTACT                                             RED,  2 failed  <- the SAME two killers
+```
+
+**No real leak escapes the suite under any of the four survivors.** `E1` costs ten failures of depth
+and keeps the kill. `E2`'s coverage is **entirely duplicated**: the drift is caught by
+`test_the_generic_denial_file_is_character_identical_to_CONTEXT_MD` and
+`test_the_summary_folds_ONLY_the_generic_denial_and_never_a_tool_result`, and copy 2's equality check
+contributes **zero** failures on that input.
+
+**The question, exactly.** Is *"a surviving mutant on a property the chunk owns"*:
+
+1. **as ruled** — a survivor is a survivor, and depth lost is coverage lost, because *"'clean today'
+   is exactly what an unpinned guard cannot promise tomorrow"*; or
+2. **narrowed once more** — a survivor holds the tag only where it leaves a **real** leak uncaught by
+   the whole suite, and a survivor whose coverage is duplicated is a MEDIUM finding?
+
+**Options seen:**
+
+1. **The ruling as written (TAKEN).** ⚠️ **The decisive argument for it is the precedent, not the
+   principle:** `R-14` — which `Q-082`'s own ruling names as *on an owned property* and tag-holding —
+   has **the identical property**. `E1c` shows that a real label leak produces 29 failures across
+   copy 1's tests, so copy 1 would have caught `R-14`'s real leak too. **Applying a stricter standard
+   to this review's four than the architect applied to `OF-124` would be choosing the standard after
+   seeing which way it cuts** — and that is the one thing this project exists to criticise.
+2. **Narrow it to real-leak escape.** ⚠️ **If this is ruled, all four of this review's survivors
+   (`OF-146`…`OF-149`) become MEDIUM and C6 PASSES on everything else** — the three findings REVIEW 4
+   failed it on are closed and re-mutated KILLED, `src/` is untouched, the four blindness claims hold
+   over the real assembled bytes by an independent 110-needle method with two controls, the door is
+   open, and the reimplementation agrees on 21 of 21. Cost: *"the guard has a hole but another test
+   happens to cover it today"* is one sentence away from *"the guard has a hole but the thing it
+   guards is clean today"*, which `Q-082` has already rejected.
+
+**Default taken pending a ruling: option 1**, because it is the ruling as written, because the two
+preceding C6 reviews applied it to the same shape, and because a reviewer narrowing a written bar on
+the day it would cost a fix cycle is precisely what `Q-082` itself was raised about. ⚠️ **This entry
+exists so the architect can overrule that on the record**, and `REVIEW_C6_5.md` §6.1a and §11 name
+which findings a ruling for option 2 would lift, so it can be applied without re-reading the review.
+
+⚠️ **AND ONE THING THAT IS NOT AMBIGUOUS AND IS NOT ASKED HERE:** the four survivors are real, each
+exhibited on a concrete input on which HEAD and the mutant differ, each with a one-fixture remedy,
+and they are in `OPEN_FINDINGS.md` as `OF-146`…`OF-149` whatever the ruling. The question is only
+whether they hold the tag.
+
+---

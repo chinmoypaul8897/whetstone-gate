@@ -1,0 +1,250 @@
+C6 REVIEW 5 - RAW MUTATION OUTPUT. session-token 0ca97bbb. Subject at 615993d (= 41f554b for src/ and tests/).
+Every slice printed whetstone_gate.__file__ and config.repo_root() at its head (INC-64 / OF-139).
+Restore writes the ORIGINAL BYTES back and re-hashes; the harness never commits (INC-57).
+Controls before and after every slice: 121 passed, 0 failed.
+
+################ mut0 ################
+==============================================================================
+C6 REVIEW 5 MUTATION HARNESS - slice 0/4, 10 mutants
+PKG : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c058639d-dc9a-4c0d-afac-7d3b7d659e84\scratchpad\c6r5\tree\src\whetstone_gate\__init__.py
+ROOT: C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c058639d-dc9a-4c0d-afac-7d3b7d659e84\scratchpad\c6r5\tree
+TREE: C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c058639d-dc9a-4c0d-afac-7d3b7d659e84\scratchpad\c6r5\tree
+==============================================================================
+CONTROL (pre)  : 121 passed, 0 failed, 0 error-lines
+M-01     OP-1   context.py                   KILLED    failed=8   passed=113   window width +1
+             killer: test_the_window_keeps_exactly_the_configured_number_of_verbatim_turns
+             killer: test_the_window_sizes_are_read_from_config_and_not_from_source
+             killer: test_the_windowed_context_stays_BOUNDED_which_is_what_the_window_is_FOR
+             killer: test_the_LOOP_copys_denial_line_COUNT_fires_on_a_summary_carrying_MORE_than_one[five
+M-07     OP-4   context.py                   KILLED    failed=2   passed=119   truncation DROPS the mandated denial line
+             killer: test_the_hard_refusal_covers_the_MANDATED_DENIAL_and_not_only_the_marker
+             killer: test_truncation_RESERVES_the_mandated_denial_at_every_size
+M-28     OP-13  estimate.py                  KILLED    failed=1   passed=120   R-20 / OF-126 - the turn_budget END of the closed range
+             killer: test_the_crossing_is_pinned_at_the_TURN_BUDGET_END_of_its_range_BOTH_WAYS
+M-25     OP-11  corpus.py                    KILLED    failed=7   passed=114   the four-corpus round robin collapsed to one corpus (INC-27's defect)
+             killer: test_coverage_ACCUMULATES_across_the_seed_set_instead_of_being_frozen
+             killer: test_every_corpus_the_card_names_is_offered_in_EVERY_episode
+             killer: test_the_episode_records_its_seed_and_prints_offered_versus_loaded
+             killer: test_the_guard_now_watches_REACHABILITY_and_not_merely_EMPTINESS
+M-11b    OP-6   test_c6_attacker.py          SURVIVED  failed=0   passed=121   COPY 1: LAYER 2's policy-clause scan deleted
+M-12c    OP-6   test_c6_fix_probes.py        KILLED    failed=4   passed=117   COPY 2: the arm/clause identity scan over the SURFACE disarmed
+             killer: test_the_LOOP_copys_own_claim_4_scan_ACTUALLY_FIRES_on_a_leaky_label[a
+             killer: test_the_LOOP_copys_own_claim_4_scan_ACTUALLY_FIRES_on_a_leaky_label[the
+             killer: test_the_sole_layer_helper_REJECTS_a_shape_that_TWO_of_copy_2s_layers_catch
+M-17     OP-8   test_c6_attacker.py          KILLED    failed=3   passed=118   COPY 1: the refusal-line COUNT loosened (N13 / OF-111)
+             killer: test_the_denial_line_COUNT_is_the_SOLE_killer_of_a_summary_with_more_than_one[five
+             killer: test_the_denial_line_COUNT_is_the_SOLE_killer_of_a_summary_with_more_than_one[three
+             killer: test_the_denial_line_COUNT_is_the_SOLE_killer_of_a_summary_with_more_than_one[two
+M-20     OP-9   test_c6_fix_probes.py        KILLED    failed=1   passed=120   _sole_layer's IDENTITY half deleted - it accepts ANY layer
+             killer: test_the_sole_layer_helper_REJECTS_a_shape_that_TWO_of_copy_2s_layers_catch
+M-19c1   OP-9   test_c6_attacker.py          KILLED    failed=1   passed=120   COPY 1: _sole_killer's EXCLUSIVITY half deleted
+             killer: test_the_sole_killer_helper_REJECTS_a_shape_that_two_layers_catch
+M-31     OP-14  test_c6_attacker.py          SURVIVED  failed=0   passed=121   R-18: rglob -> glob (predicted SURVIVOR, NOT-OWNED)
+CONTROL (post) : 121 passed, 0 failed, 0 error-lines
+==============================================================================
+
+################ mut1 ################
+==============================================================================
+C6 REVIEW 5 MUTATION HARNESS - slice 1/4, 10 mutants
+PKG : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c058639d-dc9a-4c0d-afac-7d3b7d659e84\scratchpad\c6r5\tree2\src\whetstone_gate\__init__.py
+ROOT: C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c058639d-dc9a-4c0d-afac-7d3b7d659e84\scratchpad\c6r5\tree2
+TREE: C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c058639d-dc9a-4c0d-afac-7d3b7d659e84\scratchpad\c6r5\tree2
+==============================================================================
+CONTROL (pre)  : 121 passed, 0 failed, 0 error-lines
+M-02     OP-1   context.py                   KILLED    failed=5   passed=116   window taken as a PREFIX, not a suffix
+             killer: test_the_window_keeps_exactly_the_configured_number_of_verbatim_turns
+             killer: test_the_LOOP_copys_denial_line_COUNT_fires_on_a_summary_carrying_MORE_than_one[five
+             killer: test_the_LOOP_copys_denial_line_COUNT_fires_on_a_summary_carrying_MORE_than_one[three
+             killer: test_the_LOOP_copys_denial_line_COUNT_fires_on_a_summary_carrying_MORE_than_one[two
+M-08     OP-4   context.py                   KILLED    failed=1   passed=120   the HARD REFUSAL below the floor becomes a silent trim
+             killer: test_the_cap_is_a_HARD_REFUSAL_below_the_marker_rather_than_silently_unenforced
+M-29     OP-13  estimate.py                  KILLED    failed=3   passed=118   N4 / OF-108 - STRICTLY over the target
+             killer: test_the_crossing_is_STRICTLY_over_the_target_and_is_pinned_at_the_boundary_BOTH_WAYS
+             killer: test_the_crossing_is_pinned_at_the_TURN_BUDGET_END_of_its_range_BOTH_WAYS
+             killer: test_the_crossing_returns_ZERO_when_the_base_alone_already_exceeds_the_target
+M-09     OP-5   test_c6_attacker.py          KILLED    failed=3   passed=118   COPY 1: LAYER 1's exemption widened from the state JSON to the state LINE
+             killer: test_LAYER_1_scans_the_state_LABEL_and_exempts_only_the_state_JSON[the
+M-11c    OP-6   test_c6_attacker.py          KILLED    failed=5   passed=116   COPY 1: LAYER 2b's arm/clause identity scan over the SURFACE disarmed
+             killer: test_the_denial_guard_sees_an_arm_identity_in_a_LABEL_not_only_in_the_value[a
+             killer: test_the_denial_guard_sees_an_arm_identity_in_a_LABEL_not_only_in_the_value[the
+             killer: test_the_sole_killer_helper_REJECTS_a_shape_that_two_layers_catch
+M-12d    OP-6   test_c6_fix_probes.py        SURVIVED  failed=0   passed=121   COPY 2: CLAIM 1's policy-clause scan deleted
+M-16     OP-8   test_c6_fix_probes.py        SURVIVED  failed=0   passed=121   COPY 2: the denial-VALUE equality block deleted
+M-21     OP-9   test_c6_fix_probes.py        KILLED    failed=1   passed=120   _sole_layer made a NO-OP
+             killer: test_the_sole_layer_helper_REJECTS_a_shape_that_TWO_of_copy_2s_layers_catch
+M-20c1   OP-9   test_c6_attacker.py          KILLED    failed=1   passed=120   COPY 1: _sole_killer's IDENTITY half deleted
+             killer: test_the_sole_killer_helper_REJECTS_a_shape_that_two_layers_catch
+M-08b    OP-15  test_c6_attacker.py          SURVIVED  failed=0   passed=121   R-08: the parser's exactly-one assertion loosened (predicted SURVIVOR)
+CONTROL (post) : 121 passed, 0 failed, 0 error-lines
+==============================================================================
+
+################ mut2 ################
+==============================================================================
+C6 REVIEW 5 MUTATION HARNESS - slice 2/4, 9 mutants
+PKG : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c058639d-dc9a-4c0d-afac-7d3b7d659e84\scratchpad\c6r5\tree3\src\whetstone_gate\__init__.py
+ROOT: C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c058639d-dc9a-4c0d-afac-7d3b7d659e84\scratchpad\c6r5\tree3
+TREE: C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c058639d-dc9a-4c0d-afac-7d3b7d659e84\scratchpad\c6r5\tree3
+==============================================================================
+CONTROL (pre)  : 121 passed, 0 failed, 0 error-lines
+M-05     OP-3   context.py                   KILLED    failed=1   passed=120   cap TIGHTENED by one (OF-87's M19)
+             killer: test_the_cap_is_INCLUSIVE_and_pinned_in_BOTH_directions
+M-27     OP-12  estimate.py                  KILLED    failed=6   passed=115   ceil -> floor
+             killer: test_the_windowed_context_stays_BOUNDED_which_is_what_the_window_is_FOR
+             killer: test_the_windowed_context_stops_growing_which_is_what_the_window_is_FOR
+             killer: test_the_cap_is_INCLUSIVE_and_pinned_in_BOTH_directions
+             killer: test_the_crossover_series_reproduces_against_the_REAL_seed_2001_world
+M-24     OP-11  corpus.py                    KILLED    failed=2   passed=119   Q-047's stride collapsed
+             killer: test_the_offered_reach_is_MEASURED_per_episode_and_across_the_whole_seed_set
+             killer: test_the_selection_function_is_hand_recomputable_exactly_as_the_docstring_states
+M-10     OP-5   test_c6_fix_probes.py        KILLED    failed=4   passed=117   COPY 2: R-14 / OF-124 - the same widening
+             killer: test_the_LOOP_copys_LAYER_1_scans_the_state_LABEL_and_exempts_only_the_state_JSON[the
+             killer: test_the_sole_layer_helper_REJECTS_a_shape_that_TWO_of_copy_2s_layers_catch
+M-12     OP-6   test_c6_fix_probes.py        SURVIVED  failed=0   passed=121   COPY 2: the gate vocabulary deleted
+M-13     OP-7   test_c6_attacker.py          KILLED    failed=4   passed=117   COPY 1: LAYER 3, the residue catch-all, deleted (N12 / OF-106)
+             killer: test_LAYER_3_is_the_SOLE_killer_of_authored_text_carrying_no_policy_word[A
+             killer: test_LAYER_3_is_the_SOLE_killer_of_authored_text_carrying_no_policy_word[NOTE:
+             killer: test_LAYER_3_is_the_SOLE_killer_of_authored_text_carrying_no_policy_word[OPERATOR
+             killer: test_LAYER_3_is_the_SOLE_killer_of_authored_text_carrying_no_policy_word[Your
+M-18     OP-8   test_c6_fix_probes.py        KILLED    failed=3   passed=118   COPY 2: R-15 / OF-125 - the refusal-line COUNT loosened
+             killer: test_the_LOOP_copys_denial_line_COUNT_fires_on_a_summary_carrying_MORE_than_one[five
+             killer: test_the_LOOP_copys_denial_line_COUNT_fires_on_a_summary_carrying_MORE_than_one[three
+             killer: test_the_LOOP_copys_denial_line_COUNT_fires_on_a_summary_carrying_MORE_than_one[two
+M-22     OP-9   test_c6_fix_probes.py        KILLED    failed=8   passed=113   _sole_layer INVERTED
+             killer: test_the_LOOP_copys_LAYER_1_scans_the_state_LABEL_and_exempts_only_the_state_JSON[the
+             killer: test_the_LOOP_copys_denial_line_COUNT_ALSO_fires_when_the_summary_carries_NONE
+             killer: test_the_LOOP_copys_denial_line_COUNT_fires_on_a_summary_carrying_MORE_than_one[five
+             killer: test_the_LOOP_copys_denial_line_COUNT_fires_on_a_summary_carrying_MORE_than_one[three
+M-23     OP-10  test_c6_fix_probes.py        KILLED    failed=7   passed=114   THE DOOR-SHUTTING MUTANT: the probe note banned from the WORLD surface too
+             killer: test_the_LOOP_copys_LAYER_1_scans_the_state_LABEL_and_exempts_only_the_state_JSON[the
+             killer: test_the_LOOP_copys_LAYER_1_still_EXEMPTS_a_cap_LEGITIMATELY_inside_the_state_JSON
+             killer: test_the_LOOP_copys_denial_line_COUNT_ALSO_fires_when_the_summary_carries_NONE
+             killer: test_the_four_blindness_claims_hold_over_the_LOOPS_OWN_contexts
+CONTROL (post) : 121 passed, 0 failed, 0 error-lines
+==============================================================================
+
+################ mut3 ################
+==============================================================================
+C6 REVIEW 5 MUTATION HARNESS - slice 3/4, 9 mutants
+PKG : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c058639d-dc9a-4c0d-afac-7d3b7d659e84\scratchpad\c6r5\tree4\src\whetstone_gate\__init__.py
+ROOT: C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c058639d-dc9a-4c0d-afac-7d3b7d659e84\scratchpad\c6r5\tree4
+TREE: C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c058639d-dc9a-4c0d-afac-7d3b7d659e84\scratchpad\c6r5\tree4
+==============================================================================
+CONTROL (pre)  : 121 passed, 0 failed, 0 error-lines
+M-06     OP-3   context.py                   KILLED    failed=1   passed=120   cap LOOSENED by one (OF-87's M3)
+             killer: test_the_cap_is_INCLUSIVE_and_pinned_in_BOTH_directions
+M-26     OP-12  estimate.py                  KILLED    failed=1   passed=120   the divisor hardcoded instead of resolved through the loader (Q-048)
+             killer: test_the_estimator_divisor_is_READ_FROM_CONFIG_and_not_from_source
+M-24b    OP-11  corpus.py                    KILLED    failed=4   passed=117   the EPISODE SEED term dropped - offers stop accumulating across seeds
+             killer: test_coverage_ACCUMULATES_across_the_seed_set_instead_of_being_frozen
+             killer: test_the_offered_reach_is_MEASURED_per_episode_and_across_the_whole_seed_set
+             killer: test_the_same_seed_repeats_exactly_and_different_seeds_differ
+             killer: test_the_selection_function_is_hand_recomputable_exactly_as_the_docstring_states
+M-11     OP-6   test_c6_attacker.py          KILLED    failed=1   passed=120   COPY 1: LAYER 2's gate vocabulary deleted
+             killer: test_the_sole_killer_helper_REJECTS_a_shape_that_two_layers_catch
+M-12b    OP-6   test_c6_fix_probes.py        KILLED    failed=4   passed=117   COPY 2: the config/ money-ceiling scan deleted
+             killer: test_the_LOOP_copys_LAYER_1_scans_the_state_LABEL_and_exempts_only_the_state_JSON[the
+             killer: test_the_sole_layer_helper_REJECTS_a_shape_that_TWO_of_copy_2s_layers_catch
+M-15     OP-8   test_c6_attacker.py          KILLED    failed=4   passed=117   COPY 1: the denial-VALUE equality block deleted (N14 / OF-105)
+             killer: test_the_denial_equality_is_the_SOLE_killer_of_a_value_that_leaks_nothing_else[This
+             killer: test_the_sole_killer_helper_REJECTS_a_shape_that_two_layers_catch
+M-19     OP-9   test_c6_fix_probes.py        KILLED    failed=1   passed=120   SM-B RE-APPLIED: _sole_layer's EXCLUSIVITY half deleted
+             killer: test_the_sole_layer_helper_REJECTS_a_shape_that_TWO_of_copy_2s_layers_catch
+M-19e    OP-9   test_c6_fix_probes.py        SURVIVED  failed=0   passed=121   EQUIVALENCE CANDIDATE: `==` -> `>=` where matched is a subset of findings
+M-30     OP-14  test_c6_attacker.py          KILLED    failed=2   passed=119   the source-text scan's refusal list shortened by one entry
+             killer: test_the_dynamic_reach_refusal_list_is_pinned
+             killer: test_the_dynamic_reach_scan_ACTUALLY_FIRES_on_every_form_the_ast_walk_misses[importlib.import_mo
+CONTROL (post) : 121 passed, 0 failed, 0 error-lines
+==============================================================================
+
+################ mutA ################
+==============================================================================
+C6 REVIEW 5 MUTATION HARNESS - slice 0/2, 4 mutants
+PKG : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c058639d-dc9a-4c0d-afac-7d3b7d659e84\scratchpad\c6r5\tree\src\whetstone_gate\__init__.py
+ROOT: C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c058639d-dc9a-4c0d-afac-7d3b7d659e84\scratchpad\c6r5\tree
+TREE: C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c058639d-dc9a-4c0d-afac-7d3b7d659e84\scratchpad\c6r5\tree
+==============================================================================
+CONTROL (pre)  : 121 passed, 0 failed, 0 error-lines
+M-35     OP-7   context.py                   KILLED    failed=20  passed=101   A REAL LEAK: an unexplained AUTHORED line appended to the summary
+             killer: test_LAYER_1_scans_the_state_LABEL_and_exempts_only_the_state_JSON[the
+             killer: test_LAYER_1_still_EXEMPTS_a_cap_value_that_is_legitimately_inside_the_state_JSON
+             killer: test_the_attackers_context_contains_no_gate_denial_reason
+             killer: test_the_denial_equality_is_the_SOLE_killer_of_a_value_that_leaks_nothing_else[This
+M-37     OP-5   context.py                   KILLED    failed=22  passed=99    A REAL LEAK: the E1 cap planted in STATE_LABEL, the shape INC-42's M17 used
+             killer: test_LAYER_1_still_EXEMPTS_a_cap_value_that_is_legitimately_inside_the_state_JSON
+             killer: test_LAYER_3_is_the_SOLE_killer_of_authored_text_carrying_no_policy_word[A
+             killer: test_LAYER_3_is_the_SOLE_killer_of_authored_text_carrying_no_policy_word[NOTE:
+             killer: test_LAYER_3_is_the_SOLE_killer_of_authored_text_carrying_no_policy_word[OPERATOR
+M-39     OP-10  test_c6_fix_probes.py        SURVIVED  failed=0   passed=121   COPY 2: the probe-note-on-AUTHORED check disarmed
+M-41     OP-16  loop.py                      KILLED    failed=3   passed=118   Q-046's EXACT-EQUALITY fold widened to containment - world text can now be folded
+             killer: test_the_LOOP_copys_denial_line_COUNT_fires_on_a_summary_carrying_MORE_than_one[five
+             killer: test_the_LOOP_copys_denial_line_COUNT_fires_on_a_summary_carrying_MORE_than_one[three
+             killer: test_the_LOOP_copys_denial_line_COUNT_fires_on_a_summary_carrying_MORE_than_one[two
+CONTROL (post) : 121 passed, 0 failed, 0 error-lines
+==============================================================================
+
+################ mutB ################
+==============================================================================
+C6 REVIEW 5 MUTATION HARNESS - slice 1/2, 3 mutants
+PKG : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c058639d-dc9a-4c0d-afac-7d3b7d659e84\scratchpad\c6r5\tree2\src\whetstone_gate\__init__.py
+ROOT: C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c058639d-dc9a-4c0d-afac-7d3b7d659e84\scratchpad\c6r5\tree2
+TREE: C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c058639d-dc9a-4c0d-afac-7d3b7d659e84\scratchpad\c6r5\tree2
+==============================================================================
+CONTROL (pre)  : 121 passed, 0 failed, 0 error-lines
+M-36     OP-7   context.py                   KILLED    failed=2   passed=119   A REAL LEAK on the STATE LINE (OF-128's class) - predicted to ESCAPE
+             killer: test_the_cap_is_INCLUSIVE_and_pinned_in_BOTH_directions
+             killer: test_the_crossover_series_reproduces_against_the_REAL_seed_2001_world
+M-38     OP-8   context.py                   KILLED    failed=27  passed=94    A REAL LEAK: arm identity in LAST_REFUSAL_LABEL (OF-104's first exhibit)
+             killer: test_LAYER_1_scans_the_state_LABEL_and_exempts_only_the_state_JSON[the
+             killer: test_LAYER_1_still_EXEMPTS_a_cap_value_that_is_legitimately_inside_the_state_JSON
+             killer: test_LAYER_3_is_the_SOLE_killer_of_authored_text_carrying_no_policy_word[A
+             killer: test_LAYER_3_is_the_SOLE_killer_of_authored_text_carrying_no_policy_word[NOTE:
+M-40     OP-2   context.py                   KILLED    failed=31  passed=90    the summary stops being a pure function of (state, refusal, cap)
+             killer: test_LAYER_1_scans_the_state_LABEL_and_exempts_only_the_state_JSON[the
+             killer: test_LAYER_1_still_EXEMPTS_a_cap_value_that_is_legitimately_inside_the_state_JSON
+             killer: test_LAYER_3_is_the_SOLE_killer_of_authored_text_carrying_no_policy_word[A
+             killer: test_LAYER_3_is_the_SOLE_killer_of_authored_text_carrying_no_policy_word[NOTE:
+CONTROL (post) : 121 passed, 0 failed, 0 error-lines
+==============================================================================
+
+################ pairA ################
+==============================================================================
+C6 REVIEW 5 - COMBINED-MUTATION EXPERIMENTS, slice 0/2
+PKG : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c058639d-dc9a-4c0d-afac-7d3b7d659e84\scratchpad\c6r5\tree\src\whetstone_gate\__init__.py
+ROOT: C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c058639d-dc9a-4c0d-afac-7d3b7d659e84\scratchpad\c6r5\tree
+TREE: C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c058639d-dc9a-4c0d-afac-7d3b7d659e84\scratchpad\c6r5\tree
+==============================================================================
+CONTROL (pre)  : 121 passed, 0 failed
+E1    RED      failed=19  passed=102   M-12 (copy 2's vocabulary deleted) PLUS a REAL gate-reason leak in the refusal label
+        red on: test_LAYER_1_scans_the_state_LABEL_and_exempts_only_the_state_JSON[the
+        red on: test_LAYER_1_still_EXEMPTS_a_cap_value_that_is_legitimately_inside_the_state_JSON
+        red on: test_LAYER_3_is_the_SOLE_killer_of_authored_text_carrying_no_policy_word[A
+        red on: test_LAYER_3_is_the_SOLE_killer_of_authored_text_carrying_no_policy_word[NOTE:
+        red on: test_LAYER_3_is_the_SOLE_killer_of_authored_text_carrying_no_policy_word[OPERATOR
+        red on: test_LAYER_3_is_the_SOLE_killer_of_authored_text_carrying_no_policy_word[Your
+E2    RED      failed=2   passed=119   M-16 (copy 2's denial equality deleted) PLUS a REAL drift in texts.generic_denial()
+        red on: test_the_generic_denial_file_is_character_identical_to_CONTEXT_MD
+        red on: test_the_summary_folds_ONLY_the_generic_denial_and_never_a_tool_result
+CONTROL (post) : 121 passed, 0 failed
+==============================================================================
+
+################ pairB ################
+==============================================================================
+C6 REVIEW 5 - COMBINED-MUTATION EXPERIMENTS, slice 1/2
+PKG : C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c058639d-dc9a-4c0d-afac-7d3b7d659e84\scratchpad\c6r5\tree2\src\whetstone_gate\__init__.py
+ROOT: C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c058639d-dc9a-4c0d-afac-7d3b7d659e84\scratchpad\c6r5\tree2
+TREE: C:\Users\chinm\AppData\Local\Temp\claude\c--Users-chinm-whetstone-gate\c058639d-dc9a-4c0d-afac-7d3b7d659e84\scratchpad\c6r5\tree2
+==============================================================================
+CONTROL (pre)  : 121 passed, 0 failed
+E1c   RED      failed=29  passed=92    CONTROL for E1: the REAL leak alone, copy 2's vocabulary INTACT
+        red on: test_LAYER_1_scans_the_state_LABEL_and_exempts_only_the_state_JSON[the
+        red on: test_LAYER_1_still_EXEMPTS_a_cap_value_that_is_legitimately_inside_the_state_JSON
+        red on: test_LAYER_3_is_the_SOLE_killer_of_authored_text_carrying_no_policy_word[A
+        red on: test_LAYER_3_is_the_SOLE_killer_of_authored_text_carrying_no_policy_word[NOTE:
+        red on: test_LAYER_3_is_the_SOLE_killer_of_authored_text_carrying_no_policy_word[OPERATOR
+        red on: test_LAYER_3_is_the_SOLE_killer_of_authored_text_carrying_no_policy_word[Your
+E2c   RED      failed=2   passed=119   CONTROL for E2: the REAL drift alone, copy 2's equality INTACT
+        red on: test_the_generic_denial_file_is_character_identical_to_CONTEXT_MD
+        red on: test_the_summary_folds_ONLY_the_generic_denial_and_never_a_tool_result
+CONTROL (post) : 121 passed, 0 failed
+==============================================================================
+
