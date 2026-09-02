@@ -1858,3 +1858,33 @@ remedy is still the architect's.
   fixture that derives its base from `config/` and pins **both** directions.
 * **`OF-132`** — ✅ **CLOSED `7cbe908`.** The comment now names the substitution and why it is the
   discriminator, instead of calling it *"verbatim"*.
+
+---
+
+## ⚠️ Appended by ARCH FIX (`3e5b7c10`), 2026-09-02 — `OF-155`, and `B-1` recorded as CLOSED rather than listed
+
+**ONE ROW, `OF-155`. The id is counted from THIS FILE, re-read immediately before the append** — the
+highest entry at that moment was **`OF-154`** (C6 REVIEW 5, `0ca97bbb`, landed in `615993d`). ⚠️ **A
+CONCURRENT C6 REVIEW 5 SESSION (`0ca97bbb`) SHARES THIS WORKING TREE** and holds untracked files
+under `docs/reviews/`; `git diff -- QUESTIONS.md INCIDENTS.md docs/reviews/OPEN_FINDINGS.md
+STATUS.md PROGRESS.md` was run and read immediately before staging (`Q-063` clause (i)) and carried
+nothing of theirs, and the staged snapshot was re-read in clause (ii)'s direction before the commit.
+
+⚠️ **`B-1` IS CLOSED AND DOES NOT GET A ROW HERE**, on this file's own header rule — *"a review may
+not PASS with an open BLOCKER … a BLOCKER therefore never appears here as 'open'."* **C7 REVIEW 1**
+raised it and deliberately left it out of this table for that reason; it is closed at **`8558639`**
+under the ruling recorded verbatim in `QUESTIONS.md` at `fd26497`, and `INCIDENTS.md` **INC-67**
+carries the error. **This row is the residue B-1 leaves behind**, which is a different and wider
+thing than B-1 itself.
+
+| ID | Chunk | Severity | Finding | Spec citation | Raised by | Status | Closed by (SHA) |
+|---|---|---|---|---|---|---|---|
+| **OF-155** | *(process)* | **MEDIUM** | ⚠️ **NOTHING CROSS-CHECKS ONE GOLDEN AGAINST ANOTHER, AND TWO GOLDENS SHARING THREE BYTE-IDENTICAL ROWS CONTRADICTED EACH OTHER FOR THREE DAYS.** `golden5b_ledger_writer.json`'s three rows and `golden3_harm_vector.json`'s first three rows are **identical in all thirteen shared fields** — `ledger_seq`, `tool`, `target`, `amount_paise`, `a_class`, `rejected_by_razorpay` and all four harm components, re-measured at `8558639`. Golden 3 records seq 3 as **executed** (its `canary_a_note` in terms, and both `productive_actions: 3` and `canary_a_breach: 1` require it); golden 5B carried `executed: false` on the same row from `8003c02` until `8558639`. ⚠️ **The repository has NO consistency check over `tests/goldens/` of any kind** — not a schema, not an overlap test, not a rule that a row appearing in two fixtures must agree — while `config/` gets `make check-prereg` and the token table gets `make check-roles` **E1**. ⚠️ **The overlap was not even RECORDED:** golden 5B's `source_rows` names golden 5 case A and **never mentions golden 3**, so a reader had no pointer telling them a third fixture spoke to the same three rows. **REMEDY, and it is the ARCHITECT'S to place with a chunk that owns it:** a test that walks the golden-3 / golden-5 / golden-5B overlap and fails on any disagreement, **including on a field only one fixture carries where the other fixture's own text determines it** — which is exactly the shape that was wrong here. ⚠️ **IT IS NOT WRITTEN BY THIS SESSION AND THE REASON IS A RULE, NOT A PREFERENCE:** `tests/goldens/` is read-only to every session and a session may not add the test that judges the fixture it has just corrected — that is the circularity `tests/goldens/README.md` exists to prevent, one level up. **Until it exists this class recurs**, and `INC-67`'s `Systemic guardrail` says *"none"* for this reason rather than for want of a design. | `CLAUDE.md` hard rules 3 and 4; `PROCESS.md` §5.2; `INCIDENTS.md` INC-67; `docs/reviews/REVIEW_7_1.md` §5 | **ARCH FIX (`3e5b7c10`)**, from `C7 REVIEW 1 (472cdc4b)`'s `B-1` | ⚠️ **OPEN — MEDIUM, no owner** | — |
+
+⚠️ **AND ONE THING THIS ROW DOES NOT CLAIM.** The narrower half of the remedy **is** closed at
+`8558639`: golden 5B now carries a `correction` block, a `derived_not_asserted` key recording the
+32-way and 1024-way searches that re-derived `executed`, and a `no_tool_layer_row_here` key stating
+that `Q-062`'s third refusal source is **not** exhibited by that fixture. So the **next** reader of
+golden 5B inherits a derivation instead of a story. **What is open is the mechanism, not the
+record** — and a record that depends on the next reader being adversarial is what `OF-67` calls *a
+habit rather than a guardrail*.

@@ -5068,3 +5068,109 @@ letter *r*, and this. **Four of the five were caught by re-reading a number rath
 gate.** `INC-60` closed with *"a number is not a measurement"*; this one adds the companion:
 ⚠️ **a trailer is not a trailer because it looks like one — `git interpret-trailers` decides, and
 the only honest way to know is to ask it.**
+
+---
+
+## INC-67 — a GOLDEN — the answer key itself — carried a value INFERRED by the exact rule its own project forbids in capitals, and the disproof was sitting in a second golden the same hand had authored three days earlier
+
+**Date:** 2026-09-02 (**the wrong value is the ARCHITECT'S**, landed in `8003c02` under token
+`6f3a91d2`. Found by **C7 REVIEW 1** (`472cdc4b`) as **BLOCKER `B-1`**, `docs/reviews/REVIEW_7_1.md`
+§5 — the first session ever permitted to write a test against the file. Corrected by **ARCH FIX**
+(`3e5b7c10`). Fix SHA under **Fix**.)
+
+**Event:** `tests/goldens/golden5b_ledger_writer.json` is `PROCESS.md` §5.2's **WRITER** oracle
+under the fifteen-field ledger schema — a hand-derived answer key, read-only to every build, fix and
+review session. Its **seq 3** carried `executed: false`, and therefore the digest
+`6ae5bd20f67283c0ad70811be2a17cba1a87460f13f78046c4b6f2af946ff76f`. The file's own
+`derivation.executed_assignment` stated the rule it had used: seq 3's `executed` was **inferred**
+from *"a_class NULL, verdict ALLOWED, rejected_by_razorpay false, and ALL FOUR harm components
+ZERO"*, concluding *"a NULL a_class means the action never reached the harm layer at all."* The file
+also asserted, twice — in its own `why_this_file_is_worth_its_bytes` and again in
+`tests/goldens/README.md` — that golden 5's case A *"already contained one of each of the three
+outcomes"*, an action performed, one Razorpay refused and one the **tool layer** refused.
+
+**The contradiction, measured rather than argued.** Golden 5 case A's three rows are
+`golden3_harm_vector.json`'s **first three rows, field by field** — `ledger_seq`, `tool`, `target`,
+`amount_paise`, `a_class`, `rejected_by_razorpay` and all four harm components, all three rows
+identical. And golden 3 records that same seq 3 as **EXECUTED, twice over**: its `canary_a_note`
+reads *"seq 3: **executed** on the probe, 6,000,000 > the 5,000,000 per-action cap, permitted by
+clause P7"*, and §10.1's CANARY-A counts **executed** refunds only, so `canary_a_breach: 1` requires
+it; independently, §8.6a's term 2 is *"that the world executed"*, so `productive_actions: 3` requires
+it. **Applied to golden 3's own five rows, the withdrawn rule yields `productive_actions` 1 against
+the pinned 3, and `canary_a_breach` 0 against the pinned 1.**
+
+**Action:** the ruling was recorded **verbatim** in `QUESTIONS.md` (`fd26497`) **before the file was
+opened**. A standalone script in a fresh OS temp directory, importing nothing from `whetstone_gate`,
+then ran the architect's own control **first** — golden 5 case A's three thirteen-field digests
+reproduced exactly, with case A's stored `prev_hash` linkage confirmed intact — and only then
+recomputed the fifteen-field chain. ⚠️ **`executed` was re-derived as a SEARCH and not as a
+confirmation:** all **32** assignments over golden 3's five rows scored against both pinned counts,
+then all **1024** assignments of `executed` **and** the gate verdict together, so the reading does
+not rest on assuming golden 3's rows were all ALLOWED. Seqs 1, 3 and 4 are **forced executed** and
+seq 2 **forced not-executed** in **every** satisfying assignment of both searches. Seq 3's value and
+digest moved — `false` → `true`, `6ae5bd20…` → `5433c3f4…` — and **seqs 1 and 2 did not move at
+all**; all three match the architect's re-derived values exactly. The narrative claim is **retracted
+in both files rather than reworded**, `executed_assignment.rule` now reads from the world's execution
+fact as golden 3 records it and states in terms that a null `a_class` does **not** imply a refusal,
+and a `correction` block names C7 REVIEW 1, `B-1` and the withdrawn rule. **The four other goldens
+are untouched** — `git diff` EMPTY on all four. **`docs/reviews/independent/` still pins the
+superseded digest and is NOT edited**: it is the correct record of what the file said when the review
+read it.
+
+**Expectation:** hard rule 3 — *"Hand-compute the expected outputs before writing the code. A test
+whose expected value was produced by the code it tests proves nothing."* The protection a golden buys
+is that its values come from **outside** the implementation. ⚠️ **This value came from outside the
+implementation and was still wrong**, because it was derived by a *rule* rather than read from a
+*fact* — and the rule was the one `Q-062` exists to forbid. Hard rule 4's converse also bites: a
+frozen artefact outranks `CONTEXT.md`, so an answer key that is wrong is worse than code that is
+wrong, and every consumer downstream inherits it silently.
+
+**Missing:** ⚠️ **nothing in this repository cross-checks one golden against another, and the two
+that contradicted each other share three byte-identical rows.** `make check-prereg` hashes `config/`;
+`make check-roles` audits tokens; the goldens have **no** consistency check of any kind — not a
+schema, not an overlap test, not a rule that a row appearing in two fixtures must agree. The overlap
+was not even *recorded*: golden 5B's `source_rows` names golden 5 case A and **never mentions golden
+3**, so a reader had no pointer telling them a third fixture spoke to the same three rows. The
+`derivation` block, which exists precisely so a value can be audited, was the thing that made the
+error auditable — and it took a full adversarial review to read it.
+
+**Missed:** ⚠️ **the disproof was inside a fixture the architect had already authored, and the
+prohibition was inside a prompt the architect had already written.** `golden3_harm_vector.json`'s
+seq 3 **and** seq 4 both carry a null `a_class` with `rejected_by_razorpay` false, and golden 3
+counts **both** executed and **both** productive — so golden 3 falsifies the inference **twice, on
+its own rows**, and the architect wrote those rows. And the C7 build prompt, written by the same
+hand, forbade this exact inference **in capitals**: *"`executed` MUST BE READ FROM `ToolResult.ok`,
+NEVER INFERRED from verdict and `rejected_by_razorpay`"* — the rule C7's own `build.executed_of`
+implements mechanically and which mutant **M20** confirms is enforced in code. ⚠️ **The rule was
+stated, implemented, mutation-tested and enforced in the codebase, and then broken by hand in the
+answer key that outranks it** — while the golden's own `derivation` block wrote the forbidden
+inference out in full, in plain sight, and two prior reads of the file went past it.
+
+**Diagnosis:** the fifteen-field schema exists because a tool-layer refusal is invisible in the
+thirteen, and the architect filled the new column by reasoning **from those same thirteen fields** —
+which is definitionally the one thing they cannot answer. A satisfying narrative (*"one of each of
+the three outcomes"*) then stood in for a derivation and made the wrong value look like a finding.
+
+**Fix:** **`8558639`** — `tests/goldens/golden5b_ledger_writer.json` and `tests/goldens/README.md`,
+under the ruling recorded verbatim at `fd26497`. Read from `git rev-parse` after the commit existed,
+not drafted ahead of it. The corrected golden is
+sha256 `68374f59eabe6432af763e60942bdab0bfbdf2171044623e98f24a1c7da38a6c`, **14,750 bytes**,
+**0 CR bytes**, `git hash-object` == `--no-filters`.
+
+**Systemic guardrail:** ⚠️ **NONE LANDED, AND THE ANSWER TO THE QUESTION THIS FIELD ASKS IS PLAINLY
+NO: nothing in this repository cross-checks one golden against another, before this incident or
+after it.** The check that would have caught it is small and is named here so it is owed rather than
+gestured at — **golden 5B's three rows and golden 3's first three rows are identical in thirteen
+fields, so a test that walks the overlap and fails on any disagreement, including on a field only one
+fixture carries where the other fixture's own text determines it, would have failed the day
+`8003c02` landed.** ⚠️ **It is NOT written here, and the reason is a rule and not a preference:**
+`tests/goldens/` is read-only to every session and this one may not add a test that consumes the
+fixture it just corrected — that is the circularity `tests/goldens/README.md` exists to prevent, one
+level up. **It is the architect's to place with a chunk that owns it, and until it exists this class
+recurs.** The narrower half **is** closed: the golden now carries a `correction` block, a
+`no_tool_layer_row_here` key and a `derived_not_asserted` key recording the 32-way and 1024-way
+searches, so the **next** reader of this fixture inherits the derivation rather than the story. ⚠️
+**And the honest tally: this is the SECOND time in three days that a claim about Q-062's three
+sources was published without being driven** — `INC-35` records a *term by term* test that could not
+discriminate two of its three terms — **and both were found by an adversarial reader rather than by
+any check.**

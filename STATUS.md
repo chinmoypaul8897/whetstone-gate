@@ -1,3 +1,54 @@
+*⚠️ **UPDATE, ARCH FIX (`3e5b7c10`), 2026-09-02 — GOLDEN 5B IS RE-CUT. C7 REVIEW 1's BLOCKER `B-1`
+IS UPHELD AND CLOSED. NO TAG — THIS IS NOT A REVIEW SESSION. ZERO PROVIDER MODEL CALLS.**
+⚠️ **THIS BLOCK SUPERSEDES THE `6f3a91d2` BLOCK BELOW IT ON TWO FIGURES AND ONE CLAIM, AND THAT
+BLOCK IS NOT REWRITTEN** — it is that session's record of what it landed and was true when written.
+**(1) `tests/goldens/golden5b_ledger_writer.json`** (`8558639`) — sha256
+`68374f59eabe6432af763e60942bdab0bfbdf2171044623e98f24a1c7da38a6c`, **14,750 bytes**, **0 CR bytes**,
+`git hash-object` == `--no-filters`. **Seq 3's `executed` was FALSE and is TRUE**, so seq 3's digest
+moves `6ae5bd20…` → `5433c3f4…`. ⚠️ **SEQS 1 AND 2 ARE UNCHANGED, VALUE AND DIGEST ALIKE** —
+`186a2118…` and `26019af3…` still stand, because the chain only moves downstream of the edited row.
+**(2) THE CLAIM THAT BLOCK BELOW REPEATS IS RETRACTED, NOT SOFTENED.** *"Golden 5's case A already
+contained ONE OF EACH of `Q-062`'s three outcomes"* is **FALSE**. Case A's three rows are golden 3's
+first three rows **field by field** — re-measured, all thirteen shared fields, all three rows — and
+golden 3 records seq 3 as **EXECUTED** twice over: its `canary_a_note` says so in terms, and
+`canary_a_breach: 1` (§10.1 counts executed refunds only) and `productive_actions: 3` (§8.6a's term
+2 is *"that the world executed"*) each require it independently. **Case A holds an EXECUTED row, a
+RAZORPAY-REFUSED row and a SECOND EXECUTED row, and NO tool-layer-refused row at all.**
+⚠️ **THE METHOD WAS WORSE THAN THE VALUE:** `executed` had been **inferred** from a NULL `a_class`,
+which is the inference **`Q-062` forbids in terms** and the C7 build prompt forbade **in capitals**.
+**The disproof was inside a fixture the architect authored** — golden 3's seq 3 **and** seq 4 both
+carry a null `a_class` with `rejected_by_razorpay` false and golden 3 counts **both** executed and
+**both** productive; the withdrawn rule run on golden 3's five rows yields `productive_actions` **1**
+against the pinned **3** and `canary_a_breach` **0** against the pinned **1**.
+⚠️ **THE CONTROL RAN FIRST, AGAIN, AND `executed` WAS DERIVED AS A SEARCH RATHER THAN READ OFF THE
+RULING.** A standalone script in a fresh OS temp directory, importing nothing from `whetstone_gate`,
+reproduced golden 5 case A's own three thirteen-field digests (`3f62d0a6…`, `63579792…`,
+`72072b8e…`) and confirmed its stored `prev_hash` linkage **before** one new value was computed;
+then **all 32** assignments of `executed` over golden 3's five rows, and **all 1024** assignments of
+`executed` **and** the gate verdict together, were enumerated against both pinned counts. **Seqs 1, 3
+and 4 are FORCED executed in EVERY satisfying assignment of both searches.** All three corrected
+digests **MATCH the architect exactly**; a disagreement would have been a STOP with both canonical
+JSON strings printed byte for byte. ⚠️ **REPORTED RATHER THAN SMOOTHED: seq 5's `executed` is NOT
+determined by the two pinned counts** — it is Razorpay-rejected and outside CANARY-A — and is settled
+by a third fact named in the golden. It changes nothing: every satisfying vector agrees on seqs 1, 2
+and 3, which are golden 5B's whole scope.
+**(3) `tests/goldens/README.md`** — the same false claim and the now-stale SHA/byte figures corrected,
+with the superseded values **named** rather than overwritten silently.
+**(4) `INCIDENTS.md` INC-67** — the error, with `Missed:` filled in: the disproof was in golden 3 and
+the prohibition was in the architect's own C7 build prompt, in capitals, and C7 enforces it in code
+where mutant **M20** kills the violation. **`Systemic guardrail:` says NONE, plainly** — nothing
+cross-checks one golden against another, before or after — and the check that would have caught it is
+named and owed as **`OF-155`**, MEDIUM. It is not written by this session because
+`tests/goldens/` is read-only and a session may not add the test that judges the fixture it has just
+corrected.
+⚠️ **NOT TOUCHED, PROVED RATHER THAN ASSERTED:** `git diff` **EMPTY on all four** other goldens
+(`golden3_harm_vector`, `golden5_tamper`, `golden1_money`, `world_seed_2001`), and
+`git status --porcelain tests/goldens/` clean after the commit. **`Q-070` is untouched and still
+OPEN.** **NO TEST CONSUMES GOLDEN 5B AND NONE WAS ADDED.**
+⚠️ **`docs/reviews/independent/c7_review1_goldens.py` and its committed output still pin the
+superseded digest `6ae5bd20…` and are NOT edited** — that directory is append-only, and it is the
+correct record of what the file said when C7 REVIEW 1 read it.*
+
 *⚠️ **UPDATE, ARCH FIX (`6f3a91d2`), 2026-09-02 — GOLDEN 5B IS LANDED AND `OF-139`'s GUARD IS
 BUILT AND FIRED BOTH WAYS. NO TAG — THIS IS NOT A REVIEW SESSION. ZERO PROVIDER MODEL CALLS.**
 **(1) `tests/goldens/golden5b_ledger_writer.json`** (`8003c02`) — sha256

@@ -1,4 +1,4 @@
-PUSHED SHA: <PENDING>
+PUSHED SHA: 805bc54  (805bc54ab39fa65bb0f044c023e7270fab391f91)
             The commit that carries this file. Its own SHA cannot be inside itself, so it
             is filled by the commit that FOLLOWS it, which is this project's convention.
             The commit before it, already pushed, is 016c41a.
