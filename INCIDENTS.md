@@ -4635,9 +4635,9 @@ measurements disagreed and the convenient one was never re-examined.
 expand `$'…'`, so a broken line-ending check returns a large plausible number instead of an error —
 and because the *conclusion* it supported was true, nothing downstream ever contradicted it.
 
-**Fix:** ⚠️ **NO SHA IS INVENTED HERE.** The commit that lands this entry is what binds the
-correction, and **its real SHA is written into this line by the commit immediately following it**
-(`git log -p -- INCIDENTS.md`). What the fix consists of: the byte-level re-measurement above, the
+**Fix:** **`0742360`** — and this line was written by the commit that follows it, exactly as the
+placeholder it replaces promised, which is the third time in this session a `Fix:` field was filled
+from `git log` rather than from memory. What the fix consists of: the byte-level re-measurement, the
 correction in `docs/sessions/nightrun-b-1.txt` §7 and in `QUESTIONS.md`, and the three superseded
 sentences quoted rather than erased. **No code changed, because nothing in the repository was
 wrong** — only this session's account of why it was right.
