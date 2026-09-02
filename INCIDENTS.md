@@ -5048,8 +5048,10 @@ the next one.*
 it to prose, and nothing in the commit's appearance changes — the message still *reads* as though it
 ends in two trailers, so the defect is invisible without running git's own parser.
 
-**Fix:** ⚠️ **NO SHA IS INVENTED HERE.** The commit landing this entry is what binds it, and **its
-real SHA is written into this line by the commit immediately following it** — the convention this
+**Fix:** **`b5c4562`** — filled by the commit that follows it, read from `git rev-parse`.
+That is the **fourth** `Fix:` field this session filled from git rather than from memory, and the
+placeholder it replaces is the form this session adopted after fabricating two such fields
+earlier today (`INC-60`) — the convention this
 session adopted after fabricating two such fields earlier today (`INC-60`). **That commit is also
 the demonstration:** its own trailer block holds `Session-Token` and `Co-Authored-By` as **adjacent
 lines**, and `git interpret-trailers --parse` returns both.
