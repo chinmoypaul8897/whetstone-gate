@@ -1,5 +1,7 @@
 PUSHED SHA (content commits, origin/main before this file landed): f74c59b
-PUSHED SHA (this file): <filled by the commit that follows this one>
+PUSHED SHA (this file): 599336c - filled by the commit that FOLLOWS it, because a file cannot name
+                        the commit that lands it. The final origin/main SHA after that commit is
+                        the first line of the printed report, and it is one commit later than this.
 
 ARCH FIX - GOLDENS 4, 8, 9 AND GOLDEN 2's F9
 SESSION-TOKEN: e1956729 . ROLE: FIX . CHUNK: ARCH . 2026-09-03
