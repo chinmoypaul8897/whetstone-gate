@@ -3,7 +3,10 @@ C8 - THE SCORER.  FIX session 1, after REVIEW 1's FAIL.   SESSION-TOKEN: 9e4a71c
 NO TAG.  `c8-pass` DOES NOT EXIST AFTER THIS SESSION.  DO NOT SELF-CERTIFY.
 ================================================================================
 
-PUSHED SHA: <filled by the commit that follows this file; see the closing note>
+PUSHED SHA: 64ccb4a   (the commit that landed THIS FILE; filled by the commit that
+                       follows it, because a commit cannot name its own SHA.  The
+                       SHA printed to the architect is origin/main after the final
+                       push, which is one commit later - see the closing note.)
 
 TOKEN SPEND: ZERO.  No provider call of any kind.  No lane touched.  No `.env`
 read.  `evals/` is ABSENT and was not created.
