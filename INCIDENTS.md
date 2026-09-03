@@ -10525,3 +10525,99 @@ and `--dry-run` still never builds the pacer, so **nothing here reduces what `Q-
 architect to rule.** The number is reported because `PROCESS.md` §9 requires the generating
 measurement beside the claim, and because *"it did not fire in 24"* and *"it did not fire in 139"*
 are different statements and only the second was cheap to leave unmade.
+
+---
+
+## INC-139 — this session's own one-commit-old guardrail was applied to the BASE TREE as well as to the content, and silently reverted another session's entire FINAL OUTPUT; the `--stat` printed 764 deletions under a message that said "Swept: NOTHING, by construction"
+
+**Date:** 2026-09-04 (ARCH NIGHT 1, `5d7e2b91`). Fix SHA under **Fix**.
+
+⚠️ **ID COLLISION RISK, AGAIN:** `INCIDENTS.md` already carries **two** `## INC-137` headings — this
+session's and the concurrent session's. `INC-138` and `INC-139` may collide the same way. The
+renumbering is the architect's and nothing here depends on the number.
+
+**Event:** commit **`fd67082`** was built with `PROCESS.md` §7b's private-index recipe, with step 2
+written as
+
+    git read-tree d982632033f82694cabd0e547476eccb0642e739     # ⚠️ A PINNED SHA
+
+instead of `git read-tree HEAD`. The SHA was read two tool calls earlier. **In that interval the
+concurrent session of `INC-136` committed `68f970f`**, which added
+`docs/sessions/arch-night-1.txt` — **763 lines, its FINAL OUTPUT, committed verbatim before printing
+exactly as `CLAUDE.md` §6 requires** — and corrected one citation in `QUESTIONS.md`. Seeding the
+index from the stale SHA made both changes absent from the tree `fd67082` committed, so that commit
+**reverted them**:
+
+    docs/sessions/arch-night-1.txt  | 763 ------------------------------------
+    QUESTIONS.md                    |   2 +-
+
+⚠️ **THE SNAPSHOT PRINTED IT AND THE COMMIT WENT AHEAD.** §7b's step 3 exists precisely to put that
+`--stat` in front of the committer — *"the only true statement of what is about to be committed"* —
+and it read **`4 files changed, 190 insertions(+), 764 deletions(-)`** under a message whose own
+`Swept:` line said **"NOTHING, by construction"**. **The snapshot was right and the message was
+wrong**, and the two were on the screen together.
+
+**Action:** restored at **`fa73b76`**, in the same session, before anything else was written. Both
+paths were set to `68f970f`'s own blobs —
+`c834f18896cf870cb77d9cb9df585a4270fabd42` and `ee209eb1cb08641eaca8dd9013505b5aa675ea28` — on a tree
+read from **live `HEAD`**. Verified byte-exact two ways: the blob ids at `HEAD` now equal
+`68f970f`'s, and `git diff 68f970f HEAD -- <the two paths>` is **empty**. ⚠️ **The concurrent
+session's NEWER working-tree version of that file was deliberately NOT committed** — it had edited it
+further (worktree blob `39c947d1…`, staged `A` in the shared index) and committing that would have
+been `INC-137`'s sweep in the opposite direction. **Exactly the deleted bytes were restored and
+nothing else.** Afterwards §7b's step 4 was run for **this session's two paths only**, which cleared
+`INCIDENTS.md` and `tests/test_c12_driver.py` from the shared index where they were staged **for
+deletion** — `INC-91`'s shape — while leaving every path the other session had staged untouched.
+
+**Expectation:** a recipe followed with a deliberate, documented improvement should not be able to
+revert a commit it never names. ⚠️ **It can, and the reason is that the recipe's two steps freeze two
+different things and only one of them may be frozen.** `update-index --cacheinfo` pins **content**,
+which is safe and is `INC-137`'s point. `read-tree` chooses the **parent tree**, and pinning that
+does not protect anything — it silently discards every commit that lands in between.
+
+**Missing:** ⚠️ **any refusal on a `--stat` that deletes a path the committer did not name.** The
+recipe requires the committer to *look* at the snapshot; nothing compares it to the pre-declared path
+list. **This session pre-declared two paths and the snapshot listed four**, which is a mechanical
+mismatch a shell `&&` chain could have refused for free. ⚠️ **And `git commit` has the exact guard
+built in and unused:** with the parent named explicitly, a stale base is a conflict rather than a
+silent revert — but the recipe uses `git commit` on an index, which has no such check.
+
+**Missed:** ⚠️ **`OF-215` is the name of this failure, this session had written it into
+`INCIDENTS.md` twenty minutes earlier as `INC-137`, and the miss is the mirror image of it.**
+`INC-137` is *"the snapshot listed MORE than you staged, so you swept somebody's draft."* This is
+*"the snapshot listed a DELETION you never staged, so you reverted somebody's commit."* **The same
+line of output, read for one failure mode and not the other.** ⚠️ **And the deeper miss is that the
+guardrail was one commit old and untested against a moving `HEAD`:** `INC-137` proposed pinning
+content *"at READ time, before composing anything"*, and this session generalised *read time* from
+the blobs to the base tree without asking what the base tree is for. **A guardrail invented in one
+incident and applied unexamined in the next is how the next incident happens.**
+
+**Diagnosis:** `git read-tree <fixed-sha>` makes the commit's parent tree a snapshot of the past
+while its parent *pointer* is live `HEAD`, so every change committed between the snapshot and the
+commit is expressed as a deletion — and nothing in the recipe compares the resulting `--stat` against
+the paths the committer declared.
+
+**Fix:** **`fa73b76`** restores both paths byte-for-byte. **`fd67082` IS NOT AMENDED** — history is
+not rewritten here — so the log carries the revert and its undo as two commits, which is the correct
+and readable record. ⚠️ **AND THE CORRECTED RECIPE IS STATED, because the improvement itself is
+sound and should not be abandoned along with the mistake:**
+
+    export GIT_INDEX_FILE="$(mktemp -d)/index"
+    git read-tree HEAD                                    # ⚠️ ALWAYS HEAD. NEVER A PINNED SHA.
+    git update-index --add --cacheinfo 100644,<blob>,<path>   # content pinned at READ time
+    git diff --cached --stat                              # ⚠️ AND IT MUST LIST YOUR PATHS AND NO OTHERS
+
+**Systemic guardrail:** ⚠️ **proposed, not claimed — `PROCESS.md` is outside this session's fence.**
+The mechanical form is one line and it refuses instead of asking a human to notice:
+
+    test "$(git diff --cached --name-only | sort)" = "$(printf '%s\n' <declared paths> | sort)" \
+      || { echo "STOP: the snapshot does not match the declared path list"; exit 1; }
+
+Chained with `&&` before `git commit`, that turns both `INC-137` and `INC-139` into refusals — the
+first because an unexpected path appears, the second because a path appears that was never declared.
+⚠️ **What it does NOT close, and is accepted:** a path that IS declared and whose *content* has moved
+underneath the committer still commits silently, which is `INC-88`'s uncloseable half. **And the real
+guardrail remains the operator's and is one line: do not run two sessions in one working tree.**
+This is the **sixth** incident in this family — `INC-88`, `INC-123`, `INC-125`, `INC-136`, `INC-137`,
+and now this — and ⚠️ **the first in which the harm landed on a COMPLETED, COMMITTED artefact rather
+than on a draft.**
