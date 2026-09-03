@@ -175,13 +175,15 @@ def main(argv: list[str] | None = None) -> int:
         allow_absent_corpus=bool(arguments.allow_absent_corpus),
     )
 
-    client = (
-        _transcript_client(arguments, matrix)
-        if request.dry_run
-        else _refuse_to_invent_a_provider_client()
-    )
-
+    # ⚠️ The client factory is built INSIDE the try, because refusing to invent a provider
+    # client IS a RunRefused and must print like every other refusal — as a named outcome
+    # and a non-zero exit, never as a traceback. Built outside, it escaped this handler.
     try:
+        client = (
+            _transcript_client(arguments, matrix)
+            if request.dry_run
+            else _refuse_to_invent_a_provider_client()
+        )
         result = driver_run.execute(request, client=client)
     except driver_run.RunRefused as refused:
         say("REFUSED - and the refusal is the outcome, not an error to work around:")
