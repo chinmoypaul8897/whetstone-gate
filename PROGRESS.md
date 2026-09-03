@@ -264,6 +264,23 @@ git-history scan using that exact pattern set, with history never rewritten.
   and printed, and its oracle is this session's own, not the architect's.*
 - ⚠️ **NOT DONE, AND NAMED — `Q-121` is not settled.** A default was taken because a runner must
   return a number; it is declared as a default and both readings are printed.
+- ⚠️ **AND A LAST MEASUREMENT, WITH A CONCURRENT **C10 BUILD** SESSION (`bc69e8d7`) LIVE IN
+  THIS SAME WORKING TREE, REPORTED BECAUSE IT IS THE STATE AT PUSH RATHER THAN THE STATE THAT
+  FLATTERS THIS CHUNK.** A run after C10's files appeared reads **`4 failed, 1181 passed,
+  2 deselected`** in 594.2 s: the extra **+52 passing are C10's own `tests/test_c10_probe.py`**,
+  and the fourth failure is **`test_check_roles_exits_zero`**, red because `check-roles` **A3**
+  (*no CRLF in any tracked file*) and **A4** (*working tree and object store hold identical
+  bytes*) both name **`QUESTIONS.md`** and nothing else. ⚠️ **MEASURED: `QUESTIONS.md` now
+  carries 10,490 CR bytes**, and the working-tree diff against `HEAD` is C10's own token row
+  `bc69e8d7` plus its `Q-122`…`Q-124` block — **130 lines, none of them this session's**, and
+  this session's own eight `86ee1e45` references are intact. **That is `INC-74`'s class
+  recurring** (a `write_text` on Windows converting a whole journal). ⚠️ **THIS SESSION DID NOT
+  TOUCH IT AND DID NOT WRITE AN `INCIDENTS.md` ENTRY FOR IT:** it is another live session's
+  **uncommitted** work, editing it is the sweep hazard `INC-82`/`INC-87`/`INC-88` record from
+  both sides, `INC-74` already exists for the class, and a second entry about it is exactly the
+  `INC-87`/`INC-88` collision. **It is reported here and in the FINAL OUTPUT, attributed, with
+  the measurement.** The clean figures above stand as measured at `88d9693`, before those files
+  existed.
 - **NOT TAGGED. NOT SELF-CERTIFIED.** Both `src/` and `tests/` commits end `(unreviewed)`.
 
 ---
