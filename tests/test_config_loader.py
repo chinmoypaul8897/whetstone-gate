@@ -128,11 +128,15 @@ def test_protocol_yaml_carries_every_determined_constant():
     # the string "0.50" and the float hop the ruling abolished is gone. The old
     # `== 0.50` REQUIRED that float, which is why it went red — INC-101 predicted the
     # red in memory BEFORE the edit that caused it, and did not touch this line.
-    # ⚠️ NOT A WEAKENING (hard rule 6). This pins the exact RATIONAL *and* excludes the
-    # float, so it is stricter than `== 0.50` on both axes and FAILS ON THE OLD CODE.
+    # ⚠️ NOT A WEAKENING (hard rule 6): it FAILS ON THE OLD CODE, which is that rule's
+    # own test for a legitimate flip — `type(0.5)` is `float`, not `str`. It pins the
+    # exact RATIONAL *and* the TYPE the ruling chose.
+    # ⚠️ It is NOT a superset or a subset of the old assertion: the two accept-sets are
+    # deliberately DISJOINT on type, which is the whole point of `Q-123`, and is why
+    # "stricter on both axes" would be the wrong claim to make for it.
     # ⚠️ Q-126's bare `Fraction(...) == Fraction(1, 2)` could NOT fail on the old code:
     # 0.5 is exactly representable in binary, so `Fraction(0.5)` IS `Fraction(1, 2)`
-    # and that form passes on the float too. Measured both ways; see Q-130 / INC-104.
+    # and that form passes on the float too. Measured both ways; see Q-137 / INC-107.
     arm_fraction = protocol.require("probe.arm_confounded_reach_fraction")
     assert (type(arm_fraction), Fraction(arm_fraction)) == (str, Fraction(1, 2))
 

@@ -29,8 +29,12 @@ TARGETS = ("test", "eval", "selftest", "check-prereg", "check-roles")
 #: `CONTEXT.md` §16 names ``evals/results/`` as the raw per-episode JSON, and the
 #: assembler's own contract is ``<run-dir>/run.json`` plus ``<arm>/<episode>.json``.
 #: This is a repository PATH, not one of §8.6's spec-specified values, so hard rule 9's
-#: *"every spec-specified value lives in `config/`"* does not reach it — and `config/`
-#: is a FROZEN pre-registration artefact that may not gain a key. `QUESTIONS.md` Q-131.
+#: *"every spec-specified value lives in `config/`"* does not reach it.
+#: ⚠️ **AND THE SECOND REASON IS THE FENCE, NOT THE FREEZE.** `config/` is a
+#: pre-registration artefact but it is **not frozen yet** — `prereg-v1` does not resolve
+#: today, and `Q-123` legitimately edited it this morning — so the accurate statement is
+#: that `config/` is named under this session's **NOT** list, never that it "may not gain
+#: a key". `QUESTIONS.md` **Q-138**.
 EVAL_RUN_DIR = "evals/results"
 
 
@@ -167,6 +171,7 @@ def task_eval() -> int:
     manifest = run_dir / "run.json"
 
     say("── eval ──────────────────────────────────────────────────────────────────────")
+    say(f"  ROOT EXAMINED : {root}")  # OF-09: a target names the checkout it examined
     if not manifest.is_file():
         why = "the directory does not exist" if not run_dir.is_dir() else "it holds no run.json"
         say(f"  NO SCORED RUN EXISTS YET — {EVAL_RUN_DIR}/: {why}.")
@@ -181,9 +186,11 @@ def task_eval() -> int:
         return 2
 
     say(f"  run directory : {EVAL_RUN_DIR}/")
-    say("  Replaying the STORED LEDGERS. No model is called and no token is spent:")
-    say("  tests/test_c18_results.py asserts the assembler's import closure holds no")
-    say("  model client two independent ways, with a planted leaky module firing both.")
+    say("  Replaying the STORED LEDGERS. No model is called and no token is spent.")
+    say("  ASSERTED: tests/test_c18_results.py walks `whetstone_gate.results`'s import")
+    say("  closure AND scans its raw source, firing each at a planted leaky module.")
+    say("  ⚠️ MEASURED, NOT ASSERTED: this module's OWN closure. No test seeds a walk at")
+    say("  `whetstone_gate.tasks`, so that property is measured and not guarded. OF-231.")
     say()
 
     # Local import, the convention `results/__main__.py` already uses for `trail`: it keeps
@@ -197,8 +204,10 @@ def task_eval() -> int:
     say()
     if rc == 0:
         say("  RESULTS.md written. Every number in it came out of committed JSON, and the")
-        say("  pre-registration check's PASS/FAIL line is carried INTO that file by the")
-        say("  assembler itself, as hard rule 9 requires.")
+        say("  assembler carries `check-prereg`'s own line INTO that file (hard rule 9).")
+        say("  ⚠️ THAT LINE IS NOT A PASS TODAY AND MUST NOT BE READ AS ONE. `check-prereg`")
+        say("  verifies nothing until `prereg-v1` exists, and it FAILS OPEN (OF-185/Q-100),")
+        say("  so what is published is `NOT-YET-FROZEN`, labelled in the file as 'not yet'.")
     else:
         say("  ⚠️ THE ASSEMBLER REFUSED and nothing was written — see the REFUSED line")
         say("  above. A missing block is a refusal naming its owner, never a filled-in")
