@@ -2422,7 +2422,7 @@ this session's own, both are **OPEN**, and neither closes anything.
 
 ---
 
-## Findings appended by C10 BUILD 1 (`bc69e8d7`), 2026-09-03 — `OF-209`…`OF-215`
+## Findings appended by C10 BUILD 1 (`bc69e8d7`), 2026-09-03 — `OF-209`…`OF-216`
 
 ⚠️ **NUMBERED FROM THE FILE, RE-READ IMMEDIATELY BEFORE THIS APPEND.** The highest id at that
 moment was **`OF-208`** (C11 BUILD 1, `86ee1e45`, committed in `9d38e7d`).
@@ -2433,7 +2433,7 @@ source docstrings and one test docstring already cited them.** They were renumbe
 was staged. **Eleventh consecutive session to allocate from a counter it does not hold — `OF-67`,
 and it is still a habit rather than a guardrail.**
 
-⚠️ **NO ROW ABOVE THIS HEADING WAS READ FOR STATUS, EDITED OR RE-POINTED.** All seven rows below are
+⚠️ **NO ROW ABOVE THIS HEADING WAS READ FOR STATUS, EDITED OR RE-POINTED.** All eight rows below are
 this session's own, all are **OPEN**, and **none of them closes anything** — closing a row is a
 review's act, not a builder's.
 
@@ -2448,7 +2448,9 @@ review's act, not a builder's.
 
 | **OF-215** | **process**, **all sessions** | **MEDIUM** | ⚠️ **`OF-205`'s STAGED SNAPSHOT ALSO DETECTS BEING SWEPT, AND NOTHING SAYS SO.** **MEASURED on this session's own journal commit:** five paths were staged and `git diff --cached --stat` listed **four** - `STATUS.md` was absent because the concurrent C11 session had already committed this session's C10 row in `12f6c6f`, under token `86ee1e45` (`INCIDENTS.md` `INC-95`). ⚠️ **`git status` reported the path CLEAN, which is indistinguishable from *"you never edited it"*** - a session trusting it would conclude its update was LOST and write a duplicate row. `INC-88` and `OF-205` both close by saying *"nothing can warn the session being swept"*, and that remains true of the **sweep**; what is newly measured here is that the **detection** is free, because `OF-205` already requires reading the snapshot. **REMEDY, one clause:** stage your paths, and if the snapshot lists **fewer files than you staged**, a concurrent session has committed one of yours - find it with `git log -1 -- <path>`, verify the content INTACT, and record the SHA and the token. ⚠️ It belongs in `PROCESS.md` §7 and in every prompt's GIT section, both the **architect's**, exactly as `INC-68`, `OF-205` and `INC-91` record of their own remedies. `OF-67`. | `INCIDENTS.md` `INC-95`, `INC-88`, `INC-65`; `OF-205`; `QUESTIONS.md` `Q-063`; `PROCESS.md` §7, §7a | **C10 BUILD 1 (`bc69e8d7`)** | ⚠️ **OPEN - MEDIUM, for the architect (`PROCESS.md` §7)** | — |
 
-⚠️ **WHAT THESE SEVEN ROWS DO NOT DO.** They close nothing. `OF-183` and `OF-202` are the two a
+| **OF-216** | **process**, **all sessions** | **MEDIUM** | ⚠️ **`OF-205`'s PROCEDURE AND `INC-68`'s PRIVATE-INDEX RECIPE ARE IN TENSION, AND THE TENSION FORCES THE `Swept:` LINE'S NUMBERS TO BE **PREDICTED**.** The recipe runs `add`, `diff --cached` and `commit` as ONE compound command so no session can move the tree between the diff and the commit - correct, and `OF-205`'s whole point - but the heredoc holding the message is therefore composed **before** the `--stat` it is supposed to quote ever runs. **MEASURED on this session's own six commits: five `Swept:` lines reproduce exactly against `git show --numstat`; the sixth, `af5118e`, claims `+67/-2` and `+45/-0` where the snapshot said `111/0` and `51/0` - and it is the one whose numbers were TYPED rather than READ** (`INCIDENTS.md` `INC-97`). This project has now measured the same class twice: `INC-88` typed `182` where `309` landed. **REMEDY, and it dissolves the tension rather than trading one risk for the other: PUT NO LINE COUNTS IN A `Swept:` LINE AT ALL.** State what a session can verify BEFORE the commit - the paths, the mode, the headings added, *"swept nothing"* - and leave the arithmetic to `git show --numstat`, which is authoritative, free and cannot be wrong. ⚠️ **The alternative - a two-command diff-then-commit - REOPENS the write-side window `INC-68` and `OF-205` closed, and is the wrong trade.** It belongs in `PROCESS.md` §7 beside `OF-205` itself, which is the **architect's**. | `INCIDENTS.md` `INC-97`, `INC-88`, `INC-68`, `INC-47`; `OF-205`; `PROCESS.md` §7 | **C10 BUILD 1 (`bc69e8d7`)** | ⚠️ **OPEN - MEDIUM, for the architect (`PROCESS.md` §7)** | — |
+
+⚠️ **WHAT THESE EIGHT ROWS DO NOT DO.** They close nothing. `OF-183` and `OF-202` are the two a
 reader will expect a probe chunk to touch, and this session **does not close either** — what it can
 say is that `src/whetstone_gate/probe/` was built to import **no ledger module on any path**, so it
 adds **zero** offenders to `test_Q069_nothing_in_this_repository_imports_the_ledger_yet`, whose

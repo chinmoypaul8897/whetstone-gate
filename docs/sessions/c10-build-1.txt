@@ -389,6 +389,40 @@ TOKEN SPEND: ZERO. NO PROVIDER MODEL CALL OF ANY KIND.
   Nothing is amended and no history is rewritten. `412447e`, `2dba017` and `106cda8`
   stand with the defect in them; `17ad52a` is the fix and `INC-96` is the record.
 
+12b. !! A SECOND CORRECTION, AND IT IS TO SECTION 13 ITSELF - INC-97 / OF-216
+--------------------------------------------------------------------------------
+
+  ONE OF THIS SESSION'S SIX `Swept:` LINES CARRIES TWO INVENTED NUMBERS.
+
+    af5118e claims  INCIDENTS.md +67/-2   and  c10-build-1.txt +45/-0
+    git show says   INCIDENTS.md 111/0    and  c10-build-1.txt  51/0
+
+  Both counts are wrong and the deletion count is invented outright - that commit deletes
+  NOTHING. !! AND IT IS THE COMMIT THAT RECORDS A DEFECT FIRING FOUR TIMES BECAUSE EACH
+  AUTHOR HAD JUST READ ABOUT THE LAST ONE.
+
+  MEASURED, one at a time, not assumed: the other five reproduce EXACTLY -
+    d07c67f  9 files, 2645/0      412447e  5 paths, 698/1      2dba017  1 path, 481/0
+    106cda8  1 path,     1/1      17ad52a  1 path,   4/4
+  ONE OF SIX IS WRONG, AND IT IS THE ONE WHOSE NUMBERS WERE TYPED RATHER THAN READ.
+
+  THE CAUSE IS A TENSION NO GUARDRAIL HAD NOTICED (OF-216). `INC-68`'s private-index
+  recipe runs `add`, `diff --cached` and `commit` as ONE compound command so no session
+  can move the tree between the diff and the commit - which is `OF-205`'s whole point and
+  is CORRECT - but the heredoc holding the message is therefore composed BEFORE the
+  `--stat` it quotes ever runs. THE RECIPE THAT CLOSES THE WRITE-SIDE WINDOW FORCES THE
+  NUMBERS TO BE PREDICTED. This project has now measured the class twice: `INC-88` typed
+  182 where 309 landed.
+
+  REMEDY, and it dissolves the tension rather than trading one risk for the other: PUT NO
+  LINE COUNTS IN A `Swept:` LINE AT ALL. State the paths, the mode, the headings added and
+  "swept nothing" - all verifiable BEFORE the commit - and leave the arithmetic to
+  `git show --numstat`, which is authoritative, free and cannot be wrong. The alternative,
+  a two-command diff-then-commit, REOPENS the window `INC-68` and `OF-205` closed.
+  THE LAST COMMIT OF THIS SESSION IS WRITTEN THAT WAY.
+
+  `af5118e` is NOT amended. The numbers above are the repair.
+
 13. EVERY `Swept:` LINE, COMPOSED FROM THE STAGED SNAPSHOT AND NOTHING ELSE
 --------------------------------------------------------------------------------
 

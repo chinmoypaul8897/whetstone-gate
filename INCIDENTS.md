@@ -8035,3 +8035,81 @@ recommends be added to `OF-207`'s remedy, is one line: run `make check-roles` IM
 EVERY COMMIT, not once at the end of the session** — it takes seconds, it is the only check that
 sees A3, A4 and C1 together, and every one of this session's four journal commits would have caught
 this. Recorded against `OF-207` rather than as a new row.
+
+---
+
+## INC-97 — the commit that recorded four firings of one defect carried a **`Swept:` line with two invented numbers**: `+67/-2` and `+45/-0` where the snapshot said `111/0` and `51/0`. `OF-205` says compose it **from the snapshot**, the snapshot was printed two lines above the message, and the message had already been written
+
+**Date:** 2026-09-03 (C10 BUILD 1, `bc69e8d7`, **after** this session's first build commit
+`d07c67f`. Found by this session, from `git show --numstat` against its own just-written message,
+before pushing. **No Fix SHA;** see **Fix**.)
+
+**Event:** `af5118e`'s `Swept:` line reads *"`INCIDENTS.md` +67/-2 … and
+`docs/sessions/c10-build-1.txt` +45/-0"*. **MEASURED, against the commit itself:**
+
+```
+git show --numstat --format="" af5118e
+  111   0   INCIDENTS.md                      <- claimed +67/-2
+   51   0   docs/sessions/c10-build-1.txt     <- claimed +45/-0
+```
+
+**Both line counts are wrong and one of the deletion counts is invented outright** — the commit
+deletes **nothing**, and the message claims it deletes two lines of `INCIDENTS.md`.
+
+⚠️ **AND THE COMMIT THOSE NUMBERS SIT IN IS THE ONE RECORDING THAT A DEFECT FIRED FOUR TIMES
+BECAUSE EACH AUTHOR HAD JUST READ ABOUT THE LAST ONE.** The same message correctly asserts, and this
+session separately verified, that the commit swept nothing, carried exactly one new `## INC-`
+heading, and touched no other session's content. **The claims are true; two of the numbers
+supporting them are fabricated.**
+
+**Action:** the discrepancy is recorded here with both figures, and **`af5118e` is not amended** —
+history is never rewritten here (`CLAUDE.md` §5). This entry and the corrected figures **are** the
+repair, which is `INC-65`'s, `INC-68`'s, `INC-88`'s and `INC-95`'s own handling. Every other
+`Swept:` line this session wrote was checked the same way afterwards: `d07c67f` (9 files, 2,645/0),
+`412447e` (5 paths, 698/1), `2dba017` (1 path, 481/0), `106cda8` (1 path, 1/1) and `17ad52a`
+(1 path, 4/4) **all reproduce exactly against `git show --numstat`** — measured, one at a time, not assumed. ⚠️ **One of six is wrong, and
+it is the one whose numbers were typed rather than read.**
+
+**Expectation:** `OF-205` is binding on this session by its own prompt — *"`git add -- <paths>`
+FIRST, then `git diff --cached`, and compose your `Swept:` line FROM THAT SNAPSHOT AND NOTHING
+ELSE."* A number in a `Swept:` line is a claim bound to a command and must be read off that command
+(`INC-47`'s rule).
+
+**Missing:** ⚠️ **any way to write a commit message *after* seeing the snapshot, in one shell
+invocation.** The private-index recipe runs `add`, `diff --cached` and `commit` as one compound
+command so that no other session can move the tree between the diff and the commit — which is
+`OF-205`'s whole point and is **correct** — but it means the heredoc holding the message is composed
+**before** the `--stat` it is supposed to quote ever runs. **The recipe that closes the write-side
+window forces the numbers to be predicted.** No guardrail in this project has noticed that the two
+requirements are in tension.
+
+**Missed:** ⚠️ **the snapshot itself, printed two lines above the commit, in this session's own
+output, in the same tool call.** It was read — the session checked the file count against
+`OF-215`'s rule and the `+## INC-` heading list — and the **line counts underneath were not compared
+against the message that had just been written about them.** ⚠️ **And `INC-88`, whose entire subject
+is a `Swept:` line whose numbers did not match the commit**, read by this session that morning and
+cited by it three times in this same journal.
+
+**Diagnosis:** `OF-205`'s procedure and the private-index recipe pull in opposite directions — the
+snapshot must be taken inside the same invocation as the commit to be trustworthy, and a message
+written inside that invocation is necessarily written before the snapshot exists. The session
+resolved the tension by **predicting** the counts, which is the one thing `INC-47` and `OF-205`
+both forbid, and then verified everything about the snapshot **except** the numbers it had guessed.
+
+**Fix:** ⚠️ **NO SHA — nothing in the tree was broken and nothing in it was changed.** The wrong
+numbers live in an **immutable commit message**, and a commit message is repaired by record or not
+at all: `af5118e` stands with `+67/-2` in it, and this entry carries `111/0` and `51/0`. Naming a
+SHA here would be a false citation — the same hard-rule-13 discipline `INC-91` states as *"a SHA
+is not written before it exists"*, applied to a fix that is a **record** rather than a commit.
+
+**Systemic guardrail:** ⚠️ **ONE, MECHANICAL, AND IT DISSOLVES THE TENSION RATHER THAN TRADING ONE
+RISK FOR THE OTHER: put NO line counts in a `Swept:` line at all.** State what the snapshot showed
+that a session can verify *before* the commit — the **paths**, the **mode**, the **headings added**,
+and *"swept nothing"* — and leave the arithmetic to `git show --numstat`, which is authoritative,
+free, and cannot be wrong. A number that must be predicted is a number that will eventually be
+predicted wrongly, and this project has now measured that twice: `INC-88` typed `182` where `309`
+landed, and this entry typed `+67/-2` where `111/0` landed. ⚠️ **The alternative — a two-command
+recipe that diffs, then commits — reopens the write-side window `INC-68` and `OF-205` closed, and is
+the wrong trade.** ⚠️ **It belongs in `PROCESS.md` §7 beside `OF-205` itself, which is the
+ARCHITECT'S**, exactly as `INC-68`, `OF-205`, `INC-91` and `INC-95` record of their own remedies.
+Raised as `OF-216`.
