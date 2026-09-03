@@ -25,6 +25,14 @@ from ._console import say
 
 TARGETS = ("test", "eval", "selftest", "check-prereg", "check-roles")
 
+#: ⚠️ **THE RUN DIRECTORY `make eval` READS, AND WHY IT IS A LITERAL, NOT A CONFIG KEY.**
+#: `CONTEXT.md` §16 names ``evals/results/`` as the raw per-episode JSON, and the
+#: assembler's own contract is ``<run-dir>/run.json`` plus ``<arm>/<episode>.json``.
+#: This is a repository PATH, not one of §8.6's spec-specified values, so hard rule 9's
+#: *"every spec-specified value lives in `config/`"* does not reach it — and `config/`
+#: is a FROZEN pre-registration artefact that may not gain a key. `QUESTIONS.md` Q-131.
+EVAL_RUN_DIR = "evals/results"
+
 
 def _pytest(*args: str) -> int:
     """Run pytest in-process-adjacent, from the repository root."""
@@ -145,18 +153,57 @@ def task_eval() -> int:
     at temperature 0.7 against a hosted provider. So the claim is *"every number
     regenerates from the stored ledgers"*, which is true, checkable, and enough. Do not
     let this command, or the README, imply that re-running the models reproduces the run.
+
+    ⚠️ **IT SPENDS NO TOKEN AND ASKS NO MODEL ANYTHING.** It replays committed JSON.
+
+    ⚠️ **WITH NO RUN DIRECTORY IT REFUSES AND EXITS NON-ZERO** — never 0. See the body.
     """
     say("── check-prereg (hard rule 9: runs inside both `test` and `eval`) ─────────────")
     prereg = task_check_prereg()
     say()
+
+    root = cfg.repo_root()
+    run_dir = root / EVAL_RUN_DIR
+    manifest = run_dir / "run.json"
+
     say("── eval ──────────────────────────────────────────────────────────────────────")
-    say("  NOT YET IMPLEMENTED. Owned by C18, which builds RESULTS.md and this pipeline")
-    say("  on top of C7's ledgers, C8's scorer, C10's statistics module and the sweep.")
-    say("  C0 wires the target so that the command in the README exists from day one.")
+    if not manifest.is_file():
+        why = "the directory does not exist" if not run_dir.is_dir() else "it holds no run.json"
+        say(f"  NO SCORED RUN EXISTS YET — {EVAL_RUN_DIR}/: {why}.")
+        say("  There is nothing to regenerate FROM. The run directory is the sweep's own")
+        say("  output; until it exists this command has no stored ledgers to replay, and")
+        say("  CONTEXT.md §20's one-command claim is PENDING THE RUN, not satisfied.")
+        say()
+        say("  ⚠️ THIS IS A REFUSAL AND IT EXITS NON-ZERO ON PURPOSE. A green `make eval`")
+        say("  with no run behind it is precisely the overclaim this project fails other")
+        say("  entrants for. `check-prereg` FAILS OPEN today (OF-185 / Q-100); that defect")
+        say("  is deliberately NOT copied into the target CONTEXT.md §20 names.")
+        return 2
+
+    say(f"  run directory : {EVAL_RUN_DIR}/")
+    say("  Replaying the STORED LEDGERS. No model is called and no token is spent:")
+    say("  tests/test_c18_results.py asserts the assembler's import closure holds no")
+    say("  model client two independent ways, with a planted leaky module firing both.")
     say()
-    say("  Scope, when it lands: every number regenerates FROM THE STORED LEDGERS,")
-    say("  byte-identically. Not: re-running the models reproduces the episodes.")
-    return prereg
+
+    # Local import, the convention `results/__main__.py` already uses for `trail`: it keeps
+    # this module's module-level import list free of the assembler's whole dependency graph.
+    from .results.__main__ import main as _assemble
+
+    rc = _assemble(
+        [str(run_dir), "--root", str(root), "--output", str(root / "RESULTS.md")]
+    )
+
+    say()
+    if rc == 0:
+        say("  RESULTS.md written. Every number in it came out of committed JSON, and the")
+        say("  pre-registration check's PASS/FAIL line is carried INTO that file by the")
+        say("  assembler itself, as hard rule 9 requires.")
+    else:
+        say("  ⚠️ THE ASSEMBLER REFUSED and nothing was written — see the REFUSED line")
+        say("  above. A missing block is a refusal naming its owner, never a filled-in")
+        say("  default: a RESULTS.md assembled over an absent block would look complete.")
+    return max(rc, prereg)
 
 
 # --------------------------------------------------------------------------------------
