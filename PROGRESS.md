@@ -179,6 +179,30 @@ passes `Q-048`'s own test for a value that ought to be frozen. · `Q-115` an unp
   own lines, and a bare `git commit` by anyone at that instant would have reverted them silently.
   One commit swept `Q-110` (81 lines, theirs) and **says so in a `Swept:` line** — `Q-063` clause
   (ii).
+- ⚠️ **AND ONE `Swept:` LINE OF THIS SESSION'S IS FALSE, WHICH IS `INC-88` AND IS CORRECTED BY
+  RECORD RATHER THAN QUIETLY.** `42faed5`'s message says *"the other three files in this commit
+  carry NOTHING of theirs, checked line by line before staging."* **They did not: `PROGRESS.md`
+  carried the concurrent session's complete 127-line `C8 — FIX 1` entry, and this commit committed
+  it.** The clause-(i) read said **182** lines and the commit landed **309**; the read was **true
+  when it ran and false when `git add` ran**, minutes later. ⚠️ **The private index worked and
+  could not help** — it prevents committing another session's *staged paths*, and this was another
+  session's *file contents* on a path legitimately this session's. **The swept entry was verified
+  INTACT rather than assumed intact**: byte-identical between `HEAD` and the working tree,
+  127 lines / 9,299 bytes, opening with its own `SESSION-TOKEN: 9e4a71c2` and ending cleanly.
+  Nothing is amended and nothing is reverted (`CLAUDE.md` §5). **The remedy is in use from the next
+  commit onward and is `OF-205`:** stage and diff in **one** command under the private index and
+  compose `Swept:` **from `git diff --cached`**, never from an earlier read — `INC-47`'s rule
+  applied to the one field that lacked it. ⚠️ **IT WAS PUT TO WORK ON THE VERY NEXT COMMIT AND
+  CAUGHT A FOREIGN `OF-204` ROW BEFORE COMMITTING RATHER THAN AFTER**, which is the only evidence
+  in this session that it is a guardrail and not a sentence.
+- ⚠️ **AND THE SPIRAL CLOSED BOTH WAYS WITHIN THE HOUR, WHICH IS `INC-82`'s SHAPE WITH BOTH SIDES
+  PRESENT FOR ONCE.** The concurrent session then committed **this** session's uncommitted
+  `INC-87` and `OF-203` drafts inside its own commit `58e9299`, having already allocated those two
+  numbers for entries of its own **about this same sweep, written from the swept side**. Two
+  sessions, one event, two honest records, **one number each**. ⚠️ **This session renumbered ITS
+  OWN to `INC-88` and `OF-205`** — the noticing session moves, which is C8 REVIEW 1's precedent —
+  **and touched not one character of theirs.** `OF-67`: the counter is still a habit and not a
+  guardrail, and this is the clearest instance yet of what that costs.
 - ⚠️ **NOT DONE, AND NAMED:** `test_c7_ledger.py::test_Q069_nothing_in_this_repository_imports_the
   _ledger_yet` is **still red** and C9 **cannot** narrow it — `tests/test_c7_ledger.py` is under
   **NOT** in this session's fence, and hard rule 6 forbids weakening a test in any case. **C9's

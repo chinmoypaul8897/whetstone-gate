@@ -6998,7 +6998,18 @@ the repository-wide tripwires (`OF-99`'s address), and it is named here rather t
 
 ---
 
-## INC-87 — the `Swept:` line said "the other three files carry NOTHING of theirs, checked line by line before staging" and the commit swept a 127-line entry into one of them: the read was TRUE when it ran and FALSE when `git add` ran, and a PRIVATE INDEX cannot close that gap because the gap is on the READER's side
+## INC-88 — the `Swept:` line said "the other three files carry NOTHING of theirs, checked line by line before staging" and the commit swept a 127-line entry into one of them: the read was TRUE when it ran and FALSE when `git add` ran, and a PRIVATE INDEX cannot close that gap because the gap is on the READER's side
+
+> ⚠️ **RENUMBERED FROM `INC-87` BY ITS OWN AUTHOR, AND THE RENUMBER IS PART OF THE INCIDENT.**
+> This entry was drafted as `INC-87` against a file whose highest entry was `INC-86`. While it sat
+> uncommitted, the concurrent **C8 FIX 1** session (`9e4a71c2`) allocated **`INC-87`** for its own
+> entry — *about this same sweep, from the swept side* — and then **committed this session's
+> uncommitted draft along with it** (`58e9299`), so both landed in one commit under one token with
+> **the same number**. ⚠️ **The two entries are different documents about the same event and both
+> are kept**: `INC-87` is the swept session's and is untouched; this is the sweeping session's.
+> **This one moves, because the session that notices a collision renumbers its own** — the
+> precedent is C8 REVIEW 1 renumbering eleven `OF` rows rather than asking anyone else to.
+> `OF-205` (formerly `OF-203`) moves with it. **`OF-67`, and the counter is still a habit.**
 
 **Date:** 2026-09-03 (C9 BUILD 1, `3f8b2d56`, **after** this session's first build commit. The
 sweeping commit is **`42faed5`**; the swept session is the concurrent **C8 FIX 1** (`9e4a71c2`).
@@ -7103,7 +7114,13 @@ sweep, only make the `Swept:` line **true**. A session that does not use it swee
 ⚠️ **AND IT WANTS TO BE A RULE IN `PROCESS.md` §7 AND A LINE IN EVERY PROMPT'S GIT SECTION, BOTH OF
 WHICH ARE THE ARCHITECT'S** — `PROCESS.md` is outside this session's fence, exactly as `INC-68`
 records of its own remedy. Until then it is one session's habit, which is what `OF-67` says about
-the last five of these. **Recorded as `OF-203`.**
+the last five of these. **Recorded as `OF-205`.**
+
+⚠️ **AND THE REMEDY WAS PUT TO WORK IMMEDIATELY AND CAUGHT THE NEXT ONE, WHICH IS THE ONLY
+EVIDENCE HERE THAT IT IS A GUARDRAIL RATHER THAN A SENTENCE.** On this session's very next commit
+the staged snapshot was read under the private index **in the same command as the `git add`**, and
+it named a foreign `OF-204` row that an earlier read would have missed — **before** the commit
+rather than after it. The window is real, it is short, and reading the snapshot is what closes it.
 
 ---
 
