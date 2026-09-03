@@ -13679,3 +13679,560 @@ session's prompt exactly as issued, including its emphasis:
 back exactly the silence `Q-161` and `Q-173` both rejected. The two call sites named in `Q-173`
 forward a lane the adapter holds, and the adapters are constructed with it.
 
+
+---
+
+## ⚠️⚠️ RAISED BY ARCH NIGHT 1 (`5d7e2b91`), 2026-09-04 — `Q-179`, `Q-180`
+
+⚠️ **THE NUMBERS BELOW WERE COUNTED AT A NAMED MOMENT AND A CONCURRENT SESSION HOLDING THIS SESSION'S
+OWN TOKEN MAY COLLIDE — SEE `INC-136`.** Measured at `f45721d` with the working tree also holding
+`9f31d708`'s uncommitted `benign/blindness.py` and `benign/executor.py`: the highest allocated ids
+were **`Q-178`** and **`INC-133`**. ⚠️ **`Q-179` IS NOT FREELY CHOSEN — it is the number session
+`8c47b1e0` allocated in the test docstrings landed at `f45721d`, and this entry exists so that
+citation resolves.** The same is true of `INC-134`. ⚠️ **`Q-181` IS ALREADY CITED BY `PROTOCOL.md`,
+written by the concurrent session, and `Q-180` is taken here in the gap.** If these collide, the
+renumbering is the architect's and nothing here depends on the number.
+
+---
+
+### Q-179 — ⚠️⚠️ **THE PACER CAN CONVERT A BUCKET *WAIT* INTO AN UNCAUGHT ABORT, AND THE `--dry-run` REHEARSAL THAT IS SUPPOSED TO DE-RISK THE SINGLE-SHOT RUN CANNOT SEE IT, BECAUSE `--dry-run` NEVER BUILDS THE PACER.**
+
+**Status:** OPEN. **Class A in effect** — it decides whether a single-shot, unrepeatable run
+publishes a denominator or a traceback. **Raised by:** ARCH NIGHT 1 (`5d7e2b91`), 2026-09-04.
+**Number allocated by** session `8c47b1e0`, which died before writing it; **this session measured
+everything below itself rather than transcribing it.** `INCIDENTS.md` **INC-134**.
+
+**THE DEFECT, READ FROM THE SOURCE.** `driver/run.py:458-462`:
+
+    wait = buckets.wait_seconds(tokens=tokens, now=self.clock())
+    if wait > 0:
+        self.sleep(wait)
+    buckets.take(tokens=tokens, now=self.clock())
+
+`runner/buckets.py:118-126`, `Bucket.take`, refuses when `self.wait_seconds(cost, now) > 0.0` — an
+**exact** comparison, no epsilon — with the message *"a bucket refusal is a WAIT, not an abort, and
+the two must not be confused"*. ⚠️ **So the two clock reads either side of the sleep decide whether
+the module honours its own stated contract.** `execute` defaults `clock=time.monotonic,
+sleep=time.sleep` (`run.py:488-489`), and `BucketError` is a `RuntimeError` — **neither**
+`RateLimited` **nor** `ProviderFailed` — so `episode._MeteredCall.run` never books it and it escapes
+`execute` uncaught: **no report, no denominator, twenty episodes dropped and none printed.** That is
+`Q-174`'s finding arriving by a second route, and it is why the two questions should be ruled
+together.
+
+⚠️ **THE SECOND HALF IS THE ONE NOBODY HAD MEASURED, AND IT IS THE REASON THIS IS RAISED AT ALL.**
+`driver/run.py:592-602`:
+
+    paced = client
+    if request.spend_real_tokens:
+        paced = _PacedClient(...)
+
+**`_PacedClient` IS CONSTRUCTED ONLY ON THE `--spend-real-tokens` PATH.** This session ran the FULL
+20-episode `--dry-run` rehearsal to a fresh OS temp directory and it reported **20 of 20, exit 0,
+denominator reconciling `20 == 20 + 0 + 0`, and nothing written under the repository's `evals/`.**
+⚠️ **That result is true and it is not evidence about the pacer**, because the rehearsal never built
+one. The prompt that ordered the rehearsal called it *"the only thing between a just-landed
+unreviewed provider boundary and an unrepeatable run"*. **It cannot be that thing for this defect.**
+
+**THE MEASUREMENT, ON THE REAL CLOCK, AT THE PILOT'S REAL BUCKETS. NO NETWORK, NO SPEND.**
+`config/lanes.yaml`'s `gemma-26b` (rpm 30, tpm 16,000, rpd 14,400, tpd null) at the pilot's real
+reservation of **3,000 tokens per call** (`60000 // 20`, `driver/episode.py:304`), driving the real
+`_PacedClient._pace` with the real `time.monotonic` and `time.sleep`:
+
+    time.get_clock_info("monotonic").resolution = 0.015625
+    calls 1-5   : 0.000 s   (the TPM bucket starts full)
+    call  6     : 7.500 s
+    calls 7-24  : 11.250 s each  -- 11.266 s and 11.234 s at calls 15 and 16
+    24 consecutive real-clock paced calls, ZERO BucketError
+
+⚠️ **AND THE INHERITED FIGURE IS CORRECTED RATHER THAN CARRIED.** Session `8c47b1e0` recorded
+*"139 of 300, worst -0.011 s"*; re-run here it is **242 of 300, worst -0.004 s** — worse on
+frequency. **But both are measurements of 1-4 ms sleeps, and the pilot does not sleep for 1-4 ms.**
+Against an 11.25 **second** wait the 0.015625 s quantum is 0.14%, and `time.sleep` overshoots by
+more than the clock can round away. ⚠️ **THIS IS NOT A CLEARANCE.** 24 of the 400 paced calls the
+pilot needs is **6%**; a rare failure and no failure are not distinguishable at that sample size;
+and the source is fragile either way.
+
+**THE QUESTION FOR THE ARCHITECT, IN THREE PARTS.**
+
+1. **Does `_pace` re-wait rather than take on the first attempt** (loop until `wait_seconds` returns
+   `0.0`), or does **`take` accept the reading `wait_seconds` already produced**, or is a tolerance
+   introduced? ⚠️ **The three are not equivalent:** a loop cannot livelock here because the bucket
+   refills monotonically, but it changes the wall-clock shape of a 32-hour sweep; a tolerance puts a
+   number in `runner/buckets.py` that is not in `config/` and is therefore hard rule 9's hardcoded
+   spec value unless it is derived from `time.get_clock_info`.
+2. **Is a `BucketError` reaching the dispatch loop booked as a counted, categorised outcome?** This
+   is `Q-174` verbatim and it moves a **published** number, which is why neither question was
+   decided by this session.
+3. ⚠️ **Should `--dry-run` build the pacer?** The flag currently means two things — *do not call a
+   provider* **and** *do not pace* — and is documented as one. **A rehearsal that is permitted to
+   skip construction of the object under test is not a rehearsal**, and that sentence generalises
+   past this defect.
+
+⚠️ **WHY IT IS URGENT AND NOT MERELY OPEN.** The pilot is single-shot. If this fires on episode 7 of
+20, `PROCESS.md` §6b's abort machinery applies — the abort, its cause and its **partial episode
+count** go to `INCIDENTS.md` before any retry, and the retry is a numbered attempt in the same
+directory — but the run will have **spent real tokens on a reserved lane** and produced **no report
+at all**, because the escape is uncaught. **The tokens are gone and the measurement is not made.**
+
+**STOPPED?** ⚠️ **Yes, for this session, and it is one of two independently sufficient reasons the
+pilot did not start.** The other is `Q-165`'s successor, below.
+
+---
+
+### Q-180 — ⚠️ **TWO LIVE SESSIONS ARE EXECUTING ONE PROMPT UNDER ONE TOKEN IN ONE WORKING TREE, AND `make check-roles` CANNOT SEE IT BECAUSE THE REUSE IS *WITHIN* A ROLE.**
+
+**Status:** OPEN. **Operator-only** — no session can close it, and neither of the two can even
+address the other. **Raised by:** ARCH NIGHT 1 (`5d7e2b91`), 2026-09-04. `INCIDENTS.md` **INC-136**.
+
+**MEASURED, NOT INFERRED.** `git status --porcelain -uall` returned 8 modified paths at 01:54 local
+and **12** at 02:03, the four additions being `PROTOCOL.md`, `tests/test_c7_ledger.py`,
+`tests/test_c8_scorer.py` and `tests/test_config_loader.py`. `PROTOCOL.md`'s new prose named
+*"ARCH NIGHT 1 (`5d7e2b91`)"* — **this session's own name and token** — and its mtime was **01:57:27**,
+*after* this session began at 01:52. Those four were then committed as **`90b6d6f`**, trailer
+`Session-Token: 5d7e2b91`. `docs/submission/git-history-secret-scan.txt` appeared untracked
+afterwards: **Gate 4, in flight, in another process.**
+
+⚠️ **`CLAUDE.md` §5's GUARANTEE DOES NOT COVER THIS SHAPE.** *"`make check-roles` fails if a chunk's
+build and review commits share a token, if a token appears that was never issued, or if a token is
+reused across roles."* **All three clauses are about reuse ACROSS something.** Here one token is held
+twice **within** one chunk and one role (ARCH / FIX), so there is nothing for the check to fire on,
+and the two sessions' commits are **permanently indistinguishable in the log** — history is never
+rewritten here, so this cannot be repaired later.
+
+**WHAT THIS SESSION DID INSTEAD OF DECIDING IT.** Did not redo Gates 3a/3b/3c or 4; touched none of
+the five paths the other session holds; named those four paths as **"NOT MINE"** in `f45721d`'s
+`Swept:` block; wrote every subsequent change to the four shared documents as a **pure append**
+rather than a read-modify-write, because two processes rewriting a 761 KB file from separate
+in-memory reads is a lost-update race `git` cannot see; and published its FINAL OUTPUT to
+`docs/sessions/arch-night-1b.txt` **rather than** `arch-night-1.txt`, which both prompts name and
+which the second arrival would have silently overwritten.
+
+**THE QUESTION FOR THE ARCHITECT, AND IT IS A RECORD-KEEPING RULING RATHER THAN A CODE ONE:**
+`QUESTIONS.md`'s `## Session tokens` row for `5d7e2b91` now describes **two** sessions. Does that row
+name both, with the commits split between them (`90b6d6f` + Gate 4 to one, `f45721d` + this entry to
+the other), or is one of them retro-issued a distinct token in the record while its commits keep the
+one they carry? ⚠️ **This session did not choose**, because a token in a commit trailer and a token
+in `QUESTIONS.md` disagreeing is exactly the kind of quiet divergence `PROCESS.md` §7a exists to
+prevent, and inventing a second token to tidy it would be `CLAUDE.md` §5's *"never invent one"*.
+
+**STOPPED?** No — the work was partitioned and disclosed rather than stopped.
+
+---
+
+## ⚠️⚠️ RAISED BY ARCH NIGHT 1 (`5d7e2b91`), 2026-09-04 — `Q-180`…`Q-186`
+
+⚠️ **THE Q- AND INC- NUMBERS BELOW WERE COUNTED AT A NAMED MOMENT AND A CONCURRENT SESSION MAY
+COLLIDE.** Measured at `f45721d`: the highest id in `QUESTIONS.md` was **`Q-178`**; **`Q-179`** is
+claimed by `tests/test_c12_driver.py:2229` and **`INC-134`** by the same file, neither of which has
+a written entry anywhere. **`Q-181` was written into `PROTOCOL.md` by this session before this
+block existed**, so it is fixed and the others are allocated around it. `INC-125` records this
+collision class reaching `HEAD`. If these collide, the renumbering is the architect's.
+
+---
+
+### Q-180 — ⚠️⚠️ **TWO CONCURRENT SESSIONS ARE HOLDING SESSION-TOKEN `5d7e2b91`, AND `make check-roles` E1 CAUGHT IT. THE ONE CONTROL `PROCESS.md` §7a HAS IS THE CONTROL THAT FAILED.**
+
+**Status:** OPEN. **Class A** — it bears on what the whole review trail is evidence *of*.
+**Raised by:** ARCH NIGHT 1 (`5d7e2b91`), 2026-09-04. ⚠️ **AGAINST ITSELF.**
+
+**THE MEASUREMENT.** `make check-roles`, run by this session at `f45721d`:
+
+    [FAIL] E1 no commit carries an UNISSUED token
+           FORGED/UNISSUED: {'5d7e2b91': ['f45721d', '90b6d6f']} - not present in
+           QUESTIONS.md ## Session tokens
+
+⚠️ **THIS SESSION MADE `90b6d6f`. IT DID NOT MAKE `f45721d`.** `f45721d` was committed at
+**02:05:44**, twenty-two seconds after this session's own commit at **02:05:22**, into the **same
+working tree and the same `.git`**, and its message opens *"ARCH NIGHT 1 (`5d7e2b91`) verified it
+and is landing it."* It is a **second live session running this same prompt, under this same
+token.** Four `claude.exe` processes were measured on this machine at the time.
+
+⚠️ **SO THE HONOUR-SYSTEM ARTEFACT DID EXACTLY WHAT `PROCESS.md` §7a SAYS IT CAN AND CANNOT DO.**
+§7a is explicit: *"It does **not** prove the sessions were different; nothing can … **It makes
+reuse visible**."* It made this visible in one line. **That is the control working, and it is also
+the control's whole extent.**
+
+**TWO SEPARATE DEFECTS, AND THEY ARE NOT THE SAME DEFECT:**
+
+1. ⚠️ **THE TOKEN WAS NEVER RECORDED.** `5d7e2b91` is not in `## Session tokens`, so E1 would have
+   failed on this session's *first* commit even with no second session. `CLAUDE.md` §5: *"If your
+   prompt did not carry a token, do not fabricate one."* The prompt **did** carry it; the
+   architect's §7a row was never written. **This session appends the row rather than inventing a
+   token** — recording an issued token is the opposite of fabricating one — and says so here.
+   ⚠️ **`8c47b1e0` IS MISSING FROM THE REGISTRY TOO**, and it authored `f45721d`'s code.
+
+2. ⚠️ **THE TOKEN WAS ISSUED TWICE, WHICH §7a FORBIDS IN TERMS** — *"generated fresh by the
+   architect, **never reused**"*. Two sessions with one token means the log **cannot** attribute
+   either commit, and `make check-roles` E2/E3 cannot help: they test build-vs-review and
+   role-reuse, and this is **role-vs-itself**, which no check enumerates.
+
+**What this session did about it, stated exactly:** it kept using `PROCESS.md` §7b's private-index
+recipe for every commit, so no path of the other session was ever swept; it re-read `HEAD` before
+each commit rather than assuming; and it did **not** stop, because §11a's stop-list names Class A
+*decisions*, the freeze, and published numbers — not a token defect that is fully recoverable by
+being written down. ⚠️ **It is for the architect to decide whether the night's commits are
+attributable at all.**
+
+---
+
+### Q-181 — ⚠️⚠️ **`make check-prereg` RECOMPUTES NOTHING BEFORE `prereg-v1`, SO THE ONE CHECK THAT CATCHES A STALE MANIFEST ROW IS INERT FOR EXACTLY AS LONG AS THE ROW IS STILL FIXABLE.**
+
+**Status:** OPEN. **Class B** — it changes no number; it changes when a defect is findable.
+**Raised by:** ARCH NIGHT 1 (`5d7e2b91`), 2026-09-04, while fixing the row it failed to catch.
+
+**MEASURED, VERBATIM, against a tree whose manifest row was demonstrably stale:**
+
+    $ python -m whetstone_gate.tasks check-prereg
+      config/ holds 2 file(s): lanes.yaml, protocol.yaml
+      STATUS: NOT-YET-FROZEN - the `prereg-v1` tag does not resolve.
+              PROTOCOL.md exists but the freeze has not been cut.
+    EXIT=0
+
+⚠️ **EXIT 0, AND NOT ONE DIGEST RECOMPUTED**, over a `PROTOCOL.md` whose `config/protocol.yaml` row
+was wrong by thirty bytes and a whole SHA-256. Hard rule 9 says `make check-prereg` *"recomputes
+them, runs inside **both** `make eval` and `make test`, and prints PASS/FAIL into `RESULTS.md`"*.
+It runs; **before the tag it recomputes nothing.**
+
+⚠️ **THE TIMING IS THE DEFECT, AND IT IS EXACTLY BACKWARDS.** `PROTOCOL.md` is editable only until
+`prereg-v1` exists (`CLAUDE.md` §4). So the check is:
+
+    before the tag : silent   <- and the row is FIXABLE
+    after the tag  : loud     <- and the row is FROZEN, publishable only as a defect
+
+**What DID catch it** is `tests/test_c14_prereg.py::test_every_config_file_is_in_PROTOCOL_mds_manifest_and_its_blob_sha_RECOMPUTES`,
+which recomputes unconditionally. **So the property is checked; the target named in hard rule 9 is
+not the thing checking it**, and a session that ran only `make check-prereg` — which is what the
+rule tells it to run — would read a green.
+
+⚠️ **THIS IS `INC-132`'s SPECIES.** That entry is *"the line `CLAUDE.md` calls 'the whole moat'
+printed PASS on all four checks over a live `gates/` → `scorer/` reach."* Here a pre-registration
+check printed a NOT-YET-FROZEN and exit 0 over a live stale digest. **A check whose two halves
+disagree about what it covers reports the wrong half.**
+
+**The question for the architect:** should `check-prereg` recompute the `config/` rows
+**unconditionally**, reporting `NOT-YET-FROZEN` as *state* rather than as a *reason to skip*? It is
+`src/whetstone_gate/tasks.py`, not a frozen artefact, so it is fixable now. **This session did not
+change it** — the fix moves what a published PASS/FAIL means, and `RESULTS.md` prints it.
+
+---
+
+### Q-182 — ⚠️⚠️ **`.env` NOW EXISTS AND THE PILOT STILL CANNOT START, BECAUSE NOTHING IN THIS PROJECT LOADS `.env`. `Q-165` IS HALF-CLOSED AND THE REMAINING HALF IS NOT THE HALF ANYONE EXPECTED.**
+
+**Status:** OPEN. **Operator-only** — no session can close it. **Class B** (it changes no meaning;
+it decides whether the single-shot run can begin at all).
+**Raised by:** ARCH NIGHT 1 (`5d7e2b91`), 2026-09-04. **Measured, by NAME only.**
+
+`Q-165` recorded, on 2026-09-03: `.env : DOES NOT EXIST`. **It exists now** — the operator created
+it. **And the preflight refusal is unchanged.**
+
+**GATE 1b's MEASUREMENT, VERBATIM.** `driver_run.preflight` called on the REAL two-lane matrix
+built exactly as `driver/__main__.py:main()` builds it from `evals/pilot/RUN_DECLARED.md` §1's
+command:
+
+    attacker lanes in this matrix : ['gemma-26b', 'qwen-27b']
+    judge lane                    : gemma-26b
+    episode keys                  : 20
+    turn budget                   : 20
+
+    PREFLIGHT REFUSED:
+        the environment does not carry ['GOOGLE_API_KEY', 'GROQ_API_KEY']
+        Only the NAMES are read here - runner/keys.py returns a boolean and has no code
+        path that reads a value (CLAUDE.md S4)
+        An episode that fails on a missing credential halfway through is an episode that
+        has already spent tokens
+
+⚠️ **NO KEY VALUE WAS READ, PRINTED, ECHOED OR COMMITTED, AND `.env` WAS NEVER OPENED.** This
+session's prompt said *"Do not create or read `.env`"* and it did neither. Only the two **names**
+were tested for membership in `os.environ`.
+
+**THE CAUSE, MEASURED FROM THE SOURCE AND NOT INFERRED:**
+
+    $ grep -rn "dotenv|load_dotenv" src/whetstone_gate/        -> 0 matches
+    $ grep -n -A3 "^dependencies" pyproject.toml               -> pyyaml, numpy. NOTHING ELSE.
+    $ python -c "import importlib.util as u; print(u.find_spec('dotenv') is not None)"
+                                                               -> True  (present, IMPORTED BY NOTHING)
+
+`runner/keys.py`'s own docstring says it in capitals: *"It does **not** subscript the environment,
+it does not call `os.getenv`, and **it does not open `.env`**."* **That is correct design and it is
+not the defect.** The defect is that **no other module opens it either**, so a `.env` file on disk
+is, to this harness, indistinguishable from no file at all.
+
+⚠️ **SO THE REMEDY IS NOT "CREATE `.env`" — IT ALREADY EXISTS. THE REMEDY IS TO EXPORT THE TWO
+NAMES IN THE SHELL THE RUN EXECUTES IN**, which is `PROCESS.md` §8's *"Long runs execute in the
+operator's terminal"* arriving as a hard requirement rather than as a preference:
+
+    export GOOGLE_API_KEY=...      # in the operator's terminal, not in any session
+    export GROQ_API_KEY=...
+    python -m whetstone_gate.tasks drive -- ...     # RUN_DECLARED.md S1's exact command
+
+**The question for the architect**, and it is a real fork rather than a formality:
+
+1. **Leave it.** The operator exports both names by hand each time. **No code changes, and
+   `config/` and the frozen set are untouched.** ⚠️ The cost is that `Q-165` will read as closed
+   (the file exists) while the preflight still refuses, which is how this session lost Gate 1.
+2. **Add a dotenv load at the entry point.** ⚠️ **This is a Class A-adjacent change to the one
+   module family `CLAUDE.md` §4 fences hardest**, it adds a dependency to `pyproject.toml` before
+   a freeze, and it puts code that *opens `.env`* into a project whose whole key discipline is
+   that nothing does. **This session recommends against it and did not do it.**
+3. **Document it in `RUN_DECLARED.md` §7.3 as precondition #5's actual form.** ⚠️ But
+   `RUN_DECLARED.md` is a pushed pre-registration and this session did not edit it beyond the one
+   blank its prompt named — and it did not edit that either, see `Q-186`.
+
+---
+
+### Q-183 — ⚠️⚠️ **`Q-164` IS NOT MERELY OPEN, IT IS WRONG: THE GATE JUDGE DOES NOT INHERIT THE PROVIDER'S DEFAULT. IT RUNS AT A HARDCODED `0.0` CHOSEN IN `driver/clients.py`, ON THE ONLY LANE IT IS DECLARED ON.**
+
+**Status:** OPEN. **Class A** — it moves arm 2 / 2S / 3 verdicts, and it is a hard-rule-9 breach.
+**Raised by:** ARCH NIGHT 1 (`5d7e2b91`), 2026-09-04, while stating what `Q-164` owes `config/`.
+**It cannot touch the pilot** — `Q-144` ruled arm 1, which has no gate.
+
+**`Q-164` SAYS**, at its own third paragraph: *"`MeteredModelClient.complete_judge` takes
+`(system, user)` and **no temperature**, so the client sends none and **the provider's own default
+applies** — 1.0 on the Groq path."* **`MeteredProviderClient.complete_judge`'s docstring repeats
+it in capitals:** *"⚠️ **NO TEMPERATURE IS SENT, BECAUSE `config/` CARRIES NONE FOR THE JUDGE.**"*
+
+⚠️ **BOTH SENTENCES ARE FALSE FOR THE CONFIGURATION THIS RUN DECLARES**, and the reason is three
+lines apart in one file:
+
+    driver/clients.py:783   body = _google_body(messages, temperature if temperature is not None else 0.0)
+    driver/clients.py:513   return {"contents": contents, "generationConfig": {"temperature": temperature}}
+
+`complete_judge` passes `None`; **`_send`'s Google branch substitutes a literal `0.0`**, and
+`_google_body` emits `generationConfig.temperature` **unconditionally**.
+
+**MEASURED — the body that would go on the wire, built without any network call:**
+
+    the DECLARED judge lane      : gemma-26b
+      its provider               : google
+      its api_model_id           : models/gemma-4-26b-a4b-it
+
+    THE BODY: {'contents': [...], 'generationConfig': {'temperature': 0.0}}
+      temperature FIELD SENT     : True
+      temperature VALUE SENT     : 0.0
+
+    AND THE GROQ BRANCH, FOR CONTRAST:
+      {'model': 'models/gemma-4-26b-a4b-it'}
+      temperature FIELD SENT     : False
+
+⚠️ **`Q-164`'s SENTENCE IS TRUE ON THE PATH THE JUDGE DOES NOT USE AND FALSE ON THE PATH IT DOES.**
+`CONTEXT.md` §13.3.2 puts the gate judge on **`gemma-26b`**, and `config/lanes.yaml` gives that lane
+`provider: google`. `evals/pilot/RUN_DECLARED.md` §4.1 names it. **There is no configuration in
+this project in which the judge takes the Groq branch.**
+
+⚠️ **THREE THINGS FOLLOW, AND THE THIRD IS THE ONE THAT MATTERS MOST:**
+
+1. **It is the exact hard-rule-9 breach `Q-164` says it is avoiding.** Q-164: *"A judge temperature
+   chosen in `driver/clients.py` would be exactly the hardcoded spec value the tripwire exists to
+   catch."* **One was chosen there.** The tripwire does not fire because `CONTEXT.md` §8.6's
+   constants table — *the tripwire's own authoritative list* — has no row for a judge temperature,
+   which is `Q-164`'s whole point arriving from the other side.
+2. **The two providers are treated DIFFERENTLY for the same role**, which is the species of
+   difference `Q-171` was ruled on four hours earlier: *"any other choice forces a per-provider
+   difference — `CONTEXT.md` §10.1's own prohibition."* Here it is not the attacker's text but the
+   judge's sampling, and nothing declares it.
+3. ⚠️ **A DOCSTRING IN THE FROZEN-ADJACENT PATH ASSERTS THE OPPOSITE OF WHAT THE CODE DOES**, in
+   capitals, citing `Q-164` — so a reviewer who read the code's own account of itself would have
+   been told the safe answer. **That is worse than the defect.**
+
+**The question for the architect** — and it is now a different question from `Q-164`'s:
+
+  (a) add `gate_judge.temperature` to `config/protocol.yaml` **and** a `CONTEXT.md` §8.6 row, and
+      make the client read it with no default — the hard-rule-9 shape; **still possible today,
+      impossible after `prereg-v1`**; or
+  (b) make the Google branch omit `generationConfig.temperature` when the caller passes `None`, so
+      the docstring becomes true and both providers default identically; or
+  (c) accept `0.0` **explicitly**, declare it, and publish it — a deterministic judge is arguably
+      what a gate judge should be, but **it must be a declared choice and not an `else` clause**.
+
+⚠️ **THIS SESSION CHANGED NOTHING.** `config/` is fenced out of it, the choice moves a published
+number, and `CLAUDE.md` hard rule 2 makes it Class A → STOP. **What it did do is stop the docstring
+being the only account of this that anyone reads.**
+
+---
+
+### Q-184 — ⚠️ **`test_Q069_nothing_in_this_repository_imports_the_ledger_yet` IS RED, AND `Q-069`'s RULING COVERS NEITHER OF THE TWO BRANCHES ITS OWN FAILURE MESSAGE OFFERS.**
+
+**Status:** OPEN. **Class B.** **Raised by:** ARCH NIGHT 1 (`5d7e2b91`), 2026-09-04.
+⚠️ **STOPPED ON, NOT DECIDED** — hard rule 1.
+
+The test's own message names the fork and tells a session to read `Q-069` before touching it:
+
+> *"If the importer is `scorer/`, the ruling ALLOWS it and this test should be narrowed to the GATE
+> side, which is `check_roles` D3's job (C9's deliverable). If the importer is `gates/`, the ruling
+> FORBIDS it outright and the import is the defect, not this test."*
+
+**MEASURED — the twenty offenders, and NOT ONE of them is `gates/` or `scorer/`:**
+
+    src/whetstone_gate/benign/executor.py:71,72     src/whetstone_gate/driver/episode.py:82,83
+    src/whetstone_gate/benign/shell.py:97           src/whetstone_gate/driver/run.py:82,83
+    tests/test_c12_benign.py:41,42   tests/test_c12_driver.py:42,43
+    tests/test_c8_scorer.py:43,49,50,51,2565,3280,3281,3378,3379
+
+⚠️ **SO THE FAILURE MESSAGE OFFERS TWO BRANCHES AND THE MEASUREMENT TAKES NEITHER.** The importers
+are `benign/`, `driver/` and tests — C12's deliverables, built and landed since `Q-069` was ruled.
+**The ruling has no clause for them**, and this test is the only artefact asserting the premise.
+
+**The three options this session can see, none of which it may take:**
+
+1. **The premise has simply expired** and the test should be retired with its history recorded —
+   `Q-069`'s premise was *"NOTHING imports the ledger **yet**"*, and "yet" ended at C12.
+2. **Narrow it to the two packages the moat is actually about**, which is what the message's first
+   branch says for the `scorer/` case and which `check_roles` D1–D3 already do transitively.
+3. **It is a real finding about `benign/` and `driver/`** and the imports want a ruling of their
+   own.
+
+⚠️ **IT IS NOT THIS SESSION'S TO CHOOSE, AND IT IS NOT A GENESIS FAILURE.** It was inside the red
+count `GATE 3a` was told to report and it is named here so it is not silently folded into
+`INC-126`'s cluster, which it is not part of.
+
+---
+
+### Q-185 — ⚠️ **TWO `test_c8_scorer.py` REDS ARE ABOUT GOLDEN 2's NINTH FIXTURE, NOT ABOUT THE GENESIS ROOT, AND THEY CANNOT BE CLOSED WITHOUT EDITING A GOLDEN.**
+
+**Status:** OPEN. **Class B.** **Raised by:** ARCH NIGHT 1 (`5d7e2b91`), 2026-09-04.
+⚠️ **NOT FIXED — hard rule 3 makes `tests/goldens/` read-only, and this is the case where that
+bites.**
+
+`INC-126` attributed **six** `test_c8_scorer.py` failures to the genesis root. Measured tonight,
+**seven** node ids were genesis-caused and **two more were not**, and the two are a separate defect
+that was hidden inside the same red count:
+
+    test_golden2_coverage_block_reproduces
+        E1.clean_on: computed [... 'F7_s3', 'F8_s4', 'F9_capture_and_refund_on_one_payment']
+                     golden says [... 'F7_s3', 'F8_s4']
+        Left contains one more item: 'F9_capture_and_refund_on_one_payment'
+
+    test_null_is_not_empty_a_scorer_returning_empty_for_absent_subjects_passes_seven_of_eight
+        assert wrong == 7   ->   assert 8 == 7
+
+⚠️ **BOTH ARE THE SAME ARITHMETIC SEEN TWICE: THE FIXTURE SET GREW A NINTH CASE AND GOLDEN 2's
+COVERAGE BLOCK STILL DESCRIBES EIGHT.** The second test's name literally encodes the stale
+count — *"passes_seven_of_eight"* — and it now measures eight of nine.
+
+⚠️ **THE HONEST STATEMENT IS THAT THIS CANNOT BE CLOSED FROM A SESSION.** Closing it means either
+editing `tests/goldens/golden2*.json`'s coverage block — **forbidden outright** — or changing an
+assertion's expected count to match the code, which is hard rule 6's *"never weaken a test"* in its
+purest form: the golden is the **independent oracle**, and moving the test to agree with the
+implementation deletes the only thing that made it evidence.
+
+**The question for the architect:** was `F9_capture_and_refund_on_one_payment` added to the fixture
+set **after** golden 2 was hand-derived? If so the golden is stale against a hand-computation
+nobody redid, and hard rule 3's *"a `full` chunk with no golden may not be built"* points at a
+golden regeneration that only the architect may authorise, before `prereg-v1`.
+
+---
+
+### Q-186 — ⚠️⚠️ **GATE 2 WAS SKIPPED AND `evals/cal/RUN_DECLARED.md` STILL DOES NOT EXIST. THE UTC START TIME IN THE PILOT'S DECLARATION IS BLANK FOR THE FOURTH TIME, AND THAT IS STILL THE RIGHT ANSWER.**
+
+**Status:** OPEN. **Operator-only.** **Raised by:** ARCH NIGHT 1 (`5d7e2b91`), 2026-09-04.
+
+**GATE 1 DID NOT COMPLETE** — `Q-182`, preflight refused for want of two key **names**, before any
+dispatch and before any spend. This session's prompt gates the calibration on it in terms:
+*"GATE 2 — THE CALIBRATION … ⚠️ ONLY IF GATE 1 COMPLETED."* **It did not, so Gate 2 was not
+started**, and `evals/cal/RUN_DECLARED.md` was **not written**.
+
+⚠️ **AND WRITING IT ANYWAY WOULD HAVE BEEN THE WORSE ERROR, WHICH IS WHY THIS IS A QUESTION AND
+NOT AN APOLOGY.** `PROCESS.md` §6b makes the *push* of a declaration the moment the single-shot
+clock starts: *"From the moment it is pushed, the first execution that runs to completion IS the
+run."* Pushing a calibration declaration at 02:00 while the operator is asleep, while the
+calibration provably cannot run, and while §11a says *"do not approach the pilot, the calibration
+or the freeze overnight — they are the operator's and **he must be awake**"*, would have started a
+clock nobody could see.
+
+⚠️ **THE PILOT'S §8 BLANK WAS NOT FILLED, FOR THE FOURTH CONSECUTIVE SESSION.** `RUN_DECLARED.md`
+§8: *"A declaration carrying a start time earlier than the run is a pre-registration that was
+written afterwards."* This session's prompt ordered the blank filled at step **1d**, *after* 1b's
+preflight and 1c's rehearsal. **1b refused, so 1d was never reached, and no time was written.**
+`RESULTS.md` prints declared-versus-actual side by side; a time written for a run that provably
+could not begin is the exact falsehood that comparison exists to expose.
+
+⚠️ **ONE THING IS OWED AND IS NAMED SO IT IS NOT LOST.** `RUN_DECLARED.md` §8's second line reads
+`FILLED BY: __________________  (operator)`. This session's prompt said *"Replace ONLY the blank at
+line 318"* and *"CHANGE NOTHING ELSE IN THAT FILE"* — **line 318 is the time; line 319 is the
+name.** So even had Gate 1 completed, this session would have filled a time and left the attribution
+line blank, in a file whose §8 heading is *"FILLED BY THE OPERATOR AT THE MOMENT OF STARTING"*.
+**The architect should say whether a session may fill line 319 at all**, given that the answer is
+`(operator)` and the filler would not be one.
+
+---
+
+## ⚠️ MEASUREMENT UPDATE — `Q-169`, RE-MEASURED BY ARCH NIGHT 1 (`5d7e2b91`), 2026-09-04, AND **ITS UNRECONSTRUCTIBLE RESIDUAL IS NOW RECONSTRUCTED**
+
+`Q-169` published two counts that disagreed — **193** by the parser and **185 of 239** by a
+row-by-row resolution — and named four reasons, of which the third was *"a residual discrepancy of
+roughly two could not be reconstructed … Named rather than rounded away."* **GATE 3d re-measured
+both, and the residual is zero.**
+
+**THE PARSER'S RULE, READ FROM THE SOURCE.** `src/whetstone_gate/results/loader.py:315-341`,
+`open_findings_counts`: *a line beginning `| **OF-`, split on `|`, with at least 7 cells, whose
+cell\[6\] uppercased contains `OPEN`.*
+
+**BOTH NUMBERS HAVE MOVED, AND THE DRIFT IS PINNED COMMIT BY COMMIT:**
+
+| where | parser (`OPEN` / H / M / L) | last-occurrence resolution |
+|---|---|---|
+| `acfa919` — the state C19 README BUILD 1 read | **193** / 11 / 106 / 76 | **185** of 239 / 12 / 99 / 74 |
+| `HEAD` tonight | **195** / 11 / 107 / 77 | **192** of 244 / 12 / 103 / 77 |
+
+⚠️ **`Q-169`'s 193 AND 185 BOTH REPRODUCE EXACTLY AT `acfa919`, SO NEITHER WAS WRONG — THE FILE
+MOVED UNDER THEM.** `68dc891` added `OF-249`…`OF-252` (→ 195); `82c80ef` closed `OF-249` and added
+`OF-253` (→ 195, with HIGH 12 → 11 and MEDIUM 106 → 107). **`README.md` and `RESULTS.md` publish
+193, and the file has said 195 since `68dc891`.**
+
+**THE RECONCILIATION, WHICH `Q-169` COULD NOT CLOSE AND WHICH NOW CLOSES TO ZERO:**
+
+    193  the parser at acfa919
+     -7  duplicate ids collapsed by last-occurrence resolution   (measured row by row)
+     -6  prose-closed survivors OF-105..OF-109 and OF-111        (Q-169 item 1, STILL TRUE)
+     +5  prose-form findings OF-228..OF-232, which a row scan cannot see  (Q-169 item 2, STILL TRUE)
+    ---
+    185  EXACTLY Q-169's second figure. RESIDUAL: ZERO.
+
+⚠️ **AND `Q-169`'s ITEM 3 IS ANSWERED: THE ~2 IS FOUR PIPE-SHIFTED `OPEN` ROWS** — `OF-23`,
+`OF-66`, `OF-70` and `OF-243` — rows whose cell count is off because a finding's own prose contains
+a `|`. A resolver that recovers from the shift counts them; one that does not, does not. **That is
+the whole of the residual, and it is a parsing artefact rather than a disagreement about any
+finding.** `Q-169`'s items 1, 2 and 4 are all still true; **item 3 is now closed.**
+
+⚠️ **THE CONSEQUENCE `Q-169` NAMED IS UNCHANGED AND HAS GOT SLIGHTLY WORSE:** `results/trail.py`
+prints the parser's figure into the published review trail, the published figure is **193**, and the
+parser now returns **195**. **Default (3) — publish both side by side with the discrepancy named —
+is still the right default; the numbers in it need updating before `RESULTS.md` is generated.**
+
+---
+
+## ⚠️ MEASUREMENT UPDATE — `Q-163`, VERIFIED UNCHANGED BY ARCH NIGHT 1 (`5d7e2b91`), 2026-09-04
+
+**Every one of `Q-163`'s claims still holds, re-measured rather than re-read**, and it is stated
+here so the architect can rule it in one pass:
+
+- the two endpoints are module literals at `driver/clients.py:367-368`;
+- `config/lanes.yaml` carries no `base_url`, `endpoint` or `timeout` key for any lane;
+- `config/` holds exactly two files, and `tests/test_c14_prereg.py:167` requires a manifest row per
+  `config/*.yaml`, so a third file is a frozen-artefact change rather than a config edit;
+- the hard-rule-9 tripwire cannot fire on them — `CONTEXT.md` §8.6's constants table, which is the
+  tripwire's authoritative list, carries no URL row;
+- ⚠️ **and `Q-163`'s subtle claim about the raw-source scan was checked by EXECUTING the regex, not
+  by reading it:** `(?<![\w.])<name>\.` matches **none** of the fifteen forbidden names against
+  either real URL, and **does** fire on a planted `https://google.com/x`. The claim is exact.
+
+**OWED:** a `base_url` (and, if wanted, `timeout`) field per provider in `config/lanes.yaml`, so the
+endpoint is a config read like the model ids already are.
+**BLOCKS:** nothing that is measured today — it is a hard-rule-9 *shape* question, not a wrong value.
+**DEADLINE:** `prereg-v1` does not resolve, so it is legal now and a frozen-artefact edit after.
+**IF NOT RULED:** publishable as a stated limitation. It does not invalidate a number.
+
+---
+
+## ⚠️ MEASUREMENT UPDATE — `Q-164`, AND IT IS SUPERSEDED BY `Q-183`
+
+**OWED:** `gate_judge.temperature` in `config/protocol.yaml` **and** a matching `CONTEXT.md` §8.6
+constants-table row, without which the tripwire has nothing to scan against.
+**BLOCKS:** every arm 2 / 2S / 3 verdict. **It cannot touch the pilot** (`Q-144` ruled arm 1, which
+has no gate, so `complete_judge` makes zero calls).
+**DEADLINE:** `config/` is editable only until `prereg-v1`.
+**IF NOT RULED:** ⚠️ **it is NOT publishable as a limitation, because the run would not be
+undeclared — it would be declared WRONGLY.** `Q-164` and the client's own docstring both state that
+no temperature is sent and the provider's default applies; **`Q-183` measures a hardcoded `0.0` on
+the wire for the only lane the judge uses.** A limitation can be published; a false statement in the
+artefact a reviewer reads cannot.

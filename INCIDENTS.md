@@ -9993,3 +9993,228 @@ against a hosted provider — and these four components are, and nothing more.**
 this repository can run.** What now exists is the specific one: `INVARIANTS.md` §5.2's four
 components have four tests, one per component, each named in `OF-252`'s row and each proved able to
 fail. The general gap stays open and is published as a limitation.
+
+---
+
+## INC-134 — the declared pilot's pacer can turn a bucket WAIT into an uncaught abort, the test that pins it injects the shortfall, and the rehearsal that is supposed to catch it CANNOT — `--dry-run` never builds the pacer at all
+
+**Date:** 2026-09-04 (ARCH NIGHT 1, `5d7e2b91`). Fix SHA under **Fix**.
+
+⚠️ **THE `Q-179` / `INC-134` NUMBERS WERE ALLOCATED BY SESSION `8c47b1e0`, WHICH DIED BEFORE
+WRITING EITHER.** Its test docstrings, landed at `f45721d`, cite both by name. This entry is written
+by the session that landed that code so the citations resolve, and **every number below was
+re-measured by this session rather than transcribed** — the two measurements disagree, and the
+disagreement is in the entry.
+
+**Event:** `driver/run.py:458-462`, `_PacedClient._pace`, computes a wait, sleeps it, then requires
+the clock to have advanced by at least that much:
+
+    wait = buckets.wait_seconds(tokens=tokens, now=self.clock())
+    if wait > 0:
+        self.sleep(wait)
+    buckets.take(tokens=tokens, now=self.clock())
+
+`Bucket.take` (`runner/buckets.py:118-126`) raises `BucketError` when `wait_seconds(cost, now) > 0.0`
+— an **exact** comparison with no epsilon. So a clock that advances even one microsecond less than
+the sleep it was handed turns a bucket refusal into an abort, contradicting the contract that
+module's own message states: *"a bucket refusal is a WAIT, not an abort, and the two must not be
+confused"*. ⚠️ `BucketError` is a `RuntimeError`; it is **neither** `RateLimited` **nor**
+`ProviderFailed`, so `episode._MeteredCall.run` does not book it as a counted outcome and it escapes
+`driver_run.execute` **uncaught** — `Q-174`'s finding reached by a second route. `execute` defaults
+`clock=time.monotonic, sleep=time.sleep` (`run.py:488-489`).
+
+**Action:** ⚠️ **NOT FIXED. `driver/run.py` and `runner/buckets.py` are outside this session's
+fence**, which names `src/` only *"under GATES 0 AND 3's NAMED ITEMS ONLY"* and this is neither.
+Measured, recorded, and raised at `QUESTIONS.md` `Q-179`. The pinning test landed at `f45721d`.
+
+**Expectation:** a rehearsal that reports **20 of 20, exit 0** should mean the declared command's
+code path has been exercised. ⚠️ **IT DOES NOT, AND THAT IS THE HALF NOBODY HAD MEASURED.**
+`driver/run.py:592-602`:
+
+    paced = client
+    if request.spend_real_tokens:
+        paced = _PacedClient(...)
+
+**`_PacedClient` IS CONSTRUCTED ONLY ON THE `--spend-real-tokens` PATH.** A `--dry-run` rehearsal
+**never builds it**, never calls `_pace`, and therefore **cannot** exercise the one code path a
+single-shot run takes and a rehearsal does not. This session's own Gate 1b rehearsal — 20 of 20,
+exit 0, denominator reconciling 20 == 20 + 0 + 0 — proves nothing about the pacer, and the prompt
+that ordered it called it *"the only thing between a just-landed unreviewed provider boundary and an
+unrepeatable run."* **It is not that thing.**
+
+**Missing:** ⚠️ **a rehearsal mode that builds the pacer.** The `--dry-run` flag currently selects
+two things at once — *do not call a provider* and *do not pace* — and only the first is what the
+word means. A third option (`--dry-run` **with** pacing against a compressed clock) would have made
+this reachable for free, and it is exactly what the landed test does by hand with `_short_clock`.
+
+**Missed:** ⚠️ **the signal was in the landed test's own docstring and this session nearly filed its
+numbers unmeasured.** `test_the_DECLARED_COMMAND_now_ROUTES_and_is_STOPPED_BY_A_DIFFERENT_DEFECT`
+says the shortfall is *"injected rather than waited for, deliberately"* because the real-clock form
+*"reproduces it — that is how it was found — but as a race"*. **An injected shortfall proves the
+code is fragile; it does not measure how often the real clock is.** The distinction was available to
+be read and was one step from being copied forward as though it were a measurement.
+
+⚠️ **AND THE RE-MEASUREMENT DISAGREES WITH THE ONE IT INHERITED, IN THE DIRECTION THAT MATTERS.**
+Session `8c47b1e0` reported *"in a 300-sample measurement `time.sleep(w)` returned before
+`time.monotonic()` had advanced by `w` **139 times**, worst shortfall **-0.011 s**"*. This session
+re-ran it and got **242 of 300**, worst **-0.004 s** — *worse* on frequency. **But both were taken on
+sleeps of 1-4 ms, and the pilot does not sleep for 1-4 ms.** Driving the REAL `_PacedClient._pace`
+with the REAL `time.monotonic` and `time.sleep`, against `config/lanes.yaml`'s real `gemma-26b`
+buckets (rpm 30, tpm 16,000, rpd 14,400) at the pilot's real reservation of **3,000 tokens per call**
+(`60000 // 20`, `driver/episode.py:304`):
+
+    calls 1-5   : 0.000 s  (the TPM bucket starts full)
+    call  6     : 7.500 s
+    calls 7-24  : 11.250 s each   -- and 11.266 s / 11.234 s at calls 15 and 16
+    24 consecutive real-clock paced calls, ZERO BucketError
+
+**The race did not fire once in 24 calls.** `time.get_clock_info("monotonic").resolution` is
+**0.015625 s** on this machine, and against an 11.25 **second** sleep that quantum is 0.14% —
+`time.sleep` overshoots by more than the clock can round away. **The 242/300 figure is real and it
+is about millisecond sleeps; the pilot's waits are three orders of magnitude larger.** ⚠️ **This is
+NOT a clearance:** 24 of the 400 paced calls the pilot needs is 6%, the two figures are consistent
+with a rare failure rather than none, and the defect in the source is unchanged either way.
+
+**Diagnosis:** `_pace` reads a monotonic clock twice around a sleep and hands the second reading to a
+bucket that tests admissibility with an exact `> 0.0`, so any clock quantisation or early sleep
+return between the two reads converts a wait into an abort; and `--dry-run` bypasses the whole
+construction, so no rehearsal can observe it.
+
+**Fix:** ⚠️ **NONE — NOT FIXED HERE, AND THE ENTRY SAYS SO RATHER THAN NAMING A SHA IT DOES NOT
+HAVE.** The pinning test is `f45721d` (landed, not authored, by this session). The remedy is
+`Q-179`'s and the architect's: either `_pace` re-waits rather than taking on the first attempt, or
+`take` accepts the reading `wait_seconds` produced, or `BucketError` is booked as a counted outcome.
+**All three move a published number or a control-flow guarantee, so none is this session's to pick.**
+
+**Systemic guardrail:** ⚠️ **none yet — accepted, because the honest guardrail is a mode flag this
+session may not add.** The generalisable finding is stated instead, and it is the one worth keeping:
+**a rehearsal that is allowed to skip construction of the object under test is not a rehearsal.**
+`--dry-run` currently means two things and is documented as one. The narrow, checkable version — *a
+test asserting that the set of collaborators `execute` builds is the same under both modes except
+for the transport* — is three lines and belongs with whoever owns `driver/run.py`.
+
+---
+
+## INC-135 — closing the editor to pick up two environment variables killed a session holding six files of finished, uncommitted work, and nothing anywhere warned that the work was at risk
+
+**Date:** 2026-09-04 (ARCH NIGHT 1, `5d7e2b91`). Fix SHA under **Fix**.
+
+**Event:** session `8c47b1e0` (ARCH ROLE FIX) implemented `Q-171` and `Q-173` in full — the `tool`
+role mapped on both providers, the two `benign/` adapters taking a required undefaulted lane, four
+new tests and one hard-rule-6 flip. The operator then closed the editor so that a newly-set
+`GOOGLE_API_KEY` and `GROQ_API_KEY` would be visible to a restarted process. **The session died with
+the work uncommitted:** six files, 586 insertions, no commit, no push, no `docs/sessions/` record, no
+`INCIDENTS.md` entry, no `STATUS.md` row, no `PROGRESS.md` entry. It was recovered only because the
+work happened to survive in the shared working tree and the next prompt named it explicitly.
+
+**Action:** ARCH NIGHT 1 read the full `git diff` and verified the four properties the work claims
+before trusting any of it — `tool` maps to `user` on both maps; an unknown role still raises naming
+the role and the legal values on both paths; `lane` still required, undefaulted and keyword-only on
+all three implementations of both protocol methods; both `benign/` call sites passing a real lane —
+then measured the suite on **two** trees (HEAD exported with `git archive` to a fresh OS temp
+directory with `PYTHONPATH` pinned to it: **22 failed, 113 passed**; the working tree: **1 failed,
+136 passed, 2 skipped**) and landed it at **`f45721d`**, marked `(unreviewed)`, with the authorship
+and the non-disclosure stated in the commit's **first line**.
+
+**Expectation:** an environment change that requires a restart should not be able to destroy work,
+because work should not be able to reach six files and 586 insertions without a commit. `CLAUDE.md`
+§6 requires a push at the end of **every** session; there is no rule about the middle of one, and
+this session was killed in the middle.
+
+**Missing:** ⚠️ **any warning, of any kind, at any point.** Nothing in the harness, the editor or the
+process notices that a session is holding a large uncommitted delta; `git status` says so only to
+somebody who runs it, and a dying process runs nothing. There is also **no record the dead session
+left behind at all** — its own intent survives only inside the `QUESTIONS.md` prose it had already
+typed into the working tree, and that prose forward-references `docs/sessions/arch-role-fix-1.txt`,
+`Q-179` and `INC-134`, **none of which it lived to write.**
+
+**Missed:** ⚠️ **the restart was known to be coming and the work was not committed first.** The two
+variables were being set precisely so the pilot could run; the session that would be interrupted was
+the session doing the work. **The signal was the operator's own stated intention**, and the ordering
+it implied — commit, then restart — was available to both parties and taken by neither. ⚠️ **And
+`PROCESS.md` §7b already contains the argument in a different accent:** every one of its private-index
+rules exists because *another* session's uncommitted work is fragile. **Nothing generalised that to
+one's own.**
+
+**Diagnosis:** a session's only durable record is a commit, and this project's own rules place every
+commit at the **end** of a session, so an interrupted session is by construction a session that
+produces nothing — the failure needs no bug, only a stop.
+
+**Fix:** the work is landed at **`f45721d`**, verified rather than trusted, with the authorship
+disclosed in the first line of the message. **The dead session's own duties are NOT retroactively
+performed** — there is no `docs/sessions/arch-role-fix-1.txt` and this session did not write one
+under another session's name.
+
+**Systemic guardrail:** ⚠️ **a partial one is available and is proposed rather than claimed as
+done.** *"Commit and push after every gate"* is exactly this guardrail, and it is in the prompt that
+governs THIS session — where it reads *"a session that dies with six hours uncommitted has produced
+nothing, WHICH IS EXACTLY WHAT GATE 0 IS CLEANING UP."* **It was not in the prompt that governed the
+session that died.** The durable form is a rule in `PROCESS.md` §7 rather than a line in one prompt:
+**a session commits at every natural boundary, not only at the end**, and an operator action known
+to require a restart is announced to the session **before** it is taken. ⚠️ **The uncloseable half is
+named:** nothing can warn a process that is about to be killed, which is `INC-65`'s standing
+observation arriving on a second axis — there it was the session being *swept*, here it is the
+session being *stopped*, and neither can be told.
+
+---
+
+## INC-136 — a second live session is executing this session's prompt under this session's own token in the same working tree, and each discovered the other only by watching `git status` change under it
+
+**Date:** 2026-09-04 (ARCH NIGHT 1, `5d7e2b91`). Fix SHA under **Fix**.
+
+**Event:** at 01:54 local this session recorded `git status --porcelain -uall` as 8 modified paths.
+At 02:03, mid-read, the same command returned **12**, the four new ones being `PROTOCOL.md`,
+`tests/test_c7_ledger.py`, `tests/test_c8_scorer.py` and `tests/test_config_loader.py` — Gate 3a/3b/3c's
+deliverables, which this session had not touched. `PROTOCOL.md`'s new prose read *"RE-MEASURED ON
+2026-09-03 BY ARCH NIGHT 1 (`5d7e2b91`)"* — **this session's own name and its own token, written by
+something that is not this session.** Minutes later those four paths vanished from `git status`; they
+had been committed as **`90b6d6f`**, whose trailer is `Session-Token: 5d7e2b91`. Later,
+`docs/submission/git-history-secret-scan.txt` appeared untracked — **Gate 4, in flight.**
+
+**Action:** this session did **not** redo Gates 3a, 3b, 3c or 4, did not touch any of the five paths
+the other session owns, and committed **`f45721d`** through `PROCESS.md` §7b's private-index recipe
+with its six paths named before staging. The snapshot matched the pre-declaration exactly — 6 files,
+586 insertions, 69 deletions — so nothing was swept in either direction. All subsequent writes to the
+four shared documents are **pure appends** (`>>`), never read-modify-write, because two sessions
+rewriting a 761 KB file from separate in-memory reads is a lost-update race that `git` cannot see.
+
+**Expectation:** `CLAUDE.md` §5 says *"never invent one and never reuse one"* of a session token, and
+`make check-roles` is described as failing *"if a token is reused across roles"*. ⚠️ **This reuse is
+within one role**, ARCH/FIX, so the check has nothing to fire on: two sessions, one token, one role,
+one tree, and every commit either makes is indistinguishable from the other's in the log **for ever**.
+
+**Missing:** ⚠️ **any mechanism by which a session can learn that another session holds its token.**
+`PROCESS.md` §7a mechanises identity *"as far as it can be, and names it as an honour system where it
+cannot"*, and this is squarely in the second half. A token is issued in a prompt and recorded in
+`QUESTIONS.md`; nothing observes how many live processes are holding one.
+
+**Missed:** ⚠️ **the evidence was in this session's own first tool call and was read as a stale
+snapshot.** `git status` at 01:54 and the file mtimes at 02:03 (`PROTOCOL.md` 01:57:27, after this
+session started at 01:52) are the same fact twice, and the first reading was *"the operator did this
+earlier"*. **It was not earlier. It was concurrent, and the timestamp said so.** ⚠️ **And
+`PROCESS.md` §7b names this exact hazard in capitals — *"Two or more sessions run in one working tree,
+and they also share ONE `.git/index`"* — with eight incidents behind it.** What was missed is that
+§7b's whole apparatus protects the **paths**, and says nothing about two sessions **executing the
+same instructions**: both were told to write `docs/sessions/arch-night-1.txt`, and the second one to
+arrive would have silently overwritten the first's record of the night.
+
+**Diagnosis:** the prompt carrying token `5d7e2b91` was started twice against one working tree, and
+nothing in the token mechanism, the git recipe or the harness makes a duplicate observable to either
+holder — so the only detector is a session noticing its own `git status` change underneath it.
+
+**Fix:** ⚠️ **NONE — there is nothing for a session to fix, and this entry says so rather than
+inventing one.** Both sessions' commits stand; history is never rewritten here. What this session
+did instead is **disclose it in the commit that discovered it** (`f45721d`'s `Swept:` block names the
+four paths as *"NOT MINE"*), avoid every path the other session holds, write only by append, and
+publish its FINAL OUTPUT to a **distinct** filename so the other session's record cannot be
+destroyed by this one. ⚠️ **`QUESTIONS.md`'s `## Session tokens` row for `5d7e2b91` will therefore
+describe two sessions, and that is a fact about the run rather than a defect in the record.**
+
+**Systemic guardrail:** ⚠️ **none available to a session — accepted, because the only real guardrail
+is the operator's and it is one line:** a token is issued to exactly one process, and a prompt is not
+started twice. The **detection** half is closeable and is proposed: `make check-roles` already parses
+`Session-Token` trailers, and *"more than one commit carrying one token where the token's row names
+one session"* is a check it could make — but it can only ever fire **after** both commits exist, which
+is after the damage it would report. ⚠️ **The prevention half is uncloseable from inside a session**,
+which is `INC-65`'s and `INC-135`'s shape a third time: **nothing can tell a process about a process
+it cannot see.**
