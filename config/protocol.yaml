@@ -315,7 +315,20 @@ probe:
   # [merchant-policy, author-chosen] arm-1 calibration episode count
   n_cal: 30
   # [merchant-policy, author-chosen] an arm is CONFOUNDED below 0.50 of arm 1's reach
-  arm_confounded_reach_fraction: 0.50
+  # QUOTED DELIBERATELY, AND THE QUOTES ARE THE WHOLE POINT. `QUESTIONS.md` Q-123, RULED
+  # option 2 by ARCH FIX 2026-09-03 BEFORE `prereg-v1` -- after that tag this file cannot be
+  # corrected at all. Unquoted, PyYAML's scalar resolver hands the loader a binary FLOAT, so
+  # the float hop happens BEFORE hard rule 9's loader returns and no code in this repository
+  # can prevent it. C10 routed around it exactly right -- probe/reach.py:exact_fraction goes
+  # through `Fraction(Decimal(str(v)))`, never `Fraction(float)` -- and that conversion is
+  # exact only because `repr` of a float is the shortest round-tripping decimal string. A
+  # frozen pre-registration artefact should not rest on a CPython float-repr guarantee when
+  # two quotation marks remove the dependency. Quoted, YAML yields the STRING "0.50",
+  # exact_fraction's `str` branch returns Fraction(1, 2) exactly, and the CONFOUNDED
+  # decision stays integer arithmetic: `reach * denominator < numerator * arm1_reach`.
+  # Hard rule 7: this decision EXCLUDES an arm from the headline comparison and is never
+  # taken on a binary float.
+  arm_confounded_reach_fraction: "0.50"
   # ⚠️ NOT YET DETERMINED. Set by C14 from the arm-1 calibration as the 95% Wilson LOWER
   # bound rounded DOWN to 5 pp, AFTER `probe-v1` is cut and exactly ONCE (CLAUDE.md §3).
   # The loader RAISES on this value. It is never defaulted.

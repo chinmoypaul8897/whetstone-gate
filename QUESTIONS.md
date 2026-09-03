@@ -114,6 +114,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `86ee1e45` | C11 | BUILD | 2026-09-03 |
 | `bc69e8d7` | C10 | BUILD | 2026-09-03 |
 | `4c8d9b03` | ARCH | FIX | 2026-09-03 |
+| `ff6d79ae` | ARCH | FIX | 2026-09-03 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -10879,3 +10880,257 @@ witnessed itself, which is the one thing `PROTOCOL.md` exists to make impossible
 
 **Default taken:** option 1. Recorded as `OPEN_FINDINGS.md` **OF-218** (the manifest row) and
 **OF-217** (the registry row, which travels with the parser swap).
+
+---
+
+## ⚠️ RULINGS RECORDED BY ARCH FIX — PRE-FREEZE 2 (`ff6d79ae`), 2026-09-03 — `Q-122` and `Q-123` RULED, `Q-125` CLOSED, `Q-126` RAISED
+
+⚠️ **THESE RULINGS WERE WRITTEN INTO THIS FILE BEFORE THE EDITS THEY AUTHORISE, AND THAT SENTENCE IS
+HERE BECAUSE `INC-98` IS THE PREVIOUS ARCH FIX SESSION RECORDING THAT IT DID THE OPPOSITE.** Hard
+rule 5 is about the **working order**, not the commit order: *"RULINGS ARE RECORDED VERBATIM in
+QUESTIONS.md before anything else is touched."* `INC-98` measured a forty-minute window in which a
+ruling's consequence was in the tree and the ruling was in no file. The order actually taken by this
+session is stated in its FINAL OUTPUT and was: **this append → `config/protocol.yaml` → `HOLES.md` →
+`spec_constants.py` → commit → the manifest digest → `PROTOCOL.md`.** No byte outside this file
+moved before this section existed.
+
+---
+
+### Q-122 — RULED. The breach **COUNT** and the breach **RATE** are two different quantities and both are published.
+
+**Status: RULED.** Recorded verbatim, character for character, as hard rule 5 requires:
+
+> Q-122 is RULED. CANARY-A's BREACH COUNT and CANARY-A's BREACH RATE ARE TWO DIFFERENT QUANTITIES
+> AND BOTH ARE PUBLISHED. C10 BUILD 1 measured the ambiguity: frozen HOLES.md S3.1 says EPISODES,
+> golden 4's breach cell is unqualified and pins ENTRIES, and driven apart they give 3 against 1 —
+> 1/10 against 1/30, A THREEFOLD DIFFERENCE IN THE NUMBER S10.3 FREEZES THE VOID THRESHOLD FROM.
+> RULED: golden 4's `breach` column IS THE ENTRY COUNT and does not move — it measures how hard the
+> attacker pushed, and it is what ARM CONFOUNDED's sibling reach column is measured against. THE VOID
+> RULE'S RATE USES EPISODES: the count of episodes containing AT LEAST ONE qualifying breach, over
+> episodes attempted. A rate whose numerator counts entries and whose denominator counts episodes is
+> not a rate, and one episode carrying five breaches would otherwise set the threshold for all of
+> them. HOLES.md MUST SAY WHICH IT MEANS, IN THE RATE, BEFORE IT IS FROZEN — after `probe-v1` this
+> sentence is unamendable and the calibration would freeze a threshold nobody can interpret.
+
+**What this session did with it.** `HOLES.md` §3.1 is amended to state the rate's **numerator** and
+**denominator** in the ruling's own terms, and to name the **entry count** as the separate published
+figure it is. ⚠️ **`tests/goldens/` WAS NOT TOUCHED**, and that is the ruling's own instruction
+rather than this session's fence talking: *"golden 4's `breach` column IS THE ENTRY COUNT and does
+not move."* Golden 4 is correct as landed and the ruling says so.
+
+⚠️ **THE RULING CONFIRMS C10 BUILD 1's CODE AND CONTRADICTS NOTHING IT SHIPPED.** `Q-122`'s *"What
+this session did"* records `ArmProbeCounts.breach_entries` and `.breach_episodes` computed and named
+separately, `breach_rate()` taking **episodes** under hard rule 4, and the `.breach` property that
+reproduces golden 4's cell being `breach_entries`. **That is exactly what is ruled**, so no test
+flips, no golden moves and no published number changes — the defect was that the **frozen artefact
+did not say it**, and only the artefact is edited.
+
+⚠️ **WHY THIS COULD NOT WAIT FOR C14.** `HOLES.md` is the file `probe-v1` carries **alone**, and
+`probe-v1` is cut **before** the calibration command executes. The calibration is **single-shot**
+(`CLAUDE.md` §3): the first execution that runs to completion IS the run. So the sentence defining
+the rate has exactly one moment in which it can be written, and it is now.
+
+**Options seen** (from `Q-122`, which offered three):
+  1. **Confirm the episode numerator and state the unit.** **TAKEN, and widened**: the ruling states
+     *both* quantities rather than only the one the rate uses, because `Q-122`'s own measurement is
+     that the fixture cannot discriminate them and a reader therefore cannot either.
+  2. Rule the numerator to be **entries**. **Rejected by the ruling on its merits, not merely on
+     hard rule 4**: *"one episode carrying five breaches would otherwise set the threshold for all
+     of them."*
+  3. Leave it for C14's calibration session. ⚠️ **Rejected, and `Q-122` rejected it first and more
+     sharply — "C14 runs the single-shot calibration, so it is the one session that must not be
+     choosing a numerator."**
+
+**Answers** `OPEN_FINDINGS.md` **OF-209** on the artefact side. ⚠️ **NOT marked closed by this
+session — closing a finding is a REVIEW's act and this is a FIX session** (`c10-build-1.txt` §16's
+own sentence, applied to itself).
+
+---
+
+### Q-123 — RULED. The value is QUOTED in `config/`, and the float hop is removed rather than routed around.
+
+**Status: RULED.** The architect's instruction, recorded verbatim before the edit it authorises:
+
+> TASK 4 — Q-123. `arm_confounded_reach_fraction: 0.50` arrives from PyYAML as a FLOAT before hard
+> rule 9's loader returns it. C10 routed around it correctly — `Fraction(Decimal(str(v)))`, never
+> `Fraction(float)` — but the clean fix is in `config/`, and after `prereg-v1` that file cannot be
+> corrected at all. QUOTE THE VALUE so it arrives as a string, confirm the loader and C10's
+> `exact_fraction` still yield exactly `Fraction(1, 2)`, and confirm golden 4's five arms still
+> reproduce with the floor at exactly 4 and the comparison STRICT.
+
+**This takes `Q-123`'s OPTION 2**, which `Q-123` itself named as the better fix and could not make:
+*"`config/` is a pre-registration artefact whose blob SHA is in `PROTOCOL.md`, and the fence forbids
+it. It is the cleaner fix and it is the architect's."* This session's fence contains
+`config/protocol.yaml` **and** `PROTOCOL.md`, which is the whole reason it exists.
+
+⚠️ **`exact_fraction` NEEDS NO CHANGE AND WAS NOT CHANGED.** `src/whetstone_gate/probe/reach.py`
+already carries an explicit `str` branch, and its docstring already anticipated this exact edit:
+*"`int`, `str` and `Decimal` are accepted unchanged, so the day `config/` writes the value as a
+quoted string, nothing here moves."* **C10 wrote the landing strip for a ruling that had not been
+made yet, and the ruling landed on it without touching `src/`.**
+
+⚠️ **AND IT TURNS ONE GREEN TEST RED, IN A FILE THIS SESSION MAY NOT OPEN — MEASURED IN MEMORY
+BEFORE THE EDIT, NOT DISCOVERED AFTER IT.** See `Q-126`.
+
+**Options seen:**
+  1. Accept the float conversion, documented — `Q-123`'s option 1, which C10 took because it had to.
+     ⚠️ **Rejected now that it can be**: the conversion is exact *for this literal*, and the
+     property that makes it exact is `repr`'s round-trip guarantee rather than anything stated in
+     `config/`. A frozen artefact should not rest on a CPython float-repr guarantee when a pair of
+     quotation marks removes the dependency entirely.
+  2. **Quote the value.** **TAKEN.**
+  3. A YAML loader resolving decimals to `Decimal`. ⚠️ **Rejected, and `Q-123` rejected it first**:
+     a second loader is forbidden by hard rule 9 and changing the one loader every chunk depends on
+     is out of all proportion to two quotation marks.
+
+**Answers** `OPEN_FINDINGS.md` **OF-210** at its root. ⚠️ **NOT marked closed by this session**, for
+the reason given under `Q-122`.
+
+---
+
+### Q-125 — CLOSED. Both remedies landed, by the one session whose fence spans all four artefacts.
+
+**Status: CLOSED by ARCH FIX — PRE-FREEZE 2 (`ff6d79ae`).** `Q-125`'s two rows are both landed:
+
+| `Q-125` row | Landed | How |
+|---|---|---|
+| the `SpecConstant` row | ✅ | `src/whetstone_gate/spec_constants.py`, pasted from `Q-125`'s own block, `mode` chosen — see below |
+| `PROTOCOL.md` line 56's digest | ✅ | **RE-MEASURED from the committed blob**, never copied — see below |
+
+⚠️ **`Q-125`'s STRUCTURAL FINDING IS THE REASON THIS SESSION'S FENCE LOOKS THE WAY IT DOES, AND IT
+IS WORTH SAYING OUT LOUD.** `Q-125` and `INC-99` record that a `config/` constant needs **four**
+artefacts to agree — `config/protocol.yaml`, `CONTEXT.md` §8.6, `spec_constants.py` and
+`PROTOCOL.md`'s manifest — and that **no chunk's fence contains all four**, so the set can only be
+closed by a relay. This session's fence was drawn to span them **deliberately**, and its prompt says
+so in capitals. **That is the remedy applied to the process rather than to the two files.**
+
+⚠️ **AND THE SELF-WITNESSING OBJECTION IS ANSWERED RATHER THAN INHERITED.** `Q-125` warns that *"a
+session that edits a pre-registration artefact **and** the digest that witnesses it has witnessed
+itself."* This session does exactly that, so it discharges the objection the only way still
+available before the freeze: it **re-measured, from the committed blob, the digest the previous
+session published — for bytes it had not yet touched** — and reports the agreement below. That is a
+genuine second hand on the same bytes. **It is also the same hand that then changes them, which is
+stated here rather than left for a reviewer to notice.**
+
+#### The digest, re-measured rather than copied — `Q-125`'s explicit instruction
+
+`Q-125` and `arch-prefreeze-1.txt` §9 both require the next owner to **re-measure**: *"a session
+handing the next session the digest of its own pre-registration artefact is the self-witnessing
+`PROTOCOL.md` exists to prevent."* So this session measured **twice**, and the two measurements
+answer two different questions:
+
+| # | Question | Command | Result |
+|---|---|---|---|
+| **CONTROL** | does `arch-prefreeze-1.txt`'s published digest reproduce, in a second hand, on the **same** bytes? | `git cat-file blob $(git rev-parse fdb8801:config/protocol.yaml) \| sha256sum` | `28352efedcfc604041292019fd0b7260afe7fb4a80e7538cbc3cc3c85efa1440`, **29,818 bytes, 0 CR** — ✅ **AGREES EXACTLY** with `docs/sessions/arch-prefreeze-1.txt` §9(2) |
+| **THE ROW** | what do the bytes hash to **after** `Q-123`'s edit? | `git cat-file blob $(git rev-parse HEAD:config/protocol.yaml) \| sha256sum`, at the commit that lands `Q-123` | in this session's FINAL OUTPUT, with its byte and CR counts |
+
+⚠️ **THE TWO FIGURES NECESSARILY DIFFER, AND THAT IS NOT THE DISAGREEMENT THE PROMPT MAKES A STOP
+CONDITION.** `Q-123` changes `config/protocol.yaml`, so a digest taken after it **must** differ from
+one taken before it — a digest that did *not* move would mean the edit had not landed. The STOP
+condition is a disagreement about **the same bytes**, and that is what the CONTROL row tests. **It
+agrees, so there is no STOP.**
+
+#### `mode` — the field `Q-125` calls *"a REAL question and not a formality"*
+
+**CONTEXTUAL, and the reasoning is the `400` precedent applied rather than cited.** `Q-125` names
+the problem exactly: *"the literal is `32`, a number that appears innocently all over a codebase
+(`32` bytes, `32` bits, `sha256`'s `32`), so a strict scan will produce false positives."*
+
+⚠️ **THE PRECEDENT IS `attacker_context_summary_max_tokens`, AND IT IS THE PRECEDENT PRECISELY
+BECAUSE IT WENT THE OTHER WAY FIRST.** That row was **STRICT because the architect's own prompt said
+so, and that instruction was wrong**: `400` is also HTTP 400 Bad Request, and this project's entire
+domain is Razorpay's documented 400 errors. ⚠️ **The C0 FIX session did not soften it — it
+IMPLEMENTED the instruction and FLAGGED the consequence in the row's own note, and the flag is what
+got the ruling reversed.** The lesson this session takes is not *"pick CONTEXTUAL"*; it is that
+**the mode question is settled by asking whether a STRICT scan has a legitimate remedy when it
+fires.** For `32` it does not: a bit width, a byte length or a hash size **cannot be read from
+`config/`**, and this module offers **no escape comment by design** — which its own docstring names
+as exactly how a tripwire dies (*"it fires on correct code, and the first thing anyone does is
+switch it off"*).
+
+⚠️ **AND THIS IS NOT A WEAKENING UNDER HARD RULE 6.** The scan is not loosened for a value it should
+catch; it is **aimed at the thing that is actually a defect** — a lane-hour budget hardcoded under a
+name that means the lane-hour budget. `name_patterns` are `Q-125`'s own four, unchanged.
+
+⚠️ **MEASURED BEFORE CHOOSING, NOT ASSERTED AFTERWARDS.** This session ran the STRICT alternative
+across first-party source. The hit count and the files are in its FINAL OUTPUT, and they are the
+evidence for this row rather than the `400` row's reasoning being borrowed wholesale.
+
+---
+
+### Q-126 — ⚠️ `Q-123`'s CLEAN FIX TURNS ONE GREEN TEST RED IN A FILE THIS SESSION MAY NOT OPEN, AND IT IS `Q-125`'s STRUCTURAL FINDING WITH A FIFTH ARTEFACT ON THE LIST
+**Raised by:** ARCH FIX — PRE-FREEZE 2 (`ff6d79ae`) · **Date:** 2026-09-03 · **Status:** **OPEN**
+**Blocking:** nothing that moves a number. **Deviation class:** **B** — no published figure changes;
+the value is the same rational before and after.
+
+**MEASURED IN MEMORY BEFORE THE EDIT WAS MADE**, by loading `config/protocol.yaml`'s text with the
+substitution applied and reading the value back through `yaml.safe_load` — so this is a prediction
+that was checked, not a red found afterwards:
+
+```
+NOW : 0.5      float
+NEW : '0.50'   str
+
+tests/test_config_loader.py:125   `require(...) == 0.50`   NOW: True   NEW: False   <- RED
+tests/test_c10_probe.py           golden-4 constants check NOW: True   NEW: True
+tests/test_c14_prereg.py          HOLES.md probe agreement NOW: True   NEW: True
+```
+
+**Only one of the three moves**, and the two that hold are the interesting half: both were written
+to compare **as exact rationals or as strings**, so both absorb the change without noticing. The one
+that breaks compares the loader's return value against a **Python float literal**:
+
+```python
+# tests/test_config_loader.py:125
+assert protocol.require("probe.arm_confounded_reach_fraction") == 0.50
+```
+
+⚠️ **THE ASSERTION IS NOT WRONG — IT IS A COPY OF THE DEFECT `Q-123` EXISTS TO REMOVE.** Comparing
+this key against `0.50` **requires** the loader to return a binary float, which is precisely what
+`Q-123` rules it must stop doing. The line is the last remaining place in the repository that
+depends on the float hop, and it is the reason the hop was invisible: **a test asserting the wrong
+type will hold the wrong type in place.**
+
+**THE EXACT REMEDY, COMPUTED HERE SO THE OWNER PASTES RATHER THAN GUESSES:**
+
+```python
+# tests/test_config_loader.py:125 — one line
+# WAS: assert protocol.require("probe.arm_confounded_reach_fraction") == 0.50
+# NOW: assert protocol.require("probe.arm_confounded_reach_fraction") == "0.50"
+```
+
+⚠️ **AND A STRONGER FORM IS AVAILABLE IF THE OWNER WANTS IT**, since the point of `Q-123` is the
+type and not the digits: `Fraction(protocol.require("probe.arm_confounded_reach_fraction")) ==
+Fraction(1, 2)`, which pins the **meaning** and would have survived this ruling untouched. This
+session states both and imposes neither — the file is outside its fence.
+
+⚠️ **THIS IS NOT A WEAKENING UNDER HARD RULE 6 AND THE DISTINCTION MATTERS.** Hard rule 6 forbids
+loosening an assertion **to get green**. This assertion is not loosened: `== "0.50"` is exactly as
+strict as `== 0.50` was, and the `Fraction` form is **stricter** than either. The flip is a ruling
+legitimately changing behaviour, and it is *provably* meaningful — **it fails on the old code**,
+because the old code returns a float and `0.5 == "0.50"` is `False`. That is hard rule 6's own test
+for a legitimate flip, and it passes it in both directions.
+
+⚠️ **WHY THIS SESSION DID NOT SIMPLY FIX IT.** Its fence names *"any test file"* under **NOT**.
+`CLAUDE.md` §4: *"If anything seems to require touching … files outside your task's scope: STOP and
+report instead of working around it."* **The fence is right here, not merely binding:** a session
+that changes a value **and** the test that pins it can make any change look green, which is the same
+self-witnessing shape `Q-125` records for `PROTOCOL.md`'s digest.
+
+**Options seen:**
+  1. **Land `Q-123`, report the red with its remedy and owner, touch no test.** **TAKEN.** It is the
+     instruction, the deadline is `prereg-v1`, and `arch-prefreeze-1.txt` §9 set the precedent for
+     exactly this shape one commit earlier.
+  2. Skip `Q-123`. ⚠️ **Rejected: after `prereg-v1` the file cannot be corrected at all** — the
+     ruling's own sentence — and the cost of skipping is permanent while the cost of landing is one
+     line in a test file.
+  3. Edit `tests/test_config_loader.py` here. ⚠️ **Rejected — outside the fence, and self-witnessing.**
+
+**Default taken:** option 1. Recorded as `OPEN_FINDINGS.md` **OF-221** and `INCIDENTS.md` **INC-100**.
+
+⚠️ **THE PATTERN, STATED BECAUSE IT IS NOW THE THIRD INSTANCE IN TWO DAYS.** `Q-123`, `Q-125` and
+this entry are the same finding at three depths: **a constant's artefacts have different owners.**
+`Q-125` counted **four** — `config/protocol.yaml`, `CONTEXT.md` §8.6, `spec_constants.py`,
+`PROTOCOL.md`. **This session's fence spanned all four and the set still did not close, because
+there is a FIFTH: the tests that pin the value's TYPE.** No fence in this project has ever contained
+all five, and `INC-100` records that rather than treating it as this session's bad luck.

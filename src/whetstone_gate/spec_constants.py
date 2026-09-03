@@ -829,6 +829,58 @@ SPEC_CONSTANTS: tuple[SpecConstant, ...] = (
             "The tripwire is the only thing that would notice it being hardcoded."
         ),
     ),
+    SpecConstant(
+        key="projected_lane_hour_budget_h",
+        spec_row="projected lane-hour budget (the N decision rule's SECOND threshold)",
+        config_path="protocol.yaml:n_decision.projected_lane_hour_budget_h",
+        tag=_AUTHORED,
+        literals=("32",),
+        mode=_C,
+        name_patterns=("lane_hour", "lane_hours", "budget_h", "projected_lane"),
+        note=(
+            "CONTEXT.md S13.4's `two run-days at ~16 usable h/day (32 h)`; Q-120, RULED "
+            "2026-09-03 option 1, raised by C11 BUILD 1 (86ee1e45). "
+            "⚠ THE SEVENTH TIME S8.6 WAS FOUND INCOMPLETE, AND THE FIRST FOUND BY A SESSION "
+            "HAVING TO PARSE THE SPECIFICATION AT RUN TIME TO GET A NUMBER: until the config key "
+            "existed, runner/n_rule.py:lane_hour_budget PARSED this value out of S13.4's PROSE "
+            "with a regex refusing on zero matches and on more than one. The parser should now "
+            "read the key; that swap is owed to a session whose fence includes runner/ (OF-217). "
+            "⚠ IT IS A THRESHOLD, NOT A PROJECTION (S13.4 says so in capitals), so it does not "
+            "move when the projected figures do - and by Q-048's test ('does this value change "
+            "what the experiment sees?') it is the most load-bearing of the seven, because IT "
+            "SELECTS N AND N SIZES THE WHOLE M-ADV BLOCK. "
+            "⚠ CONTEXTUAL, AND THE MODE WAS A REAL QUESTION THAT Q-125 REFUSED TO ANSWER FOR "
+            "THIS SESSION - 'the literal is 32, a number that appears innocently all over a "
+            "codebase, so a strict scan will produce false positives.' MEASURED BEFORE CHOOSING, "
+            "over 80 first-party modules: STRICT gives FIVE hits in FIVE files and ALL FIVE ARE "
+            "LEGITIMATE CODE WITH NO LEGITIMATE REMEDY - check_roles.py's secret-scanning regex "
+            "`sk-[A-Za-z0-9]{32,}` (an API-key LENGTH, and firing there would land on the "
+            "SECRET SCANNER), world/prng.py's `U32_RANGE = 1 << 32` (mulberry32's word width), "
+            "world/semantics.py and world/selftest.py's Razorpay rule id `RS-32`, and n_rule.py's "
+            "own quoted prose about the threshold. A regex quantifier, a PRNG word width and a "
+            "rule id CANNOT BE READ FROM config/, and this module offers no escape comment BY "
+            "DESIGN - which its own docstring names as exactly how a tripwire dies: it fires on "
+            "correct code, and the first thing anyone does is switch it off. CONTEXTUAL with the "
+            "four name_patterns above gives ZERO false positives and STILL FIRES on the defect: "
+            "measured against `lane_hour_budget = 32`, `projected_lane_hour_budget_h = 32`, "
+            "`PROJECTED_LANE_HOURS = 32`, `budget_h: 32`, `self.lane_hours = 32` and "
+            "`n_rule(projected_lane_hour_budget_h=32)` - six shapes, all caught - while staying "
+            "silent on all five real occurrences above. "
+            "⚠ THE PRECEDENT IS attacker_context_summary_max_tokens AND IT IS THE PRECEDENT "
+            "BECAUSE IT WENT THE OTHER WAY FIRST: that row was STRICT because the architect's own "
+            "prompt said so, the C0 FIX session IMPLEMENTED the instruction AND FLAGGED the "
+            "consequence rather than softening it, and the flag is what got the ruling reversed. "
+            "The lesson taken here is not 'pick CONTEXTUAL' - it is that the mode question is "
+            "settled by asking whether a STRICT scan has a legitimate remedy when it fires. "
+            "⚠ NOT A WEAKENING UNDER HARD RULE 6: the scan is not loosened for a value it "
+            "should catch, it is aimed at what is actually a defect - a lane-hour budget "
+            "hardcoded under a name that means the lane-hour budget. "
+            "⚠ THE COMPANION RATE (S13.4's `1.92M tokens/h`) GETS NO ROW, deliberately: it is "
+            "DERIVED from config/lanes.yaml's two Gemma lanes by "
+            "runner/n_rule.py:gemma_tokens_per_lane_hour, which refuses unless exactly two are "
+            "found, and a derived figure is not an authored constant."
+        ),
+    ),
 )
 
 
