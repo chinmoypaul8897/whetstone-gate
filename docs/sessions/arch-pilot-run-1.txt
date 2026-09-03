@@ -747,3 +747,63 @@ END OF ARCH -- PILOT RUN 1
 ================================================================================
 END OF ADDENDUM. END OF ARCH -- PILOT RUN 1.
 ================================================================================
+
+================================================================================
+12. STATE AT THE MOMENT THIS BLOCK WAS PRINTED
+================================================================================
+
+  ! S11 WAS COMMITTED AT 33ed053. TWO MORE THINGS HAPPENED. THEY ARE APPENDED HERE
+    SO THE PRINTED BLOCK AND THE COMMITTED FILE STAY IDENTICAL AND EVERYTHING THAT
+    MATTERS IS INSIDE THE BLOCK, WHICH IS WHAT CLAUDE.md S6.1 AND S6.8 REQUIRE.
+
+  (G) INC-123 IS WRITTEN AND COMMITTED AT 0ccae43. S11(E) said the entry was OWED
+      and could not be written because INCIDENTS.md held 2e94c7b5's eight
+      uncommitted entries. THAT BLOCK LIFTED: 2e94c7b5 committed its own journal at
+      acfa919, INCIDENTS.md went clean, and the entry landed as INC-123 with all
+      EIGHT rule-13 fields filled - Event, Action, Expectation, Missing, Missed,
+      Diagnosis, Fix, Systemic guardrail - verified 8 of 8 at HEAD. Its opening
+      paragraph records WHY IT WAS LATE, because the delay is part of the record.
+      ! ITS `Systemic guardrail` IS THE WORD NONE, WITH THREE DESIGN CHANGES NAMED
+        AND NONE OF THEM IN THIS SESSION'S FENCE - one journal per session; a
+        check-roles E6 over journal commits; or concurrency withheld from sessions
+        that write the same journal, which PROCESS.md S1's own "disjoint SCOPE
+        FENCEs" ALREADY REQUIRES AND THE JOURNALS SILENTLY VIOLATE FOR EVERY
+        CONCURRENT PAIR EVER APPROVED.
+
+  (H) ! ONE STEP-5 CHECK EXITED 1, WHICH S7b CALLS A HARD-RULE-1 STOP, AND IT IS
+      REPORTED RATHER THAN SMOOTHED OVER. After committing 0ccae43,
+      `env -u GIT_INDEX_FILE git diff --cached --quiet` returned 1. IT WAS
+      INVESTIGATED IMMEDIATELY AND IT WAS A RACE, NOT A DIRTY INDEX: `--cached
+      --stat` and `--cached --name-status` were both EMPTY at that same moment, and
+      three consecutive re-checks returned exit 0 with ZERO paths staged in the
+      shared index. The concurrent session was mid-operation on `.git/index` when
+      the check ran. ! THE HONEST FORM: THE CHECK IS NOT ATOMIC AGAINST A LIVE
+      CONCURRENT SESSION, so a single exit-1 from it is not by itself evidence of a
+      dirty index - and that is one more thing S7b's recipe does not say.
+
+  FINAL FIGURES, ALL RE-VERIFIED AFTER EVERYTHING ABOVE:
+    this session's commits : 01ea31f, aa9e24c, 4ce8f56, 4788184, 7f39546, cc8a221,
+                             33ed053, 0ccae43 - EIGHT, all present in the log
+    concurrent commits that landed during it (OF-214) : b0a7bba, acfa919, d3efc95,
+                             f4562ea - FOUR, all 2e94c7b5's
+    shared index           : CLEAN, 0 paths, three consecutive checks
+    check-roles            : 21 passed, 0 failed, 3 n/a - OK
+    probe-v1               : 170bd3ff4abfdd8f87f64055972a60c82cc54efc, resolves
+    evals/                 : evals/pilot/RUN_DECLARED.md AND NOTHING ELSE
+    RUN_DECLARED.md S8     : PLACEHOLDER STILL BLANK
+    corpora                : three trees at their pins; load_entries() -> 498
+                             entries, all five hashes verified
+    TOKEN SPEND            : ZERO. gemma-26b 0/0. qwen-27b 0/0. NO PROVIDER CALL.
+
+  ! f4562ea, THE CONCURRENT SESSION'S LAST COMMIT, IS WORTH ONE LINE BECAUSE IT IS
+    THE SAME CLASS AS THIS SESSION'S OWN (A): "the FINAL OUTPUT named ANOTHER
+    SESSION'S two commits as its own, because its generator read `git log -2` at an
+    instant when a concurrent session had already landed on top." TWO SESSIONS, ONE
+    TREE, THE SAME DEFECT IN BOTH DIRECTIONS, INSIDE ONE AFTERNOON. That is not two
+    careless sessions; IT IS A PROCESS THAT PERMITS CONCURRENCY OVER SHARED JOURNALS
+    AND HAS NO MECHANISM FOR IT. INC-123's guardrail field says so, and says NONE.
+
+================================================================================
+END OF ARCH -- PILOT RUN 1. NOT SELF-CERTIFIED. prereg-v1 NOT CUT.
+THE PILOT'S SINGLE-SHOT WINDOW IS UNSPENT.
+================================================================================
