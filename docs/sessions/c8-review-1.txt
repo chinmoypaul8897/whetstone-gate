@@ -398,6 +398,11 @@ FULL SUITE, RUN BY THIS SESSION: 6 failed, 923 passed, 1 skipped (621 s).
      THIS SESSION'S OWN, and not a defect: it compares every tracked file's bytes
      to HEAD, so ANY uncommitted edit trips it.  Every file this session wrote is
      PURE LF, ZERO CRLF - verified byte by byte.
+     ! RE-MEASURED AFTER THIS SESSION'S COMMITS LANDED: GREEN, 1 passed.  So the
+     standing count is 5 FAILED, and #6 is CLOSED by committing rather than by
+     any change to the check.  It is left in the table above BECAUSE it was the
+     measurement at the time it was taken, and a measurement is reported as taken
+     or not at all - the correction is here rather than in place of it.
 
 NONE OF THE SIX IS A TEST C8 WEAKENED.  Verified: C8's commits never touch
 tests/test_c7_ledger.py (last written by C7 FIX 1, 464c587), and
