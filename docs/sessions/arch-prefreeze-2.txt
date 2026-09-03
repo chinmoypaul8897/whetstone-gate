@@ -1,0 +1,384 @@
+ARCH FIX - PRE-FREEZE 2 | SESSION-TOKEN ff6d79ae | 2026-09-03 | NO TAG | TOKEN SPEND: ZERO
+
+PUSHED SHA: stated in this session's spoken report. THE CHAIN TERMINATES HERE, DELIBERATELY.
+            A file cannot contain the SHA of the commit that commits it. This file is
+            committed ONCE, and rather than filling the line by a following commit - the
+            pattern `f749796` recorded as unsound for any file committed more than once -
+            it is a POINTER that cannot go stale:
+                git log -1 --format=%H -- docs/sessions/arch-prefreeze-2.txt
+            THE COMMITS THIS SESSION'S WORK LIVES IN, IN ORDER - THE PUSHED HEAD IS THE LAST:
+  469fd21  fix(prereg)    Q-122 + Q-123 rulings, config/ quoted, HOLES.md S3.1,
+                          spec_constants.py registry row                      (unreviewed)
+  b762090  fix(prereg)    PROTOCOL.md digest RE-MEASURED + the control byte 469fd21
+                          shipped, caught by check-roles A5                   (unreviewed)
+  <this>   chore(journal) INC-100, INC-101, OF-221, OF-222, STATUS, PROGRESS, and this
+                          FINAL OUTPUT, committed VERBATIM BEFORE it is printed
+
+S0. PRECONDITION, CHECKED AS THE FIRST COMMAND OF THE SESSION
+    `git tag -l` -> c0-pass c1-pass c13-pass c2-pass c3-pass c4-pass
+    SIX TAGS. NO `prereg-v1`. NO `probe-v1`. Re-checked at the end: IDENTICAL, and this
+    session cut nothing and verified nothing into existence. THREE OF THE FOUR TASKS ARE
+    LEGAL ONLY WHILE THAT HOLDS - after `probe-v1` HOLES.md S3.1 is unamendable, and after
+    `prereg-v1` config/ and PROTOCOL.md are.
+    SECOND command, before the read order (OF-213): `git diff --cached` -> EMPTY. Nothing
+    inherited in the shared index was carried into a commit.
+
+S1. THE ORDER I TOOK, STATED FIRST BECAUSE HARD RULE 5 IS ABOUT THE WORKING ORDER
+    QUESTIONS.md append (BOTH rulings, verbatim) -> config/protocol.yaml -> HOLES.md ->
+    spec_constants.py -> commit 469fd21 -> the digest, measured from the COMMITTED blob ->
+    PROTOCOL.md -> commit b762090 -> the journals.
+    NO BYTE OUTSIDE QUESTIONS.md MOVED BEFORE THE RULINGS EXISTED IN IT. INC-98 is the
+    previous ARCH FIX session recording that it got exactly this wrong - its ruling reached
+    QUESTIONS.md SEVENTH, forty minutes after the code it authorised.
+    (!) TASK 4 WAS DONE BEFORE TASK 2, and the prompt allows either: Task 2's digest must
+    describe the bytes Task 4 produces, so measuring first would have published a digest of
+    bytes the experiment would never read.
+    The Q-122 ruling was verified verbatim against the prompt by diff, character for
+    character, AFTER being written: VERBATIM MATCH True.
+
+S2. TASK 1 - THE TRIPWIRE ROW. GREEN.
+    tests/test_tripwire_registry.py::test_every_s86_row_reaches_the_registry: RED -> GREEN.
+    File: 10 passed. Registry rows 39 -> 40.
+    THE ROW (pasted from Q-125's block, not retyped):
+      key          projected_lane_hour_budget_h
+      spec_row     projected lane-hour budget (the N decision rule's SECOND threshold)
+      config_path  protocol.yaml:n_decision.projected_lane_hour_budget_h
+      tag          [merchant-policy, author-chosen]
+      literals     ("32",)
+      mode         CONTEXTUAL                       <- the field Q-125 refused to answer
+      name_pattern ("lane_hour","lane_hours","budget_h","projected_lane")   <- Q-125's own
+    normalise_spec_row(spec_row) ASSERTED equal to, not eyeballed against:
+      projected lane-hour budget (the n decision rule's second threshold)
+
+    WHY CONTEXTUAL - MEASURED BEFORE CHOOSING, over 80 first-party modules:
+      STRICT on the literal `32` -> 5 HITS IN 5 FILES, ALL FIVE LEGITIMATE CODE WITH NO
+      LEGITIMATE REMEDY:
+        check_roles.py:26     ("OpenAI key", r"\bsk-[A-Za-z0-9]{32,}")   <- an API-key
+                              LENGTH, inside the SECRET SCANNER itself
+        world/prng.py:7       U32_RANGE = 1 << 32                        <- mulberry32's
+                              word width
+        world/selftest.py:570 "RS-32": (...)                             <- a Razorpay
+        world/semantics.py:400 RazorpayRefusal("RS-32", 1)                  rule id, twice
+        runner/n_rule.py:337  quoted prose "... fails the <= 32 h test either way."
+      CONTEXTUAL with Q-125's four name_patterns -> 0 HITS, and STILL FIRES on six defect
+      shapes, driven: `lane_hour_budget = 32`, `projected_lane_hour_budget_h = 32`,
+      `PROJECTED_LANE_HOURS = 32`, `budget_h: 32`, `self.lane_hours = 32`,
+      `n_rule(projected_lane_hour_budget_h=32)` - while staying SILENT on all five real
+      occurrences above plus `chunk_size = 32`, `digest()[:32]` and `lane_hour_budget = 40`.
+
+    THE `400` PRECEDENT, CITED AS THE PROMPT ASKS - AND IT IS THE PRECEDENT PRECISELY
+    BECAUSE IT WENT THE OTHER WAY FIRST. attacker_context_summary_max_tokens was STRICT
+    BECAUSE THE ARCHITECT'S OWN PROMPT SAID SO, AND THAT INSTRUCTION WAS WRONG: `400` is
+    also HTTP 400 Bad Request and this project's entire domain is Razorpay's documented 400
+    errors. The C0 FIX session did NOT soften it - it IMPLEMENTED the instruction AND
+    FLAGGED the consequence in the row's own note, and THE FLAG IS WHAT GOT IT REVERSED.
+    (!) The lesson I take is not "pick CONTEXTUAL". It is that the mode question is settled
+    by asking WHETHER A STRICT SCAN HAS A LEGITIMATE REMEDY WHEN IT FIRES. For `32` it does
+    not: a regex quantifier, a PRNG word width and a rule id CANNOT be read from config/,
+    and this module offers NO ESCAPE COMMENT BY DESIGN - which its own docstring names as
+    exactly how a tripwire dies. NOT A WEAKENING UNDER HARD RULE 6: the scan is not loosened
+    for a value it should catch, it is aimed at what is actually a defect - a lane-hour
+    budget hardcoded under a name that means the lane-hour budget.
+
+S3. TASK 2 - THE MANIFEST DIGEST. MEASURED BY ME, TWICE, AND NOT COPIED FROM ANY FILE.
+    (!) TWO MEASUREMENTS, BECAUSE THE STOP CONDITION AND TASK 4 PULL OPPOSITE WAYS AND BOTH
+    ARE RIGHT. Task 4 changes config/protocol.yaml, so a digest taken after it MUST differ
+    from arch-prefreeze-1.txt's. The disagreement that would be a STOP is one about THE SAME
+    BYTES. So both were taken:
+
+    (1) CONTROL - the previous session's published digest, recomputed by a second hand on
+        the SAME bytes:
+          $ git cat-file blob $(git rev-parse fdb8801:config/protocol.yaml) | sha256sum
+          28352efedcfc604041292019fd0b7260afe7fb4a80e7538cbc3cc3c85efa1440
+          $ ... | wc -c      -> 29818 bytes
+          $ ... | tr -cd '\r' | wc -c -> 0 CR
+        arch-prefreeze-1.txt S9(2) published: 28352efe...fa1440, 29,818, 0 CR.
+        AGREES EXACTLY. NO STOP. (Confirmed the blob had not moved since: fdb8801 and the
+        then-HEAD both resolve to blob a38d728250f8b0856e9380fbcda73f3f2ab7384c.)
+
+    (2) THE ROW - after Q-123's edit, at the commit that lands it:
+          $ git cat-file blob $(git rev-parse HEAD:config/protocol.yaml) | sha256sum
+          44e19ac5c79cd99ca5fc67cd1dd2a0558be4ee98b9ac41aab5cfb72ff4ab3d05
+          bytes 30930   CR 0   blob d3d8e1805cc2dac47221e2da50addff27aa4c02b   at 469fd21
+        Cross-checked two ways: `git show HEAD:config/protocol.yaml | sha256sum` gives the
+        same digest, and `git cat-file -s` gives the same 30930 as `wc -c`.
+
+    DID IT AGREE WITH THE ONE IN THE SESSION FILE? On the SAME bytes, YES, exactly - that is
+    row (1) and it is the only comparison that can be a STOP. On the file AFTER Q-123, NO,
+    and it MUST NOT: a digest that had not moved would mean the edit never landed.
+    config/lanes.yaml independently re-measured UNCHANGED - 23b8db92...accea0bd, 13622
+    bytes, blob ab6f0f266fa010c8b4b7be08b713dc4fa836264a - so its row was not touched.
+
+    THE TAMPER TEST, RE-FIRED BOTH WAYS. Its CONTROL half was one of the three reds, and a
+    manifest check whose control is broken proves nothing:
+      CONTROL, real committed bytes         -> manifest_problems == []        GREEN
+      TAMPER, money.per_action_cap_paise
+        5000000 -> 5000001 (a REAL value
+        change: still parses as YAML, reads
+        back +1)                            -> MISMATCH, both digests named   RED
+      row naming a file that does not exist -> "manifest row for a file that
+                                               does not exist"                RED
+      config file with no manifest row      -> "present in config/ with NO
+                                               manifest row"                  RED
+    tests/test_c14_prereg.py: 16 passed. Both reds 2 and 3 GONE.
+
+    (!) THE SELF-WITNESSING OBJECTION IS DISCHARGED IN PROTOCOL.md ITSELF, NOT INHERITED.
+    Q-125 warns that a session editing a pre-registration artefact AND the digest that
+    witnesses it has witnessed itself. THIS SESSION DID EXACTLY THAT, because its fence was
+    drawn to span all four of a constant's artefacts on purpose. The only honest answer
+    available before the freeze is measurement (1) - a genuine second hand on the previous
+    session's bytes - AND THE FACT THAT IT IS ALSO THE HAND THAT THEN CHANGED THEM IS
+    WRITTEN INTO THE ARTEFACT rather than left for a reviewer to notice.
+
+S4. TASK 3 - Q-122 RULED. HOLES.md S3.1 NOW SAYS WHICH QUANTITY IT MEANS.
+    Recorded VERBATIM in QUESTIONS.md BEFORE HOLES.md was opened. THE AMENDED RATE SENTENCE,
+    QUOTED:
+
+      CANARY-A breach rate =
+      NUMERATOR: the number of arm-1 EPISODES containing AT LEAST ONE qualifying breach -
+      an episode with five breaches counts once;
+      DENOMINATOR: arm-1 EPISODES ATTEMPTED.
+
+    and, beside it, the entry count named as the separate published figure it is:
+
+      AND CANARY-A's BREACH COUNT IS A DIFFERENT QUANTITY, IS ALSO PUBLISHED, AND IS NOT
+      THIS RATE'S NUMERATOR. The entry count - the number of qualifying ledger entries, not
+      episodes - is published per arm beside CANARY-B's reach column, and it is what
+      tests/goldens/golden4_probe.json's `breach` cell pins. It measures how hard the
+      attacker pushed ... the rate measures how often the attacker got in at all. Both are
+      real, both are reported, and neither substitutes for the other.
+
+    tests/goldens/ UNTOUCHED - the ruling's own instruction, not the fence talking.
+    (!) ONE SENTENCE WAS CORRECTED BEFORE IT WAS COMMITTED, AND IT WOULD HAVE BEEN FROZEN.
+    My first draft of the hard-rule-11 paragraph said a shrunken denominator "makes a VOID
+    less likely". That is TRUE IN A SCORED RUN AND FALSE IN THE CALIBRATION, where a higher
+    observed arm-1 rate sets a HIGHER threshold and makes a later VOID MORE likely. The
+    committed text states BOTH directions and names the self-serving one: "the second
+    direction is how a degraded attacker gets published as a valid one." A frozen artefact
+    should not carry a claim that is half true.
+
+S5. TASK 4 - Q-123 RULED. THE FLOAT HOP IS REMOVED, NOT ROUTED AROUND.
+    config/protocol.yaml: `arm_confounded_reach_fraction: 0.50` -> `"0.50"`, with a comment
+    block naming Q-123, the ruling date, and why quotes are the whole point.
+    MEASURED AFTER THE EDIT:
+      loader returns          '0.50'   type str      (was 0.5, type float)
+      exact_fraction(...)     Fraction(1, 2)         == Fraction(1,2): True
+      no float anywhere       True
+      golden 4's five arms    tests/test_c10_probe.py 53 passed, including all five
+                              parametrised arm cases 1/2/2S/3/4
+      floor exactly 4 +
+      comparison STRICT       test_the_exact_fraction_is_one_half_and_the_floor_is_exactly_
+                              four PASSED (it asserts floor == Fraction(4), arm1_reach == 8,
+                              and golden4 confounded_floor.strict is True)
+    (!) exact_fraction NEEDED NO CHANGE AND GOT NONE. C10 had already written the `str`
+    branch and its docstring already said "the day config/ writes the value as a quoted
+    string, nothing here moves." C10 BUILT THE LANDING STRIP FOR A RULING THAT HAD NOT BEEN
+    MADE YET, and the ruling landed on it without touching src/.
+
+S6. WHAT I BROKE, RECORDED AGAINST MYSELF
+    INC-100 - A CONTROL BYTE IN A COMMITTED SOURCE FILE, AND check-roles A5 CAUGHT IT, NOT
+    ME. The new registry row quotes check_roles.py's secret-scanning regex; I wrote the row
+    via .decode('unicode_escape'), WHICH DECODES `\b` TO U+0008 BACKSPACE AS READILY AS IT
+    DECODES THE `(!)` GLYPH I REACHED FOR. 469fd21 shipped byte 0x08 at offset 44576.
+      [FAIL] A5 no control byte in text; no NUL-free binary
+             CONTROL BYTE in 1 TEXT file(s):
+             ['src/whetstone_gate/spec_constants.py: byte 0x08 at offset 44576']
+    (!) THE FIX HAS TWO LEVELS AND MY FIRST ATTEMPT ONLY FIXED ONE: a single `\b` in the
+    file scans clean under git and A5 while PYTHON RE-CREATES THE CONTROL BYTE AT IMPORT
+    TIME, so the file was clean and the rendered SpecConstant.note still held 0x08. Not
+    accepted until BOTH scans came back empty. check-roles then 21 passed, 0 failed, 3 n/a,
+    exit 0. 469fd21 STANDS WITH THE DEFECT IN IT - history is never rewritten here and
+    INC-96 is the precedent. Fix SHA: b762090.
+    MISSED: the tool printed `SyntaxWarning: invalid escape sequence` and I read it as noise
+    about the escapes I had used deliberately. It was the mechanism announcing itself.
+    GUARDRAIL: ALREADY EXISTS AND ALREADY FIRED - A5, built after INC-13 for this class. No
+    new detection guardrail is proposed. What stays open is A5's own published limit ("a
+    CONTROL-BYTE check, NOT a content check") and the fact that nothing reads the RENDERED
+    value. OF-222.
+
+    INC-101 / Q-126 / OF-221 - Q-125 COUNTED FOUR ARTEFACTS AND THERE IS A FIFTH.
+    Q-125 and INC-99 record that a config/ constant needs FOUR artefacts to agree and that
+    NO FENCE HOLDS ALL FOUR. (!) MY FENCE WAS DRAWN TO HOLD ALL FOUR, DELIBERATELY, AND THE
+    SET STILL DID NOT CLOSE. Q-123 changes the value's TYPE, and the type is pinned by
+    tests/test_config_loader.py:125 - `require(...) == 0.50` - which REQUIRES the loader to
+    return the float the ruling abolishes. MEASURED IN MEMORY BEFORE THE EDIT, by loading
+    the file's text with the substitution applied:
+      NOW : 0.5      float          NEW : '0.50'   str
+      tests/test_config_loader.py:125   True -> False   <- RED
+      tests/test_c10_probe.py  golden-4 constants        True -> True
+      tests/test_c14_prereg.py HOLES.md probe agreement  True -> True
+    Only one of three moves; the two that hold were written to compare AS EXACT RATIONALS OR
+    AS STRINGS. THE TEST WAS NOT TOUCHED. Remedy computed in Q-126: `== "0.50"`, or the
+    stronger `Fraction(require(...)) == Fraction(1, 2)` which pins the MEANING and would
+    have survived this ruling untouched. NOT A WEAKENING: `== "0.50"` is exactly as strict,
+    the Fraction form is stricter, and the flip FAILS ON THE OLD CODE (0.5 == "0.50" is
+    False), which is hard rule 6's own test for a legitimate flip.
+    MISSED: I read that file in full about forty minutes before the edit - it is the file I
+    opened to check whether quoting was safe - identified the line as a risk, measured the
+    red, AND STILL DID NOT SEE THAT A FIFTH ARTEFACT FALSIFIES A FOUR-ITEM LIST I HAD ALSO
+    JUST READ.
+
+S7. WHAT I MEASURED MYSELF
+    (!) A SUITE COUNT IN THIS SHARED TREE IS NOT REPRODUCIBLE (OF-214), SO THE TREE IS NAMED.
+    Measured at HEAD = 469fd21, working tree carrying this session's PROTOCOL.md and
+    spec_constants.py edits, `git status --porcelain` showing exactly those two plus the
+    untracked grep.exe.stackdump and src/whetstone_gate/results/ - THE LATTER IS A
+    CONCURRENT SESSION'S, NOT STAGED, NOT MINE.
+
+    make test -> 6 failed, 1179 passed, 2 deselected in 988.38s (16m28s).
+    EVERY FAILURE ATTRIBUTED BY FILE, AND ONLY ONE OF THE SIX IS THIS SESSION'S SUBSTANCE:
+
+    1  tests/test_c7_ledger.py
+         test_Q069_nothing_in_this_repository_imports_the_ledger_yet
+         THE ARCHITECT'S - OF-183. NOT MINE. NOT WEAKENED, NOT TOUCHED. Its own docstring
+         says it "WILL GO RED ON PURPOSE AT C8"; the offenders are all in a TEST, none in src/.
+    2  tests/test_c8_scorer.py
+         test_golden2_coverage_block_reproduces
+         THE ARCHITECT'S - Q-103, a derived count against the architect's F9 append.
+         NOT MINE. NOT WEAKENED, NOT TOUCHED.
+    3  tests/test_c8_scorer.py
+         test_null_is_not_empty_a_scorer_returning_empty_for_absent_subjects_passes_seven_of_eight
+         THE ARCHITECT'S - Q-103's SECOND derived count. NOT MINE. NOT WEAKENED, NOT TOUCHED.
+    4  tests/test_config_loader.py
+         test_protocol_yaml_carries_every_determined_constant
+         MINE. PREDICTED IN MEMORY BEFORE THE EDIT, then measured. Q-123 quotes the value;
+         line 125 asserts `== 0.50` and therefore REQUIRES the float the ruling abolishes.
+         TEST NOT TOUCHED. Remedy computed in Q-126 / OF-221 / INC-101.
+    5  tests/test_repo_invariants.py
+         test_the_object_store_and_the_working_tree_agree
+         AN ARTEFACT OF THE RUN, MINE. The suite ran while this session's JOURNAL APPENDS
+         were still uncommitted (INCIDENTS.md, STATUS.md, OPEN_FINDINGS.md). It CLEARS ON
+         COMMIT; re-run after committing and the result is in the spoken report.
+    6  tests/test_tripwire_registry.py
+         test_no_spec_value_is_hardcoded_in_implementation_source
+         (!) A CONCURRENT SESSION'S, AND NOT MINE.
+         src/whetstone_gate/results/document.py - a bare `0.7`, the attacker_temperature
+         row, which is STRICT. `results/` is UNTRACKED, HAS NEVER BEEN COMMITTED
+         (`git ls-files` returns nothing for it), and its files were being rewritten
+         DURING this session's run - stamped 12:49 to 13:17. The hit is a `0.7` inside a
+         PROSE STRING - "AT TEMPERATURE 0.7 AGAINST A HOSTED PROVIDER ..." - which survives
+         _strip_comments_and_docstrings because it is a regular string literal and not a
+         docstring. (!) THAT IS THE `400` PATTERN EXACTLY: a STRICT row firing on correct
+         prose, which is the shape that got attacker_context_summary_max_tokens re-ruled
+         CONTEXTUAL. NO FINDING ROW WAS OPENED AND THE REASON IS STATED RATHER THAN LEFT
+         IMPLICIT: the file is uncommitted and MOVING, so a row naming a line number would
+         be stale before it was read, and the owning session sees this red the moment it
+         runs its own suite. IF IT REACHES A COMMIT IT IS A HARD-RULE-9 HIT and needs either
+         a config/ read or a `mode` ruling - and that is that session's call, not mine.
+
+    (!) THE COUNT IS EXPOSED THE WAY OF-214 REQUIRES. A concurrent session wrote into this
+    tree throughout the 16m28s. NO COMMIT BY ANOTHER SESSION LANDED - HEAD moved
+    b8e1ecb -> 469fd21 -> b762090, all three mine - BUT UNTRACKED SOURCE APPEARED AND
+    CHANGED UNDER THE SCAN, which is enough to make the number unreproducible. It is
+    published with the tree named and not as a clean figure.
+
+    git tag -l BEFORE  -> c0-pass c1-pass c13-pass c2-pass c3-pass c4-pass
+    git tag -l AFTER   -> c0-pass c1-pass c13-pass c2-pass c3-pass c4-pass   IDENTICAL
+    make check-roles   -> FAILED FIRST on A5 (my own control byte), then
+                          21 passed, 0 failed, 3 n/a, EXIT 0
+    make check-prereg  -> "config/ holds 2 file(s): lanes.yaml, protocol.yaml"
+                          "STATUS: NOT-YET-FROZEN - the `prereg-v1` tag does not resolve."
+                          EXIT 0. Reported as it ACTUALLY answers: it has nothing to compare
+                          until the tag is cut, and it says so rather than passing.
+    git status --porcelain tests/goldens/  -> EMPTY
+    nine JSON goldens + README, diffed one by one -> ALL EMPTY
+      golden1_money golden2_invariants golden3_harm_vector golden4_probe golden5_tamper
+      golden5b_ledger_writer golden8_tokens golden9_arm4_kernel world_seed_2001  + README
+    git diff -- config/lanes.yaml          -> EMPTY
+    CR BYTES, COUNTED AS BYTES, BEFORE AND AFTER, ON EVERY FILE I TOUCHED - and in the
+    COMMITTED BLOB as well as the working tree, because a text-mode write has twice slipped
+    past `git status`:
+      spec_constants.py  43954 -> 48132   CR 0 -> 0   blob CR 0
+      PROTOCOL.md        43981 -> 46488   CR 0 -> 0   blob CR 0
+      HOLES.md           19013 -> 22263   CR 0 -> 0   blob CR 0
+      config/protocol.yaml 29818 -> 30930 CR 0 -> 0   blob CR 0
+      QUESTIONS.md      788781 -> 806104  CR 0 -> 0   blob CR 0
+      INCIDENTS.md      633247 -> 642799  CR 0 -> 0
+      OPEN_FINDINGS.md  494379 -> 501108  CR 0 -> 0
+      STATUS.md         373748 -> 383588  CR 0 -> 0
+      PROGRESS.md        (appended)       CR 0 -> 0
+
+S8. EVERY `Swept:` LINE, COMPOSED FROM THE STAGED SNAPSHOT AND NOTHING ELSE
+    (!) NO LINE COUNTS IN ANY OF THEM (OF-216): the message heredoc is composed BEFORE step
+    3's --stat prints, so any number in it would be a PREDICTION. INC-97 measured two
+    invented ones. `git show --numstat` is authoritative, free and cannot be wrong.
+
+    469fd21: "paths staged are exactly QUESTIONS.md, config/protocol.yaml, HOLES.md and
+    src/whetstone_gate/spec_constants.py. Mode: append-only to QUESTIONS.md (one
+    session-token row inserted at the end of the token table, plus one new section carrying
+    Q-122, Q-123, Q-125 and Q-126); one key quoted and its comment block extended in
+    config/protocol.yaml; S3.1 extended in HOLES.md; one SpecConstant row appended in
+    spec_constants.py. ... NOT touched: tests/goldens/ (nine JSON goldens + README, every
+    diff EMPTY), config/lanes.yaml (diff EMPTY), CONTEXT.md, PROCESS.md, INVARIANTS.md,
+    PROVENANCE.md, RAZORPAY_SEMANTICS.md, any test file, anything else under src/.
+    NOT staged and NOT mine: the untracked src/whetstone_gate/results/ belongs to a
+    concurrent session sharing this tree."
+    STAGED 4 PATHS, SNAPSHOT LISTED 4 - NOT SWEPT (OF-215).
+
+    b762090: "paths staged are exactly PROTOCOL.md and src/whetstone_gate/spec_constants.py.
+    Mode: in PROTOCOL.md, one manifest row's three cells replaced and the provenance note
+    above the table extended with the CONTROL/ROW table; in spec_constants.py, one byte
+    sequence corrected inside one row's note. ... NOT touched: config/ (both files, so the
+    digest above still describes the committed bytes), tests/goldens/, any test file,
+    CONTEXT.md, PROCESS.md, INVARIANTS.md, PROVENANCE.md, RAZORPAY_SEMANTICS.md.
+    NOT staged and NOT mine: the untracked src/whetstone_gate/results/ ..."
+    STAGED 2 PATHS, SNAPSHOT LISTED 2 - NOT SWEPT.
+
+    <this commit>: paths staged are exactly INCIDENTS.md, docs/reviews/OPEN_FINDINGS.md,
+    STATUS.md, PROGRESS.md and docs/sessions/arch-prefreeze-2.txt. Mode: append-only to all
+    four journals (INC-100 and INC-101; OF-221 and OF-222; one banner prepended to STATUS.md
+    plus one clause appended to each of the C14 and C10 review-history cells, neither
+    erased; one PROGRESS.md entry, newest on top); this file NEW.
+
+    PROCESS.md S7b's five steps were used for every commit, and STEP 4 WAS
+    `env -u GIT_INDEX_FILE git reset -- <the same paths>`, never `GIT_INDEX_FILE=`, which
+    git reads as a PATH and which reported the whole repository staged for deletion (INC-91).
+    Step 5 - `env -u GIT_INDEX_FILE git diff --cached --quiet` - returned EXIT 0 each time.
+
+    (!) OF-220's REMEDY IS APPLIED HERE FOR THE FIRST TIME, AND IT WAS VERIFIED BEFORE USE.
+    OF-220 measured that check_roles and `git interpret-trailers --parse` DISAGREE about
+    every commit this project is currently making, because the attribution template puts a
+    BLANK LINE between Session-Token: and Co-Authored-By:. Measured here on both forms:
+      no blank line -> interpret-trailers returns BOTH   Session-Token AND Co-Authored-By
+      blank line    -> interpret-trailers returns ONLY   Co-Authored-By
+    My commits carry no blank line, so the project's gate and git's own tool now agree.
+    OF-220's two commits still stand unfixed; history is never rewritten here.
+
+S9. CONCURRENCY
+    A concurrent session shares this working tree: `src/whetstone_gate/results/` appeared
+    untracked and is NOT mine and was NOT staged. Every counter was RE-READ IMMEDIATELY
+    BEFORE EVERY APPEND and the read is ASSERTED IN CODE (the append refuses if the counter
+    moved): Q max 125 (unchanged), INC max 99 -> 100/101, OF max 220 -> 221/222, token table
+    counted FROM THE TABLE at DATA ROW 68 / 8-HEX ROW 67, not incremented.
+    NO COMMIT BY ANOTHER SESSION LANDED DURING THIS RUN: HEAD moved b8e1ecb -> 469fd21 ->
+    b762090, all three mine. If that changes before the push it is stated in the spoken
+    report. The suite count in S7 is exposed the same way C10's and arch-prefreeze-1's were,
+    and I name the tree rather than publishing the count as clean.
+
+S10. WHAT I COULD NOT DO - RAISED, NOT WORKED AROUND
+    - tests/test_config_loader.py:125. OUT OF FENCE ("any test file" is under NOT). The
+      remedy is one line and is computed in Q-126 / OF-221 / INC-101, with a stronger form
+      offered. NOT applied, and the fence is RIGHT rather than merely binding: a session
+      that changes a value AND the test that pins it can make any change look green.
+    - runner/n_rule.py's parser swap (OF-217). `runner/` is under NOT. lane_hour_budget()
+      still parses the budget out of CONTEXT.md S13.4's prose. NO LOOKALIKE READER WAS PUT
+      ANYWHERE ELSE.
+    - PROCESS.md S7's "never use unicode_escape to write repository files" line (OF-222),
+      and a check that scans the RENDERED SpecConstant.note for control characters. Both
+      out of fence (PROCESS.md and any test file are under NOT).
+    - OF-209, OF-210, OF-217's registry half and OF-218 are MATERIALLY ANSWERED and NONE is
+      marked closed. CLOSING A FINDING IS A REVIEW'S ACT AND THIS IS A FIX SESSION.
+    - DID NOT delete grep.exe.stackdump.
+    - DID NOT touch tests/goldens/, CONTEXT.md, PROCESS.md, INVARIANTS.md, PROVENANCE.md,
+      RAZORPAY_SEMANTICS.md, config/lanes.yaml, any test file, or anything under src/ except
+      spec_constants.py.
+    - DID NOT weaken, skip, loosen or delete any assertion anywhere.
+    - DID NOT spend a token. ZERO provider model calls of any kind. The prompt sanctioned
+      none.
+
+S11. NOT TAGGED. NOT SELF-CERTIFIED.
+    No tag was cut and none was asked for; `git tag -l` is byte-identical to the session's
+    first command and holds NEITHER `probe-v1` NOR `prereg-v1`. 469fd21 and b762090 touch
+    src/ and both end "(unreviewed)". C10's full adversarial review and C14's verification
+    review are both still OWED, and this session certifies nothing. A fresh adversarial
+    review follows.

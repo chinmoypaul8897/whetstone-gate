@@ -8252,3 +8252,138 @@ one commit. **The relay is the cost of the moat, and the moat is the submission.
 and is cheap, is a line in `PROCESS.md` §6 telling a session landing a `config/` constant that it is
 starting a **four-artefact relay** and must name all four owners in its report — which is what this
 session did without being told to. `OPEN_FINDINGS.md` **OF-218**.
+
+---
+
+## INC-100 — a **control byte** reached a committed source file because the session used `unicode_escape` to write it, and the check that caught it is the one this project built after `INC-13`: `make check-roles` **A5**, on the last look before the push
+
+**Date:** 2026-09-03 (ARCH FIX — PRE-FREEZE 2, `ff6d79ae`. **Found by `make check-roles` A5**, not by
+the session, not by the suite, and not by review. **Fix:** `b762090`.)
+
+**Event:** the session added `Q-125`'s `SpecConstant` row to
+`src/whetstone_gate/spec_constants.py` by building the row as a `bytes` literal in a heredoc and
+decoding it with `.decode('unicode_escape')` — chosen so that `⚠` would render as `⚠` and match
+the module's existing rows. The row's note quotes `check_roles.py`'s own secret-scanning regex,
+`\bsk-[A-Za-z0-9]{32,}`. ⚠️ **`unicode_escape` does not only decode `\uXXXX`. It decodes `\b` too**,
+and `\b` is **U+0008 BACKSPACE**. The regex's leading word-boundary anchor was written into the file
+as a raw control byte. The commit `469fd21` shipped it.
+
+```
+[FAIL] A5 no control byte in text; no NUL-free binary
+       CONTROL BYTE in 1 TEXT file(s):
+       ['src/whetstone_gate/spec_constants.py: byte 0x08 at offset 44576']
+       378 text + 2 binary + 0 non-regular = 380 tracked
+```
+
+**Action:** the byte was replaced with a **doubled** backslash in the file (`\\b`), so that the file
+holds no control byte **and** the Python string *value* is `\bsk-…` rather than a backspace. ⚠️ **BOTH
+LEVELS WERE THEN VERIFIED SEPARATELY, BECAUSE THE FIRST ATTEMPT FIXED ONLY ONE OF THEM:** writing a
+single `\b` into the file removes the control byte from `git`'s view while Python re-creates it at
+**import** time, so the file scanned clean and `BY_KEY[...].note` still contained `0x08`. The fix was
+not accepted until a scan of the file bytes **and** a scan of the rendered attribute both returned
+empty. `make check-roles` then returned **21 passed, 0 failed, 3 n/a**, exit 0.
+
+**Expectation:** a source file should contain the characters the author typed. Nothing in the row's
+content required an escape at all — the `⚠` could have been pasted directly, as every other row in
+the module does it.
+
+**Missing:** ⚠️ **nothing in the session's own edit path looked at what it had just written.** The
+session verified the row *semantically* — it imported the module, printed the parsed
+`SpecConstant`, and confirmed `normalise_spec_row` produced `Q-125`'s exact string — and every one
+of those checks passed **with the backspace in the file**, because a control byte inside a `note`
+string changes no behaviour the tests observe. **A byte-level look at the diff would have caught it;
+a semantic look could not, and the session did the semantic one.**
+
+**Missed:** ⚠️ **the tool printed a warning and the session read past it.** The command that wrote
+the row emitted `SyntaxWarning: invalid escape sequence '\u'` on `stdin` line 10, and the session
+treated it as noise about the `⚠` escapes it had deliberately used. **The warning was the
+mechanism announcing itself**: a decoder that is surprising enough to warn about one escape was
+silently applying the same rule to `\b` two lines later. ⚠️ **And `INC-13` is this project's own
+prior entry about a control byte in a text file** — the incident A5 was built for. The session had
+`INC-13` in its read order.
+
+**Diagnosis:** `unicode_escape` was reached for to solve a **display** problem (getting `⚠` into a
+byte string) and it is a **whole-language** escape decoder, so it also consumed an escape sequence
+that was meant to survive as literal text; the defect is invisible to every check that reads the
+value's *meaning* rather than its *bytes*, which is every check the session itself ran.
+
+**Fix:** `b762090` — the doubled backslash, plus verification at both the file-byte and the
+rendered-value level. ⚠️ **`469fd21` IS NOT AMENDED AND STANDS WITH THE DEFECT IN IT.** History is
+never rewritten here (`CLAUDE.md` §5), and `INC-96` is the precedent: C10 shipped CRLF and two
+secret-shaped literals into three commits, fixed forward, and left the three standing.
+
+**Systemic guardrail:** ⚠️ **ALREADY EXISTS, ALREADY FIRED, AND THAT IS THE ONLY REASON THIS ENTRY
+IS SHORT.** `check_roles` **A5** — built after `INC-13`, for exactly this class — caught it on the
+last look before the push, named the file, the byte and the offset, and failed the build. **No new
+guardrail is proposed and none is needed for the detection side.** What remains open is narrower and
+is A5's own published limitation, quoted in its output: *"A5 is a CONTROL-BYTE check, NOT a content
+check"* — an escape that resolved to a **printable** character would have been invisible to it, and
+this session's `⚠` escapes are exactly that shape. **The habit that closes the remaining gap is
+"do not use `unicode_escape` to write source files," which is one session's discipline and therefore
+`OF-67`'s sentence again** — recorded as `OPEN_FINDINGS.md` **OF-222** rather than claimed as closed.
+
+---
+
+## INC-101 — closing `Q-123` took the suite from **1 failure to 2** by design, and the new red is in a **test file**: `Q-125` counted four artefacts a constant needs and there is a **FIFTH**
+
+**Date:** 2026-09-03 (ARCH FIX — PRE-FREEZE 2, `ff6d79ae`. **Predicted in memory before the edit,
+then measured** — not discovered afterwards. **Fix:** one line, owned elsewhere; see **Fix**.)
+
+**Event:** `Q-123` is RULED — `config/protocol.yaml`'s `probe.arm_confounded_reach_fraction` is
+**quoted**, so PyYAML yields the string `"0.50"` instead of a binary float. The session measured the
+consequence **before making the edit**, by loading the file's text with the substitution applied and
+reading the value back:
+
+```
+NOW : 0.5      float
+NEW : '0.50'   str
+
+tests/test_config_loader.py:125   `require(...) == 0.50`   NOW: True   NEW: False   <- RED
+tests/test_c10_probe.py           golden-4 constants check NOW: True   NEW: True
+tests/test_c14_prereg.py          HOLES.md probe agreement NOW: True   NEW: True
+```
+
+**Action:** the edit was made, the red was confirmed by running the file, and **the test was not
+touched**. The one-line remedy and a stronger `Fraction`-based form are both computed and written
+into `QUESTIONS.md` `Q-126` and `OPEN_FINDINGS.md` `OF-221`, with the owner named.
+
+**Expectation:** ⚠️ **this is the expected behaviour of the ruling and it is written down as such.**
+Two of the three call sites absorbed the change without noticing, because both were written to
+compare **as exact rationals or as strings**. The third compares the loader's return value against a
+**Python float literal**, which *requires* the loader to return the binary float the ruling
+abolishes.
+
+**Missing:** ⚠️ **`Q-125` and `INC-99` enumerated the artefacts a `config/` constant needs and the
+list was one short.** They named **four** — `config/protocol.yaml`, `CONTEXT.md` §8.6,
+`spec_constants.py`, `PROTOCOL.md`'s manifest — and observed that no chunk's fence held all four.
+**This session's fence was drawn to hold all four, deliberately, and the set STILL did not close**,
+because a value has a **type** as well as a number and the type is pinned in a **test file** that no
+`config/`-owning fence contains. **The enumeration was treated as complete because it was written
+by the session that hit the wall, and it listed everything that had hurt it so far.**
+
+**Missed:** ⚠️ **`tests/test_config_loader.py:125` was read by this session, in full, roughly forty
+minutes before the edit** — it is the file the session opened to check whether quoting was safe, and
+the assertion is the line the grep returned. The session correctly identified it as *a risk to
+check*, checked it, measured the red — **and still did not recognise that finding a fifth artefact
+falsified `Q-125`'s four-item list**, which it had also just read. The two facts sat one screen
+apart and were not put together until this entry was written.
+
+**Diagnosis:** an assertion that pins a value's **type** is a copy of that value's specification, so
+it belongs to the same consistency set as the config key and the spec table — but it lives in
+`tests/`, which every fence in this project treats as a **verification** surface rather than a
+**declaration** surface, so no enumeration of "where this constant is declared" ever looks there.
+
+**Fix:** ⚠️ **NOT THIS SESSION'S, AND DELIBERATELY NOT ATTEMPTED.** One line in
+`tests/test_config_loader.py:125`, computed in `Q-126`. **No Fix SHA here; the SHA belongs to
+whoever lands it.** ⚠️ **And the fence is right, not merely binding:** a session that changes a
+value **and** the test that pins it can make any change look green — the same self-witnessing shape
+`Q-125` records for `PROTOCOL.md`'s digest, one level down.
+
+**Systemic guardrail:** ⚠️ **NONE — ACCEPTED, BECAUSE THE ONLY MECHANICAL FORM IS THE ONE THIS
+PROJECT HAS ALREADY REJECTED TWICE.** The guardrail that removes this class is *"one session owns
+every artefact of a constant"*, and `INC-99` already recorded why that is worse: such a session
+could edit a pre-registration artefact, the digest that witnesses it, **and now the test that pins
+it**, which is three self-witnessing powers in one fence. **The honest remedy is not a guardrail but
+a correction to a list**: `Q-125`'s enumeration should say **five**, and `OF-221` carries that so the
+next session that lands a `config/` value is told where the fifth one is before it starts rather
+than after.
