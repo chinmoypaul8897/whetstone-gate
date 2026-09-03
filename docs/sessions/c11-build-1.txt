@@ -7,7 +7,13 @@ PUSHED SHA, THIS FILE: 12f6c6f   (filled by the commit that follows it and by no
                         else - the `e022c86` precedent. A SHA IS NOT WRITTEN BEFORE IT
                         EXISTS, and this file was committed BEFORE it was printed.)
 PUSHED SHA, THE WORK:  0a77db1   (the last commit before this file's own)
-PUSHED SHA, FINAL:     <this line's own commit - the SHA-fill commit itself>
+PUSHED SHA, SHA-FILL:  f3b9a28   (the commit that filled the line above)
+                       ! THE REGRESS STOPS HERE ON PURPOSE. A file cannot contain
+                       the SHA of the commit that commits it, so each fill needs one
+                       more commit. Two fills is enough to make the chain checkable
+                       and a third would only move the placeholder again. THE SHA
+                       THIS SESSION REPORTS AS ITS PUSHED HEAD IS THE ONE IN THE
+                       PRINTED REPORT, and it is one commit ahead of this file.
 
 VERDICT: BUILT, UNREVIEWED, NOT TAGGED. `c11-pass` DOES NOT EXIST.
          NOTHING IS SELF-CERTIFIED. A FRESH ADVERSARIAL REVIEW FOLLOWS.
