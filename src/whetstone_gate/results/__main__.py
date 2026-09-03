@@ -55,6 +55,7 @@ from .figures import UNDECIDED, both_branch_ceilings
 from .nrule import lines as n_decision_lines_for
 from .loader import (
     LoadError,
+    attacker_temperature,
     Repository,
     calibrated_void_threshold,
     genesis_hash,
@@ -207,6 +208,7 @@ def build_input(run_dir: Path, root: Path) -> ResultsInput:
         head_sha=head_sha(root),
         tree_description=tree_description(root),
         genesis_hash=genesis_hash(),
+        attacker_temperature=attacker_temperature(),
         void=void,
         table=table,
         denominator=denominator_report(

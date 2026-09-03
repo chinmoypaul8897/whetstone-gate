@@ -13,10 +13,11 @@ enough.** Hard rule 10 scopes it exactly, because the looser claim is false:
 
     the **world, the ledger schema, the scorer and the replay** are byte-identical from the
     same seed, and are tested to be. **Model output is NOT** — the attacker runs at
-    temperature 0.7 against a hosted provider.
+    a non-zero sampling temperature against a hosted provider (the figure is `config/`'s
+    ``attacker.temperature`` and is never written into this package's source).
 
 **Do not write, and do not let a docstring or a README write, that re-running the models
-reproduces the run.** :data:`~whetstone_gate.results.document.DETERMINISM_SCOPE` is that
+reproduces the run.** :func:`~whetstone_gate.results.document.determinism_scope` is that
 sentence and it is printed **into** `RESULTS.md`, not left here.
 
 ---
@@ -129,12 +130,12 @@ from .denominator import (
     report_from_blocks,
 )
 from .document import (
-    DETERMINISM_SCOPE,
     EXPLORATORY_NOTICE,
     HEADLINE_COMPARISON,
     ResultsDocument,
     ResultsInput,
     assemble,
+    determinism_scope,
     render_results,
 )
 from .figures import (
@@ -203,7 +204,6 @@ __all__ = [
     "ConfoundColumnMissing",
     "CorpusSplit",
     "CutMeaning",
-    "DETERMINISM_SCOPE",
     "DegradationParseError",
     "DegradationRecord",
     "DeltaReport",
@@ -254,6 +254,7 @@ __all__ = [
     "count_verdicts",
     "degradation_record",
     "delta_report",
+    "determinism_scope",
     "figure",
     "median_and_iqr",
     "money_report",

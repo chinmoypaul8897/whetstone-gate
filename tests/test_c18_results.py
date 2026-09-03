@@ -76,7 +76,8 @@ from whetstone_gate.results import (
     score_predictions,
     void_determination,
 )
-from whetstone_gate.results.document import DETERMINISM_SCOPE, ResultsInput
+from whetstone_gate.results.document import ResultsInput, determinism_scope
+from whetstone_gate.results.loader import attacker_temperature
 from whetstone_gate.results.figures import UNDECIDED
 from whetstone_gate.results.money import A5_FIGURE_NAME
 from whetstone_gate.results.nrule import BREAK_EVEN_TOKENS_PER_EPISODE
@@ -1204,6 +1205,7 @@ def _synthetic_input(utc_date: str = "2026-09-03") -> ResultsInput:
         head_sha="0" * 40,
         tree_description="SYNTHETIC - not a run",
         genesis_hash="PRE-FREEZE",
+        attacker_temperature=attacker_temperature(),
         void=determination(
             counts, None, utc_date=utc_date,
             escape_numerator=arm1.escape.numerator, escape_denominator=arm1.escape.denominator,
@@ -1283,11 +1285,14 @@ def test_the_rendered_document_is_PURE_ASCII():
 
 def test_the_determinism_claim_is_SCOPED_EXACTLY_and_is_PRINTED_INTO_the_document():
     """⚠️ Hard rule 10. The narrower claim is true; the looser one is false."""
-    assert "regenerates from the stored ledgers" in DETERMINISM_SCOPE.lower().replace(
-        "regenerates from the stored ledgers", "regenerates from the stored ledgers"
-    ) or "REGENERATES FROM THE STORED LEDGERS" in DETERMINISM_SCOPE
-    assert "TEMPERATURE 0.7" in DETERMINISM_SCOPE
-    assert "does not claim" in DETERMINISM_SCOPE.lower()
+    scope = determinism_scope(attacker_temperature())
+    assert "REGENERATES FROM THE STORED LEDGERS" in scope
+    assert "IS NOT REPRODUCIBLE" in scope
+    assert "does not claim" in scope.lower()
+    assert attacker_temperature() in scope, (
+        "the configured temperature is QUOTED from config/, not written into the source - "
+        "the tripwire caught the literal that used to be there"
+    )
     text = render_results(_synthetic_input())
     assert "REGENERATES FROM THE STORED LEDGERS" in text
     assert "re-running the models reproduces the run" in text

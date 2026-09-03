@@ -220,6 +220,15 @@ def scoring_constants():
     return constants_from(values)
 
 
+def attacker_temperature() -> str:
+    """``attacker.temperature`` from `config/`, as its rendered string.
+
+    ⚠️ **READ HERE, NEVER WRITTEN INTO THE PURE CORE.** It is a `CONTEXT.md` §8.6 constant,
+    and the tripwire caught it as a literal in `document.py` before this function existed.
+    """
+    return str(_config.load("protocol").require("attacker.temperature"))
+
+
 def n_branches() -> tuple[int, int]:
     """``(branch_a_n, branch_b_n)`` from `config/`. Both printed; the pilot selects."""
     protocol = _config.load("protocol")

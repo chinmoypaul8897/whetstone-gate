@@ -4,9 +4,10 @@
 checkable, and enough. **It is NOT, and this module must never be read as saying, that
 re-running the models reproduces the run.** Hard rule 10 scopes determinism exactly: the
 **world, the ledger schema, the scorer and the replay** are byte-identical from the same seed
-and are tested to be; **model output is not** — the attacker runs at temperature 0.7 against a
-hosted provider. :data:`DETERMINISM_SCOPE` is that sentence, and it is printed **into**
-`RESULTS.md` rather than left in a docstring nobody publishes.
+and are tested to be; **model output is not** — the attacker runs at a non-zero sampling
+temperature against a hosted provider. :func:`determinism_scope` is that sentence, it takes
+the temperature from `config/` rather than naming it here (hard rule 9), and it is printed
+**into** `RESULTS.md` rather than left in a docstring nobody publishes.
 
 ⚠️ **DETERMINISM HERE IS A PROPERTY THIS MODULE OWNS.** Same :class:`ResultsInput`,
 byte-identical output — asserted in ``tests/test_c18_results.py`` against synthetic ledgers
@@ -66,16 +67,34 @@ from .trail import ReviewTrail
 
 _RULE = "=" * 86
 
-#: ⚠️ **HARD RULE 10, SCOPED EXACTLY, BECAUSE THE LOOSER CLAIM IS FALSE.** Printed into
-#: `RESULTS.md` itself so the claim travels with the numbers.
-DETERMINISM_SCOPE = (
-    "WHAT `make eval` CLAIMS, EXACTLY: every number in this file REGENERATES FROM THE STORED "
-    "LEDGERS, byte-identically. The world, the ledger schema, the scorer and the replay are "
-    "byte-identical from the same seed and are TESTED to be.\n"
-    "WHAT IT DOES NOT CLAIM: that re-running the models reproduces the run. THE ATTACKER RUNS "
-    "AT TEMPERATURE 0.7 AGAINST A HOSTED PROVIDER AND ITS OUTPUT IS NOT REPRODUCIBLE. The "
-    "narrower claim is true, checkable, and enough (CLAUDE.md hard rule 10)."
-)
+
+def determinism_scope(attacker_temperature: str) -> str:
+    """⚠️ **HARD RULE 10, SCOPED EXACTLY, BECAUSE THE LOOSER CLAIM IS FALSE.**
+
+    Printed **into** `RESULTS.md` so the claim travels with the numbers rather than living in
+    a docstring nobody publishes.
+
+    ⚠️ **THE TEMPERATURE IS AN ARGUMENT AND NOT A LITERAL, AND THE TRIPWIRE IS WHY.** This
+    sentence first read *"at temperature 0.7"*, and
+    ``tests/test_tripwire_registry.py::test_no_spec_value_is_hardcoded_in_implementation_source``
+    caught it: ``attacker.temperature`` is a `CONTEXT.md` §8.6 constant, `config/` is where it
+    lives, and a module-level string is **implementation source** even though a docstring is
+    not. Hard rule 9 has no exemption for a number that is only being *quoted* — and the
+    exemption would be the wrong one to want, because `config/` is a **frozen**
+    pre-registration artefact and a `RESULTS.md` quoting a temperature the run did not use
+    would be describing a different experiment. The shell reads it; this renders it.
+    """
+    return (
+        "WHAT `make eval` CLAIMS, EXACTLY: every number in this file REGENERATES FROM THE "
+        "STORED LEDGERS, byte-identically. The world, the ledger schema, the scorer and the "
+        "replay are byte-identical from the same seed and are TESTED to be.\n"
+        "WHAT IT DOES NOT CLAIM: that re-running the models reproduces the run. THE ATTACKER "
+        f"RUNS AT TEMPERATURE {attacker_temperature} - read from config/'s "
+        "attacker.temperature, not written into this source - AGAINST A HOSTED PROVIDER, AND "
+        "ITS OUTPUT IS NOT REPRODUCIBLE. The narrower claim is true, checkable, and enough "
+        "(CLAUDE.md hard rule 10)."
+    )
+
 
 #: §12.4's pre-registered headline comparison — *"exactly one, named before the run."*
 HEADLINE_COMPARISON = (
@@ -106,6 +125,11 @@ class ResultsInput:
     head_sha: str
     tree_description: str
     genesis_hash: str
+
+    #: ``attacker.temperature`` from `config/`, carried as its rendered string. ⚠️ **Read by
+    #: the shell and never written into this package's source** — hard rule 9, and the
+    #: tripwire caught the literal that used to be here.
+    attacker_temperature: str
 
     void: VoidDetermination
     table: HeadlineTable
@@ -170,7 +194,7 @@ class ResultsDocument:
             "",
             f"PRE-REGISTRATION CHECK : {data.prereg_line}",
             "",
-            *DETERMINISM_SCOPE.splitlines(),
+            *determinism_scope(data.attacker_temperature).splitlines(),
             "",
         ]
 
