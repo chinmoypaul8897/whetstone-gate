@@ -1,3 +1,106 @@
+*⚠️ **UPDATE, C19 README BUILD 1 (`9f31d708`), 2026-09-03 — `README.md` EXISTS. IT PUBLISHES NO
+NUMBER THE REPOSITORY CANNOT PRODUCE, AND IT PUBLISHES FOUR THINGS AGAINST US THAT NOTHING ASKED IT
+TO. ZERO PROVIDER MODEL CALLS. ZERO TOKENS. NO TAG. NOT SELF-CERTIFIED.***
+
+**(1) `README.md` IS WRITTEN — 1,565 lines, 114,309 bytes, ZERO CR BYTES, a STATUS box plus 19 numbered sections.** It did not
+exist before this session; `pyproject.toml:9` has declared `readme = "README.md"` since C0 against a
+missing file (`OF-13`, closed by this chunk). **Every number in it is either MEASURED BY THIS SESSION
+with the command printed beside it, or a named `<<PENDING-RUN:…>>` placeholder** — **39 occurrences
+on 9 lines**, greppable in one command. **No claim is made about a run that has not happened.**
+
+**(2) ⚠️ THE STATUS BOX IS THE FIRST THING IN THE DOCUMENT, BECAUSE NO SCORED EPISODE HAS RUN.**
+**MEASURED:** `git for-each-ref refs/tags` → `c0-pass c1-pass c2-pass c3-pass c4-pass c13-pass
+probe-v1`; **`prereg-v1` DOES NOT EXIST**; `probe.void_threshold_breach_rate` = `TODO_C14_CALIBRATION`;
+`n_decision.selected_branch` = `TODO_C14_PILOT`; `vendor.agentdojo_sha` = `TODO_C13_C16`; `evals/`
+holds **one file**, `pilot/RUN_DECLARED.md`, and **no run directory**. ⚠️ **`probe-v1` was cut during
+this session's run, by `7c05e3b9`, at `4ce8f56`, and the PILOT DID NOT RUN** — named in the README
+rather than smoothed over.
+
+**(3) ⚠️ FOUR CORRECTIONS THIS SESSION MADE **AGAINST ITS OWN PROMPT AND ITS OWN DRAFT**, each
+measured rather than argued.**
+**(a) The prompt lists C8 among the unreviewed chunks. C8 IS REVIEWED** — once, `REVIEW_8_1.md`,
+**FAIL on four blockers** — and it is **neither unreviewed nor `Q-089` shipped-with-residue**. Measured:
+`git diff --stat 650f0dc~1 fdb8801 -- src/whetstone_gate/scorer/` = **4 files, 458 insertions, 22
+deletions**, four commits all self-marked `(unreviewed)`, against a 2,116-line package, **with the
+review's findings closed by the fix session rather than by a reviewer.** The README publishes it as a
+**third** disposition: *reviewed-once-then-substantially-rewritten, re-review owed.*
+**(b) The prompt's *"two goodwill refunds a week apart"* is NOT MODELLED.** Golden 2's own
+`clock_note`: *"'A week apart' is INC-04's narrative and is NOT modelled … the fixture carries no time
+field."* The README states the finding without the week. **`INC-124`.**
+**(c) The prompt's *"Tables 5–7 … show CaMeL BEHIND"* would itself be an overclaim.** **Tables 5 and
+6** show that on banking utility; **Table 7 counts ATTACKS and runs the other way** — CaMeL banking
+**0 ± 0.0** against the undefended model's **11 ± 4.7** — and Table 7 is **retained** as §8.5.2's P2
+citation. The README prints the precise form.
+**(d) This session's OWN first draft cited the goldens as determinism evidence.** A golden is a
+**correctness oracle**; it says nothing about computing the same bytes twice. **`INC-124`.**
+
+**(4) ⚠️⚠️ AND THE ONE THAT MATTERS MOST: `INVARIANTS.md` §5.2 MAKES THE SAME OVERCLAIM, AND IT IS
+ABOUT TO BE FROZEN.** Verbatim: *"The **world, the ledger schema, the scorer and the replay** are
+byte-identical from the same seed and are **tested** to be."* **MEASURED: two of the four are.** The
+world (`tests/test_c2_world.py:608`) and the ledger (`tests/test_c7_ledger.py:1353`) each have a
+two-run byte-comparison test; **`tests/test_c8_scorer.py` holds 102 tests and NOT ONE is a
+determinism, byte-identity or two-run test**, and no dedicated replay-determinism test exists
+anywhere. ⚠️ **`INVARIANTS.md` is byte-identical at `probe-v1` but is NOT frozen by it** — `probe-v1`
+freezes `HOLES.md`; the five-file set is `prereg-v1`'s, **and `prereg-v1` does not exist** — **so this
+is fixable today and unfixable after the freeze.** `OF-252`, **HIGH, DUE BEFORE `prereg-v1`.** The
+README publishes it in §14, against ourselves.
+
+**(5) A SECOND MEASURED HOLE, IN THE MOAT ITSELF.** `OF-249`, **HIGH.** `D1`–`D3` walk the transitive
+closure; **`D4`'s source-text scan walks the two package DIRECTORIES only** (`check_roles.py:922`).
+**MEASURED by running the walker directly: 118 first-party modules; `gates/` closure 15; `scorer/`
+closure 6; intersection EMPTY; and `(closures) − gates_dir − scorer_dir` = `{whetstone_gate.config}`,
+exactly one module — text-scanned by nothing while sitting inside the gate side of the moat.** A
+dynamic hop there passes **all four** checks over a live `gates/`→`scorer/` reach: `INC-51`'s measured
+class, one module out. ⚠️ **Not exploited — no hop was planted — and the README says so.** **Distinct
+from `OF-212`**, which is about other packages' hygiene; this is about the moat still being defeatable.
+
+**(6) THE REVIEW TRAIL IS PUBLISHED AS A RESULT, COUNTED FROM THE FILES.** **FAIL 14 · PASS 6 ·
+UNRECORDED 0**, across **20 `REVIEW_*.md`** files, using `results/trail.py` — the same counter
+`RESULTS.md` uses — read-only from a scratch directory. **6 chunks tagged** (C0–C4, C13); **C6 ships
+with residue after SIX reviews, C7 after TWO**; **14 chunks are UNREVIEWED and are in the table's own
+column, not a footnote** — C5, C9, C10, C11, C12, C12-DRIVER, C14, C15, C16, C17, C18, **C19 itself**,
+C20, C21. ⚠️ **The architect's earlier "eleven" is measured at FOURTEEN and nothing was adjusted
+toward the prompt** (`Q-129`, `INC-102`). **C6's and C7's sixteen marked PUBLISHED-RESIDUE rows are
+LIFTED into the README, as `OPEN_FINDINGS.md` instructs** — including the three C7 HIGHs the
+disposition prompt's range did not name.
+
+**(7) ⚠️ TWO HONEST COUNTS OF THE OPEN FINDINGS, AND THEY DISAGREE — BOTH PUBLISHED.** The parser
+`RESULTS.md` uses reports **193 OPEN (11/106/76)**; a row-by-row resolution reports **185 of 239
+(12/99/74)**. Six rows are **CLOSED in prose while their table rows still read OPEN**; **`OF-229` is
+HIGH-and-OPEN but is a prose section, not a row**, so a row scan misses it; ~2 could not be
+reconstructed and **is named rather than rounded away**; and **`ACCEPTED` reads 0 while three findings
+are accepted in prose.** `Q-164`. ⚠️ **Under either count C19's own done-when is NOT met, and the
+README says so.**
+
+**(8) ⚠️ THE SEEDED-DEFECT TEST — §14's NEVER-CUT ITEM, *"the only evidence the PASS verdicts mean
+anything"* — DID NOT RUN AT C7 AND NO ARTEFACT SHOWS IT RUNNING SINCE.** The architect ruled it
+**relocated to an unnamed later chunk**; `REVIEW_7_1.md` §13.2 says in terms *"THIS REVIEW'S FAIL MUST
+NOT BE READ AS THE SEEDED-DEFECT TEST PASSING … the gate has gone red on its own findings, which is
+weaker evidence than a planted red."* **So the fourteen FAILs are evidence that reviews FIND things,
+not that they would find a thing deliberately hidden. The README states the weaker claim.** `Q-165`.
+
+**(9) WHAT THIS SESSION COULD NOT DO — five items, in the README's own §18 as well as here.**
+⚠️ **`AGENTS.md`, `docs/adr/` and `bench/` were NOT created** — the C19 card names them and the fence
+excludes them; hard-rule-1 STOP, `Q-161`. ⚠️ **The PROVENANCE final pass was NOT done** — outside the
+fence **and** `PROVENANCE.md` is frozen-set. ⚠️ **The clean-clone test was NOT executed** (`Q-163`) —
+the README prints all three bootstrap steps, and **`CONTEXT.md` §20's first box stays FALSE**.
+⚠️ **§6a.3's verification could NOT be run** and it is C19's one surviving `full`-grade check: it
+hashes `prereg-v1`, **which does not exist**, and there is no published fingerprint or gist to compare
+against (`Q-162`). ⚠️ **`OPEN_FINDINGS.md` was not emptied.**
+
+**(10) FENCE HELD, AND THE SHARED TREE WAS RESPECTED.** Written: `README.md` (new), `QUESTIONS.md`,
+`INCIDENTS.md`, `docs/reviews/OPEN_FINDINGS.md`, `STATUS.md`, `PROGRESS.md`, `docs/sessions/`.
+**`git status --porcelain tests/goldens/` EMPTY and all nine golden diffs EMPTY.** No `src/`, no
+`tests/`, no `config/`, no `evals/`, no frozen artefact, no `CONTEXT.md`, no `PROCESS.md`, **no tag.**
+`grep.exe.stackdump` **not deleted**. ⚠️ **`QUESTIONS.md` was committed from a CONSTRUCTED BLOB —
+`HEAD` plus this session's own append — never with `git add` on the working-tree file**, because two
+concurrent sessions (`7c05e3b9`, `2e94c7b5`) and the live pilot session were writing the same journals;
+that is `INC-123`'s defect and `git add` on that path would have repeated it. **A line-count
+expectation was pre-declared and compared against the staged `--stat` before every commit**, which is
+the gate `INC-123`'s `Missing` field asks for.
+
+---
+
 *⚠️ **UPDATE, ARCH FIX — PILOT DECLARED (`8b46f2e1`), 2026-09-03 — THE FOUR RULINGS ARE RECORDED
 AND `evals/pilot/RUN_DECLARED.md` EXISTS. THE PILOT IS NOW DECLARED AND HAS NOT STARTED.
 ZERO PROVIDER MODEL CALLS. ZERO TOKENS. ⚠️ THE DRIVER WAS NOT RUN IN ANY MODE, NOT EVEN
@@ -1427,7 +1530,7 @@ credential. **`docs/reviews/ARCHITECT_CHECK_0.md` now exists** and **UPHOLDS C0'
 | **C16** | 1 Sep | AgentDojo banking adapter (AD-CMP) | ~~`full`~~ - **NOT RUN** | ⚠️ **NOT RUN - CUT (rung 3)** | **RUNG 3 FIRED 2026-09-02 08:10 IST (`d5c8039f`; `INC-62`; `Q-083`).** AD-CMP's **80 episodes (`InjectionTask6` x 16 user tasks x 5 arms) WILL NOT RUN.** Original review type was `full`, and the original reason - *"this chunk publishes a claim about a third party's system"* - is preserved here rather than erased. ⚠️ **The second external environment is LOST; τ²-bench remains, so the externally-authored-answer-key claim - the one the submission rests on - is UNTOUCHED.** Named as *not run*, with why, in `RESULTS.md` and the README (`PROCESS.md` §14). ⚠️ **`config/protocol.yaml`'s `vendor.agentdojo_sha` sentinel stays unresolved and the loader keeps RAISING - the correct end state; `config/` must NOT be edited to tidy it away.** |
 | **C17** | 1 Sep | `docs/render/` — the replay renderer (video RACE beat + the readable audit log) | `code` - **DOWNGRADED from `full`** (rung 5, 2 Sep) | todo - review downgraded | **RUNG 5 FIRED 2026-09-02 08:10 IST (`d5c8039f`; `INC-63`; `Q-083`).** Original review type `full`, preserved here. C17 replays a **stored** ledger and **publishes no number**, so there is no figure for a reimplementation to disagree with. ⚠️ **This does reduce adversarial coverage on the renderer behind the video's RACE beat, and that is published as a cost, not waved away.** ⚠️ **Second of the pre-declared next three to go.** |
 | **C18** | 2 Sep | `RESULTS.md` + `make eval` | `full` | 🟡 **BUILT (attempt 1). UNREVIEWED. NO TAG.** `C18: todo → built(1)` | **BUILT** (`5a2c81df`, 3 Sep) — `src/whetstone_gate/results/`, **11 modules**, and `tests/test_c18_results.py`, **91 tests, all green**. ⚠️ **`RESULTS.md` ITSELF WAS NOT WRITTEN AND MUST NOT BE**: it is written **by the run**, and the entry point defaults to **stdout** so a build session cannot publish numbers no sweep produced. **What is built:** every figure carries its ceiling or **refuses to render** (§12.4.4 — §12.4's table regenerated **by computation**: 6.0% at N=50, 10.0% at N=30, 45.1% at n=5, **both branches printed and the one taken named**, or `UNDECIDED` because `Q-107`/`Q-121` say no session may call N before the pilot); hard rule 11's denominator **reconciles or refuses**, every declared drop category prints **including the zeros**, a truncated episode is **counted in**, and the **pre-registered-N shortfall prints as a number** because N is not a rung; the **productive-actions confound is mandatory per row** and a row without it refuses (`Q-067`'s ledger reading — *"the word MONEY is absent"*); **A5 prints BESIDE the four and never inside one** (`Q-110`), asserted by an **AST walk per component, fired at a dirty file**; `customer_overcharge_paise` prints as a **structural zero with its mechanism** (`Q-030`); the **S2/S2-amt delta ships in BOTH directions** against golden 2's own `published_finding` (**NOISY 2 · BLIND 1**), and **an S2 zero prints as a result, not a gap**; **C10's void banner is printed VERBATIM**, with the state `UNDETERMINED` today because `Q-106`'s threshold is still a sentinel; **CANARY-A is published twice, labelled** — the **episode** rate that voids and the **entry** count golden 4 pins — under `Q-122` **as RULED 2026-09-03** and the amended, frozen `HOLES.md` §3.1 (**version read is recorded**: commit `469fd21`, blob `0fb1e5cd…`); the **degradation record is PARSED from `PROTOCOL.md` §5**, not assumed — **rungs 1/3/5 FIRED, 2/4/6 NOT**, **C16 / AD-CMP named NOT RUN with why**, and the `agentdojo_sha` sentinel published as **the consequence of a cut, not a defect**; **P1–P3 scored**, with P2's **pre-registered non-reproduction** on `gemini-2.0-flash-lite-001` given its **own outcome** so a Branch-A run that blocks nothing is recorded as *consistent with the paper* and **cannot be scored as CaMeL underperforming**; and the **review trail is published as a result**, counted from the files. **VERIFIED:** the assembler runs **end to end on synthetic ledgers and on golden 3's own**, **byte-identical across re-runs** (asserted, and re-measured through the CLI); **golden 4's `expected.per_arm` reproduces cell for cell** (reach 8/6/4/3/0, breach entries 3/1/0/1/0, CONFOUNDED no/no/no/YES/YES at a floor of exactly 4); `results/` **imports no model client — asserted TWO WAYS**, transitive walk **and** raw text, each **fired at a planted module**, and it imports **no ledger, no gates and no attacker**; `make check-roles` **21 passed, 0 failed, 3 n/a, exit 0** with **D1–D4 all PASS**; `git status --porcelain tests/goldens/` **EMPTY** and all nine golden diffs empty. **TOKEN SPEND: ZERO — no provider call of any kind.** ⚠️ **THREE THINGS THIS SESSION COULD NOT DO, NAMED RATHER THAN LEFT:** (i) **`make eval` still prints "NOT YET IMPLEMENTED"** — `tasks.py` is in **neither** the fence nor the NOT list, so the pipeline ships behind `python -m whetstone_gate.results` and the one-function wiring is owed (`Q-128`, `OF-224`); (ii) **C18 is a `full` chunk and no artefact says which golden is its own** — built against 2, 3 and 4 as the prompt names them, gap recorded (`Q-127`, `OF-223`); (iii) the prompt's *"eleven real FAILs"* is **measured at FOURTEEN** and the code **counts rather than asserts** (`Q-129`). **INCIDENTS: `INC-102`** (this session's own verdict parser published FAIL 10, then 6 AMBIGUOUS, before it published 14) and **`INC-103`** (its first escape rate divided by an episode the scorer had DROPPED — hard rule 11 running backwards, where it flatters). ⚠️ **NO TAG. NOTHING SELF-CERTIFIED; a fresh adversarial review follows, and it also absorbs C15's folded `code` review (rung 1, `INC-61`).** |
-| **C19** | 3 Sep | README + architecture + PROVENANCE final pass + Agent-Ready conventions | `code` - **DOWNGRADED from `full`** (rung 5, 2 Sep) | todo - review downgraded | **RUNG 5 FIRED 2026-09-02 08:10 IST (`d5c8039f`; `INC-63`; `Q-083`).** Original review type `full`, preserved here. C19 writes prose and **publishes no computed number**. ⚠️ **BUT ONE done-when VERIFICATION SURVIVES THE DOWNGRADE AND IS NAMED SO IT IS NOT SKIPPED: *"a fresh session runs §6a.3's verification procedure start to finish from that clean clone and reproduces the published fingerprint"* - a reproduction check on the PRE-REGISTRATION. It is a PROCEDURE, not a reimplementation, and it is REQUIRED under `code`.** ⚠️ **Reduces coverage on the artefact a judge reads FIRST; mitigated by C21's `full` + `submission` review reading C19's output verbatim. A mitigation, not an equivalence.** |
+| **C19** | 3 Sep | README + architecture + PROVENANCE final pass + Agent-Ready conventions | `code` - **DOWNGRADED from `full`** (rung 5, 2 Sep) |  🟡 **BUILT (attempt 1). UNREVIEWED. NO TAG.** `C19: todo → built(1)` | **RUNG 5 FIRED 2026-09-02 08:10 IST (`d5c8039f`; `INC-63`; `Q-083`).** Original review type `full`, preserved here. C19 writes prose and **publishes no computed number**. ⚠️ **BUT ONE done-when VERIFICATION SURVIVES THE DOWNGRADE AND IS NAMED SO IT IS NOT SKIPPED: *"a fresh session runs §6a.3's verification procedure start to finish from that clean clone and reproduces the published fingerprint"* - a reproduction check on the PRE-REGISTRATION. It is a PROCEDURE, not a reimplementation, and it is REQUIRED under `code`.** ⚠️ **Reduces coverage on the artefact a judge reads FIRST; mitigated by C21's `full` + `submission` review reading C19's output verbatim. A mitigation, not an equivalence.** **BUILT** (`9f31d708`, 3 Sep) - `README.md`, **1,565 lines, 114,309 bytes, ZERO CR**, a STATUS box plus 19 numbered sections. It did not exist before; `pyproject.toml:9` declared it since C0 (`OF-13` closed). **Every number is MEASURED WITH ITS COMMAND or a named `<<PENDING-RUN:…>>` placeholder** (39 occurrences, 9 lines). ⚠️ **NO SCORED EPISODE HAS RUN and the STATUS box says so FIRST**: `prereg-v1` DOES NOT EXIST, the void threshold is still `TODO_C14_CALIBRATION`, N is still `TODO_C14_PILOT`, `evals/` holds one file and no run directory, and `probe-v1` was cut DURING this session by `7c05e3b9` while the pilot did NOT run. **`make eval` refuses because no run exists, NOT because the tag is missing** - `check-prereg` FAILS OPEN (`OF-185`) - and ⚠️ **the driver gate checks only `probe-v1`, so nothing in code stops a scored run starting.** **FOUR CORRECTIONS AGAINST THE PROMPT AND ITS OWN DRAFT:** C8 is REVIEWED (FAIL, four blockers) and is a THIRD disposition - `git diff --stat 650f0dc~1 fdb8801 -- src/whetstone_gate/scorer/` = **4 files, 458 insertions, 22 deletions** across four `(unreviewed)` commits, findings closed by the FIX session not a reviewer; *"a week apart"* is NOT MODELLED (golden 2's `clock_note`); *"Tables 5-7 show CaMeL behind"* is an overclaim - **Table 7 counts ATTACKS and runs the OTHER way** (0 ± 0.0 vs 11 ± 4.7) and is RETAINED as P2; and this session's own draft cited the GOLDENS as determinism evidence (`INC-124`). ⚠️⚠️ **TWO HIGH FINDINGS, BOTH AGAINST US: `OF-252`** - `INVARIANTS.md` §5.2 says four components are byte-identical *"and are TESTED to be"* and **TWO of four are** (`test_c8_scorer.py` holds **102 tests, NOT ONE a determinism test**); it is **NOT frozen by `probe-v1`**, so it is fixable today and unfixable after the freeze - **DUE BEFORE `prereg-v1`**; and **`OF-249`** - `D4` scans the two package DIRECTORIES while `D1`-`D3` walk the CLOSURE, and **MEASURED: 118 modules, gates closure 15, scorer closure 6, intersection EMPTY, and `{whetstone_gate.config}` is inside a closure and scanned by nothing** - `INC-51`'s class one module out, **not exploited and the row says so.** **REVIEW TRAIL COUNTED FROM THE FILES: FAIL 14 · PASS 6 · UNRECORDED 0** over 20 files; 6 tagged; C6 with residue after SIX, C7 after TWO; **14 UNREVIEWED and named in the table's own column** - including C14 and C19 itself. **C6's and C7's sixteen PUBLISHED-RESIDUE rows are LIFTED**, including the three C7 HIGHs the disposition range did not name. ⚠️ **THE COUNTER-METRIC IS ON THE NEVER-CUT LIST AND IS NOT COMPLETE** - `Q-154`/`Q-155` (τ², disjoint tool sets, no arm can verdict a τ² action) and **3 of 30** mock scenarios (`Q-158`). ⚠️ **THE SEEDED-DEFECT TEST DID NOT RUN AT C7 AND NO ARTEFACT SHOWS IT RUNNING SINCE** (`Q-165`), so the 14 FAILs are evidence reviews FIND things, not that they would find a PLANTED thing - and the README states the weaker claim. **FIVE THINGS NOT DONE, NAMED:** `AGENTS.md`/`docs/adr/`/`bench/` (card-vs-fence, `Q-161`); the PROVENANCE final pass (fence + frozen); the clean-clone test (`Q-163`, §20's first box stays FALSE); ⚠️ **§6a.3's verification, C19's ONE surviving `full`-grade check, which CANNOT run because `prereg-v1` does not exist** (`Q-162`); and `OPEN_FINDINGS.md` not emptied - **193 OPEN by the parser `RESULTS.md` uses, 185 of 239 by a row-by-row resolution, and BOTH ARE PUBLISHED because the disagreement is the finding** (`Q-164`). **VERIFIED:** `make check-roles` **exit 0**; `git status --porcelain tests/goldens/` **EMPTY** and all nine golden diffs empty; every README anchor resolves; **no suite total is printed anywhere** (`OF-214`). **TOKEN SPEND: ZERO - no provider call, no network call.** ⚠️ **`QUESTIONS.md` was committed from a CONSTRUCTED BLOB (HEAD + this session's append), never with `git add` on the working-tree file, because three sessions were live in the tree and that path carried another session's work - `INC-123`. A line-count expectation was pre-declared and compared to the staged `--stat` before every commit.** ⚠️ **NO TAG. NOT SELF-CERTIFIED.** |
 | **C20** | 3 Sep | The video | `code` + `submission` - **the `code` review FOLDED into C21's** (rung 1, 2 Sep) | todo - review folded | **RUNG 1 FIRED 2026-09-02 08:10 IST (`d5c8039f`; `INC-61`; `Q-083`).** Original cell preserved. **C21's review is `full` + `submission` and reads C20's output**, so the video is still adversarially reviewed - by the session that also checks the two form paragraphs. C20 publishes **no number**. ⚠️ **Third of the pre-declared next three to go.** |
 | **C21** | 4 Sep | The submission pack, the history secret scan, the visibility flip | `full` + `submission` | todo | — |
 

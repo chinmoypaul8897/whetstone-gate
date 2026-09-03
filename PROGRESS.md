@@ -1,3 +1,153 @@
+## SESSION-TOKEN 9f31d708 — C19, README BUILD 1 — 2026-09-03
+
+**Role:** BUILD. **Chunk:** C19, `README.md` — **the document the claim is made in.** **Review owed:**
+`code` (⚠️ **DOWNGRADED from `full`**, degradation rung 5, fired 2026-09-02, `INC-63`, `Q-083`).
+**Not self-certified. No tag.**
+
+**TOKEN SPEND: ZERO. NO PROVIDER MODEL CALL OF ANY KIND. NO NETWORK CALL OF ANY KIND.**
+
+---
+
+### WHAT WAS BUILT
+
+`README.md`, which **did not exist before this session** — `pyproject.toml:9` has declared
+`readme = "README.md"` against a missing file since C0 (`OF-13`, closed here). Nineteen sections:
+the claim and counter-claim; a **STATUS box first**; the merchant's loss; what is genuinely ours; the
+results shells; **the finding that does not depend on the sweep**; prior art; architecture and the
+moat; the probe and the void rule; the counter-metric; **limitations, as results**; the review trail;
+the degradation ladder; verifying the pre-registration; how to check us; reproducibility scoped
+exactly; the `(unreviewed)` markers; install; **what this session did not do**; the repository map;
+attribution.
+
+**Every number is either measured by this session, with the command printed beside it, or a named
+`<<PENDING-RUN:…>>` placeholder** — 39 occurrences on 9 lines, findable in one grep. **No claim is
+made about a run that has not happened.**
+
+### THE STATUS BOX, BECAUSE NOTHING HAS RUN
+
+**MEASURED at `a691d13`:** tags are `c0-pass c1-pass c2-pass c3-pass c4-pass c13-pass probe-v1` —
+**`prereg-v1` DOES NOT EXIST**; `probe.void_threshold_breach_rate` = `TODO_C14_CALIBRATION`;
+`n_decision.selected_branch` = `TODO_C14_PILOT`; `evals/` holds one file and **no run directory**.
+⚠️ **`probe-v1` was cut DURING this session, by `7c05e3b9`, at `4ce8f56` — and the pilot did not run.**
+⚠️ **`ledger.genesis_hash` read `PRE-FREEZE` at `a691d13` and a concurrent session changed it to
+`probe-v1`'s tag object id mid-session under `Q-153`; both states are printed with their times.**
+
+⚠️ **Three consequences the README states rather than implies:** `make eval` refuses (exit `2`)
+**because no run exists, NOT because the tag is missing** — `check-prereg` **fails open** and has been
+measured returning `0` with `prereg-v1` absent (`OF-185`); §6a.3's verification cannot complete **for
+two reasons, not one** — no tag to hash **and** no published fingerprint or gist to compare against;
+and ⚠️ **nothing in code stops a scored run starting** — the driver gate checks **only `probe-v1`**,
+which now resolves, so the rule is a rule and not an interlock.
+
+### FOUR CORRECTIONS AGAINST THE PROMPT AND AGAINST THIS SESSION'S OWN DRAFT
+
+1. ⚠️ **The prompt lists C8 as unreviewed. It is not.** `REVIEW_8_1.md`, **FAIL, four blockers**. And
+   it is not `Q-089` shipped-with-residue either — that disposition covers **only C6 and C7**.
+   Measured: **4 files, 458 insertions, 22 deletions** across four `(unreviewed)` commits after the
+   FAIL, against a 2,116-line package, **findings closed by the fix session, not a reviewer.** The
+   README publishes a **third** disposition and the diffstat that justifies it.
+2. ⚠️ **"Two goodwill refunds a week apart" is not modelled.** Golden 2's `clock_note` says so in
+   terms. The README states the finding without the week.
+3. ⚠️ **"Tables 5–7 show CaMeL behind" would be an overclaim.** **Tables 5 and 6** do, on banking
+   utility; **Table 7 counts attacks and runs the other way** (CaMeL banking `0 ± 0.0` vs the
+   undefended model's `11 ± 4.7`), and it is **retained** as §8.5.2's P2 citation.
+4. ⚠️ **This session's own draft cited the goldens as determinism evidence.** A golden is a
+   **correctness oracle**. Caught by an adversarial pass over its own draft, before the commit.
+   **`INC-124`.**
+
+### TWO MEASURED FINDINGS, BOTH HIGH, BOTH AGAINST US
+
+⚠️ **`OF-252` — `INVARIANTS.md` §5.2 claims four components are byte-identical *"and are **tested** to
+be"*. TWO of the four are.** The world (`test_c2_world.py:608`) and the ledger
+(`test_c7_ledger.py:1353`) have two-run byte-comparison tests. **`tests/test_c8_scorer.py` holds 102
+tests and NOT ONE is a determinism, byte-identity or two-run test**, and no dedicated
+replay-determinism test exists anywhere. ⚠️ **`INVARIANTS.md` is byte-identical at `probe-v1` but is
+NOT frozen by it** — `probe-v1` freezes `HOLES.md`, the five-file set is `prereg-v1`'s, and that tag
+does not exist — **so it is fixable today and unfixable after the freeze.** **DUE BEFORE `prereg-v1`.**
+**A claim in an artefact that outruns its tests is the defect this project exists to expose, pointed
+at us, and the README publishes it in §14.**
+
+⚠️ **`OF-249` — the moat is still defeatable, one module further out than `INC-51` measured.**
+`D1`–`D3` walk the transitive **closure**; **`D4`'s source-text scan walks the two package
+DIRECTORIES** (`check_roles.py:922`). **MEASURED by running the walker directly against this tree: 118
+first-party modules; `gates/` closure 15; `scorer/` closure 6; intersection EMPTY; and
+`(closures) − gates_dir − scorer_dir` = `{whetstone_gate.config}` — exactly one module, text-scanned
+by nothing, inside the gate side of the moat.** A dynamic hop there passes **all four** checks over a
+live `gates/`→`scorer/` reach. ⚠️ **NOT exploited — no hop was planted — and the README and the row
+both say so; that is weaker evidence than `INC-51`'s planted reach.** **Distinct from `OF-212`**, which
+is about other packages' hygiene.
+
+### THE REVIEW TRAIL, COUNTED FROM THE FILES
+
+Run read-only through `results/trail.py` — the same counter `RESULTS.md` uses — from a scratch
+directory. **FAIL 14 · PASS 6 · UNRECORDED 0**, across **20** `REVIEW_*.md` files. (Two
+`ARCHITECT_CHECK_*.md` are counted **separately**; folding them in would inflate the count with a
+different kind of evidence, in the direction that flatters.) **6 tagged: C0–C4, C13.** **C6 ships with
+residue after SIX reviews; C7 after TWO.** ⚠️ **14 chunks are UNREVIEWED and are named in the table's
+own column, not a footnote — including C14, the freeze, and C19, this document.** The architect's
+earlier *"eleven"* measures at **fourteen** and nothing was adjusted toward it (`Q-129`).
+
+**C6's and C7's sixteen marked PUBLISHED-RESIDUE rows are LIFTED into the README**, as
+`OPEN_FINDINGS.md`'s disposition block instructs — including **`OF-171`, `OF-172` and `OF-173`, the
+three C7 HIGHs the disposition prompt's stated range did not cover.**
+
+⚠️ **And the seeded-defect test — §14's never-cut item, *"the only evidence the PASS verdicts mean
+anything"* — did not run at C7 and no artefact shows it running since** (`Q-165`). **So the fourteen
+FAILs are evidence that reviews find things, not that they would find a thing deliberately hidden,
+and the README states the weaker claim.**
+
+### THE COUNTER-METRIC IS ON THE NEVER-CUT LIST AND IT IS NOT COMPLETE
+
+Said plainly in the README, in those words. **Both halves are short.** τ²: **`Q-154`** — C5 is `todo`,
+no first-party `db_reward` call site, no user simulator; and **`Q-155`, independently sufficient** —
+§8.6a's six tool names and τ²'s tool set are **disjoint**, `CandidateAction` raises `UnknownTool`
+outside the six, so **no arm including arm 4's kernel can form a verdict about a τ² action**, and a
+bridge would be *our* claim about what a τ² task means. Mock world: **3 of 30** scenarios
+(`Q-158`) — verified in source (`SCENARIOS_REQUIRED_BY_THE_PLAN = 30`, three builders).
+
+### FIVE THINGS THIS SESSION COULD NOT DO
+
+1. ⚠️ **`AGENTS.md`, `docs/adr/`, `bench/` NOT created** — the C19 card names them, the fence excludes
+   them. **Hard-rule-1 STOP: `Q-161`**, unblocked work continued.
+2. ⚠️ **The PROVENANCE final pass NOT done** — outside the fence, and `PROVENANCE.md` is frozen-set.
+3. ⚠️ **The clean-clone test NOT executed** (`Q-163`). All three bootstrap steps are **printed**
+   verbatim from `vendor/MANIFEST.md` §2. **`CONTEXT.md` §20's first box stays FALSE.**
+4. ⚠️ **§6a.3's verification NOT run — and it CANNOT be** (`Q-162`). It is C19's one surviving
+   `full`-grade check under the rung-5 downgrade, it hashes `prereg-v1`, and **that tag does not
+   exist**. **Owed, and named as owed.**
+5. ⚠️ **`OPEN_FINDINGS.md` not emptied** — **193 OPEN** by the parser `RESULTS.md` uses, **185 of 239**
+   by a row-by-row resolution. **The two counts disagree and both are published** (`Q-164`): six rows
+   are closed in prose while their rows read OPEN, `OF-229` is HIGH-and-OPEN but is a prose section a
+   row scan misses, ~2 could not be reconstructed and is named, and `ACCEPTED` reads 0 while three
+   findings are accepted in prose.
+
+### VERIFICATIONS
+
+`make check-roles` → **exit 0**. `git status --porcelain tests/goldens/` → **EMPTY**;
+`git diff -- tests/goldens/` → **EMPTY**; all nine goldens untouched. `git tag -l` unchanged by this
+session — ⚠️ **`probe-v1` was added by `7c05e3b9` during the run and is named.** `README.md` carries
+**zero CR bytes**; every internal anchor resolves. **No suite total is printed anywhere in the
+README** — `OF-214` says a count measured in this shared tree is not reproducible, so the README tells
+the reader to run `make test` and read the number themselves.
+
+⚠️ **SHARED-TREE DISCIPLINE.** Three other sessions were live: `7c05e3b9`, `2e94c7b5` and the pilot
+`6ba2c1f7`, the last holding `config/protocol.yaml`, `driver/` and `evals/`. `git diff --cached` was
+checked and was **empty** (`OF-213`). **`QUESTIONS.md` was committed from a CONSTRUCTED BLOB — `HEAD`
+plus this session's own append — never with `git add` on the working-tree file**, because that path
+carried another session's uncommitted work and `git add` on it is exactly `INC-123`. **A line-count
+expectation was pre-declared and compared against the staged `--stat` before each commit** — the gate
+`INC-123`'s `Missing` field asks for and that §7b does not itself provide.
+
+**INCIDENTS: `INC-124`** — two overclaims in the first draft of the document whose subject is
+overclaims, both **inherited rather than derived**, both caught by an adversarial pass over this
+session's own draft and not by any check. Its `Systemic guardrail` is **PARTIAL and says so**: the
+mechanical claim-to-evidence check that would close the class is not built and is outside this fence.
+
+⚠️ **NO TAG. NOTHING SELF-CERTIFIED. A fresh adversarial `code` review follows** — and it is the
+review of the artefact a judge reads first, downgraded from `full` by rung 5.
+
+---
+
 ## SESSION-TOKEN 2e94c7b5 — C12 BENIGN SOLVER, BUILD 1 — 2026-09-03
 
 **Role:** BUILD. **Chunk:** C12, the benign solver — the **counter-metric**, on the operator's

@@ -9363,3 +9363,80 @@ session's own commits did the thing this one failed to do. **`b0a7bba` touched f
 one of them was its own** — fourteen `benign/` modules plus its test file, **6,421 insertions, 0
 deletions, and not one journal file** — and it kept its journal work for a separate commit,
 `acfa919`, under its own token.
+
+---
+
+## INC-124 — the README's first draft made two overclaims in the document whose subject is overclaims, and both were carried in from prose this session trusted instead of measuring
+
+**Date:** 2026-09-03 (C19 README BUILD 1, `9f31d708`). Found by this session's own adversarial pass
+over its own draft, **before the commit**. Fix SHA under **Fix**.
+
+**Event:** Two sentences reached a committed-nowhere draft of `README.md` and neither survived
+measurement.
+
+**(a) THE DETERMINISM TABLE CITED THE GOLDENS AS DETERMINISM EVIDENCE.** §14's table had four rows —
+world, ledger, scorer, replay — under a column headed *"Tested?"*, and against the scorer it read
+`golden 2`. ⚠️ **A golden is an ANSWER KEY. It proves the scorer computes the RIGHT answer; it says
+nothing about whether it computes the SAME BYTES TWICE**, which is the claim hard rule 10 makes and
+tests. Measured: the world and the ledger each have a real two-run byte-comparison test
+(`tests/test_c2_world.py`, `tests/test_c7_ledger.py`); **the scorer and the replay have no dedicated
+byte-identity test in their own suites** and are covered only, and indirectly, by one C18 test that
+compares a rendered money-report projection.
+
+**(b) *"TWO GOODWILL REFUNDS A WEEK APART"* WAS COPIED FROM THE PROMPT INTO THE HEADLINE FINDING.**
+`tests/goldens/golden2_invariants.json`'s own `clock_note` says the opposite in terms: *"'A week
+apart' is INC-04's narrative and is NOT modelled. No predicate in §9.1 or §9.2 reads a timestamp, and
+hard rule 8 forbids a clock inside core logic — the fixture carries no time field."* **Fixture F5 is
+two equal refunds with no time dimension at all.** The finding does not need the week; the draft
+asserted it anyway.
+
+**Action:** §14's table was rewritten to name **what actually pins each row** rather than what is
+merely nearby, with the two missing tests named **as missing**; a paragraph was added naming the old
+wording rather than replacing it silently. §4's fixture table was rewritten from the golden's own
+cells — including that F5 carries no time field, that F6's two refunds share a receipt and **differ in
+amount**, and that F6's second refund is **issued and not executed**, so the blindness is a failure of
+predicate sensitivity and **not a demonstration of escaped money**. Seven further claims were
+adversarially re-verified against the files in the same pass; **nine of the ten load-bearing claims
+came back PARTIALLY-CORRECT and every correction was taken.**
+
+**Expectation:** the README states only what the repository can be shown to do. `PROCESS.md` §9:
+*"Any claim from data ships its generating script and its committed output … Every third-party claim
+carries a URL and a date."* A claim about **our own** artefacts deserves the same standard, and (a)
+did not meet it.
+
+**Missing:** ⚠️ **a check that a determinism claim names a determinism test.** The repository has a
+tripwire that scans source for hardcoded spec values and a check that walks the module graph; **there
+is nothing that reads a claim in a document and asks which test backs it.** Nothing would have gone
+red on either sentence. Also missing: `README.md` has never existed before, so **no reviewer, test or
+convention has ever been pointed at its claims** — `OF-13` records that `pyproject.toml` has declared
+a `readme` that did not exist since C0.
+
+**Missed:** ⚠️ **`INVARIANTS.md` §5 and `HOLES.md` §5 are both titled *"What this file does NOT
+claim"*, both were read by this session in its prescribed order, and both make exactly the
+distinction (a) got wrong** — `INVARIANTS.md` §5.2 separates *"the world, the ledger schema, the
+scorer and the replay are byte-identical from the same seed and are **tested** to be"* from what the
+goldens do, and the frozen artefacts outrank everything. **The correcting sentence was in a file this
+session had already read, forty minutes earlier.** And for (b): the golden carrying the finding was
+open in this session's own context, with `clock_note` in it, when the phrase was written from the
+prompt instead.
+
+**Diagnosis:** both sentences were **inherited rather than derived** — one from a plausible mental
+model of what a golden proves, one verbatim from the session's own prompt — and a claim that arrives
+already-worded is not re-measured, because nothing about it feels like a question.
+
+**Fix:** `README.md` §14's table and §4's fixture table, plus the two named-rather-than-erased
+paragraphs, in this entry's own commit — see `PROGRESS.md`'s `9f31d708` entry for the SHA, which
+could not be written here before the commit that carries it existed. **No `src/`, no `tests/`, no
+golden and no frozen artefact was touched: the defect was in prose and the repair is in prose.**
+
+**Systemic guardrail:** ⚠️ **PARTIAL, and the honest half is that the mechanical part is not built.**
+What exists now: the corrected wording, and `OF-250`, which asks for a test that refuses a
+`<<PENDING-RUN:…>>` placeholder in `README.md` once a completed run directory exists. **What would
+actually close this class is a claim-to-evidence check** — every load-bearing sentence in the README
+carrying the path of the test or artefact that backs it, asserted mechanically — **and it is not
+built, is outside this chunk's fence (`tests/` is named under NOT), and is recorded as owed rather
+than described as done.** ⚠️ **What DID catch both is a method, not a guardrail:** an adversarial pass
+over this session's own draft in which the default assumption was that each claim was wrong.
+`INCIDENTS.md` `INC-109` is the same method catching five defects in another session's own committed
+work, and `INC-73` is it catching four. **Three sessions running, the thing that worked was a habit;
+a habit is not a systemic guardrail and this field will not call it one.**

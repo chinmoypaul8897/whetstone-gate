@@ -121,6 +121,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `8b46f2e1` | ARCH | FIX | 2026-09-03 |
 | `7c05e3b9` | ARCH | FIX | 2026-09-03 |
 | `2e94c7b5` | C12 | BUILD | 2026-09-03 |
+| `9f31d708` | C19 | BUILD | 2026-09-03 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -12705,3 +12706,235 @@ pushed journal is wrong, the correction is in the repository, and a reader compa
 both the claim and its retraction. **A session that quietly edited its own already-pushed journal to
 match a fact it learned afterwards would be doing, at the scale of one sentence, exactly what this
 whole project exists to make impossible.**
+
+---
+
+## ⚠️ QUESTIONS RAISED BY C19 README BUILD 1 (`9f31d708`), 2026-09-03
+
+⚠️ **SELF-RECORDED TOKEN ROW, AND IT IS NAMED RATHER THAN FILED SILENTLY.** The `9f31d708` row was
+appended to `## Session tokens` by this session. **Measured before writing it:**
+`grep -c "9f31d708" QUESTIONS.md` → **0**, and a `grep` across `QUESTIONS.md STATUS.md PROGRESS.md
+INCIDENTS.md CLAUDE.md PROCESS.md CONTEXT.md` returned **no match anywhere**. The token was issued in
+this session's prompt but **was never recorded**, so without this row `check_roles` **E1 would fail
+FORGED/UNISSUED on every commit this session makes** — the identical red `Q-021`, `Q-025` and the
+`365deaf7` note already record. `CLAUDE.md` §5 forbids fabricating a token and requires an unrecorded
+one to be written here and named in the report; the prompt supplied the token and restricted the row's
+role to **FIX or BUILD**, and this is a **BUILD** session. **The row is the architect's token; only the
+recording is this session's.** The general remedy stands unchanged and is still owed: *a token is
+recorded before the session that carries it runs, whether it is issued in a batch or alone.*
+
+⚠️ **NO ORDINAL IS CLAIMED FOR THE ROW.** `OF-179` measured two sessions publishing *"row 55"* for two
+different rows on the same day, **both correct**, because the field's convention is unstated — the
+table's data-row count and `check_roles._TOKEN_ROW`'s 8-hex-row count differ by one. Continuing the
+sequence would mean inventing a number in the shape of a measurement.
+
+⚠️ **THE Q- NUMBERS BELOW WERE COUNTED AT A NAMED MOMENT AND A CONCURRENT SESSION MAY COLLIDE.**
+Measured at `a691d13` with the working tree holding `6ba2c1f7`'s uncommitted block: the highest
+allocated id was **`Q-160`**. `OF-179` records this exact collision class happening to a previous
+session that re-read immediately before appending, *"and the discipline did not prevent it."* If these
+ids collide, the renumbering is the architect's and nothing here depends on the number.
+
+---
+
+### Q-161 — ⚠️ **THE C19 CARD AND THE C19 PROMPT'S FENCE DISAGREE ON THREE DELIVERABLES, AND HARD RULE 1 SAYS STOP.**
+
+**Raised by:** C19 README BUILD 1 (`9f31d708`), 2026-09-03. **Class:** B (scope, not meaning).
+**Blocking:** three named deliverables. **Not blocking:** the README, which was built.
+
+`PROCESS.md` §12.1's **C19 row** names the chunk *"README + architecture + PROVENANCE final pass and
+the Agent-Ready conventions"* and lists, in terms, **`AGENTS.md`, `docs/adr/`, `bench/`**.
+
+**This session's prompt fence reads, in full:** *"ONLY README.md (NEW or rewritten), QUESTIONS.md,
+INCIDENTS.md, docs/reviews/OPEN_FINDINGS.md, STATUS.md, PROGRESS.md, docs/sessions/."* **`AGENTS.md`,
+`docs/adr/` and `bench/` are not in it.** `PROVENANCE.md` is not in it either, and it is additionally a
+**frozen artefact** that `CLAUDE.md` §4 forbids editing after its tag exists.
+
+**Measured:** `AGENTS.md`, `docs/adr/` and `bench/` **do not exist** in this tree.
+
+`CLAUDE.md` §1: *"If the card, the spec and the logs disagree → STOP and write `QUESTIONS.md`."* Hard
+rule 1: *"STOP that item, write the question with the options you see, continue any unblocked work."*
+**That is what happened: the three items are stopped and the README was built.**
+
+**Options as this session sees them:**
+1. **The fence is authoritative and the card's three items move to a later chunk.** Cheapest; the
+   Agent-Ready conventions are then owed to C21 or to a named follow-up.
+2. **The card is authoritative and a follow-up C19 session is issued with a widened fence.** Preserves
+   the plan; costs one session.
+3. **The three items are dropped and published as dropped**, in the ladder's own manner — named in
+   `RESULTS.md` and the README as *not built*, with why. **§14's ladder has no rung for them**, so this
+   would be a cut outside the ladder, which is precisely what §14 exists to prevent.
+
+⚠️ **The PROVENANCE final pass is a separate half of the same conflict and its answer may differ**: it
+is named in the card, excluded by the fence, **and forbidden by hard rule 4 while `PROVENANCE.md` is
+frozen.** Option 1 is the only one of the three that is consistent with the freeze.
+
+**Default taken:** the fence. **Nothing outside it was written**, and §18 of the README names all three
+as not done.
+
+---
+
+### Q-162 — ⚠️⚠️ **C19's ONE SURVIVING `full`-GRADE VERIFICATION IS UNSATISFIABLE TODAY, BECAUSE `prereg-v1` DOES NOT EXIST.**
+
+**Raised by:** C19 README BUILD 1 (`9f31d708`), 2026-09-03. **Class:** A — it is a done-when clause the
+plan singles out as surviving a ladder downgrade. **Blocking:** C19's done-when. **OPEN.**
+
+`PROCESS.md` §12.1's C19 row, on the rung-5 downgrade from `full` to `code`:
+
+> ⚠️ **BUT ONE VERIFICATION IN ITS done-when SURVIVES THE DOWNGRADE AND IS NAMED HERE SO IT IS NOT
+> SKIPPED: *"a fresh session runs §6a.3's verification procedure start to finish from that clean clone
+> and reproduces the published fingerprint"* — that is a reproduction check on the PRE-REGISTRATION, it
+> is a PROCEDURE rather than a reimplementation, and it is REQUIRED under `code`.**
+
+**Measured at `a691d13`:** `git for-each-ref refs/tags` holds `c0-pass c1-pass c2-pass c3-pass c4-pass
+c13-pass probe-v1`. **`prereg-v1` does not exist.** §6a.3's procedure opens with
+`git rev-parse prereg-v1^{commit}` and every subsequent line hashes `prereg-v1:<path>`. **There is no
+tag to hash, no `prereg-v1.sha256` manifest to diff against, and no gist id to curl.** There is also no
+*published fingerprint* to reproduce.
+
+**This is not a refusal to do the work. It is a missing precondition**, and the precondition is C14's:
+`PROCESS.md` §12.1 gives the freeze order as `HOLES.md` → `probe-v1` → pilot → calibration → the frozen
+set → `prereg-v1` → the witness. **`probe-v1` was cut on 2026-09-03 at 20:42:34 +0530 by session
+`7c05e3b9`; the pilot did NOT run; `probe.void_threshold_breach_rate` is still
+`TODO_C14_CALIBRATION`; `n_decision.selected_branch` is still `TODO_C14_PILOT`.** The sequence stopped
+after its first step.
+
+**Options:**
+1. **The clause is deferred to a post-`prereg-v1` session** — a fresh session runs §6a.3 once the tag
+   and the gist exist, and its output is committed. **This is the only option that satisfies the clause
+   as written.**
+2. **The clause is re-scoped to what is runnable today** — run the procedure against `probe-v1`, which
+   *does* exist, and publish that as a partial verification. ⚠️ **This session did not do it**, because
+   §6a.3's manifest, its combined fingerprint and its witness are all defined over the `prereg-v1`
+   frozen set, and running a differently-scoped check while calling it §6a.3 would be the citation
+   defect `Q-058` exists to stop, one artefact over.
+3. **It is published as not done.** The README does this in §18 **as well as** raising the question,
+   because a silence here would be indistinguishable from an omission.
+
+**Default taken:** option 3 for the record, option 1 as the recommendation. **The verification is owed
+and is named as owed.**
+
+---
+
+### Q-163 — ⚠️ **C19's CLEAN-CLONE DONE-WHEN WAS NOT EXECUTED, AND THE FENCE AND THE SPEND SANCTION BOTH POINT AWAY FROM IT.**
+
+**Raised by:** C19 README BUILD 1 (`9f31d708`), 2026-09-03. **Class:** B. **OPEN.**
+
+C19's done-when requires *"the clean-clone test passes in a fresh directory, on the free tier, with no
+card attached"* and that it *"EXECUTES ALL THREE bootstrap steps — clone; venv + `pip install -e
+".[dev]"`; the `vendor/MANIFEST.md` §2 fetch commands followed by `pip install -e vendor/tau2-bench`
+— and the README prints all three beside the clone command."* (`Q-010`.)
+
+**Done:** the README prints all three, verbatim from `vendor/MANIFEST.md` §2, beside the clone command.
+**Not done:** the execution.
+
+**Why, stated rather than excused.** This session's prompt sanctioned **zero provider model calls and
+zero token spend**, and its fence lists documentation files only; a clone of a **private** remote plus
+two `pip install`s plus four corpus fetches is neither a documentation write nor obviously inside a
+zero-spend sanction, and `CLAUDE.md` §4 says that if anything seems to require working outside the
+task's scope, **stop and report instead of working around it.** ⚠️ **The counter-argument is real and
+is recorded: a clone is not a model call, and a done-when the prompt itself quotes is not obviously out
+of scope.** This session read the ambiguity the conservative way and is naming it rather than deciding
+it silently.
+
+⚠️ **And there is a known defect waiting for whoever runs it.** `INC-114`: the documented corpus fetch
+produces **CRLF payloads on Windows** that fail `corpora/MANIFEST.md` §2's hashes, **while §4's
+verification passes anyway** because it hashes git objects rather than the bytes the loader reads. It
+was repaired in one working tree; **`corpora/fetched/` is gitignored, so a fresh clone reproduces it.**
+`OF-08` also records an **unruled Class A** `vendor/*/` gitignore decision explicitly marked *"needs a
+ruling before C19's clean-clone test."*
+
+**Options:** (1) a follow-up session with an explicit network sanction runs all three steps and commits
+the transcript; (2) the operator runs it in their own terminal, as `CLAUDE.md` §4 prefers for long
+work, and commits the output; (3) it is published as not done. **The README publishes it as not done
+and says the Definition of Done's first box is FALSE until it runs.**
+
+---
+
+### Q-164 — ⚠️ **`docs/reviews/OPEN_FINDINGS.md` IS NOT EMPTY, C19's DONE-WHEN SAYS THAT BLOCKS THIS CHUNK, AND THE FILE'S TWO HONEST COUNTS DISAGREE.**
+
+**Raised by:** C19 README BUILD 1 (`9f31d708`), 2026-09-03. **Class:** B. **OPEN.**
+
+C19's done-when: *"`docs/reviews/OPEN_FINDINGS.md` is empty or every remaining item is explicitly
+accepted with a reason."* That file's own governing sentence is blunter: *"an item that is neither
+closed nor accepted blocks the README chunk."*
+
+**Measured two ways, and the two disagree — which is itself the finding, so both are published:**
+
+| method | OPEN | HIGH | MEDIUM | LOW |
+|---|---|---|---|---|
+| the parser `RESULTS.md` uses (`loader.open_findings_counts` — table rows whose status cell says `OPEN`) | **193** | 11 | 106 | 76 |
+| a row-by-row resolution, each id taken at its **last** occurrence | **185** of **239** unique ids | **12** | 99 | 74 |
+
+**Where they differ, each difference named:**
+
+1. **Six rows are CLOSED by a later prose block while their original table rows still read `OPEN`** —
+   `OF-105`–`OF-109` (MEDIUM) and `OF-111` (LOW), under the heading *"the six non-equivalent survivors
+   — all six CLOSED"*, all six `KILLED`. **A row-scanning parser over-counts them.**
+2. **`OF-229` is HIGH and OPEN but is a prose section, not a table row**, so a row-only scan misses it
+   entirely. That is the missing twelfth HIGH — and it is *"the results assembler crashes instead of
+   refusing when an arm's episodes all drop,"* which is exactly the run whose drop ledger hard rule 11
+   most needs published. **Four other findings, `OF-228`…`OF-232`, are in the same prose form.**
+3. **A residual discrepancy of roughly two could not be reconstructed.** Likely sources: `OF-53` is
+   deliberately allocated twice to two different findings, and several early ids are restated by later
+   sessions. **Named rather than rounded away.**
+4. **`ACCEPTED` reads 0 in every status column, while three findings are declared accepted in prose and
+   their status cells were never updated** — `OF-79`, and `OF-57`/`OF-61` (*"ACCEPTED AND PUBLISHED AS
+   LIMITATIONS, NOT DEFECTS … DO NOT FAIL C7 ON EITHER"*). **So the file under-reports its own accepted
+   set, in the direction that makes the OPEN count look worse rather than better.**
+
+⚠️ **The consequence for `RESULTS.md` is not cosmetic.** `results/trail.py` prints the parser's figure
+into the published review trail. **The number `RESULTS.md` prints is the 193, and it is reproducible
+from the parser but not from the file's own semantics.**
+
+**Options:** (1) the six prose-closed rows have their status cells updated and the five prose findings
+are converted to rows, after which the two counts converge; (2) the parser is taught the prose form and
+the closed-by-prose case — **but that is `results/`, a `full` chunk nobody has reviewed**; (3) both
+counts are published side by side with the discrepancy named. **Default taken: (3), in the README, in
+its own subsection.** ⚠️ **This session did not edit a single finding row**, because reclassifying
+another chunk's findings from inside a README fence is the shape of thing `OF-180` and `INC-73` record.
+
+---
+
+### Q-165 — ⚠️⚠️ **THE SEEDED-DEFECT TEST IS ON §14's NEVER-CUT LIST, IT DID NOT RUN AT C7, IT WAS RULED TO "RELOCATE TO A LATER CHUNK", AND NO ARTEFACT SHOWS IT HAVING RUN SINCE.**
+
+**Raised by:** C19 README BUILD 1 (`9f31d708`), 2026-09-03. **Class:** A — it bears on what the review
+trail's fourteen FAILs are evidence *of*. **OPEN.**
+
+`PROCESS.md` §5.4 is unambiguous about the stakes: *"This is the known-red case B.9 asks for, applied
+to our own grader — **and it is the only evidence in the repository that the PASS verdicts mean
+anything**."* §14's never-cut list carries it in terms: *"The seeded-defect test (§5.4) — the only
+evidence the review gate works."*
+
+**What is on the record.** The architect ruled, verbatim: *"NO C7 BUILD PROMPT CARRIED ONE — all three
+instructed the CORRECT behaviour, in capitals. The trap was ALSO pre-announced in `PROCESS.md` §12.1,
+in `tests/goldens/README.md` and in golden 5's own `seeded_defect_note`, so it could not have worked
+here in any case. RULED: §5.4's test DID NOT RUN AT C7; the card's done-when clause is UNSATISFIABLE AS
+WRITTEN and is corrected; **the test RELOCATES to a later chunk which is not named.**"*
+`REVIEW_7_1.md` §13.2 raised it as `F-1`/`OF-144` and added the sentence that matters:
+*"**THIS REVIEW'S FAIL MUST NOT BE READ AS THE SEEDED-DEFECT TEST PASSING** … The gate has gone red on
+its own findings, which is weaker evidence than a planted red, and this review does not claim
+otherwise."*
+
+**What this session measured.** Reviews completed **after** that ruling are `REVIEW_7_2`, `REVIEW_8_1`
+and `REVIEW_13_2`…`REVIEW_13_4`. **A search across `docs/reviews/` finds no review reporting that it
+caught a planted defect**, and the relocation names no chunk, so **no artefact in this repository
+records the never-cut test as having run.** This session cannot prove it did not — a relocated trap is
+deliberately unannounced, and a build session is exactly the wrong reader to confirm one — **which is
+why this is a question and not a finding.**
+
+**Why it matters to the document this session wrote.** The README publishes **20 reviews and 14 FAILs**
+as the evidence that the review gate is not decorative. **Every one of those FAILs is the gate's own
+finding.** Without the planted red, the trail is evidence that reviews *find things*, not evidence that
+they *would find a thing deliberately hidden* — and those are different claims. **The README states the
+weaker one and says so.**
+
+**Options:** (1) the architect confirms the relocation has since fired, names the chunk and the defect
+retrospectively, and the README's §9.12 is corrected on the record; (2) the trap is planted in a
+remaining review — C14's owed verification review is the natural host, and it is owed anyway;
+(3) it is published as not-run, which is what the README does today.
+
+**Default taken:** (3). ⚠️ **If (1) is the truth, this entry is wrong and the correction should be
+appended rather than this entry edited away** — the convention `Q-082`'s supersession marker
+establishes.
+
+---
