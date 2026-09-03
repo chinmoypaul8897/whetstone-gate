@@ -1,0 +1,421 @@
+================================================================================
+ARCH NIGHT 1 -- SECOND INSTANCE of SESSION-TOKEN 5d7e2b91 -- CHUNK ARCH -- ROLE FIX
+FINAL OUTPUT. Committed to docs/sessions/arch-night-1b.txt BEFORE it was printed.
+================================================================================
+
+PUSHED SHA: 30e199c79f70051bfb22c017de6b4e0aed4b4e0c   (this file lands in the next commit)
+
+!! READ THIS FIRST. TWO LIVE SESSIONS EXECUTED THIS PROMPT UNDER THIS TOKEN, IN THIS
+   WORKING TREE, AT THE SAME TIME. The other instance wrote docs/sessions/arch-night-1.txt.
+   THIS FILE IS DELIBERATELY NAMED -1b SO IT CANNOT OVERWRITE THAT ONE. Both prompts named
+   arch-night-1.txt and the second arrival would have destroyed the first's record.
+   INCIDENTS.md INC-136; QUESTIONS.md Q-180 (this instance) and Q-187 (the other).
+
+!! TOKEN SPEND: ZERO. NO PROVIDER MODEL CALL OF ANY KIND, ON ANY LANE, ALL NIGHT.
+   `git status --porcelain evals/ tests/goldens/ config/` was EMPTY at every step.
+   evals/pilot/RUN_DECLARED.md S8's UTC start time is BLANK FOR THE FOURTH TIME and the
+   pilot's SINGLE-SHOT WINDOW IS UNSPENT. No tag cut. prereg-v1 NOT cut, NOT resolvable.
+   NOT SELF-CERTIFIED -- everything below ships UNREVIEWED and a fresh review is owed.
+
+================================================================================
+0. THE THREE THINGS THIS INSTANCE FOUND AGAINST ITSELF
+================================================================================
+
+  These are first because they are the part worth reading.
+
+  (1) INC-138 -- THE WORK THIS INSTANCE LANDED HAD DELETED A TEST, AND ITS OWN COMMIT
+      MESSAGE SAID "NOTHING WAS DELETED".
+      f45721d's rewrite of test_the_DECLARED_COMMAND_now_ROUTES_... deleted:
+          assert transport.urls[0].endswith(f"/{lanes['gemma-26b'].api_model_id}:generateContent")
+      That was THE ONLY assertion in the suite that the URL built inside the declared
+      command's REAL driver_run.execute path carries config/lanes.yaml's own api_model_id
+      rather than a literal -- hard rule 9's guard on the SHIPPED path.
+      MEASURED by an AST scan over every `def test_*`:
+          tests calling driver_run.execute(  : 7
+          tests asserting api_model_id       : 4
+          tests doing BOTH                   : 0     <-- THE INTERSECTION WAS EMPTY
+      RESTORED at fd67082, additively, plus a STRONGER form on the completing test --
+      all(...) over EVERY Google URL, on the path that runs all 400 calls.
+      PROVED MEANINGFUL, not asserted: with the model id replaced by a literal in a
+      THROWAWAY fixture repo in a fresh OS temp dir, both tests FAIL:
+          AssertionError: ... must carry config/lanes.yaml's model id and never a literal
+          AssertionError: every Google URL ... must end '/models/gemma-4-26b-a4b-it:generateContent';
+                          got ['.../models/gemma-4-26b-it:generateContent']
+          2 failed, 76 deselected
+      !! IT WAS FOUND BY AN ADVERSARIAL AUDIT THIS INSTANCE COMMISSIONED AGAINST ITS OWN
+         LANDED WORK -- twelve read-only agents, each measurement re-run by an independent
+         verifier told to refute it -- AND NOT BY ITS OWN VERIFICATION, WHICH PASSED.
+         Gate 0a named four properties to confirm and ALL FOUR are about what the code now
+         DOES; not one is about what a test STOPPED covering. And the two-tree red count
+         (22 -> 1) is the same blind spot with a number on it: A DELETED ASSERTION CANNOT
+         MAKE A SUITE REDDER. f45721d is NOT amended; its false sentence stands in the log.
+
+      A SECOND, SMALLER DEFECT IN THE SAME REWRITE: assertion (4), labelled "HARD RULE 11's
+      DENOMINATOR IS LOST WITH THE RUN", is
+          assert not isinstance(raised.value, (RateLimited, ProviderFailed))
+      and is VACUOUS -- pytest.raises(BucketError) already fixes the type and the three are
+      SIBLING RuntimeError subclasses (measured: both issubclass checks are False). It is
+      KEPT AND LABELLED AS VACUOUS IN PLACE, because hard rule 6 forbids DELETING an
+      assertion; the non-vacuous form is added beneath it.
+
+  (2) INC-137 -- OF-215 FIRED ON THE COMMIT WHOSE OWN MESSAGE CITED IT.
+      A `git diff --numstat` two tool calls before the `add` said 137 lines for QUESTIONS.md.
+      THE COMMIT LANDED 557. 420 lines were the other instance's UNFINISHED draft -- its
+      Q-180..Q-186 and three MEASUREMENT UPDATE sections. PROCESS.md S7b's recipe was
+      followed EXACTLY and did not prevent it, because S7b protects the FILE LIST and not
+      the FILE (INC-123's own words). Content VERIFIED INTACT: zero deleted lines, carried
+      EARLY rather than damaged. SHA and token recorded: 0e3a69f, Session-Token 5d7e2b91.
+      !! AND IT WAS CARRIED IN AN UNFINISHED STATE. The other instance then renumbered its
+         Q-180 to Q-187 and its entry says "RENUMBERED TO Q-187 BEFORE IT WAS COMMITTED".
+         THAT SENTENCE IS FALSE AGAINST THE LOG BECAUSE OF THIS SWEEP:
+             git show 0e3a69f:QUESTIONS.md | grep -c '^### Q-180 — .*TWO CONCURRENT SESSIONS'
+         returns 1. Neither instance can make it true now; history is not rewritten here.
+
+  (3) INC-139 -- THE GUARDRAIL INVENTED IN (2) WAS MISAPPLIED ONE COMMIT LATER AND
+      REVERTED THE OTHER INSTANCE'S ENTIRE FINAL OUTPUT.
+      INC-137 proposed staging a CONTENT HASH captured at read time instead of a path.
+      fd67082 used it -- and ALSO wrote `git read-tree <pinned sha>` in place of
+      `git read-tree HEAD`. Between the read and the commit the other instance committed
+      68f970f, which ADDED docs/sessions/arch-night-1.txt (763 lines, its FINAL OUTPUT) and
+      corrected one citation. Seeding from the stale SHA expressed both as DELETIONS:
+          docs/sessions/arch-night-1.txt | 763 -----------------------------------
+          QUESTIONS.md                   |   2 +-
+      !! THE --stat PRINTED "764 deletions" UNDER A MESSAGE THAT SAID "Swept: NOTHING, by
+         construction". THE SNAPSHOT WAS RIGHT AND THE MESSAGE WAS WRONG, ON THE SAME SCREEN.
+      RESTORED at fa73b76 to 68f970f's own blobs, verified TWO WAYS: blob ids at HEAD equal
+      68f970f's, and `git diff 68f970f HEAD -- <the two paths>` is EMPTY. Its NEWER
+      working-tree version was deliberately NOT committed -- that would be INC-137's sweep
+      in the opposite direction. NOTHING WAS EVER LOST; this was a revert that was undone.
+      !! THE MISS IS THE MIRROR IMAGE OF WHAT THIS INSTANCE HAD JUST WRITTEN. INC-137 is
+         "the snapshot listed MORE than you staged." This is "the snapshot listed a DELETION
+         you never staged." THE SAME LINE OF OUTPUT, READ FOR ONE FAILURE MODE AND NOT THE OTHER.
+      THE CORRECTED RECIPE, now used by every commit after it:
+          git read-tree HEAD                       # ALWAYS HEAD. NEVER A PINNED SHA.
+          git update-index --add --cacheinfo 100644,<blob>,<path>
+          git diff --cached --stat
+          [ "$(git diff --cached --name-only|sort)" = "$DECLARED" ] || exit 1   # REFUSES
+      SIXTH INCIDENT IN THIS FAMILY (INC-88, 123, 125, 136, 137, 139) AND THE FIRST TO
+      DAMAGE A COMPLETED, COMMITTED ARTEFACT RATHER THAN A DRAFT.
+
+================================================================================
+1. GATE 0 -- LAND THE DEAD SESSION'S WORK.  **RAN. LANDED. PUSHED.**
+================================================================================
+
+  0a. VERIFIED BEFORE TRUSTING ANY OF IT, by reading the full git diff:
+      * `tool` -> `user` on BOTH providers, identical, one key added to each of
+        _GOOGLE_ROLE and _GROQ_ROLE and NOTHING ELSE in either map moved.
+      * An unknown role STILL RAISES DriverClientError naming the role AND the legal
+        values, on BOTH paths -- clients.py:498-506 (Google), :575-581 (Groq).
+      * `lane` still REQUIRED, UNDEFAULTED and KEYWORD-ONLY on both protocol methods and
+        on ALL THREE implementations: :257/:262 (Protocol), :300/:318 (TranscriptClient),
+        :725/:731 (MeteredProviderClient).
+      * Both benign/ call sites pass a REAL lane -- manifest.SOLVER_LANE for the solver,
+        and the new benign.shell.judge_lane() reading config/lanes.yaml for the judge,
+        refusing on zero matches and on more than one.
+      TREE COHERENT: all five Python files compile. Two paths (benign/blindness.py,
+      benign/executor.py) showed MODIFIED in `git status` but are BYTE-IDENTICAL to the
+      index -- hashed and compared; a stat-cache artefact, not an edit. That reconciles
+      `git status`'s 8 paths with `git diff --stat`'s 6, which is the prompt's own number.
+
+  0b. THE TWO TEST FILES, MEASURED ON TWO TREES, `-p no:randomly`:
+        HEAD 4606072, exported with `git archive` to a fresh OS temp dir, PYTHONPATH
+        pinned to it (an editable install otherwise silently tests the working tree):
+            22 failed, 113 passed in 218.28s
+        This working tree, with the landed work:
+            1 failed, 136 passed, 2 skipped in 356.00s
+      EXACTLY THE PROMPT'S PREDICTION: 136 passed, 2 skipped, ONE failure.
+      THE ONE SURVIVOR, AND IT IS PRE-EXISTING AT HEAD -- CONFIRMED TWO WAYS AS REQUIRED:
+        tests/test_c12_benign.py::test_the_benign_package_imports_no_model_client_WAY_ONE_the_transitive_ast_walk
+        AssertionError: ... reaches provider or network modules ['urllib']
+        WAY ONE -- THE RECORD: INCIDENTS.md INC-127 names this test, this file, this line
+          and this cause, and states it "is red at HEAD as a result" since b1bab1c.
+        WAY TWO -- EXECUTION: it fails identically in the HEAD-tree run above, which
+          contains not one byte of this work.
+      NOT FIXED HERE AND NOT WEAKENED. benign/shell.py:91 imports driver.clients, which
+      imports urllib; the walk is transitive. The remedy is per-module attribution and
+      belongs to whoever owns that file.
+      The 21 closed are the 20 benign `TypeError: ... missing 1 required keyword-only
+      argument: 'lane'` reds plus test_the_DECLARED_COMMAND_now_ROUTES_...
+
+  0c. COMMITTED AND PUSHED as f45721d. The message STATES IN ITS FIRST LINE that the code
+      was authored by session 8c47b1e0, which was killed before committing, and that it
+      lands UNREVIEWED and UNDISCLOSED BY ITS AUTHOR. It ends "(unreviewed)". The trailer
+      carries THIS session's token; 8c47b1e0 was never reused or invented.
+      Snapshot matched the pre-declaration exactly: 6 files, 586 insertions, 69 deletions.
+      grep.exe.stackdump NOT committed -- crash debris, left alone.
+      !! DISCLOSED IN THE COMMIT: the dead session's landed prose cites
+         docs/sessions/arch-role-fix-1.txt, Q-179 and INC-134. NONE EXISTED. The citations
+         were landed UNALTERED (rewriting another session's recorded ruling is worse than a
+         dangling reference) and Q-179 + INC-134 were then WRITTEN BY THIS INSTANCE from
+         its OWN measurements, so the citations now resolve.
+
+  0d. INC-135 WRITTEN, all eight fields, Diagnosis and Missed filled.
+      Diagnosis: a session's only durable record is a commit, and this project's rules place
+      every commit at the END of a session, so an interrupted session is BY CONSTRUCTION a
+      session that produces nothing -- the failure needs no bug, only a stop.
+      Missed: the restart was known to be coming and the work was not committed first; and
+      PROCESS.md S7b's whole apparatus exists because ANOTHER session's uncommitted work is
+      fragile, and nothing generalised that to one's own.
+      Guardrail PROPOSED, not claimed: "commit at every natural boundary, not only at the
+      end" -- which is in THIS prompt and was NOT in the dead session's -- belongs in
+      PROCESS.md S7 rather than in one prompt. Uncloseable half named: nothing can warn a
+      process that is about to be killed.
+
+================================================================================
+2. GATE 1 -- THE PILOT.  **SKIPPED AT 1a. THE WINDOW IS UNSPENT.**
+================================================================================
+
+  1a. driver_run.preflight ON THE REAL TWO-LANE MATRIX. ITS ANSWER, VERBATIM:
+
+        RAISED: whetstone_gate.driver.run.RunRefused
+        the environment does not carry ['GOOGLE_API_KEY', 'GROQ_API_KEY']. Only the NAMES
+        are read here - runner/keys.py returns a boolean and has no code path that reads a
+        value (CLAUDE.md S4). An episode that fails on a missing credential halfway through
+        is an episode that has already spent tokens
+
+      The matrix itself loaded and is right: attacker lanes ['gemma-26b','qwen-27b'],
+      judge lane gemma-26b, 20 episode keys.
+
+      !! THE DISTINCTION THE PROMPT ASKED FOR, MADE WITHOUT READING A SINGLE VALUE:
+         * BOTH NAMES ARE SET AT WINDOWS USER SCOPE. Enumerated from HKCU:\Environment with
+           GetValueNames() -- NAMES ONLY. GOOGLE_API_KEY: True. GROQ_API_KEY: True.
+         * NEITHER IS IN THIS PROCESS'S ENVIRONMENT BLOCK. Zero variables visible to this
+           process end in _API_KEY.
+         ==> A STALE ENVIRONMENT, NOT A REAL ABSENCE. **THIS IS NOT A CODE PROBLEM.**
+         The editor was restarted but this shell's environment block predates the change or
+         was inherited from a parent that does. .env exists (the operator created it) and is
+         IRRELEVANT: nothing in src/ loads it and there is no dotenv dependency, so the
+         driver reads os.environ and only os.environ.
+      NO .env WAS CREATED OR READ. NO KEY VALUE WAS READ, PRINTED, ECHOED OR COMMITTED.
+      Per the prompt -- "IF IT REFUSES FOR WANT OF A KEY, REPORT THE NAMES AND SKIP" -- the
+      names are reported and Gate 1 is skipped. NO WORKAROUND WAS ATTEMPTED: loading a User-
+      scope value into a child process would have meant handling a key value to manufacture
+      a credential path the operator did not establish, for a SINGLE-SHOT UNREPEATABLE run.
+
+  1b. THE REHEARSAL RAN ANYWAY, BECAUSE IT COSTS NOTHING. **IT PASSED.**
+      Full 20-episode --dry-run, --out-root a FRESH OS TEMP DIR OUTSIDE THE REPOSITORY:
+          episodes attempted 20 / completed 20 / TRUNCATED 0 / never started 0
+          DENOMINATOR (completed+trunc) : 20      reconciles: 20 == 20 + 0 + 0
+          every never-started category printed as a zero (TOKEN_CEILING, CALL_CEILING,
+            RATE_LIMIT_429, LANE_PARKED, LANE_RESERVED, PROVIDER_ERROR, INTERRUPTED: 0)
+          lanes stopped by reason: token ceiling 0, call ceiling 0, 429 0,
+            reservation shortfall 0, still running 2
+          per-model: gemma-26b 200/200 calls, 600,000/600,000 tokens, 429s 0
+                     qwen-27b  200/200 calls, 600,000/600,000 tokens, 429s 0
+          pooled 1,200,000 exceeds the ceiling True; any SINGLE model exceeds it False
+          N DECISION: REFUSED -- "a DRY RUN may not select the N branch"   <-- CORRECT
+          EXIT 0.  repo evals/ before: 1 file. after: 1 file. NOTHING WRITTEN UNDER evals/.
+
+  1c / 1d. NOT DONE. The UTC start time in evals/pilot/RUN_DECLARED.md S8 IS STILL BLANK,
+      for the fourth time, and that is still the right answer. S8: "a declaration carrying a
+      start time earlier than the run is a pre-registration that was written afterwards."
+
+  !! AND THE REHEARSAL PROVES LESS THAN IT LOOKS. INC-134 / Q-179, THIS INSTANCE'S FINDING.
+     driver/run.py:592-602:
+         paced = client
+         if request.spend_real_tokens:
+             paced = _PacedClient(...)
+     _PacedClient IS CONSTRUCTED ONLY ON THE --spend-real-tokens PATH. A --dry-run rehearsal
+     NEVER BUILDS IT. The prompt calls the rehearsal "the only thing between a just-landed
+     unreviewed provider boundary and an unrepeatable run". IT CANNOT BE THAT THING HERE.
+     THE DEFECT: _pace (run.py:458-462) reads a monotonic clock either side of a sleep and
+     hands the second reading to Bucket.take, which refuses on an EXACT `> 0.0` with no
+     epsilon -- contradicting runner/buckets.py's own message, "a bucket refusal is a WAIT,
+     not an abort". BucketError is a RuntimeError, NEITHER RateLimited NOR ProviderFailed,
+     so _MeteredCall.run never books it and it escapes execute UNCAUGHT: no report, no
+     denominator, twenty episodes dropped and none printed. execute defaults are
+     clock=time.monotonic, sleep=time.sleep (run.py:488-489) and __main__ passes neither.
+     MEASURED ON THE REAL CLOCK AT THE REAL BUCKETS (gemma-26b rpm 30 / tpm 16,000 /
+     rpd 14,400; reservation 3,000 = 60000 // 20; monotonic resolution 0.015625 s):
+         calls 1-5    0.000 s   (the TPM bucket starts full)
+         call  6      7.500 s
+         calls 6-139  11.250 s each (11.266 s observed at call 80)
+         139 CONSECUTIVE REAL-CLOCK PACED CALLS, ZERO BucketError
+         [stopped by a 1,500 s cap, not by a failure]
+     !! 139 OF THE 400 THE PILOT NEEDS IS 35% AND IS **NOT A CLEARANCE.** It bounds the risk
+        without removing the defect. AND THE INHERITED FIGURE WAS CORRECTED RATHER THAN
+        CARRIED: session 8c47b1e0 recorded "139 of 300, worst -0.011 s"; re-run here it is
+        242 of 300, worst -0.004 s -- but BOTH measure 1-4 ms sleeps and THE PILOT DOES NOT
+        SLEEP FOR 1-4 ms. Against an 11.25 SECOND wait the 0.015625 s quantum is 0.14%.
+
+================================================================================
+3. GATE 2 -- THE CALIBRATION.  **SKIPPED.**
+================================================================================
+
+  Gated on Gate 1 completing, which it did not. evals/cal/RUN_DECLARED.md STILL DOES NOT
+  EXIST and S6b forbids starting without it. NO THRESHOLD WAS PRODUCED, none was written
+  into config/, and none was interpreted. The other instance raised Q-186 on the same point.
+
+================================================================================
+4. GATES 3 AND 4 -- DONE BY THE OTHER INSTANCE. NOT REDONE. RE-RUN FOR THE RECORD.
+================================================================================
+
+  The other holder of this token committed 90b6d6f (Gate 3a/3b/3c), d982632 (Gate 4 +
+  Q-181..Q-187) and 68f970f (its FINAL OUTPUT). THIS INSTANCE DID NOT REDO ANY OF THEM and
+  touched none of the paths they own. What it did do is re-run the checks independently:
+
+    make check-roles ......... 21 passed, 0 failed, 3 n/a. "OK - no structural invariant is
+                               broken." E1, E2, E3 ALL PASS.
+    make check-prereg ........ "config/ holds 2 file(s): lanes.yaml, protocol.yaml
+                                STATUS: NOT-YET-FROZEN - the `prereg-v1` tag does not
+                                resolve. PROTOCOL.md exists but the freeze has not been cut."
+                               EXIT 0, RECOMPUTING NOTHING. That is Q-181's finding,
+                               confirmed independently: the one check that catches a stale
+                               manifest row is INERT for exactly as long as the row is still
+                               fixable, and goes live when the freeze makes it unfixable.
+    make selftest ............ 1 failed, 1 passed, 1426 deselected. The failure is
+                               test_the_camel_branch_is_decided_before_any_camel_run, which
+                               its own docstring says is DELIBERATELY RED so its text prints
+                               on every pre-spend gate. TODO_C13_RUN1.
+    FULL SUITE ............... 6 failed, 1420 passed, 2 skipped in 710.61s.
+                               1. test_c12_benign ... WAY_ONE_the_transitive_ast_walk (INC-127,
+                                  pre-existing at HEAD)
+                               2. test_c7_ledger ... test_Q069_nothing_in_this_repository_imports_the_ledger_yet (Q-184)
+                               3. test_c8_scorer ... test_golden2_coverage_block_reproduces (Q-185)
+                               4. test_c8_scorer ... test_null_is_not_empty_... (Q-185)
+                               5. test_lanes_operator_placeholders ... camel branch (TODO_C13_RUN1)
+                               6. test_repo_invariants ... test_the_object_store_and_the_working_tree_agree
+                                  -- red for ANY uncommitted edit (OF-07); it was THIS
+                                  instance's own uncommitted test edit and cleared on commit.
+
+  !! ON GATE 3c, AND IT MATTERS: THE PROMPT'S CLAIM WAS INVERTED, AND TWO INDEPENDENT
+     MEASUREMENTS AGREE ON THAT. The prompt said PROTOCOL.md carries a STALE row "reported
+     sha a4a9a02d..., 30,960 bytes". Recomputed at HEAD, a4a9a02d.../30,960/blob 8688b87c
+     IS THE CORRECT CURRENT VALUE; the row that was stale was the COMMITTED one,
+     44e19ac5.../30,930/blob d3d8e180. The delta is ONE LINE -- genesis_hash PRE-FREEZE ->
+     170bd3ff... (Q-153) -- and 40 - 10 = 30, 30,930 + 30 = 30,960 EXACTLY. The other
+     instance reached the same conclusion in 90b6d6f's message and said so in the same words
+     ("the direction of the staleness is the opposite of the one this session's prompt
+     named"). VERIFYING BEFORE ACTING WAS THE RIGHT INSTRUCTION AND IT PAID.
+
+  GATE 3e / Q-169 -- A SECOND HAND ON THE COUNT, kept beside the other instance's rather
+  than folded into it. MEASURED at 913129a:
+        rows matching '^| **OF-'          : 265
+        status cell contains 'OPEN'        : 195
+          ... and ALSO contains 'CLOSED'   : 6
+          ... 'OPEN' only                  : 189
+  results/loader.py:316-332 DECLARES the direction -- "a partially-closed row that still
+  says OPEN is counted as open" -- and FIVE of the six are exactly that and are correct on
+  purpose (OF-09, OF-11, OF-15, OF-19, OF-123).
+  !! THE SIXTH IS A GENUINE MIS-SCORE AND IS A THIRD FIGURE NEITHER SIDE COMPUTED. OF-157's
+     status cell OPENS with "CLOSED", its Closed-by cell is filled, and the word OPEN in it
+     refers to TWO OTHER FINDINGS. A substring test cannot tell a row's own status from its
+     commentary about somebody else's. THE RAW OPEN COUNT IS ONE TOO HIGH: 194, NOT 195.
+     That is a defect in the PARSER, not a judgement about a finding. NOT FIXED --
+     results/loader.py is outside this fence and it moves a number README.md publishes.
+  !! AND A CORRECTION AGAINST THIS INSTANCE'S OWN INSTRUMENT: the audit that produced this
+     reported that population as 24 ROWS. IT IS 6. The auditor's observation -- "every number
+     in this dispute, on both sides, treats a spectrum of partial closure as a boolean" -- is
+     TRUE and was carried on a FALSE COUNT. Both halves are published, not just the survivor.
+
+  GATE 3d / Q-163 / Q-164: NOT DECIDED. These are architect rulings and QUESTIONS.md carries
+  none. config/ WAS NOT TOUCHED by this instance -- `git status --porcelain config/` EMPTY
+  throughout. What is owed: whether config/lanes.yaml gains a `base_url` per provider
+  (Q-163) and a gate-judge temperature key (Q-164) BEFORE prereg-v1. Both are legal to fix
+  now and illegal after. The other instance raised Q-183 reporting that Q-164 is not merely
+  open but WRONG -- the judge runs at a hardcoded 0.0, not a provider default.
+
+  GATE 4: the other instance's scan is committed at docs/submission/git-history-secret-scan.txt.
+  Its result, read not rerun: HEAD 0 hits across 433 tracked files; FULL HISTORY 4 hits, all
+  four the SAME 30-byte zero-entropy documentation placeholder, already removed by d63f722
+  and already recorded as INC-93. No key revoked because none was exposed. NO HISTORY
+  REWRITTEN. THE REPOSITORY WAS NOT FLIPPED PUBLIC.
+
+================================================================================
+5. QUESTIONS.md ENTRIES THIS INSTANCE OPENED
+================================================================================
+
+  Q-179  THE PACER CAN CONVERT A BUCKET *WAIT* INTO AN UNCAUGHT ABORT, AND THE --dry-run
+         REHEARSAL CANNOT SEE IT BECAUSE --dry-run NEVER BUILDS THE PACER. Class A in effect.
+         Three parts for the architect: (1) does _pace re-wait, or does take accept the
+         reading wait_seconds produced, or is a tolerance introduced -- and a tolerance is
+         hard rule 9's hardcoded spec value unless derived from time.get_clock_info;
+         (2) is a BucketError booked as a counted outcome (this is Q-174 verbatim and moves a
+         PUBLISHED number); (3) should --dry-run build the pacer. RULE THEM WITH Q-174.
+  Q-180  TWO LIVE SESSIONS HOLDING ONE TOKEN IN ONE TREE, AND check-roles CANNOT SEE IT
+         BECAUSE THE REUSE IS *WITHIN* A ROLE. Operator-only. Corrected by this instance
+         after the fact -- see below.
+  CORRECTION to Q-180 and INC-136, written by the session that wrote them: their claim that
+         check-roles "has nothing to fire on" is WRONG -- E1 DID fire, on the OTHER instance's
+         run, because the token had no ## Session tokens row. It fired on an UNISSUED token,
+         a different defect. AND THE STRUCTURAL CLAIM IS NOW MEASURED RATHER THAN ARGUED:
+         with the row appended, check-roles run BY THIS INSTANCE WHILE TWO SESSIONS HELD THE
+         TOKEN reports E1, E2, E3 ALL PASS and "21 passed, 0 failed". RECORDING THE TOKEN --
+         the correct and required action -- REMOVED THE ONLY SIGNAL THAT EXISTED.
+  MEASUREMENT UPDATE to Q-169: the 194-not-195 finding and the 24-vs-6 self-correction above.
+  MEASUREMENT UPDATE to INC-134 / Q-179: the 24-call figure extended to 139.
+
+  INCIDENTS.md: INC-134, INC-135, INC-136, INC-137, INC-138, INC-139. All eight fields in
+  every one, Diagnosis and Missed filled in every one.
+
+================================================================================
+6. EVERY `Swept:` LINE, AND THE ONE THAT WAS FALSE
+================================================================================
+
+  f45721d  "paths staged are exactly the six named above and nothing else" -- TRUE. Snapshot
+           6 files / 586 insertions / 69 deletions, matching the pre-declaration exactly.
+  0e3a69f  "paths staged are exactly INCIDENTS.md and QUESTIONS.md ... APPEND ONLY" -- the
+           PATHS were right and the CONTENT was not: 420 lines of another session's draft
+           came with QUESTIONS.md. INC-137.
+  1d3f2fa  "NOTHING, and for the first time that is a construction rather than a hope" --
+           TRUE. 78 + 57 = 135, exactly what was measured.
+  fd67082  "Swept: NOTHING, by construction" -- **FALSE.** The --stat on the same screen said
+           764 deletions. INC-139.
+  fa73b76  "paths staged are exactly docs/sessions/arch-night-1.txt and QUESTIONS.md, both
+           set to 68f970f's blobs, on a tree read from LIVE HEAD" -- TRUE.
+  913129a  "the staged path is exactly INCIDENTS.md" -- TRUE, and guarded by a path-list test.
+  30e199c  "NOTHING, by construction" -- TRUE, and the guard REFUSED-or-committed rather
+           than asking a human to notice.
+
+================================================================================
+7. WHAT THE OPERATOR MUST DO ON WAKING -- NUMBERED, SHORTEST FIRST
+================================================================================
+
+  1. DO NOT START THE PILOT YET. Read item 5 first.
+
+  2. RENUMBER ONE INCIDENT. INCIDENTS.md carries TWO `## INC-139` headings -- the other
+     instance's stale-manifest entry and this one's base-tree revert. Both are intact and
+     neither was edited. One line of work.
+
+  3. DECIDE THE TOKEN RECORD. QUESTIONS.md's `## Session tokens` row for 5d7e2b91 describes
+     TWO sessions. Q-180 asks whether the row names both with the commits split between them,
+     or whether one is retro-issued a distinct token in the record while its commits keep the
+     one they carry. THIS INSTANCE DID NOT CHOOSE -- inventing a token to tidy it is exactly
+     CLAUDE.md S5's "never invent one".
+
+  4. FIX THE ENVIRONMENT, WHICH IS A ONE-LINE FIX AND NOT A CODE CHANGE.
+     GOOGLE_API_KEY and GROQ_API_KEY ARE set at Windows User scope and are NOT in the
+     editor's environment block. Start the pilot from a FRESH terminal opened after the
+     variables were set -- or `setx`-refresh and fully restart the editor process tree.
+     Confirm with: python -c "import os;print([k for k in os.environ if k.endswith('_API_KEY')])"
+     which prints NAMES only. `.env` exists but NOTHING IN src/ LOADS IT and there is no
+     dotenv dependency, so .env alone will never satisfy preflight (the other instance
+     raised Q-182 on exactly this).
+
+  5. RULE Q-179 TOGETHER WITH Q-174, BEFORE THE PILOT RUNS. This is the one that can lose
+     the single-shot window. A BucketError mid-run escapes execute UNCAUGHT: real tokens
+     spent, NO report, NO denominator, and S6b's abort machinery then has a partial episode
+     count nobody printed. 139 real-clock paced calls produced none, which bounds the risk
+     and does not remove it -- and the --dry-run rehearsal CANNOT test this path at all.
+
+  6. RULE Q-163 AND Q-164 (and read Q-183, which says Q-164 is worse than open). These are
+     config/ keys owed BEFORE prereg-v1. They are fixable now and UNFIXABLE after the tag.
+     config/ was not touched by this instance.
+
+  7. COMMISSION A REVIEW OF f45721d BY A THIRD SESSION. It is unreviewed work written by a
+     session that died and landed by a session that then found a deleted assertion in it
+     (INC-138) -- and found it only by commissioning an audit against itself. THE LANDING
+     SESSION'S VERIFICATION IS EVIDENCE, NEVER A CLEARANCE.
+
+  8. DECIDE WHETHER TO KEEP RUNNING TWO SESSIONS IN ONE WORKING TREE. Tonight produced SIX
+     incidents in that family, three of them tonight's own (INC-136, INC-137, INC-139), and
+     one of them destroyed a completed FINAL OUTPUT for twenty minutes. Every technical
+     guardrail proposed tonight closes a detection half and none closes the prevention half.
+     THE ONLY REAL GUARDRAIL IS ONE LINE AND IT IS YOURS: a token is issued to exactly one
+     process, and a prompt is not started twice.
+
+================================================================================
+NOT DONE, DELIBERATELY: prereg-v1 NOT cut. The sweep NOT started. The witness gist NOT
+published, NOT simulated, NOT worked around. N NOT written into config/. No void threshold
+produced or written. The repository NOT flipped public. NOTHING SELF-CERTIFIED.
+================================================================================
