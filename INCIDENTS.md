@@ -8113,3 +8113,142 @@ recipe that diffs, then commits — reopens the write-side window `INC-68` and `
 the wrong trade.** ⚠️ **It belongs in `PROCESS.md` §7 beside `OF-205` itself, which is the
 ARCHITECT'S**, exactly as `INC-68`, `OF-205`, `INC-91` and `INC-95` record of their own remedies.
 Raised as `OF-216`.
+
+---
+
+## INC-98 — the session sent to record a ruling **VERBATIM FIRST** implemented it first and recorded it forty minutes later: hard rule 5's ordering was broken by the session whose entire job was that ruling, and the only reason it cost nothing is that nothing had been committed in between
+
+**Date:** 2026-09-03 (ARCH FIX — PRE-FREEZE, `4c8d9b03`. Found by this session, from re-reading its
+own prompt while writing the `QUESTIONS.md` append. **Fix:** see **Fix** — it is this entry plus the
+ordering restored for the rest of the session; there is no code SHA because no code was wrong.)
+
+**Event:** this session's prompt opens `TASK 1` with, in capitals: *"Q-110 RULED. A5 COMES OUT OF
+THE COMPONENT. **RECORD IT VERBATIM FIRST:**"*, followed by the ruling text and then `IMPLEMENT:`.
+`CLAUDE.md` hard rule 5 says the same thing without the emphasis: *"RULINGS ARE RECORDED VERBATIM in
+QUESTIONS.md **before anything else is touched**."*
+
+**The actual order of operations was:**
+
+```
+1. removed the Q-109 booking from src/whetstone_gate/scorer/episode.py
+2. flipped six tests in tests/test_c8_scorer.py
+3. proved the flips fail on the old code
+4. amended CONTEXT.md S12.2 and S8.6, bumped v1.9 -> v1.10
+5. added the config/protocol.yaml key
+6. wrote PROCESS.md S7b
+7. <- ONLY HERE was the ruling written into QUESTIONS.md
+```
+
+**Action:** the ruling is now recorded verbatim under `Q-110`, character for character, with the same
+no-normalisation discipline `Q-029`'s closing note requires. **Nothing was committed between steps 1
+and 7**, so no commit exists that carries the consequence of a ruling this repository had no record
+of — which is a mitigation and **not** a defence, because the rule is about the working order and
+not the commit order. The remaining two rulings (`Q-120`, `Q-121`) were written **before** anything
+further was touched, and `Q-121` was record-only by construction.
+
+**Expectation:** `QUESTIONS.md` should have carried the `Q-110` text before the first byte of
+`scorer/episode.py` moved. The window in which it did not is roughly forty minutes.
+
+**Missing:** ⚠️ **anything at all that observes the ORDER.** Every guardrail this project has is a
+property of the final state — `check_roles`, the tripwire, the manifest, the never-summed AST walk,
+the `Swept:` discipline. **All of them would have passed on the final tree at step 6, with the
+ruling recorded nowhere.** A rule about sequence is enforced by nothing that runs.
+
+**Missed:** ⚠️ **the prompt said it in capitals and the session read the capitals as emphasis rather
+than as sequencing.** The signal was not faint, it was not buried and it was not inferred — it was
+the third and fourth words of the task, `RECORD IT VERBATIM FIRST`, on their own line. The session
+transcribed the ruling verbatim into the scorer's comment block and into six test docstrings **while**
+implementing, and that partial compliance is exactly what made the omission invisible: the ruling
+text *was* going into the repository, just not into the file the rule names.
+
+**Diagnosis:** implementing and recording both consume the ruling text, so a session that has the
+text in front of it experiences recording as bookkeeping that can follow the work; hard rule 5 exists
+because the failure mode is a session that dies, or is interrupted, after the work and before the
+bookkeeping — which would leave the consequence of a ruling in the tree with no record of the ruling.
+
+**Fix:** the ordering is restored for the remainder of this session and the ruling is recorded
+verbatim (`QUESTIONS.md` `Q-110`, `Q-120`, `Q-121`). **No commit SHA, because no committed byte was
+ever wrong** — recording that plainly rather than attaching a cosmetic SHA is `INC-13`'s rule about
+invented incidents applied to a real one.
+
+**Systemic guardrail:** ⚠️ **NONE THAT THIS SESSION CAN LAND, AND THE HONEST REASON IS THAT THE ONLY
+MECHANICAL FORM IS A COMMIT-TIME CHECK AND THE FAILURE IS PRE-COMMIT.** A `check_roles` rule of the
+shape *"a commit whose diff touches `src/` or `tests/` and whose message cites a `Q-` number must
+also touch `QUESTIONS.md`"* would have passed here, because this session's commits do both. What
+would actually catch it is a session-opening step — **write the ruling first, as the first tool call,
+before the read order** — which is procedure and lands in `PROCESS.md` §6, **the architect's**, and
+`check_roles.py` is named under this session's **NOT**. Recorded as `OPEN_FINDINGS.md` **OF-219**.
+⚠️ **Until then it is one session's habit, which is `OF-67`'s sentence about the last twelve.**
+
+---
+
+## INC-99 — this session took `make test` from **2 failures to 4** deliberately: landing `Q-120`'s constant turned two green guards RED, both need one line each in files named under this session's **NOT**, and both reds are the tripwire working exactly as §8.6 built it to
+
+**Date:** 2026-09-03 (ARCH FIX — PRE-FREEZE, `4c8d9b03`. **Predicted before the edit and then
+measured**, not discovered afterwards. **Fix:** two one-line edits, owned elsewhere; see **Fix**.)
+
+**Event:** `CONTEXT.md` §8.6 gained one constants row and `config/protocol.yaml` gained one key —
+`Q-120` option 1, which this session's prompt instructs and which must land **before `prereg-v1`**.
+**MEASURED, on the three files that guard `config/`, before and after:**
+
+```
+BEFORE (HEAD 90aa76c):  tests/test_c14_prereg.py + test_tripwire_registry.py + test_config_loader.py
+                        -> 47 passed, 0 failed
+AFTER  (this session):  -> 45 passed, 2 failed
+
+  FAILED test_tripwire_registry.py::test_every_s86_row_reaches_the_registry
+    AssertionError: CONTEXT.md S8.6 carries constants the tripwire's registry has never heard of ...
+    ["projected lane-hour budget (the n decision rule's second threshold)"]
+
+  FAILED test_c14_prereg.py::test_the_working_tree_agrees_with_the_object_store_for_config
+    (before this session's commit; it clears on commit and is REPLACED by:)
+  FAILED test_c14_prereg.py::test_every_config_file_is_in_PROTOCOL_mds_manifest_and_its_blob_sha_RECOMPUTES
+    PROTOCOL.md says 2d9ab9d8...e292d69a for config/protocol.yaml; the committed bytes now hash
+    to a different digest
+```
+
+**Action:** **neither test was touched, neither remedy was faked, and no lookalike edit was made
+anywhere it does not belong.** Both reds are reported as **this session's**, with the exact remedy
+and the exact owner computed and written into `QUESTIONS.md` `Q-125` and `OPEN_FINDINGS.md`
+`OF-217`/`OF-218` — including the `SpecConstant` row's exact `spec_row` string, normalised, so the
+owner pastes rather than guesses.
+
+**Expectation:** ⚠️ **this is the expected behaviour and it is written down as such.** §8.6's own
+sentence is *"Any constant that is not in this table and not in `config/` is a defect, and finding
+one is a review BLOCKER"*, and `test_every_s86_row_reaches_the_registry` exists **because** the
+missing direction was §8.6 → registry. The guard firing on a new §8.6 row is the guard working.
+What is **not** expected, and is the actual finding, is that **closing a BLOCKER requires two files
+the closing session may not open.**
+
+**Missing:** ⚠️ **any way for a session to land a `config/` constant atomically.** A constant needs
+**four** artefacts to agree — `config/protocol.yaml`, `CONTEXT.md` §8.6, `spec_constants.py` and
+`PROTOCOL.md`'s manifest — and **no chunk's fence contains all four**. §8.6 itself names the
+three-way consistency check and calls it C14's; it does not notice that the three directions have
+**three different owners**, so the set can only ever be closed by a relay.
+
+**Missed:** ⚠️ **`Q-123`, written by a concurrent session ONE DAY EARLIER, says this in one
+sentence** — *"`config/` is a pre-registration artefact whose blob SHA is in `PROTOCOL.md`, and the
+fence forbids it. It is the cleaner fix and it is the architect's."* This session read `Q-123` while
+gathering context and still treated the manifest coupling as something to discover by running the
+tests. **The finding was already in the file it was reading.**
+
+**Diagnosis:** `PROTOCOL.md`'s manifest hashes `config/`, so **every** edit to `config/` invalidates
+a row in a **frozen** artefact — and the registry transcribes §8.6, so **every** edit to §8.6
+invalidates the registry; the two guards are correct and the fence is correct, and the collision is
+structural rather than anyone's mistake.
+
+**Fix:** ⚠️ **NOT THIS SESSION'S, AND DELIBERATELY NOT ATTEMPTED.** Two one-line edits: a
+`SpecConstant` row in `src/whetstone_gate/spec_constants.py`, and `PROTOCOL.md` line 56's digest,
+**re-measured by C14 rather than copied from this session's FINAL OUTPUT** — a session supplying the
+digest of its own pre-registration artefact is the self-witnessing `PROTOCOL.md` exists to prevent,
+and that file's own `lanes.yaml` row is annotated as cross-checked against a *different* session's
+independent measurement for exactly this reason. **No Fix SHA here; the SHA belongs to whoever lands
+those two lines.**
+
+**Systemic guardrail:** ⚠️ **NONE — ACCEPTED, BECAUSE the alternative is worse and is named.** The
+guardrail that would remove this class is *"one session owns all four artefacts of a constant"*, and
+that session would be able to edit a pre-registration artefact and the digest that witnesses it in
+one commit. **The relay is the cost of the moat, and the moat is the submission.** What *is* owed,
+and is cheap, is a line in `PROCESS.md` §6 telling a session landing a `config/` constant that it is
+starting a **four-artefact relay** and must name all four owners in its report — which is what this
+session did without being told to. `OPEN_FINDINGS.md` **OF-218**.
