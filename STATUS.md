@@ -1,3 +1,53 @@
+*⚠️ **UPDATE, ARCH FIX — EVAL WIRING (`c1f0a4d8`), 2026-09-03 — `Q-126`'s RED IS GONE AND
+`make eval` NO LONGER PRINTS A PLACEHOLDER. BOTH BRANCHES DRIVEN. ⚠️ AND AN ADVERSARIAL PASS
+FOUND FIVE DEFECTS IN THIS SESSION'S OWN COMMITTED WORK, ALL FIVE CORRECTED BEFORE THE PUSH.
+ZERO PROVIDER MODEL CALLS. ZERO TOKENS. NO TAG. NOT SELF-CERTIFIED.***
+
+**(1) `Q-126` CLOSED — AND NOT BY THE EXPRESSION THE REMEDY NAMED.** `a7d9f89`.
+`tests/test_config_loader.py`: **30 passed, 0 failed**. ⚠️ **The ordered remedy
+`Fraction(require(...)) == Fraction(1, 2)` CANNOT satisfy hard rule 6's condition**, measured
+against a reconstructed pre-`Q-123` `config/` rather than argued: `0.5` is exactly representable in
+binary, so `Fraction(0.5)` **is** `Fraction(1, 2)` and the form **passes on the old code too**.
+`Q-126`'s praise *"would have survived this ruling untouched"* **is** the disqualifying fact,
+written as a virtue. What landed is that expression **verbatim, conjoined** with the clause that
+restores the axis `Fraction()` discards: `(type(v), Fraction(v)) == (str, Fraction(1, 2))` —
+**failing on the old code**, as hard rule 6 requires. Class B, recorded: `Q-137`, `INC-107`,
+`OF-228`. **No other assertion in that file was touched.**
+
+**(2) `Q-128` CLOSED AS TO THE WIRING.** `1caacd6`. `make eval` runs
+`python -m whetstone_gate.results <run-dir>` after `check-prereg`, returning the larger return
+code. **Both branches driven, both exit codes measured: no run directory → exit `2`; a synthetic
+run directory → exit `0`, `RESULTS.md` rendered at 50,228 bytes.** ⚠️ **The no-run branch NEVER
+exits 0** — `check-prereg` FAILS OPEN (`OF-185`) and that defect is deliberately not copied into
+the target §20 names.
+
+**(3) ⚠️ §20's ONE-COMMAND CLAIM IS *STILL PENDING THE RUN*, IN THOSE WORDS.** The wiring is real
+and exercised, but no run directory exists until RUN-3/RUN-4, so **today the command REFUSES**.
+C19's README must say so rather than implying otherwise.
+
+**(4) ⚠️ FIVE DEFECTS IN THIS SESSION'S OWN COMMITTED WORK, FOUND BY A 25-AGENT READ-ONLY
+ADVERSARIAL AUDIT OF ITS OWN DIFF, CORRECTED IN `8ffcf35`.** `INC-109`, `OF-232`. Two citations
+written **before** their records existed **and already held by the concurrent C12 session**
+(`Q-130`–`Q-136`, `INC-104`–`INC-106`, `OF-227`) — so they would have resolved to **the wrong
+ruling**, not to nothing; a **false premise stated as fact** (*"`config/` is a FROZEN artefact"* —
+`prereg-v1` does not resolve and `Q-123` edited `config/` this morning); an **overclaim on
+`make eval`'s SUCCESS branch**, asserting hard rule 9 satisfied while `check-prereg` verifies
+nothing and fails open; and `OF-09` unmet. **History was not rewritten** — `a7d9f89` and `1caacd6`
+stand with the defects in them, `INC-96` is the precedent.
+
+**(5) ⚠️ A HIGH-SEVERITY DEFECT WAS FOUND IN ANOTHER CHUNK'S CODE AND NOT FIXED.** Driving branch 2
+surfaced `results/__main__.py:173` **crashing with an `AttributeError` where it is designed to
+refuse**, whenever every arm-1 episode is dropped — the exact run whose drop ledger hard rule 11
+most needs published. `results/` is outside this session's fence, so it is recorded with its owner
+named and **not worked around**: `INC-108`, `OF-229`.
+
+**(6) ⚠️ C12's `drive` TARGET LANDED IN `tasks.py` DURING THIS SESSION, UNCOMMITTED.** This
+session's `tasks.py` commits were therefore staged from a **constructed blob** = HEAD + its own
+corrections, never with `git add` on the working-tree file, which would have committed C12's work
+under this session's token. **The corrections were applied to both copies, so C12 loses nothing.**
+
+---
+
 *⚠️ **UPDATE, ARCH FIX — PRE-FREEZE 2 (`ff6d79ae`), 2026-09-03 — THE THREE REDS THAT BLOCKED THE
 FREEZE ARE GONE. `Q-122` AND `Q-123` RULED AND LANDED; `Q-125` CLOSED; `Q-126` RAISED.
 ZERO PROVIDER MODEL CALLS. ZERO TOKENS. NO TAG. NOT SELF-CERTIFIED.***

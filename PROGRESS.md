@@ -6,6 +6,144 @@ not a record; this file is.
 
 ---
 
+## ARCH — **FIX, eval wiring** — 2026-09-03 — 🟢 **`Q-126`'s RED CLOSED AND `make eval` WIRED. BOTH BRANCHES DRIVEN. §20's CLAIM IS STILL PENDING THE RUN. FIVE OF THIS SESSION'S OWN DEFECTS FOUND AND FIXED BEFORE THE PUSH.**
+
+**SESSION-TOKEN:** `c1f0a4d8` · ⚠️ **SELF-RECORDED ROW, AND NO ORDINAL IS CLAIMED.** The token
+appeared **nowhere** in `QUESTIONS.md` when this session opened (grep: zero matches;
+`make check-roles` reported **68** issued rows), and `check_roles` **E1** fails on a token that is
+not in that table, so the row was appended — **counted from the table immediately before
+appending**, because concurrent sessions hold that file. `OF-225` records that the numbered
+self-record sequence stopped at row 43 and that later self-records claim none, so **an ordinal is
+not derivable from the file, and inventing one would be a number in the shape of a measurement**.
+**The token is the architect's; only the row is this session's.**
+
+⚠️ **WHICH TREE** (`INC-54`): the operator's working tree at `C:\Users\chinm\whetstone-gate`,
+opening at `HEAD` = `23903a0`.
+
+⚠️ **THE CONCURRENT C12 DRIVER SESSION (`3d7e50ba`) CONTENDED FOR THIS SESSION'S FILE *AND* FOR ITS
+IDENTIFIERS, AND ONLY THE FIRST WAS ANTICIPATED.**
+* **The file:** `tasks.py`'s last commit was `ee098a4` at the read **and** at the stage, so
+  `1caacd6` landed alone. ⚠️ **C12's `drive` target then appeared in the working tree, uncommitted,
+  on top of it.** The later correction commit was therefore staged from a **constructed blob** =
+  HEAD + this session's own corrections — never `git add` on the working-tree file, which would
+  have landed C12's work under this session's token (`PROCESS.md` §7b; `INC-65`, `INC-68`,
+  `INC-88`). **Verified: the committed blob does not contain `"drive"`; the working tree does, and
+  it also carries this session's corrections, so C12 loses nothing.**
+* **The identifiers:** ⚠️ **not anticipated, and it produced this session's worst defect.** C12
+  holds `Q-130`–`Q-136`, `INC-104`–`INC-106` and `OF-227` in its untracked tree. This session's
+  first draft numbered from `max(existing) + 1` over the **committed** journals and cited `Q-131`
+  and `Q-137 / INC-104` from source **before writing them**. `INC-109`.
+
+**VERDICT: FIXED, UNREVIEWED, NOT TAGGED.** ⚠️ **NO TAG WAS CUT AND NONE WAS ASKED FOR** — the
+prompt says `NO TAG`, and `git tag -l` is byte-identical before and after: `c0-pass c1-pass
+c13-pass c2-pass c3-pass c4-pass`, holding **neither `probe-v1` nor `prereg-v1`**. **This session
+does not self-certify.**
+
+⚠️ **TOKEN SPEND: ZERO. NO PROVIDER MODEL CALL OF ANY KIND.** The prompt sanctioned none and none
+was made. `evals/usage/` was not read because nothing was spent.
+
+⚠️ **`git diff --cached` WAS THE FIRST COMMAND OF THE SESSION** (`OF-213`). The shared index was
+**clean**. All four commits went through `PROCESS.md` §7b's private index, each followed by the
+scoped `env -u GIT_INDEX_FILE git reset` (`INC-91`) and each verified clean afterwards.
+
+---
+
+### 1. TASK 1 — `Q-126`. The red is gone, and the interesting half is *how*.
+
+`a7d9f89`. `tests/test_config_loader.py`: **30 passed, 0 failed.**
+
+⚠️ **THE PROMPT ORDERED A REMEDY AND ORDERED A PROOF, AND THE ORDERED REMEDY CANNOT PRODUCE THE
+ORDERED PROOF.** Measured by reconstructing the pre-`Q-123` `config/` in an OS temp directory and
+reading the value back through the **real loader**:
+
+```
+OLD CODE (unquoted config) : 0.5      float
+NEW CODE (Q-123 quoted)    : '0.50'   str
+
+assertion                                          OLD     NEW    hard-rule-6 flip?
+== 0.50                        (the old line)      True    False   n/a
+== "0.50"                      (Q-126 weaker)      False   True    YES — fails on old
+Fraction(v) == Fraction(1, 2)  (Q-126 STRONGER)    True    True    NO  — passes on BOTH
+(type(v), Fraction(v)) == (str, Fraction(1, 2))    False   True    YES — fails on old
+```
+
+`0.5` is **exactly representable in binary**, so `Fraction(0.5)` *is* `Fraction(1, 2)`: the ordered
+form is **blind to the very type hop `Q-123` abolished**. What landed is that expression
+**verbatim**, conjoined with the clause that restores the discarded axis. **Class B** (`Q-126`'s
+own classification), so hard rule 2 makes it *done and recorded*, not stopped: `Q-137`, `INC-107`,
+`OF-228`. **No other assertion in that file was touched.**
+
+⚠️ **AND THIS SESSION'S FIRST DRAFT REPEATED `Q-126`'s OWN MISTAKE** — its comment claimed the new
+form is *"stricter on both axes"*. It is not: the two accept-sets are **disjoint on type**.
+Corrected in `8ffcf35`; `INC-109`.
+
+### 2. TASK 2 — `Q-128`. `make eval` runs the assembler, and refuses when there is nothing to run.
+
+`1caacd6`, corrected in `8ffcf35`.
+
+| branch | measured behaviour | exit |
+|---|---|---|
+| **no run directory** (today) | prints ROOT EXAMINED, that no scored run exists, and that §20's claim is PENDING THE RUN | **2** |
+| **synthetic run directory** | `check-prereg` + the assembler; `RESULTS.md` rendered, 50,228 bytes | **0** |
+
+⚠️ **IT NEVER EXITS 0 WITH NO RUN BEHIND IT.** ⚠️ **§20's ONE-COMMAND CLAIM IS STILL PENDING THE
+RUN.** ⚠️ **NO SYNTHETIC `RESULTS.md` IN THE REPOSITORY** — `--output` was redirected to a temp
+path, the one disclosed redirection, and `RESULTS.md` is still absent from the tree.
+
+**TOKEN SAFETY, MEASURED WITH THE REPOSITORY'S OWN INSTRUMENT** (`test_c18_results`'s
+`_first_party_graph`, `check_roles._transitive_closure`, `_client_import_offenders`), re-seeded at
+`whetstone_gate.tasks`: a **38-module** closure, **zero** offenders, **zero** dynamic-reach hits,
+`whetstone_gate.results.__main__` confirmed inside it. ⚠️ **A measurement, not an assertion** — no
+test seeds a closure at `whetstone_gate.tasks`, and the fence names *"any other test file"* under
+**NOT**. `OF-231`.
+
+### 3. ⚠️ WHAT AN ADVERSARIAL PASS FOUND IN THIS SESSION'S OWN COMMITTED WORK
+
+A 25-agent **read-only** audit of this session's own diff, every finding then handed to a separate
+agent instructed to **refute** it. **Five survived, all five this session's**, all corrected in
+`8ffcf35` — two citations that would have resolved to **another chunk's** rulings, a false premise
+(*"`config/` is FROZEN"*), an overclaim on the **success** branch (hard rule 9 asserted satisfied
+while `check-prereg` verifies nothing and fails open), and `OF-09` unmet. `INC-109`, `OF-232`.
+**History was not rewritten**; `INC-96` is the precedent.
+
+### 4. WHAT THIS SESSION FOUND AND DID NOT FIX
+
+⚠️ **`results/__main__.py:173` CRASHES WHERE IT IS DESIGNED TO REFUSE** when every arm-1 episode
+drops — *precisely* the run whose drop ledger hard rule 11 most needs published. The scorer had done
+its job; the assembler died before printing one of the fifteen drops. `results/` is outside the
+fence: recorded, owner named, **not worked around**. `INC-108`, `OF-229`.
+
+### 5. THE SUITE
+
+⚠️ **A SUITE COUNT IN THIS SHARED TREE IS NOT REPRODUCIBLE (`OF-214`), SO THE TREE IS NAMED.**
+Measured **after** all four of this session's commits — the last, `8ffcf35`, at 15:17:48; the run
+started 15:18:10 at `HEAD` = `8ffcf35`. ⚠️ **AND THE TREE MOVED UNDER IT, WHICH THE PROMPT
+ANTICIPATES:** C12's `c071578` landed at **15:24:28, inside the run window** (15:18:10 → 15:31:50),
+converting `src/whetstone_gate/driver/` and `tests/test_c12_driver.py` from untracked to tracked
+**while the suite was executing**. Named rather than smoothed: this is not a clean-room measurement
+and cannot be one while two sessions share a working tree.
+
+**`make test` → 4 failed, 1320 passed, 2 deselected in 816.16s.**
+
+⚠️ **`Q-126`'s LINE IS GONE FROM THE RED SET.** Every remaining failure is attributed by file in
+`docs/sessions/arch-eval-wiring-1.txt` §6; the architect's three (`OF-183`, `Q-103`'s two) were
+**not touched and not weakened**.
+
+⚠️ **AN EARLIER SUITE RUN IS NOT REPORTED.** It was still executing when the audit returned and this
+session began correcting source; `c10-build-1.txt` §12c's precedent is that a suite measured across
+a live tree **is not a measurement of anything**. It was STOPPED rather than quoted.
+
+`make check-roles` → **exit 0**, 21 passed / 0 failed / 3 n/a.
+
+### 6. FROZEN ARTEFACTS, VERIFIED UNTOUCHED
+
+`git status --porcelain tests/goldens/` **empty**; all nine golden diffs **empty**;
+`git diff -- config/` **empty**; `git tag -l` **unchanged**, holding neither `probe-v1` nor
+`prereg-v1`. `grep.exe.stackdump` was **not** deleted. Every file this session touched carries
+**0 CR bytes**, verified in the working tree **and** in the committed blob.
+
+---
+
 ## C18 — **BUILD, attempt 1** — 2026-09-03 — 🟡 **THE RESULTS ASSEMBLER IS BUILT. `RESULTS.md` IS NOT WRITTEN, AND MUST NOT BE — IT IS WRITTEN BY THE RUN.**
 
 **SESSION-TOKEN:** `5a2c81df` · **DATA ROW 69** of `QUESTIONS.md`'s `## Session tokens` table,
