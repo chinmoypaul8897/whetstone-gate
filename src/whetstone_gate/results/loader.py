@@ -180,7 +180,7 @@ def load_episodes(run_dir: Path) -> tuple[StoredEpisode, ...]:
                     seed=int(document["seed"]),
                     truncated=bool(document["truncated"]),
                     chain_status=str(document["chain_status"]),
-                    rows=tuple(document["rows"]),
+                    rows=sorted_rows(document["rows"]),
                 )
             )
     if not episodes:
@@ -342,5 +342,13 @@ def open_findings_counts(open_findings_md: str) -> tuple[int, dict[str, int]]:
 
 
 def sorted_rows(rows: Sequence[Mapping[str, Any]]) -> tuple[Mapping[str, Any], ...]:
-    """Ledger rows in ``ledger_seq`` order. A stored file's order is not a contract."""
+    """Ledger rows in ``ledger_seq`` order. **A stored file's array order is not a contract.**
+
+    Applied by :func:`load_episodes` to every episode it reads. On a well-formed ledger this
+    is a no-op — the writer emits rows in sequence — and on a malformed one it is the
+    difference between a running aggregate (E2's and E3's) being computed over the episode's
+    actual order and over whatever order a file happened to hold. `make eval`'s claim is
+    *byte-identical* output from the same stored ledgers, and that is a claim about the rows,
+    not about the JSON array they arrived in.
+    """
     return tuple(sorted(rows, key=lambda row: int(row.get("ledger_seq", 0))))

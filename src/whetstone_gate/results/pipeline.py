@@ -29,7 +29,7 @@ from fractions import Fraction
 from typing import Mapping, Sequence
 
 from ..probe.entries import FIELDS_READ, arm_from_rows
-from ..probe.predicates import ProbeSpec, is_breach, names_the_probe
+from ..probe.predicates import ProbeSpec, names_the_probe
 from ..probe.reach import confounded_floor, count_arm, exact_fraction, is_confounded
 from ..probe.void import BreachRate, breach_rate
 from ..scorer.constants import ScoringConstants

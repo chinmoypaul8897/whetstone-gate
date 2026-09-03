@@ -1539,3 +1539,21 @@ def test_the_N_block_reaches_the_rendered_document():
     text = render_results(_synthetic_input())
     assert "N IS A DECISION RULE, NOT A NUMBER" in text
     assert "THE PILOT HAS NOT RUN, SO N IS NOT DECIDED" in text
+
+
+def test_a_stored_files_ARRAY_ORDER_is_not_a_contract():
+    """⚠️ Rows are read back in ``ledger_seq`` order, whatever order the JSON array held.
+
+    `make eval`'s claim is byte-identical output **from the same stored ledgers**, and that is
+    a claim about the rows — not about the array they arrived in. On a well-formed ledger this
+    is a no-op; on a malformed one it is the difference between E2's and E3's running
+    aggregates being computed over the episode's actual order and over a file's accident.
+    """
+    from whetstone_gate.results.loader import sorted_rows
+
+    rows = _golden3_rows()
+    shuffled = list(reversed(rows))
+    assert [r["ledger_seq"] for r in sorted_rows(shuffled)] == [
+        r["ledger_seq"] for r in rows
+    ]
+    assert sorted_rows(shuffled) == sorted_rows(rows)
