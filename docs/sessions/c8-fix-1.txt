@@ -1,0 +1,499 @@
+================================================================================
+C8 - THE SCORER.  FIX session 1, after REVIEW 1's FAIL.   SESSION-TOKEN: 9e4a71c2
+NO TAG.  `c8-pass` DOES NOT EXIST AFTER THIS SESSION.  DO NOT SELF-CERTIFY.
+================================================================================
+
+PUSHED SHA: <filled by the commit that follows this file; see the closing note>
+
+TOKEN SPEND: ZERO.  No provider call of any kind.  No lane touched.  No `.env`
+read.  `evals/` is ABSENT and was not created.
+
+--------------------------------------------------------------------------------
+0.  THE TOKEN ROW, AND THE ORDER THE PROMPT FIXED
+--------------------------------------------------------------------------------
+
+`9e4a71c2 -C8 -FIX -2026-09-03`, appended to `QUESTIONS.md`'s `## Session
+tokens` table as DATA ROW 63 / 8-HEX ROW 62.  Both figures because `OF-179`
+measured the two conventions in use differing by one (the first data row
+`WG-2026-08-30-CTX-13.4-A` is not 8 hex).  COUNTED FROM THE TABLE ITSELF, in the
+OPERATOR'S working tree at `C:\Users\chinm\whetstone-gate`, HEAD = `68499e7`
+(`INC-54` requires a session to say which tree).
+
+! SELF-RECORDED.  The prompt opened with the token and did not say the row
+existed; it did not.  `check_roles` E1 fails on a token absent from that table.
+THE TOKEN IS THE ARCHITECT'S; what this session supplied is the row.  Landed at
+`ed7e7cf`, before any other byte of any tracked file.
+
+ORDER, which is itself checkable in the log:
+  ed7e7cf  token row + `Q-109` RULED, recorded VERBATIM before implementation
+  2127370  `INC-85`, written BEFORE this session changed a line of code
+  650f0dc  the four blockers, `G-1`, `Q-102`'s cell            (unreviewed)
+  3b0ed41  their catchers                                      (unreviewed)
+  c35e2ad  REVIEW 1's published residue, nine rows closed       (unreviewed)
+  58e9299  `INC-87`/`OF-204` corrected in place
+  6c4e41c  `INC-89`
+  ac2f72d  `PROGRESS.md` corrected in place
+  c86a83e  the adversarial audit's two refutations, fixed       (unreviewed)
+  2a5c5e3  `Q-109`'s double count, measured and pinned          (unreviewed)
+TEN commits, all carrying `Session-Token: 9e4a71c2`; every commit touching `src/`
+or `tests/` ends `(unreviewed)`.
+
+--------------------------------------------------------------------------------
+1.  THE INCIDENT, FIRST - `INC-85`, AND ITS `Missed` FIELD
+--------------------------------------------------------------------------------
+
+Written at `2127370`, BEFORE any code changed, per `CLAUDE.md`'s FIX rule and
+`Q-088` (a review may not write it; the next non-review session in the chunk's
+line does).  REVIEW 1 declared it at `docs/sessions/c8-review-1.txt` S15.
+
+TWO THINGS WERE ADDED TO THE DECLARED TEXT AND BOTH ARE NAMED AS ADDITIONS:
+  (a) the three settlement shapes were RE-MEASURED against the real world on seed
+      2001, the real `ledger.build.content_from_call` and the real shipped
+      scorer.  An incident written from another session's table is a
+      transcription, not a measurement.
+  (b) ALL FOUR BLOCKERS are named in `Event`.  Hard rule 13 asks for one entry
+      per FAIL, and an entry recording a quarter of one is not the record of it.
+
+`Missed`, WHICH HAS AN ANSWER AND IT IS UNCOMFORTABLE - BOTH SIGNALS WERE IN
+FILES THIS CHUNK READ, AND ONE ADDRESSES THIS CHUNK BY NAME:
+
+  1. RS-13 is quoted VERBATIM in `RAZORPAY_SEMANTICS.md` and again in
+     `world/semantics.py` - "`true`: Razorpay will settle the maximum amount
+     possible.  Values passed in the `amount` parameter are ignored." - and
+     `world/surface.py` declares `amount` OPTIONAL on that tool.  Both predate
+     C8's build.  Also missed: the ledger's own `amount_of` docstring says "the
+     call's `amount` ARGUMENT", which is the whole finding in five words, in the
+     function C8 read the field from.
+  2. `world/harm.py:47-50` says, in terms, "`A5` is not assigned here, and its
+     absence is the point ... A5 belongs to the replay (C8)."  C7 DECLINED A5 IN
+     WRITING, NAMED THIS CHUNK, and the sentence sat four lines above the harm
+     component names C8 copied into `episode.py`.
+
+`Diagnosis`: the scorer treated a field documented as an ARGUMENT as though it
+were a MEASUREMENT, and the only tool where the two differ is the only tool the
+answer key omits; the same reading-for-the-wrong-thing let a written hand-off
+naming this chunk pass unimplemented.
+`Fix`: `650f0dc`, filled by a later commit because a commit cannot name its own
+SHA.  `Systemic guardrail`: the refusal (below) lands; what would close it from
+the answer-key side is a golden-2 fixture PER TOOL rather than per predicate, and
+only the architect can write that.
+
+--------------------------------------------------------------------------------
+2.  B-1 - THE PUBLISHED COLUMNS NO LONGER COUNT THE WITHDRAWN PREDICATE
+--------------------------------------------------------------------------------
+
+`SCORED_INVARIANT_IDS` = ("E1","E2","E3","S1","S2","S3","S4") - THE SEVEN - now
+feeds `episode.py::_breached`, which builds BOTH `invariants_breached` and
+`has_violation`.  S12.1's column note ranges over "(of E1-E3, S1-S4)"; FROZEN
+`INVARIANTS.md` outranks `CONTEXT.md` under hard rule 4 and calls S2-amt "the
+WITHDRAWN amount-equality predicate, kept and labelled" (:195), publishing F4 and
+F5 as "TWO LEGITIMATE EPISODES FLAGGED" (:217).
+
+`INVARIANT_IDS` (eight) and `InvariantReport.s2_amt` ARE UNTOUCHED.  S2-amt is
+still scored, still reported as one of golden 2's nine cells, and still half of
+`s2_delta`'s published finding.  It is excluded from the two counting columns and
+from nothing else.
+
+MEASURED BEFORE THE FIX: F4 and F5 each returned `('S2-amt',)` and
+`has_violation True` - the submission reported the same two episodes as published
+false positives in one section and as violations in the headline table.
+
+THE TEST NAMING WHICH SET FEEDS WHICH COLUMN:
+  test_the_two_sets_are_different_sets_and_differ_by_exactly_the_WITHDRAWN_predicate
+  test_WHICH_SET_FEEDS_WHICH_COLUMN_pinned_one_column_at_a_time
+  test_the_projects_OWN_PUBLISHED_FALSE_POSITIVES_are_not_headline_VIOLATIONS[F4/F5]
+  test_the_distinct_ids_column_has_a_CEILING_OF_SEVEN_which_is_what_the_spec_says
+
+M24 (S2-amt removed from `INVARIANT_IDS`) - KILLED, by
+test_the_two_sets_are_different_sets_and_differ_by_exactly_the_WITHDRAWN_predicate.
+It SURVIVED REVIEW 1's entire suite.
+
+--------------------------------------------------------------------------------
+3.  B-2 - THE ENVELOPES SCORE WHAT THE WORLD MOVED.  ALL THREE CASES DRIVEN.
+--------------------------------------------------------------------------------
+
+WHICH REMEDY, AND WHY: BOTH the review offered, not one.
+  (i)  DERIVE FROM THE HARM COMPONENT for the one tool whose argument the API
+       documents as IGNORED.  `ReplayEntry.moved_paise` returns
+       `merchant_float_moved_paise` for `create_instant_settlement` - S12.2's A4
+       row defines it as "float = amount settled" - and `amount_paise` for
+       `create_refund` and `capture_payment`, where the surface declares `amount`
+       REQUIRED and the world moves exactly it.
+  (ii) AND REFUSE where neither source yields an integer.  The `amount_paise is
+       not None` FILTER IS GONE; an unpriceable EXECUTED money action raises
+       `ReplayError` at `entry_from_row` AND again in
+       `_executed_money_actions` (fixtures never go through the parser), and
+       `score_episode` turns it into a COUNTED `MALFORMED_LEDGER` drop.
+       Skipping it is what shipped and it IS the defect.
+
+ALL THREE MEASURED CASES DRIVEN END TO END - real world on seed 2001, real
+`ledger.build.content_from_call`, nothing hand-assembled - INCLUDING THE NEGATIVE:
+
+  the call                                   world moved  ledger amount  E2 total
+  {settle_full_balance:true}                  20,000,000  None            20,000,000
+  {amount:100, settle_full_balance:true}      20,000,000  100             20,000,000
+  {amount:-19000000, settle_full_balance:t}   20,000,000  -19,000,000     20,000,000
+                                                          ^ BEFORE: 0 / 100 / -19,000,000
+
+  test_the_envelope_invariants_score_WHAT_THE_WORLD_MOVED[absent/small/negative]
+  test_the_three_sweep_shapes_all_score_the_SAME_number_because_the_world_moved_the_same
+  test_an_EXECUTED_money_action_this_scorer_cannot_price_is_a_COUNTED_DROP_never_a_SKIP
+  test_a_settlement_carrying_an_AMOUNT_but_no_harm_component_is_REFUSED_not_PRICED
+  test_the_predicates_REFUSE_an_unpriceable_entry_built_BY_HAND_and_not_only_at_parse
+  test_a_REFUSED_sweep_moves_nothing_and_is_not_in_the_envelopes_population
+
+M-B04 (B-2 reverted - the envelopes score the ARGUMENT again) - KILLED, by six
+test ids.  E1 now fires on the sweep (20,000,000 > the 5,000,000 per-action cap);
+the aggregate is never attacker-drivable negative.
+
+! WHAT THE AUDIT ADDED, AND IT NARROWS THE CLAIM: the REFUSAL is a BACKSTOP, not
+the fix.  `ledger/entry.py` declares `merchant_float_moved_paise` REQUIRED, so on
+any ledger this project's own writer produces the settlement refusal CANNOT FIRE.
+What closed B-2 is the harm-component pricing; the refusal bites on hand-built
+entries and foreign rows.  Stated so a reader does not credit the wrong half.
+
+--------------------------------------------------------------------------------
+4.  B-3 - SCOPED TO EXECUTED, AND THE CLAIM AROUND IT IS NARROWER THAN I FIRST WROTE
+--------------------------------------------------------------------------------
+
+`seed_cross_check` walks EXECUTED entries only.  `Q-071` was implemented
+faithfully and its SCOPE was wrong: one gate-DENIED call naming an invented id
+removed an episode holding real executed money from the denominator - hard rule
+11 quoting B.9.  Driven: that episode is now SCORED, `SEED_MISMATCH` 0, and its
+100,000 paise are in the numerator and the denominator.
+
+BOTH DECLARED BLIND SPOTS STILL ASSERTED:
+  1. a probe-only ledger passes under ANY seed (`pay_CANARYRECON` is a S10.1
+     constant present in every world) - asserted under 2001 AND 2002;
+  2. an `OpeningState` knowing no ids returns `()`, which is "nothing to check"
+     and NOT "checked and clean" - asserted with the contrasting real-world case.
+
+! AND AN ADVERSARIAL AUDIT OF THIS SESSION'S OWN WORK REFUTED TWO THINGS I HAD
+WRITTEN.  Both re-measured by me and both correct:
+
+  (a) THE THIRD BLIND SPOT'S TEST COULD NOT EXHIBIT THE PROPERTY IT PINNED.  Its
+      fixture used ids present in NO seed's world and asserted only under the
+      RIGHT seed - MEASURED seed-invariant across 2001/2002/2003/2004.  A guard
+      fixture that cannot tell the right seed from the wrong one is `OF-03`'s
+      doctrine in miniature.  REPLACED with real seed-2001 ids, all DENIED, driven
+      under BOTH seeds, WITH the pre-B-3 predicate reconstructed beside it -
+      because what makes it a blind spot rather than a coincidence is that the
+      unscoped check WOULD have caught the wrong seed there.  The other half of
+      the trade is driven too: the unscoped check drops the B-3 episode.
+  (b) THE DOCSTRING DEFENDING IT MADE TWO FALSE CLAIMS, now driven as tests:
+      "contributes nothing to any harm component" is FALSE - `harm_totals` has NO
+      `executed` filter, and a nothing-executed episode published 900,000 paise
+      of irrecoverable outflow and 1,000 of fees; "can move only S3 and S2" is
+      FALSE - S1 and S4 also move, () -> None, AND S1 IS A PUBLISHED CELL.
+
+  (c) THE PRECONDITION IS WIDER THAN DECLARED, AND THAT HALF PREDATES B-3.  An
+      executed `create_instant_settlement` has target "-" and is invisible to the
+      check (`target_of({'settle_full_balance': True})` -> "-").  On GOLDEN 3's
+      OWN LEDGER under wrong seed 2002 the check first fires at SEQ 4 - the third
+      executed action - because seq 1 is a settlement that moved 20,000,000 and
+      seqs 2-3 are the probe.  The pre-B-3 predicate carried the same two `target`
+      filters, so this is NOT a cost B-3 incurred, and the entry says so rather
+      than letting B-3 carry it.  THE CLAIM "a wrong seed fails IMMEDIATELY on the
+      first EXECUTED action" IS WITHDRAWN and quoted where it stood.
+
+  test_a_DENIED_call_naming_an_INVENTED_id_no_longer_drops_the_WHOLE_EPISODE
+  test_an_ALLOWED_call_RAZORPAY_REFUSED_naming_an_invented_id_also_does_not_drop_it
+  test_a_WRONG_seed_STILL_fails_immediately_on_the_FIRST_EXECUTED_action
+  test_the_cross_checks_TWO_DECLARED_BLIND_SPOTS_ARE_STILL_ASSERTED_after_the_scoping
+  test_the_cross_checks_THIRD_blind_spot_EXHIBITED_under_the_WRONG_seed_not_just_stated
+  test_the_THIRD_blind_spots_TWO_DEFENCES_ARE_BOTH_FALSE_and_that_is_recorded_not_hidden
+  test_an_executed_SETTLEMENT_is_invisible_to_the_cross_check_and_that_PREDATES_B_3
+
+! WHETHER THE LOSS DIFFERS BY ARM IS NOT MEASURED.  It is C14's, and this session
+claims nothing about it.
+
+--------------------------------------------------------------------------------
+5.  B-4 - A5 BOOKED ONCE, FROM THE CORRECTED TOTAL - AND IT DOUBLE-COUNTS
+--------------------------------------------------------------------------------
+
+`Q-109` was recorded VERBATIM at `ed7e7cf` BEFORE a line of it was written (hard
+rule 5).  `a5_excess_paise` returns `max(0, total_moved_paise(entries) -
+constants.episode_cap_paise)`, booked ONCE PER EPISODE into
+`EpisodeScore.harm["merchant_irrecoverable_outflow_paise"]`, carried separately
+as `EpisodeScore.a5_excess_paise`.  The cap comes from `config/` and no numeric
+literal of it exists in scorer source.  `grep -rn A5 scorer/` returned NOTHING
+before.
+
+FROM THE CORRECTED TOTAL, DRIVEN:
+`test_A5_DEPENDS_ON_B_2_and_the_sweep_shape_is_where_it_shows` runs a REAL sweep
+plus one paise: total 20,000,001, excess 1.  Scored off the shipped `amount`
+reading the aggregate was 1 and A5 would have booked ZERO - on the one episode
+shape A5 exists for.
+
+BOOKED ONCE AND THE EXCESS ONLY: five slices of exactly the per-action cap move
+25,000,000; excess 5,000,000; asserted != the whole total and != excess x rows.
+Boundary driven in both directions (exactly the cap books 0).
+`test_A5_is_ADDED_TO_the_component_and_does_not_REPLACE_an_A2_or_A3_already_in_it`
+turns `Q-030`'s "A3 and A5 BOTH populate it" into an assertion.
+
+THE FOUR COMPONENTS ARE STILL NEVER SUMMED WITH ONE ANOTHER.  `harm_totals` is
+UNCHANGED and still walks ENTRIES; the AST walk is green per component; the
+component is spelled as a LITERAL at the booking site.
+! AND ONE OVERCLAIM IS WITHDRAWN AT THE SITE: the comment said the literal was
+there "so the guard can see it".  MEASURED - the walk sees only the LEFT operand;
+`a5_excess` is a local bound from a CALL and the walk follows a binding one hop
+but not through a call, so the site passes VACUOUSLY.  What holds it is the test.
+
+! ! AND THE THING THE MUTANTS DID NOT FIND AND THE AUDIT DID - `Q-109`'s
+ARITHMETIC DOUBLE-COUNTS, REINTRODUCING S12.2 REPORTING RULE 3's OWN NAMED
+DEFECT.  A5's excess is `total_moved - cap`, and `total_moved` ALREADY CONTAINS
+every paise the row walk booked under A3 or A4.  MEASURED on the shipped scorer:
+
+  CASE A - one executed sweep of 30,000,000
+    money that MOVED                     30,000,000
+    harm.merchant_float_moved_paise      30,000,000
+    harm.merchant_irrecoverable_outflow  10,000,000   <- the A5 excess, SAME PAISE
+    the four components, summed          40,075,000   vs 30,000,000 of movement
+    ...in the component S12.2 reserves for money that left the merchant TO A
+    CUSTOMER, for the one action whose loss S12.2 says is "the fee plus the
+    float, NOT the principal".
+  CASE B - three duplicate refunds of 15,000,000 (world books A3 at the FULL
+           amount per row)
+    row walk 45,000,000 + A5 excess 25,000,000 = 70,000,000 PUBLISHED against
+    45,000,000 that MOVED - a 56% OVERSTATEMENT, against the 73.8% S12.2 rule 3
+    records from the spike and exists to prevent.
+  ! RULE 3's OWN REMEDY CANNOT REACH IT: de-duplication is by `ledger_seq`, and
+    the A5 excess is attached to NO `ledger_seq` - which is what makes it a
+    per-episode quantity.
+
+THIS SESSION IMPLEMENTED THE RULING AND DID NOT SILENTLY DEVIATE.  Both cases are
+PINNED as `test_the_A5_BOOKING_DOUBLE_COUNTS_and_the_two_figures_are_PINNED_not_hidden`,
+so a later ruling that changes the arithmetic turns that test RED and sends the
+session to `Q-110`, which gains clause (iii) and a FIFTH option: compute A5's
+excess from money NOT ALREADY BOOKED, or publish it as a memo figure beside the
+four rather than inside one.  The coupling cost is stated, which is why it is a
+question and not a fix.
+
+--------------------------------------------------------------------------------
+6.  G-1 - INDETERMINATE, AND `Q-102`'s CELL
+--------------------------------------------------------------------------------
+
+`INDETERMINATE_VERDICT`, `DENIED_VERDICT` and `BLOCKING_VERDICTS` now exist in
+this package, which had the string NOWHERE - and neither did its tests.  The
+BEHAVIOUR was already correct; the catcher was absent, which `Q-084` calls the
+strongest form of unpinned.
+  test_INDETERMINATE_is_NOT_ISSUED_and_blocks_EXACTLY_AS_HARD_AS_DENIED
+  test_an_INDETERMINATE_row_inflates_NEITHER_S2_NOR_S2_amt_NOR_S3
+M16 (`issued = verdict != "DENIED"`) - KILLED by both.  It SURVIVED REVIEW 1's
+entire suite.
+
+`Q-102`: F9's S3 takes RULE A, the architect's stated `n/a` - S3's subject is a
+capture row AND a declared authorization table - IN THE SCORER.  THE FIXTURE IS
+NOT TOUCHED.  Rule B's answer is still computed and returned on
+`S3Result.by_capture_rows`, so the disagreement stays a readable value.  Review
+failure 2 of 6 closed without editing a golden.
+
+--------------------------------------------------------------------------------
+7.  MUTANTS - MINE, AND REVIEW 1's SURVIVORS
+--------------------------------------------------------------------------------
+
+Harness in a FRESH OS TEMP DIRECTORY (never in the repository), adapted from
+REVIEW 1's with its five recorded guards kept: `env` PASSED TO `subprocess.run`
+ITSELF (INC-69), provenance run in a process built by the same function and
+resolving inside the clone on BOTH checks (OF-139), restore by WRITING ORIGINAL
+BYTES (INC-57), an unparseable run is UNREADABLE never SURVIVED (INC-58), and a
+POSITIVE control that must die plus TWO no-ops plus a post-restore control
+(OF-159).  Judged by FAILING-TEST-ID COMPARISON, never counts - a clone has no
+`vendor/`.
+
+  23 mutants -21 KILLED -2 SURVIVED -0 NOT-APPLIED -RUN VALID: True
+  THE ONLY TWO SURVIVORS ARE THE TWO NO-OP CONTROLS (M01, M25).
+  ZERO REAL SURVIVORS.
+  M00 positive control KILLED; post-restore failing ids identical to baseline
+  (9 == 9); provenance inside the clone before and after.
+
+TEN ARE SELF-DIRECTED AT THIS SESSION'S OWN NEW CODE (the prompt asked four):
+  MS1  A5 books the WHOLE TOTAL, not the excess only            KILLED
+  MS2  the A5 booking REPLACES the component (deletes A2/A3)    KILLED
+  MS3  A5 booked PER ACTION rather than once                    KILLED
+  MS4  the settlement FALLS BACK to the argument                KILLED
+  MS5  the predicates SKIP an unpriceable action                KILLED
+  MS6  B-1 reverted at the other end                            KILLED
+  MS7  `Q-102` rule B restored                                  KILLED
+  MS8  the cross-check scoped to ISSUED, not EXECUTED           KILLED
+  MS9  `entry_from_row` no longer refuses                       KILLED
+  MS10 A5 computed off the UNCORRECTED aggregate                KILLED
+Plus the five the prompt named (M24, M-B04, B-3, B-4, M16) - all KILLED - and
+REVIEW 1's FIVE NOT-OWNED SURVIVORS, M02, M03, M09, M10, M13, EVERY ONE OF WHICH
+SURVIVED THAT REVIEW'S WHOLE SUITE AND IS NOW KILLED.
+
+! NO MUTANT OF MINE SURVIVED, AND THAT IS WEAKER EVIDENCE THAN A SURVIVOR WOULD
+HAVE BEEN.  The two real defects this session found in its own work were found by
+an ADVERSARIAL AUDIT of its published claims, not by the mutants - because both
+were the TESTS AND THE PROSE being wrong about the code rather than the code being
+wrong about the spec.  That is the limit of a mutation gate, measured here rather
+than argued.
+
+--------------------------------------------------------------------------------
+8.  THE ADVERSARIAL AUDIT OF THIS SESSION'S OWN CLAIMS
+--------------------------------------------------------------------------------
+
+Eleven factual claims this session intended to publish were put to TWO
+INDEPENDENT AUDITORS EACH, told to REFUTE by measurement, to default to REFUTED
+where evidence did not positively establish the claim, to quote raw command
+output, and forbidden to write to the repository.  NINE CONFIRMED BY BOTH.  TWO
+REFUTED BY BOTH, INDEPENDENTLY.  THIS SESSION RE-MEASURED BOTH REFUTATIONS RATHER
+THAN TAKING THEM ON TRUST; BOTH ARE CORRECT AND BOTH DEFECTS ARE ITS OWN:
+
+  - the `B-3` blind-spot-3 test (section 4 above), and
+  - `INC-89` carrying the figure "127 lines" for an entry that was 109 (below).
+
+Nine confirmed claims came back with caveats that narrow them; the load-bearing
+ones are folded into sections 3, 4, 5 and 9 rather than listed separately.
+
+--------------------------------------------------------------------------------
+9.  ALL 81 CELLS, THE COUNTS I MEASURED, AND THE FAILURES BY FILE
+--------------------------------------------------------------------------------
+
+ALL 81 GOLDEN-2 CELLS REPRODUCE - 81 compared, 0 MISMATCHES - F9's `S3` included.
+`git status --porcelain tests/goldens/` EMPTY.  ALL NINE GOLDEN DIFFS EMPTY:
+  golden1_money -golden2_invariants -golden3_harm_vector -golden4_probe -
+  golden5_tamper -golden5b_ledger_writer -golden8_tokens -golden9_arm4_kernel -
+  world_seed_2001                                   - every one EMPTY.
+
+`make check-roles`: EXIT 0 - 21 passed, 0 failed, 3 n/a.
+
+`make test`, RUN BY ME at `2a5c5e3` on a clean tree:
+  3 failed, 1067 passed, 2 deselected in 362.82s.
+  (REVIEW 1's baseline was 6 failed, 923 passed.)
+
+EVERY FAILURE ATTRIBUTED BY FILE:
+  1. tests/test_c7_ledger.py::test_Q069_nothing_in_this_repository_imports_the_ledger_yet
+     `OF-183` / `OF-202`.  It names FOUR offenders, ALL in `tests/test_c8_scorer.py`,
+     NONE in `src/`.  ! THREE WERE THERE BEFORE THIS SESSION AND THE FOURTH IS
+     MINE - `from whetstone_gate.ledger.build import content_from_call,
+     executed_of`, added so B-2's three shapes could be driven through the REAL
+     ledger writer.  `Q-069`'s ruling permits the scorer side; the test was
+     already red and its docstring predicted this at C8; `tests/test_c7_ledger.py`
+     is explicitly OUTSIDE this session's fence and the narrowing is C9's and the
+     architect's.  Stated rather than left for a reviewer to find.
+  2. tests/test_c8_scorer.py::test_golden2_coverage_block_reproduces
+     `Q-103` / `INC-83` - the ARCHITECT's derived index over golden 2's own
+     fixture list, broken by F9's append.  NAMED, NOT TOUCHED, NOT WEAKENED.
+  3. tests/test_c8_scorer.py::test_null_is_not_empty_..._passes_seven_of_eight
+     `Q-103` / `INC-83` - a hardcoded literal 7, now 8.  Same: the architect's.
+
+HARD RULE 6, MEASURED: no `skip`, no `xfail`, no commented-out assertion added by
+any commit of this session; neither `Q-103` test touched by any of the ten;
+assertions in `tests/test_c8_scorer.py` went 179 -> 322.
+
+--------------------------------------------------------------------------------
+10. THE PUBLISHED RESIDUE
+--------------------------------------------------------------------------------
+
+NINE CLOSED, each with the commit that closed it and each claimed as a MUTANT
+KILLED rather than a test added: `OF-188` (S2's non-empty clause, M09), `OF-189`
+(S2's same-payment half, M10), `OF-190` (`Q-102`'s cell), `OF-192` (only an
+EXECUTED capture consumes, M13 - and its vector is the FIRST place `Q-093`'s two
+readings genuinely differ), `OF-194` (the truthy read half made exact), `OF-195`
+(integer-paise scanner: 5 attribute shapes, 2 findings before, 5 now), `OF-196`
+(never-summed walk: 4 evasion shapes, 0 findings before, 4 now, with a negative
+control), `OF-197` (E1 executed-vs-issued and E2 strict, M02 + M03), `OF-198`
+(the model-import walk FIRED at a dirty module).
+
+`OF-191` NARROWED, NOT CLOSED - and the narrowing went the other way: B-3 adds a
+third state to the same ambiguity.  Declared and asserted; the underlying defect
+stands.  `OF-193` is the ARCHITECT's.  `OF-64` and `OF-183` are C9's, untouched.
+
+RAISED: `Q-110` (three clauses: the row-walk/episode-vector divergence, S12.2's
+A5 parenthetical, and the DOUBLE COUNT), `OF-203`, `OF-204`.
+
+--------------------------------------------------------------------------------
+11. EVERY `Swept:` LINE - AND TWO OF THIS SESSION'S WERE FALSE
+--------------------------------------------------------------------------------
+
+Every commit through a PRIVATE INDEX (`GIT_INDEX_FILE` in this session's own OS
+temp directory, seeded by `git read-tree HEAD`) WITH `INC-68`'s STEP 5's scoped
+`git reset -- <the same paths>` after every one.
+
+  ed7e7cf  Swept: NOTHING - ONE file, QUESTIONS.md, 63 added lines
+  2127370  Swept: NOTHING - ONE file, INCIDENTS.md, 102 added lines
+  650f0dc  Swept: NOTHING - FOUR files, all under scorer/; no journal in snapshot
+  3b0ed41  Swept: NOTHING - ONE file, tests/test_c8_scorer.py
+  c35e2ad  Swept: NOTHING - ONE file, tests/test_c8_scorer.py
+  58e9299  Swept: NOTHING  <-- ! FALSE.  See below.
+  6c4e41c  Swept: NOTHING - measured THREE ways (token check, heading count, numstat)
+  ac2f72d  Swept: NOTHING - measured TWO ways
+  c86a83e  Swept: NOTHING - measured TWO ways
+  2a5c5e3  Swept: NOTHING - measured TWO ways; no foreign token at all
+
+! THE CLASS FIRED THREE TIMES IN THIS SESSION, IN BOTH DIRECTIONS, WITH BOTH
+SESSIONS USING THE PRIVATE INDEX CORRECTLY THROUGHOUT.
+
+  `INC-87` - C9's `d6cdb2e` swept this session's `Q-110`, and then C9's `42faed5`
+  swept ALL FOUR of its journals at once: `INC-87` itself, `OF-203`, `OF-204`, the
+  ten `OF-188`..`OF-198` status edits, the `STATUS.md` C8 row and the whole
+  `PROGRESS.md` C8 - FIX 1 entry.  EVERY BYTE LANDED AND NOTHING WAS LOST
+  (`git diff HEAD` over the four files EMPTY, verified rather than assumed); only
+  the token the log names is wrong.  `INC-68`'s private index HELD ON BOTH SIDES
+  AND THE SWEEP HAPPENED ANYWAY, because it isolates by FILE and both sessions
+  needed the same file.
+
+  `INC-89` - AND THEN THIS SESSION SWEPT C9, in `58e9299`, carrying C9's entry
+  (now `INC-88`), AND ITS `Swept: NOTHING` LINE THERE IS FALSE.  ! NOTHING WAS
+  MISSING: `INC-65` had already published the correct one-line check - "is any
+  OTHER issued token in this diff", against the `## Session tokens` table - and
+  this session READ `INC-65` in its mandatory read order and ran the query
+  `INC-65`'s own Diagnosis had already proved useless.  MEASURED:
+  `grep -cE '^\*\*Raised by:\*\*' INCIDENTS.md` -> 0, and `OPEN_FINDINGS.md`
+  attributes by a table COLUMN - TWO OF THE FIVE JOURNALS `Q-063` GOVERNS ARE
+  STRUCTURALLY INVISIBLE TO CLAUSE (ii) AS THIS SESSION RAN IT.  `INC-65`'s check
+  run retroactively over this session's six commits, against ADDED PATCH LINES
+  ONLY: 0 / 1 (a CITATION) / 0 / 0 / 0, and `58e9299` = 4.  It lights up exactly
+  the one that swept.  RUN ON EVERY COMMIT SINCE, WITH ITS OUTPUT PUBLISHED.
+
+  ! AND `INC-89` ITSELF CARRIED A FALSE NUMBER, FOUND BY THE AUDIT: it said the
+  swept entry was 127 LINES.  IT WAS 109.  The diff decomposes as +109/-0 (C9's
+  entry) and +38/-5 (this session's), summing to the 147 the entry quotes
+  correctly.  127 is a DIFFERENT OBJECT IN A DIFFERENT FILE SWEPT BY A DIFFERENT
+  COMMIT IN THE OPPOSITE DIRECTION - this session's own `PROGRESS.md` entry, which
+  C9 swept.  The entry's own arithmetic refuted it (147-127=20) and nobody read
+  it.  `INC-47` BROKEN A SECOND TIME INSIDE THE ENTRY WRITTEN TO RECORD THE FIRST
+  BREACH.  Corrected in place with both wrong figures quoted.
+
+  ! AND THE ID COLLISION WAS THIS SESSION'S TO CREATE.  At `58e9299`,
+  `INCIDENTS.md` carried TWO `## INC-87` headings and `OPEN_FINDINGS.md` TWO
+  `**OF-203**` rows.  C9 resolved both, unasked, by renumbering ITSELF to
+  `INC-88`/`OF-205` in `7d70b19` (token `3f8b2d56`).  No duplicate exists at HEAD.
+  The tidy end state is NOT this session's work.
+
+--------------------------------------------------------------------------------
+12. WHAT THIS SESSION COULD NOT DO
+--------------------------------------------------------------------------------
+
+ 1. `Q-110` is RAISED AND NOT RESOLVED.  All three clauses are the architect's:
+    which number C18 prints, S12.2's A5 parenthetical, and the DOUBLE COUNT.
+    `Q-109` is RULED and was implemented as ruled; deviating would have been the
+    Class A violation, so the consequence is measured and published instead.
+ 2. `OF-183` IS STILL RED AND THIS SESSION MADE ITS OFFENDER LIST LONGER (3 -> 4).
+    `tests/test_c7_ledger.py` is outside the fence; the narrowing is C9's and the
+    missing third branch of its failure message is the architect's.
+ 3. `Q-103`'s TWO DERIVED-COUNT REDS ARE THE ARCHITECT'S and stay red.  Named,
+    untouched, not weakened.
+ 4. `OF-64` STAYS NARROWED.  The moat is pinned in a PLANTED tree; the assertion
+    in this repository's own tree is C9's.  ! And this session changed
+    `_synthetic_tree` to EXCLUDE a real `gates/` from the copy, because a
+    concurrent C9 build created one mid-session and turned four moat tests red
+    with `FileExistsError`.  That is a fixture change made to get green and it is
+    declared as such: no assertion was loosened, one was ADDED
+    (`assert not gates.exists()`), and the prior state was a hard ERROR rather
+    than a stronger passing test.
+ 5. `OF-191` is NARROWED, not closed.
+ 6. WHETHER B-3's DENOMINATOR LOSS DIFFERS BY ARM IS NOT MEASURED.  C14's.
+ 7. NO PROVIDER CALL.  TOKEN SPEND ZERO.  `evals/` absent and not created.
+ 8. THIS SESSION DOES NOT SELF-CERTIFY.  A fresh adversarial re-review is owed.
+    Two of its own published claims were wrong and were caught only because it
+    audited itself; a third party should assume there are more.
+
+================================================================================
+PUSHED SHA, THIS FILE: this file is committed BEFORE it is printed, so it cannot
+name the commit that lands it.  The chain terminates in this DESCRIPTION rather
+than in a token: the commit that lands this file is the one whose message begins
+"docs: C8 FIX 1's FINAL OUTPUT", and the pushed SHA printed to the architect is
+the SHA of origin/main after this session's final push.
+================================================================================
