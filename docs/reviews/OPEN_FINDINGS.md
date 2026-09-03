@@ -2545,3 +2545,87 @@ says so instead of borrowing a review's name.**
 | **OF-224** | **C18**, **C19** | **MEDIUM** | ⚠️ **`make eval` STILL PRINTS *"NOT YET IMPLEMENTED"*, AND THE ASSEMBLER IT NAMES IS COMPLETE.** **MEASURED at HEAD `42491bf`:** `src/whetstone_gate/tasks.py:task_eval` runs `check-prereg` and then prints *"NOT YET IMPLEMENTED. Owned by C18, which builds RESULTS.md and this pipeline"*. `PROCESS.md` §12.1's C18 row is *"`RESULTS.md` **+ `make eval`**"*, but **the C18 BUILD prompt's fence names only `src/whetstone_gate/results/` and `tests/test_c18_results.py` as new code**, and `tasks.py` appears under **neither FENCE nor NOT**. `CLAUDE.md` §4: *"If anything seems to require touching … files outside your task's scope: STOP and report instead of working around it."* So the pipeline ships behind its **own** entry point — `python -m whetstone_gate.results <run-dir>` — which is exercised end to end on a real run directory and is byte-identical across re-runs, and the one-function wiring is owed. **REMEDY, written so the owner pastes rather than guesses:** `task_eval()` calls `whetstone_gate.results.__main__.main([<run-dir>, "--output", "RESULTS.md"])` after `task_check_prereg()` and returns the larger return code. ⚠️ **IT ALSO NEEDS A RUN DIRECTORY, WHICH IS RUN-3/RUN-4's OUTPUT AND DOES NOT EXIST TODAY** — so this lands **with or after the sweep**, never before it, and until then `make eval` printing a placeholder is honest rather than broken. ⚠️ **AND `make check-prereg` STILL FAILS OPEN** (`OF-185`, `Q-100`) while hard rule 9 requires its PASS/FAIL line **in `RESULTS.md`**: the assembler prints the line the target actually produces, `NOT-YET-FROZEN`, **labelled as *not a PASS***, and names `OF-185`'s owner in the same string. | `PROCESS.md` §12.1's C18 row and its done-when; `CLAUDE.md` §4, hard rule 9; `QUESTIONS.md` `Q-128`, `Q-100`; `OPEN_FINDINGS.md` `OF-185`; `Makefile` header | **C18 BUILD 1 (`5a2c81df`)** | ⚠️ **OPEN — MEDIUM, for whoever owns `src/whetstone_gate/tasks.py`, AT OR AFTER THE SWEEP** | — |
 | **OF-225** | **process**, **all sessions** | **LOW** | ⚠️ **`Q-025`'s SELF-RECORD NUMBERING HAS LAPSED SILENTLY FOR TWENTY-FIVE ROWS, AND THE LAPSE IS INVISIBLE FROM THE TABLE.** `QUESTIONS.md`'s session-token table carries a long, careful sequence of paragraphs numbering each self-recorded row — *"THE FIFTH"*, *"THE SIXTH"* … up to **`363a2e9f`, "THE TWENTY-EIGHTH SELF-RECORDED ROW … ROW 43"** — several of which correct their own predecessors' arithmetic. **MEASURED: the sequence stops at row 43.** Every self-record since — **seven** of them, at pre-append lines 8621, 8940, 9599, 9721, 9911, 10159 and 10634 — says only `⚠️ **SELF-RECORDED.**` and claims no ordinal, and the remaining rows to 68 say nothing at all. ⚠️ **THE CONSEQUENCE IS THAT THE ORDINAL IS NO LONGER DERIVABLE FROM THE FILE**: a session cannot say how many of rows 44–68 were self-recorded, so continuing the sequence would mean inventing a number **in the shape of a measurement** — which is the exact error `363a2e9f`'s own paragraph records correcting against itself. C18 BUILD 1 therefore recorded *"self-recorded, row 69, ordinal NOT DERIVABLE"* rather than guessing. ⚠️ **NOTHING IS BROKEN AND NO NUMBER IS WRONG** — `make check-roles` E1/E2/E3 are clean at 68 issued rows. **The finding is that a control which existed to make self-recording visible has decayed into a word without a count, in the file whose whole subject is honour-system visibility (`PROCESS.md` §7a).** **REMEDY:** either retire the ordinal explicitly — one sentence saying the count is no longer maintained and why — or have `check_roles` derive it, since it already parses every row. ⚠️ **Both are the architect's**; `check_roles.py` is outside this session's fence. | `PROCESS.md` §7a; `QUESTIONS.md` `Q-025`, `Q-021`, `Q-127`; `OPEN_FINDINGS.md` `OF-67` | **C18 BUILD 1 (`5a2c81df`)** | ⚠️ **OPEN — LOW, for the architect** | — |
 | **OF-226** | **C18** | **LOW** | ⚠️ **NOTHING FORCES A *FUTURE* RATE ADDED TO §12.1's TABLE TO DECLARE WHICH EPISODE POPULATION IT IS OVER.** `INCIDENTS.md` **INC-103** records this session publishing an escape rate of `0/1` for an arm whose single episode the scorer had **DROPPED** — hard rule 11's shrinkage running backwards, where it flatters. It is fixed: `ArmRow` carries `episodes` (the arm's published ledgers, which is CANARY-A's and CANARY-B's denominator under frozen `HOLES.md` §3.1) and `scored_episodes` (the escape rate's) as **separate fields with separate docstrings**, both print, the table states that they differ, and a test asserts `episodes − scored_episodes == dropped` on a real run. ⚠️ **WHAT IS NOT CLOSED:** a column added later can still pick either field without saying which, and the identity test would stay green because it is about the two existing fields rather than about any new rate. **REMEDY, and it is a design one rather than a line:** a rate type that carries its population's NAME, so a denominator cannot be supplied anonymously — the same shape `figures.Figure` already applies to ceilings, where a missing one is a refusal rather than a blank. **Raised rather than taken**, because it widens C18's surface past its card and belongs to a review's judgement, not a build session's. | `CONTEXT.md` §12.1, §10.2; `HOLES.md` §3.1 (frozen); `CLAUDE.md` hard rule 11; `INCIDENTS.md` `INC-103` | **C18 BUILD 1 (`5a2c81df`)** | ⚠️ **OPEN — LOW, for C18's REVIEW** | — |
+
+
+## OF-228 -- a remedy written for another session to paste carried no measurement of its own, and was wrong
+
+**Raised:** 2026-09-03, ARCH FIX -- EVAL WIRING (`c1f0a4d8`). **Severity: MEDIUM.**
+**Status: OPEN -- procedural, for the architect.** **Owner: whoever writes remedies into
+`QUESTIONS.md`.**
+
+`Q-126` computed a three-line before/after table for the **defect** it found and **none at all for
+the remedy it recommended**. The recommended remedy -- `Fraction(require(...)) == Fraction(1, 2)` --
+does **not** fail on the old code (`Fraction(0.5)` *is* `Fraction(1, 2)`), so it could not satisfy
+hard rule 6's condition for a legitimate flip, and `Q-126`'s claim that it is *"stricter than
+either"* is false on the type axis. Measured in `INC-107`; closed in code at `a7d9f89` by
+conjoining the clause the bare form lacks.
+
+**Proposed guardrail:** a remedy written into `QUESTIONS.md` for another session to paste must
+carry **its own** measurement against the old code, computed by the session that writes it -- the
+same standard `INC-101` already met for the defect. The remedy is the half that gets pasted.
+
+## OF-229 -- the results assembler crashes instead of refusing when an arm's episodes all drop
+
+**Raised:** 2026-09-03, ARCH FIX -- EVAL WIRING (`c1f0a4d8`). **Severity: HIGH.**
+**Status: OPEN.** **Owner: C18 / `src/whetstone_gate/results/`.**
+**NOT fixed here -- `results/` is outside this session's fence.**
+
+`src/whetstone_gate/results/__main__.py:173`
+(`escape_numerator=arm1.escape.numerator if arm1 else 0`) guards the arm-1 **row** but not its
+**escape figure**, which `build_arm_rows` sets to `None` for any arm with zero *scored* episodes.
+A run in which every arm-1 episode is dropped therefore dies with
+`AttributeError: 'NoneType' object has no attribute 'numerator'` instead of producing the
+assembler's own `REFUSED:` line -- **and that is exactly the run whose drop ledger hard rule 11
+most needs published.** Reproduced end-to-end while driving `make eval`; see `INCIDENTS.md`
+**INC-108**.
+
+**Proposed guardrail:** a fixture in the C18 suite in which one arm scores **zero** episodes --
+`INC-14`'s convention that a check ships with the input that makes it fail. No existing fixture has
+one.
+
+## OF-230 -- `make eval`'s run directory is a path literal with no test and no override
+
+**Raised:** 2026-09-03, ARCH FIX -- EVAL WIRING (`c1f0a4d8`). **Severity: LOW.**
+**Status: OPEN.** **Owner: the architect / the sweep.**
+
+`task_eval()` resolves its run directory from `EVAL_RUN_DIR = "evals/results"`, taken from
+`CONTEXT.md` S16. It is a path and not a S8.6 spec value, so hard rule 9 does not reach it, and
+`config/` is frozen so it cannot hold a key for it (`Q-138`). **Nothing asserts that the sweep
+writes there**, in the assembler's `<run-dir>/run.json` + `<arm>/<episode>.json` shape. The failure
+mode is safe -- `make eval` refuses loudly and non-zero rather than regenerating nothing silently --
+but it would be discovered at the worst moment, after the run.
+
+## OF-231 -- `tasks.py`'s own import closure is client-free by MEASUREMENT, not by ASSERTION
+
+**Raised:** 2026-09-03, ARCH FIX -- EVAL WIRING (`c1f0a4d8`). **Severity: LOW.**
+**Status: OPEN.** **Owner: whoever's fence next contains a test file for `tasks.py`.**
+
+`make eval` must never spend a token, and `tests/test_c18_results.py` asserts that property for
+`whetstone_gate.results` two independent ways. **It does not assert it for
+`whetstone_gate.tasks`**, which is the module the published command actually enters, and which now
+imports the assembler. Measured by this session **using the repository's own instrument** --
+`test_c18_results._first_party_graph`, `check_roles._transitive_closure` and
+`_client_import_offenders`, re-seeded at `whetstone_gate.tasks`: a **38-module** closure, **zero**
+offenders on the transitive walk and **zero** dynamic-reach hits, with
+`whetstone_gate.results.__main__` confirmed inside the closure. **That is a measurement, and a
+measurement is not a guardrail.** This session could not close it: its fence names *"any other test
+file"* under **NOT**. The one-line remedy is a third seed in the existing test file.
+
+
+## OF-232 -- nothing checks a cited `Q-`/`INC-`/`OF-` identifier against the WORKING tree, so two concurrent chunks allocate the same numbers
+
+**Raised:** 2026-09-03, ARCH FIX -- EVAL WIRING (`c1f0a4d8`). **Severity: MEDIUM.**
+**Status: OPEN.** **Owner: whoever's fence next contains `check_roles.py`.**
+
+This session cited `Q-131` and `Q-137 / INC-104` from source **before writing them**, and all three
+numbers were already held by the concurrent C12 driver session in its untracked tree (C12 holds
+`Q-130`-`Q-136`, `INC-104`-`INC-106`, `OF-227`). A citation that resolves to **another chunk's**
+ruling cannot be detected by reading the file that carries it. Corrected here by renumbering into a
+verified-free block; the full account is `INCIDENTS.md` **INC-109**.
+
+**Proposed guardrail:** `make check-roles` already validates **session tokens** against
+`QUESTIONS.md` -- this is the same check, one artefact over. Extend it so every `Q-`/`INC-`/`OF-`
+identifier cited in `src/` or `tests/` must resolve in its journal, **scanning the working tree,
+not the index** -- `git grep` walks tracked files only and cannot see a concurrent chunk's
+reservations, which is precisely how this was missed. **Not added here: `check_roles.py` is outside
+this session's fence.**

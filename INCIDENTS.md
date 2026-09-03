@@ -8525,3 +8525,204 @@ a test computes both sides from the same run. A future field that quietly re-mer
 breaks that identity rather than producing a plausible smaller rate. ⚠️ **What is NOT closed, and is
 named rather than accepted quietly:** nothing forces a *future* rate added to this table to declare
 which population it is over. `OPEN_FINDINGS.md` **OF-226**.
+
+
+## INC-107 -- the one-line remedy an incident computed **could not have caught the defect that incident was about**: `Fraction(0.5)` is `Fraction(1, 2)`
+
+**Date:** 2026-09-03 (ARCH FIX -- EVAL WIRING, `c1f0a4d8`.) **Measured before the edit was
+committed, by reconstructing the old code -- not discovered after it.**
+
+**Event:** `Q-126` / `INC-101` computed two remedies for the red at
+`tests/test_config_loader.py:125` and named the second the stronger:
+`Fraction(require(...)) == Fraction(1, 2)`, *"which pins the MEANING and would have survived this
+ruling untouched"*. This session was instructed to take that stronger remedy **and** to demonstrate
+that the new assertion **fails on the old code**, which is hard rule 6's condition for a legitimate
+flip.
+
+**Action:** before editing, the old code was reconstructed -- `config/protocol.yaml`'s text with
+`Q-123`'s quotes removed, written to an OS temp directory and read back through the real loader --
+and all four candidate assertions were evaluated against **both** the old value and the new one:
+
+```
+OLD CODE (unquoted config) : 0.5      float
+NEW CODE (Q-123 quoted)    : '0.50'   str
+
+assertion                                          OLD     NEW    flip?
+== 0.50                        (the old line)      True    False   n/a
+== "0.50"                      (Q-126 weaker)      False   True    YES
+Fraction(v) == Fraction(1, 2)  (Q-126 STRONGER)    True    True    NO
+(type(v), Fraction(v)) == (str, Fraction(1, 2))    False   True    YES
+```
+
+**Expectation:** the ordered remedy should have failed on the old code, because that is the
+property it was ordered to demonstrate. **It passes on the old code.** `0.5` is exactly
+representable in binary, so `Fraction(0.5)` **is** `Fraction(1, 2)`, and the form is blind to the
+`float` -> `str` hop that `Q-123` exists to remove.
+
+**Missing:** nothing in `Q-126`, `INC-101` or the prompt records that **`Fraction()` erases the
+distinction it was chosen to preserve.** All three reason about the value's *meaning* and treat
+"pins the meaning" as strictly stronger than "pins the spelling", with no line anywhere asking the
+one question that decides it: *which inputs does each form ACCEPT?* On that question the Fraction
+form accepts a strict **superset** -- both the `str` and the `float` -- so on the type axis it is
+**laxer** than the assertion it replaces, and `Q-126`'s sentence *"the Fraction form is stricter
+than either"* is false in that direction.
+
+**Missed:** **`Q-126` states the disqualifying fact in its own praise and no reader has flinched at
+it, this session included, on the first pass.** The words are *"would have survived this ruling
+untouched"* -- which **is** the statement "it does not fail on the old code", written as a virtue.
+It sat one sentence above the paragraph arguing the flip *"fails on the old code, because the old
+code returns a float and `0.5 == "0.50"` is False"* -- a proof that is correct **only for the
+weaker remedy** and was carried over to the stronger one without being re-derived. Two adjacent
+sentences, contradictory, in the entry whose whole subject is an assertion that pinned the wrong
+thing.
+
+**Diagnosis:** `Fraction()` is a **normalising** constructor -- it maps `float 0.5` and `str "0.50"`
+onto the same object -- so wrapping a value in it necessarily **discards** the type information that
+this particular ruling changed; an assertion built on a normaliser cannot witness a change the
+normaliser erases.
+
+**Fix:** the ordered expression **verbatim**, conjoined with the one clause that restores the
+discarded axis -- `(type(v), Fraction(v)) == (str, Fraction(1, 2))` -- which is stricter than
+`== 0.50` on **both** axes and fails on the old code. **Fix SHA: `a7d9f89`.** Recorded as a Class B
+deviation with its rationale in `QUESTIONS.md` **Q-137**, not taken silently.
+
+**Systemic guardrail:** **none -- accepted, because** the general form ("no assertion may wrap its
+subject in a normalising constructor") is false: `Q-126` is right that `Fraction` is the correct
+tool for a value whose *meaning* is a rational, and the repository has two such assertions that are
+correct precisely because they normalise. What is proposed instead is a **procedural** one, in
+`OF-228`: **a remedy written into `QUESTIONS.md` for another session to paste must carry its own
+measurement against the old code, computed by the session that writes it.** `Q-126` computed a
+three-line before/after table for the *defect* and none at all for the *remedy*, and the remedy is
+the half that gets pasted.
+
+
+## INC-109 -- this session's own first draft shipped three unearned claims and two citations that would have resolved to **another chunk's** rulings; an adversarial read-only pass caught all five before the push
+
+**Date:** 2026-09-03 (ARCH FIX -- EVAL WIRING, `c1f0a4d8`. **Found by a 25-agent read-only audit of
+this session's own diff, run while the suite executed.**)
+
+**Event:** after `a7d9f89` and `1caacd6` were committed, an adversarial audit of this session's own
+diff -- five independent dimensions, every finding then handed to a separate agent instructed to
+**refute** it -- returned five surviving defects **in this session's own work**:
+
+1. **Two dangling forward citations.** `tasks.py` cited `Q-131`, and the test cited
+   `Q-137 / INC-104`, while `QUESTIONS.md` topped out at `Q-129` and `INCIDENTS.md` at `INC-103`
+   and both journals were **unmodified**. Hard rule 5 is *"RULINGS ARE RECORDED VERBATIM in
+   `QUESTIONS.md` **before anything else is touched**"*; `CLAUDE.md` S6.6 is *"a ruling that exists
+   only in a chat does not exist."* **The order was simply wrong -- code first, record second.**
+2. **AND THOSE NUMBERS WERE ALREADY TAKEN.** The concurrent C12 driver session holds
+   **`Q-130`-`Q-136`, `INC-104`-`INC-106` and `OF-227`** across its untracked
+   `src/whetstone_gate/driver/` and `tests/test_c12_driver.py`. So the citations were **worse than
+   dangling:** once C12 records its `Q-131` -- *what a capture references for S9.2's S3*, an
+   **open Class A** question -- `tasks.py`'s hard-rule-9 exemption would have silently resolved to
+   **the wrong ruling** rather than to nothing. **A pointer that resolves to the wrong target
+   cannot be detected by reading the file that carries it.**
+3. **A false premise stated as fact.** The `EVAL_RUN_DIR` comment read *"`config/` is a FROZEN
+   pre-registration artefact that may not gain a key."* **It is not frozen:** `prereg-v1` does not
+   resolve, and `Q-123` legitimately edited `config/protocol.yaml` this morning -- as
+   `task_check_prereg`, twenty lines up the same file, says out loud.
+4. **An overclaim on the success path.** `make eval`'s success branch printed *"the
+   pre-registration check's PASS/FAIL line is carried INTO that file by the assembler itself, as
+   hard rule 9 requires."* `check-prereg` emits **no PASS/FAIL**, verifies **nothing** until
+   `prereg-v1` exists, and **fails open** (`OF-185`, `Q-100`). The refusal branch disclosed that
+   defect by name; **the success branch -- the only branch a judge ever sees once the sweep lands
+   -- asserted the rule was satisfied.**
+5. **`OF-09` unmet.** `OF-09` (OPEN) requires every target to name the root it examined, its named
+   failure being *"a green report over the wrong checkout"*. The new `eval` target resolved two
+   paths from `repo_root()` and printed neither.
+
+**Action:** all five corrected before the push, in the same two files, inside the fence. The
+citations were renumbered into a **verified-free block** -- `Q-137`, `Q-138`, `INC-107`, `INC-108`,
+`OF-228`-`OF-231` -- after re-scanning the **whole tree, tracked and untracked**, for the highest
+reserved identifier. **No history was rewritten:** `a7d9f89` and `1caacd6` stand with the defects in
+them and the correcting commit is separate. `INC-96` is the precedent.
+
+**Expectation:** a session that prints *"this project fails other entrants for overclaiming"* into
+its own console output should not, in the same function, assert that a hard rule is satisfied when
+the check behind it verifies nothing.
+
+**Missing:** **nothing in this repository cross-checks an identifier against the untracked tree.**
+`make check-roles` validates **session tokens** against `QUESTIONS.md` -- exactly this class of
+check, one artefact over -- but no equivalent exists for `Q-`/`INC-`/`OF-` numbers, and the natural
+instrument is `git grep`, which walks **tracked files only** and therefore cannot see a concurrent
+chunk's reservations at all. **The first audit agent used `git grep`, concluded the numbers were
+free, and was wrong; only a full-tree scan found the collision.**
+
+**Missed:** **the prompt said it, the session read it, and the session still took its numbers from
+"what comes next".** The prompt opens *"A C12 DRIVER SESSION IS RUNNING and holds
+`src/whetstone_gate/driver/`, `tests/test_c12_driver.py` AND `src/whetstone_gate/tasks.py`"*. The
+session checked that warning **three separate times** for the *file* contention -- `git diff` and
+`git log` on `tasks.py`, before the read and again before the stage, exactly as instructed -- and
+**never once considered that the same session was also consuming the shared `QUESTIONS.md` NUMBER
+SPACE.** The contention was read as being about **bytes in one file** when it was equally about
+**identifiers in another.** And the numbering was taken from `max(existing) + 1` over the
+**committed** journals -- a measurement of the wrong set -- minutes after running a scan whose own
+output listed `src/whetstone_gate/driver/` as untracked.
+
+**Diagnosis:** an identifier is allocated from a namespace whose authoritative extent is the
+**working tree**, while every instrument here -- `git grep`, `git log`, the journals themselves --
+describes the **committed** tree, so two concurrent sessions each measure a namespace that excludes
+the other and both correctly compute the same next free number.
+
+**Fix:** the five corrections above, in the commit that carries this entry. **Fix SHA: this
+commit** -- named as a pointer because a file cannot contain the SHA of the commit that adds it.
+
+**Systemic guardrail:** proposed at `OF-232` -- extend `make check-roles`, which **already**
+validates session tokens against `QUESTIONS.md`, so that every `Q-`/`INC-`/`OF-` identifier cited
+in `src/` or `tests/` must **resolve in its journal**, scanning the **working tree** rather than the
+index. That would have failed on the dangling citation and on the collision alike, before either
+commit. **Not added here: `check_roles.py` is named under this session's NOT list.**
+
+
+## INC-108 -- the results assembler **crashes with an `AttributeError`** where it is designed to refuse, when every episode of arm 1 is dropped
+
+**Date:** 2026-09-03 (ARCH FIX -- EVAL WIRING, `c1f0a4d8`. **Found while driving `make eval`'s
+second branch; NOT this session's code and NOT this session's to fix.**)
+
+**Event:** driving the newly-wired `make eval` against a synthetic run directory whose episodes the
+scorer legitimately dropped, `build_input()` raised:
+
+```
+File "src/whetstone_gate/results/__main__.py", line 173, in build_input
+    escape_numerator=arm1.escape.numerator if arm1 else 0,
+AttributeError: 'NoneType' object has no attribute 'numerator'
+```
+
+**Action:** the fixture was corrected until the episodes scored, and the branch then rendered
+`RESULTS.md` cleanly at exit 0. **The defect was NOT worked around in the source and NOT fixed:**
+`src/whetstone_gate/results/` is named under this session's **NOT** list. It is recorded here and
+as `OPEN_FINDINGS.md` **OF-229**, with its owner named.
+
+**Expectation:** a refusal naming its owner, in the assembler's own established idiom -- *"a missing
+block is a refusal, not a guess"*, which every other absent input in that file produces via
+`LoadError` and a `REFUSED:` line with exit code 2. Instead the command dies with a Python
+traceback and a shell exit of 1.
+
+**Missing:** a guard on the **escape figure**. Line 173 guards the **row** (`if arm1 else 0`) but
+not the row's `escape` attribute, and `build_arm_rows` sets `escape=None` whenever an arm has zero
+**scored** episodes (`escape=... if scores else None`). So the two guards protect different things:
+the written one covers "arm 1 has no row", the missing one covers "arm 1 has a row but nothing in
+it survived scoring".
+
+**Missed:** the condition is **not exotic, and hard rule 11 is about exactly it.** Rule 11 is *"NO
+SILENT DENOMINATOR SHRINKAGE ... every dropped episode is counted, categorised and printed as a
+number"*, and the scorer already implements that faithfully -- `DropLedger` recorded all fifteen
+drops with categories and reasons. **The assembler then crashed before it could print a single one
+of them.** A run in which arm 1's episodes all drop is precisely the catastrophe the void rule and
+the denominator report exist to publish, and it is the one input shape that stops them being
+published at all.
+
+**Diagnosis:** `escape` is `Optional` by construction for an arm with no scored episodes, and
+exactly one of its several read sites -- the void determination's numerator -- dereferences it
+behind a guard written for a **different** `None` (the absent row), so the type's optionality is
+enforced everywhere except where a total drop-out puts it.
+
+**Fix:** **NOT THIS SESSION'S, AND DELIBERATELY NOT ATTEMPTED.** `src/whetstone_gate/results/` is
+outside the fence. **No Fix SHA here; the SHA belongs to whoever lands it.** The shape is a
+one-line guard mirroring the file's own idiom -- refuse via `LoadError`, naming arm 1's drop
+categories, rather than dereference. `OF-229`.
+
+**Systemic guardrail:** proposed in `OF-229`: the assembler is already driven end-to-end on
+synthetic input by its own suite, and **no fixture in it has an arm whose episodes all drop**. A
+fixture in which one arm scores zero episodes -- `INC-14`'s convention that *"a check ships WITH THE
+INPUT THAT MAKES IT FAIL"* -- would have caught this before the wiring existed.

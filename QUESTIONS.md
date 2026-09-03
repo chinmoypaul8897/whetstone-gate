@@ -116,6 +116,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `4c8d9b03` | ARCH | FIX | 2026-09-03 |
 | `ff6d79ae` | ARCH | FIX | 2026-09-03 |
 | `5a2c81df` | C18 | BUILD | 2026-09-03 |
+| `c1f0a4d8` | ARCH | FIX | 2026-09-03 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -11301,3 +11302,169 @@ because a remembered number in a `RESULTS.md` is precisely what this chunk exist
 `INCIDENTS.md` **INC-102**. The first draft reported **FAIL 10** with three FAILs as `UNRECORDED`;
 the second reported six more as `AMBIGUOUS`. **The count only became trustworthy once the parser was
 built to refuse rather than to guess.**
+
+
+---
+
+## RECORDED BY ARCH FIX -- EVAL WIRING (`c1f0a4d8`), 2026-09-03 -- `Q-126` AND `Q-128` CLOSED, `Q-137` AND `Q-138` RAISED
+
+**Written before this session's first commit**, as hard rule 5 requires.
+
+> **THE TOKEN ROW IS SELF-RECORDED.** `c1f0a4d8` appeared **nowhere** in this file when the session
+> opened (grep: zero matches; `make check-roles` reported 68 issued rows), and without the row E1
+> fails on every commit this session makes. It is appended to the table above and **labelled**,
+> counted from the table immediately before appending because concurrent sessions hold this file.
+> **NO ORDINAL IS CLAIMED.** `OF-225` records that the numbered self-record sequence stopped at row
+> 43 and that later self-records claim none, so an ordinal is **not derivable** from this file and
+> inventing one would be a number in the shape of a measurement.
+
+---
+
+### Q-126 -- CLOSED. The red is gone, but **not by the expression the remedy named**, and that difference is the entry.
+
+**Closed by:** ARCH FIX -- EVAL WIRING (`c1f0a4d8`) - **Date:** 2026-09-03 - **Fix SHA:** `a7d9f89`
+**Status: CLOSED.** `tests/test_config_loader.py`: **30 passed, 0 failed**, measured by this session.
+
+`Q-123` quoted the value, so the loader returns the string `"0.50"`;
+`tests/test_config_loader.py:125` asserted `== 0.50` and therefore *required* the float the ruling
+abolished. `INC-101` predicted that red **in memory, before the edit that caused it**, and
+correctly refused to touch the test -- a session that changes a value **and** the test pinning it
+can make any change look green.
+
+**What landed** is `Q-126`'s stronger expression **verbatim**, conjoined with the one clause that
+makes hard rule 6's proof possible:
+
+```python
+arm_fraction = protocol.require("probe.arm_confounded_reach_fraction")
+assert (type(arm_fraction), Fraction(arm_fraction)) == (str, Fraction(1, 2))
+```
+
+**No other assertion in that file was touched.** Why the bare form was not enough: **`Q-137`**.
+
+---
+
+### Q-128 -- CLOSED as to the wiring. `CONTEXT.md` S20's one-command claim is **STILL PENDING THE RUN**.
+
+**Closed by:** ARCH FIX -- EVAL WIRING (`c1f0a4d8`) - **Date:** 2026-09-03 - **Fix SHA:** `1caacd6`
+
+The remedy `Q-128` wrote out for its owner is taken **as written**: `task_eval()` runs
+`task_check_prereg()` first (hard rule 9: inside **both** `test` and `eval`), then
+`whetstone_gate.results.__main__.main([<run-dir>, "--root", ..., "--output", RESULTS.md])`, and
+returns the larger of the two return codes. **Both branches driven, both exit codes measured:**
+
+| branch | measured behaviour | exit |
+|---|---|---|
+| **no run directory** (today's state) | prints that no scored run exists and that S20's claim is PENDING THE RUN | **2** |
+| **a synthetic run directory** | `check-prereg` + the assembler; `RESULTS.md` rendered, 50,228 bytes, carrying the `PRE-REGISTRATION CHECK` line INTO the file | **0** |
+
+**THE NO-RUN BRANCH NEVER EXITS 0, ON PURPOSE.** `make check-prereg` FAILS OPEN (`OF-185` /
+`Q-100`) and that defect is deliberately **not** copied into the target S20 names: a green
+`make eval` with no run behind it would make the one-command claim look satisfied by a command
+that regenerated nothing -- the precise overclaim this project fails other entrants for.
+
+**NO SYNTHETIC `RESULTS.md` WAS WRITTEN INTO THE REPOSITORY.** `RESULTS.md` is written **by the
+run**; a session that created one from a fixture would publish numbers no sweep produced, which is
+what C18 refused to do. The drive redirected `--output` to an OS temp path -- the **one** disclosed
+redirection -- and `RESULTS.md` is still **absent** from the tree. The synthetic run directory was
+built in a fresh OS temp directory from `tests/goldens/golden3_harm_vector.json`'s hand-computed
+ledger, **read only**.
+
+---
+
+### Q-137 -- **THE REMEDY `Q-126` COMPUTED IS BLIND TO THE DEFECT `Q-126` IS ABOUT, AND ITS SENTENCE "THE FRACTION FORM IS STRICTER THAN EITHER" IS FALSE ON THE TYPE AXIS.**
+
+**Raised by:** ARCH FIX -- EVAL WIRING (`c1f0a4d8`) - **Date:** 2026-09-03
+**Status: DEFAULT TAKEN, RECORDED.** **Deviation class: B** -- `Q-126`'s own classification: no
+published figure moves and the value is the same rational before and after. **Blocking: nothing.**
+
+**The instruction, in two halves that cannot both hold:**
+
+* *"TAKE THE STRONGER OF THE TWO REMEDIES `INC-101` COMPUTED: `Fraction(require(...)) ==
+  Fraction(1, 2)`"*, and
+* *"the new assertion must FAIL ON THE OLD CODE ... demonstrate the flip is provably meaningful in
+  both directions"* -- which is hard rule 6's own condition for a legitimate flip.
+
+**MEASURED**, by reconstructing the pre-`Q-123` `config/` in an OS temp directory and reading the
+value back through the **real loader** -- not argued from the code:
+
+```
+OLD CODE (unquoted config) : 0.5      float
+NEW CODE (Q-123 quoted)    : '0.50'   str
+
+assertion                                          OLD     NEW    hard-rule-6 flip?
+== 0.50                        (the old line)      True    False   n/a
+== "0.50"                      (Q-126 weaker)      False   True    YES -- fails on old
+Fraction(v) == Fraction(1, 2)  (Q-126 STRONGER)    True    True    NO  -- passes on BOTH
+(type(v), Fraction(v)) == (str, Fraction(1, 2))    False   True    YES -- fails on old
+```
+
+**Why:** `0.5` is **exactly representable in binary**, so `Fraction(0.5)` *is* `Fraction(1, 2)`.
+The Fraction form is therefore **blind to the very type hop `Q-123` abolished** -- the one defect
+the ruling exists to remove. `Q-126` says the form *"would have survived this ruling untouched"*,
+which is true and is exactly the problem: **an assertion that survives a behaviour change untouched
+cannot be that change's proof.**
+
+**AND ITS "STRICTER THAN EITHER" IS FALSE IN ONE DIRECTION.** On the **value** axis it is stricter
+(it would catch a `0.1`, which no binary float represents). On the **type** axis it is **laxer**:
+it accepts the `str` *and* the `float` -- a strict **superset** of what `== 0.50` accepted. **That
+laxity is precisely what would have made it green**, which is hard rule 6's definition of a
+weakening, taken through hard rule 6's own escape clause while failing the condition that clause
+imposes.
+
+**Options seen:**
+  1. **Land the ordered expression VERBATIM, conjoined with the one clause that makes the ordered
+     proof possible** -- `(type(v), Fraction(v)) == (str, Fraction(1, 2))`. **TAKEN.** It contains
+     `Fraction(v) == Fraction(1, 2)` unchanged, pins the type the ruling chose, and **fails on
+     the old code**, which is hard rule 6's own condition. Class B ==> *"do it, record it with
+     rationale, judged at review"* (hard rule 2).
+     > **AND THE ACCURATE STATEMENT OF ITS STRENGTH, BECAUSE THIS SESSION'S OWN FIRST DRAFT GOT
+     > IT WRONG THE SAME WAY** (`INC-109`): it is **not** a superset or a subset of `== 0.50`.
+     > The two accept-sets are **disjoint on type** -- the old one takes the `float` and refuses
+     > the `str`, the new one does the reverse -- which is exactly what `Q-123` intended, and is
+     > why *"stricter on both axes"* is the wrong claim to make for it. It **is** strictly
+     > stronger than `Q-126`'s bare Fraction form, and stronger than `== "0.50"` on value.
+  2. Land the bare Fraction form as literally ordered, and report that the proof cannot be
+     produced. **Rejected:** it ships an assertion that takes hard rule 6's escape clause while
+     failing its condition, and hard rule 4 puts the constitution above the prompt.
+  3. Land the weaker `== "0.50"`. **Rejected:** it satisfies hard rule 6 but merely tracks the
+     **spelling**, which is the half `Q-126` is right to call the lesser remedy.
+  4. STOP the item under hard rule 1. **Rejected:** hard rule 2 classes this **B**, and Class B is
+     explicitly *do it and record it*. Stopping would also leave the suite red against a deadline
+     the ruling itself calls permanent after `prereg-v1`.
+
+**Default taken:** option 1. `INCIDENTS.md` **INC-107**, `OPEN_FINDINGS.md` **OF-228**.
+
+**THE PATTERN, AND IT IS `Q-126`'s OWN PATTERN ONE LEVEL UP.** `Q-126` found a **fifth** artefact a
+constant needs -- the test that pins its **type** -- after `Q-125` had enumerated four. This entry
+finds that **the remedy written for that fifth artefact did not itself pin the type.** The
+enumeration grew; the instinct that produced it did not.
+
+---
+
+### Q-138 -- `make eval` takes no argument, so the run directory is a **path literal**, and hard rule 9 does not reach it
+
+**Raised by:** ARCH FIX -- EVAL WIRING (`c1f0a4d8`) - **Date:** 2026-09-03
+**Status: DEFAULT TAKEN, RECORDED.** **Deviation class: B.** **Blocking: nothing.**
+
+`make eval` is `python -m whetstone_gate.tasks eval` with **no positional argument** -- the Makefile
+passes none, and widening `tasks.py`'s argparse surface is outside a fence that says *"ONE target"*.
+The assembler needs a run directory, so `task_eval()` resolves one itself:
+`EVAL_RUN_DIR = "evals/results"`, from `CONTEXT.md` S16's *"`evals/results/` -- raw per-episode
+JSON"*.
+
+**Why this is not a hard rule 9 violation:** rule 9 binds *"every **spec-specified value**"*, whose
+authoritative list is `CONTEXT.md` S8.6's constants table. A repository **path** is not in that
+table and is not a value the freeze covers. **And the alternative is impossible, not merely
+unattractive:** `config/` is a **frozen pre-registration artefact**, and adding a key to it is
+exactly the amendment `CLAUDE.md` S4 forbids.
+
+**Options seen:**
+  1. **A documented module constant in `tasks.py`, sourced from S16.** **TAKEN.**
+  2. A new `config/` key. **Rejected -- `config/` is frozen and outside the fence.**
+  3. An optional CLI argument on `tasks.py`. **Rejected -- the fence says ONE target**, and it
+     would change every target's CLI surface, not only `eval`'s.
+
+**What the architect may wish to settle:** whether the sweep will in fact write to `evals/results/`
+in the assembler's `<run-dir>/run.json` + `<arm>/<episode>.json` shape. **If the sweep writes
+elsewhere, `make eval` refuses -- loudly and non-zero -- rather than silently regenerating
+nothing.** `OPEN_FINDINGS.md` **OF-230**.
