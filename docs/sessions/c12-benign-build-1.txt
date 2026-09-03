@@ -9,9 +9,24 @@ PUSHED SHA: stated in this session's spoken report. THE CHAIN TERMINATES HERE,
             DELIBERATELY. A file cannot contain the SHA of the commit that commits it.
 
   THE COMMITS THIS SESSION'S WORK LIVES IN, IN ORDER - THE PUSHED HEAD IS THE LAST:
-33ed053 chore(journal): the FINAL OUTPUT file gains an ADDENDUM, appended rather than woven in, because everything in it happened AFTER the file was committed at `4788184`
-cc8a221 fix(record): E1 is RED because this session's token row carries a role `_TOKEN_ROW` cannot parse - and `4788184` swept SEVEN of another session's questions under this session's token
-    <this>   docs   this file, committed BEFORE being printed
+    b0a7bba  feat(benign)    src/whetstone_gate/benign/ (14 modules) and
+                             tests/test_c12_benign.py                    (unreviewed)
+    acfa919  chore(journal)  INC-115..INC-122, OF-243..OF-248, STATUS, PROGRESS
+    <this>   docs            this file, committed BEFORE being printed
+
+  ! THE TWO LINES ABOVE WERE WRONG IN THE FIRST WRITING OF THIS FILE AND THE
+    CORRECTION IS ITS OWN COMMIT, NOT A REWRITE. The generator took `git log -2`,
+    which at that instant returned `33ed053` and `cc8a221` - A CONCURRENT SESSION'S
+    COMMITS, landed on top of this session's between the commit and the generation.
+    A FINAL OUTPUT naming another session's commits as its own is exactly the
+    paraphrase the commit-before-print rule exists to make detectable, and it was
+    detected by reading the committed file back rather than by trusting the generator.
+
+  ! QUESTIONS.md IS IN NEITHER COMMIT. This session's Q-154..Q-160 and its token row
+    were carried into HEAD by `4788184` - ANOTHER SESSION'S COMMIT, UNDER ANOTHER
+    SESSION'S TOKEN - because a bare `git add QUESTIONS.md` there picked up this
+    session's uncommitted lines. INC-65's uncloseable half, from the swept side. The
+    content is intact and was verified line by line against HEAD.
 
 TOKEN SPEND: ZERO. NO PROVIDER MODEL CALL OF ANY KIND.
   The prompt sanctioned none and none was made. Every episode below ran against
