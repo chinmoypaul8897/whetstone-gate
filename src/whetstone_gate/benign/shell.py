@@ -90,10 +90,12 @@ from whetstone_gate.benign.solve import (
 )
 from whetstone_gate.driver.clients import MeteredModelClient, TranscriptClient
 from whetstone_gate.driver.episode import S3_BINDINGS, opening_state
+from whetstone_gate.driver.pilot import GATE_JUDGE_ROLE_MARKER
 from whetstone_gate.driver.protocol import tool_schemas_text
 from whetstone_gate.gates import shell as gate_shell
 from whetstone_gate.gates.verdict import ARMS
 from whetstone_gate.ledger.chain import Ledger, load_chain_spec
+from whetstone_gate.runner import lanes as runner_lanes
 from whetstone_gate.runner.budget import usage_total_tokens
 from whetstone_gate.world import generator as world_generator
 from whetstone_gate.world import surface as world_surface
@@ -242,7 +244,41 @@ def judge_adapter_for(arm: str, client: MeteredModelClient) -> Any:
     """
     if arm in (BASELINE_ARM, "4"):
         return None
-    return _JudgeAdapter(inner=client)
+    return _JudgeAdapter(inner=client, lane=judge_lane())
+
+
+def judge_lane() -> str:
+    """The lane ``config/lanes.yaml`` assigns the gate judge. ⚠️ **READ, NEVER HARDCODED.**
+
+    `QUESTIONS.md` **Q-173**. The value is not written down in this package: it is the single
+    lane whose ``role`` prose contains
+    :data:`whetstone_gate.driver.pilot.GATE_JUDGE_ROLE_MARKER`, and the **marker is imported
+    rather than retyped** so that this module and `driver/pilot.py` cannot drift apart into two
+    different answers about which lane the judge is on.
+
+    ⚠️ **IT REFUSES ON ZERO MATCHES AND ON MORE THAN ONE**, which is `driver/pilot.py`'s own
+    shape and `Q-143`'s: ``config/lanes.yaml`` carries this role as **prose and not as a key**,
+    so the ambiguity is a hard rule 9 refusal rather than a choice this module makes quietly.
+
+    ⚠️ **CALLED HERE AND NOT AT IMPORT**, and **after** the two arms that get no adapter have
+    already returned: arms 1 and 4 must not have a judge, and a module-level read would make
+    importing this package depend on ``config/`` being loadable for arms that never use it.
+    """
+    matches = [
+        lane
+        for lane in runner_lanes.load_lanes().values()
+        if GATE_JUDGE_ROLE_MARKER in lane.role
+    ]
+    if len(matches) != 1:
+        raise BenignRunRefused(
+            f"config/lanes.yaml has {len(matches)} lane(s) whose role contains "
+            f"{GATE_JUDGE_ROLE_MARKER!r} ({sorted(lane.name for lane in matches)}). Exactly "
+            f"one is required: a role matching none leaves the benign judge with no lane, and "
+            f"one matching two leaves this module choosing. A DEFAULT HERE WOULD BOOK THE "
+            f"JUDGE'S TOKENS TO THE WRONG LANE SILENTLY, which is what Q-161 and Q-173 both "
+            f"refused. See QUESTIONS.md Q-143"
+        )
+    return matches[0].name
 
 
 @dataclass
@@ -253,15 +289,24 @@ class _JudgeAdapter:
     `INCIDENTS.md` `INC-111`: a lane-based split silently dropped a whole role because
     §13.3.2 puts two roles on one lane. This counts calls and tokens on the adapter itself,
     so the two figures cannot be merged by accident.
+
+    ⚠️⚠️ **``lane`` IS REQUIRED AND HAS NO DEFAULT.** `QUESTIONS.md` **Q-173**;
+    `INCIDENTS.md` **INC-130**. This is the second of the two adapters `Q-161`'s ruling broke,
+    and it is the **judge's** lane — resolved by :func:`judge_lane` from ``config/lanes.yaml``,
+    not the solver's. ⚠️ **THE TWO LANES ARE DIFFERENT AND MUST STAY DIFFERENT:** §13.3.2 puts
+    the roles on their own lanes with their own budgets, and booking the judge's tokens to the
+    solver's lane is `INC-111`'s failure — a role's spend landing in the wrong figure — arrived
+    at through routing instead of through counting.
     """
 
     inner: MeteredModelClient
+    lane: str
     calls: int = 0
     tokens: int = 0
 
     def complete(self, *, system: str, user: str) -> str:
         self.calls += 1
-        reply = self.inner.complete_judge(system=system, user=user)
+        reply = self.inner.complete_judge(system=system, user=user, lane=self.lane)
         self.tokens += usage_total_tokens(reply.usage)
         return reply.text
 
@@ -303,7 +348,7 @@ def run_task_under_arm(
         turn_budget=settings.constants.turn_budget,
     )
     episode = run_benign_episode(
-        client=MeteredSolverClient(inner=client),
+        client=MeteredSolverClient(inner=client, lane=manifest_module.SOLVER_LANE),
         executor=executor,
         task=task,
         constants=settings.constants,

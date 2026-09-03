@@ -43,6 +43,7 @@ from whetstone_gate.ledger import chain as ledger_chain
 from whetstone_gate.ledger import store as ledger_store
 from whetstone_gate.runner import lanes as runner_lanes
 from whetstone_gate.runner import n_rule
+from whetstone_gate.runner.buckets import BucketError
 from whetstone_gate.runner.budget import (
     Ceilings,
     LaneBudget,
@@ -1607,15 +1608,65 @@ def test_an_ABSENT_KEY_NAME_is_a_refusal_that_names_the_NAME_and_no_value(
 def test_an_UNMAPPED_ROLE_is_a_refusal_and_never_a_silent_coercion(
     _no_provider_call, _key_names
 ):
-    """⚠️ Rewriting a role the caller did not ask for sends a different prompt on one lane
-    than on another — `CONTEXT.md` §10.1's *"no DIFFERENTIAL information across arms"*."""
-    fake = _FakeTransport(status=200, body=_google_ok())
-    with pytest.raises(driver_clients.DriverClientError, match="no Google equivalent"):
-        _client(fake).complete_attacker(
-            messages=({"role": "tool", "content": "s"},), temperature=0.7,
-            lane="gemma-26b",
-        )
-    assert fake.calls == 0
+    """⚠️⚠️ **FLIPPED UNDER HARD RULE 6 BY `Q-171`, RULED 2026-09-04. NOT WEAKENED.**
+
+    ⚠️ **THE OLD DOCSTRING, VERBATIM, SO THE TRAIL IS READABLE:** *"Rewriting a role the
+    caller did not ask for sends a different prompt on one lane than on another —
+    `CONTEXT.md` §10.1's 'no DIFFERENTIAL information across arms'."* **That sentence is
+    still true and it is still what this test enforces.** What changed is only which roles
+    are *unmapped*: `Q-171` maps ``tool`` to ``user`` on **both** providers, so ``tool`` is
+    no longer an example of an unmapped role — and `INCIDENTS.md` `INC-129` records that
+    this test asserting the refusal on ``tool`` was *"the exact input that breaks
+    production, asserted as correct behaviour"*.
+
+    ⚠️ **THE FLIP IS A STRENGTHENING, AND IT IS PROVABLY MEANINGFUL** (hard rule 6: it
+    fails on the old code — measured, and printed in `docs/sessions/arch-role-fix-1.txt`).
+    It now asserts **both** halves rather than one: that ``tool`` maps, on both providers,
+    **and** that a genuinely unknown role is still a refusal, on both providers. The old
+    version could not have caught a change that dropped the refusal wholesale; this one
+    does.
+    """
+    # (1) ⚠️ THE HALF THAT IS NEW: `tool` MAPS, AND IT MAPS THE SAME WAY ON BOTH.
+    google = _FakeTransport(status=200, body=_google_ok())
+    _client(google).complete_attacker(
+        messages=({"role": "tool", "content": "a tool result"},), temperature=0.7,
+        lane="gemma-26b",
+    )
+    sent = json.loads(google.seen[0][1].decode("utf-8"))
+    assert [c["role"] for c in sent["contents"]] == ["user"], (
+        "Q-171 maps tool -> user on Google; contents[].role has no tool value at all"
+    )
+    assert sent["contents"][0]["parts"][0]["text"] == "a tool result"
+
+    groq = _FakeTransport(status=200, body=_groq_ok())
+    _client(groq, attacker="qwen-27b").complete_attacker(
+        messages=({"role": "tool", "content": "a tool result"},), temperature=0.7,
+        lane="qwen-27b",
+    )
+    sent = json.loads(groq.seen[0][1].decode("utf-8"))
+    assert [m["role"] for m in sent["messages"]] == ["user"], (
+        "Q-171 maps tool -> user on Groq TOO. Groq's schema HAS a tool role, but it "
+        "requires a tool_call_id this driver never mints, and a per-provider difference "
+        "is CONTEXT.md S10.1's own prohibition"
+    )
+    assert sent["messages"][0]["content"] == "a tool result"
+
+    # (2) ⚠️ THE HALF THAT MUST NOT BE WEAKENED: AN UNKNOWN ROLE IS STILL A REFUSAL.
+    #     A silent coercion here is exactly the differential S10.1 forbids, and Q-171's
+    #     ruling turns on the mapping being missing, NEVER on the refusal being wrong.
+    for lane, attacker, body, marker in (
+        ("gemma-26b", "gemma-26b", _google_ok(), "no Google equivalent"),
+        ("qwen-27b", "qwen-27b", _groq_ok(), "no Groq equivalent"),
+    ):
+        fake = _FakeTransport(status=200, body=body)
+        with pytest.raises(driver_clients.DriverClientError, match=marker) as raised:
+            _client(fake, attacker=attacker).complete_attacker(
+                messages=({"role": "function", "content": "s"},), temperature=0.7,
+                lane=lane,
+            )
+        assert "'function'" in str(raised.value), "the refusal names the offending role"
+        assert "tool" in str(raised.value), "and it names tool among the legal values"
+        assert fake.calls == 0
 
 
 def test_GOOGLE_gets_only_user_and_model_roles_with_consecutive_parts_MERGED(
@@ -2168,32 +2219,78 @@ def test_the_FULL_ADAPTER_CHAIN_routes_TWO_LANES_to_TWO_PROVIDERS(
     assert len(transport.seen) == 2
 
 
+def _short_clock(shortfall: float):
+    """A clock whose ``sleep`` advances it by ``shortfall`` seconds **LESS** than asked.
+
+    ⚠️ **THIS IS NOT A CONTRIVANCE — IT IS WHAT THIS PROJECT'S OWN PLATFORM DOES.**
+    ``time.get_clock_info("monotonic").resolution`` on the operator's win32 machine is
+    **0.015625 s**, and in a 300-sample measurement ``time.sleep(w)`` returned before
+    ``time.monotonic()`` had advanced by ``w`` **139 times**, worst shortfall **-0.011 s**.
+    See `QUESTIONS.md` **Q-179** and `INCIDENTS.md` **INC-134**.
+    """
+
+    class _Clock:
+        def __init__(self) -> None:
+            self.t = 0.0
+
+        def __call__(self) -> float:
+            return self.t
+
+        def sleep(self, seconds: float) -> None:
+            self.t += max(0.0, seconds - shortfall)
+
+    return _Clock()
+
+
+def _declared_request(tmp_path, matrix, attacker_lanes):
+    """`evals/pilot/RUN_DECLARED.md` §1's own matrix, as a :class:`RunRequest`."""
+    return driver_run.RunRequest(
+        matrix=matrix,
+        out_root=tmp_path,
+        ceilings=Ceilings(call_ceiling=400, token_ceiling=2_000_000),
+        s3_binding="authorization-is-the-payment",
+        spend_real_tokens=True,
+        sanctioned_lanes=frozenset(attacker_lanes) | {matrix.judge_lane},
+        allow_absent_corpus=True,
+    )
+
+
 def test_the_DECLARED_COMMAND_now_ROUTES_and_is_STOPPED_BY_A_DIFFERENT_DEFECT(
     tmp_path, _no_provider_call, _key_names
 ):
-    """⚠️⚠️ **MEASURED, AND IT IS THE REASON THE PILOT STILL CANNOT RUN. `QUESTIONS.md`
-    `Q-171`.**
+    """⚠️⚠️ **UPDATED BY `Q-171`, RULED 2026-09-04 — AND THE NAME IS STILL TRUE.**
 
-    This drives `evals/pilot/RUN_DECLARED.md` §1's own matrix through the real
-    ``run.execute`` against a fake transport. **`Q-161`'s refusal is gone** — the client is
-    constructed for both lanes and the first request is built and routed to Google's
-    endpoint with `config/lanes.yaml`'s own model id.
+    ⚠️ **THE OLD BODY ASSERTED THE `tool`-ROLE DEFECT AND ITS OWN DOCSTRING SAID SO:**
+    *"THIS TEST ASSERTS THE DEFECT ON PURPOSE, AND MUST BE UPDATED RATHER THAN DELETED
+    WHEN IT IS RULED."* It is updated, not deleted. `Q-171` is closed, ``tool`` maps on
+    both providers, and the run no longer dies on the second call of the first episode.
 
-    ⚠️ **AND THE RUN THEN DIES ON THE SECOND CALL OF THE FIRST EPISODE**, because
-    `attacker/context.py:505` puts every tool result into the message list under the role
-    ``"tool"`` and **neither** ``_GOOGLE_ROLE`` **nor** ``_GROQ_ROLE`` has a key for it. So
-    no episode can reach turn 2 on **either** provider. ⚠️ It is not a `RateLimited` and not
-    a `ProviderFailed`, so ``_MeteredCall.run`` does not convert it to a ``LaneStopped``:
-    it escapes ``execute`` **uncaught**, and the run ends with a traceback and **no report**
-    — which is hard rule 11's denominator lost as well as the episodes.
+    ⚠️⚠️ **AND IT IS STOPPED BY A DIFFERENT DEFECT AGAIN — A NEW, FOURTH BLOCKER.**
+    `QUESTIONS.md` **Q-179**, `INCIDENTS.md` **INC-134**. ``run._PacedClient._pace``
+    computes a wait, sleeps it, then requires the clock to have advanced by **at least**
+    that much::
 
-    ⚠️ **THIS TEST ASSERTS THE DEFECT ON PURPOSE, AND MUST BE UPDATED RATHER THAN DELETED
-    WHEN IT IS RULED.** Pinning it is `PROCESS.md` §9's *"every evidence pack states what
-    it is NOT"*: the alternative is a suite that is green while the declared command
-    cannot complete one episode. Fixing it needs a decision about what a tool result looks
-    like to each provider — Google's ``contents[]`` has no ``tool`` role at all, and Groq's
-    requires a ``tool_call_id`` this driver never mints — which is a Class A change to what
-    is sent to a model, not a lane-threading edit.
+        wait = buckets.wait_seconds(tokens=tokens, now=self.clock())
+        if wait > 0:
+            self.sleep(wait)
+        buckets.take(tokens=tokens, now=self.clock())
+
+    ``Buckets.permits`` tests ``wait_seconds(...) == 0.0`` **exactly**, so a clock that
+    advances even **one microsecond** less than the sleep it was handed turns a bucket
+    refusal into a ``BucketError`` that escapes the run — contradicting the contract
+    `runner/buckets.py` states in its own message, *"A bucket refusal is a WAIT, not an
+    abort"*. ⚠️ **NOT HYPOTHETICAL ON THIS PROJECT'S PLATFORM:** see
+    :func:`_short_clock` for the 300-sample measurement of ``time.monotonic`` on the
+    operator's own machine.
+
+    ⚠️ **THE SHORTFALL IS INJECTED RATHER THAN WAITED FOR, DELIBERATELY.** Driving this
+    with the real ``time.sleep`` reproduces it — that is how it was found — but as a
+    **race**, which is a flaky test and also a three-minute one. The injected clock makes
+    the same defect deterministic, and `Q-179` carries the real-clock measurement.
+
+    ⚠️ **IT IS OUTSIDE THIS SESSION'S FENCE** (``driver/run.py``, ``runner/buckets.py``)
+    and is therefore pinned here rather than fixed, exactly as `INC-129` pinned the defect
+    this test used to assert.
     """
     transport = _RoutingTransport()
     matrix = pilot_module.load_pilot(arm="1")
@@ -2203,41 +2300,312 @@ def test_the_DECLARED_COMMAND_now_ROUTES_and_is_STOPPED_BY_A_DIFFERENT_DEFECT(
         judge_lane=matrix.judge_lane,
         transport=transport,
     )
+    clock = _short_clock(0.000001)
 
-    with pytest.raises(driver_clients.DriverClientError) as raised:
+    with pytest.raises(BucketError) as raised:
         driver_run.execute(
-            driver_run.RunRequest(
-                matrix=matrix,
-                out_root=tmp_path,
-                ceilings=Ceilings(call_ceiling=400, token_ceiling=2_000_000),
-                s3_binding="authorization-is-the-payment",
-                spend_real_tokens=True,
-                sanctioned_lanes=frozenset(attacker_lanes) | {matrix.judge_lane},
-                allow_absent_corpus=True,
-            ),
+            _declared_request(tmp_path, matrix, attacker_lanes),
             client=client,
+            clock=clock,
+            sleep=clock.sleep,
         )
 
-    assert "role 'tool' has no Google equivalent" in str(raised.value)
+    # (1) ⚠️ Q-171 IS CLOSED: THE OLD STOPPING POINT IS GONE.
+    assert "has no Google equivalent" not in str(raised.value)
+    assert "has no Groq equivalent" not in str(raised.value)
 
-    # (1) ⚠️ THE ROUTING WORKED ON THE CALL THAT HAPPENED — Q-161's own deliverable. The
-    #     first episode is a `gemma-26b` one, so the first request is Google's, and it
-    #     carries config/lanes.yaml's model id rather than a literal.
-    lanes = runner_lanes.load_lanes()
-    assert len(transport.seen) == 1, (
-        "exactly one request was built before the tool-role defect stopped the run; a "
-        "different count means the failure point moved and this test must be re-measured"
-    )
-    assert transport.urls[0].startswith(driver_clients._GOOGLE_BASE)
-    assert transport.urls[0].endswith(
-        f"/{lanes['gemma-26b'].api_model_id}:generateContent"
+    # (2) ⚠️ AND THE RUN GOT FAR PAST TURN 2, WHICH IS THE THING Q-171 BOUGHT. The old
+    #     body asserted `len(transport.seen) == 1`; a tool result now encodes, so turn 2
+    #     and every turn after it reach a provider.
+    assert len(transport.seen) > 2, (
+        "the run still dies at turn 2; Q-171's mapping is not in effect"
     )
 
-    # (2) ⚠️ AND THE OTHER PROVIDER IS BLOCKED BY THE SAME DEFECT, NOT BY ROUTING. Asserted
-    #     directly so the reader does not have to infer it from a run that never got there.
-    with pytest.raises(driver_clients.DriverClientError, match="no Groq equivalent"):
-        client.complete_attacker(
-            messages=({"role": "tool", "content": "a tool result"},),
-            temperature=0.7,
-            lane="qwen-27b",
+    # (3) ⚠️ THE NEW STOPPING POINT, NAMED. A bucket refusal reached the caller as an
+    #     abort, which runner/buckets.py's own message says it must never be.
+    assert "does not permit" in str(raised.value)
+    assert "a WAIT, not an abort" in str(raised.value)
+
+    # (4) ⚠️ AND IT IS AN UNCAUGHT ESCAPE, SO HARD RULE 11's DENOMINATOR IS LOST WITH
+    #     THE RUN — `Q-174`'s finding, unchanged, now reached by a second route.
+    assert not isinstance(raised.value, (RateLimited, driver_clients.ProviderFailed))
+
+
+def test_the_DECLARED_COMMAND_COMPLETES_ALL_TWENTY_EPISODES_when_the_clock_is_exact(
+    tmp_path, _no_provider_call, _key_names
+):
+    """⚠️⚠️ **THIS IS WHAT `Q-171` ACTUALLY BOUGHT, AND IT IS THE STRONGEST STATEMENT
+    THIS SUITE CAN MAKE ABOUT THE DECLARED COMMAND WITHOUT SPENDING A TOKEN.**
+
+    The same matrix, the same fake transport, the same request — with a clock whose
+    ``sleep`` advances it **exactly** as asked, so `Q-179`'s pacer race cannot fire and
+    the only thing under test is whether the declared command can run end to end.
+
+    ⚠️ **BEFORE `Q-171` THIS COULD NOT HAVE PASSED AT ALL:** every episode died on its
+    second call, on both providers, so the count of completed episodes was **zero** and no
+    report existed. It is now 20/20 with a reconciling denominator.
+
+    ⚠️ **AND IT PROVES NOTHING ABOUT THE PROVIDERS.** The transport is a fake; `Q-162`
+    stands — no session may call either endpoint — so what is asserted here is that the
+    driver, the client, the encoders and the accounting agree with **each other**, not
+    that a provider accepts the bytes.
+    """
+    transport = _RoutingTransport()
+    matrix = pilot_module.load_pilot(arm="1")
+    attacker_lanes = sorted({matrix.lane_for(key) for key in matrix.keys()})
+    client = driver_clients.MeteredProviderClient.for_lane_names(
+        attacker_lanes=attacker_lanes,
+        judge_lane=matrix.judge_lane,
+        transport=transport,
+    )
+    clock = _short_clock(0.0)
+
+    result = driver_run.execute(
+        _declared_request(tmp_path, matrix, attacker_lanes),
+        client=client,
+        clock=clock,
+        sleep=clock.sleep,
+    )
+
+    assert len(result.episodes) == 20
+
+    # ⚠️ BOTH PROVIDERS WERE REACHED, WHICH IS Q-161'S DELIVERABLE STILL HOLDING.
+    google = [u for u in transport.urls if u.startswith(driver_clients._GOOGLE_BASE)]
+    groq = [u for u in transport.urls if u == driver_clients._GROQ_CHAT_URL]
+    assert len(google) == 200 and len(groq) == 200, (
+        f"expected 10 seeds x 20 turns on each lane; got {len(google)} google, "
+        f"{len(groq)} groq"
+    )
+
+    # ⚠️ AND EVERY EPISODE RAN ITS WHOLE TURN BUDGET — no episode stopped early, which
+    #    is what "no episode can reach turn 2" used to make impossible. Hard rule 11: the
+    #    denominator is asserted to hold every episode, none quietly dropped.
+    outcomes = result.denominator.outcomes
+    assert len(outcomes) == 20
+    for outcome in outcomes:
+        assert outcome.turns_run == outcome.turn_budget == 20, outcome
+        assert outcome.cause is None, outcome
+
+
+# --------------------------------------------------------------------------------------
+# ⚠️⚠️ THE SHAPE `INC-129` NAMES AS MISSING: the client driven with the driver's REAL
+# messages, through BOTH providers. Every other client test in this file hand-writes its
+# `messages` tuple, and `INC-129`'s `Missing` field says so in as many words.
+# --------------------------------------------------------------------------------------
+
+
+class _CapturingClient:
+    """Delegates to a real client and keeps every ``messages`` tuple it was handed.
+
+    ⚠️ **IT CAPTURES WHAT THE DRIVER PRODUCED, NEVER WHAT A TEST TYPED.** That distinction
+    is the whole point of `INC-129`: the twenty client tests that existed when the defect
+    shipped all hand-wrote their messages, and the one that used the role ``tool`` asserted
+    it was **refused**.
+    """
+
+    def __init__(self, inner):
+        self.inner = inner
+        self.attacker_messages: list = []
+
+    def complete_attacker(self, *, messages, temperature, lane):
+        self.attacker_messages.append(messages)
+        return self.inner.complete_attacker(
+            messages=messages, temperature=temperature, lane=lane
         )
+
+    def complete_judge(self, *, system, user, lane):
+        return self.inner.complete_judge(system=system, user=user, lane=lane)
+
+
+def _real_episode_messages(tmp_path):
+    """One real episode's message tuples, captured out of ``run.execute``. No provider."""
+    transport = _RoutingTransport()
+    matrix = pilot_module.load_pilot(arm="1")
+    attacker_lanes = sorted({matrix.lane_for(key) for key in matrix.keys()})
+    inner = driver_clients.MeteredProviderClient.for_lane_names(
+        attacker_lanes=attacker_lanes,
+        judge_lane=matrix.judge_lane,
+        transport=transport,
+    )
+    capturing = _CapturingClient(inner)
+    clock = _short_clock(0.0)
+    driver_run.execute(
+        _declared_request(tmp_path, matrix, attacker_lanes),
+        client=capturing,
+        clock=clock,
+        sleep=clock.sleep,
+    )
+    return capturing.attacker_messages
+
+
+def test_a_REAL_EPISODES_MESSAGES_ENCODE_ON_BOTH_PROVIDERS_and_the_TEXT_IS_IDENTICAL(
+    tmp_path, _no_provider_call, _key_names
+):
+    """⚠️⚠️ **THE TEST `INC-129` SAYS WAS MISSING, AND ITS `Missing` FIELD NAMES IT
+    EXACTLY:** *"a test driving the client with the driver's REAL message shapes"*.
+
+    ⚠️ **AND IT ASSERTS THE RULING'S OWN LOAD-BEARING CLAIM:** *"THE ATTACKER'S TEXT IS
+    BYTE-IDENTICAL ON BOTH WIRES"*. That sentence is what makes `Q-171`'s disclosed
+    provider difference a **provider** difference rather than an **arm** difference, and
+    `CONTEXT.md` §10.1 forbids only the second. It is measured here rather than asserted
+    in prose.
+    """
+    captured = _real_episode_messages(tmp_path)
+    assert captured, "no attacker call was captured"
+
+    # ⚠️ THE LATE-EPISODE SHAPE IS THE ONE THAT USED TO BE UNENCODABLE. Turn 1 carries no
+    #    tool result; every turn after it does, and that is the shape that broke.
+    late = max(captured, key=len)
+    roles = [m["role"] for m in late]
+    assert "tool" in roles, (
+        "a real multi-turn context must carry attacker/context.py:505's tool result; "
+        "without one this test is not exercising the shape INC-129 is about"
+    )
+
+    google = _FakeTransport(status=200, body=_google_ok())
+    _client(google).complete_attacker(
+        messages=late, temperature=0.7, lane="gemma-26b"
+    )
+    groq = _FakeTransport(status=200, body=_groq_ok())
+    _client(groq, attacker="qwen-27b").complete_attacker(
+        messages=late, temperature=0.7, lane="qwen-27b"
+    )
+
+    google_body = json.loads(google.seen[0][1].decode("utf-8"))
+    groq_body = json.loads(groq.seen[0][1].decode("utf-8"))
+
+    # (1) ⚠️ BYTE-IDENTICAL TEXT ON BOTH WIRES. Google merges consecutive same-role parts
+    #     with a newline and Groq does not, so the comparison is over the joined text —
+    #     which is exactly what the model reads, and exactly what the ruling promises is
+    #     the same. Compared as BYTES, not as str, because that is the claim.
+    authored = "\n".join(m["content"] for m in late)
+    google_text = "\n".join(
+        part["text"] for content in google_body["contents"] for part in content["parts"]
+    )
+    groq_text = "\n".join(m["content"] for m in groq_body["messages"])
+    assert google_text.encode("utf-8") == authored.encode("utf-8")
+    assert groq_text.encode("utf-8") == authored.encode("utf-8")
+
+    # (2) ⚠️ AND NOTHING WAS DROPPED, INVENTED OR REORDERED on either wire.
+    assert len(groq_body["messages"]) == len(late)
+    assert [m["content"] for m in groq_body["messages"]] == [
+        m["content"] for m in late
+    ]
+
+    # (3) ⚠️ THE MERGE, MEASURED ON THE REAL SHAPES RATHER THAN ASSUMED. Google receives
+    #     FEWER entries than Groq because the leading system parts fold into one `user`.
+    assert len(google_body["contents"]) < len(groq_body["messages"])
+    assert {c["role"] for c in google_body["contents"]} <= {"user", "model"}
+
+
+def test_the_DISCLOSED_MERGE_DIFFERENCE_IS_REAL_but_DOES_NOT_ARISE_in_C6s_OWN_OUTPUT(
+    tmp_path, _no_provider_call, _key_names
+):
+    """⚠️⚠️ **`Q-171`'s DISCLOSED CONSEQUENCE, MEASURED IN BOTH DIRECTIONS — AND THE
+    SECOND DIRECTION IS NOT WHAT THE RULING PREDICTED.**
+
+    The ruling discloses: *"a user turn followed by a tool-result-as-user merges on the
+    Gemma lane and stays separate on the qwen lane"*.
+
+    ⚠️ **HALF ONE — THE PROPERTY IS REAL.** Handed that adjacency directly, Google merges
+    and Groq does not. Asserted below, so the disclosure is not taken on trust.
+
+    ⚠️⚠️ **HALF TWO — IT NEVER HAPPENS IN THIS HARNESS, AND THAT IS A MEASUREMENT THIS
+    SESSION MAKES AGAINST ITS OWN RULING'S FRAMING.** `attacker/context.py` emits exactly
+    three roles — ``system``, ``assistant`` and ``tool`` — and **never** ``user``; and it
+    always separates one tool result from the next with an ``assistant`` turn. So a
+    ``tool`` part is never adjacent to another part that maps to ``user``, and the mapping
+    introduces **zero** additional merges. The merges Google performs are the ones it
+    already performed before `Q-171`: the leading ``system`` parts.
+
+    **The disclosure is therefore CONSERVATIVE, not wrong** — it names a difference that
+    could exist and, on this harness's actual context, does not. `docs/sessions/` carries
+    the number.
+    """
+    # ⚠️ HALF ONE: the adjacency the ruling names, constructed on purpose.
+    adjacent = (
+        {"role": "user", "content": "a user turn"},
+        {"role": "tool", "content": "a tool result"},
+    )
+    google = _FakeTransport(status=200, body=_google_ok())
+    _client(google).complete_attacker(
+        messages=adjacent, temperature=0.7, lane="gemma-26b"
+    )
+    google_body = json.loads(google.seen[0][1].decode("utf-8"))
+    assert len(google_body["contents"]) == 1, "Google merges the two into one user turn"
+    assert google_body["contents"][0]["parts"][0]["text"] == "a user turn\na tool result"
+
+    groq = _FakeTransport(status=200, body=_groq_ok())
+    _client(groq, attacker="qwen-27b").complete_attacker(
+        messages=adjacent, temperature=0.7, lane="qwen-27b"
+    )
+    groq_body = json.loads(groq.seen[0][1].decode("utf-8"))
+    assert len(groq_body["messages"]) == 2, "Groq keeps them separate"
+    assert [m["role"] for m in groq_body["messages"]] == ["user", "user"]
+
+    # ⚠️ HALF TWO: and it does not arise, because C6 emits no `user` role at all and
+    #    never puts two tool results side by side.
+    captured = _real_episode_messages(tmp_path)
+    every_role = {m["role"] for messages in captured for m in messages}
+    assert "user" not in every_role, (
+        f"C6 emitted a user role ({sorted(every_role)}); the ruling's disclosed merge "
+        f"would then arise in the real context and this test must be re-measured"
+    )
+    late = max(captured, key=len)
+    mapped = [driver_clients._GOOGLE_ROLE[m["role"]] for m in late]
+    tool_positions = [i for i, m in enumerate(late) if m["role"] == "tool"]
+    assert tool_positions, "no tool result in the captured context"
+    for i in tool_positions:
+        neighbours = [mapped[j] for j in (i - 1, i + 1) if 0 <= j < len(mapped)]
+        assert "user" not in neighbours, (
+            f"a tool part at index {i} is adjacent to another user-mapped part, so the "
+            f"ruling's disclosed merge DOES arise here and must be published as such"
+        )
+
+
+def test_EVERY_ROLE_C6_CAN_EMIT_IS_A_KEY_IN_BOTH_PROVIDER_MAPS(_no_provider_call):
+    """⚠️⚠️ **`INC-129`'s OWN `Systemic guardrail`, LANDED. It could not be written before
+    `Q-171` was ruled, and its `Systemic guardrail` says exactly that:** *"A three-line
+    test asserting ``set(context roles) <= set(_GOOGLE_ROLE) & set(_GROQ_ROLE)`` would make
+    this class impossible, and it belongs with whoever rules `Q-171`."*
+
+    ⚠️ **IT IS READ FROM C6's SOURCE, NOT FROM A LIST TYPED HERE.** A hand-maintained list
+    of roles is the same artefact that failed: it would agree with the maps by
+    construction and would not notice a **new** ``ContextPart`` role the day it is added.
+    This walks `attacker/context.py`'s AST for every string literal in the ``role``
+    position of a ``ContextPart(...)`` construction, so a fourth role added tomorrow fails
+    this test on the commit that adds it.
+    """
+    source = Path(driver_clients.__file__).resolve().parents[1] / "attacker" / "context.py"
+    tree = ast.parse(source.read_text(encoding="utf-8"))
+
+    emitted: set[str] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        name = node.func.id if isinstance(node.func, ast.Name) else None
+        if name != "ContextPart":
+            continue
+        # ContextPart(origin, role, text, label) — role is the second positional.
+        if len(node.args) >= 2 and isinstance(node.args[1], ast.Constant):
+            emitted.add(node.args[1].value)
+        for keyword in node.keywords:
+            if keyword.arg == "role" and isinstance(keyword.value, ast.Constant):
+                emitted.add(keyword.value.value)
+
+    assert emitted, (
+        "no ContextPart role literal was found in attacker/context.py; this walk has "
+        "stopped measuring anything and must be repaired, not deleted"
+    )
+    assert emitted == {"system", "assistant", "tool"}, (
+        f"attacker/context.py now emits {sorted(emitted)}. Q-171 was ruled against "
+        f"exactly three roles; a new one needs its own mapping decision on BOTH "
+        f"providers, and a silent coercion is CONTEXT.md S10.1's forbidden differential"
+    )
+
+    both = set(driver_clients._GOOGLE_ROLE) & set(driver_clients._GROQ_ROLE)
+    assert emitted <= both, (
+        f"roles {sorted(emitted - both)} are emitted by attacker/context.py and are NOT "
+        f"keys in BOTH provider maps. That is INC-129 exactly: no episode can reach the "
+        f"turn that first carries such a role"
+    )

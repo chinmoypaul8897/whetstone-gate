@@ -383,8 +383,26 @@ _TIMEOUT_SECONDS = 180
 #: — silently rewriting a role the caller did not ask for is how an attacker prompt becomes
 #: a different prompt on one lane than on another, and `CONTEXT.md` §10.1 forbids exactly
 #: that: *"no DIFFERENTIAL information across arms"*.
-_GOOGLE_ROLE = {"system": "user", "user": "user", "assistant": "model"}
-_GROQ_ROLE = {"system": "system", "user": "user", "assistant": "assistant"}
+#:
+#: ⚠️⚠️ **``tool`` MAPS TO ``user`` ON BOTH, AND THE MAPPING IS IDENTICAL ON BOTH.**
+#: `QUESTIONS.md` **Q-171**, RULED 2026-09-04; `INCIDENTS.md` **INC-129**. C6 emits every tool
+#: result as ``ContextPart(Origin.WORLD, "tool", …)`` (`attacker/context.py:505`), so **every
+#: turn after the first** carries one and, before the ruling, neither map had the key — no
+#: episode could reach turn 2 on **either** provider.
+#:
+#: ⚠️ **THE REASON IS THE PROTOCOL'S SHAPE, NOT CONVENIENCE.** This attacker uses **no
+#: native tool-calling**: C6's protocol is text-only, so a tool result here is *text the harness
+#: hands the attacker* — which is what a ``user`` message is. There is **no ``tool_call_id`` to
+#: mint**, because no tool call was ever made on the wire; Groq's OpenAI-compatible ``tool`` role
+#: **requires** one, so the faithful-looking option is the one that 400s. And Google's
+#: ``contents[].role`` has **no tool role at all**. Any other choice therefore forces a
+#: per-provider difference — §10.1's own prohibition, rejected on the record at `Q-171`.
+#:
+#: ⚠️ **THE REFUSAL BELOW IS UNCHANGED FOR EVERY OTHER ROLE**, and that is the half of
+#: this that must not be weakened: an unknown role still raises, naming the role and the legal
+#: values. The defect `INC-129` records was the **missing mapping**, never the refusal.
+_GOOGLE_ROLE = {"system": "user", "user": "user", "assistant": "model", "tool": "user"}
+_GROQ_ROLE = {"system": "system", "user": "user", "assistant": "assistant", "tool": "user"}
 
 
 @dataclass(frozen=True)

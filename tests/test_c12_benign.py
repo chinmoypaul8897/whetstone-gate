@@ -1073,9 +1073,13 @@ def test_the_transcript_client_REFUSES_on_exhaustion_rather_than_repeating():
     from whetstone_gate.driver.clients import DriverClientError
 
     client = TranscriptClient(attacker_replies=(("only one", 0),))
-    client.complete_attacker(messages=(), temperature=0.0)
+    client.complete_attacker(
+        messages=(), temperature=0.0, lane=manifest_module.SOLVER_LANE
+    )
     with pytest.raises(DriverClientError):
-        client.complete_attacker(messages=(), temperature=0.0)
+        client.complete_attacker(
+            messages=(), temperature=0.0, lane=manifest_module.SOLVER_LANE
+        )
 
 
 def test_the_rehearsal_replies_use_the_protocols_OWN_keys():
@@ -1366,7 +1370,8 @@ def test_a_reply_that_says_DONE_AND_ATTEMPTS_A_CALL_still_counts_the_turn():
     settings = settings_for(turns=4)
     broken = 'nothing is DONE here: {"tool": "create_refund", "arguments": {'
     client = benign_shell.MeteredSolverClient(
-        inner=TranscriptClient(attacker_replies=((broken, 0), ("DONE", 0)))
+        inner=TranscriptClient(attacker_replies=((broken, 0), ("DONE", 0))),
+        lane=manifest_module.SOLVER_LANE,
     )
     from whetstone_gate.benign.solve import run_benign_episode
 

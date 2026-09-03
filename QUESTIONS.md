@@ -13616,3 +13616,66 @@ safe, and the remedy is scheduling rather than plumbing. ⚠️ **What this sess
 was luck: the other session happened to commit first.** That is not a control.
 
 **STOPPED?** No.
+
+---
+
+## ⚠️ RULING RECORDED VERBATIM — `Q-171`, RULED 2026-09-04, **`tool` → `user` ON BOTH** (ARCH ROLE FIX, `8c47b1e0`)
+
+**Hard rule 5: recorded here, verbatim, BEFORE a line of code was touched.** Copied from this
+session's prompt exactly as issued, including its emphasis:
+
+> "Q-171 is RULED: THE ROLE `tool` MAPS TO `user` ON BOTH PROVIDERS, AND THE MAPPING IS IDENTICAL ON
+> BOTH. THE REASON IS THE PROTOCOL'S SHAPE, NOT CONVENIENCE: this attacker uses NO NATIVE TOOL-CALLING
+> — ARCH FIX PILOT RUN 3 measured that `attacker/loop.py` needed no change because C6's protocol is
+> TEXT-ONLY. A tool result here is TEXT THE HARNESS HANDS THE ATTACKER, which is what a user-role
+> message is. There is no `tool_call_id` to mint because no tool call was ever made on the wire, and
+> Google HAS NO TOOL ROLE AT ALL — so any other choice forces a per-provider difference, which is
+> CONTEXT.md S10.1's own prohibition and which INC-129 rejected on the record.
+> ⚠️ ONE CONSEQUENCE IS DISCLOSED RATHER THAN DISCOVERED: Google MERGES consecutive same-role parts
+> and Groq does not, so a user turn followed by a tool-result-as-user merges on the Gemma lane and
+> stays separate on the qwen lane. THAT IS A PROVIDER DIFFERENCE, NOT AN ARM DIFFERENCE — S10.1
+> governs arms, the ATTACKER'S TEXT IS BYTE-IDENTICAL ON BOTH WIRES, and the attacker-strength ladder
+> exists to measure exactly this kind of cross-model variation. It is published as a limitation.
+> ⚠️ `attacker/context.py` IS NOT EDITED. The mapping belongs at the PROVIDER BOUNDARY, which is the
+> only module that knows what a provider's wire format is. Moving it into C6 would put transport
+> knowledge inside the attacker and would need a C6 review."
+
+**`Q-171` IS CLOSED. IT WAS IMPLEMENTED AS RULED AND IT IS TESTED.** One key was added to each of
+`_GOOGLE_ROLE` and `_GROQ_ROLE` in `driver/clients.py` and **nothing else in either map moved**.
+⚠️ **THE REFUSAL FOR EVERY OTHER UNMAPPED ROLE IS UNCHANGED AND IS STILL TESTED BY NAME** — an
+unknown role still raises `DriverClientError` naming the role and the legal values, because a silent
+coercion is the differential `CONTEXT.md` §10.1 forbids and the refusal was never the defect.
+
+⚠️ **`attacker/context.py` WAS NOT EDITED, AS THE RULING DIRECTS.** The mapping is at the provider
+boundary. C6 still emits `Origin.WORLD, "tool"` at line 505 and the *audit* trail keeps the word
+`tool`; only the two **wire** encoders rename it, each to its own provider's vocabulary.
+
+**THE DISCLOSED CONSEQUENCE IS MEASURED RATHER THAN ASSUMED**, by a test that drives one episode's
+real message shapes through **both** providers and asserts (a) that the attacker's text is
+byte-identical on the two wires and (b) the exact Google merge the ruling predicts. See
+`INCIDENTS.md` `INC-129`'s `Fix` for the SHA and `docs/sessions/arch-role-fix-1.txt` for the numbers.
+
+---
+
+## ⚠️ RULING RECORDED VERBATIM — `Q-173`, RULED 2026-09-04, **PASS THE LANE, DO NOT DEFAULT IT** (ARCH ROLE FIX, `8c47b1e0`)
+
+**Hard rule 5: recorded here, verbatim, BEFORE a line of code was touched.** Copied from this
+session's prompt exactly as issued, including its emphasis:
+
+> "TASK 2 — Q-173. benign/ IS RED AND IT IS THE LANE THREADING'S FALLOUT.
+> `MeteredSolverClient` and `_JudgeAdapter` both raise "missing 1 required keyword-only argument:
+> 'lane'". 21 tests are red.
+> ⚠️ THE ACCOMMODATION IS STILL REFUSED: DO NOT DEFAULT THE LANE ANYWHERE. Q-161 ruled it undefaulted,
+> and ARCH FIX PILOT RUN 3 refused the easy fix on the record — "a loud break is detectable, a silent
+> accommodation is not", and a dry run tolerating a missing lane would prove the wiring on a shape the
+> scored run does not use. PASS THE LANE AT BOTH CALL SITES INSTEAD.
+> ⚠️ EXACTLY TWO CALL SITES. If closing it needs a third file, that is a STOP and a question.
+> ⚠️ VERIFY WITH tests/test_c12_benign.py AND SAY HOW MANY OF THE 21 CLOSE. ⚠️ ONE OF THE 21 WAS
+> ALREADY RED AT HEAD BEFORE THE LANE THREADING (INC-127) AND IS NOT YOURS — name it separately and
+> do not claim it."
+
+**`Q-173` IS CLOSED, AND THE ACCOMMODATION WAS NOT TAKEN.** `TranscriptClient`'s `lane` is still
+**required and undefaulted**, and so is the new `lane` on each adapter: a default on either would put
+back exactly the silence `Q-161` and `Q-173` both rejected. The two call sites named in `Q-173`
+forward a lane the adapter holds, and the adapters are constructed with it.
+

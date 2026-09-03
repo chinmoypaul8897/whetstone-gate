@@ -142,15 +142,33 @@ class MeteredSolverClient:
     solver is a message-list caller, so it uses that method. Renaming it is C12-DRIVER's
     fence, and `OPEN_FINDINGS.md` carries the observation rather than this package
     inventing a third method the driver would not know about.
+
+    ⚠️⚠️ **``lane`` IS REQUIRED AND HAS NO DEFAULT, AND THAT IS THE WHOLE POINT.**
+    `QUESTIONS.md` **Q-173**, RULED 2026-09-04; `INCIDENTS.md` **INC-130**. `Q-161` made
+    ``lane`` a required, undefaulted argument on :class:`MeteredModelClient`'s two methods, and
+    this adapter called one of them **without** it — so every benign episode raised
+    ``TypeError`` and twenty tests went red. ⚠️ **THE ACCOMMODATION WAS REFUSED AGAIN HERE:**
+    defaulting the lane — on the protocol, on ``TranscriptClient``, or on this adapter — would
+    have turned a loud break into a silent one, and `Q-173` records that *"a loud break is
+    detectable, a silent accommodation is not"*. The lane is **passed**, from the one place that
+    knows it, and a caller that does not know its lane cannot construct this.
+
+    ⚠️ **IT IS THE BENIGN SOLVER'S OWN LANE AND NOT THE ATTACKER'S**, even though the protocol
+    method is named ``complete_attacker`` — the method name is a **shape** distinction (C6's
+    message list), which this class's docstring already says above. `whetstone_gate.benign.shell`
+    supplies :data:`whetstone_gate.benign.manifest.SOLVER_LANE`.
     """
 
     inner: MeteredModelClient
+    lane: str
     calls: int = 0
     tokens: int = 0
 
     def complete(self, *, messages: tuple[dict[str, str], ...], temperature: float) -> str:
         self.calls += 1
-        reply = self.inner.complete_attacker(messages=messages, temperature=temperature)
+        reply = self.inner.complete_attacker(
+            messages=messages, temperature=temperature, lane=self.lane
+        )
         self.tokens += usage_total_tokens(reply.usage)
         return reply.text
 
