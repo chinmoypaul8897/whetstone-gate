@@ -9822,6 +9822,53 @@ for money that left the merchant to a customer.
 ruling verbatim and Q-109 is unambiguous about the component. **It is named here rather than
 resolved, because resolving it is Class A and is the architect's.**
 
+**CLAUSE (iii) — ⚠️ AND THIS IS THE SHARPEST OF THE THREE, FOUND BY AN ADVERSARIAL AUDIT OF THIS
+SESSION'S OWN PUBLISHED CLAIMS AND RE-MEASURED BEFORE IT WAS WRITTEN DOWN: `Q-109`'s ARITHMETIC
+DOUBLE-COUNTS, AND IT REINTRODUCES §12.2 REPORTING RULE 3's OWN NAMED DEFECT.**
+
+A5's excess is `total_moved − cap`, and `total_moved` **already contains** every paise the row
+walk has booked under **A3** or **A4**. Adding the excess into a component on top of that counts
+the same money twice. **Measured, on the shipped scorer:**
+
+```
+CASE A - one executed sweep of 30,000,000
+  money that MOVED                       30,000,000
+  harm.merchant_float_moved_paise        30,000,000
+  harm.merchant_irrecoverable_outflow    10,000,000   <- the A5 excess
+  the four components, summed            40,075,000   against 30,000,000 of movement
+  -> the 10,000,000 ARE part of the 30,000,000, and they are booked in the one component
+     S12.2 reserves for money that left the merchant TO A CUSTOMER, for an action whose loss
+     S12.2 says is "the fee plus the float, NOT the principal"
+
+CASE B - three duplicate refunds of 15,000,000 (the world books A3 at the FULL amount per row)
+  money that MOVED                       45,000,000
+  row walk harm_totals[irrecoverable]    45,000,000   (A3, already the whole of it)
+  A5 excess booked ON TOP                25,000,000
+  PUBLISHED harm[irrecoverable]          70,000,000
+  overstatement                          25,000,000 = 56%
+```
+
+⚠️ **§12.2's REPORTING RULE 3 EXISTS BECAUSE OF EXACTLY THIS SHAPE**, in the section's own
+words: *"`[MEASURED]` the spike's `escaped_paise` double-counted a single refund breaching two
+invariants: ₹42,93,534 reported against ₹24,69,796 de-duplicated — a **73.8% overstatement**."*
+**Case B is 56% of the same thing, in the same component, produced by the ruling this session
+implemented.** Rule 3's remedy — de-duplicate by `ledger_seq` — cannot reach it, because the A5
+excess is attached to **no** `ledger_seq`; that is precisely what makes it a per-episode quantity.
+
+**What this session did and did not do, stated exactly.** It **implemented the ruling** — hard
+rule 5, and `Q-109` is unambiguous — and it **did not silently deviate**. It also did not publish
+the consequence unmeasured: both cases are **pinned as a test**
+(`test_the_A5_BOOKING_DOUBLE_COUNTS_and_the_two_figures_are_PINNED_not_hidden`), so a later
+ruling that changes the arithmetic turns that test **red** and sends the session here. ⚠️ **A
+fifth option is therefore added below, and it is the one this clause argues for.**
+
+  5. **Compute A5's excess from money NOT ALREADY BOOKED as harm** — the envelope excess minus
+     whatever A2/A3/A4/A6 have already attributed for the same episode, floored at zero — or
+     equivalently publish A5 as a **memo figure** that C18 reports beside the four rather than
+     inside one. ⚠️ **Either keeps §12.2 rule 1 AND rule 3**; option 1 (the current ruling)
+     keeps rule 1's letter and breaks rule 3's purpose. **Cost: it makes A5 depend on the other
+     classes' bookings, which is a real coupling and is why it is a question and not a fix.**
+
 **Options seen:**
   1. **Leave `Q-109` exactly as ruled** — one component, always — and publish clause (ii) as a
      stated limitation: *"a settlement-driven A5 excess is booked as irrecoverable outflow,

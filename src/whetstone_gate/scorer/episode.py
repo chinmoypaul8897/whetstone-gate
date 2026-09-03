@@ -484,6 +484,15 @@ def score_episode(
     # never-summed AST walk misses "bind the component to a local first, then add the local",
     # so code in this package that reached for a component through a variable would be
     # written in the one shape the guard cannot see. It is spelled out instead.
+    #
+    # ⚠️ AND THE GUARD STILL CANNOT SEE THIS SITE, WHICH IS STATED RATHER THAN LEFT IMPLIED.
+    # An earlier version of this comment said the literal was here "so the guard can see it".
+    # MEASURED: the guard sees only the LEFT operand. `a5_excess` is a local bound from a
+    # CALL, and `_summed_together` follows a binding one hop but not through a call, so this
+    # expression passes it VACUOUSLY — the reduced shape of these three lines, put to the
+    # shipped walk in a scratch file, returns `[]`. The literal is still correct and still
+    # worth keeping; what it buys is a READER's ability to see the component, not a guard's.
+    # The thing that actually holds this site is the test that drives the arithmetic.
     harm = dict(harm)
     harm["merchant_irrecoverable_outflow_paise"] = (
         harm["merchant_irrecoverable_outflow_paise"] + a5_excess
