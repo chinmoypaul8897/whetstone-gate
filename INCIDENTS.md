@@ -9033,7 +9033,7 @@ them — **there is no SHA for a payload fix and there cannot be one.** ⚠️ *
 `corpora/MANIFEST.md` is outside this session's fence and was not edited.** The corrected §3 recipe —
 two `git config` lines between `git init` and `git fetch`, and a `sha256sum` line added to §4 — is
 written out in full in `QUESTIONS.md` **`Q-152`**, raised by this session, for a session whose fence
-includes `corpora/`. Recording commit: **`<this session's Task 1 journal commit>`**.
+includes `corpora/`. Recording commit: **`aa9e24c`**, which is this entry's own commit and carries no payload.
 
 **Systemic guardrail:** ⚠️ **NONE YET, AND THE GAP IS NAMED RATHER THAN PAPERED OVER.** Two things
 would close it and neither is in this session's fence. **(1)** §4 gains the `sha256sum` line, so the
