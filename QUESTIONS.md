@@ -125,6 +125,19 @@ appears that was never issued**, or if a token is reused across roles.
 | `9f31d708` | C19 | BUILD | 2026-09-03 |
 | `d4e7b920` | ARCH | FIX | 2026-09-04 |
 | `5f8a3e61` | ARCH | FIX | 2026-09-04 |
+| `5d7e2b91` | ARCH | FIX | 2026-09-04 |
+
+⚠️⚠️ **THE `5d7e2b91` ROW IS SELF-RECORDED, AND IT IS THE ROW FOR A TOKEN THAT WAS ISSUED TO **TWO**
+LIVE SESSIONS.** `QUESTIONS.md` `Q-180` and `Q-187` — two independent detections of one event.
+`make check-roles` **E1 FAILED** on it and named both commits: *"FORGED/UNISSUED: {'5d7e2b91':
+['f45721d', '90b6d6f']} - not present in QUESTIONS.md ## Session tokens"*. The token **was** issued
+— it opened both prompts — so writing this row records an issued token rather than fabricating one,
+which is the distinction `CLAUDE.md` §5 draws: *"If your prompt did not carry a token, do not
+fabricate one."* **It carried it. The architect's §7a row was never written, and E1 is right that
+the registry could not vouch for it.** ⚠️ **ONE ROW IS WRITTEN FOR WHAT WERE TWO SESSIONS**, because
+§7a's table has no column that could say otherwise — which is `Q-187`'s finding, not this row's fix.
+⚠️ **`8c47b1e0` (ARCH ROLE FIX) IS ALSO ABSENT FROM THIS TABLE** and authored the code landed by
+`f45721d`; it is named here so the gap is visible rather than inferred from a green E1.
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -13819,21 +13832,40 @@ prevent, and inventing a second token to tidy it would be `CLAUDE.md` §5's *"ne
 
 ---
 
-## ⚠️⚠️ RAISED BY ARCH NIGHT 1 (`5d7e2b91`), 2026-09-04 — `Q-180`…`Q-186`
+## ⚠️⚠️ RAISED BY ARCH NIGHT 1 (`5d7e2b91`), 2026-09-04 — `Q-181`…`Q-187`
 
-⚠️ **THE Q- AND INC- NUMBERS BELOW WERE COUNTED AT A NAMED MOMENT AND A CONCURRENT SESSION MAY
-COLLIDE.** Measured at `f45721d`: the highest id in `QUESTIONS.md` was **`Q-178`**; **`Q-179`** is
-claimed by `tests/test_c12_driver.py:2229` and **`INC-134`** by the same file, neither of which has
-a written entry anywhere. **`Q-181` was written into `PROTOCOL.md` by this session before this
-block existed**, so it is fixed and the others are allocated around it. `INC-125` records this
-collision class reaching `HEAD`. If these collide, the renumbering is the architect's.
+⚠️ **THE NUMBERS BELOW COLLIDED WITH A CONCURRENT SESSION WHILE THEY WERE BEING WRITTEN, AND THE
+COLLISION IS RECORDED RATHER THAN TIDIED AWAY.** Surveyed at `f45721d`: the highest id in
+`QUESTIONS.md` was **`Q-178`**; **`Q-179`** was claimed by `tests/test_c12_driver.py:2229` and
+**`INC-134`** by the same file, neither with a written entry anywhere. `Q-180` was then allocated
+here — and **the other session holding this same token allocated its own `Q-180`, to the same
+finding, in the same file, in the minutes between that survey and this append.** This block's
+`Q-180` is therefore renumbered **`Q-187`** and is left **immediately beneath the other session's
+`Q-180`** rather than moved to the end, because the two entries are two independent detections of
+one event and belong side by side; see `Q-187` for the full account.
+`Q-181`…`Q-186` keep their numbers because `PROTOCOL.md` already cites `Q-181` in a committed line.
+⚠️ **`INC-134`, `INC-135` and `INC-136` ARE THE OTHER SESSION'S**, measured in the working tree
+before this block was appended, so this session's incident is **`INC-137`**. `INC-125` records this
+collision class reaching `HEAD` once already. If any of these still collide, the renumbering is the
+architect's and nothing here depends on the number.
 
 ---
 
-### Q-180 — ⚠️⚠️ **TWO CONCURRENT SESSIONS ARE HOLDING SESSION-TOKEN `5d7e2b91`, AND `make check-roles` E1 CAUGHT IT. THE ONE CONTROL `PROCESS.md` §7a HAS IS THE CONTROL THAT FAILED.**
+### Q-187 — ⚠️⚠️ **TWO CONCURRENT SESSIONS ARE HOLDING SESSION-TOKEN `5d7e2b91`, AND `make check-roles` E1 CAUGHT IT. THE ONE CONTROL `PROCESS.md` §7a HAS IS THE CONTROL THAT FAILED.**
 
 **Status:** OPEN. **Class A** — it bears on what the whole review trail is evidence *of*.
 **Raised by:** ARCH NIGHT 1 (`5d7e2b91`), 2026-09-04. ⚠️ **AGAINST ITSELF.**
+
+⚠️⚠️ **THIS ENTRY WAS WRITTEN AS `Q-180` AND RENUMBERED TO `Q-187` BEFORE IT WAS COMMITTED,
+BECAUSE THE COLLISION IT DESCRIBES HAPPENED TO IT WHILE IT WAS BEING WRITTEN.** The other session
+holding `5d7e2b91` independently detected the same defect and allocated **its** `Q-180` to it,
+landing that heading in the shared working copy of this file between this session's id survey and
+its append. **Both entries are kept.** The other one is above; it found the collision by watching
+`git status` change, this one found it through `make check-roles` E1, and **two independent
+detections by two different instruments is better evidence than one.** The renumbering goes to the
+entry that landed **second** in the file, which is this one, and `Q-181`…`Q-186` are left where
+they are because `PROTOCOL.md` already cites `Q-181` in a **committed** line. `INC-125` records
+this class reaching `HEAD`; this is it, caught before the commit rather than after.
 
 **THE MEASUREMENT.** `make check-roles`, run by this session at `f45721d`:
 

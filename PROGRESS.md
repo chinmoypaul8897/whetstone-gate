@@ -1,3 +1,119 @@
+## SESSION-TOKEN 5d7e2b91 — ARCH, NIGHT 1 — 2026-09-04
+
+**Role:** FIX. **Chunk:** ARCH. **Review owed:** everything below ships **UNREVIEWED**.
+**Not self-certified. No tag. `prereg-v1` NOT cut and NOT resolvable.**
+
+**TOKEN SPEND: ZERO. NO PROVIDER MODEL CALL OF ANY KIND.** The pilot did not start; `preflight`
+refused before any dispatch. `git status --porcelain evals/ tests/goldens/ config/` is EMPTY.
+
+⚠️⚠️ **A SECOND LIVE SESSION EXECUTED THIS SAME PROMPT UNDER THIS SAME TOKEN, IN THIS SAME WORKING
+TREE, AT THE SAME TIME.** `make check-roles` **E1 FAILED** and named both commits. Each instance
+found the other independently — that one by watching `git status`, this one through E1 — and both
+allocated a `Q-180` to it before either committed. Both entries are kept: `Q-180` and `Q-187`.
+`INC-136` (theirs) and `Q-187` (this one). **This journal entry describes only what THIS instance
+did**, and where a shared document carries the other's work the `Swept:` line says so.
+
+---
+
+### GATE 1 — THE PILOT. **SKIPPED, AT STEP 1b, AND THE SINGLE-SHOT WINDOW IS STILL UNSPENT.**
+
+**1a PASSED.** `tool` → `user` on **both** providers, identical, measured out of the module:
+`_GOOGLE_ROLE` and `_GROQ_ROLE` each carry the key and each maps it to `user`. An unknown role
+still **raises** — `test_an_UNMAPPED_ROLE_is_a_refusal_and_never_a_silent_coercion` passes and
+asserts both halves. `Q-171` is closed. ⚠️ **The code implementing it was UNCOMMITTED work by a
+killed session (`8c47b1e0`) when this instance verified it**; the other instance landed it as
+`f45721d`.
+
+**1b REFUSED, so 1c, 1d and 1e were never reached.** `driver_run.preflight` on the real two-lane
+matrix (20 episode keys, `gemma-26b` + `qwen-27b`, judge `gemma-26b`):
+
+    PREFLIGHT REFUSED:
+        the environment does not carry ['GOOGLE_API_KEY', 'GROQ_API_KEY']
+
+⚠️ **`.env` EXISTS NOW AND IT MAKES NO DIFFERENCE, WHICH IS THE NIGHT'S MOST ACTIONABLE FINDING.**
+Nothing in `src/` opens it; `pyproject.toml` declares only `pyyaml` and `numpy`; `runner/keys.py`
+asks `name in os.environ` **by design**. The two names must be **exported in the shell the run
+executes in**. `QUESTIONS.md` **`Q-182`**. ⚠️ **No key value was read, printed, echoed or committed,
+and `.env` was never opened** — the prompt said do not read it, and it was not read.
+
+### GATE 2 — THE CALIBRATION. **SKIPPED, ON ITS OWN PRECONDITION.**
+
+The prompt gates it: *"ONLY IF GATE 1 COMPLETED."* It did not. `evals/cal/RUN_DECLARED.md` was
+**not written**, and writing it would have been the worse error — `PROCESS.md` §6b makes the
+**push** of a declaration the moment the single-shot clock starts, and §11a says the calibration is
+the operator's and *"he must be awake"*. `QUESTIONS.md` **`Q-186`**.
+⚠️ **`RUN_DECLARED.md` §8's UTC start time is blank for the fourth session running, and that is
+still the right answer.** The prompt ordered it filled at step **1d**, after 1b; 1b refused.
+
+### GATE 3 — THE FREEZE BLOCKERS. **RUN IN FULL.**
+
+**3a — the count was reported as NINE and is TEN, and all ten are closed.** `INC-126`'s own list
+expands to ten pytest node ids (it wrote `test_c8_scorer.py × 6` where four names cover **seven**
+parametrised ids). Four edits: `test_config_loader.py` ×1 (now resolves `probe-v1` **out of git**
+and checks it is a **tag object**, not a retyped literal), `test_c7_ledger.py` ×2 (the golden-vs-
+config test **inverted** into the post-freeze form its own docstring predicted, four assertions
+where there was one; the hardcoded `2e2b9ec4…` head **kept untouched** and its **root** pinned to
+the one it was measured under), `test_c8_scorer.py` ×7 through one helper. ⚠️ **HARD RULE 6
+DISCHARGED: every flip was run against a `config/` fixture carrying the pre-`Q-153` value and
+OBSERVED TO FAIL.** ⚠️ **No golden was edited and `config/` was not touched.**
+**Independently confirmed:** the same three-file run went from **13 failed / 321 passed** to
+**3 failed / 331 passed** at a constant **334 collected** — ten green, none added, none deleted.
+
+**3b — `PROTOCOL.md`'s manifest row was stale, and the prompt's description of it was INVERTED.**
+The prompt named `a4a9a02…`/30,960 as the stale value; it is the **true** value at `HEAD`, and the
+published row (`44e19ac5…`/30,930) was the stale one. Proved by **diffing the two blobs**: one line
+differs, and it is `Q-153`'s. `30,930 + (40−10) = 30,960` exactly. Row re-measured; derivation
+written beside it. `INC-137`. ⚠️ **`make check-prereg` exited 0 over the defect**, recomputing
+nothing, because its recompute is gated on a tag that does not exist — `Q-181`.
+
+**3c — `Q-163` verified unchanged; `Q-164` is not merely open, it is WRONG.** `config/` untouched
+and no ruling taken. ⚠️ **`Q-183`: the gate judge does not inherit the provider's default — it runs
+at a hardcoded `0.0` chosen in `driver/clients.py`.** `complete_judge` passes `None`; `_send`'s
+Google branch substitutes `0.0`; `_google_body` emits `generationConfig.temperature`
+**unconditionally**; and the declared judge lane `gemma-26b` is **`provider: google`**. The Groq
+branch sends no temperature at all. **Measured, no network call.** The client's own docstring says
+in capitals that no temperature is sent. It is a hard-rule-9 breach inside the sentence that
+disclaims it, and it is Class A for arms 2/2S/3. **Nothing was changed.**
+
+**3d — `Q-169` re-measured, and its unreconstructible residual is now RECONSTRUCTED.** The parser
+returns **195** today (H11/M107/L77) where `README.md` publishes **193**; both of `Q-169`'s figures
+reproduce **exactly** at `acfa919`, so neither was wrong — the file moved. The reconciliation now
+closes to **zero**: `193 − 7 (duplicate ids) − 6 (prose-closed) + 5 (prose-form) = 185`, and
+`Q-169`'s "~2 that could not be reconstructed" is **four pipe-shifted rows** — `OF-23`, `OF-66`,
+`OF-70`, `OF-243` — a parsing artefact, not a disagreement about a finding.
+
+**3e — run and reported verbatim in `docs/sessions/arch-night-1.txt`.**
+
+### GATE 4 — C21's GIT-HISTORY SECRET SCAN. **RUN. OUTPUT COMMITTED.**
+
+`docs/submission/git-history-secret-scan.txt`. **HEAD: 0 hits across 433 tracked files. History: 4
+hits, all one 30-byte string.** Two methods: `PROCESS.md` §8's literal `git log -p --all | grep`
+form (6 matching lines) **and** an all-objects scan over **3,007 objects / 1,177 blobs /
+187,297,167 bytes**, reachable or not — which is a strict superset and which found **one
+unreachable blob** the prescribed form cannot see. Patterns **imported** from
+`check_roles.SECRET_PATTERNS`, never retyped.
+⚠️ **THE FOUR HITS ARE NOT A CREDENTIAL, AND THAT IS PROVED BY DIGEST RATHER THAN ASSERTED:**
+`sha256("gsk_" + "0123456789" + "abcdefghijklmnop")` equals the digest of the matched bytes. It is a
+zero-entropy placeholder — 26 characters, **26 of them distinct** — inside a test that asserts the
+runner *refuses* key-shaped payloads, already removed from the tree by `d63f722` and already
+recorded as `INC-93`. ⚠️ **NO VALUE IS PRINTED ANYWHERE IN THE REPORT.** No key revoked, because
+none was exposed. **No history rewritten. The repository was NOT flipped public.**
+
+---
+
+### What this session did NOT do, and why
+
+1. **Run the pilot.** `Q-182`, operator-only, and no session may create or read `.env`.
+2. **Write `evals/cal/RUN_DECLARED.md`.** Gate 2's own precondition, and §11a.
+3. **Fill `RUN_DECLARED.md` §8's UTC start time.** Step 1d was never reached.
+4. **Rule `Q-163`, `Q-164`/`Q-183`, `Q-069`/`Q-184`.** Architect's; `config/` untouched.
+5. **Fix `test_golden2_coverage_block_reproduces` or its sibling.** `Q-185` — closing them needs a
+   golden edit (hard rule 3) or an assertion weakened to match the code (hard rule 6).
+6. **Change `check-prereg`.** `Q-181` — it moves what a published PASS/FAIL means.
+7. **Cut any tag, start the sweep, or touch the witness gist.** On the never-cut list.
+
+---
+
 ## SESSION-TOKEN 5f8a3e61 — ARCH, PRE-FREEZE 3 — 2026-09-04
 
 **Role:** FIX. **Chunk:** ARCH. **Review owed:** everything below ships **UNREVIEWED**.

@@ -10221,6 +10221,86 @@ it cannot see.**
 
 ---
 
+## INC-137 — a frozen artefact's manifest row was stale for two days, and the target `CLAUDE.md` hard rule 9 names as the check for it exited 0 over the defect on every one of those days
+
+**Date:** 2026-09-04 (ARCH NIGHT 1, `5d7e2b91`). Fix SHA under **Fix**.
+
+**Event:** `PROTOCOL.md` §1.1's manifest row for `config/protocol.yaml` published
+`44e19ac5c79cd99ca5fc67cd1dd2a0558be4ee98b9ac41aab5cfb72ff4ab3d05`, **30,930 bytes**, git blob
+`d3d8e1805cc2dac47221e2da50addff27aa4c02b`. The file at `HEAD` hashed to
+`a4a9a02ddd556d599807e2b2ded8f7d35d8ca8c7707deebfa7a9397ff4c3886e`, **30,960 bytes**, blob
+`8688b87cf8ce0ac440234b9aed9fac5bb419cb53`. `Q-153`'s ruling had moved
+`ledger.genesis_hash` from the literal `PRE-FREEZE` to `probe-v1`'s tag object id at `b1bab1c` on
+2026-09-03, and **the row that witnesses those bytes did not move with them.** `INC-126` named it as
+owed; `6ba2c1f7`, `d4e7b920` and `5f8a3e61` each carried it forward as a standing item.
+
+**Action:** the two blobs were **diffed against each other** rather than re-hashed and compared,
+so the staleness would be attributable rather than merely detected:
+
+    $ diff <(git cat-file blob d3d8e180...) <(git cat-file blob HEAD:config/protocol.yaml)
+    363c363
+    <   genesis_hash: PRE-FREEZE
+    ---
+    >   genesis_hash: 170bd3ff4abfdd8f87f64055972a60c82cc54efc
+
+**ONE LINE DIFFERS AND IT IS `Q-153`'s LINE.** The byte count is the same fact a second way:
+`len("170bd3ff…") − len("PRE-FREEZE") = 40 − 10 = 30`, and `30,930 + 30 = 30,960` **exactly** — a row
+that had moved by any other amount would mean something else had also changed. The row was then
+re-measured and replaced, with both the old values and the derivation written into `PROTOCOL.md`
+beside it. ⚠️ **`config/` was not touched:** `git status --porcelain config/ tests/goldens/` was
+EMPTY at every step and is empty at the commit.
+
+**Expectation:** hard rule 9 says of `config/` that *"every file under it is listed in `PROTOCOL.md`
+with the SHA-256 of its **git blob**. `make check-prereg` recomputes them, runs inside **both**
+`make eval` and `make test`, and prints PASS/FAIL into `RESULTS.md`."* A session that ran the target
+the rule names should have been told. **Run against the stale tree it printed:**
+
+    config/ holds 2 file(s): lanes.yaml, protocol.yaml
+    STATUS: NOT-YET-FROZEN - the `prereg-v1` tag does not resolve.
+            PROTOCOL.md exists but the freeze has not been cut.
+    EXIT=0
+
+**Exit 0, and not one digest recomputed.**
+
+**Missing:** ⚠️ **an unconditional recompute.** `check-prereg` treats *"the tag does not resolve"* as
+a **reason to skip** rather than as a **state to report alongside a recompute**. The two facts are
+independent: the tag's absence says the freeze has not happened; it says nothing about whether the
+rows describe the bytes. Had the recompute run unconditionally, this defect would have been a
+one-line fix on 3 September in the session that created it, instead of surviving three sessions.
+
+**Missed:** ⚠️ **`INC-126` NAMED THIS EXACT ROW, IN ITS OWN TITLE, AND THE SIGNAL WAS READ AS
+BOOKKEEPING RATHER THAN AS A DEADLINE.** Its title is *"… **and staled a frozen artefact's manifest
+row**"*, and its `Fix` field says the row is *"unlanded"*. Three sessions afterwards listed it under
+"what the architect is owed". ⚠️ **What none of them said is the part that mattered: `PROTOCOL.md`
+is editable ONLY until `prereg-v1` exists, so this was not a queued chore but a closing window** —
+and `RUN_DECLARED.md` §7.1 put the tag two steps away. **A second signal was also there and also
+missed:** `tests/test_c14_prereg.py::test_every_config_file_is_in_PROTOCOL_mds_manifest_and_its_blob_sha_RECOMPUTES`
+was **red in every full-suite run for two days**, sitting inside a red count that sessions
+attributed wholesale to `INC-126`'s genesis cluster and therefore stopped reading item by item.
+
+**Diagnosis:** `check-prereg` gates its recompute on the freeze having happened, so the check that
+catches a stale manifest row is inert for exactly as long as the row is fixable and becomes live at
+the moment the row is frozen. The suite did catch it, but its failure was pooled into a cluster
+already classified as "known and owed", and a known-red pool is where a new red hides.
+
+**Fix:** `90b6d6f` re-measures the row and records the derivation beside it. ⚠️ **`check-prereg`
+ITSELF IS NOT CHANGED**, and that is deliberate rather than an omission: making it recompute
+unconditionally changes what a published PASS/FAIL means in `RESULTS.md`, which is Class A.
+It is raised as `QUESTIONS.md` **`Q-181`** and left for the architect.
+
+**Systemic guardrail:** ⚠️ **partial, and the part that is missing is named rather than claimed.**
+What is closed: the row is correct, and the suite test that recomputes unconditionally is green, so
+any future drift goes red in `make test` on the next run. What is **not** closed: the target hard
+rule 9 tells a session to run still exits 0 over a stale row before the tag, so a session that
+follows the rule literally still reads a green — that is `Q-181` and it is the architect's.
+⚠️ **And the second half has no guardrail at all:** nothing distinguishes a NEW red inside a pool of
+known reds from the known ones. This entry is the second time that has cost this project a
+two-day-old defect (`INC-122`: *"the test that re-measures the gate/scorer moat did not run at all,
+twice, and an error is not a failure"*), and the honest statement is that **counting reds is not
+reading them**, which no check enforces.
+
+---
+
 ## INC-137 — `OF-215` fired against this session on the commit whose own message cited it: a `numstat` read two tool calls before the `add` said 137 lines and the commit landed 557, carrying a concurrent session's entire unfinished draft under this session's token
 
 **Date:** 2026-09-04 (ARCH NIGHT 1, `5d7e2b91`). Fix SHA under **Fix**.
