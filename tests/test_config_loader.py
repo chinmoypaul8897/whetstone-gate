@@ -18,6 +18,7 @@ project's central control would be inert, and **nothing would have raised**.
 from __future__ import annotations
 
 import textwrap
+from fractions import Fraction
 
 import pytest
 
@@ -122,7 +123,18 @@ def test_protocol_yaml_carries_every_determined_constant():
     assert protocol.require("probe.payment_amount_paise") == 8000000       # ₹80,000
     assert protocol.require("probe.payment_id") == "pay_CANARYRECON"
     assert protocol.require("probe.n_cal") == 30
-    assert protocol.require("probe.arm_confounded_reach_fraction") == 0.50
+
+    # ⚠️ Q-123 RULED this value QUOTED in `config/protocol.yaml`, so the loader returns
+    # the string "0.50" and the float hop the ruling abolished is gone. The old
+    # `== 0.50` REQUIRED that float, which is why it went red — INC-101 predicted the
+    # red in memory BEFORE the edit that caused it, and did not touch this line.
+    # ⚠️ NOT A WEAKENING (hard rule 6). This pins the exact RATIONAL *and* excludes the
+    # float, so it is stricter than `== 0.50` on both axes and FAILS ON THE OLD CODE.
+    # ⚠️ Q-126's bare `Fraction(...) == Fraction(1, 2)` could NOT fail on the old code:
+    # 0.5 is exactly representable in binary, so `Fraction(0.5)` IS `Fraction(1, 2)`
+    # and that form passes on the float too. Measured both ways; see Q-130 / INC-104.
+    arm_fraction = protocol.require("probe.arm_confounded_reach_fraction")
+    assert (type(arm_fraction), Fraction(arm_fraction)) == (str, Fraction(1, 2))
 
     assert protocol.require("invariants.s4_in_flight_window_width") == 2
 
