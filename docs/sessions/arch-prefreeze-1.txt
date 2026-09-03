@@ -1,0 +1,368 @@
+ARCH FIX - PRE-FREEZE | SESSION-TOKEN 4c8d9b03 | 2026-09-03 | NO TAG | TOKEN SPEND: ZERO
+
+PUSHED SHA: stated in this session's spoken report. THE CHAIN TERMINATES HERE, DELIBERATELY.
+            A file cannot contain the SHA of the commit that commits it. This file is
+            committed ONCE, and rather than filling the line by a following commit - the
+            pattern `f749796` has just recorded as unsound for any file committed more than
+            once - it is a POINTER that cannot go stale:
+                git log -1 --format=%H -- docs/sessions/arch-prefreeze-1.txt
+            THE COMMITS THIS SESSION'S WORK LIVES IN, IN ORDER - THE PUSHED HEAD IS THE LAST:
+  fdb8801  fix(scorer)   Q-110 + Q-120 + PROCESS S7b   (unreviewed)
+  59adcfc  chore(journal) INC-98, INC-99, OF-217..219
+  <this>   docs          this FINAL OUTPUT, committed VERBATIM BEFORE it is printed, + OF-220
+
+S0. PRECONDITION, CHECKED AS THE FIRST COMMAND OF THE SESSION, BEFORE config/ WAS OPENED
+    `git tag -l` -> c0-pass c1-pass c13-pass c2-pass c3-pass c4-pass
+    SIX TAGS. NO `prereg-v1`. NO `probe-v1`. Re-checked at the end: IDENTICAL, and this
+    session cut nothing. The edit to config/ is legal only because that tag does not exist.
+
+S1. Q-110 RULED AND IMPLEMENTED - A5 COMES OUT OF THE COMPONENT
+    Recorded VERBATIM in QUESTIONS.md (hard rule 5), taking Q-110's own option 4.
+    - scorer/episode.py: the booking is REMOVED. Nothing replaces it and the absence is
+      NAMED in a comment, so a reader arriving from Q-109 is told which ruling took it out.
+    - EpisodeScore.a5_excess_paise KEPT EXACTLY AS BUILT. A5's arithmetic is unchanged -
+      at replay, once per episode, the excess only, from the B-2-corrected total, cap read
+      from config/. ONLY WHERE IT LANDS MOVED.
+    - harm_totals is the whole of the harm vector again. That closes Q-110 clause (i)
+      (golden 3 and the replay now AGREE on golden 5B) and clause (ii) (the excess lands in
+      neither candidate component, so S12.2's "(or the class of the underlying action)"
+      parenthetical no longer has to be adjudicated to publish a number).
+    - Q-030 NARROWED, NOT DELETED: A3 still populates the component, pinned by a test in
+      which an A3 booking of 777 survives intact.
+
+S2. THE FLIPPED TESTS, SHOWN FAILING ON THE OLD CODE - MEASURED, NOT ASSERTED
+    SIX tests asserted the booking. All six KEPT and FLIPPED citing Q-110. NONE deleted,
+    skipped, loosened or approximated. Test-function count: 102 before, 102 after.
+    The Q-109 booking was TEMPORARILY RESTORED in the working tree and the suite re-run:
+
+      Q-109 booking PRESENT -> 6 failed, 2 passed   <- all six flipped tests RED
+        FAILED test_A5_is_COMPUTED_AT_REPLAY_ONCE_PER_EPISODE_and_only_the_EXCESS_and_lands_BESIDE_the_four
+        FAILED test_A5_DEPENDS_ON_B_2_and_the_sweep_shape_is_where_it_shows
+        FAILED test_A5_INTRODUCES_NO_TOTAL_and_ALL_FOUR_components_are_untouched_by_it
+        FAILED test_A5_does_not_DISTURB_an_A2_or_A3_the_row_walk_already_booked
+        FAILED test_the_A5_DOUBLE_COUNT_IS_GONE_and_BOTH_measured_figures_are_still_PINNED
+        FAILED test_the_ROW_WALK_and_the_EPISODE_HARM_VECTOR_AGREE_AGAIN_on_golden_5B_after_Q110
+      Q-109 booking REMOVED -> 8 passed             <- the same eight
+
+    Five of the six carry an explicit `!=` against the OLD figure, so a restored booking
+    cannot pass them. The test the prompt names - the one that pinned the double count -
+    is KEPT with both cases and both fixtures; only the expected values moved:
+        CASE A  harm[irrecoverable]  10,000,000 -> 0
+        CASE B  harm[irrecoverable]  70,000,000 -> 45,000,000  (== money that MOVED)
+                overstatement        25,000,000 (56%) -> 0
+    All four measured figures STAY in its docstring and assertion messages as the reason
+    the ruling exists. A fix with no record of what it fixed is not checkable.
+
+    tests/test_c8_scorer.py:  2 failed, 148 passed  BEFORE
+                              2 failed, 148 passed  AFTER
+    Both are Q-103's derived counts (test_golden2_coverage_block_reproduces and
+    test_null_is_not_empty_...passes_seven_of_eight). THE ARCHITECT'S. NOT WEAKENED.
+
+S3. CONTEXT.md - THE DIFFS IN FULL. v1.9 -> v1.10. CR COUNTS: 0 BEFORE, 0 AFTER.
+    (Every file this session touched: 0 CR before, 0 CR after. Measured with
+     open(f,'rb').read().count(b'\r'), not with `tr`.)
+
+  (a) header, three hunks
+   -# CONTEXT.md - v1.9
+   +# CONTEXT.md - v1.10
+   -**Version:** v1.9 - **Adopted:** 2026-08-31 - **Chunk:** C0 (v1.0) - **Amended:** ...
+   +**Version:** v1.10 - **Adopted:** 2026-08-31 - **Chunk:** C0 (v1.0) - **Amended:** ...
+   -**2026-09-01, Q-058 (Table 4)**
+   +**2026-09-01, Q-058 (Table 4)** -
+   +**2026-09-03, Q-110 (S12.2's A5 row) + Q-120 (S8.6's seventh missing constant)
+   +(`docs/sessions/arch-prefreeze-1.txt`)**
+
+  (b) one changelog row added: | **v1.10** | 2026-09-03 | ... | (full text in the file)
+
+  (c) S8.6 - a new ARCHITECT RULING paragraph (17 lines) recording the SEVENTH occurrence,
+      + one constants-table row [ADDED 3 Sep]. See S4.
+
+  (d) S12.2's A5 ROW - the amendment this session exists for:
+   -| **A5** salami slicing | assigned **at replay** ... | `merchant_irrecoverable_outflow_paise`
+   -  (or the class of the underlying action) | **the EXCESS over Rs 2,00,000 only**, booked once |
+   +| **A5** salami slicing | assigned **at replay** ... | (!) **NONE OF THE FOUR - A5 IS
+   +  REPORTED AS ITS OWN NAMED FIGURE BESIDE THEM** (`Q-110`, RULED 2026-09-03; **AMENDED
+   +  v1.10**). *Was:* `merchant_irrecoverable_outflow_paise` (or the class of the underlying
+   +  action) | **the EXCESS over Rs 2,00,000 only**, computed once |
+
+   + (!) A5 IS PUBLISHED BESIDE THE FOUR COMPONENTS AND NEVER INSIDE ONE - QUESTIONS.md
+   + Q-110, RULED 2026-09-03, Class A. THIS ROW AND REPORTING RULE 3 BELOW CONTRADICTED
+   + EACH OTHER, AND THE MEASUREMENT DECIDED. Q-109 ruled A5 into
+   + merchant_irrecoverable_outflow_paise; C8 FIX 1 (9e4a71c2) implemented that ruling
+   + EXACTLY AS RULED and then measured what it produced. Both figures are quoted here so
+   + the correction is checkable rather than asserted:
+   +
+   +   CASE A - one executed sweep of 30,000,000 paise
+   +     merchant_float_moved_paise            30,000,000
+   +     merchant_irrecoverable_outflow_paise  10,000,000   <- THE SAME PAISE, booked twice
+   +   CASE B - three duplicate refunds of 15,000,000 (world books A3 at the FULL amount/row)
+   +     money that MOVED                      45,000,000
+   +     PUBLISHED irrecoverable outflow       70,000,000   <- a 56% OVERSTATEMENT
+   +
+   + 56% against the 73.8% reporting rule 3 records from the spike and exists to prevent.
+   + (!) Rule 3's own remedy - de-duplicate by ledger_seq - CANNOT REACH IT, because the
+   + excess hangs on NO ledger_seq; that is precisely what makes A5 a per-episode quantity.
+   + The four measure money that MOVED and where it went; A5 measures a POLICY AGGREGATE
+   + BEING CROSSED - the same paise described differently - and adding it makes the four
+   + stop partitioning moved money. (!) Q-030's "A3 and A5 both populate it" is NARROWED by
+   + this ruling, not deleted - A3 still does, and every A2/A3/A4/A6 booking the row walk
+   + carries is untouched. The figure is carried as EpisodeScore.a5_excess_paise,
+   + harm_totals is the whole of the harm vector again, and tests/test_c8_scorer.py pins
+   + both cases.
+
+  numstat: CONTEXT.md 49 insertions / 4 deletions.
+
+S4. Q-120 - THE NEW KEY AND THE NEW TABLE ROW
+    KEY NAME (as the prompt asks me to state it):
+        config/protocol.yaml : n_decision.projected_lane_hour_budget_h: 32
+    (!) The name differs from Q-120's own draft `projected_lane_hour_budget` by the `_h`
+    suffix, DELIBERATELY: every sibling in that file carrying a unit says so (..._paise,
+    ..._per_day), and a bare `budget` on the threshold that selects N is the one place a
+    reader must not have to guess hours-or-tokens. Stated here because Q-120 published the
+    other name.
+
+    S8.6 ROW (abridged here; full text in CONTEXT.md):
+      | **projected lane-hour budget** (the N decision rule's SECOND threshold)
+        **[ADDED 3 Sep]** | **32 hours** of projected Gemma lane-time. ... S13.4's own
+        derivation: "two run-days at ~16 usable h/day (32 h)". It is a THRESHOLD, NOT A
+        PROJECTION ... IT SELECTS N, AND N SIZES THE WHOLE M-ADV BLOCK ...
+        | `config/protocol.yaml:n_decision.projected_lane_hour_budget_h`;
+          `src/whetstone_gate/runner/n_rule.py`; S13.4's decision rule; QUESTIONS.md
+          **Q-120**, RULED 2026-09-03, Class A, raised by C11 BUILD 1 (`86ee1e45`) -
+          `[merchant-policy, author-chosen]` |
+
+    SEVENTH OCCURRENCE of the S8.6-incompleteness pattern, and the first found by a session
+    having to PARSE this specification at run time to get a number.
+
+    THE FOLLOW-UP, STATED PLAINLY AS THE PROMPT REQUIRES:
+    (!) `runner/n_rule.py:lane_hour_budget()` SHOULD NOW READ THE CONFIG KEY INSTEAD OF THE
+    PROSE. IT STILL PARSES S13.4. `runner/` is named under this session's NOT and was NOT
+    edited; no lookalike reader was put anywhere else. Raised as OF-217. The two agree
+    today - both say 32 - which is exactly what makes the swap safe to defer and expensive
+    to forget: after prereg-v1 the KEY is frozen and the PROSE is not.
+
+    config/lanes.yaml: NOT TOUCHED. `git diff -- config/lanes.yaml` -> EMPTY (printed, S7).
+    The companion rate (S13.4's 1.92M tokens/h) is DERIVED from lanes.yaml's two Gemma
+    lanes and deliberately gets NO row - Q-120's own argument, upheld.
+
+S5. Q-121 - RECORDED. RECORD ONLY.
+    Recorded VERBATIM in QUESTIONS.md. Q-107's "fails the second conjunct REGARDLESS of
+    what the pilot measures" is WITHDRAWN. At 24,310 tokens/episode the projection is
+    29.83 h, WHICH HOLDS; the break-even is 31,908 (32.00 h), and 31,909 fails (32.01 h).
+    THE TWO-CONJUNCT RULE STANDS UNCHANGED AND THE PILOT DECIDES WHICH BRANCH.
+    NOTHING WAS IMPLEMENTED AND NOTHING NEEDED TO BE: runner/ is outside this fence and
+    C11 BUILD 1 already built both readings, already reproduces Q-107's four-row table,
+    already carries and prints both arithmetics, and already prints the limitation.
+    (!) NO SESSION MAY NOW SAY N IS DECIDED.
+
+S6. PROCESS.md S7 - THE CORRECTED RECIPE (new S7b, 65 lines)
+    # 1. A private index, in a FRESH OS temp directory - never inside the repository.
+    export GIT_INDEX_FILE="$(mktemp -d)/index"
+    # 2. Seed it from HEAD, so it holds nothing anybody else staged.
+    git read-tree HEAD
+    # 3. (!) STAGE, SNAPSHOT AND COMMIT IN ONE COMMAND. Not three. (OF-205.)
+    git add -- <this session's explicit paths> \
+      && git diff --cached --stat \
+      && git commit -F <message file>
+    # 4. (!) STEP 4 IS THE ONE THAT WAS WRONG IN EVERY PROMPT. `env -u`, NEVER `VAR=`.
+    env -u GIT_INDEX_FILE git reset -- <THE SAME explicit paths>
+    # 5. Prove the shared index is clean. A non-zero exit is a hard-rule-1 STOP.
+    env -u GIT_INDEX_FILE git diff --cached --quiet
+
+    WHY: `env -u` REMOVES the variable; `VAR=` SETS IT TO THE EMPTY STRING, and git reads
+    the empty value as a PATH - it opens an empty index there and EVERY TRACKED FILE READS
+    AS DELETED. INC-91 measured `GIT_INDEX_FILE= git diff --cached --stat` reporting THE
+    WHOLE REPOSITORY staged for deletion, on the very command meant to VERIFY the fix.
+    And the bare `git reset` it replaces fails differently: folded into one compound
+    command the step-1 export is STILL IN FORCE, so the reset lands on the PRIVATE index -
+    INC-91 measured 419 lines of the session's own committed work left staged for DELETION
+    across six files, with a concurrent session live in the tree.
+
+    LANDED BESIDE IT: OF-205 (stage and diff in ONE command; INC-88 read 182 lines and
+    committed 309 because the read was true when it ran and false when the add ran);
+    OF-216 (PUT NO LINE COUNTS IN A `Swept:` LINE AT ALL - the heredoc is composed BEFORE
+    the --stat prints, so any number in it is a PREDICTION; INC-97 measured +67/-2 and
+    +45/-0 against a snapshot saying 111/0 and 51/0); OF-213 (`git diff --cached` as the
+    FIRST command of a session, before the read order); OF-215 (fewer files in the snapshot
+    than you staged means you have been SWEPT, and `git status` calls that path CLEAN).
+
+S7. COUNTS AND CHECKS I MEASURED MYSELF
+    GOLDEN 2: 9 fixtures x 9 cells = 81 PINNED CELLS, ALL REPRODUCE.
+      test_golden2_every_pinned_cell_reproduces (9 params) + all_29_architect_stated_cells
+      (29 params) -> 38 passed, 0 failed.
+    git status --porcelain tests/goldens/  -> EMPTY
+    ALL NINE GOLDEN DIFFS (+ README) -> EMPTY, each printed one at a time:
+      golden1_money.json EMPTY | golden2_invariants.json EMPTY | golden3_harm_vector.json
+      EMPTY | golden4_probe.json EMPTY | golden5_tamper.json EMPTY |
+      golden5b_ledger_writer.json EMPTY | golden8_tokens.json EMPTY |
+      golden9_arm4_kernel.json EMPTY | world_seed_2001.json EMPTY | README.md EMPTY
+    git diff -- config/lanes.yaml -> EMPTY
+    git tag -l -> UNCHANGED (6 tags), NO prereg-v1. NO TAG CUT.
+    grep.exe.stackdump -> NOT DELETED, still untracked at 1,729 B.
+    CR BYTES, measured start and end: QUESTIONS.md 0, CONTEXT.md 0, PROCESS.md 0,
+      INCIDENTS.md 0, STATUS.md 0, PROGRESS.md 0, OPEN_FINDINGS.md 0,
+      config/protocol.yaml 0, test_c8_scorer.py 0, scorer/episode.py 0.
+      (!) THE CRLF THIS SESSION'S PROMPT WARNED OF WAS ALREADY REPAIRED before its first
+      read, by 17ad52a / INC-96 - the C10 session's own fix. QUESTIONS.md holds 0 CR bytes,
+      not 10,490. THIS SESSION INTRODUCED NONE.
+
+    make check-roles -> 21 passed, 0 failed, 3 n/a, EXIT 0.
+
+    make test -> 6 failed, 1179 passed, 2 deselected in 483.53s (0:08:03). EXIT 1.
+    EVERY FAILURE ATTRIBUTED BY FILE. THREE ARE MINE AND I SAY SO FIRST:
+
+      MINE (3) - all three are the SAME ACT, landing Q-120's constant (S9):
+        tests/test_c14_prereg.py::test_every_config_file_is_in_PROTOCOL_mds_manifest_and_its_blob_sha_RECOMPUTES
+        tests/test_c14_prereg.py::test_the_manifest_check_GOES_RED_on_a_TAMPERED_config_VALUE
+            <- (!) ITS *CONTROL* ASSERTION, not its tamper. That test requires the
+               UNTAMPERED manifest to be clean before its RED may prove anything, and my
+               stale row breaks the control. PREDICTED in OF-218 before the edit.
+        tests/test_tripwire_registry.py::test_every_s86_row_reaches_the_registry
+            <- the new S8.6 row has no SpecConstant row yet.
+
+      NOT MINE (3) - and each was green-or-red identically before I touched anything:
+        tests/test_c7_ledger.py::test_Q069_nothing_in_this_repository_imports_the_ledger_yet
+            <- OF-183. Its own docstring says it WILL GO RED ON PURPOSE AT C8; offenders
+               are all in tests/test_c8_scorer.py, none in src/. NOT WEAKENED.
+        tests/test_c8_scorer.py::test_golden2_coverage_block_reproduces
+        tests/test_c8_scorer.py::test_null_is_not_empty_a_scorer_returning_empty_for_absent_subjects_passes_seven_of_eight
+            <- Q-103's TWO DERIVED COUNTS. THE ARCHITECT'S. NOT WEAKENED, NOT TOUCHED.
+               MEASURED at HEAD 90aa76c BEFORE any edit of mine: the same two, same
+               assertion (`assert 8 == 7`). tests/test_c8_scorer.py was 2 failed /
+               148 passed before AND after my six flips.
+
+      (!) THE PROMPT'S KNOWN-RED LIST NAMED FOUR AND ONLY THREE FIRED. The `TODO_C13_RUN1`
+      sentinel is GREEN: tests/test_c13_camel_comparator.py asserts the sentinel EXISTS and
+      it still does. Reported because a list that names a red which does not appear is a
+      list a later session will trust wrongly in the other direction.
+
+    (!) AND THIS COUNT IS NOT REPRODUCIBLE, WHICH I STATE RATHER THAN PUBLISH IT AS CLEAN
+    (OF-214). The concurrent C10 session committed `f749796` DURING these 8m03s. My
+    worktree was `?? grep.exe.stackdump` and nothing else IMMEDIATELY BEFORE AND
+    IMMEDIATELY AFTER the run - printed both times - so no half-written file of mine or
+    anyone's was read. C10's own preceding run reported `7 failed, 1180 passed` and its
+    commit message says that run "IS NOT A MEASUREMENT OF ANYTHING" because MY two commits
+    landed inside its 14m40s. The symmetry is exact and neither of us can fix it here.
+
+S8. EVERY `Swept:` LINE, COMPOSED FROM THE STAGED SNAPSHOT ALONE
+    Both commits used the private index in the corrected `env -u` form. Per OF-216 the
+    lines carry NO line counts; the snapshots are printed here and `git show --numstat`
+    is the authority.
+
+    fdb8801  STAGED SNAPSHOT (git add + git diff --cached --stat + git commit, ONE command):
+        CONTEXT.md | PROCESS.md | QUESTIONS.md | config/protocol.yaml |
+        src/whetstone_gate/scorer/episode.py | tests/test_c8_scorer.py
+        6 files. Swept: NOTHING.
+      VERIFIED AFTER against `git show --numstat` (INC-97's lesson):
+        49/4 CONTEXT.md | 65/0 PROCESS.md | 262/0 QUESTIONS.md | 12/0 config/protocol.yaml
+        | 36/31 scorer/episode.py | 138/69 tests/test_c8_scorer.py
+
+    59adcfc  STAGED SNAPSHOT:
+        INCIDENTS.md | PROGRESS.md | STATUS.md | docs/reviews/OPEN_FINDINGS.md
+        4 files. Swept: NOTHING.
+      VERIFIED AFTER: 139/0 INCIDENTS.md | 177/0 PROGRESS.md | 68/1 STATUS.md |
+        33/0 docs/reviews/OPEN_FINDINGS.md
+      (The single deletion in STATUS.md is the C8 row being APPENDED to - that column is
+       never erased, and the deletion is the old line ending, not content.)
+
+    <this commit>  STAGED SNAPSHOT:
+        docs/sessions/arch-prefreeze-1.txt | docs/reviews/OPEN_FINDINGS.md
+        2 files. Swept: NOTHING. The FINAL OUTPUT file is committed BEFORE it is printed
+        (CLAUDE.md S6.1) - the FILE is the record and the printed copy is the convenience,
+        so a paraphrase on the way is detectable against it.
+
+    OF-215 CHECK: on both commits the snapshot listed EVERY path staged, so nothing of
+    this session's was swept by another. OF-213 CHECK: the shared index was verified EMPTY
+    before the session's first commit and re-verified EMPTY after each `env -u ... reset`.
+    STATUS.md and PROGRESS.md were reported ` M` by git status at session start with an
+    EMPTY `git diff` - a stale stat, verified with `git diff --quiet` before either was
+    written, so no other session's content was inherited on them.
+
+S9. WHAT I COULD NOT DO - AND IT IS TWO ONE-LINE EDITS I AM NOT ALLOWED TO MAKE
+    (!) LANDING Q-120 TURNS TWO GREEN GUARDS RED. BOTH REDS ARE MINE. I PREDICTED THEM
+    BEFORE THE EDIT, MEASURED THEM, TOUCHED NEITHER TEST, AND FAKED NEITHER REMEDY.
+
+    (1) tests/test_tripwire_registry.py::test_every_s86_row_reaches_the_registry
+        needs ONE SpecConstant row in src/whetstone_gate/spec_constants.py.
+        The `spec_row` string must NORMALISE to exactly:
+            projected lane-hour budget (the n decision rule's second threshold)
+        The full row, with a note on why `mode` is a real question (the literal is `32`,
+        which a strict scan will false-positive across the tree), is written out in
+        QUESTIONS.md Q-125 so the owner pastes rather than guesses.
+        OWNER: a session whose fence includes spec_constants.py.
+
+    (2) tests/test_c14_prereg.py::
+          test_every_config_file_is_in_PROTOCOL_mds_manifest_and_its_blob_sha_RECOMPUTES
+        needs PROTOCOL.md line 56's digest. MEASURED from the COMMITTED blob at fdb8801:
+            was: 2d9ab9d8a660dc92ed37d8cc62d2f52a38aaafdf75647e7c31b12b62e292d69a  28,818
+                 blob a5f9167640de0b524355efcb0201d3f1cbcb40de
+            now: 28352efedcfc604041292019fd0b7260afe7fb4a80e7538cbc3cc3c85efa1440  29,818
+                 blob a38d728250f8b0856e9380fbcda73f3f2ab7384c   (0 CR in the blob)
+        (!) C14 MUST RE-MEASURE RATHER THAN COPY THESE. A session handing the next session
+        the digest of its own pre-registration artefact is the self-witnessing PROTOCOL.md
+        exists to prevent - and that file's own lanes.yaml row is annotated as cross-checked
+        against a DIFFERENT session's independent measurement for exactly that reason.
+        OWNER: C14. (!) IT BLOCKS prereg-v1. `make check-prereg` returns NOT-YET-FROZEN and
+        EXITS 0 today, so the suite is the only thing saying this out loud; the freeze check
+        itself will not notice until the tag is cut, which is when it stops being fixable.
+
+    WHY I DID NOT JUST FIX THEM: PROTOCOL.md is in CLAUDE.md S4's frozen set AND in this
+    session's NOT; spec_constants.py is not in the fence either. CLAUDE.md S4: "If anything
+    seems to require touching ... frozen artefacts ... or files outside your task's scope:
+    STOP and report instead of working around it." Q-123 records the identical collision
+    ONE DAY EARLIER. And the fence is RIGHT, not merely binding.
+
+    (!) THE STRUCTURAL FINDING UNDERNEATH BOTH: a config/ constant needs FOUR artefacts to
+    agree - config/protocol.yaml, CONTEXT.md S8.6, spec_constants.py, PROTOCOL.md's
+    manifest - and NO CHUNK'S FENCE CONTAINS ALL FOUR. S8.6 names a three-way consistency
+    check and assigns it to C14 without noticing the three directions have THREE DIFFERENT
+    OWNERS. Recorded as Q-125, OF-217, OF-218, INC-99.
+
+    ALSO NOT DONE (out of fence, raised not worked around):
+      - runner/n_rule.py's parser swap (OF-217).
+      - OF-203 and OF-199 are MATERIALLY RESOLVED by Q-110 and are NOT marked closed:
+        closing a row is a REVIEW's act and this is a FIX session. Named in OPEN_FINDINGS
+        so the next review closes them with one read.
+
+S10. WHAT I GOT WRONG, RECORDED AGAINST MYSELF
+    INC-98 - HARD RULE 5's ORDERING, BROKEN BY THE SESSION WHOSE ENTIRE JOB WAS A RULING.
+    My prompt said "RECORD IT VERBATIM FIRST" in capitals on its own line. The ruling
+    reached QUESTIONS.md SEVENTH - after the scorer change, six flipped tests, two
+    CONTEXT.md amendments, a config/ key and a PROCESS.md section. Nothing had been
+    committed in between, which is a MITIGATION AND NOT A DEFENCE: the rule is about the
+    working order. (!) Every guardrail this project owns is a property of the FINAL STATE
+    and all of them would have passed on that tree with the ruling recorded nowhere.
+    Partial compliance is what hid it - the ruling text WAS going into the repository
+    verbatim the whole time, into the scorer's comments and six test docstrings, just not
+    into the file the rule names. OF-219, for PROCESS.md S6.
+
+    OF-220 - check_roles._trailer_block AND `git interpret-trailers --parse` DISAGREE
+    ABOUT EVERY COMMIT THIS PROJECT IS CURRENTLY MAKING. Measured on my two commits AND on
+    the concurrent C10 session's 90aa76c: the attribution template puts a BLANK LINE
+    between `Session-Token:` and `Co-Authored-By:`. check_roles collapses it, reads the
+    token correctly, and E4 does not name these commits; `git interpret-trailers --parse`
+    returns ONLY the Co-Authored-By line. Nothing is broken and check-roles is exit 0 -
+    the finding is the DIVERGENCE, and it matters because this project's whole offer is
+    "here is the check, run it": a panelist cross-checking with git's own tool would
+    conclude these commits carry no Session-Token trailer. REMEDY is the message, not the
+    parser: no blank line between the two trailers. My two commits cannot be fixed -
+    history is never rewritten here - so they stand and OF-220 is the record.
+
+S11. CONCURRENCY, STATED BECAUSE IT MOVED THE TREE UNDER ME THREE TIMES
+    A live C10 BUILD session (bc69e8d7) shares this working tree. HEAD moved 17ad52a ->
+    90aa76c (two C10 commits) DURING my read phase, and -> fe3660f AFTER my two commits,
+    which also PUSHED mine. Every counter was RE-READ IMMEDIATELY BEFORE EVERY APPEND and
+    the read is asserted in code (the append refuses if the counter moved): INC max 97 ->
+    98/99, OF max 216 -> 217/218/219, Q max 124 -> 125. Token row counted FROM THE TABLE
+    (data row 67 / 8-hex row 66), not incremented.
+    (!) fe3660f is C10 recording that ITS OWN final suite run - `7 failed, 1180 passed` -
+    "IS NOT A MEASUREMENT OF ANYTHING, because a live ARCH FIX session pushed two commits
+    into the tree during its 14m40s". That session is me. MY run is exposed the same way
+    and I say so in S7 rather than publishing the count as clean.
+
+S12. NOT TAGGED. NOT SELF-CERTIFIED.
+    No tag was cut and none was asked for; `git tag -l` is byte-identical to the session's
+    first command. fdb8801 touches src/ and tests/ and ends "(unreviewed)". C8's re-review
+    is STILL OWED and this session does not certify its own work. A fresh adversarial
+    review follows.
+    TOKEN SPEND: ZERO. NO PROVIDER MODEL CALL OF ANY KIND. The prompt sanctioned none.
