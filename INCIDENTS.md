@@ -7565,8 +7565,8 @@ session already runs `git diff --cached` **before** committing (`INC-88`'s guard
 running it **after**, against `HEAD`, would have caught this on the **first** of the four
 commits instead of after the fifth. ⚠️ **And `INC-68`'s recipe would be immune to the whole class
 if step 5 did not depend on ambient state at all:** `git --git-dir=… reset` with the index named
-per-invocation, or simply `GIT_INDEX_FILE= git reset -- <paths>`, cannot be defeated by an
-`export` that outlived its intended scope.
+per-invocation, or `env -u GIT_INDEX_FILE git reset -- <paths>` (NOT `GIT_INDEX_FILE=` — see the
+guardrail below), cannot be defeated by an `export` that outlived its intended scope.
 
 **Missed:** ⚠️ **`INC-68`'s own remedy is a recipe about which index a command writes to, and
 this session's failure was writing to the wrong index.** That is the recipe's subject, missed in
@@ -7592,7 +7592,7 @@ sets up for itself.
 honest than naming one.** The re-sync (`GIT_INDEX_FILE` unset, `git reset -- <the six paths>`)
 changed no tracked file and produced no object; `INC-65` set the precedent for a `Fix:` field
 that records this rather than inventing a SHA. What *is* committed is this entry and the
-`PROGRESS.md` and `STATUS.md` lines that name it — **`THIS ENTRY'S OWN COMMIT SHA, FILLED BY THE COMMIT THAT FOLLOWS IT AND BY NOTHING ELSE`** — and the remedy in use for the
+`PROGRESS.md` and `STATUS.md` lines that name it — **`9d38e7d`** — and the remedy in use for the
 rest of this session is under **Systemic guardrail**. ⚠️ **A SHA IS NOT WRITTEN BEFORE IT EXISTS:** hard rule 13
 requires the `Fix` field to carry one, and an invented one would be exactly the *"invented
 incident has no commit"* that the rule's own closing sentence is about. The precedent for
@@ -7604,8 +7604,8 @@ POINTED AT THE OTHER END OF THE COMMIT:** after `git commit` and after step 5, r
 exit. The pre-commit half of this is already `OF-205`; this is the post-commit half, and between
 them the index is read immediately before and immediately after every commit. ⚠️ **The stronger
 form, which removes the dependence on ambient state rather than checking for it, is to write step
-5 as `GIT_INDEX_FILE= git reset -- <paths>`** — a per-command override that an outer `export`
-cannot defeat. ⚠️ **WHAT IT DOES NOT CLOSE, SAID PLAINLY:** like `INC-68`'s and `INC-88`'s
+5 as `env -u GIT_INDEX_FILE git reset -- <paths>`** — a per-command override that an outer `export`
+cannot defeat. ⚠️ **AND THE SPELLING IS LOAD-BEARING, MEASURED MINUTES AFTER THIS WAS FIRST WRITTEN: `GIT_INDEX_FILE= git reset` IS WRONG.** git does not read an empty `GIT_INDEX_FILE` as *unset* — **it reads it as a PATH**, opens an empty index there, and every tracked file then reads as **deleted**. On the very command meant to VERIFY this entry's own fix, `GIT_INDEX_FILE= git diff --cached --stat` reported **the whole repository staged for deletion** — `CONTEXT.md 2361-`, `QUESTIONS.md 10489-`, `PROGRESS.md 9770-`, every file in the tree — which is a **more** alarming output than the 419 lines that started this entry and is an **artefact of the check** rather than a fact about the index. **`env -u` removes the variable; `VAR=` sets it to the empty string.** The correct per-command form is **`env -u GIT_INDEX_FILE git reset -- <paths>`**, and it is what re-synced the index here. **Corrected in place WITH the measurement rather than replaced silently**: a guardrail published and then found not to work is worth more as a record than as a tidy line. ⚠️ **WHAT IT DOES NOT CLOSE, SAID PLAINLY:** like `INC-68`'s and `INC-88`'s
 remedies before it, this wants to be a line in `PROCESS.md` §7 and in every prompt's GIT section,
 **both of which are the ARCHITECT'S**, and `src/whetstone_gate/check_roles.py` — where a
 mechanical form could live as a check — is named under **NOT** in this session's fence. Until
