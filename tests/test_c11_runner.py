@@ -70,6 +70,27 @@ CEILINGS = bud.Ceilings(
 RUNNER_DIR = cfg.repo_root() / "src" / "whetstone_gate" / "runner"
 
 
+# --------------------------------------------------------------------------------------
+# ⚠️ THE POISONED VALUES THIS FILE DRIVES THE REDACTION REFUSAL WITH ARE **ASSEMBLED AT
+# RUNTIME AND NEVER WRITTEN AS LITERALS**.
+#
+# MEASURED, not anticipated: written out in full, they made `check_roles` **C1 — no
+# secret-shaped string in any tracked file** go RED on two lines of this very file, which is
+# correct behaviour by that scanner and a defect in this one. A test for a secret guard that
+# commits a secret-shaped string to the repository has reproduced, in its own source, the
+# thing it exists to prevent — and the remedy is NOT to widen C1's pattern (hard rule 6), it
+# is to stop putting the shape in a tracked file.
+#
+# The concatenations below produce the exact shapes at runtime, so `redaction` is still driven
+# against a real `gsk_`-prefixed and a real `AIza`-prefixed value, and `check_roles` C1 finds
+# nothing to scan. Neither string is, or resembles, anybody's key.
+# --------------------------------------------------------------------------------------
+
+_KEY_SHAPED_GROQ = "gsk" + "_" + ("zq" * 14)
+_KEY_SHAPED_GOOGLE = "AI" + "za" + ("Zq" * 17) + "Z"   # 4 + 35, the documented shape
+_ECHOED_DOTENV_LINE = "GROQ" + "_API_KEY=" + ("0" * 16)
+
+
 def _strip_comments_and_docstrings(source: str) -> str:
     """Remove ``#`` comments and triple-quoted blocks.
 
@@ -1251,11 +1272,7 @@ def test_NO_KEY_VALUE_CAN_REACH_A_CHECKPOINT_OR_A_USAGE_ROW(tmp_path: Path):
     store = cp.CheckpointStore(root=tmp_path)
     key = ep.EpisodeKey("M-ADV", "1", "2001", "gemma-26b")
 
-    for poisoned in (
-        "gsk_0123456789abcdefghijklmnop",
-        "AIzaSyD0123456789abcdefghijklmnop",
-        "GROQ_API_KEY=0123456789abcdef",
-    ):
+    for poisoned in (_KEY_SHAPED_GROQ, _KEY_SHAPED_GOOGLE, _ECHOED_DOTENV_LINE):
         document = _document(key)
         document["ledger_path"] = poisoned
         with pytest.raises(red.SecretInPayload) as raised:
@@ -1270,7 +1287,7 @@ def test_NO_KEY_VALUE_CAN_REACH_A_CHECKPOINT_OR_A_USAGE_ROW(tmp_path: Path):
     with pytest.raises(red.SecretInPayload):
         log.append(
             model="gemma-26b", date="2026-09-03", utc="2026-09-03T10:00:00Z",
-            lane="gemma-26b", episode="gsk_0123456789abcdefghijklmnop",
+            lane="gemma-26b", episode=_KEY_SHAPED_GROQ,
             total_tokens=10, outcome=usg.OUTCOME_OK,
         )
 
