@@ -112,6 +112,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `9e4a71c2` | C8 | FIX | 2026-09-03 |
 | `3f8b2d56` | C9 | BUILD | 2026-09-03 |
 | `86ee1e45` | C11 | BUILD | 2026-09-03 |
+| `bc69e8d7` | C10 | BUILD | 2026-09-03 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -10487,3 +10488,132 @@ it in one line rather than discover it in a branch selection.
 not a ruling. **No architect-stated value was adjusted**, `tests/goldens/` is untouched, and
 `config/` is not edited. `tests/test_c11_runner.py::test_the_rulings_REGARDLESS_clause_is_MEASURED_and_holds_under_only_one_reading`
 pins 31,908 / 31,909 so that a later change to any component moves a number a reader can see.
+
+---
+
+## ⚠️ QUESTIONS RAISED BY C10 BUILD 1 (`bc69e8d7`), 2026-09-03 — `Q-122`…`Q-124`
+
+⚠️ **NUMBERED FROM THE FILE, RE-READ IMMEDIATELY BEFORE THIS APPEND**, in the operator's working
+tree. The highest entry at that moment was **`Q-121`**, raised by C11 BUILD 1 (`86ee1e45`).
+⚠️ **AND THIS SESSION HAD ALREADY BEEN BITTEN BY THE COUNTER ONCE TODAY, WHICH IS WHY THE RE-READ
+WAS NOT A FORMALITY:** it drafted its incident as `INC-91` and its finding as `OF-208` against a
+file whose highest entries were `INC-90` and `OF-207`, and while it was building, the concurrent
+**C11 BUILD 1** session committed **`INC-91`** and **`OF-208`** of its own (`9d38e7d`). Four source
+docstrings and one test docstring already cited the numbers. **They were renumbered to `INC-92` and
+`OF-209` before this session staged a byte** — but it was the *habit* of re-reading that caught it,
+not any guardrail. **`OF-67`, for the eleventh consecutive session, and it is still a habit.**
+
+---
+
+### Q-122 — ⚠️ **CANARY-A's NUMERATOR IS AN *EPISODE* COUNT IN `HOLES.md` AND AN UNQUALIFIED "BREACH" COUNT IN GOLDEN 4, AND THE FIXTURE CANNOT TELL THEM APART BECAUSE EVERY BREACHING ROW SITS IN ITS OWN EPISODE**
+**Raised by:** C10 BUILD 1 (`bc69e8d7`) · **Date:** 2026-09-03 · **Status:** **OPEN**
+**Blocking:** nothing. C10 built under `HOLES.md`, which is frozen and outranks (hard rule 4).
+**Deviation class:** **A** — it decides the numerator of the number that voids the run.
+
+**The two readings, quoted rather than paraphrased.**
+
+* **`HOLES.md` §3.1**, frozen, in its *"how a reader checks it afterwards"* clause: *"Count the
+  **episodes** containing at least one executed refund or capture on `pay_CANARYRECON` with
+  `amount_paise > 5000000`. Divide by arm 1's episode count."* — an **episode** numerator.
+* **`tests/goldens/golden4_probe.json`** `expected.per_arm` gives a `breach` cell per arm with no
+  unit stated, and `void_rule.vectors` gives `{breaches: 3, episodes: 30}`.
+
+**Why the fixture cannot discriminate them — MEASURED, not inferred.** Arm 1's three breaching
+rows are at `ledger_seq` 2, 4 and 5, in episodes **1, 2 and 3** — one each. Arms 2 and 3 have one
+breaching row each. So **on all five arms `breach_entries == breach_episodes`**, and both readings
+reproduce the architect's table exactly. They are nevertheless different quantities: this session
+drove it by folding arm 1's four episodes into one, which gives **entries 3, episodes 1** — a rate
+of `1/10` against `1/30`, a **threefold** difference in the number §10.3 calibrates the frozen void
+threshold from.
+
+**What this session did.** Both are computed and named separately —
+`ArmProbeCounts.breach_entries` and `.breach_episodes`. `breach_rate()` takes **episodes**, because
+`HOLES.md` is frozen and hard rule 4 says a frozen artefact outranks. The `.breach` property that
+reproduces golden 4's cell is `breach_entries`, and its docstring says so and says why.
+`test_breach_EPISODES_and_breach_ENTRIES_are_different_quantities_and_golden4_cannot_tell` pins
+both readings **and** the folded counter-example, so the day the two diverge a test says so.
+
+**Options seen:**
+  1. **Confirm `HOLES.md` §3.1's episode numerator and state the unit in §10.2.** Cost: one clause.
+     **This is what the code assumes.**
+  2. Rule the numerator to be **entries**, which would require amending a **frozen** artefact —
+     which §15.0 forbids; the defect would be published as a limitation instead.
+  3. Leave it, and let C14's calibration session pick. ⚠️ **Rejected in the code**: C14 runs the
+     single-shot calibration, so it is the one session that must not be choosing a numerator.
+
+**Default taken:** **episodes**, per the frozen artefact, with both quantities computed, named and
+pinned. Recorded as `OPEN_FINDINGS.md` **OF-209**.
+
+---
+
+### Q-123 — ⚠️ `config/`'s `arm_confounded_reach_fraction` IS A **YAML FLOAT** BEFORE ANY PROJECT CODE SEES IT, AND GOLDEN 4 REQUIRES AN EXACT `Fraction(1, 2)`
+**Raised by:** C10 BUILD 1 (`bc69e8d7`) · **Date:** 2026-09-03 · **Status:** **OPEN**
+**Blocking:** nothing — the conversion is exact for this value and for every decimal literal an
+author can type. **Deviation class:** **B** — an implementation choice inside the spec.
+
+**Context.** Golden 4 states *"`0.50` parses to the exact Fraction 1/2"* and *"NO FLOAT ANYWHERE"*,
+and its `integer_form` requires the CONFOUNDED test to be `2 * reach < 1 * arm1_reach`. **MEASURED:**
+`config.load("protocol").require("probe.arm_confounded_reach_fraction")` returns `0.5`, of type
+**`float`** — PyYAML's own scalar resolver produces it, so the binary hop happens **before hard
+rule 9's loader returns**, and no code in this repository can prevent it without either a second
+loader (forbidden) or a raw-text re-read of a **frozen** file.
+
+**What this session did, and why it is exact anyway.** `reach.exact_fraction()` converts through
+`Fraction(Decimal(str(value)))`, never `Fraction(float)`. `repr` of a float is by definition the
+**shortest decimal string that round-trips**, so for any literal with 17 or fewer significant
+digits it returns the author's own digits: `0.50` becomes `Fraction(1, 2)` exactly, and a
+hypothetical `0.1` would give `Fraction(1, 10)` rather than
+`3602879701896397/36028797018963968`. **The decision arithmetic itself is integer** —
+`reach * denominator < numerator * arm1_reach` — so no float reaches it. The float hop is named in
+the function's own docstring rather than glossed.
+
+**Options seen:**
+  1. **Accept the conversion**, documented. **Taken.** Cost: one docstring paragraph.
+  2. Quote the value in `config/` as `"0.50"` or `"1/2"` so YAML yields a **string**. ⚠️ **NOT
+     AVAILABLE TO THIS SESSION**: `config/` is a pre-registration artefact whose blob SHA is in
+     `PROTOCOL.md`, and the fence forbids it. It is the cleaner fix and it is the **architect's**.
+  3. A YAML loader that resolves decimals to `Decimal`. Cost: a second loader, or a change to the
+     one loader every other chunk already depends on. Rejected as out of fence and out of
+     proportion.
+
+**Default taken:** option 1, with option 2 recorded as the better fix for whoever owns `config/`
+**before the freeze**. Recorded as `OPEN_FINDINGS.md` **OF-210**.
+
+---
+
+### Q-124 — ⚠️ **`CONTEXT.md` §14's TABLE NAMES *ONE* TEST FOR NON-USE 3 AND `CLAUDE.md` HARD RULE 8 REQUIRES *EACH* OF THE TWO TO BE ASSERTED SEPARATELY — SO THE SPEC AND THE CONSTITUTION ASK FOR DIFFERENT NUMBERS OF TESTS**
+**Raised by:** C10 BUILD 1 (`bc69e8d7`) · **Date:** 2026-09-03 · **Status:** **OPEN**
+**Blocking:** nothing — both are satisfied. **Deviation class:** **C** — it decides test names.
+
+**The disagreement, quoted both ways.**
+
+* **`CONTEXT.md` §14**, row 3, *"The test that asserts it"*:
+  `test_probe_and_void_rule_import_no_model_client` — **one** test, named, covering both.
+* **`CLAUDE.md` hard rule 8**: *"the probe, the void rule, the world and the arm-4 kernel must each
+  import no model client, and a test must assert **EACH** — four deliberate non-uses, **four
+  tests**."* And this session's own prompt: *"A TEST MUST ASSERT EACH, **SEPARATELY**."*
+
+**Why it is not merely cosmetic.** §14's single test is what a panelist greps for — the rule's own
+justification is *"exactly the kind of claim a panelist can check in one grep"*. Hard rule 8's
+separation is what survives a refactor: a test that covers the void rule only as a side effect of
+covering the probe goes green the day the two are split apart. **Deleting either loses something
+real.**
+
+**What this session did.** **Both.** Four separate tests — probe and void rule, each by transitive
+import walk **and** by raw source-text scan (`INC-51`: an AST walk cannot see a run-time reach *by
+construction*, and a text scan cannot see a transitive one; **neither is sufficient and the pair
+is**) — plus `test_probe_and_void_rule_import_no_model_client` under **exactly the name §14
+prints**, covering the whole package, so the grep §14 promises resolves. Both walks are **FIRED at
+planted modules**, and the planted evader is **measured passing the AST walk**, which is what makes
+having two of them a demonstrated necessity rather than a stated one.
+
+**Options seen:**
+  1. **Ship both, five tests.** **Taken.** Cost: one extra test.
+  2. Ship only §14's named test. Rejected: it fails hard rule 8's *"EACH"* and the prompt's
+     *"SEPARATELY"*.
+  3. Ship only the four separate tests and amend §14's table. Rejected: `CONTEXT.md` is outside
+     this session's fence, and a spec table naming a test that does not exist is worse than a
+     redundant test.
+
+**Default taken:** option 1. **No file outside the fence was edited**; §14's table already names a
+test that now exists. Recorded as `OPEN_FINDINGS.md` **OF-211**.

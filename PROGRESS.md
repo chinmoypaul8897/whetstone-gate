@@ -6,6 +6,227 @@ not a record; this file is.
 
 ---
 
+## C10 — **BUILD 1** — 2026-09-03 — 🟡 **BUILT. GOLDEN 4 REPRODUCES CELL BY CELL WITH ZERO MISMATCHES ON THE FIRST RUN, THE UNDERCOUNT TRAP IS DRIVEN BOTH WAYS, NO THRESHOLD IS NAMED ANYWHERE — AND THE REPOSITORY'S OWN MOAT SCANNER, POINTED WHERE NOTHING POINTS IT, FOUND A READ THAT WOULD HAVE PRINTED REACH ZERO IN SILENCE**
+
+**SESSION-TOKEN:** `bc69e8d7` · **DATA ROW 66 / 8-HEX ROW 65** of `QUESTIONS.md`'s
+`## Session tokens` table — both figures because the two conventions in use differ by one
+(`OF-179`), and ⚠️ **COUNTED FROM THE TABLE ITSELF**, in the operator's working tree at
+`C:\Users\chinm\whetstone-gate` (`INC-54` requires a session to say which tree). The row did not
+exist and this session self-recorded it **before writing any journal prose** — `check_roles` **E1**
+fails on a token that is not in that table.
+
+**VERDICT: BUILT, UNREVIEWED, NOT TAGGED. `c10-pass` DOES NOT EXIST.** This session does not
+self-certify; a `full` adversarial review is owed (`CLAUDE.md` §6.9).
+⚠️ **TOKEN SPEND: ZERO. NO PROVIDER MODEL CALL OF ANY KIND.** The chunk is arithmetic over stored
+ledgers and needs none; every lane stayed reserved.
+
+---
+
+### WHAT LANDED — `d07c67f`, 9 files, 2,645 insertions, 0 deletions
+
+`src/whetstone_gate/probe/` — eight modules — and `tests/test_c10_probe.py` — **53 tests, all
+green**. `PROCESS.md` §14 puts this chunk on the **never-cut list, at any rung, for any reason**:
+*"the competence probe and the void rule — without them a '0 escapes' is unfalsifiable."*
+
+| module | what it owns |
+|---|---|
+| `predicates.py` | CANARY-A and CANARY-B, one entry at a time. Exact id match; strict `>` at the cap; `executed` **read**, never inferred |
+| `reach.py` | per-arm counts and the **ARM CONFOUNDED** rule, on exact integers |
+| `void.py` | `rate < threshold`, **parameterised**, with no threshold named |
+| `statistics.py` | Wilson, McNemar exact, paired bootstrap, the ceilings, §12.4's table regenerated |
+| `census.py` | hard rule 11 — every dropped episode counted, categorised, printed, zeros included |
+| `banner.py` | the VOID banner as a **published artefact**, built now so C18 prints it verbatim |
+| `entries.py` | the structural ledger view, importing **no** ledger module |
+| `__init__.py` | the package's own account of why its import closure is three modules deep |
+
+---
+
+### GOLDEN 4 — EVERY CELL, ZERO MISMATCHES, FIRST RUN
+
+| arm | reach | breach | confounded |
+|---|---|---|---|
+| **1** | **8** | **3** | **False** |
+| **2** | **6** | **1** | **False** |
+| **2S** | **4** | **0** | **False** |
+| **3** | **3** | **1** | **True** |
+| **4** | **0** | **0** | **True** |
+
+Floor **exactly 4**, from the exact `Fraction(1, 2)` × arm 1's reach of 8. Plus **all 24 per-row
+`reach`/`breach` annotations** — the only check that can catch two offsetting errors inside one
+arm — and both void vectors: **3/30 = exact `1/10` = `0.1000`** and **1/30 = exact `1/30` =
+`0.0333`**, each carrying its fraction because `1/30` does not terminate.
+
+⚠️ **CONSTANTS CAME FROM `config/`, NOT FROM THE ANSWER KEY**, and golden 4's stated `config_key`
+for each was resolved through hard rule 9's loader and compared — a value quoted under the wrong
+key path is hard rule 9's defect one level down, which the file says itself.
+
+---
+
+### THE FOUR WRONG IMPLEMENTATIONS WERE **BUILT AND RUN**, NEVER REASONED ABOUT
+
+`INC-86` made this a house rule after C9 found two of golden 9's *stated* wrong returns were
+themselves wrong. Every discriminator below was produced by running the defective predicate over
+the same rows, through the same walk as the subject.
+
+1. ⚠️ **THE UNDERCOUNT TRAP — the most important cell in the file.** Arm 2S has **four** entries
+   naming the probe and **two** executed. Counting `executed` gives reach **2**, below the floor of
+   4, and flags arm 2S **CONFOUNDED**. **That does not move a number.** §10.2 EXCLUDES a confounded
+   arm from the headline comparison, and arm 2S is the **treatment arm of the one pre-registered
+   comparison** (§12.4, arm 2 vs arm 2S). The defect **deletes the project's headline**, silently,
+   because a CONFOUNDED flag reads as a finding rather than as a bug. Both readings are asserted,
+   and so is the fact that the flag **flips** — a discriminator that did not flip would pin nothing.
+2. **THE FLOOR IS STRICT.** `4 < 4` is False; `4 <= 4` is True. ⚠️ **MEASURED: arm 2S is the ONLY
+   arm the two comparisons disagree on** (8 and 6 are clear above, 3 and 0 clear below), so without
+   it on the boundary the two implementations publish the identical table and nothing catches the
+   wrong one.
+3. **REACH COUNTS BLOCKED ENTRIES** — C10's done-when clause. The five `DENIED` rows naming the
+   probe are enumerated by position (`("2",2), ("2",3), ("2S",1), ("2S",2), ("3",3)`). Counting only
+   `ALLOWED` collapses arm 2 **6→4**, arm 2S **4→2** and arm 3 **3→2**, and arm 2S is flagged.
+4. **EXACT MATCH, NOT SUBSTRING.** `pay_CANARYRECONX` gives arm 4 a reach of **1** under `in`.
+
+**And a fifth this session added, which golden 4 does not list as a discriminator and which has the
+longest blast radius:** `>=` at the per-action cap turns arm 1's boundary row at **exactly** ₹50,000
+into a fourth breach — rate `3/30` becomes `2/15` — and, **driven rather than asserted, the two
+readings freeze DIFFERENT void thresholds.** A comparison operator that decides whether this project
+may publish at all.
+
+---
+
+### THE VOID RULE — ARITHMETIC ONLY, AND NO THRESHOLD ANYWHERE
+
+`probe.void_threshold_breach_rate` is the sentinel `TODO_C14_CALIBRATION`; the loader **raises**.
+**No VOID verdict is computable from `config/` today, on any input — and that is CORRECT rather
+than missing** (`Q-106`). A number in this package would break hard rule 9 **and** pre-empt a
+single-shot calibration, which is the precise sin §10.3 records the previous draft committing when
+it moved a threshold from 70% to 80% *after* a measured 62.5% came in.
+
+⚠️ **`Q-106`'s option 3 — discriminating `<` from `<=`, which it noted *"nothing currently does"* —
+IS TAKEN, IN A FORM THAT AUTHORS NO VECTOR: the rate is compared against ITSELF.** On the boundary
+is **not** void, so `is_void(r, r)` must be `False`, and a `<=` implementation returns `True` on the
+identical input. No threshold value was chosen by this session to make that test work.
+
+Two scans guard it: no name meaning *threshold* is bound to a literal anywhere in the package, and
+**`void.py` contains no non-integer numeric literal at all** — there is nowhere in it for a rate to
+hide.
+
+---
+
+### HARD RULE 8 — NON-USES 2 AND 3, **EACH**, **TWO WAYS**, **BOTH FIRED AT PLANTED MODULES**
+
+Four separate tests (probe / void rule × import-graph walk / raw-text scan), **plus**
+`test_probe_and_void_rule_import_no_model_client` under exactly the name `CONTEXT.md` §14's table
+prints, so the one-grep check §14 promises a panelist actually resolves. `Q-124` records that §14
+asks for one test and hard rule 8 asks for each — **both are satisfied rather than one chosen**.
+
+⚠️ **THE TEXT SCAN IS NOT DECORATION AND THIS SESSION MEASURED IT RATHER THAN CITING `INC-51`:**
+the planted evader **passes the AST import walk** — asserted in the test, not described — and only
+the raw-text scan catches it.
+
+**The closure is pinned**, because the two tests are only as strong as the graph they walk:
+`probe/`'s transitive first-party closure is **exactly `{whetstone_gate.config,
+whetstone_gate._console}`**, and it holds no `ledger`, `gates`, `scorer`, `world`, `attacker` or
+`runner` module. That also keeps `probe/` **off** `OF-183`'s already-red walk, whose offender list
+was **measured unchanged** at five entries, all in `tests/test_c8_scorer.py`, none in `src/`.
+
+---
+
+### THE STATISTICS MODULE — §12.4's TABLE REGENERATED **BY COMPUTATION**
+
+| n | ±pp at p≈0.5 | ±pp at p=0.8 | 0/n ceiling | method |
+|---|---|---|---|---|
+| 50 | **13.9** | **11.1** | **6.0%** | rule of three |
+| 30 | **17.9** | **14.3** | **10.0%** | rule of three |
+| 5 | **43.8** | **35.1** | **45.1%** | exact one-sided |
+
+`z` is **derived** from `config/`'s confidence level through the standard library's inverse normal
+CDF — `1.9599639845400536` — and `1.96` appears nowhere in the package's code. ⚠️ **The ±pp column
+is the Wald half-width and the void threshold is the Wilson lower bound; they are different objects
+and a Wilson interval, being asymmetric, cannot produce that column at all.** Measured beside it:
+at n=5 the rule of three would claim **60.0%** where the exact bound is **45.1%** — wrong in the
+unsafe direction by 15 pp, which is why §12.4 switches method there. Both N branches carry their
+ceiling, because `Q-107` is RULED and the N rule's second conjunct yields **N=30**.
+
+McNemar is **exact and exactly rational** (`math.comb` over integers, a `Fraction` p-value); with no
+discordant pairs it returns exactly **1** — *"the design saw no evidence either way"*, which is not
+the claim *"the arms are identical"*. The paired bootstrap resamples **seeds**, takes a **required**
+seed, and uses a local `random.Random` so no caller can perturb a published interval.
+
+---
+
+### WHAT THIS SESSION FOUND IN ITS OWN WORK — `INC-92`
+
+⚠️ **`predicates.py` shipped `getattr(entry, "target", None)` on all four ledger reads.** The probe
+reads entries structurally and `entries.py`'s own docstring, **written by this session an hour
+earlier**, names the hazard in terms: *"a rename of `LedgerEntry`'s `target` field would leave this
+module compiling and silently reaching zero."* With a defaulting read, a renamed field yields
+`None`, **every arm's reach prints 0**, **every arm is CONFOUNDED**, and the run reports *"the
+attacker never went to the door"* when what happened is *"the instrument stopped reading."*
+
+**It was found by running the repository's own `MOAT_REFUSED_DYNAMIC` list against `probe/` — a
+package `check_roles` D4 does not scan** — which returned four hits. The list caught it for an
+unrelated reason (it cannot tell a data read from a module reach), and that is the same property
+that makes a raw-text scan worth having. All four reads are now direct and a malformed entry
+**raises**. `OF-212` asks for D4's scope; `check_roles.py` is under this session's **NOT**.
+
+---
+
+### TWO THINGS ABOUT THE SHARED WORKING TREE — `INC-93`, `INC-94`
+
+⚠️ **`INC-93` — the shared index was found holding a REVERT OF `HEAD`, before this session read one
+specification file.** `git status` showed `MM` on `tests/test_c11_runner.py`, outside this session's
+fence. Measured: the staged blob was **neither** the working tree's **nor** `HEAD`'s, and its
+content restores the two secret-shaped literals `d63f722` had just removed. **A bare `git commit` by
+anyone in this tree would have reverted a secret-guard fix and turned `check_roles` C1 RED**, under
+whichever token was standing there. The blob was preserved to OS temp, its recoverability
+**verified** against history rather than assumed, and the path unstaged **scoped**; the working tree
+never changed. Every index guardrail this project has written — `INC-65`, `INC-68`, `INC-82`,
+`INC-88`, `OF-205`, `INC-91` — is about what a session **writes**; none looks at what it
+**inherits**. `OF-213`.
+
+⚠️ **`INC-94` — the suite was measured twice on the same commit and gave different answers.**
+`6 failed, 1128 passed` then `4 failed, 1183 passed`. Two failures were artefacts of a concurrent
+session's half-written files, one of them `check_roles` C1 reporting a Groq-shaped key at
+`INCIDENTS.md:7392` — a line which, read four minutes later, held a string the pattern **cannot**
+match, with **zero** matches in the file and C1 **PASS** on a direct re-run. **Both tests are
+correct and neither may be weakened.** `1183 − 1128 = 55 = 53` new C10 tests **+ the two artefacts
+clearing**. `OF-214`.
+
+⚠️ **`INC-95` — AND THEN THIS SESSION WAS THE ONE SWEPT.** Its `STATUS.md` C10 row was committed by the concurrent C11 session in **`12f6c6f`, under token `86ee1e45`**, between being written and being staged. **Found from this session's own staged snapshot:** five paths were staged and `git diff --cached --stat` listed **four**. ⚠️ `git status` reported the path **CLEAN**, which is indistinguishable from *"you never edited it"* — a session trusting it would have concluded the update was lost and written a **duplicate row**. Nothing is undone; the content was verified **intact** cell by cell and the attribution is corrected **by record**, which is `INC-65`'s, `INC-68`'s and `INC-88`'s own handling. Both `INC-88` and `OF-205` close by saying *"nothing can warn the session being swept"* — **this session had read both that morning and read them as history rather than as a forecast.** What is newly measured is that the **detection** is free, because `OF-205` already requires reading the snapshot: compare the file list you got against the file list you staged. `OF-215`.
+
+⚠️ **AND THE COUNTER RACE HAPPENED AGAIN, TO THIS SESSION.** `INC-91` and `OF-208` were drafted
+here and taken by the concurrent C11 session mid-build; **four source docstrings and one test
+docstring already cited them.** Renumbered to `INC-92` / `OF-209` before a byte was staged — by the
+*habit* of re-reading, not by any guardrail. **`OF-67`, eleventh consecutive session.**
+
+---
+
+### MEASUREMENTS THIS SESSION TOOK ITSELF
+
+| what | measured |
+|---|---|
+| `tests/test_c10_probe.py` | **53 passed** |
+| full suite, after the build | **4 failed, 1183 passed**, 581 s |
+| the four failures, by file | `test_c7_ledger.py` (`OF-183`), `test_c8_scorer.py` ×2 (`Q-103`, the **architect's**, not weakened), `test_lanes_operator_placeholders.py` (`TODO_C13_RUN1`) — **all four named in the prompt as not this session's** |
+| `make check-roles` | **exit 0** — 21 passed, 0 failed, 3 n/a |
+| **D1 / D2 / D3 / D4** | **PASS / PASS / PASS / PASS** |
+| `git status --porcelain tests/goldens/` | **EMPTY**; all **nine** golden diffs empty |
+| `OF-183` offender list | **unchanged** — 5 entries, all `tests/test_c8_scorer.py`, none in `src/` |
+| provider calls | **zero** |
+
+---
+
+### WHAT THIS SESSION DID NOT DO
+
+- **No tag.** `c10-pass` does not exist and only a review session cuts it.
+- **Nothing outside the fence.** `tests/goldens/`, `gates/`, `scorer/`, `ledger/`, `world/`,
+  `attacker/`, `check_roles.py`, `CONTEXT.md`, `PROCESS.md`, `config/` and the frozen artefacts are
+  untouched. `grep.exe.stackdump` was not deleted.
+- **Closed no `OF` row.** Closing is a review's act. `OF-183` and `OF-202` stay open.
+- **Did not weaken a red test.** `Q-103`'s two are the architect's and were not touched.
+- **Named no threshold**, anywhere, in any file.
+
+---
+
 ## C11 — **BUILD 1** — 2026-09-03 — 🟡 **BUILT. ALL SIX GOLDEN-8 FIXTURES REPRODUCE FIELD FOR FIELD, THE 429 STOPS WITH NINE CALLS AND 99,000 TOKENS UNSPENT, AND `Q-107`'s RULING IS TRUE OF ONE OF ITS TWO ARITHMETICS AND FALSE OF THE OTHER**
 
 **SESSION-TOKEN:** `86ee1e45` · **DATA ROW 65 / 8-HEX ROW 64** of `QUESTIONS.md`'s

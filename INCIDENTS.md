@@ -7613,3 +7613,314 @@ then it is one session's habit, which is what `OF-67` says about the last six of
 as **`OF-208`**.
 
 ---
+
+---
+
+## INC-92 — the probe shipped a **defaulting attribute read** that would have scored a silent **reach of ZERO** over a renamed ledger field, three files from a docstring warning about exactly that; it was caught by the repository's own moat refusal list, pointed at a package `check_roles` does not scan, and it was caught for a reason the list cannot know
+
+**Date:** 2026-09-03 (C10 BUILD 1, `bc69e8d7`, **before** this session's first build commit
+`d07c67f`. Found by **running the repository's own `MOAT_REFUSED_DYNAMIC` scan against
+`src/whetstone_gate/probe/`**, which `check_roles` D4 applies only to `gates/` and `scorer/`.
+Fix SHA under **Fix**.)
+
+**Event:** `src/whetstone_gate/probe/predicates.py` read every ledger field defensively:
+
+```python
+return getattr(entry, "target", None) == spec.payment_id
+...
+if getattr(entry, "tool", None) not in BREACH_TOOLS: return False
+if not getattr(entry, "executed", False):            return False
+amount = getattr(entry, "amount_paise", None)
+```
+
+The probe reads ledger entries **structurally**, importing no ledger module on purpose — the
+reason is in `entries.py`'s own docstring, and one of the two reasons is that
+`test_c7_ledger.py::test_Q069_nothing_in_this_repository_imports_the_ledger_yet` is **already
+red** and this session must not widen it (`OF-183`, `OF-202`). The **price** of structural reading
+is that a rename is invisible to the type system, and `entries.py` says so in terms — *"a rename of
+`LedgerEntry`'s `target` field would leave this module compiling and silently reaching zero."*
+
+⚠️ **AND THEN `predicates.py`, three files away, IMPLEMENTED PRECISELY THAT FAILURE.** With a
+defaulting read, a renamed `target` yields `None`, `None != "pay_CANARYRECON"`, and **every arm's
+CANARY-B reach prints 0**. Every arm is then below any floor, so **every arm is flagged
+CONFOUNDED**, the pre-registered headline is published as CONFOUNDED, and the run reports *"the
+attacker never went to the door"* when what happened is *"the instrument stopped reading."*
+
+**Action:** ⚠️ **THE SCAN WAS RUN BEFORE THE DEFECT WAS REASONED ABOUT, AND IT IS WHAT RAISED IT.**
+`test_c10_probe.py` points `check_roles._dynamic_reach_hits` at `probe/` — a package D4 does not
+cover — and it returned four hits on `predicates.py` at lines 84, 98, 100 and 102, plus eight in
+`__init__.py` where this session's own prose **names** the forbidden vocabulary. All four reads were
+rewritten to direct attribute access, so a malformed entry now **raises** instead of scoring zero.
+The `__init__.py` prose was rephrased to describe the forms without spelling them.
+
+**Expectation:** a package whose entire subject is *"can this instrument still read?"* does not
+contain a read that fails silently. And a module that documents a hazard in one file does not
+implement it in another.
+
+**Missing:** ⚠️ **a `check_roles` check over `probe/` at all.** D1–D4 are scoped to `gates/` and
+`scorer/` because hard rule 8's moat is between those two, and that scoping is correct for the
+moat — but it means the **run-time-reach refusal list is not applied to the probe, the void rule,
+the world or the runner**, and this session had to point it at `probe/` itself to get the finding.
+Nothing would have applied it if the session had not chosen to.
+
+**Missed:** ⚠️ **`entries.py`'s own docstring, written by this session, in this session, naming this
+exact failure mode in a sentence beginning *"What it costs"*.** The mitigation it promised —
+`test_every_field_the_probe_reads_exists_on_the_real_LedgerEntry` — was written **and passes**, and
+it checks that the field exists **today**; it cannot see that the reader would have swallowed its
+absence tomorrow. The warning and the defect were authored within the hour, by the same session,
+and the warning was not re-read against the code it warned about.
+
+**Diagnosis:** `getattr(x, "f", default)` was reached for as *defensive*, when in a measurement
+instrument a defaulting read is not defensive but **lossy** — it converts *"I cannot read this"*
+into *"there is nothing here"*, and those are opposite claims about the attacker. The refusal list
+caught it for an unrelated reason (it cannot distinguish a data read from a module reach), which is
+the same property that makes a raw-text scan worth having at all.
+
+**Fix:** direct attribute access on all four reads, in **`d07c67f`**, with the reason in
+`names_the_probe`'s docstring and the whole episode in `probe/__init__.py`'s.
+
+**Systemic guardrail:** ⚠️ **`test_no_module_in_the_probe_package_uses_a_dynamic_import_form` now
+runs `MOAT_REFUSED_DYNAMIC` over `probe/` on every suite run**, so the scan that found this is no
+longer a thing a session has to think of. ⚠️ **WHAT IT DOES NOT CLOSE, SAID PLAINLY:** it guards
+`probe/` only, because that is this session's fence. `world/`, `runner/`, `ledger/`, `attacker/`
+and `tau2/` are still outside every dynamic-reach scan in this repository, and extending D4's
+scope is the **architect's** — `check_roles.py` is named under this session's **NOT**. Raised as
+`OF-212`.
+
+---
+
+## INC-93 — the **shared git index** was found holding a **pre-fix blob** of another session's test file whose content re-introduces the two secret-shaped strings `d63f722` had just removed: a bare `git commit` by anyone would have reverted a secret-guard fix and turned `check_roles` **C1** RED, as a clean, silent, verifying revert
+
+**Date:** 2026-09-03 (C10 BUILD 1, `bc69e8d7`, **before this session read a single specification
+file**. Found by running `git diff --cached` at session start, on habit, because `git status`
+showed `MM` on a path outside this session's fence. **No Fix SHA — an index is not a commit;** see
+**Fix**.)
+
+**Event:** `git status --porcelain` at session start read:
+
+```
+ M INCIDENTS.md
+ M docs/reviews/OPEN_FINDINGS.md
+MM tests/test_c11_runner.py      <- staged AND unstaged, and outside this session's fence
+?? grep.exe.stackdump
+```
+
+**MEASURED, before anything was touched:**
+
+```
+git diff --cached --stat -- tests/test_c11_runner.py   ->  29 ++---   (6 insertions, 23 deletions)
+git diff HEAD      --stat -- tests/test_c11_runner.py  ->  (EMPTY - the WORKING TREE equals HEAD)
+```
+
+⚠️ **So the staged blob was neither the working tree's nor `HEAD`'s: it was a STALE INTERMEDIATE,
+and its content is the *reverse* of the fix in `HEAD`.** `HEAD` at that moment was **`d63f722`**,
+whose own subject line is *"the test that proves NO KEY VALUE CAN REACH A CHECKPOINT committed two
+secret-shaped strings and turned `check_roles` C1 RED"*. The staged blob **deletes** that fix's
+runtime-assembled values and **restores the literals**:
+
+```
+-_KEY_SHAPED_GROQ = "gsk" + "_" + ("zq" * 14)
+-_KEY_SHAPED_GOOGLE = "AI" + "za" + ("Zq" * 17) + "Z"
++    "gsk_0123456789abcdefghijklmnop",
++    "AIzaSyD0123456789abcdefghijklmnop",
+```
+
+**A bare `git commit` by any session in this shared tree would have reverted `d63f722`, put two
+secret-shaped strings back into a tracked file, and turned `check_roles` C1 RED** — under whichever
+session's token happened to be standing there, with a commit whose diff reads as a deliberate
+revert.
+
+**Action:** the index blob was first **preserved** to this session's own OS temp directory
+(`git show :tests/test_c11_runner.py`, 1,541 lines, blob `903ccbd`) so nothing could be lost, and
+its recoverability was then **verified rather than assumed** — the blob is already reachable in
+history from `a4d422d`. Only then was the path unstaged, **scoped to that one path**
+(`git restore --staged -- tests/test_c11_runner.py`), which leaves the working tree byte-identical
+and unstages nothing of anybody else's. `git diff --cached` was then **EMPTY**, verified.
+
+**Expectation:** the shared index holds either nothing or the current work of the session that
+staged it. It should never hold a blob that is a **revert of `HEAD`** on a path no live session is
+editing.
+
+**Missing:** ⚠️ **anything that looks at the shared index at session START.** Every guardrail this
+project has written about the index — `INC-65`, `INC-68`, `INC-82`, `INC-88`, `OF-205` — is about
+what a session **writes**. Not one of them looks at what a session **inherits**, and a stale index
+is a loaded weapon that is handed to the *next* session rather than fired by the session that left
+it.
+
+**Missed:** ⚠️ **the `MM` in `git status`'s own first column, which this repository's sessions read
+several times a day.** `MM` means *staged changes AND further unstaged changes*, and the second `M`
+is the loud half — it says the staged content is **not** what is on disk. It was read here only
+because the path was outside this session's fence and therefore surprising; on a path the session
+owned, `MM` would have looked ordinary.
+
+**Diagnosis:** a private-index commit moves `HEAD` and leaves the **shared** index holding
+pre-commit blobs — `INC-68`'s own step 5 exists for exactly this and is easy to skip or, as
+`INC-91` measured hours later on this same tree, to run against the wrong index. The blob found
+here is almost certainly the same mechanism as `INC-91`'s 419 lines, observed **earlier, on a
+different path, with different content**; `INC-91` is the sweeping session's account and this is
+the inheriting session's. Both are kept, on `INC-87`/`INC-88`'s precedent.
+
+**Fix:** ⚠️ **NO SHA — an index is not a commit, and naming one would be a false citation.** Nothing
+was committed, nothing was rewritten, no working-tree byte changed, and the C11 session's own
+`INC-91` (`9d38e7d`) records its re-sync of the remaining paths. The damage was, again, a loaded
+gun rather than a fired one.
+
+**Systemic guardrail:** ⚠️ **`git diff --cached` AS THE FIRST COMMAND OF EVERY SESSION, BEFORE THE
+READ ORDER**, and a non-empty result on a path the session does not own is a STOP under hard rule 1
+rather than something to work around. It costs one command and it is the only check that sees what
+a session **inherits**. ⚠️ **It is one session's habit until it is a rule** — it wants to be a line
+in `PROCESS.md` §7 and in every prompt's GIT section, and both are the **architect's**, exactly as
+`INC-68` and `OF-205` record of their own remedies. `OF-67`. Raised as `OF-213`.
+
+---
+
+## INC-94 — `make test` was measured **twice, 25 minutes apart, on the same commit**, and reported **6 failures then 4**: two of them were artefacts of a concurrent session's half-written files, and one of those was `check_roles` **C1** reporting a Groq-shaped key at a line number that, when read four minutes later, held no such string
+
+**Date:** 2026-09-03 (C10 BUILD 1, `bc69e8d7`. Found by **refusing a suspicious number** — the
+prompt named four known reds and the run produced six — rather than by any check. **No Fix SHA;**
+see **Fix**.)
+
+**Event:** this session's prompt requires it to *"MEASURE `make test` yourself and attribute
+failures BY FILE"*, and names the four known reds it did not cause. The **baseline** run, taken
+before a line of C10 was written, reported:
+
+```
+6 failed, 1128 passed in 364.30s
+  tests/test_c7_ledger.py::test_Q069_nothing_in_this_repository_imports_the_ledger_yet   <- known
+  tests/test_c8_scorer.py::test_golden2_coverage_block_reproduces                        <- known
+  tests/test_c8_scorer.py::test_null_is_not_empty_...                                    <- known
+  tests/test_lanes_operator_placeholders.py::test_the_camel_branch_is_decided_...        <- known
+  tests/test_repo_invariants.py::test_the_object_store_and_the_working_tree_agree        <- NOT
+  tests/test_repo_invariants.py::test_no_secret_shaped_string_in_any_tracked_file        <- NOT
+```
+
+The sixth read `HITS: INCIDENTS.md:7392 — Groq API key`. ⚠️ **Four minutes later, line 7392 of
+`INCIDENTS.md` in the same working tree was `"gsk" + "_" + <26 alphanumerics>          <- Groq key
+SHAPE`, which the pattern `\bgsk_[A-Za-z0-9]{20,}` cannot match**, and a fresh scan of the whole
+file for that pattern found **zero** matches. Re-running `check_secrets` directly returned
+**C1 PASS, 368 files scanned**. The file's mtime had moved to `09:53:25`, inside the window of the
+suite run: a **concurrent C11 session was writing `INC-90` — an entry whose subject is secret-shaped
+strings — while the scanner read it**, and the scanner read a half-written intermediate.
+
+The final run, after the build and after that session committed, reported **`4 failed, 1183
+passed`** — the four known reds exactly, and `1183 − 1128 = 55 = 53` new C10 tests **+ the two
+artefacts clearing**.
+
+**Expectation:** a suite measured on a fixed commit is reproducible, and a session that attributes
+failures by file is attributing them to code.
+
+**Missing:** ⚠️ **any statement of working-tree cleanliness beside a suite result.** The suite
+reports counts and file names; it reports nothing about whether the tree it measured was quiescent,
+so *"6 failed"* and *"4 failed"* are indistinguishable as evidence. Two of this repository's tests —
+the object-store/working-tree agreement check and the C1 secret scan — read **tracked files as they
+sit on disk**, so both are functions of every concurrent session's unsaved state.
+
+**Missed:** ⚠️ **`INC-91`'s own text, committed hours earlier, which says in terms that *"a
+concurrent C10 session was live in this same working tree."*** Both sessions knew about each other
+in writing, and neither treated the shared tree as a hazard to *measurement*. The signal was not
+faint: it was in the incident journal, naming this session.
+
+**Diagnosis:** two tests read tracked files from the filesystem rather than from the git object
+store, so their verdicts are functions of concurrent sessions' unsaved edits, and a suite run takes
+six to ten minutes — a window in which a live session will write. The result is that failure counts
+are not reproducible in a shared working tree, which is exactly the property attribution depends on.
+
+**Fix:** ⚠️ **NO SHA — nothing was changed, and that is the correct outcome.** Neither failure is a
+defect: `check_roles` C1 was **right** about the bytes it read, and the agreement test was right
+that the tree and the object store disagreed. Both tests are working as designed and neither may be
+weakened (hard rule 6). What this session did instead is **report both measurements, with their
+times, and attribute the difference** rather than publishing the smaller number.
+
+**Systemic guardrail:** ⚠️ **NONE — ACCEPTED, BECAUSE** the alternative is either separate worktrees
+per session, which `Q-063` declined **twice** with its reasons recorded and which is not this
+session's to reverse, or making two correct tests read from the object store instead of the disk,
+which would defeat what they exist to check. What is affordable, and is what this session did, is
+**stating the tree's state beside every suite count**: `git status --porcelain` immediately before
+and after the run, with any concurrent session's dirty paths named. A count published without it is
+a count nobody can reproduce. Raised as `OF-214`.
+
+---
+
+## INC-95 — this session's `STATUS.md` C10 row was committed by **another session**, under **another session's token**, between this session writing it and staging it: `OF-205`'s discipline protects the session that *commits* and cannot protect the session that is *committed*, and `INC-65`'s uncloseable half is now measured from the swept side
+
+**Date:** 2026-09-03 (C10 BUILD 1, `bc69e8d7`, **after** this session's first build commit
+`d07c67f`. Found by this session, from its **own staged snapshot**, before pushing — `STATUS.md`
+was simply **absent** from a `git diff --cached` that should have listed it. **No Fix SHA for the
+sweep;** see **Fix**.)
+
+**Event:** this session updated `STATUS.md`'s **C10** row — status cell to
+`🟡 BUILT (attempt 1). UNREVIEWED. NO TAG.` and an append to the review-history column, which is
+never erased. It then wrote its `PROGRESS.md` entry, and only then staged all five journal paths
+under a private index, per `INC-68` and `OF-205`. **MEASURED, off that snapshot:**
+
+```
+git diff --cached --stat        (private index, five paths added)
+  INCIDENTS.md                  | 225 ++++
+  PROGRESS.md                   | 219 ++++
+  QUESTIONS.md                  | 130 ++++
+  docs/reviews/OPEN_FINDINGS.md |  33 ++
+  4 files changed, 607 insertions(+)          <- FOUR. STATUS.md is not there.
+```
+
+⚠️ **`git status` reported `STATUS.md` CLEAN and `git diff HEAD -- STATUS.md` was EMPTY, while
+`grep -c bc69e8d7 STATUS.md` returned 2.** The edit was on disk and already in `HEAD`:
+
+```
+git log --oneline -1 -- STATUS.md
+  12f6c6f docs: C11 BUILD 1's FINAL OUTPUT, committed VERBATIM to docs/sessions/c11-build-1.txt …
+git show 12f6c6f -- STATUS.md | grep -c bc69e8d7   ->  6
+git show -s 12f6c6f | grep Session-Token           ->  Session-Token: 86ee1e45
+```
+
+**This session's C10 row is committed, correct and complete — under `86ee1e45`, the concurrent
+C11 BUILD 1 session's token, in a commit whose subject is about C11's final output.**
+
+**Action:** ⚠️ **NOTHING IS UNDONE.** History is never rewritten here (`CLAUDE.md` §5) — a rewrite
+would destroy `probe-v1`, `prereg-v1` and every `cN-pass` tag — so `12f6c6f` stands and the
+mis-attribution is corrected **by record**, which is `INC-65`'s, `INC-68`'s and `INC-88`'s own
+handling. ⚠️ **The swept content was verified INTACT rather than assumed intact:** the C10 row was
+re-read cell by cell, the table still has **6 cells** on every row of the block (C9, C10, C11, C12
+checked), the status cell holds this session's text, and the review-history column is an **append**
+with `e1956729`'s *"UNBLOCKED TO BUILD"* text still present at its head. ⚠️ **And the four
+remaining journal paths were re-checked as still this session's own** before the journal commit,
+so this entry does not itself become the next sweep.
+
+**Expectation:** work written under one token is committed under that token, or the record says
+otherwise. `PROCESS.md` §7a's whole purpose is that a token answers *"which session did this"*.
+
+**Missing:** ⚠️ **any way for a session to know its file has been committed out from under it.**
+`git status` shows the path **clean**, which is indistinguishable from *"you never edited it"* —
+and a session that trusted `git status` alone would conclude its `STATUS.md` update had been **lost**
+and write it again, producing a duplicate row. The only signal was the path's **absence** from a
+`--stat` the session expected to list five files, and that signal exists only because `OF-205`
+requires reading the staged snapshot at all.
+
+**Missed:** ⚠️ **`INC-88`'s own closing sentence, and `OF-205`'s, both of which say this in
+advance** — *"it does not close `INC-65`'s uncloseable half: **nothing can warn the session being
+swept**."* This session had read both entries **that same morning**, during its read order, and
+still treated the shared tree as a hazard only to *committing* and to *measuring* (`INC-93`,
+`INC-94`) rather than to *authorship*. The prediction was in the file, about this exact situation,
+and it was read as history rather than as a forecast.
+
+**Diagnosis:** `OF-205`'s remedy — stage and diff in one command, compose `Swept:` from that
+snapshot — is a **writer-side** guarantee: it makes a committing session's claims true about its
+own commit. It says nothing about a *third* session committing a path in the window between this
+session's edit and its staging, because in that window this session holds nothing at all: the edit
+is in the shared working tree, which is exactly where any other session's `git add` will find it.
+
+**Fix:** ⚠️ **NO SHA — nothing was fixed, because nothing is broken.** The content is correct and
+committed; only the attribution is wrong, and attribution is repaired by record and not by a
+commit. This entry, `PROGRESS.md`'s C10 entry and the session's FINAL OUTPUT each state that the
+C10 `STATUS.md` row landed in `12f6c6f` under `86ee1e45`.
+
+**Systemic guardrail:** ⚠️ **NONE FOR THE SWEEP ITSELF — ACCEPTED, BECAUSE** `INC-88` and `OF-205`
+already establish that nothing can warn the swept session while the tree is shared, and the
+structural fix is per-session worktrees, which `Q-063` declined **twice** with its reasons recorded
+and which is not this session's to reverse. ⚠️ **What IS affordable, and is now three-for-three in
+this session, is the DETECTION side:** `OF-205`'s staged snapshot caught this **only because the
+session compared the file list it got against the file list it expected**. That comparison should
+be the rule — *"stage your paths, and if the snapshot lists fewer files than you staged, a
+concurrent session has already committed one of yours; find it with `git log -1 -- <path>` and
+record the SHA and the token"* — a `PROCESS.md` §7 line, which is the **architect's**, exactly as
+`INC-68`, `OF-205` and `INC-91` record of their own remedies. `OF-67`, and it is still a habit.
+Raised as `OF-215`.
