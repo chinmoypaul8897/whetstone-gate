@@ -7501,3 +7501,115 @@ set, and history is never rewritten here — so a shape committed today is a sha
 committed output forever. This one was caught before the push; the next one might not be.
 
 ---
+
+## INC-91 — ⚠️ `INC-68`'s **step 5** was run with `GIT_INDEX_FILE` **still exported**, so four resets landed on the **private** index and the **shared** one was left holding **419 lines of stale pre-commit blobs**: the guardrail's own `export` defeated the guardrail's own remedy
+
+**Date:** 2026-09-03 (C11 BUILD 1, `86ee1e45`, after this session's fifth commit `88d9693` and
+**before** its push. **Found by this session**, from a routine `git diff --stat` that showed
+changes to six files it had already committed — a number that could not be right — and then from
+`git diff --cached`, which said why. Fix under **Fix**.)
+
+**Event:** `INC-68`'s private-index recipe, as `INC-88` restates it, is five steps:
+
+```
+export GIT_INDEX_FILE=<a path in this session's own OS temp directory>
+git read-tree HEAD
+git add -- <this session's explicit paths>
+git diff --cached                 # compose `Swept:` from THIS
+git commit
+unset GIT_INDEX_FILE
+git reset -- <the same explicit paths>          # <- STEP 5
+```
+
+⚠️ **THE `unset` IS ON ITS OWN LINE AND IT IS THE WHOLE OF WHY STEP 5 WORKS.** This session ran
+the `export`, the `add`, the `diff`, the `commit` **and step 5** as one compound shell command,
+four times. `GIT_INDEX_FILE` was still set when `git reset` ran, so **each reset reset the
+private index** — a file in a temp directory that nothing else ever reads — and the **shared**
+index was never touched after `read-tree HEAD` had populated it from a **pre-commit** `HEAD`.
+
+**MEASURED, at the moment it was found:**
+
+```
+git diff --cached --stat     (shared index vs HEAD)
+  INCIDENTS.md                        | 124 -------
+  PROGRESS.md                         | 237 -------
+  STATUS.md                           |   2 +-
+  docs/reviews/OPEN_FINDINGS.md       |  17 ---
+  src/whetstone_gate/runner/n_rule.py |  39 ++---
+  tests/test_c11_runner.py            |  12 ---
+  6 files changed, 12 insertions(+), 419 deletions(-)
+```
+
+**419 lines of this session's own committed work, staged for deletion.** A bare `git commit` by
+anybody at that instant — and a **concurrent C10 session was live in this same working tree**,
+`src/whetstone_gate/probe/` and `tests/test_c10_probe.py` untracked beside it — would have
+reverted `INC-90`, `OF-206`, `OF-207`, the `STATUS.md` C11 row, the whole `PROGRESS.md` entry and
+the corrected `limitation()`, **silently, under somebody else's token**.
+
+**Action:** ⚠️ **The shared index was re-synced BEFORE anything else was done**, with the `unset`
+on its own command this time and with the **same six explicit paths** rather than a bare
+`git reset`, because a pathless reset would also unstage anything the concurrent session had
+staged. `git diff --cached` is now **EMPTY**, verified. **Nothing was lost, nothing was
+rewritten, and no commit was amended** — the damage was a *loaded gun*, not a *fired* one, and
+this entry exists because the difference was luck rather than design.
+
+**Expectation:** that following `INC-68`'s recipe would leave the shared index matching `HEAD`.
+It is a five-line recipe, this session read it in `INC-88` in its mandatory read order, ran every
+line of it, and the recipe's own **ordering** was the thing that carried the meaning — a fact no
+line of it states, because in a transcript the `unset` and the `reset` are simply two lines and
+nothing says one must not be folded into the other's shell.
+
+**Missing:** ⚠️ **any check that the shared index matches `HEAD` at the end of a commit.** It is
+one command — `git diff --cached --quiet` — and its non-zero exit is exactly this condition. The
+session already runs `git diff --cached` **before** committing (`INC-88`'s guardrail, `OF-205`);
+running it **after**, against `HEAD`, would have caught this on the **first** of the four
+commits instead of after the fifth. ⚠️ **And `INC-68`'s recipe would be immune to the whole class
+if step 5 did not depend on ambient state at all:** `git --git-dir=… reset` with the index named
+per-invocation, or simply `GIT_INDEX_FILE= git reset -- <paths>`, cannot be defeated by an
+`export` that outlived its intended scope.
+
+**Missed:** ⚠️ **`INC-68`'s own remedy is a recipe about which index a command writes to, and
+this session's failure was writing to the wrong index.** That is the recipe's subject, missed in
+the recipe. ⚠️ **And there was a louder signal, twice:** after the fourth commit a routine
+`git diff --stat` printed **six files with 419 insertions** — files this session had *just
+committed* — and the first reading of that output was to treat it as noise from a Python
+traceback in the same command. **A diff that says work you have committed is uncommitted is
+never noise.** `INC-47`'s rule is the general form and this session quoted it in three commit
+messages today: *a claim bound to a command must be READ OFF THE COMMAND.* Here the command was
+read and its answer was explained away. ⚠️ **The sharpest miss is that this session had already
+written, in `INC-90`, that the secret rule is enforced at one level and was applied at another —
+and then did the identical thing with an index**: `git reset` was reasoned about at the level of
+*which paths*, and the thing that mattered was *which index*.
+
+**Diagnosis:** `GIT_INDEX_FILE` is process-environment state and a compound shell command is one
+process, so an `export` at the head of a line is still in force at its tail; step 5's `unset` is
+a separate line in the recipe precisely because it must take effect before the `reset`, and
+nothing enforces that ordering when both are folded into one invocation. A guardrail whose
+correctness depends on ambient state is a guardrail that can be defeated by the environment it
+sets up for itself.
+
+**Fix:** ⚠️ **NO SHA FOR THE INDEX ITSELF — an index is not a commit, and saying so is more
+honest than naming one.** The re-sync (`GIT_INDEX_FILE` unset, `git reset -- <the six paths>`)
+changed no tracked file and produced no object; `INC-65` set the precedent for a `Fix:` field
+that records this rather than inventing a SHA. What *is* committed is this entry and the
+`PROGRESS.md` and `STATUS.md` lines that name it — **`THIS ENTRY'S OWN COMMIT SHA, FILLED BY THE COMMIT THAT FOLLOWS IT AND BY NOTHING ELSE`** — and the remedy in use for the
+rest of this session is under **Systemic guardrail**. ⚠️ **A SHA IS NOT WRITTEN BEFORE IT EXISTS:** hard rule 13
+requires the `Fix` field to carry one, and an invented one would be exactly the *"invented
+incident has no commit"* that the rule's own closing sentence is about. The precedent for
+filling it afterwards, by the next commit and by nothing else, is `e022c86`.
+
+**Systemic guardrail:** ⚠️ **ONE, MECHANICAL, ONE COMMAND, AND IT IS THE `INC-88` DISCIPLINE
+POINTED AT THE OTHER END OF THE COMMIT:** after `git commit` and after step 5, run
+`git diff --cached --quiet` **with `GIT_INDEX_FILE` unset** and refuse to proceed on a non-zero
+exit. The pre-commit half of this is already `OF-205`; this is the post-commit half, and between
+them the index is read immediately before and immediately after every commit. ⚠️ **The stronger
+form, which removes the dependence on ambient state rather than checking for it, is to write step
+5 as `GIT_INDEX_FILE= git reset -- <paths>`** — a per-command override that an outer `export`
+cannot defeat. ⚠️ **WHAT IT DOES NOT CLOSE, SAID PLAINLY:** like `INC-68`'s and `INC-88`'s
+remedies before it, this wants to be a line in `PROCESS.md` §7 and in every prompt's GIT section,
+**both of which are the ARCHITECT'S**, and `src/whetstone_gate/check_roles.py` — where a
+mechanical form could live as a check — is named under **NOT** in this session's fence. Until
+then it is one session's habit, which is what `OF-67` says about the last six of these. Recorded
+as **`OF-208`**.
+
+---

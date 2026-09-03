@@ -210,11 +210,37 @@ git-history scan using that exact pattern set, with history never rewritten.
 ### MEASUREMENTS, AND WHAT THIS SESSION DID NOT DO
 
 - **`make test` BEFORE** (at `2a5c5e3`, before a line was written): **`3 failed, 1067 passed,
-  2 deselected`** in 233.7 s. **AFTER** (at `d63f722`): **`4 failed, 1128 passed, 2 deselected`**
-  in 377.9 s, the fourth being `test_the_object_store_and_the_working_tree_agree` naming
-  **`QUESTIONS.md`**, this session's own uncommitted journal at the time of the run — it clears
-  on commit. **+61 tests, all C11's, all green. Attributed BY FILE in the FINAL OUTPUT; every
-  other failure is another file's and none was touched.**
+  2 deselected`** in 233.7 s. **AFTER**, measured on a **CLEAN TREE** at `88d9693`:
+  **`3 failed, 1129 passed, 2 deselected`** in 399.9 s. **+62 tests, all C11's, all green, and
+  the SAME THREE known reds as the baseline** — attributed BY FILE in the FINAL OUTPUT; every
+  one is another file's and none was touched. ⚠️ **An intermediate run at `d63f722` read
+  `4 failed, 1128 passed`, the fourth being `test_the_object_store_and_the_working_tree_agree`
+  naming this session's own UNCOMMITTED journals.** It cleared on commit, and the intermediate
+  figure is named here rather than dropped: a session that quotes only its best measurement has
+  chosen one. **`make selftest`: 1 failed, 1 passed, 1,185 deselected** — the one being
+  `test_the_camel_branch_is_decided_before_any_camel_run` on **`TODO_C13_RUN1`**, C13/RUN-1's
+  and not this session's.
+- ⚠️ **A FINDING AFTER THE JOURNAL COMMIT, `88d9693`, FOUND BY PRINTING THE REPORT RATHER
+  THAN BY ANY CHECK: the PUBLISHED limitation repeated the ruling's *"regardless"* as an
+  unqualified claim that this repository's own suite REFUTES.** `limitation()` is the string a
+  report prints so the limitation cannot be forgotten, and its first version restated the
+  ruling's reason verbatim while a test twelve hundred lines away **in the same commit** proved
+  that sentence false under the RECOMPUTED reading. **That is `PROCESS.md` §9's named failure**
+  — *"three false claims about other people's code reached the specification before an audit
+  caught them, which is why the rule is a rule and not a habit"* — committed against **our own
+  ruling** instead of somebody else's paper. The string now names **both** readings, gives the
+  **31,908 / 31,909** break-even and **24,310** below it, and cites `Q-121`; the test asserts
+  the qualification is present **and** that the unqualified word is absent, so the weaker form
+  cannot come back silently.
+- ⚠️ **AND `INC-91`, THIS SESSION'S SECOND OWN INCIDENT: `INC-68`'s STEP 5 WAS RUN WITH
+  `GIT_INDEX_FILE` STILL EXPORTED**, so four `git reset -- <paths>` calls landed on the
+  **private** index and the **shared** one was left holding **419 lines of stale pre-commit
+  blobs across six files**. A bare `git commit` by the concurrent **C10** session live in this
+  same tree would have **reverted this session's work silently** — which is precisely the
+  hazard step 5 exists for, defeated by the very `export` that makes the private index work.
+  **Found by reading `git diff --cached` when a routine `git diff --stat` showed changes that
+  should have been committed**, re-synced before anything else, and `git diff --cached` is now
+  **EMPTY**.
 - **`make check-roles`: 21 passed / 0 failed / 3 n/a, exit 0.** **D1, D2, D3 and D4 all PASS**
   with the runner present, which is `Q-119`'s own claim measured rather than asserted.
 - **`git status --porcelain tests/goldens/` EMPTY** and **all nine golden diffs EMPTY.**
