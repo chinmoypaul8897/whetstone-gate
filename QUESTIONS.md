@@ -118,6 +118,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `5a2c81df` | C18 | BUILD | 2026-09-03 |
 | `3d7e50ba` | C12 | BUILD | 2026-09-03 |
 | `c1f0a4d8` | ARCH | FIX | 2026-09-03 |
+| `8b46f2e1` | ARCH | FIX | 2026-09-03 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -11732,3 +11733,94 @@ the benign solver is renumbered, or the driver takes a new id (**C12a / C22**) a
 a row for it. ⚠️ **`PROCESS.md` §12.1's C18 row lists `C12` among its dependencies**, so the
 answer decides which deliverable C18 is waiting on — and today the plan says *benign solver*
 while the repository holds *a driver*.
+
+---
+
+## ⚠️ RULINGS RECORDED BY ARCH FIX — PILOT DECLARED (`8b46f2e1`), 2026-09-03 — `Q-141`, `Q-144`, `Q-147` AND `Q-149` ARE ALL RULED
+
+⚠️ **SELF-RECORDED.** The `8b46f2e1` row was appended to `## Session tokens` by this session;
+the token is the architect's and only the row is this session's. **NO ORDINAL IS CLAIMED**, and
+`OF-225` is why: `Q-025`'s self-record numbering stopped at row 43, seven later self-records say
+only *"SELF-RECORDED"*, and **the ordinal is therefore no longer derivable from the file**.
+Continuing the sequence would mean inventing a number in the shape of a measurement.
+
+⚠️ **RECORDED BEFORE ANYTHING ELSE WAS TOUCHED**, as hard rule 5 requires — before
+`evals/pilot/RUN_DECLARED.md` was written, before `STATUS.md`, before `PROGRESS.md`.
+**The rulings are the architect's, transcribed verbatim from the prompt that carried them.**
+This session made no ruling of its own and resolved no other open question.
+
+### THE FOUR RULINGS, VERBATIM
+
+> Q-141 is RULED: **authorization-is-the-payment**. A capture references the payment's OWN
+> authorized state. Razorpay's surface carries no separate authorization object, so the competing
+> reading returns INDETERMINATE on EVERY capture — which BLOCKS, WHICH FLATTERS OUR OWN GATE, and
+> which makes S3 UNFIRABLE. That is the exact shape S9.2 withdrew two S2 definitions for, and C12
+> BUILD 1 was right to refuse to choose it silently. The folded state can see which payments are
+> authorized because the world's opening state supplies it.
+> Q-144 is RULED: **arm 1**. The pilot measures ATTACKER tokens per episode for S13.4's rule. Arm 1
+> is the only arm where no gate truncates an episode early and no judge adds lane load, so it
+> measures the attacker and nothing else — and it is the CONSERVATIVE direction, since arm-1
+> episodes run their full turn budget.
+> Q-147 is RULED: **200 calls and 600,000 tokens, PER LANE**, exactly as C12 BUILD 1 derived them —
+> ten episodes x `attacker.turn_budget` and ten x `attacker.target_tokens_per_episode`, both read
+> from config/. They are DERIVED, not chosen, which is why they are right; and they are CEILINGS,
+> never targets.
+> Q-149 is RULED, AND THE ERROR IS THE ARCHITECT'S: the C12 prompt reused a chunk id. `plan.md` and
+> STATUS.md give C12 as the BENIGN SOLVER and that row STANDS UNTOUCHED. The episode driver is its
+> own deliverable under its own id. C18's dependency on C12 means THE BENIGN SOLVER.
+
+### WHAT EACH RULING CHANGES, AND WHERE IT LANDS
+
+**`Q-141` — CLASS A, and it was the only one of the four that could move a published number.**
+`--s3-binding` stays a **required** flag with no default; what the ruling supplies is the value the
+pilot and every scored arm-4 episode are declared with. The literal is
+`authorization-is-the-payment`, which is `driver/episode.py`'s
+`S3_AUTHORIZATION_IS_THE_PAYMENT` — **the string is checked against the source, not assumed**, so
+the declared command cannot name a choice the parser would reject. **The rejected reading is named
+in the declaration as well as the accepted one**, because a pre-registration that records only the
+option taken hides the option that flattered.
+
+**`Q-144` — the pilot runs arm 1.** Arm 1 has **no gate**, so `gemma-26b` makes **zero gate-judge
+calls** in this run even though §13.3.2 puts the judge on that same lane. That is what makes the
+measurement clean, and it is also why `OF-240` — the resumed-judged-arm token split that
+`runner/checkpoint.py` cannot recover — **cannot fire on this run**: for a judge-less arm
+`tokens_spent` **is** the attacker figure and a resume is exact. **`OF-240` stays OPEN**; it is
+merely not on this run's path.
+
+**`Q-147` — 200 calls and 600,000 tokens, per lane, never pooled.** The ruling adopts C12 BUILD 1's
+arithmetic rather than a new number, and both figures are re-derived from `config/` in
+`evals/pilot/RUN_DECLARED.md` with their keys named. `Q-147` asked *"whether the sanction belongs in
+`evals/pilot/RUN_DECLARED.md`, which §6b already requires to name the exact command"*. **It does,
+and it now is** — the declared command carries `--call-ceiling 200 --token-ceiling 600000` and the
+declaration states the derivation beside them. **Nothing in `config/` was added or changed**: the
+ceilings remain the prompt's sanction, as hard rule 12 has them, and both flags remain
+`required=True` so no future run inherits them by default.
+
+**`Q-149` — the C12 collision is the architect's error, and the plan absorbs it rather than the
+repository.** `STATUS.md`'s **C12** row (*benign solver + the 30 benign scenarios + the paired-FP
+harness*, `todo`) **was not touched by this session at all** — not its status, not its
+review-history column — because the ruling says it stands untouched and the safest reading of
+"untouched" is the literal one. The driver keeps the distinct id C12 BUILD 1 gave it,
+**`C12-DRIVER`**, which is the row that already exists. ⚠️ **`PROCESS.md` §12.1's C18 row lists
+`C12` among its dependencies and that now resolves to THE BENIGN SOLVER, which is `todo`** — so
+C18's dependency is **unmet**, and it was unmet before this ruling too; what the ruling removes is
+the ambiguity about which deliverable it is waiting on, not the gap.
+
+### ⚠️ WHAT THIS SESSION DID **NOT** RULE, AND WHAT IS STILL OPEN AGAINST THE PILOT
+
+**`Q-145` IS STILL OPEN AND IT STILL BLOCKS THE PILOT.** ⚠️ **MEASURED AGAIN IN THIS TREE,
+2026-09-03: `corpora/fetched/` DOES NOT EXIST.** `corpora/MANIFEST.md` and `corpora/seed_index.json`
+are committed; the payloads are **pinned, not committed** (`Q-010`). A real run refuses in
+**preflight** — which is C12's fix and is the right shape — but the refusal still lands **after**
+`RUN_DECLARED.md` is pushed and the single-shot clock has started, unless the operator fetches the
+corpora first. **This session therefore wrote the corpus fetch into the declaration's own
+preconditions**, beside `probe-v1`, rather than leaving it to fire at episode 1. ⚠️ **That is a
+declaration written to be honest about a precondition, NOT a ruling on `Q-145`**: whether *"fetch
+the corpora and verify their pins"* becomes a numbered step of `PROTOCOL.md` §6 is still the
+architect's, and `PROTOCOL.md` is a frozen-set artefact this session may not edit.
+
+**`Q-140`, `Q-142`, `Q-143`, `Q-146` and `Q-148` are untouched and stay as C12 BUILD 1 left them.**
+`Q-140` (the tool-call grammar and schema block, outside the freeze and experiment-visible) and
+`Q-143` (no machine-readable pilot-role key in `config/lanes.yaml`) both ask for a `config/` change
+before `prereg-v1`; **this session's fence excludes `config/`**, so neither could be actioned here
+even had it been ruled.
