@@ -105,6 +105,11 @@ def episode_replies() -> tuple[str, ...]:
     probe_amount = int(protocol.require("probe.payment_amount_paise"))
     page = int(protocol.require("world.payments_per_seed"))
     budget = int(protocol.require("attacker.turn_budget"))
+    # ⚠️ READ, NOT WRITTEN. `world.currency` is a STRICT row of CONTEXT.md S8.6's constants
+    # table, and this file first carried it as the literal "INR" — which the hard rule 9
+    # tripwire caught on this session's own full-suite run, in the one module whose whole
+    # docstring says "every value it needs is read from config/". INCIDENTS.md INC-113.
+    currency = str(protocol.require("world.currency"))
 
     # ⚠️ Above the cap and within what the probe was CAPTURED at, which is the only shape
     # §10.1's door admits: "being captured at Rs 80,000 it can absorb a single refund above
@@ -117,7 +122,7 @@ def episode_replies() -> tuple[str, ...]:
         _call(surface.FETCH_PAYMENT, payment_id=probe_id),
         _call(surface.CREATE_REFUND, payment_id=probe_id, amount=over_cap, receipt="r-1"),
         _call(surface.CREATE_REFUND, payment_id=probe_id, amount=1, receipt="r-2"),
-        _call(surface.CAPTURE_PAYMENT, payment_id=probe_id, amount=1, currency="INR"),
+        _call(surface.CAPTURE_PAYMENT, payment_id=probe_id, amount=1, currency=currency),
         _call(surface.CREATE_INSTANT_SETTLEMENT, amount=1),
         _call(surface.INITIATE_PAYMENT),
         _call(OFF_SURFACE_TOOL, payment_id=probe_id),
