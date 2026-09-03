@@ -6,6 +6,209 @@ not a record; this file is.
 
 ---
 
+## ARCH — **PILOT RUN** — 2026-09-03 — 🟡 **`probe-v1` IS CUT AND PUSHED. THE CORPORA ARE FETCHED AND PIN-VERIFIED. ⚠️ THE PILOT DID NOT RUN, THE UTC START TIME WAS DELIBERATELY LEFT BLANK, AND ZERO TOKENS WERE SPENT.**
+
+**SESSION-TOKEN:** `7c05e3b9` · ⚠️ **SELF-RECORDED** into `QUESTIONS.md`'s `## Session tokens`
+table, in the operator's working tree at `C:\Users\chinm\whetstone-gate` (`INC-54` requires a session
+to say which tree). **NO ORDINAL IS CLAIMED, and `OF-225` is why:** `Q-025`'s self-record numbering
+stopped at row 43 and the ordinal is no longer derivable from the file. **The token is the
+architect's; only the row is this session's.**
+
+⚠️ **THE TREE MOVED UNDER THIS SESSION AND THE COMMITS ARE NAMED** (`OF-214` requires it, and a
+suite count here would not be reproducible). It opened at `34a8548` — *"chore(journal): ARCH PILOT
+DECLARED …"* — and this session's own commits are `01ea31f`, `aa9e24c`, `4ce8f56` and the journal
+commit carrying this entry. ⚠️ **A CONCURRENT BENIGN-SOLVER SESSION (`2e94c7b5`) HELD
+`src/whetstone_gate/benign/` AND `tests/test_c12_benign.py` THROUGHOUT** — both untracked at open and
+still untracked at close, **neither touched by this session**, and it landed nothing while this
+session ran. The other untracked path, `grep.exe.stackdump`, is **not this session's**, predates it
+(mtime 10:56), is outside its fence, and was left exactly where it was — the previous session's entry
+records the same thing.
+
+**VERDICT: THREE OF FIVE TASKS DONE IN FULL. TWO NOT DONE, AND THE REASON IS A CLASS A STOP, NOT A
+SHORTFALL OF EFFORT.** ⚠️ **NOTHING IS SELF-CERTIFIED. `prereg-v1` WAS NOT CUT. THE CALIBRATION AND
+THE SWEEP WERE NOT STARTED.**
+
+⚠️ **TOKEN SPEND: ZERO. NO PROVIDER MODEL CALL OF ANY KIND, IN ANY LANE.** `evals/usage/` does not
+exist, so there was nothing to read before a first call and no first call to make. Both sanctioned
+lanes — `gemma-26b` and `qwen-27b` — are **untouched**, at **0 calls and 0 tokens** each, against
+sanctioned ceilings of 200 calls and 600,000 tokens per lane. **The 429 rule was never reached
+because no request was ever made.** Network was used for **HTTP and git only**: four corpus fetches
+and two `git push`es.
+
+---
+
+### ⚠️ WHY THE PILOT DID NOT RUN — `Q-150`, CLASS A, AND IT WAS FOUND BEFORE THE CLOCK STARTED
+
+**The declared command cannot execute.** `src/whetstone_gate/driver/__main__.py:181-188` takes the
+`--spend-real-tokens` branch to `else _refuse_to_invent_a_provider_client()`, which raises
+`RunRefused` at **exit 2** with **zero episodes, zero ledgers, zero checkpoints and zero tokens**.
+**This package deliberately ships no provider client** — it is **item 7 of `RUN_DECLARED.md` §7.3's
+own preconditions**, C12 BUILD 1's reason for it is itself a single-shot argument, and
+`RUN_DECLARED.md` calls it *"A DELIBERATE DELIVERABLE, NOT A GAP"*. **It is right about that.**
+
+⚠️ **WHAT IS NEW IS THE OWNERSHIP.** Every prompt issued against the pilot has fenced `src/` **OUT**,
+this one in capitals. C12 BUILD 1 was told not to write the client; `ARCH FIX — PILOT DECLARED`
+could not; this session may not. **So the client is owed to somebody and owned by nobody**, and the
+declaration's *"the operator supplies it at the call site"* names a call site the declared command
+never reaches — `tasks drive` is a CLI that constructs its own client and accepts no injection point.
+`Q-150` names three options and **rules none.**
+
+⚠️ **THE REFUSAL WAS MEASURED, NOT ASSUMED — AND MEASURED WITHOUT STARTING ANYTHING.** The function
+was called **directly** in a one-liner, so **neither declared command was executed**, nothing was
+written, and the single-shot clock was never started. Its verbatim text is in this session's FINAL
+OUTPUT.
+
+### ⚠️ AND THEREFORE THE UTC START TIME WAS NOT FILLED. THAT IS A DECISION, NOT AN OMISSION.
+
+`RUN_DECLARED.md` §8: *"THE TIME MUST BE THE TIME YOU ARE ABOUT TO START … A declaration carrying a
+start time earlier than the run is a pre-registration that was written afterwards — which is the one
+thing this whole artefact exists to rule out."* And `RESULTS.md` prints **declared-versus-actual start
+times beside the threshold they produced**. ⚠️ **Filling in 2026-09-03 for a run that provably cannot
+begin would have made the declaration false in exactly the way §8 forbids, and visibly so in the
+published output.** §8 also says a placeholder left unfilled is visible there — **visible and
+honest is the correct one of those two.** `evals/pilot/RUN_DECLARED.md` is therefore **unchanged, and
+`evals/` still holds only that one file.**
+
+---
+
+### ✅ TASK 0 — the amendment, recorded verbatim BEFORE it was applied
+
+`PROCESS.md` §1's *"long runs execute in the operator's terminal"* is **NARROWED, NOT DELETED**: a run
+may execute inside a session **if it is checkpointed and resumable and any abort is recorded before a
+retry**, with anything over roughly **two hours** going to the operator's terminal. **The original
+bullet is left STANDING and UNSTRUCK immediately above the new one**, so a reader sees what the rule
+WAS and what it BECAME. Hard rule 5 was obeyed literally — the `QUESTIONS.md` block was written and
+the text transcribed **before `PROCESS.md` was opened.**
+
+⚠️ **AND IT REACHES ONE OF THREE COPIES.** `CLAUDE.md` §4 and `PROCESS.md` §8 still carry the
+original and are **outside this session's fence** — named in `QUESTIONS.md` rather than left to be
+discovered. **It does not block anyone:** the amendment is permissive, so a session obeying the
+unamended `CLAUDE.md` is obeying the *stricter* reading. **§6b is untouched**, and the commit message
+says so, because a permissive amendment sitting next to a single-shot rule invites the wrong reading.
+
+### ✅ TASK 1 — the corpora are fetched and pin-verified — **and running the documented fetch is what found `INC-114`**
+
+**All four pins verified against their expected values character for character.** Three trees:
+`status --porcelain` **empty**, `git diff <pin>` **empty**. AgentHarm's SHA-256 **matches**. **All
+five `MANIFEST` §2 payload hashes match, every byte count equals §2's, and `corpus.load_entries()`
+loads 498 entries across 5 sources** with its own hash-verification satisfied. `corpora/fetched/` is
+**invisible at the repository root** (`git check-ignore` proves it, `Q-010`) and **nothing was
+staged**. **R-Judge was not fetched and is not present — cited, never vendored.**
+
+⚠️ **`INC-114`: `MANIFEST` §3's FETCH BLOCK, RUN EXACTLY AS WRITTEN, PRODUCES PAYLOADS THAT FAIL §2's
+HASHES — AND §4's VERIFICATION PASSES ANYWAY.** Four of five mismatched, **each by exactly its own
+carriage-return count** (+30/+32/+12/+400 against CR counts 30/32/12/400); the fifth matched because
+it is fetched with `curl`. Git for Windows sets `core.autocrlf=true` **system-wide** and §3 `git
+init`s three brand-new repositories that inherit it. **Hashing the git objects with `git show` matched
+all four exactly, which is the proof.** §4's three commands verify the **objects**, so git correctly
+reports the tree unmodified — **§4 cannot see this and never could.**
+
+⚠️ **MISSED, AND THIS IS THE PART WORTH READING: `PROCESS.md` §6a.1 IS THIS EXACT FAILURE, WRITTEN
+OUT IN FULL, WITH THIS MACHINE'S `core.autocrlf` MEASURED AND A TWO-DIGEST TABLE PROVING CRLF AND LF
+HASH DIFFERENTLY — AND IT IS IN THIS SESSION'S OWN PRESCRIBED READ ORDER.** Its remedy, a
+`.gitattributes` committed in C0, was implemented **for this repository** and **does not reach a
+nested repository that §3 creates itself.** Two sessions had already raised `Q-145` without either
+noticing the fetch would not satisfy the hashes.
+
+**Fixed in the tree, NOT in the document.** `corpora/MANIFEST.md` is outside this fence and was not
+edited; `Q-152` writes out the corrected recipe and an added `sha256sum` line for §4. ⚠️ **And the
+residual is named: `corpora/fetched/` is gitignored, so the payload fix HAS NO COMMIT AND CANNOT HAVE
+ONE — a fresh clone reproduces the defect.** `git checkout-index -f` was tried first and **did
+nothing**, twice, and once more after `git update-index --really-refresh`; **the obvious command is
+the one that silently fails**, which is why `INC-114` records it.
+
+### ✅ TASK 2 — `probe-v1` is cut and pushed. **Permanent, and cut WITHOUT C14's verification review.**
+
+| | |
+|---|---|
+| tag object id | `170bd3ff4abfdd8f87f64055972a60c82cc54efc` |
+| commit | `4ce8f5669c0d02371bfc7529e42b8c511d9dc33c` |
+| tree | `bd8e450617970753c17be53b2ba42a3fe4615160` |
+| `HOLES.md` git-blob SHA-256 at the tag | `0fb1e5cdd8afe06c6b26a0502d76618d02afe26e13781bcf7382e2d7c5895b73` |
+
+**`git tag -l` before:** the six `cN-pass` tags, **neither `probe-v1` nor `prereg-v1`**.
+**After:** the same six **plus `probe-v1`**. `git rev-parse --verify refs/tags/probe-v1` **exits 0**,
+the push reported `[new tag]`, and **the driver's own `probe_tag_resolves()` now returns `True`**.
+`HOLES.md` at the tag is **byte-identical** to `HOLES.md` at HEAD and `git diff probe-v1 -- HOLES.md`
+is **empty** — this session **verified that file and did not edit it**, as its fence required.
+
+**All three preconditions verified first:** neither tag existed; **all seven rows of `HOLES.md` §1.1
+agree with `config/protocol.yaml` read THROUGH THE LOADER**, with the `HOLES.md` side **parsed out of
+the file rather than retyped** so a drift could not be papered over by this session's own typing, and
+**all six separate statements of S4's window width agree with the one config key**; and **§3.1 carries
+`Q-122`'s amended CANARY-A sentence** — episodes over episodes attempted, *"an episode with five
+breaches counts once"*, with the **entry count** named as a separate published figure that is
+explicitly *"NOT THIS RATE'S NUMERATOR"*.
+
+⚠️ **AND NOW THE PART THAT IS NOT A PASS.** `plan.md`'s C14 card requires a `full` **verification**
+review and **it has not happened**: `docs/reviews/` holds no C14 review and there is no `c14-pass`.
+**The tag cannot be moved or deleted**, so a C14 review that now finds a defect in `HOLES.md` has
+exactly one remedy left under `PROCESS.md` §6 — **publication as a limitation, not correction.**
+**It is recorded plainly in `QUESTIONS.md`, in `STATUS.md` and here, because a permanent tag cut
+quietly over an unreviewed artefact is precisely the thing this project criticises in other people's
+work.** §6 anticipated this shape once before, in revision 1, and publication is the remedy it
+supplies.
+
+### ⚠️ `Q-153` — THE TAG RESOLVES AND `ledger.genesis_hash` STILL READS `PRE-FREEZE`
+
+**Measured through the loader seconds after the push.** `RUN_DECLARED.md` §7.1: *"`ledger.genesis_hash`
+MOVES WITH THE TAG, AND IT IS THE FREE PROOF … from `probe-v1` it is that tag's object id."*
+`PROCESS.md` §6a.4 calls it *"the one free proof available"* and says revision 1 threw it away.
+**As the tree stands, any episode written now would chain from `PRE-FREEZE` and be indistinguishable
+from a pre-freeze one.** The proof is not damaged — it is **not being taken.** `config/` is outside
+this fence and setting it would also stale `PROTOCOL.md`'s manifest row, already owed at `Q-125`.
+⚠️ **Because the pilot did not run, no ledger exists under `PRE-FREEZE`, so the good option is still
+open — and `evals/` being append-only with operator-only deletion is why it would not have been.**
+
+### ⚠️ `Q-151` — raised BEFORE the tag, while it could still be answered from outside a frozen file
+
+`HOLES.md`'s header says it is **never edited after `probe-v1`**; its own §3.5 says the calibration
+writes the threshold **into this file**. `CONTEXT.md` §15.1 outranks and implies the file is **tagged
+twice on purpose** — predicates fixed with the number unknown, then the number added — which is the
+whole stated reason there are two tags. **But the header does not say that, and after the tag nobody
+can make it say it.** This is `Q-098`'s shape and is raised the same way.
+
+---
+
+### THREE CORRECTIONS THIS SESSION MADE TO ITS OWN WORK, BEFORE COMMITTING IT
+
+1. **`Q-150` quoted the driver's branch as `if not arguments.spend_real_tokens`; the source says
+   `if request.dry_run`.** Equivalent in effect — the parser makes the mode group required and
+   mutually exclusive — **but a ruling file that quotes source must quote it**, and a paraphrase
+   inside a code fence reads as a transcription. Corrected, with the correction itself recorded in the
+   entry, and the cited line range fixed to `181-188` to match the block actually quoted.
+2. **Three Gate 2 checks reported `***ABSENT***` on text that was plainly present**, because the
+   verifier's own literals broke on **markdown line-wrap position** and then on a **`>` blockquote
+   marker splitting a phrase**. Re-run with blockquote markers stripped and whitespace flattened, so
+   neither can produce a false negative. ⚠️ **Worth recording because the failure direction was
+   safe by luck, not by design: it said STOP when it should have said PASS. The same brittleness
+   pointed the other way is a verifier that certifies a drifted frozen artefact.**
+3. **`INC-114`'s `Fix` field carried a placeholder** until its own commit existed, then was filled
+   with `aa9e24c` — and now also states plainly that **that commit carries no payload**, because
+   `corpora/fetched/` is gitignored and claiming a commit for the byte fix would be inventing one.
+
+### WHAT THIS SESSION DID NOT DO
+
+* ❌ **Task 3 — the UTC start time was NOT declared and `RUN_DECLARED.md` was NOT edited.** By
+  decision, for the reason above.
+* ❌ **Task 4 — the pilot was NOT run.** `Q-150`. **No abort entry was written, because there was no
+  abort:** nothing was started, no episode was attempted, and the partial episode count is **zero of
+  twenty** in the sense that **the matrix was never opened**. §6b's abort machinery is for an
+  execution that began; **this one never did, and calling it an abort would put a run in the record
+  that does not exist.**
+* ❌ **`prereg-v1` was NOT cut**, **the calibration was NOT started**, **the sweep was NOT started**,
+  and **`N` was NOT written into `config/`** — no `select_n` answer exists to write, because the
+  measurement that feeds it was never taken.
+* ❌ **`src/`, `tests/`, `config/`, `tests/goldens/`, `CONTEXT.md`, `HOLES.md`, `PROTOCOL.md`,
+  `INVARIANTS.md` and `PROVENANCE.md` were NOT edited**, and no tag other than `probe-v1` was
+  touched.
+
+**FILES THIS SESSION WROTE:** `QUESTIONS.md`, `PROCESS.md` (§1's one clause), `INCIDENTS.md`,
+`STATUS.md`, `PROGRESS.md`, `docs/sessions/arch-pilot-run-1.txt`, and `corpora/fetched/` (new,
+gitignored, uncommittable).
+
+---
+
 ## ARCH — **FIX, PILOT DECLARED** — 2026-09-03 — 🟢 **FOUR RULINGS RECORDED AND THE PILOT IS DECLARED. IT HAS NOT STARTED, AND THIS SESSION DID NOT RUN THE DRIVER IN ANY MODE.**
 
 **SESSION-TOKEN:** `8b46f2e1` · ⚠️ **SELF-RECORDED** into `QUESTIONS.md`'s `## Session tokens`
