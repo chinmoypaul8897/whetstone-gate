@@ -8958,3 +8958,94 @@ registry from silently losing that row. ⚠️ **The honest residual is the one 
 nothing catches a *docstring* that claims a property the code does not have, and this session
 produced two such docstrings in one day. That is not closeable by a scanner and is not claimed to
 be; it is what the adversarial review reads for.
+
+
+---
+
+## INC-114 — `corpora/MANIFEST.md` §3's fetch block, run **exactly as written**, produces payloads that FAIL §2's hashes on Windows — and §4's verification passes anyway
+
+**Event:** ARCH — PILOT RUN (`7c05e3b9`) ran `corpora/MANIFEST.md` §3's four fetch commands verbatim
+from the repository root. All four landed on their pinned revisions. §4's verification then passed on
+all three git trees: `git rev-parse HEAD` printed each pin character for character, `git status
+--porcelain` was **empty**, and `git diff <pin>` was **empty**. ⚠️ **The session then checked §2's five
+payload SHA-256s, which §4 does not ask for, and FOUR OF THE FIVE MISMATCHED:**
+
+| File | §2 bytes | measured bytes | delta | `tr -dc '\r' \| wc -c` |
+|---|---|---|---|---|
+| `injecagent/data/attacker_cases_dh.jsonl` | 10,937 | **10,967** | +30 | **30** |
+| `injecagent/data/attacker_cases_ds.jsonl` | 13,209 | **13,241** | +32 | **32** |
+| `agentdojo/…/banking/injection_vectors.yaml` | 657 | **669** | +12 | **12** |
+| `asb/data/all_attack_tools.jsonl` | 209,436 | **209,836** | +400 | **400** |
+| `agentharm/benchmark/harmful_behaviors_validation.json` | 22,584 | **22,584** | **0** | **0** |
+
+**Every delta equals that file's carriage-return count exactly.** The one file that matched is the one
+fetched with **`curl`** rather than checked out by git.
+
+**Action:** the session hashed the **git objects** instead of the working-tree files —
+`git show HEAD:<path> | sha256sum` — and **all four matched §2 exactly.** `git ls-files --eol` read
+`i/lf w/crlf attr/`. `git config --show-origin --get-all core.autocrlf` read
+`file:C:/Program Files/Git/etc/gitconfig  true`. The diagnosis being proven, each of the three trees
+got `git config core.autocrlf false`, `git config core.eol lf`, then `git rm --cached -r -q .` (which
+does **not** touch the working tree; it drops the index's stale stat cache) followed by
+`git reset --hard <the pin>` to re-materialise. All five payload hashes then matched, every byte count
+equalled §2's, `tr -dc '\r'` returned **0** on all five, §4's three checks still passed on all three
+trees, and `corpus.load_entries()` loaded **498 entries** across **5** sources with its own
+hash-verification satisfied.
+
+⚠️ **`git checkout-index -f` was tried FIRST and DID NOTHING** — twice, and once after
+`git update-index --really-refresh`. The file stayed at 669 bytes with 12 CRs. The index's cached stat
+data records the **working-tree** size written at checkout, so git believed the file current and
+declined to rewrite it. That is why the heavier `rm --cached` + `reset --hard` was needed, and it is
+recorded because the obvious command is the one that silently fails.
+
+**Expectation:** §3 is titled *"Reproducing the checkouts"* and §2 says *"The loader verifies each
+hash before it parses, because once the payload is not committed **the pin is the entire integrity
+story**."* Running §3 verbatim should therefore produce bytes that satisfy §2. It does not, on the
+machine this project runs on.
+
+**Missing:** ⚠️ **a check that compares §2's hashes.** §4 is titled *"Verifying a fetched tree has not
+been touched"* and its three commands verify **the git objects** — the tree is at the pin and nothing
+was edited. **All three pass while the bytes the loader reads are wrong**, because git knows about its
+own conversion and correctly reports the tree unmodified. **§4 cannot detect this defect, and it is
+the only verification §3 hands the operator.** A fourth line — `sha256sum` over the five files in §2 —
+would have caught it in the same breath, with no new machinery.
+
+**Missed:** ⚠️ **`PROCESS.md` §6a.1 IS THIS EXACT FAILURE, WRITTEN OUT IN FULL, WITH THIS MACHINE'S
+`core.autocrlf=true` MEASURED AND QUOTED, AND A TWO-HASH TABLE SHOWING THE CRLF AND LF DIGESTS OF ONE
+FILE DIFFERING.** It says *"Do not hash working-tree bytes"* and warns the failure would land *"at the
+moment of judging, silently, and look like fraud rather than a line-ending bug."* Its remedy —
+`.gitattributes` with `* text=auto eol=lf`, *"a C0 DELIVERABLE, not a 31 August step"* — was
+implemented, **and it does not reach here**: `corpora/fetched/*` are **separate repositories**, created
+by §3's own `git init`, which inherit the system gitconfig and carry no `.gitattributes` of their own.
+**The signal was read by this session before it started** — §6a.1 is in the prescribed read order — **and
+it was read as being about the pre-registration fingerprint rather than about any hashed file.** Two
+sessions had already recorded `Q-145` (*"the corpora are not fetched, so no episode can run"*) without
+either noticing that the fetch as documented would not satisfy the hashes.
+
+**Diagnosis:** the Git for Windows installer sets `core.autocrlf=true` **system-wide**, so the four
+`git init`ed corpus repositories convert LF to CRLF on checkout, while `corpus.py` hashes
+`target.read_bytes()` — the converted working-tree bytes — against pins computed from the **objects**.
+§4 verifies the objects and therefore certifies a tree whose payloads the loader would refuse.
+
+**Fix:** the **payloads** are corrected in this tree by the commands under **Action** above, verified
+five hashes for five files, and `corpora/fetched/` is **gitignored** (`Q-010`) so no commit carries
+them — **there is no SHA for a payload fix and there cannot be one.** ⚠️ **The DOCUMENT is NOT fixed:
+`corpora/MANIFEST.md` is outside this session's fence and was not edited.** The corrected §3 recipe —
+two `git config` lines between `git init` and `git fetch`, and a `sha256sum` line added to §4 — is
+written out in full in `QUESTIONS.md` **`Q-152`**, raised by this session, for a session whose fence
+includes `corpora/`. Recording commit: **`<this session's Task 1 journal commit>`**.
+
+**Systemic guardrail:** ⚠️ **NONE YET, AND THE GAP IS NAMED RATHER THAN PAPERED OVER.** Two things
+would close it and neither is in this session's fence. **(1)** §4 gains the `sha256sum` line, so the
+documented verification checks the quantity the loader checks. **(2)** ⚠️ **The stronger one: nothing
+in `make test` fetches a corpus, so no test in this repository has ever executed
+`corpus.load_entries()` against a real fetched tree** — the defect was reachable only by an operator
+following §3 on a real machine, which is why it survived `Q-145` being raised twice. A test that
+fetches is not free and may not be wanted; **what is cheap and is recommended in `Q-152` is a
+`make check-corpora` target that hashes the five files if `corpora/fetched/` exists and refuses if any
+differ**, so the operator learns before the single-shot clock starts rather than at preflight. ⚠️ **On
+this occasion preflight would in fact have caught it** — `corpus.py` raises `CorpusUnavailable` naming
+both hashes — **but it would have caught it AFTER `RUN_DECLARED.md` was pushed and the single-shot
+clock had started, which is precisely the timing defect `Q-145` exists to name.** That it would have
+refused rather than run on wrong bytes is the one thing that was right here, and it is C12's fix, not
+this session's.

@@ -12004,3 +12004,91 @@ the same reason.
 
 **⚠️ THIS SESSION DID NOT EDIT `HOLES.md`.** Its fence says *"YOU VERIFY IT AND DO NOT EDIT IT"*, and
 `git diff probe-v1 -- HOLES.md` is empty at this session's last commit.
+
+---
+
+### Q-152 — ⚠️ **`corpora/MANIFEST.md` §3's FETCH BLOCK PRODUCES PAYLOADS THAT FAIL §2's HASHES ON THIS MACHINE, AND §4's VERIFICATION PASSES ANYWAY. THE DOCUMENT IS OUTSIDE THIS SESSION'S FENCE.**
+
+**Status:** OPEN. **Class A** on the document — it changes what an operator following it gets.
+**Raised by:** ARCH — PILOT RUN (`7c05e3b9`), 2026-09-03, having run §3 verbatim and measured the
+result. **`INCIDENTS.md` `INC-114`** carries the full measurement in hard rule 13's eight fields.
+
+**THE SHORT FORM.** Git for Windows sets `core.autocrlf=true` **system-wide**. §3's four commands
+`git init` **three brand-new repositories**, which inherit that setting and carry no `.gitattributes`
+of their own, so every text payload is checked out **CRLF**. `corpus.py` hashes
+`target.read_bytes()` — the converted bytes — against pins computed from the **git objects**. Four of
+§2's five hashes therefore fail, each by exactly its own carriage-return count. **The fifth passes
+because it is fetched with `curl`.**
+
+⚠️ **AND §4 — THE ONLY VERIFICATION §3 HANDS THE OPERATOR — PASSES ON ALL THREE TREES WHILE THIS IS
+TRUE.** `rev-parse HEAD` matches the pin, `status --porcelain` is empty, `git diff <pin>` is empty.
+They verify the **objects**, git knows about its own conversion, and the tree genuinely has not been
+touched. **§4 cannot see this and never could.**
+
+⚠️ **`PROCESS.md` §6a.1 IS THIS FAILURE, WRITTEN OUT, WITH THIS MACHINE'S `core.autocrlf` MEASURED AND
+A TWO-DIGEST TABLE PROVING CRLF AND LF HASH DIFFERENTLY.** Its remedy — `.gitattributes` carrying
+`* text=auto eol=lf`, *"a C0 DELIVERABLE"* — was implemented **for this repository** and **does not
+reach a nested repository that §3 creates itself.**
+
+**WHAT THIS SESSION DID AND DID NOT DO.**
+
+* ✅ **The payloads are corrected in this tree.** Per-repository `core.autocrlf false` and
+  `core.eol lf`, then `git rm --cached -r -q .` (which does **not** touch the working tree — it drops
+  the index's stale stat cache) and `git reset --hard <the pin>`. **All five §2 hashes now match, all
+  five byte counts equal §2's, `tr -dc '\r'` returns 0 on all five, §4's three checks still pass, and
+  `corpus.load_entries()` loads 498 entries across 5 sources** with its own hash check satisfied.
+  ⚠️ **`corpora/fetched/` is gitignored (`Q-010`), so this fix has NO COMMIT AND CANNOT HAVE ONE** —
+  it lives in the operator's working tree and **any fresh clone reproduces the defect.**
+* ❌ **`corpora/MANIFEST.md` IS NOT EDITED.** It is outside this session's fence, which lists
+  `corpora/fetched/` and not `corpora/`. **The document still tells the next operator to do the thing
+  that does not work.**
+
+**THE REMEDY, WRITTEN OUT SO THE NEXT SESSION TRANSCRIBES RATHER THAN REDERIVES.** Two `git config`
+lines between `git init` and `git remote add`, in each of §3's three git blocks:
+
+    mkdir -p corpora/fetched/agentdojo && cd corpora/fetched/agentdojo
+    git init -q
+    git config core.autocrlf false     # <-- ADDED: Git for Windows sets this true SYSTEM-WIDE, and
+    git config core.eol lf             #     a CRLF checkout fails S2's hashes. PROCESS.md S6a.1.
+    git remote add origin https://github.com/ethz-spylab/agentdojo.git
+    git fetch -q --depth 1 origin 089ed468cf3ed0322acc66b0211f26d9d90dbf60
+    git checkout -q --detach FETCH_HEAD
+    git rev-parse HEAD
+
+⚠️ **THE CONFIG MUST BE SET BEFORE THE CHECKOUT, NOT AFTER.** Setting it afterwards does **not**
+re-materialise the tree: `git checkout-index -f` was measured doing **nothing**, twice, and once more
+after `git update-index --really-refresh`, because the index's cached stat data records the
+working-tree size written at checkout and git believes the file current. **The obvious command is the
+one that silently fails**, which is why `INC-114` records it.
+
+**And §4 gains a fourth line**, because a verification that cannot see the defect is not a
+verification of the thing that matters:
+
+    sha256sum data/attacker_cases_dh.jsonl data/attacker_cases_ds.jsonl   # must equal S2's rows
+
+**THE OPTIONS, AND THIS SESSION RULES NONE.**
+
+1. **Amend §3 and §4 as above.** Cheapest, and it is the honest minimum: the document is wrong about
+   its own machine. `corpora/MANIFEST.md` is **not** in `CONTEXT.md` §15.0's frozen set, so this is
+   legal — **but its pinned SHAs are owed into `PROTOCOL.md` by C14 (`Q-032`), and `PROTOCOL.md` IS
+   frozen-set**, so the amendment should land before that.
+2. **Add a `make check-corpora` target** that hashes §2's five files when `corpora/fetched/` exists and
+   **refuses** on any mismatch. ⚠️ **This is the one that would have caught it before the clock
+   started.** Preflight already refuses — `corpus.py` raises `CorpusUnavailable` naming both hashes —
+   **but preflight fires AFTER `RUN_DECLARED.md` is pushed and the single-shot window has opened**,
+   which is exactly the timing defect `Q-145` names and does not close.
+3. **Both.** Recommended, and 2 is the load-bearing half.
+
+⚠️ **WHY THIS IS WORTH A CLASS A LABEL ON A FILE NOBODY WOULD CALL LOAD-BEARING.** `CONTEXT.md` §11.3
+publishes a **corpus-versus-improvisation split**, and `RUN_DECLARED.md` §7.2 states the consequence
+of a corpus-less run in its own words: **"a run with no corpus publishes *100% IMPROVISED* — a broken
+instrument reporting a headline."** A corpus that fails its hash is refused rather than silently
+empty, so the instrument breaks **loudly** — that much is C12's fix working. **What is not fixed is
+that it breaks loudly at the worst possible moment.**
+
+⚠️ **`Q-145` IS NOW HALF-SETTLED AND SHOULD BE READ THAT WAY.** The corpora **are** fetched and
+pin-verified in the operator's working tree as of this session, so the precondition it names no longer
+stands in the way **on this machine**. `Q-145`'s actual question — whether *"fetch the corpora and
+verify their pins"* becomes a numbered step of `PROTOCOL.md` §6 — is **untouched and still the
+architect's**, and `INC-114` is now a second, independent argument that it should be, **with the word
+*verify* doing work the manifest's own §4 does not do.**
