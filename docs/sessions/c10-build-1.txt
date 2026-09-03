@@ -1,15 +1,27 @@
-PUSHED SHA: 2dba017   <- the commit that CONTAINS this file, filled by the commit that FOLLOWS it
+PUSHED SHA: stated in this session's spoken report. THE CHAIN TERMINATES HERE, DELIBERATELY.
+            This line named `2dba017` while that was the commit carrying the file; three
+            further commits have carried it since (S12a, S12b, S12c), so a fixed SHA here
+            GOES STALE BY CONSTRUCTION. It is replaced by a pointer that cannot.
 
-  !! THE SHA CHAIN TERMINATES HERE, DELIBERATELY, AND IS SAID RATHER THAN LEFT AS A
-  PLACEHOLDER. A file cannot contain the SHA of the commit that commits it. This file is
-  committed first, with the line above unfilled; the NEXT commit fills it with THIS file's
-  commit SHA and is itself the pushed HEAD. That last SHA is stated in the session's spoken
-  report and is not in this file, because it cannot be. Precedent: `64ccb4a` / `ec6322f`,
-  and C11 BUILD 1 stopping the same regress at `87a3453`.
+  !! A FILE CANNOT CONTAIN THE SHA OF THE COMMIT THAT COMMITS IT, so the last SHA is
+  stated in the session's spoken report and is not in this file, because it cannot be.
+  This file was first committed with the line above unfilled and the next commit filled
+  it - and then THREE MORE commits carried the file, which made the filled value wrong.
+  A pointer replaced it. THE CORRECTION IS ITSELF THE FINDING: the fill-it-afterwards
+  pattern is only sound for a file that is committed ONCE, and this one was not.
+  Precedent: `64ccb4a` / `ec6322f`, and C11 BUILD 1 stopping the same regress at
+  `87a3453` - neither of which had a file that kept moving.
 
-  THE TWO COMMITS THIS SESSION'S WORK ACTUALLY LIVES IN:
+  THE COMMITS THIS SESSION'S WORK LIVES IN, IN ORDER - THE PUSHED HEAD IS THE LAST:
     d07c67f  feat(probe)   src/whetstone_gate/probe/ + tests/test_c10_probe.py   (unreviewed)
     412447e  chore(journal) Q-122..Q-124, OF-209..OF-215, INC-92..INC-95, STATUS, PROGRESS
+    2dba017  docs          this file, committed BEFORE being printed
+    106cda8  docs          this file's PUSHED SHA line, filled
+    17ad52a  fix(journal)  INC-93's secret-shaped literals removed; CRLF repaired
+    af5118e  chore(journal) INC-96, S12a - and the class fired a FOURTH time inside it
+    90aa76c  chore(journal) INC-97 / OF-216 - an invented Swept: number, S12b
+    fe3660f  docs          S12c - the final suite run, and why it measures nothing
+    + ONE more, carrying this correction, and it is the pushed HEAD.
 
 ================================================================================
 C10 - THE COMPETENCE PROBE AND THE VOID RULE - BUILD, ATTEMPT 1
