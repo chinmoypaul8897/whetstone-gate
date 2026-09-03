@@ -629,6 +629,18 @@ def test_the_limitation_is_PUBLISHED_not_buried():
     for phrase in ("TWO conjuncts", "CANNOT BE SELECTED", "FROZEN", "NEITHER SIDE IS ADJUSTED"):
         assert phrase in text
 
+    # ⚠️ AND IT MUST NOT REPEAT THE RULING'S "regardless" AS AN UNQUALIFIED CLAIM, because
+    # THIS SUITE REFUTES IT under the recomputed reading. A published limitation carrying a
+    # sentence the repository's own tests disprove is `PROCESS.md` §9's named failure,
+    # committed against our own ruling instead of somebody else's paper. `Q-121`.
+    assert "Q-121" in text
+    assert "31,908" in text and "31,909" in text, "the break-even is PUBLISHED, not buried"
+    assert "24,310" in text, "and so is the golden's own vector that falls below it"
+    assert "RECOMPUTED" in text and "AT THE REGISTERED TARGET" in text, "BOTH readings"
+    assert "regardless" not in text, (
+        "the unqualified form is FALSE under reading (b) and this suite proves it"
+    )
+
     report = rep.render_run_report(
         budgets={}, denominator=ep.RunDenominator(), token_ceiling=CEILINGS.token_ceiling,
         limitations=[text],

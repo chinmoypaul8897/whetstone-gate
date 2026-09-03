@@ -511,17 +511,34 @@ def limitation() -> str:
 
     A string rather than a comment so a report **prints** it, and so a test can assert that a
     report does. A limitation that lives only in a docstring is buried by any other name.
+
+    ⚠️ **IT STATES BOTH READINGS AND THE BREAK-EVEN, AND IT DOES NOT REPEAT THE RULING'S
+    *"regardless"* AS AN UNQUALIFIED CLAIM.** An earlier version of this string did, and this
+    module's own test refutes it under one of the two arithmetics — which would have made the
+    published limitation carry a sentence the repository's own suite disproves. That is the
+    exact failure `PROCESS.md` §9 exists about (*"three false claims about other people's code
+    reached the specification before an audit caught them"*), committed against our own ruling
+    instead of somebody else's paper. `Q-121`.
     """
     return (
-        "LIMITATION, PUBLISHED (QUESTIONS.md Q-107, RULED): CONTEXT.md S13.4's N rule has TWO "
-        "conjuncts - measured attacker tokens/episode <= the pre-registered target AND "
-        "projected total Gemma lane-time <= the lane-hour budget. The SECOND conjunct FAILS at "
-        "the N=50 branch REGARDLESS of what the pilot measures, because the projection at that "
-        "branch is dominated by components that do not depend on the measured figure. S13.4 "
-        "states this itself: 'N=50 is 40.05 h on either arithmetic and fails the <= 32 h test "
-        "either way.' So config/protocol.yaml's n_decision.branch_a_n = 50 is a branch that "
-        "CANNOT BE SELECTED, and the rule yields N=30. config/ is a FROZEN pre-registration "
-        "artefact and is NOT edited to tidy this away (hard rule 4): the defect is recorded "
-        "and published. Golden 8 fixture F's 60,000 vector says N=50 under the first conjunct "
-        "alone; tests/goldens/ is read-only and NEITHER SIDE IS ADJUSTED."
+        "LIMITATION, PUBLISHED (QUESTIONS.md Q-107 RULED, Q-121 OPEN): CONTEXT.md S13.4's N "
+        "rule has TWO conjuncts - measured attacker tokens/episode <= the pre-registered "
+        "target AND projected total Gemma lane-time <= the lane-hour budget. "
+        "! THE SECOND CONJUNCT CAN BE EVALUATED TWO WAYS AND THEY DISAGREE, AND BOTH ARE "
+        "PRINTED RATHER THAN ONE BEING CHOSEN SILENTLY. (a) AT THE REGISTERED TARGET - "
+        "S13.4's own published figures for the N=50 branch, 76.90M = 40.05 h - the conjunct "
+        "FAILS whatever the pilot measures, so n_decision.branch_a_n = 50 is a branch that "
+        "CANNOT BE SELECTED and the rule yields N=30. S13.4 states this itself: 'N=50 is "
+        "40.05 h on either arithmetic and fails the <= 32 h test either way.' "
+        "(b) RECOMPUTED from the measured figure - which is what QUESTIONS.md Q-107's own "
+        "published table does - the conjunct HOLDS up to 31,908 tokens/episode (32.00 h) and "
+        "fails from 31,909 (32.01 h), so N=50 IS reachable below that break-even. Golden 8 "
+        "fixture F's own first vector, 24,310 (29.83 h), is below it. "
+        "! MEASURED BY C11, PINNED AS A TEST, AND NOT SETTLED HERE: which reading is the rule "
+        "is QUESTIONS.md Q-121, deadline BEFORE C14's pilot selects a branch. "
+        "config/ is a FROZEN pre-registration artefact and is NOT edited to tidy any of this "
+        "away (hard rule 4): the defect is recorded and published. Golden 8 fixture F's 60,000 "
+        "vector says N=50 under the FIRST CONJUNCT ALONE, which is the conjunct PROCESS.md "
+        "S5.2 names golden 8 as pinning; tests/goldens/ is read-only and NEITHER SIDE IS "
+        "ADJUSTED."
     )
