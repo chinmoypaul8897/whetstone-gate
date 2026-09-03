@@ -1,3 +1,167 @@
+## SESSION-TOKEN 6ba2c1f7 — ARCH, PILOT RUN 2 — 2026-09-03
+
+**Role:** FIX. **Chunk:** ARCH. **Review owed:** the provider client ships **UNREVIEWED AND
+DISCLOSED**, exactly as `Q-150`'s ruling says it does. **Not self-certified. No tag.**
+
+**TOKEN SPEND: ZERO. NO PROVIDER MODEL CALL OF ANY KIND. NO NETWORK CALL OF ANY KIND.**
+⚠️ **THE PILOT'S SINGLE-SHOT WINDOW IS STILL UNSPENT**, and there is **no abort**, because
+nothing began.
+
+---
+
+### WHAT LANDED — `b1bab1c`
+
+**`Q-150` RULED (option 1) AND IMPLEMENTED IN FULL.** `MeteredProviderClient` is written into
+`src/whetstone_gate/driver/clients.py` and `driver/__main__.py`'s `--spend-real-tokens` branch
+**constructs it instead of refusing**. `_refuse_to_invent_a_provider_client` is gone, and a new test
+asserts it cannot come back. Two methods, one lane each. **The provider's own `usage` block is
+carried verbatim and `total_tokens` is LIFTED from the provider's own reported total, never summed
+from parts** — Google's `usageMetadata.totalTokenCount` (whose documented definition is *prompt +
+thoughts + response candidates*, so `prompt + candidates` drops a term) and Groq's
+`usage.total_tokens`. **A reply with no usage block is a REFUSAL, not a zero.** **NO retry logic of
+any kind**: a 429 raises `RateLimited` and the runner owns hard rule 12. Model ids read from
+`config/lanes.yaml`; the key **NAME** derived through `runner/keys.py`; the **value** read on one
+line at the boundary, sent in a header and **never** in a `?key=` query string, because
+`urllib.error.HTTPError` carries the request URL in its own `repr`. `runner/redaction.py` wired
+across every reply — **it refuses, it does not mask**.
+
+**`Q-153` RULED AND LANDED.** `config/protocol.yaml:ledger.genesis_hash` = `probe-v1`'s **tag object
+id**, `170bd3ff4abfdd8f87f64055972a60c82cc54efc` — **verified with `git rev-parse probe-v1` and
+`git cat-file -t probe-v1` (`tag`), not copied from the prompt**. `prereg-v1` does not resolve, so
+`config/` is not frozen and the edit is legal; **no episode has ever run**, so the free proof was
+still available and is now taken. **All 20 ledgers of this session's dry-run rehearsal chain from
+it**, measured.
+
+---
+
+### ⚠️⚠️ WHAT DID NOT HAPPEN, AND WHY — TWO INDEPENDENT BLOCKERS, BOTH MEASURED
+
+**THE PILOT DID NOT RUN. `evals/pilot/RUN_DECLARED.md` IS UNTOUCHED AND ITS §8 UTC START TIME IS
+STILL BLANK.** §8: *"A declaration carrying a start time earlier than the run is a pre-registration
+that was written afterwards."* This session **measured** that the run could not begin; filling in a
+time would have made the declaration false in exactly the way §8 forbids, and visibly so, since
+`RESULTS.md` prints declared-versus-actual. **The same decision `7c05e3b9` took, for a different and
+equally provable reason.**
+
+**`Q-161`, CLASS A — THE DECLARED COMMAND CANNOT BE ROUTED.** `driver.run.execute` takes **one**
+client for the whole matrix; `MeteredModelClient`'s two methods distinguish the **role** and carry
+**no lane, no model id, no episode key**, both keyword-only. The pilot's matrix runs ten episodes on
+`gemma-26b` (Google) and ten on `qwen-27b` (Groq). The lane is a live local in `run.py`'s dispatch
+loop, is held by `_PacedClient` (its `attacker_buckets.lane`) and by `_MeteredCall`, and **is
+forwarded by none of them**. **Both cells also run the same seed block, so turn 1 of each lane at
+seed *N* is byte-identical** — the payload cannot distinguish them even in principle. The one
+technically reachable signal, walking the caller's frame, was found, verified to work, and
+**rejected**: it is `INC-51`'s exact species. So `__main__.py` **refuses by name**, states the
+one-line fix, and exits 2 having spent nothing.
+
+**`Q-165` — THERE ARE NO CREDENTIALS.** `.env` **does not exist** and neither `GOOGLE_API_KEY` nor
+`GROQ_API_KEY` is set. ⚠️ **Established by NAME only** — membership tests, never a value.
+**Proved independently of `Q-161`** by building a *single*-attacker-lane matrix and calling
+`driver_run.preflight` directly: it refuses in preflight, **before any dispatch**. So even with
+`Q-161` closed this minute, the run would not start from this session. **Only the operator can close
+it**, in the terminal the run executes in.
+
+---
+
+### THE REHEARSAL — DONE FIRST, AND OUT OF TREE
+
+`--dry-run` over the **full 20-episode matrix**, `--out-root` in a fresh OS temp directory outside
+the repository (the driver **refuses** an in-repo dry-run root). **20/20 episodes, denominator
+reconciles `20 == 20 + 0 + 0`, exit 0**, and the N decision correctly **REFUSED** — *"a DRY RUN may
+not select the N branch."* ⚠️ `git status --porcelain evals/` **EMPTY**: nothing from the rehearsal
+landed in the repository, and `evals/` still holds only `pilot/RUN_DECLARED.md`.
+
+---
+
+### PURITY — WHAT WAS NARROWED, AND WHAT WAS NOT
+
+**Three assertions in `tests/test_c12_driver.py` were narrowed, each by exactly one token, in exactly
+one file, keyed on a RESOLVED PATH rather than a basename:** the transitive AST walk (allowed
+`urllib`, `urllib.request`, `urllib.error`), the raw-source scan (allowed the token `urllib`), and
+the environment scan (allowed `os.environ`).
+
+⚠️ **WHAT WAS *NOT* NARROWED, MEASURED RATHER THAN ASSERTED:** the whole of `_DYNAMIC_REACH` still
+applies to `clients.py` (`__import__`, `importlib`, `getattr(` — **all absent**); the other fourteen
+forbidden names still apply to it (**none fires** — the endpoint literals are spelled so that
+`google.`, `groq.` and `http.` cannot match); the deletion-path AST walk needed **no** narrowing;
+and `getenv`, `dotenv` and any literal key **name** stay refused **in `clients.py` too**.
+
+**Five tests were ADDED that pin the exemption from the other side**, because an exemption asserted
+only by the test that grants it is an exemption nobody measures — including one that asserts the
+excused set has **exactly one member**, computed per module rather than pooled.
+
+**Twenty new tests drive a FAKE transport.** ⚠️ **ZERO provider calls are ASSERTED, not intended**: a
+fixture replaces the real `_http_post` with one that raises, so a test that forgot to inject a fake
+fails loudly instead of spending on a reserved lane. A further test asserts the **default** transport
+is the real one, so the suite's safety does not come from the production path being broken.
+
+---
+
+### MEASURED
+
+| Gate | Result |
+|---|---|
+| `make check-roles` | **exit 0** — 21 passed, 0 failed, 3 n/a; E1 `74 issued row(s) covering 74 token(s)` |
+| `python -m whetstone_gate.driver --dry-run …` | **exit 0**, clean |
+| `tests/test_c12_driver.py` | **fully green**, 66 tests |
+| `git diff -- config/lanes.yaml` | **EMPTY** |
+| `git status --porcelain tests/goldens/` | **EMPTY** |
+| `git status --porcelain -- PROTOCOL.md` | **EMPTY** (it is under NOT and was not edited) |
+| loader `ledger.genesis_hash` | `170bd3ff4abfdd8f87f64055972a60c82cc54efc` == `git rev-parse probe-v1` |
+| `make test` | **16 failed, 1391 passed**, 2 skipped, 2 deselected — every failure attributed by file below |
+
+**THE SIXTEEN, BY FILE.** **3 pre-existing** (`test_c7_ledger` ×1, `test_c8_scorer` ×2 — present in
+this session's own baseline before it changed a line). **2 uncommitted-window**
+(`test_repo_invariants`, `test_c14_prereg` — working tree versus object store). ⚠️ **BOTH WERE
+RE-MEASURED AFTER THE COMMIT AND ARE GREEN, AND 2 MANIFEST TESTS WENT RED IN THEIR PLACE**
+(`test_c14_prereg::test_every_config_file_is_in_PROTOCOL_mds_manifest_and_its_blob_sha_RECOMPUTES`
+and `::test_the_manifest_check_GOES_RED_on_a_TAMPERED_config_VALUE`, both on the stale row below),
+**so the standing post-commit figure is 15, not 16** — stated because the suite total moves with the
+commit and a reader comparing to `make test` would otherwise see a different number. **9 from the
+genesis binding** — `INC-126`, and
+⚠️ **the goldens were NOT touched**: goldens 5 and 5B are answer keys for a **pre-freeze** chain and
+every hand-derived digest in them chains from `PRE-FREEZE`. **1 in `tests/test_c12_benign.py`**,
+which is **outside this session's fence** — `INC-127`.
+
+⚠️ **`PROTOCOL.md`'s MANIFEST ROW FOR `config/protocol.yaml` IS NOW STALE**, and `PROTOCOL.md` is
+under **NOT**, so it was **not edited**. Re-measured from the committed blob and published for
+whoever lands it: **SHA-256 `a4a9a02ddd556d599807e2b2ded8f7d35d8ca8c7707deebfa7a9397ff4c3886e`,
+blob id `8688b87cf8ce0ac440234b9aed9fac5bb419cb53`, 30,960 bytes** (was
+`44e19ac5…`, `d3d8e180…`, 30,930).
+
+---
+
+### RAISED, AND CORRECTED AGAINST ITSELF
+
+**`Q-161`…`Q-165`** raised: the routing gap (Class A), the client having **never met a provider**,
+two hard-rule-9 gaps (the endpoint literals; no gate-judge temperature in `config/`), and the absent
+credentials. **`INC-126`, `INC-127`, `INC-128`** written.
+
+⚠️ **`INC-128` IS THIS SESSION CORRECTING ITSELF.** A new test asserted that `runner/redaction.py`
+would refuse a credential **embedded in a sentence**. It does not — its environment check is
+`value == env_value`, **exact equality**, and its own docstring says so. **The test was wrong and the
+code was right.** The assertion was rewritten to the two guarantees redaction actually makes, and a
+third clause was added that **asserts the limit** so it is recorded rather than merely absent.
+
+⚠️ **AND THE BLAST-RADIUS SURVEY THIS SESSION RAN BEFORE TOUCHING `config/` NAMED EIGHT OF THE NINE
+GENESIS FAILURES.** The ninth recomputes a chain from `spec.genesis_hash` against a digest hardcoded
+in the test body, a shape the survey had no bucket for. **It was found by running the suite, not by
+reading it.** `INC-54`'s standing lesson, again: *a prediction is not a result.*
+
+⚠️ **`QUESTIONS.md` WAS COMMITTED FROM A CONSTRUCTED BLOB** — `HEAD`'s bytes plus this session's
+token row, ruling block and five questions — **never with `git add` on the working-tree file**, which
+carried a concurrent session's ordering. `INC-123`. The staged `--stat` was compared against a
+pre-declared expectation before the commit, and listed **exactly** this session's five paths:
+`src/whetstone_gate/benign/` was **not** staged. ⚠️ **`INC-125` is the same two sessions colliding on
+`Q-161`…`Q-165` an hour earlier**; the other session renumbered **its own** five to `Q-166`…`Q-170`,
+and this session verified after `fa71395` that all ten ids now appear **exactly once**.
+
+**NOT DONE, NAMED:** the pilot, the calibration and the sweep (**none authorised except the pilot,
+and the pilot is blocked by `Q-161` and `Q-165`**); no `N` written into `config/`; **no tag cut**;
+`PROTOCOL.md`, `tests/goldens/`, `config/lanes.yaml` and every other module untouched.
+
+---
+
 ## SESSION-TOKEN 9f31d708 — C19, README BUILD 1 — 2026-09-03
 
 **Role:** BUILD. **Chunk:** C19, `README.md` — **the document the claim is made in.** **Review owed:**

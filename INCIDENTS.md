@@ -9506,3 +9506,177 @@ is now specific enough to write in one line: refuse a commit that introduces a `
 `| **OF-` heading whose id already exists in `HEAD`.** That is a pre-commit comparison against
 `HEAD`, not a re-read of the working tree, and **it is the only form that closes the window this
 entry is about.** Recorded as owed.
+
+---
+
+## INC-126 — setting `ledger.genesis_hash` to the `probe-v1` tag object id turned NINE tests red and staled a frozen artefact's manifest row, and the recon that predicted the blast radius under-counted it by one
+
+**Date:** 2026-09-03 (ARCH FIX — PILOT RUN 2, `6ba2c1f7`). Fix SHA under **Fix**.
+
+**Event:** `Q-153` was RULED and `config/protocol.yaml:ledger.genesis_hash` moved from the literal
+`PRE-FREEZE` to `170bd3ff4abfdd8f87f64055972a60c82cc54efc` — `probe-v1`'s **tag object id**, verified
+with `git rev-parse probe-v1` and `git cat-file -t probe-v1` (`tag`) rather than copied from the
+prompt. `make test` then went from **4 failures to 16**. The nine caused by this change are:
+
+- `tests/test_config_loader.py::test_genesis_hash_is_pre_freeze_and_is_never_absent` — asserts the
+  literal `"PRE-FREEZE"` against the loader.
+- `tests/test_c7_ledger.py::test_the_genesis_the_golden_names_is_the_one_config_carries` — compares
+  golden 5's root to `config/`'s. ⚠️ **Its own docstring PRE-DECLARED this failure** — *"C14 changes
+  `config/` to the tag object id and this assertion is then expected to fail … the test is written so
+  that moment is loud rather than silent."* **It worked exactly as designed.**
+- `tests/test_c7_ledger.py::test_two_refunds_ISSUED_with_the_SAME_receipt_were_INVISIBLE_and_now_are_NOT`
+- `tests/test_c8_scorer.py` × 6 — `test_golden5b_three_digests_reproduce_from_the_ledger_writer`,
+  `test_golden5_verdict_first_bad_seq_AND_REASON[A|B|C|D]`, `test_a_ledger_that_did_not_verify_is_NOT_scored`,
+  `test_a_fifteen_field_chain_verifies_and_scores` — all six funnel through one helper,
+  `_chain_spec_for` at `test_c8_scorer.py:981`, which reads `config/` and compares to a golden.
+
+**Action:** ⚠️ **Nothing was edited to make any of them green.** `tests/goldens/golden5_tamper.json`
+and `golden5b_ledger_writer.json` hardcode `PRE-FREEZE` as their root **and every hand-derived digest
+in both files chains from it**. They are **answer keys for a pre-freeze chain**, hard rule 3 makes
+them read-only to a build session, and regenerating them would destroy the very distinction the
+change exists to create. `git status --porcelain tests/goldens/` was **EMPTY** at every step and is
+empty at the commit. The failures are **reported as a finding**, which is what the prompt required
+and what hard rule 6 requires.
+
+**Expectation:** a config value that `PROCESS.md` §6a calls *"the one free proof available"* should
+be settable before the first ledger exists without a suite-wide red. It is not, because six of the
+nine tests assert **agreement between a frozen golden and a live config read** — a relationship that
+is *designed* to break exactly once, at the freeze.
+
+**Missing:** ⚠️ **a declared pre-freeze/post-freeze split in the assertions themselves.** The tests
+that survive — `test_all_four_golden_5_cases_reproduce_verdict_and_first_bad_seq` and sixteen others
+in `test_c7_ledger.py` — take the root from `golden["genesis_hash"]` and only the *algorithm* from
+`config/`, so they stay self-consistent for ever. The nine that broke take the root from `config/`
+and compare to a golden. **The surviving shape was already in the file, seventeen times over**; had
+the nine been written the same way, this change would have been a one-line edit with no red at all.
+
+**Missed:** ⚠️ **this session commissioned a blast-radius survey before touching the key, and the
+survey named EIGHT of the nine.** It missed
+`test_two_refunds_ISSUED_with_the_SAME_receipt_were_INVISIBLE_and_now_are_NOT`, because that test
+does not read a golden file — it recomputes a chain from `spec.genesis_hash` and compares the head to
+a digest **hardcoded in the test body** (`2e2b9ec4…`), a shape the survey's own case-(a)/case-(b)
+taxonomy had no bucket for. **The ninth was found by running the suite, not by reading it**, which is
+`INC-54`'s and `INC-60`'s standing lesson in this repository: *a number is not a measurement, and a
+prediction is not a result.* The survey was useful and it was not sufficient, and the entry says both.
+
+**Diagnosis:** six of the nine assert `golden == config`, and the change makes that inequality true
+by design; the other three pin a `PRE-FREEZE`-rooted digest in a test literal. The goldens are right,
+`config/` is now right, and the assertions that joined them were written before the freeze existed.
+
+**Fix:** the config change is `b1bab1c`. ⚠️ **The nine tests are NOT fixed by this session** —
+`tests/goldens/` is read-only under hard rule 3 and the three `test_c7`/`test_c8`/`test_config_loader`
+files are outside this session's fence. They are published here and in `QUESTIONS.md`, and the
+architect owns which of the two shapes each assertion should take.
+
+**Systemic guardrail:** none yet — **accepted, and the reason is named:** the honest guardrail is the
+one the surviving seventeen tests already demonstrate (*take the root from the artefact under test,
+not from `config/`, unless agreement with `config/` is the thing being asserted*), and applying it
+touches three test files this session may not open. ⚠️ **It is recorded as owed rather than claimed
+as done.** The one thing that IS closed: `src/whetstone_gate/ledger/store.py:130` rebuilds a stored
+ledger's `ChainSpec` from `document["genesis_hash"]` and **not** from `config/`, so **already-written
+episodes keep verifying against the root they were actually written under** — which is why this change
+was safe to make at all, and why it had to be made **before** the first episode rather than after.
+
+---
+
+## INC-127 — writing the provider client turned a test red in a file this session is fenced out of, and the fence and the ruling cannot both be satisfied
+
+**Date:** 2026-09-03 (ARCH FIX — PILOT RUN 2, `6ba2c1f7`). Fix SHA under **Fix**.
+
+**Event:** `Q-150`'s ruling put a real provider client in `src/whetstone_gate/driver/clients.py`. A
+live call needs a network library, so that file now statically imports `urllib.request` and
+`urllib.error`. **`tests/test_c12_benign.py:197`,
+`test_the_benign_package_imports_no_model_client_WAY_ONE_the_transitive_ast_walk`, went RED** — it
+walks `whetstone_gate.benign`'s **transitive** first-party closure, and that closure contains
+`whetstone_gate.driver.clients` because `benign/shell.py:91` and `benign/solve.py:61` both import
+`MeteredModelClient` from it. Its `FORBIDDEN_IMPORTS` contains `urllib`, so it reports
+`offenders == ['urllib']`.
+
+**Action:** ⚠️ **The test was NOT touched.** This session's fence reads
+`tests/test_c12_driver.py (NEW TESTS ONLY)` and `NOT: … any other test file`.
+`tests/test_c12_benign.py` is not in it, and `CLAUDE.md` §4 is explicit: *"If anything seems to
+require touching … files outside your task's scope: STOP and report instead of working around it."*
+The red is **reported**, here and at `Q-161`'s section in `QUESTIONS.md`, with the one-line remedy
+stated for whoever owns that file.
+
+**Expectation:** a ruling that authorises a network import in exactly one module should not put a
+second package's purity assertion in an unsatisfiable state. It does, because that assertion is
+**transitive** and `benign/` imports the driver's client protocol.
+
+**Missing:** ⚠️ **per-module attribution in that walk.** It unions every third-party import across the
+whole closure into one set and asserts the set is clean, so it cannot say *which* module reached
+`urllib` — and therefore cannot express *"the provider boundary may, and nothing else may."* The
+narrowed walk in `tests/test_c12_driver.py` was rewritten to attribute per module for exactly this
+reason, and the added
+`test_the_provider_boundary_is_the_ONLY_driver_module_that_reaches_a_network_library` asserts the
+excused set has **exactly one member**. **The same three-line shape fixes the benign walk.**
+
+**Missed:** ⚠️ **the prompt's own words named the risk and this session read them as being about the
+driver alone.** *"Assert that every OTHER driver module still imports no model client, two ways …
+say which assertions you had to narrow and why."* The survey commissioned before the code was written
+**did** find this test and flagged it as *"the one OUTSIDE tests/test_c12_driver.py, and it is easy to
+miss"* — so it was not missed in the sense of being unknown. **What was missed is that knowing about
+it changed nothing**: the fence made it unfixable either way, and that should have been raised as a
+fence-versus-ruling conflict **before** the client was written rather than reported after.
+
+**Diagnosis:** `benign/` imports `driver.clients` for its Protocol type, so a transitive purity walk
+rooted at `benign/` necessarily inherits whatever `clients.py` imports; authorising the import in one
+package silently breaks the other package's assertion.
+
+**Fix:** the client is `b1bab1c`. ⚠️ **The benign test is NOT fixed by this session** and is red at
+`HEAD` as a result — stated plainly rather than left for `make test` to reveal.
+
+**Systemic guardrail:** none yet — **accepted, because the remedy is a three-line change in a file
+this session may not open**, and because the deeper guardrail is a process one: a fence that permits
+a change whose *necessary* consequence lands outside it is a fence that cannot be honoured. **That is
+the generalisable finding, and it is the second time in two sessions** — `Q-150` itself was *"the
+client is owed to somebody and owned by nobody."*
+
+---
+
+## INC-128 — this session's own new test asserted a redaction guarantee the code does not have, and the assertion was corrected rather than the code loosened
+
+**Date:** 2026-09-03 (ARCH FIX — PILOT RUN 2, `6ba2c1f7`). Fix SHA under **Fix**.
+
+**Event:** A new test, `test_a_reply_ECHOING_A_CREDENTIAL_is_REFUSED_not_masked`, fed the client a
+provider reply whose text was `"your key is not-a-real-key-google"` — a credential **embedded in a
+sentence** — and asserted `runner/redaction.py` would refuse it. It did not:
+`Failed: DID NOT RAISE SecretInPayload`.
+
+**Action:** the code was read rather than adjusted. `redaction._looks_like_a_key` compares
+`value == env_value` — **exact equality on the whole field** — and its module docstring says so:
+*"Any value that equals a set environment variable's value. ⚠️ This one is exact."* **The test was
+wrong and the code was right.** It was rewritten to assert the two guarantees redaction actually
+makes — the exact-equality path and the documented-prefix path (`gsk_…`) — **and a third clause was
+added that asserts the limit**: a credential embedded in prose passes. That clause carries a message
+telling a future reader to *update it rather than delete it* if redaction ever gains containment
+matching.
+
+**Expectation:** a test written to exercise a safety wire should assert the wire's real contract.
+This one asserted a stronger contract, which — had it been written the other way round, as a
+`pytest.raises` that happened to pass for the wrong reason — would have published a guarantee this
+project does not have.
+
+**Missing:** nothing in the tooling. The module's own docstring states the limit **and states what it
+does not close**, in the paragraph beginning *"⚠️ WHAT THIS DOES NOT CLOSE, SAID PLAINLY"*. The
+information was present, complete, and one file away.
+
+**Missed:** ⚠️ **that paragraph, which this session had already read and quoted from earlier in the
+same task** when wiring `refuse_if_secret_bearing` into the client. The docstring was used as
+authority for *that redaction refuses rather than masks* and not read on for *what it matches*. **The
+signal was not merely available; it had already been consumed for a different purpose.**
+
+**Diagnosis:** the test author assumed containment matching from the phrase *"looks like a
+credential"* without reading the three-bullet list directly beneath it that enumerates prefix,
+name-as-value, and exact-equality.
+
+**Fix:** `b1bab1c` — the assertion corrected to the code's real guarantee, with the gap asserted
+explicitly as a third clause so it is recorded rather than merely absent.
+
+**Systemic guardrail:** ⚠️ **partially closed, and by this entry's own fix rather than by a new
+mechanism.** The gap is now **an assertion in the suite**, not a sentence in a docstring: if
+redaction gains containment matching, the third clause fails and names itself. That does not stop the
+next test from over-asserting some other contract, and **no guardrail proposed here would** — the
+only real one is running the test and reading the failure instead of adjusting the code, which is
+what happened. `PROCESS.md` §9's *"every evidence pack states what it is NOT"* is the rule the fix is
+written under.
