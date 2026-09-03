@@ -9680,3 +9680,149 @@ next test from over-asserting some other contract, and **no guardrail proposed h
 only real one is running the test and reading the failure instead of adjusting the code, which is
 what happened. `PROCESS.md` §9's *"every evidence pack states what it is NOT"* is the rule the fix is
 written under.
+---
+
+## INC-129 — the declared pilot command dies on the SECOND call of the FIRST episode, on BOTH providers, because a tool result has no role either of them accepts
+
+**Date:** 2026-09-04 (ARCH FIX — PILOT RUN 3, `d4e7b920`). Fix SHA under **Fix**.
+
+**Event:** with `Q-161`'s lane threading in place, `evals/pilot/RUN_DECLARED.md` §1's own matrix was
+driven through `driver_run.execute` against a fake transport. **One** request was built — correctly
+routed to Google's endpoint with `config/lanes.yaml`'s own model id — and the run then raised
+`DriverClientError: role 'tool' has no Google equivalent. The legal values are ['assistant',
+'system', 'user']`. Zero episodes completed, no report, no denominator. Measured on the Groq side
+directly, because the run never reached it: `role 'tool' has no Groq equivalent`.
+
+**Action:** the defect was **not** fixed. The fence reads *"clients.py, run.py, __main__.py — the
+LANE THREADING ONLY"*, and a role mapping is a **Class A** choice about what text a model sees, not a
+threading edit. It is raised at `QUESTIONS.md` **Q-171** with the three options and one of them
+already rejected on the record, and it is **pinned by a test that asserts the defect on purpose**
+(`test_the_DECLARED_COMMAND_now_ROUTES_and_is_STOPPED_BY_A_DIFFERENT_DEFECT`), so that a suite which
+is green cannot also be a suite in which the declared command cannot complete one episode.
+
+**Expectation:** a provider client written from the published REST references, shipped with twenty
+tests against a fake transport, should be able to encode the message list its own driver produces.
+It cannot. `attacker/context.py:505` emits every tool result under the role `"tool"`, so **every turn
+after the first** carries one, and `_GOOGLE_ROLE` and `_GROQ_ROLE` both have only three keys.
+
+**Missing:** ⚠️ **a test that drove the client with the driver's REAL message shapes.** All twenty
+existing client tests hand-write their `messages` tuples, and every one of them uses `system`,
+`user`, `assistant` or a deliberately-invalid `tool` role **in a refusal test that asserts the
+refusal**. `test_an_UNMAPPED_ROLE_is_a_refusal_and_never_a_silent_coercion` passes `role: "tool"` and
+asserts it is refused — **the exact input that breaks production, asserted as correct behaviour**,
+because nothing connected it to the fact that the attacker loop emits that role on every turn. The
+end-to-end test added this session is the missing shape, and it found this in its first run.
+
+**Missed:** ⚠️ **`Q-162` said out loud that this could not be ruled out and it was read as a note
+about credentials.** *"THE PROVIDER CLIENT HAS NEVER BEEN RUN AGAINST EITHER PROVIDER, AND NO SESSION
+MAY RUN IT"* — filed as an accepted limitation about *network* verification. **But a whole class of
+what it covers needs no network at all**: whether the client can encode its own driver's messages is
+answerable against a fake transport, for free, and was not asked. The signal was in the repository in
+the form of `attacker/context.py:505`, which two sessions read while writing the client.
+
+**Diagnosis:** the request-body builders were written against the providers' published role
+vocabularies and the driver's message list was never enumerated against them, so a role the attacker
+loop emits on every turn but the first has no key in either map.
+
+**Fix:** ⚠️ **NOT FIXED BY THIS SESSION — Class A and outside the fence.** Pinned by
+`tests/test_c12_driver.py::test_the_DECLARED_COMMAND_now_ROUTES_and_is_STOPPED_BY_A_DIFFERENT_DEFECT`
+and by an assertion on the Groq side in the same test, both landed in this session's commit. The
+remedy is `QUESTIONS.md` **Q-171**'s option 1 or 3, and it is the architect's.
+
+**Systemic guardrail:** the end-to-end test **is** the guardrail and it is landed: any future change
+that stops the declared matrix from routing, or moves where it stops, fails it by name. ⚠️ **What is
+NOT closed:** nothing forces the client's role maps and `attacker/context.py`'s emitted roles to be
+enumerated against each other. A three-line test asserting `set(context roles) <= set(_GOOGLE_ROLE)
+& set(_GROQ_ROLE)` would make this class impossible, and it belongs with whoever rules `Q-171` — it
+cannot be written before the mapping is decided.
+
+---
+
+## INC-130 — a ruling implemented inside the driver fence broke `benign/` at run time, and INC-127's finding recurred one session later on source instead of a test
+
+**Date:** 2026-09-04 (ARCH FIX — PILOT RUN 3, `d4e7b920`). Fix SHA under **Fix**.
+
+**Event:** `Q-161`'s ruling makes `lane` a **required, undefaulted** argument on
+`MeteredModelClient`'s two methods. `MeteredModelClient` has **two** consumers: `driver/` and
+`benign/`. `benign/solve.py:153` and `benign/shell.py:264` each call the protocol with no lane.
+**Measured** by constructing each adapter around a `TranscriptClient`:
+`MeteredSolverClient.complete` and `_JudgeAdapter.complete` both raise
+`TypeError: … missing 1 required keyword-only argument: 'lane'`.
+
+**Action:** ⚠️ **`benign/` and `tests/test_c12_benign.py` were NOT touched.** Both are under this
+session's `NOT` list, and `CLAUDE.md` §4 is explicit. A concurrent session (`9f31d708`) additionally
+held `benign/blindness.py` and `benign/executor.py` uncommitted in the shared working tree, so
+editing that package would also have risked sweeping its work (`INC-123`, `INC-125`). The break is
+reported here and at `QUESTIONS.md` **Q-173**, with the two-expression remedy stated for its owner.
+
+**Expectation:** a ruling scoped to the driver, implemented only in the driver, should not stop a
+second package from running. It does, because a Protocol is a **shared contract** and adding a
+required argument to one is a breaking change for every implementation and every caller — including
+the ones the ruling's own four-file impact list did not name.
+
+**Missing:** ⚠️ **an inventory of who implements or calls `MeteredModelClient`.** `Q-161`'s impact
+table was built by reading the *driver's* call chain and named `attacker/loop.py` — which, measured
+this session, needs **no** change, because C6's protocol is text-only. It did **not** name `benign/`,
+which needs two. **The table was wrong in both directions**, and a one-line grep for the two method
+names across `src/` produces the correct list in under a second. Nothing runs that grep.
+
+**Missed:** ⚠️ **`INC-127`, written one session earlier, states this exact finding as its
+`Systemic guardrail`:** *"a fence that permits a change whose **necessary** consequence lands outside
+it is a fence that cannot be honoured."* It was read as a fact about *that* incident rather than as a
+prediction. ⚠️ **And it named the mechanism too** — *"`benign/` imports `driver.clients` for its
+Protocol type"* — which is the same sentence that explains this one. The signal was not merely
+present; it was the previous entry's headline.
+
+**Diagnosis:** `benign/` imports `MeteredModelClient` from `driver/clients.py`, so any change to that
+Protocol's signature is a change to `benign/`'s runtime contract, and the fence that authorised the
+change excluded the package it necessarily changed.
+
+**Fix:** ⚠️ **NOT FIXED BY THIS SESSION.** `benign/` is red at this session's commit and it is stated
+here plainly rather than left for `make test` to reveal. The remedy is `Q-173`'s: two expressions in
+`benign/`, and the `lane=` keyword at three or four call sites in `tests/test_c12_benign.py`.
+
+**Systemic guardrail:** none yet — **accepted, because the remedy is in a file this session may not
+open**, and because the guardrail that would actually close the class is a process one, unchanged
+from `INC-127`: ⚠️ **before a fence is written for a change to a shared type, the architect runs the
+grep.** Two consecutive sessions have now paid for its absence, and the second cost more than the
+first — `INC-127` was a purity assertion going red; this is production source raising `TypeError`.
+
+---
+
+## INC-131 — the session's own first draft of the lane cross-check used a dynamic reach, and the tripwire it was written to respect refused it by name
+
+**Date:** 2026-09-04 (ARCH FIX — PILOT RUN 3, `d4e7b920`). Fix SHA under **Fix**.
+
+**Event:** `_PacedClient._agree` — the new check that the threaded lane and the pacing buckets' lane
+agree — was first written as `held = getattr(buckets, "lane", None)`.
+`tests/test_c12_driver.py::test_the_driver_imports_no_model_client_RAW_SOURCE_SCAN` went **RED**:
+`run.py carries the dynamic-reach form 'getattr('`.
+
+**Action:** the **code** was changed, not the test. `runner/buckets.py`'s `LaneBuckets` declares
+`lane` as a dataclass field, so there was nothing to be defensive about: the line is now
+`held = buckets.lane`, with a comment recording why the first spelling was refused.
+
+**Expectation:** a session implementing a ruling whose own text warns that *"deriving the lane … from
+the caller's frame would be INC-51's exact species — a dynamic reach that works until it silently
+does not"* should not reach for a dynamic form three functions later.
+
+**Missing:** nothing. The tripwire exists, it fires on the raw source text precisely because an AST
+walk cannot see a `getattr` call, and it named the file and the form in one line.
+
+**Missed:** ⚠️ **the ruling's own sentence, in the prompt this session had open.** The `getattr` was
+not written to *derive* a lane — it was defensive padding around a value already in hand — but
+`INC-51`'s lesson is about the *form*, not the intent, which is exactly why the tripwire matches
+text rather than semantics. **The habit is the hazard, and the habit showed up inside the fix for
+the incident about the habit.**
+
+**Diagnosis:** an unnecessary `getattr` default was written for a dataclass field that is always
+present, in a file whose package forbids dynamic attribute reach.
+
+**Fix:** in this session's commit, in `src/whetstone_gate/driver/run.py`; the SHA is this session's
+pushed SHA, stated as the first line of its report.
+
+**Systemic guardrail:** already present and it worked — `RAW_SOURCE_SCAN` caught it on the first test
+run, before review, before commit. ⚠️ **Recorded anyway, and deliberately**, because `INC-00`'s rule
+is that a build which produced no failure worth recording must say so: this one did produce one, the
+guardrail caught it in seconds, and an incident log containing only the failures that escaped their
+guardrails would misrepresent how often the guardrails fire.

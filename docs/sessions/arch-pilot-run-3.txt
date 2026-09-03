@@ -1,0 +1,605 @@
+================================================================================
+ARCH FIX -- PILOT RUN 3      SESSION-TOKEN d4e7b920      ROLE: FIX      2026-09-04
+================================================================================
+
+CODE + TESTS + QUESTIONS COMMIT  : b1f06d388c535a054a9d4e6355bc5f4d01549141
+JOURNAL COMMIT (this file)       : the commit that carries this file; its SHA is
+                                   the pushed SHA reported as line 1 of the
+                                   session report, and is not written here
+                                   because a file cannot contain its own hash.
+
+TOKEN SPEND : ZERO. NO PROVIDER MODEL CALL OF ANY KIND. NO NETWORK CALL OF ANY
+              KIND. gemma-26b 0 calls / 0 tokens. qwen-27b 0 calls / 0 tokens.
+NO TAG CUT. prereg-v1 NOT CUT. NOT SELF-CERTIFIED.
+
+! THE PILOT DID NOT RUN. ITS SINGLE-SHOT WINDOW IS STILL UNSPENT, THERE IS NO
+  ABORT, AND NONE WAS INVENTED.
+
+================================================================================
+0. THE HEADLINE, BEFORE THE DETAIL
+================================================================================
+
+  Q-161 WAS RULED, IMPLEMENTED IN FULL, AND IS CLOSED. The lane is threaded,
+  the declared command's two-provider matrix now CONSTRUCTS and ROUTES, and the
+  refusal that stood in driver/__main__.py is gone because its cause is gone.
+
+  THE PILOT STILL DID NOT RUN, on TWO blockers, both MEASURED, both landing
+  before any episode completes:
+
+    Q-165  .env does not exist and NEITHER key NAME is set. Operator-only.
+           This is GATE 2 and GATE 2 FAILED, so TASK 3 did not begin.
+    Q-171  ! NEW, AND FOUND BY A TEST THIS SESSION WROTE. The role "tool" has
+           no mapping on EITHER provider, so no episode reaches turn 2. The
+           declared command builds ONE request, routes it correctly, and dies.
+
+  ! NEITHER IS A DEFECT IN THE RULING, AND Q-171 COULD NOT HAVE BEEN FOUND
+    BEFORE IT. Q-161 said "thread the lane", and it is threaded. What the
+    ruling could not know is that a routable client still cannot encode its own
+    driver's message list -- and that only became visible once a run could get
+    as far as building a SECOND request.
+
+  ! THE PATTERN IS NOW THREE DEEP AND IS WORTH NAMING.
+      Q-150  the client is owed to somebody and owned by nobody
+      Q-161  the client exists and cannot be told which model to call
+      Q-171  the client can be told, and cannot encode a tool result
+    All three were invisible until something was actually RUN. All three were
+    found before a single token was spent. Each was uncovered only by fixing
+    the one before it. That is the preflight-and-refusal design working -- and
+    it is also three consecutive sessions in which "one small fix, then the
+    pilot" was not one small fix.
+
+================================================================================
+1. THE RULING, RECORDED VERBATIM FIRST -- HARD RULE 5
+================================================================================
+
+  Written to QUESTIONS.md before a line of code was touched, copied from the
+  prompt exactly as issued:
+
+    "Q-161 is RULED: OPTION 1. `lane` is threaded through `MeteredModelClient`'s
+    two methods, so the client knows which provider each call is for. OPTION 2 --
+    two executions, one per cell -- works with the client as built but CHANGES
+    THE EXACT COMMAND, and `RUN_DECLARED.md` S1's 'THE EXACT COMMAND' is the
+    clause the whole pre-registration rests on; a declared command that is not
+    the command that ran is a pre-registration written afterwards.
+    ARCH FIX PILOT RUN 2 LOCATED THE FIX AND IT IS SMALL: `_PacedClient` already
+    holds the lane in its `attacker_buckets.lane` and `_MeteredCall` already
+    holds it too, so the value is in hand at both call sites and nothing needs to
+    be inferred. AND ITS OWN REFUSAL TEXT NAMES WHY IT REFUSED RATHER THAN
+    GUESSING: deriving the lane from dispatch order or from the caller's frame
+    would be INC-51's exact species -- a dynamic reach that works until it
+    silently does not."
+
+================================================================================
+2. TASK 1 -- THE LANE, THREADED. WHAT CHANGED, FILE BY FILE.
+================================================================================
+
+  driver/clients.py
+    MeteredModelClient        both methods take `lane: str` -- REQUIRED,
+                              UNDEFAULTED, KEYWORD-ONLY.
+    _required_lane()          NEW. The language makes OMITTING the lane a
+                              TypeError; this closes the hole it leaves open --
+                              lane="" or None satisfies the signature and
+                              carries no routing information. It REFUSES and
+                              never substitutes, because every available
+                              substitute (a first lane, a default lane, the last
+                              lane used) is a GUESS about which provider the
+                              traffic belongs to.
+    TranscriptClient          takes the lane, RECORDS it (attacker_lanes /
+                              judge_lanes) and never interprets it.
+    MeteredProviderClient     holds `lanes: Mapping[str, _LaneCall]` instead of
+                              one attacker + one judge. `_route()` is a LOOKUP,
+                              not a decision: it reads nothing but the argument.
+    for_lane_names()          NEW. Builds for EVERY attacker lane the matrix
+                              dispatches on, plus the judge lane, resolving each
+                              through config/lanes.yaml AT CONSTRUCTION -- so an
+                              unknown lane or unsupported provider refuses
+                              BEFORE episode 1 rather than partway through a
+                              single-shot run that has already spent tokens.
+    for_lanes()               KEPT, delegating to for_lane_names, so every
+                              existing construction site still works.
+
+  driver/run.py
+    _PacedClient              both methods take and FORWARD the lane.
+    _agree()                  NEW, and it is the one check the threading EARNS.
+                              _PacedClient now holds TWO INDEPENDENT COPIES of
+                              the lane: the threaded one (from
+                              episode._MeteredCall) and buckets.lane (from this
+                              module's lane_states). NEITHER READS THE OTHER. A
+                              disagreement means the call is paced against one
+                              lane's published limits and dispatched to another
+                              provider -- INC-112's shape -- and it stops there
+                              rather than spending. Before the ruling the client
+                              had no lane and there was nothing to disagree with.
+
+  driver/episode.py           ! SEE S6. TWO EXPRESSIONS, AND THE FENCE'S
+                              PARENTHETICAL DID NOT NAME THIS FILE.
+    _AttackerClient.complete  ... lane=self.metered.lane
+    _JudgeClient.complete     ... lane=self.metered.lane   (the JUDGE's meter,
+                              not the episode's lane: S13.3.2 puts two roles on
+                              one lane, INC-111 is where that confusion cost a
+                              whole role, and the ROLE's meter is the reading
+                              that stays right when they diverge.)
+
+  driver/__main__.py
+    _provider_client          the two-attacker-lane REFUSAL IS GONE. It now
+                              builds for every lane the matrix names. The
+                              docstring keeps the rejected alternatives on the
+                              record: dispatch order, and the caller's frame --
+                              the latter VERIFIED TO WORK by 6ba2c1f7 and NOT
+                              BUILT, because it is INC-51's exact species.
+
+  ! attacker/loop.py NEEDED NO CHANGE, and that is a measurement rather than a
+    claim. Q-161's impact table listed it. C6's ModelClient protocol is
+    complete(*, messages, temperature) -> str and knows nothing about lanes; the
+    threading stops at episode.py's adapters by design.
+
+================================================================================
+3. THE TEST Q-161 EXISTS FOR, AND THE EIGHT AROUND IT
+================================================================================
+
+  THE PAYLOAD IS THE CONTROL. driver/pilot.py hands both pilot cells the SAME
+  seed block, so turn 1 of gemma-26b/seed N and turn 1 of qwen-27b/seed N are
+  BYTE-IDENTICAL. The two calls in the headline test differ in `lane` AND IN
+  NOTHING ELSE -- so if they land on two endpoints with two model ids, the lane
+  argument is the only thing that could have carried the difference.
+
+  NINE TESTS, NEW OR FLIPPED:
+
+    test_the_SAME_MESSAGES_go_to_DIFFERENT_PROVIDERS_when_the_LANE_differs
+      identical messages, two lanes; asserts BOTH endpoints, BOTH model ids read
+      from config/lanes.yaml (never literals in the test), BOTH credential
+      HEADERS by name (a misroute presents Google's key to Groq), the message
+      TEXT identical on both wires, and each provider's own reported total.
+    test_the_FULL_ADAPTER_CHAIN_routes_TWO_LANES_to_TWO_PROVIDERS
+      the production chain assembled exactly as episode.py assembles it --
+      _MeteredCall -> _AttackerClient -> _PacedClient -> MeteredProviderClient,
+      every link the real class, only the transport and clock faked.
+    test_the_LANE_is_REQUIRED_and_has_NO_DEFAULT_on_BOTH_methods
+      TypeError on both methods on BOTH implementations, and keyword-only, so a
+      positional cannot be mistaken for the lane.
+    test_an_EMPTY_lane_is_a_named_refusal_and_is_never_substituted
+    test_an_UNKNOWN_LANE_is_a_named_refusal_and_never_a_fallback
+      the refusing half of the flipped test, kept alive on the case that IS
+      still a wiring bug; asserts the transport was never called.
+    test_for_lane_names_RESOLVES_EVERY_LANE_UP_FRONT_and_refuses_an_empty_set
+    test_the_PACED_CLIENT_forwards_the_lane_and_REFUSES_a_lane_its_BUCKETS_disagree_with
+    test_a_TWO_ATTACKER_LANE_matrix_now_CONSTRUCTS_a_client_that_serves_BOTH
+      THE FLIP (see S4).
+    test_the_DECLARED_COMMAND_now_ROUTES_and_is_STOPPED_BY_A_DIFFERENT_DEFECT
+      THE END-TO-END TEST THAT FOUND Q-171 (see S5).
+
+  MEASURED: tests/test_c12_driver.py  72 passed, 2 skipped.
+
+  ! ALL NINE WERE PROVED TO FAIL ON 52c9077's CODE, and the method matters:
+    running the new tests in a temp tree is NOT a proof, because an editable
+    install silently imports the WORKING TREE and reports a false green. It was
+    done with PYTHONPATH pinned to HEAD's extracted src, VERIFIED by printing
+    whetstone_gate.__file__ and asserting `lane` is absent from the signature:
+
+      9 failed, 65 deselected
+
+    That is hard rule 6's "provably meaningful", DONE rather than asserted.
+
+================================================================================
+4. WHAT WAS TOUCHED IN AN EXISTING TEST FILE, AND WHAT WAS NOT
+================================================================================
+
+  The fence reads "tests/test_c12_driver.py (NEW TESTS ONLY -- WEAKEN NOTHING)".
+  Three kinds of edit were necessary and each is stated rather than buried:
+
+  (1) 19 EXISTING CALL SITES TOOK THE NEWLY-REQUIRED `lane=` KEYWORD.
+      Adding a required argument to a protocol makes every caller a caller that
+      must pass it. NOT ONE ASSERTION WAS ADDED, REMOVED, LOOSENED OR REORDERED
+      -- the transform inserts one keyword argument per call and nothing else,
+      and each inferred lane was printed and checked:
+
+        L1449 complete_attacker recv=_client(fake)                    lane="gemma-26b"
+        L1466 complete_attacker recv=_client(fake, attacker="qwen-27b") lane="qwen-27b"
+        L1490 complete_attacker recv=_client(fake, attacker=lane)     lane=lane
+        ... 16 more, 4 of them "qwen-27b", 1 complete_judge on the judge lane
+
+  (2) ONE TEST FLIPPED, UNDER HARD RULE 6, CITING THE RULING.
+      test_a_TWO_ATTACKER_LANE_matrix_REFUSES_BY_NAME_and_spends_nothing
+      asserted a refusal the ruling removes. Hard rule 6 provides for exactly
+      this: "if a ruling legitimately changes behaviour, the test flips citing
+      the ruling -- and the flip must be PROVABLY meaningful (it fails on the
+      old code)". IT DOES.
+      ! THE OLD DOCSTRING IS KEPT VERBATIM INSIDE THE NEW ONE, so the trail is
+        readable, and the flip is NOT A LOOSENING: it asserts the stronger
+        property the refusal stood in for -- that BOTH pilot attacker lanes
+        resolve, from config/lanes.yaml, onto TWO DIFFERENT PROVIDERS.
+
+  (3) ONE DOCSTRING THAT BECAME FALSE WAS CORRECTED, NOT LEFT STANDING.
+      test_the_two_methods_use_the_two_DIFFERENT_lanes said the role "is exactly
+      why it is NOT enough to separate two attacker lanes". True when written;
+      false since the ruling. Its ASSERTION is untouched; the sentence now says
+      what it used to say and that it is no longer true.
+
+  ! AND TWO ATTRIBUTE READS MOVED, BECAUSE THE SHAPE THEY READ IS GONE:
+    client.attacker.lane / client.judge.lane -> client.lanes[...]. Same
+    assertion -- both lanes resolved, by name -- read off the new shape.
+
+  ! THE THREE NARROWED NON-USE ASSERTIONS ARE UNCHANGED. Verified by grep over
+    the diff: NO diff line in tests/test_c12_driver.py touches
+    AST_WALK, RAW_SOURCE_SCAN, the environment-variable assertion, _BOUNDARY_TOKEN,
+    _is_the_network_boundary, or the urllib/os.environ exemptions. Nothing was
+    widened, so there is no Class A deviation to report on that head.
+
+================================================================================
+5. ! Q-171 -- THE THIRD BLOCKER, MEASURED. INC-129.
+================================================================================
+
+  The end-to-end test drove RUN_DECLARED.md S1's own matrix through
+  driver_run.execute against a fake transport, with the real _http_post replaced
+  by one that raises. VERBATIM:
+
+    EXECUTE RAISED: whetstone_gate.driver.clients.DriverClientError
+    MESSAGE: role 'tool' has no Google equivalent. The legal values are
+             ['assistant', 'system', 'user']. This is a refusal rather than a
+             coercion: silently rewriting a role sends a different prompt on one
+             lane than on another, and CONTEXT.md S10.1 forbids differential
+             information across arms
+
+    requests built: 1
+      google: 1   groq: 0   other: 0
+      first google url: https://generativelanguage.googleapis.com/v1beta/models/gemma-4-26b-a4b-it:generateContent
+
+  ONE REQUEST. THE RUN DIED ON THE SECOND CALL OF THE FIRST EPISODE.
+
+  THE CAUSE, READ FROM THE SOURCE:
+    attacker/context.py:505  ContextPart(Origin.WORLD, "tool", turn.tool_result_text, ...)
+    driver/clients.py:386    _GOOGLE_ROLE = {"system": "user", "user": "user", "assistant": "model"}
+    driver/clients.py:387    _GROQ_ROLE   = {"system": "system", "user": "user", "assistant": "assistant"}
+
+  ! NEITHER MAP HAS A "tool" KEY, so EVERY turn after the first is unencodable.
+    Measured on the Groq side DIRECTLY, because the run never reached it:
+    "role 'tool' has no Groq equivalent". THIS IS NOT A GOOGLE PROBLEM AND NOT A
+    LANE PROBLEM. No episode on either lane can reach turn 2.
+
+  ! THE REFUSAL ITSELF IS CORRECT AND MUST NOT BE WEAKENED. Its own message
+    says why. The defect is the MISSING MAPPING, not the refusal.
+
+  NOT FIXED, AND THE REASON IS NOT THE FENCE ALONE. A role mapping is a CLASS A
+  choice about what a model sees, and there is no obviously-right answer:
+  Google's contents[].role has exactly TWO legal values and "tool" is not one,
+  so nothing faithful exists; Groq's schema DOES have a tool role but REQUIRES a
+  tool_call_id this driver never mints, so the faithful-looking option is the
+  one that 400s. And mapping the two providers DIFFERENTLY would send
+  differentially shaped context to the two attacker cells -- CONTEXT.md S10.1's
+  own prohibition -- which is REJECTED ON THE RECORD at Q-171 rather than left
+  as an option somebody picks later.
+
+  ! IT IS PINNED BY A TEST THAT ASSERTS THE DEFECT ON PURPOSE, so a suite that
+    is green cannot also be a suite in which the declared command completes zero
+    episodes. That test says in its own docstring that it must be UPDATED rather
+    than deleted when Q-171 is ruled.
+
+  Q-174, SEPARABLE AND ALSO NEW: DriverClientError is neither RateLimited nor
+  ProviderFailed, so _MeteredCall.run does not convert it to a LaneStopped. It
+  escapes execute UNCAUGHT -- no report, no denominator, no LIMITATIONS block.
+  Hard rule 11 says every dropped episode is counted and printed; here TWENTY
+  are dropped and NONE is printed. Raised, not fixed: choosing a cause category
+  moves a published number.
+
+================================================================================
+6. ! WHAT THIS SESSION BROKE AND MAY NOT FIX, AND THE ONE IT TOUCHED ANYWAY
+================================================================================
+
+6.1 Q-173 / INC-130 -- benign/ IS RED, AND THE FENCE FORBIDS FIXING IT
+
+  MeteredModelClient has TWO consumers, not one. MEASURED, by constructing each
+  adapter around a TranscriptClient and calling it:
+
+    MeteredSolverClient : BROKEN -> TranscriptClient.complete_attacker() missing
+                                    1 required keyword-only argument: 'lane'
+    _JudgeAdapter       : BROKEN -> TranscriptClient.complete_judge() missing
+                                    1 required keyword-only argument: 'lane'
+
+    benign/solve.py:153   reply = self.inner.complete_attacker(messages=..., temperature=...)
+    benign/shell.py:264   reply = self.inner.complete_judge(system=..., user=...)
+
+  NOTHING IN benign/ OR tests/test_c12_benign.py WAS TOUCHED. Both are under
+  this session's NOT list; CLAUDE.md S4 says STOP AND REPORT rather than work
+  around it; and a concurrent session (9f31d708) additionally holds
+  benign/blindness.py and benign/executor.py UNCOMMITTED in this working tree,
+  so editing that package would also have risked sweeping its work.
+
+  ! THE ACCOMMODATION WAS AVAILABLE AND WAS DELIBERATELY NOT TAKEN, and this is
+    the part the architect should weigh. Defaulting the lane on TranscriptClient
+    would have kept benign/ GREEN -- it holds only transcripts and test fakes,
+    and a transcript routes nothing. It was rejected twice over: the ruling says
+    "REQUIRED ARGUMENT WITH NO DEFAULT" and that is an instruction, not a
+    rationale a session may re-derive; and TranscriptClient's own docstring says
+    it exists so "the accounting path under test is EXACTLY the one a provider
+    would drive" -- a dry run whose client tolerated a missing lane would prove
+    the wiring on a shape the scored run does not use.
+    A LOUD BREAK IS DETECTABLE. A SILENT ACCOMMODATION IS NOT.
+
+  THE REMEDY, for whoever owns benign/: two expressions -- the benign runner
+  knows its own lane, so each adapter takes one and forwards it -- and the
+  `lane=` keyword at three or four call sites in tests/test_c12_benign.py.
+
+  ! THIS IS INC-127's FINDING RECURRING ONE SESSION LATER AND WORSE. INC-127's
+    own Systemic guardrail reads: "a fence that permits a change whose NECESSARY
+    consequence lands outside it is a fence that cannot be honoured." It was
+    read as a fact about that incident rather than as a prediction. INC-127 was
+    a purity ASSERTION going red; this is PRODUCTION SOURCE raising TypeError.
+    The guardrail that closes the class is a process one: before a fence is
+    written for a change to a SHARED TYPE, grep for who implements and calls it.
+    Q-161's own impact table was wrong in BOTH directions -- it named
+    attacker/loop.py, which needs nothing, and missed benign/, which needs two.
+
+6.2 Q-172 -- driver/episode.py WAS TOUCHED THOUGH THE PARENTHETICAL NAMED THREE
+
+  The fence: "ONLY src/whetstone_gate/driver/ (clients.py, run.py, __main__.py
+  -- the LANE THREADING ONLY)". episode.py is NOT in the parenthetical. It is
+  also NOT in the NOT list, and it IS inside the directory the ONLY clause names.
+
+  THE RULING CANNOT BE OBEYED WITHOUT IT, AND THE RULING'S OWN TEXT SAYS SO:
+  "pass it at every call site", and "_MeteredCall already holds it too, so the
+  value is in hand at BOTH call sites". _MeteredCall, _AttackerClient and
+  _JudgeClient all live in episode.py and are the only callers of the two
+  protocol methods on the driver's path. Q-161's table listed episode.py as one
+  of its four files.
+
+  EXACTLY TWO EXPRESSIONS CHANGED THERE, plus the comment that says why the
+  judge's lane is read off the ROLE's meter. Nothing else in the file moved.
+  Disclosed as Q-172, Class B (scope, not meaning), on Q-166's precedent.
+
+================================================================================
+7. TASK 2 -- PREFLIGHT. GATE 2 FAILED. VERBATIM.
+================================================================================
+
+  driver_run.preflight called on the REAL two-lane matrix -- which is itself new,
+  because Q-161's refusal previously fired BEFORE preflight and only a
+  single-lane matrix could reach it:
+
+    attacker lanes in this matrix : ['gemma-26b', 'qwen-27b']
+    judge lane                    : gemma-26b
+
+    PREFLIGHT REFUSED:
+        the environment does not carry ['GOOGLE_API_KEY', 'GROQ_API_KEY']
+        Only the NAMES are read here - runner/keys.py returns a boolean and has
+        no code path that reads a value (CLAUDE.md S4)
+        An episode that fails on a missing credential halfway through is an
+        episode that has already spent tokens
+
+    --- key NAMES only, never a value (CLAUDE.md S4) ---
+      GOOGLE_API_KEY  : NOT SET
+      GROQ_API_KEY    : NOT SET
+      .env exists     : False
+
+  GATE 2 DID NOT PASS. THIS IS Q-165 AND IT IS OPERATOR-ONLY.
+  No .env was created. No key value was read, printed, echoed or committed. No
+  workaround was attempted. The MISSING NAMES are GOOGLE_API_KEY and
+  GROQ_API_KEY, and that is the whole of what this session may report about them.
+
+  ! NOTE FOR THE RECORD: 6ba2c1f7 could only prove this on a SINGLE-lane matrix,
+    because Q-161 refused first. It now refuses on the DECLARED matrix itself,
+    naming BOTH keys. That is a small advance and it is stated as one.
+
+================================================================================
+8. TASK 3 -- IT DID NOT RUN, AND THE START TIME IS STILL BLANK
+================================================================================
+
+  DECLARED UTC START TIME : ____________________________  (STILL BLANK, S8 of
+                            evals/pilot/RUN_DECLARED.md, UNCHANGED BY THIS
+                            SESSION)
+  ACTUAL START TIME       : THERE IS NONE. NOTHING STARTED.
+
+  THE DRIVER'S FULL RUN REPORT FOR --spend-real-tokens: THERE IS NONE, AND
+  INVENTING A SHAPE FOR ONE WOULD BE THE WORST THING THIS SESSION COULD DO.
+  The command was not issued, because the prompt gates it on Gate 2 and Gate 2
+  failed. Preflight's refusal above is the whole of what the declared command
+  path produced this session.
+
+  ! THIS IS THE THIRD SESSION TO LEAVE S8 BLANK AND IT IS RIGHT FOR THE THIRD
+    TIME. S8: "A declaration carrying a start time earlier than the run is a
+    pre-registration that was written afterwards." The prompt said to fill it
+    with "the time you are ABOUT TO start" -- and there was no such time.
+    RESULTS.md prints declared-versus-actual side by side, so a fabricated
+    declaration would be visible in the published artefact.
+
+  NO ABORT ENTRY WAS WRITTEN, AND NONE SHOULD BE. PROCESS.md S6b's abort
+  machinery -- the entry, the cause, the partial episode count, the numbered
+  retry -- is for AN EXECUTION THAT BEGAN AND DID NOT FINISH. Nothing began.
+  Zero episodes were attempted, zero ledgers written, zero checkpoints
+  published, zero tokens spent on either lane.
+
+  MEASURED TOKENS/EPISODE : NOT MEASURED. No episode ran.
+  select_n RETURNED       : NOTHING -- it was never called on a real run. The
+                            only figure this session produced is the DRY RUN's,
+                            and the driver REFUSES to let it select N:
+
+      PILOT MEASUREMENT - attacker tokens per episode (CONTEXT.md S13.4)
+        attacker tokens (API's OWN usage.total_tokens, never estimated) : 1200000
+        episodes COMPLETED                                             : 20
+        episodes TRUNCATED (counted, hard rule 11)                     : 0
+        tokens/episode over COMPLETED  (the S13.4 figure, ceil)        : 60000
+        tokens/episode over DENOMINATOR (disclosure; reads LOW)         : 60000
+        USABLE TO SELECT N                                             : True
+      N DECISION: REFUSED, and the refusal is the result -
+        a DRY RUN may not select the N branch
+        Its token counts are the caller's numbers, not a provider's (see
+        driver/clients.py), so it measures the HARNESS and never CONTEXT.md
+        S13.4's tokens/episode
+        The pilot is SINGLE-SHOT (PROCESS.md S6b) and its output directory is
+        the record
+
+  ! SO THERE IS NO "BOTH N CONJUNCTS" ANSWER AND NO "WHICH BOUND" ANSWER, AND
+    THAT IS THE HONEST REPORT RATHER THAN A GAP. 60,000 is the TRANSCRIPT's
+    number. Quoting it as a tokens/episode measurement, or running it through
+    the two-conjunct rule to name a branch, would be putting a harness figure
+    where a provider's billed figure belongs -- which is the exact substitution
+    hard rule 12 and golden 8 exist to prevent.
+  ! NOTHING WAS WRITTEN INTO config/. The TODO_C14_PILOT sentinels are
+    untouched and are the architect's.
+
+================================================================================
+9. GATE 1 -- PASSED ON EVERY CONDITION IT NAMES
+================================================================================
+
+  20-episode dry run, OUTSIDE the repository:
+    out root  C:\Users\chinm\AppData\Local\Temp\wg-dryrun-d4e7b920
+    episodes attempted            : 20
+    episodes completed            : 20
+    episodes TRUNCATED            : 0
+    episodes never started        : 0
+    DENOMINATOR (completed+trunc) : 20
+    reconciles                    : 20 == 20 + 0 + 0
+    EXIT 0
+
+  make check-roles                : EXIT 0 -- 21 passed, 0 failed, 3 n/a
+  the three narrowed assertions   : UNCHANGED (grep over the diff, S4)
+  git status --porcelain evals/   : EMPTY -- nothing new
+  evals/ contents                 : evals/pilot/RUN_DECLARED.md, and nothing
+                                    else. Tracked and on disk agree.
+  tests/goldens/                  : UNTOUCHED
+
+================================================================================
+10. THE FULL SUITE, AND WHAT IS AND IS NOT THIS SESSION'S
+================================================================================
+
+  tests/ (whole suite, in-repo, this tree) : 38 failed, 1384 passed, 2 skipped
+  tests/test_c12_driver.py                 : 72 passed, 2 skipped -- ZERO failures
+
+  THE 38, BY FILE:
+    test_c12_benign.py                21   <- THIS SESSION'S. Q-173 / INC-130.
+    test_c8_scorer.py                  9   \
+    test_c7_ledger.py                  3    |
+    test_c14_prereg.py                 2    |  NOT THIS SESSION'S -- see below
+    test_config_loader.py              1    |
+    test_lanes_operator_placeholders   1    |
+    test_repo_invariants.py            1   /
+
+  ! THE 17 NON-BENIGN FAILURES CANNOT BE THIS SESSION'S, AND THAT IS PROVED
+    STRUCTURALLY RATHER THAN ASSERTED: NOT ONE of those six files imports
+    whetstone_gate.driver at all (measured, grep count 0 in each), and this
+    session touched nothing outside driver/ and tests/test_c12_driver.py. They
+    are the genesis/pre-registration cluster that INC-126 and 6ba2c1f7's S10
+    items 3-4 already own -- tests/goldens/ is read-only and PROTOCOL.md's
+    manifest row is unlanded -- and two of those files (test_c8_scorer.py,
+    test_repo_invariants.py) are additionally held UNCOMMITTED right now by the
+    concurrent C19 session, so this session attributes them in NEITHER
+    direction.
+
+  ! THE 21: ONE was already red at HEAD (INC-127's transitive purity walk). The
+    traceback on the rest is benign/solve.py:153: TypeError, which is the lane.
+    A clean before/after attribution of every one of the other 20 WAS ATTEMPTED
+    TWICE AND BOTH ATTEMPTS WERE DISCARDED AS INVALID -- an extracted tree has
+    no .git and a relocated src moves repo_root(), and each produced MORE
+    failures than the real tree, which is a measurement of the harness and not
+    of the change. So the mechanism is stated exactly and the count is stated
+    with its confound named, rather than a clean-looking number being published
+    that the method does not support.
+
+================================================================================
+11. INCIDENTS WRITTEN
+================================================================================
+
+  INC-129  the declared command dies on the SECOND call of the FIRST episode,
+           on BOTH providers, because a tool result has no role either accepts.
+           Missing: a test that drove the client with the driver's REAL message
+           shapes -- all twenty existing client tests hand-write their messages,
+           and one of them passes role "tool" AND ASSERTS THE REFUSAL, which is
+           the exact input that breaks production, recorded as correct.
+           Missed: Q-162 said the client had never been run and it was filed as
+           a note about CREDENTIALS -- but a whole class of what it covers needs
+           no network at all and was never asked.
+  INC-130  a ruling implemented inside the driver fence broke benign/ at run
+           time. Missed: INC-127, written ONE SESSION EARLIER, states this exact
+           finding as its Systemic guardrail AND names the mechanism.
+  INC-131  ! THIS SESSION'S OWN. The first draft of _agree used
+           getattr(buckets, "lane", None) and RAW_SOURCE_SCAN refused it by
+           name -- a dynamic reach, inside the fix for the incident about
+           dynamic reaches. The CODE was changed, not the test. Recorded even
+           though it never escaped, because an incident log holding only the
+           failures that got PAST their guardrails misrepresents how often the
+           guardrails fire.
+
+================================================================================
+12. EVERY Swept: LINE, WITH THE EXPECTED PATH LIST WRITTEN DOWN BEFOREHAND
+================================================================================
+
+  THE EXPECTED PATH LIST, WRITTEN BEFORE THE FIRST `git add` (INC-123, INC-125):
+
+    COMMIT 1   src/whetstone_gate/driver/clients.py
+               src/whetstone_gate/driver/run.py
+               src/whetstone_gate/driver/episode.py
+               src/whetstone_gate/driver/__main__.py
+               tests/test_c12_driver.py
+               QUESTIONS.md
+    COMMIT 2   INCIDENTS.md
+               STATUS.md
+               PROGRESS.md
+               docs/sessions/arch-pilot-run-3.txt
+
+  NOT MINE, AND MUST NOT APPEAR IN EITHER SNAPSHOT -- the concurrent C19 session
+  (9f31d708) holds all of these uncommitted in this shared working tree:
+
+               src/whetstone_gate/benign/blindness.py
+               src/whetstone_gate/benign/executor.py
+               src/whetstone_gate/check_roles.py
+               tests/test_c8_scorer.py
+               tests/test_repo_invariants.py
+               grep.exe.stackdump   (untracked, not this session's)
+
+  The private-index recipe of PROCESS.md S7b was used for both commits, with
+  `env -u GIT_INDEX_FILE` at step 4 and the shared index proved clean at step 5.
+  The actual Swept: lines are composed from step 3's staged snapshot alone and
+  appear in the session report; no line count is predicted here, because the
+  heredoc is written BEFORE the snapshot prints (OF-216, INC-97).
+
+================================================================================
+13. WHAT THIS SESSION COULD NOT DO
+================================================================================
+
+  1. ! RUN THE PILOT. Gate 2 failed on Q-165 (operator-only), and Q-171 would
+     have stopped it on the second call in any case. The single-shot window is
+     UNSPENT.
+  2. ! DECLARE THE UTC START TIME. By decision, per S6b and RUN_DECLARED.md S8,
+     because there was no time at which the run was about to start.
+  3. ! FIX Q-171's ROLE MAPPING. Class A, and not lane threading. Pinned by a
+     test instead.
+  4. ! FIX benign/ OR tests/test_c12_benign.py. Under NOT, and a concurrent
+     session holds two of those files. Q-173 / INC-130.
+  5. ! FIX Q-174's UNCAUGHT DriverClientError. Choosing a cause category moves
+     a published number.
+  6. ! FIX THE 17 NON-BENIGN FAILURES. Outside the fence, and proved not to be
+     this session's.
+  7. VERIFY THE CLIENT AGAINST A REAL PROVIDER. No session may. Q-162.
+
+================================================================================
+14. WHAT THE ARCHITECT IS OWED, SHORTEST PATH FIRST
+================================================================================
+
+  1. RULE Q-171. It is now the FIRST thing the declared command hits, ahead of
+     the credentials, and no episode can complete until it is ruled.
+  2. CLOSE Q-165. Operator-only: create .env from .env.example in the terminal
+     the run executes in. No session may.
+  3. RULE Q-173 and hand benign/ to a session with that fence. It is red now.
+  4. RATIFY OR REVERSE Q-172 (episode.py's two expressions).
+  5. RULE Q-174, or accept it and publish it as a limitation.
+  6. THE STANDING ITEMS FROM 6ba2c1f7, UNCHANGED: PROTOCOL.md's manifest row
+     (make check-prereg stays red); Q-163 and Q-164 before prereg-v1; the nine
+     genesis assertions (INC-126).
+
+================================================================================
+15. STATE AT THE MOMENT THIS BLOCK WAS PRINTED
+================================================================================
+
+  git rev-parse probe-v1   : 170bd3ff4abfdd8f87f64055972a60c82cc54efc
+  git rev-parse prereg-v1  : DOES NOT RESOLVE
+  tags                     : UNCHANGED. NO TAG CUT BY THIS SESSION.
+  evals/                   : pilot/RUN_DECLARED.md, and nothing else
+  RUN_DECLARED.md S8       : BLANK, unchanged by this session
+  make check-roles         : exit 0
+  tests/test_c12_driver.py : 72 passed, 2 skipped
+  TOKEN SPEND              : ZERO, on every lane, for the whole session.
+
+  NOT SELF-CERTIFIED. A FRESH ADVERSARIAL REVIEW IS OWED. THE LANE THREADING
+  AND THE PROVIDER CLIENT BOTH SHIP UNREVIEWED AND DISCLOSED.
+
+================================================================================
+END OF FINAL OUTPUT -- ARCH FIX PILOT RUN 3 -- SESSION-TOKEN d4e7b920
+================================================================================

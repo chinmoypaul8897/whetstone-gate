@@ -1,3 +1,150 @@
+## SESSION-TOKEN d4e7b920 — ARCH, PILOT RUN 3 — 2026-09-04
+
+**Role:** FIX. **Chunk:** ARCH. **Review owed:** the lane threading and the provider client both
+ship **UNREVIEWED AND DISCLOSED**. **Not self-certified. No tag. `prereg-v1` NOT cut.**
+
+**TOKEN SPEND: ZERO. NO PROVIDER MODEL CALL OF ANY KIND. NO NETWORK CALL OF ANY KIND.**
+⚠️ **THE PILOT'S SINGLE-SHOT WINDOW IS STILL UNSPENT**, and there is **no abort**, because
+nothing began. `evals/` is byte-identical to `HEAD` — `git status --porcelain evals/` is empty.
+
+---
+
+### `Q-161` IS RULED, IMPLEMENTED AND CLOSED — the ruling recorded verbatim FIRST
+
+`lane` is a **required, undefaulted, keyword-only** argument on both of
+`MeteredModelClient`'s methods. It is **passed, never derived**, from
+`episode._MeteredCall.lane` — the authoritative per-role value — through `_AttackerClient`,
+`_JudgeClient` and `_PacedClient` into `MeteredProviderClient`, which resolves it against a map
+built from `config/lanes.yaml`. `driver/__main__.py`'s two-attacker-lane refusal is **gone**;
+`for_lane_names` builds for every lane the matrix dispatches on and resolves them all **at
+construction**, so an unknown lane or unsupported provider refuses before episode 1.
+
+**Four things that refuse rather than guess, each asserted by a test:** an **unknown** lane is a
+named refusal and never a fallback; an **empty or non-string** lane is a named refusal and is never
+substituted (the language enforces presence, not content); a lane whose **pacing buckets disagree**
+with it stops the call before it spends — two independent copies of one value, and this is the only
+place both are in scope; and `for_lane_names` refuses **zero** attacker lanes.
+
+⚠️ **EVERY REFUSAL THE CLIENT ALREADY MADE IS INTACT** — no retry on a 429; a missing or
+total-less usage block is a REFUSAL and never a zero; the total is LIFTED from the provider's own
+reported total and never summed; an absent key **NAME** is a refusal naming the NAME and never a
+value. ⚠️ **The three narrowed non-use assertions are UNCHANGED** — no diff line in
+`tests/test_c12_driver.py` touches them or their constants, verified by grep over the diff.
+
+**TESTS: `tests/test_c12_driver.py` 72 passed, 2 skipped.** Nine tests are new or flipped, and
+⚠️ **all nine were proved to FAIL on `52c9077`'s code** — measured in a fresh OS temp directory
+with `PYTHONPATH` pinned to `HEAD`'s tree, because an editable install otherwise silently tests the
+working tree and reports a false green. That is hard rule 6's *"provably meaningful"*, done rather
+than asserted. **19 existing call sites took the newly-required `lane=` keyword and NOT ONE
+ASSERTION WAS TOUCHED**; one test **flipped** under hard rule 6, keeping its old text verbatim in
+its docstring, and one docstring that became **false** when the ruling landed was corrected rather
+than left standing.
+
+---
+
+### ⚠️⚠️ WHAT DID NOT HAPPEN, AND WHY — GATE 2 FAILED, SO TASK 3 DID NOT RUN
+
+**GATE 1 PASSED**, on every condition it names: the 20-episode dry run completed **exit 0**, all 20
+episodes, into a fresh OS temp directory **outside the repository**; `make check-roles` **exit 0**
+(21 passed, 0 failed, 3 n/a); the three narrowed assertions unchanged; `git status --porcelain
+evals/` empty.
+
+**GATE 2 FAILED.** `driver_run.preflight`, called on the **real two-lane matrix** — which is itself
+new, because `Q-161`'s refusal previously fired *before* preflight and only a single-lane matrix
+could reach it — answers:
+
+    attacker lanes in this matrix : ['gemma-26b', 'qwen-27b']
+    judge lane                    : gemma-26b
+
+    PREFLIGHT REFUSED:
+        the environment does not carry ['GOOGLE_API_KEY', 'GROQ_API_KEY']
+        Only the NAMES are read here - runner/keys.py returns a boolean and has no code path
+        that reads a value (CLAUDE.md S4)
+        An episode that fails on a missing credential halfway through is an episode that has
+        already spent tokens
+
+⚠️ **THIS IS `Q-165` AND IT IS OPERATOR-ONLY.** Measured **by name only**: `.env` does not exist,
+`GOOGLE_API_KEY` NOT SET, `GROQ_API_KEY` NOT SET. **No key value was read, printed, echoed or
+committed to establish it, no `.env` was created, and nothing was worked around.**
+
+**SO TASK 3 DID NOT RUN, AND THE UTC START TIME IN `evals/pilot/RUN_DECLARED.md` §8 IS STILL
+BLANK — for the third time, and for the third time that is the right answer.** §8: *"A declaration
+carrying a start time earlier than the run is a pre-registration that was written afterwards."*
+The prompt gated the declaration on Gate 2 and Gate 2 failed.
+
+---
+
+### ⚠️⚠️ AND A THIRD BLOCKER WAS FOUND, BY A TEST THIS SESSION WROTE — `Q-171`, `INC-129`
+
+Driving the declared matrix through `run.execute` against a fake transport:
+
+    EXECUTE RAISED: DriverClientError: role 'tool' has no Google equivalent.
+                    The legal values are ['assistant', 'system', 'user']
+    requests built: 1   (google 1, groq 0)
+
+**One request. The run dies on the SECOND call of the FIRST episode.**
+`attacker/context.py:505` emits every tool result under role `"tool"`, so **every turn after the
+first** carries one — and **neither** `_GOOGLE_ROLE` **nor** `_GROQ_ROLE` has that key. Measured on
+the Groq side directly: `role 'tool' has no Groq equivalent`. ⚠️ **So this is not a Google problem
+and not a lane problem: no episode on either lane can reach turn 2.**
+
+**NOT FIXED — a role mapping is Class A and is not lane threading.** It is `Q-171`, with three
+options and one already rejected on the record (a differential mapping across the two cells would
+be `CONTEXT.md` §10.1's own prohibition). ⚠️ **It is PINNED by a test that asserts the defect on
+purpose**, so a green suite cannot also be a suite in which the declared command completes zero
+episodes. ⚠️ **`Q-174`**, separable: `DriverClientError` is neither `RateLimited` nor
+`ProviderFailed`, so it escapes `execute` **uncaught** and hard rule 11's denominator is lost with
+it — twenty dropped episodes, none printed.
+
+---
+
+### ⚠️ WHAT THIS SESSION BROKE AND MAY NOT FIX — `Q-173`, `INC-130`
+
+`MeteredModelClient` has **two** consumers. `benign/solve.py:153` and `benign/shell.py:264` call
+the protocol with no lane, and a required argument breaks both — **measured**, not inferred:
+`TypeError: … missing 1 required keyword-only argument: 'lane'`. ⚠️ **`benign/` and
+`tests/test_c12_benign.py` were NOT touched**; both are under this session's `NOT` list, and a
+concurrent session (`9f31d708`) additionally held two `benign/` files uncommitted in this working
+tree. **The remedy is two expressions and it is stated for its owner.**
+
+⚠️ **THE ACCOMMODATION WAS AVAILABLE AND WAS DELIBERATELY NOT TAKEN.** Defaulting the lane on
+`TranscriptClient` would have kept `benign/` green — it routes nothing. It was rejected because the
+ruling says *"REQUIRED ARGUMENT WITH NO DEFAULT"*, and because a dry run whose client tolerated a
+missing lane would prove the wiring on a shape the scored run does not use. **A loud break is
+detectable; a silent accommodation is not.** ⚠️ This is `INC-127`'s finding recurring **one session
+later** — *"a fence that permits a change whose necessary consequence lands outside it is a fence
+that cannot be honoured"* — and it got **worse**: `INC-127` was an assertion going red, this is
+production source raising `TypeError`.
+
+⚠️ **`driver/episode.py` WAS TOUCHED THOUGH THE FENCE'S PARENTHETICAL NAMED THREE FILES** — two
+expressions, one per adapter, and nothing else. It is inside the directory the fence's `ONLY`
+clause names, it is not in the `NOT` list, and the ruling cannot be obeyed without it. Disclosed at
+**`Q-172`** rather than mentioned in passing. `attacker/loop.py`, which `Q-161` also listed, needed
+**no** change — C6's protocol is text-only, measured.
+
+---
+
+### MEASURED
+
+    tests/test_c12_driver.py       : 72 passed, 2 skipped
+    the nine new/flipped tests     : ALL NINE FAIL on 52c9077 (PYTHONPATH-pinned temp tree)
+    make check-roles               : exit 0 - 21 passed, 0 failed, 3 n/a
+    20-episode dry run             : exit 0, 20/20 episodes, OUTSIDE the repository
+    driver_run.preflight (2 lanes) : REFUSED - ['GOOGLE_API_KEY', 'GROQ_API_KEY'] absent
+    .env                           : DOES NOT EXIST (by NAME only; no value read)
+    evals/                         : git status --porcelain EMPTY - nothing new
+    tests/goldens/                 : UNTOUCHED
+    TOKEN SPEND                    : ZERO, on every lane, for the whole session
+    tag cut                        : NONE. prereg-v1 NOT cut. NOT SELF-CERTIFIED.
+
+**Raised `Q-171`…`Q-174`; `INC-129`, `INC-130`, `INC-131`.** ⚠️ `INC-131` is this session's own
+first draft using `getattr(` inside the fix for the incident about dynamic reach — **the tripwire
+caught it on the first test run**, and it is recorded even though it never escaped, because an
+incident log holding only the failures that got past their guardrails misrepresents how often the
+guardrails fire.
+
+---
+
 ## SESSION-TOKEN 6ba2c1f7 — ARCH, PILOT RUN 2 — 2026-09-03
 
 **Role:** FIX. **Chunk:** ARCH. **Review owed:** the provider client ships **UNREVIEWED AND
