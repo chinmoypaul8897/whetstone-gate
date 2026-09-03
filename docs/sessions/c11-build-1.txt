@@ -431,7 +431,8 @@ OF-208 INC-68's step 5 depends on ambient shell state and can be defeated by the
 
 INC-88's guardrail / OF-205: `git add -- <paths>` FIRST, then `git diff --cached` IN
 THE SAME COMMAND, and `Swept:` composed FROM THAT SNAPSHOT and from nothing else.
-Every commit this session made used a PRIVATE INDEX. EVERY ONE SWEPT NOTHING.
+Every commit this session made used a PRIVATE INDEX. NINE OF TEN SWEPT NOTHING; THE
+TENTH SWEPT ONE ROW AND SAYS SO.
 
   1bc8b4d  Swept: NOTHING. Seven headings added, ALL this session's. The one foreign
            8-hex token in the added lines, 3f8b2d56, is a CITATION inside this
@@ -455,6 +456,32 @@ Every commit this session made used a PRIVATE INDEX. EVERY ONE SWEPT NOTHING.
            pre-existing STATUS.md row text as above, unchanged.
   0a77db1  Swept: NOTHING. Two paths, both carrying only this session's entries; no
            foreign 8-hex token in the added lines.
+  12f6c6f  !! Swept: THE `STATUS.md` C10 ROW, belonging to C10 BUILD 1 (`bc69e8d7`).
+           THE ONLY NON-EMPTY `Swept:` LINE THIS SESSION WROTE, and it is here because
+           the staged snapshot showed TWO changed rows in STATUS.md - this session's
+           C11 row and the C10 row, `| **C10** | ... | todo |` becoming
+           `| **C10** | ... | BUILT (attempt 1). UNREVIEWED. NO TAG.` naming
+           `C10 BUILD 1 (bc69e8d7)`. Q-063 clause (ii): YOU STILL COMMIT, because
+           waiting deadlocks two sessions, and the message names every foreign entry
+           and its token, and the report names them too - THIS IS THE REPORT DOING SO.
+           Nothing of theirs is altered: the row is committed EXACTLY as they wrote it
+           and this session touched no character of it. `.gitattributes`' `* text=auto
+           eol=lf` normalises their CRLF in the BLOB, so the object store is clean while
+           their WORKING TREE stays CRLF - which keeps check-roles A4 red until that
+           session or the operator re-checkouts, and is theirs to resolve.
+           `PROGRESS.md` in the same commit swept NOTHING: seventeen lines, all this
+           session's, no `##` entry heading of any other session, and `bc69e8d7`
+           appearing only as a CITATION in this session's own measurement note.
+  f3b9a28  Swept: NOTHING. One path, this session's own FINAL OUTPUT file.
+  87a3453  Swept: NOTHING. One path, this session's own FINAL OUTPUT file.
+
+!! AND THIS SECTION ITSELF WAS WRONG FOR THREE COMMITS AND IS CORRECTED IN PLACE RATHER
+THAN LEFT. As first written it said "EVERY ONE SWEPT NOTHING" and listed seven commits -
+true when it was written, false from `12f6c6f`, which is the commit that committed this
+file. A record that stops being true the moment it is committed is exactly the shape
+INC-88 is about, one level up: a claim composed from an earlier read of a tree that then
+moved. Corrected by the two commits that follow, and the wrong sentence is described
+here rather than silently replaced.
 
 STATUS.md's C11 REVIEW-HISTORY COLUMN IS APPENDED TO AND NOTHING IS ERASED, VERIFIED
 RATHER THAN ASSERTED: all 1,887 characters of the pre-existing ARCH FIX text appear
