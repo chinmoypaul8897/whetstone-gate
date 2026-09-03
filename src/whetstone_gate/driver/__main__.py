@@ -24,7 +24,7 @@ from whetstone_gate.driver import episode as driver_episode
 from whetstone_gate.driver import pilot as pilot_module
 from whetstone_gate.driver import rehearsal
 from whetstone_gate.driver import run as driver_run
-from whetstone_gate.driver.clients import TranscriptClient
+from whetstone_gate.driver.clients import MeteredProviderClient, TranscriptClient
 from whetstone_gate.runner.budget import Ceilings
 
 PROGRAM = "python -m whetstone_gate.driver"
@@ -182,7 +182,7 @@ def main(argv: list[str] | None = None) -> int:
         client = (
             _transcript_client(arguments, matrix)
             if request.dry_run
-            else _refuse_to_invent_a_provider_client()
+            else _provider_client(matrix)
         )
         result = driver_run.execute(request, client=client)
     except driver_run.RunRefused as refused:
@@ -194,25 +194,55 @@ def main(argv: list[str] | None = None) -> int:
     return 0
 
 
-def _refuse_to_invent_a_provider_client() -> object:
-    """⚠️ **THIS CHUNK SHIPS NO PROVIDER CLIENT, AND THAT IS THE DELIVERABLE, NOT A GAP.**
+def _provider_client(matrix: pilot_module.PilotMatrix) -> MeteredProviderClient:
+    """⚠️ **CONSTRUCT THE REAL PROVIDER CLIENT — `Q-150`, RULED 2026-09-03, OPTION 1.**
 
-    `PROCESS.md` §8 reserves every lane and the build prompt sanctioned **zero** provider
-    model calls, so a provider client written here could not have been run, could not have
-    been tested against a provider, and would be an untested code path standing between the
-    operator and a **single-shot** run. The client is a **parameter**
-    (:class:`whetstone_gate.driver.clients.MeteredModelClient`, two methods), the operator
-    supplies it at the call site, and this refusal names what it must satisfy.
+    This function replaced ``_refuse_to_invent_a_provider_client``, which raised on every
+    ``--spend-real-tokens`` invocation and made `evals/pilot/RUN_DECLARED.md` §1's declared
+    command unrunnable. The ruling names the architect's own error — *"the C12 BUILD prompt
+    said 'ship no provider client, supply one at the call site' AND the declared command
+    goes through `tasks drive`, WHICH IS A CLI WITH NO INJECTION POINT"* — and takes option
+    1 because it is the only one that keeps §1's command **true as written**.
+
+    ⚠️⚠️ **AND IT STILL REFUSES ON THIS MATRIX, FOR A DIFFERENT AND UNRELATED REASON.**
+    :class:`whetstone_gate.driver.clients.MeteredModelClient` has exactly two methods,
+    ``complete_attacker`` and ``complete_judge``. They distinguish the **role**; nothing in
+    either signature distinguishes a **lane**. :func:`whetstone_gate.driver.run.execute`
+    takes **one** client for the whole matrix, and the pilot's matrix has **two attacker
+    cells on two different providers** — ``gemma-26b`` on Google and ``qwen-27b`` on Groq.
+    So a single client is asked to call two different models with no way to know which, and
+    **there is no signal anywhere on the call path that would tell it**: ``lane`` is a live
+    local in ``run.py``'s dispatch loop and in ``_MeteredCall``, and neither forwards it.
+
+    ⚠️ **BOTH CELLS ALSO RUN THE SAME SEED BLOCK**, so turn 1 of ``gemma-26b``/seed *N* and
+    turn 1 of ``qwen-27b``/seed *N* are **byte-identical**: the payload cannot distinguish
+    the lanes even in principle. Inferring the lane from dispatch order, or reaching up the
+    call stack for it, would be a guess about another module's internals — `INCIDENTS.md`
+    **INC-51**'s exact species, which walked past `check_roles` D1, D2 **and** D3.
+
+    **So this refuses, by name, and states the one-line fix** (`QUESTIONS.md` **Q-161**,
+    Class A). A single-attacker-lane matrix constructs and runs normally, which is the
+    path this code takes when the fix lands or when a matrix has one cell.
     """
-    raise driver_run.RunRefused(
-        "--spend-real-tokens needs a provider client and this package deliberately ships "
-        "none: it imports no model client and makes no provider call, asserted two ways in "
-        "tests/test_c12_driver.py. Supply one at the call site - anything satisfying "
-        "whetstone_gate.driver.clients.MeteredModelClient, whose two methods return a "
-        "ModelReply carrying the provider's OWN usage block - and call "
-        "whetstone_gate.driver.run.execute(request, client=yours). Writing an untested "
-        "provider client into this chunk would put an unexercised code path between the "
-        "operator and a SINGLE-SHOT run (PROCESS.md S6b)"
+    attacker_lanes = sorted({matrix.lane_for(key) for key in matrix.keys()})
+    if len(attacker_lanes) != 1:
+        raise driver_run.RunRefused(
+            f"this matrix dispatches attacker episodes on {len(attacker_lanes)} lanes "
+            f"({attacker_lanes}) and driver.run.execute takes ONE client for all of them. "
+            f"MeteredModelClient's two methods distinguish the ROLE (attacker vs judge) and "
+            f"carry NO lane, NO model id and NO episode key, so a single client cannot know "
+            f"which provider a given complete_attacker call is for - and both cells run the "
+            f"SAME seeds, so the messages are byte-identical and cannot be told apart "
+            f"either. This REFUSES rather than guessing from dispatch order or reading the "
+            f"caller's frame, which would be INCIDENTS.md INC-51's exact species. "
+            f"THE FIX IS ONE FIELD AND ONE ARGUMENT, and it is OUTSIDE this session's "
+            f"fence: _PacedClient already holds the lane (its attacker_buckets.lane) and "
+            f"_MeteredCall already holds it too, so threading `lane` into "
+            f"MeteredModelClient's two methods closes it. QUESTIONS.md Q-161, Class A. "
+            f"NOTHING WAS SPENT and no episode was attempted"
+        )
+    return MeteredProviderClient.for_lanes(
+        attacker_lane=attacker_lanes[0], judge_lane=matrix.judge_lane
     )
 
 

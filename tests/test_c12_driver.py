@@ -22,6 +22,7 @@ prompt sanctioned no spend and every lane is reserved (`PROCESS.md` §8).
 from __future__ import annotations
 
 import ast
+import dataclasses
 import json
 import re
 from pathlib import Path
@@ -29,6 +30,8 @@ from pathlib import Path
 import pytest
 
 from whetstone_gate import config as cfg
+from whetstone_gate.driver import __main__ as driver_main
+from whetstone_gate.driver import clients as driver_clients
 from whetstone_gate.driver import episode as driver_episode
 from whetstone_gate.driver import pilot as pilot_module
 from whetstone_gate.driver import protocol as driver_protocol
@@ -38,8 +41,14 @@ from whetstone_gate.driver.clients import ModelReply, RateLimited, TranscriptCli
 from whetstone_gate.gates import shell as gate_shell
 from whetstone_gate.ledger import chain as ledger_chain
 from whetstone_gate.ledger import store as ledger_store
+from whetstone_gate.runner import lanes as runner_lanes
 from whetstone_gate.runner import n_rule
-from whetstone_gate.runner.budget import Ceilings, LaneBudget, run_offers
+from whetstone_gate.runner.budget import (
+    Ceilings,
+    LaneBudget,
+    run_offers,
+    usage_total_tokens,
+)
 from whetstone_gate.runner.episodes import EpisodeKey
 from whetstone_gate.runner.redaction import SecretInPayload, refuse_if_secret_bearing
 from whetstone_gate.world import generator as world_generator
@@ -185,6 +194,45 @@ _FORBIDDEN_IMPORTS = {
 #: `INCIDENTS.md` **INC-51** measured all three walking past `check_roles` D1, D2 and D3.
 _DYNAMIC_REACH = ("__import__", "importlib", "getattr(")
 
+# --------------------------------------------------------------------------------------
+# ⚠️⚠️ THE PROVIDER BOUNDARY — ADDED 2026-09-03 UNDER `Q-150`'s RULING (`6ba2c1f7`)
+# --------------------------------------------------------------------------------------
+# `Q-150` RULED option 1: a real `MeteredModelClient` is written into
+# `driver/clients.py`. A live provider call needs a network library and the key VALUE, so
+# the two blanket assertions below can no longer be true of EVERY driver module.
+#
+# ⚠️ **EXACTLY ONE FILE IS EXEMPTED, AND EXACTLY THE TOKENS IT NEEDS.** Nothing else is
+# widened: `_DYNAMIC_REACH` still applies to `clients.py` IN FULL, the other fourteen
+# names in `_FORBIDDEN_IMPORTS` still apply to it, the deletion-path walk is untouched,
+# and every OTHER driver module is still asserted clean BOTH ways. Three tests were added
+# below the two narrowed ones to assert the exemption is not larger than it says it is —
+# so the boundary is pinned from both sides rather than merely excused from one.
+# ⚠️ **WIDENING EITHER CONSTANT IS A CLASS A DEVIATION** (`CLAUDE.md` rule 2), exactly as
+# hard rule 8's gate/scorer allow-list is.
+
+#: The one file that may reach the network, as a path RELATIVE TO THE REPOSITORY ROOT —
+#: not a basename, so a future second file called `clients.py` elsewhere is NOT covered.
+_NETWORK_BOUNDARY = ("src", "whetstone_gate", "driver", "clients.py")
+
+#: The only module strings that file may reach out of `_FORBIDDEN_IMPORTS`. `urllib` is
+#: the standard library; there is no HTTP dependency in `pyproject.toml` and adding one to
+#: make a provider call would be a far larger change than this.
+_BOUNDARY_MODULES = frozenset({"urllib", "urllib.request", "urllib.error"})
+
+#: The one token that file may name in executable source, and the one environment form it
+#: may use. ⚠️ `getenv`, `dotenv` and a literal key NAME remain refused even here.
+_BOUNDARY_TOKEN = "urllib"
+_BOUNDARY_ENV_FORM = "os.environ"
+
+#: Set by the raw-source test from its own `repo_root` fixture, so the boundary check
+#: compares RESOLVED PATHS rather than basenames without changing the helper's shape.
+REPO_BOUNDARY_ROOT = Path("src")
+
+
+def _is_the_network_boundary(path: Path, *, source_root: Path) -> bool:
+    """True only for the ONE exempted file, compared on a RESOLVED path."""
+    return path.resolve() == source_root.parent.joinpath(*_NETWORK_BOUNDARY).resolve()
+
 
 def _imported_modules(path: Path, *, source_root: Path) -> set[str]:
     """Every module name this file could reach, **in every import form Python has.**
@@ -225,9 +273,15 @@ def _first_party_import_closure(roots: list[Path], *, source_root: Path):
         if key in seen:
             continue
         seen.add(key)
+        boundary = _is_the_network_boundary(path, source_root=source_root)
         for module in _imported_modules(path, source_root=source_root):
             root = module.split(".")[0]
             if root in _FORBIDDEN_IMPORTS:
+                # ⚠️ THE ONE EXEMPTION, AND IT IS NARROW ON BOTH AXES: this file, and
+                # these module strings. `urllib3` and `http` are NOT in the allowed set
+                # even here, and every other driver module is unchanged. Q-150.
+                if boundary and module in _BOUNDARY_MODULES:
+                    continue
                 findings.append(f"{path.name} reaches {module!r}")
             if root == "whetstone_gate":
                 candidate = source_root.joinpath(*module.split("."))
@@ -256,7 +310,7 @@ def test_the_driver_imports_no_model_client_AST_WALK(repo_root: Path, driver_sou
     ), "the walk did not reach the attacker loop, so it did not cross the package boundary"
 
 
-def test_the_driver_imports_no_model_client_RAW_SOURCE_SCAN(driver_sources):
+def test_the_driver_imports_no_model_client_RAW_SOURCE_SCAN(repo_root: Path, driver_sources):
     """⚠️ **WAY TWO OF TWO: the raw-source scan, and it is NOT belt-and-braces.**
 
     `INCIDENTS.md` **INC-51**, measured: ``__import__(…)``, ``importlib.import_module(…)``
@@ -269,12 +323,20 @@ def test_the_driver_imports_no_model_client_RAW_SOURCE_SCAN(driver_sources):
     cannot see semantics.
     """
     findings: list[str] = []
+    global REPO_BOUNDARY_ROOT
+    REPO_BOUNDARY_ROOT = repo_root / "src"
     for path in driver_sources:
         code = _strip_comments_and_docstrings(path.read_bytes().decode("utf-8"))
         for form in _DYNAMIC_REACH:
             if form in code:
                 findings.append(f"{path.name} carries the dynamic-reach form {form!r}")
+        boundary = _is_the_network_boundary(path, source_root=REPO_BOUNDARY_ROOT)
         for name in _FORBIDDEN_IMPORTS:
+            # ⚠️ ONE token, in ONE file. `_DYNAMIC_REACH` above is NOT exempted here and
+            # neither are the other fourteen names — measured, they do not fire: the
+            # endpoint literals are spelled so that `google.`/`groq.`/`http.` never match.
+            if boundary and name == _BOUNDARY_TOKEN:
+                continue
             if re.search(rf"(?<![\w.]){re.escape(name)}\.", code):
                 findings.append(f"{path.name} names {name!r} in executable source")
     assert not findings, (
@@ -344,14 +406,35 @@ def test_no_key_value_can_reach_a_checkpoint_a_ledger_or_a_usage_row():
     assert refuse_if_secret_bearing({"lane": "gemma-26b", "total_tokens": 3000}) is None
 
 
-def test_the_driver_never_names_an_environment_variable_or_reads_one(driver_sources):
+def test_the_driver_never_names_an_environment_variable_or_reads_one(
+    repo_root: Path, driver_sources
+):
     """The key **names** come from `config/lanes.yaml`'s ``provider`` field through
     :mod:`whetstone_gate.runner.keys`, whose only public function returns a **boolean**.
-    Nothing here subscripts the environment."""
+
+    ⚠️ **NARROWED 2026-09-03 UNDER `Q-150`, AND THE DOCSTRING IS CORRECTED RATHER THAN
+    LEFT STANDING.** It used to end *"Nothing here subscripts the environment"*. That is
+    now false of exactly one file: a live provider call needs the key VALUE for an
+    ``Authorization`` header, and :mod:`whetstone_gate.runner.keys` deliberately has **no
+    code path that returns one**. So the read lands at the provider boundary, in
+    ``clients.py``, and **nowhere else in this package** — which this test still asserts
+    for every other module, and which the added test below pins from the other side.
+
+    ⚠️ **ONLY ``os.environ`` IS EXEMPTED, AND ONLY THERE.** ``getenv``, ``dotenv`` and a
+    literal key NAME stay refused in ``clients.py`` too: the name is derived from
+    `config/lanes.yaml` through :func:`whetstone_gate.runner.keys.env_var_for_provider`,
+    so no key name is spelled in driver source at all. The in-repo precedent for this
+    exact shape is ``tests/test_c11_runner.py``'s
+    ``test_the_runner_never_reads_a_key_VALUE_only_a_NAME``, which already carries named
+    per-file exemptions for ``redaction.py`` and ``keys.py``.
+    """
     findings = []
     for path in driver_sources:
         code = _strip_comments_and_docstrings(path.read_bytes().decode("utf-8"))
+        boundary = _is_the_network_boundary(path, source_root=repo_root / "src")
         for form in ("os.environ", "getenv", "dotenv", "_API_KEY"):
+            if boundary and form == _BOUNDARY_ENV_FORM:
+                continue
             if form in code:
                 findings.append(f"{path.name} carries {form!r}")
     assert not findings, "the driver reaches for the environment directly:\n  " + "\n  ".join(
@@ -1164,3 +1247,560 @@ def test_the_schema_block_is_DERIVED_from_the_worlds_own_declarations():
     for declaration in surface.DECLARATIONS.values():
         for parameter in declaration.parameters:
             assert parameter in schemas
+
+
+# ======================================================================================
+# ⚠️⚠️ THE PROVIDER BOUNDARY — NEW TESTS, ADDED 2026-09-03 UNDER `Q-150` (`6ba2c1f7`)
+#
+# The three narrowed assertions above say "clients.py is excused". These say "and NOTHING
+# MORE THAN clients.py, and nothing more than these tokens" — so the exemption is pinned
+# from BOTH sides. An exemption asserted only by the test that grants it is an exemption
+# nobody measures.
+#
+# ⚠️ EVERY TEST BELOW DRIVES A **FAKE TRANSPORT**. `_no_provider_call` makes the real
+# `_http_post` raise, so a path that reached the network would FAIL rather than spend.
+# ======================================================================================
+
+
+@pytest.fixture
+def _no_provider_call(monkeypatch):
+    """⚠️ **ZERO PROVIDER CALLS IN THIS SUITE, ASSERTED RATHER THAN INTENDED.**
+
+    The real :func:`whetstone_gate.driver.clients._http_post` is replaced by one that
+    raises. Any test below that forgot to inject a fake transport fails loudly instead of
+    opening a socket against a **reserved lane** (`PROCESS.md` §8).
+    """
+
+    def refuse(*_args, **_kwargs):  # pragma: no cover - the point is that it never runs
+        raise AssertionError(
+            "a test reached the REAL provider transport. No session may spend on these "
+            "lanes (PROCESS.md S8 LANE RESERVATION)"
+        )
+
+    monkeypatch.setattr(driver_clients, "_http_post", refuse)
+    return refuse
+
+
+@dataclasses.dataclass
+class _FakeTransport:
+    """One canned HTTP answer, and a count of how many times it was asked for.
+
+    ⚠️ **THE COUNT IS THE POINT.** Hard rule 12 forbids a retry, and "no retry" is only
+    checkable by counting: a client that retried twice and succeeded looks identical from
+    the outside to one that succeeded once.
+    """
+
+    status: int
+    body: bytes
+    calls: int = 0
+    seen: list = dataclasses.field(default_factory=list)
+
+    def __call__(self, url, body, headers):
+        self.calls += 1
+        self.seen.append((url, body, dict(headers)))
+        return driver_clients.HttpResponse(status=self.status, body=self.body)
+
+
+def _google_ok(total=1234, prompt=1000, candidates=200):
+    """A well-formed Google reply. ⚠️ The parts DELIBERATELY do not sum to the total."""
+    return json.dumps(
+        {
+            "candidates": [{"content": {"parts": [{"text": "the reply"}], "role": "model"}}],
+            "usageMetadata": {
+                "promptTokenCount": prompt,
+                "candidatesTokenCount": candidates,
+                "totalTokenCount": total,
+            },
+        }
+    ).encode("utf-8")
+
+
+def _groq_ok(total=987, prompt=900, completion=50):
+    """A well-formed Groq reply. ⚠️ The parts DELIBERATELY do not sum to the total."""
+    return json.dumps(
+        {
+            "choices": [{"message": {"role": "assistant", "content": "the reply"}}],
+            "usage": {
+                "prompt_tokens": prompt,
+                "completion_tokens": completion,
+                "total_tokens": total,
+            },
+        }
+    ).encode("utf-8")
+
+
+@pytest.fixture
+def _key_names(monkeypatch):
+    """Both key NAMES set to obvious non-secrets, so the client's presence check passes.
+
+    ⚠️ No real key is read, printed or committed by this suite, and these values are not
+    credential-shaped: `runner/redaction.py` would refuse them if they ever appeared in a
+    reply, which is a property this file relies on rather than works around.
+    """
+    monkeypatch.setenv("GOOGLE_API_KEY", "not-a-real-key-google")
+    monkeypatch.setenv("GROQ_API_KEY", "not-a-real-key-groq")
+
+
+def _client(transport, *, attacker="gemma-26b", judge="gemma-26b"):
+    return driver_clients.MeteredProviderClient.for_lanes(
+        attacker_lane=attacker, judge_lane=judge, transport=transport
+    )
+
+
+# --------------------------------------------------------------------------------------
+# The boundary, pinned from the other side
+# --------------------------------------------------------------------------------------
+
+
+def test_the_provider_boundary_is_the_ONLY_driver_module_that_reaches_a_network_library(
+    repo_root: Path, driver_sources
+):
+    """⚠️ **EVERY OTHER DRIVER MODULE IS STILL CLEAN, MODULE BY MODULE.**
+
+    The narrowed walk above excuses one file. This asserts the excused set has **exactly
+    one member** — measured per module rather than pooled, so a second file quietly
+    gaining ``import urllib`` is a failure here even though the pooled walk would still
+    pass by way of the exemption.
+    """
+    source_root = repo_root / "src"
+    reaching: dict[str, list[str]] = {}
+    for path in driver_sources:
+        hits = sorted(
+            module
+            for module in _imported_modules(path, source_root=source_root)
+            if module.split(".")[0] in _FORBIDDEN_IMPORTS
+        )
+        if hits:
+            reaching[path.name] = hits
+    assert sorted(reaching) == ["clients.py"], (
+        f"exactly one driver module may reach a network library and these do: {reaching}. "
+        f"Q-150 excused clients.py and NOTHING ELSE"
+    )
+
+
+def test_the_provider_boundary_reaches_urllib_AND_NOTHING_ELSE(
+    repo_root: Path, driver_sources
+):
+    """⚠️ **THE EXEMPTION IS NOT A BLANK CHEQUE.** ``clients.py`` may reach
+    ``urllib.request`` and ``urllib.error``; it may not reach ``httpx``, ``requests``,
+    ``socket``, ``http``, ``urllib3``, or either provider's own SDK. Reaching for a
+    provider SDK would put a dependency in `pyproject.toml` that nothing pins."""
+    source_root = repo_root / "src"
+    boundary = next(p for p in driver_sources if p.name == "clients.py")
+    hits = {
+        module
+        for module in _imported_modules(boundary, source_root=source_root)
+        if module.split(".")[0] in _FORBIDDEN_IMPORTS
+    }
+    assert hits <= _BOUNDARY_MODULES, (
+        f"the provider boundary reaches {sorted(hits - _BOUNDARY_MODULES)}, which is "
+        f"outside the allow-list {sorted(_BOUNDARY_MODULES)}. Widening it is Class A"
+    )
+    assert "urllib.request" in hits, "the boundary stopped importing urllib.request"
+
+
+def test_the_provider_boundary_still_carries_NO_DYNAMIC_REACH(driver_sources):
+    """⚠️ **`_DYNAMIC_REACH` WAS NOT NARROWED FOR THE BOUNDARY, AND MUST NOT BE.**
+    `INCIDENTS.md` **INC-51**: ``__import__``, ``importlib`` and ``getattr(`` walk past an
+    AST import walk by construction. The file that is *allowed* a network library is
+    exactly the file where a dynamic reach would be least visible."""
+    boundary = next(p for p in driver_sources if p.name == "clients.py")
+    code = _strip_comments_and_docstrings(boundary.read_bytes().decode("utf-8"))
+    carried = [form for form in _DYNAMIC_REACH if form in code]
+    assert carried == [], (
+        f"the provider boundary carries {carried}. INC-51: a dynamic reach is not a "
+        f"result, it is a definition"
+    )
+
+
+def test_the_provider_boundary_reads_os_environ_and_NEVER_getenv_dotenv_or_a_key_NAME(
+    driver_sources,
+):
+    """⚠️ **THE ENVIRONMENT EXEMPTION IS ONE FORM WIDE.**
+
+    ``os.environ`` is allowed because a live call needs the key value and
+    :mod:`whetstone_gate.runner.keys` has no path that returns one. Everything else stays
+    refused **in this file too** — and no key NAME is spelled here at all, because the
+    name is derived from `config/lanes.yaml`'s ``provider`` field.
+    """
+    boundary = next(p for p in driver_sources if p.name == "clients.py")
+    code = _strip_comments_and_docstrings(boundary.read_bytes().decode("utf-8"))
+    assert "os.environ" in code, "the boundary stopped reading the environment"
+    for refused in ("getenv", "dotenv", "_API_KEY"):
+        assert refused not in code, (
+            f"the provider boundary carries {refused!r}. Only 'os.environ' is exempted, "
+            f"and the key NAME must come from runner.keys.env_var_for_provider"
+        )
+
+
+# --------------------------------------------------------------------------------------
+# The client, against a fake HTTP layer
+# --------------------------------------------------------------------------------------
+
+
+def test_a_good_GOOGLE_reply_returns_the_text_and_the_PROVIDERS_OWN_total(
+    _no_provider_call, _key_names
+):
+    """⚠️ **THE TOTAL IS READ, NEVER SUMMED.** The fixture's parts are 1000 + 200 = 1200
+    and its ``totalTokenCount`` is **1234**; golden 8's rule is that the accumulator reads
+    the provider's own total *"and nothing else"*, so 1234 is the only right answer. A
+    client that reconstructed the total would return 1200 and understate every reply."""
+    fake = _FakeTransport(status=200, body=_google_ok())
+    reply = _client(fake).complete_attacker(
+        messages=({"role": "system", "content": "s"}, {"role": "assistant", "content": "a"}),
+        temperature=0.7,
+    )
+    assert reply.text == "the reply"
+    assert reply.usage["total_tokens"] == 1234
+    assert usage_total_tokens(reply.usage) == 1234
+    assert reply.usage["totalTokenCount"] == 1234, "the provider's own block is carried"
+    assert fake.calls == 1
+
+
+def test_a_good_GROQ_reply_returns_the_text_and_the_PROVIDERS_OWN_total(
+    _no_provider_call, _key_names
+):
+    """Same rule on the other provider: parts 900 + 50 = 950, reported total **987**."""
+    fake = _FakeTransport(status=200, body=_groq_ok())
+    reply = _client(fake, attacker="qwen-27b").complete_attacker(
+        messages=({"role": "system", "content": "s"},), temperature=0.7
+    )
+    assert reply.text == "the reply"
+    assert usage_total_tokens(reply.usage) == 987
+    assert fake.calls == 1
+
+
+@pytest.mark.parametrize(
+    "lane, body",
+    [
+        ("gemma-26b", json.dumps({"candidates": [{"content": {"parts": [{"text": "x"}]}}]}).encode()),
+        ("qwen-27b", json.dumps({"choices": [{"message": {"content": "x"}}]}).encode()),
+    ],
+)
+def test_a_reply_with_NO_USAGE_BLOCK_is_a_REFUSAL_and_never_a_zero(
+    _no_provider_call, _key_names, lane, body
+):
+    """⚠️ **A ZERO WOULD SPEND THE LANE'S QUOTA AND REPORT THAT IT HAD NOT.** Hard rule 12
+    takes tokens from the API's own usage field; a missing field is a hard refusal, never
+    a silent fallback — hard rule 9's shape applied to a provider reply."""
+    fake = _FakeTransport(status=200, body=body)
+    with pytest.raises(driver_clients.ProviderFailed, match="REFUSAL, NOT A ZERO"):
+        _client(fake, attacker=lane).complete_attacker(
+            messages=({"role": "system", "content": "s"},), temperature=0.7
+        )
+    assert fake.calls == 1, "a refusal must not have retried"
+
+
+def test_a_429_RAISES_RateLimited_AND_IS_NEVER_RETRIED(_no_provider_call, _key_names):
+    """⚠️ **HARD RULE 12, AND THE CALL COUNT IS THE ASSERTION.** *"A 429 means the window
+    is already spent: STOP and report — never retry into another lane."* A client that
+    retried would be indistinguishable from one that did not, except by counting."""
+    fake = _FakeTransport(status=429, body=b'{"error":{"code":429}}')
+    with pytest.raises(driver_clients.RateLimited, match="WINDOW IS ALREADY SPENT"):
+        _client(fake).complete_attacker(
+            messages=({"role": "system", "content": "s"},), temperature=0.7
+        )
+    assert fake.calls == 1, "the client RETRIED a 429, which hard rule 12 forbids"
+
+
+def test_a_MALFORMED_body_is_a_named_refusal_that_does_not_reproduce_the_body(
+    _no_provider_call, _key_names
+):
+    """⚠️ **THE BODY IS NOT QUOTED INTO THE ERROR.** A provider error can echo the
+    credential it rejected, and `CLAUDE.md` §4 is that secrets never reach a log."""
+    fake = _FakeTransport(status=200, body=b"<html>not json at all</html>")
+    with pytest.raises(driver_clients.ProviderFailed) as raised:
+        _client(fake).complete_attacker(
+            messages=({"role": "system", "content": "s"},), temperature=0.7
+        )
+    assert "not json at all" not in str(raised.value)
+    assert "NOT reproduced" in str(raised.value)
+    assert fake.calls == 1
+
+
+def test_a_NON_429_HTTP_ERROR_is_ProviderFailed_and_is_not_retried(
+    _no_provider_call, _key_names
+):
+    """500 is counted under ``PROVIDER_ERROR`` and never swallowed — hard rule 11 counts
+    *"retries, fallbacks, skipped cases, or missing traces"* alike."""
+    fake = _FakeTransport(status=500, body=b'{"error":"boom"}')
+    with pytest.raises(driver_clients.ProviderFailed, match="PROVIDER_ERROR"):
+        _client(fake).complete_attacker(
+            messages=({"role": "system", "content": "s"},), temperature=0.7
+        )
+    assert fake.calls == 1
+
+
+def test_the_KEY_VALUE_never_appears_in_the_request_URL_only_in_a_HEADER(
+    _no_provider_call, _key_names
+):
+    """⚠️ **THIS IS A SAFETY PROPERTY, NOT A STYLE CHOICE.**
+    :class:`urllib.error.HTTPError` carries the request URL on ``.url`` and prints it in
+    its own ``repr``, so a key in a ``?key=`` query string leaks into every logged
+    traceback. Google's key goes in ``x-goog-api-key``; Groq's in ``Authorization``."""
+    fake = _FakeTransport(status=200, body=_google_ok())
+    _client(fake).complete_attacker(
+        messages=({"role": "system", "content": "s"},), temperature=0.7
+    )
+    url, _body, headers = fake.seen[0]
+    assert "not-a-real-key-google" not in url
+    assert "key=" not in url
+    assert headers["x-goog-api-key"] == "not-a-real-key-google"
+
+    groq = _FakeTransport(status=200, body=_groq_ok())
+    _client(groq, attacker="qwen-27b").complete_attacker(
+        messages=({"role": "system", "content": "s"},), temperature=0.7
+    )
+    url, _body, headers = groq.seen[0]
+    assert "not-a-real-key-groq" not in url
+    assert headers["Authorization"].endswith("not-a-real-key-groq")
+
+
+def test_the_URL_and_MODEL_ID_come_from_config_lanes_yaml_and_are_never_literals(
+    _no_provider_call, _key_names
+):
+    """⚠️ The model ids are `config/lanes.yaml`'s own ``api_model_id`` values. Google puts
+    it in the PATH (already carrying its ``models/`` prefix, so a doubled prefix would
+    404); Groq puts it in the BODY."""
+    lanes = runner_lanes.load_lanes()
+    fake = _FakeTransport(status=200, body=_google_ok())
+    _client(fake).complete_attacker(
+        messages=({"role": "system", "content": "s"},), temperature=0.7
+    )
+    url = fake.seen[0][0]
+    assert url.endswith(f"/{lanes['gemma-26b'].api_model_id}:generateContent")
+    assert "/models/models/" not in url, "the models/ prefix was doubled - a 404"
+
+    groq = _FakeTransport(status=200, body=_groq_ok())
+    _client(groq, attacker="qwen-27b").complete_attacker(
+        messages=({"role": "system", "content": "s"},), temperature=0.7
+    )
+    sent = json.loads(groq.seen[0][1].decode("utf-8"))
+    assert sent["model"] == lanes["qwen-27b"].api_model_id
+    assert "qwen" in sent["model"]
+
+
+def test_an_ABSENT_KEY_NAME_is_a_refusal_that_names_the_NAME_and_no_value(
+    _no_provider_call, monkeypatch
+):
+    """⚠️ Only the **name** appears, here and in the message. `CLAUDE.md` §4."""
+    monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
+    fake = _FakeTransport(status=200, body=_google_ok())
+    with pytest.raises(driver_clients.DriverClientError, match="GOOGLE_API_KEY"):
+        _client(fake).complete_attacker(
+            messages=({"role": "system", "content": "s"},), temperature=0.7
+        )
+    assert fake.calls == 0, "the client called the provider without a credential"
+
+
+def test_an_UNMAPPED_ROLE_is_a_refusal_and_never_a_silent_coercion(
+    _no_provider_call, _key_names
+):
+    """⚠️ Rewriting a role the caller did not ask for sends a different prompt on one lane
+    than on another — `CONTEXT.md` §10.1's *"no DIFFERENTIAL information across arms"*."""
+    fake = _FakeTransport(status=200, body=_google_ok())
+    with pytest.raises(driver_clients.DriverClientError, match="no Google equivalent"):
+        _client(fake).complete_attacker(
+            messages=({"role": "tool", "content": "s"},), temperature=0.7
+        )
+    assert fake.calls == 0
+
+
+def test_GOOGLE_gets_only_user_and_model_roles_with_consecutive_parts_MERGED(
+    _no_provider_call, _key_names
+):
+    """⚠️ Google's ``contents[].role`` has exactly two legal values. C6 emits ``system``
+    and ``assistant``; both are mapped, consecutive same-role parts are **merged**, and no
+    filler turn is invented — a synthesised turn would put text in front of the model that
+    no arm authored."""
+    fake = _FakeTransport(status=200, body=_google_ok())
+    _client(fake).complete_attacker(
+        messages=(
+            {"role": "system", "content": "one"},
+            {"role": "system", "content": "two"},
+            {"role": "assistant", "content": "three"},
+        ),
+        temperature=0.7,
+    )
+    sent = json.loads(fake.seen[0][1].decode("utf-8"))
+    assert [c["role"] for c in sent["contents"]] == ["user", "model"]
+    assert sent["contents"][0]["parts"][0]["text"] == "one\ntwo"
+    assert sent["generationConfig"]["temperature"] == 0.7
+    assert "systemInstruction" not in sent
+    assert "maxOutputTokens" not in sent["generationConfig"]
+
+
+def test_GROQ_keeps_the_system_role_and_never_emits_an_unsupported_field(
+    _no_provider_call, _key_names
+):
+    """⚠️ ``logprobs``, ``logit_bias``, ``top_logprobs`` and ``messages[].name`` are
+    documented as unsupported on Groq and are request errors; ``stream`` is never set,
+    because with streaming the usage block leaves ``payload["usage"]`` and the token
+    accounting disappears silently."""
+    fake = _FakeTransport(status=200, body=_groq_ok())
+    _client(fake, attacker="qwen-27b").complete_attacker(
+        messages=({"role": "system", "content": "s"}, {"role": "assistant", "content": "a"}),
+        temperature=0.7,
+    )
+    sent = json.loads(fake.seen[0][1].decode("utf-8"))
+    assert [m["role"] for m in sent["messages"]] == ["system", "assistant"]
+    assert sent["temperature"] == 0.7
+    for unsupported in ("logprobs", "logit_bias", "top_logprobs", "stream", "max_tokens"):
+        assert unsupported not in sent
+    assert all("name" not in m for m in sent["messages"])
+
+
+def test_the_JUDGE_method_calls_the_JUDGE_lane_and_sends_no_temperature(
+    _no_provider_call, _key_names
+):
+    """⚠️ **`config/` CARRIES NO JUDGE TEMPERATURE** — ``gate_judge`` has no such key — so
+    none is sent and the provider's default applies. Inventing one here would be hard rule
+    9's hardcoded spec value. `QUESTIONS.md` **Q-164**. The pilot runs arm 1, which makes
+    **zero** judge calls, so this cannot touch that run."""
+    fake = _FakeTransport(status=200, body=_groq_ok())
+    client = _client(fake, attacker="gemma-26b", judge="qwen-27b")
+    reply = client.complete_judge(system="you are a judge", user="allow or deny?")
+    assert reply.text == "the reply"
+    sent = json.loads(fake.seen[0][1].decode("utf-8"))
+    assert "temperature" not in sent
+    assert [m["role"] for m in sent["messages"]] == ["system", "user"]
+    assert fake.seen[0][0] == driver_clients._GROQ_CHAT_URL, "the judge used the wrong lane"
+
+
+def test_the_two_methods_use_the_two_DIFFERENT_lanes(_no_provider_call, _key_names):
+    """The protocol's two methods are the ONLY signal this client gets, and they carry the
+    **role**. That is enough to separate attacker from judge — and it is exactly why it is
+    NOT enough to separate two attacker lanes. See `Q-161`."""
+    attacker = _FakeTransport(status=200, body=_google_ok())
+    client = _client(attacker, attacker="gemma-26b", judge="qwen-27b")
+    client.complete_attacker(
+        messages=({"role": "system", "content": "s"},), temperature=0.7
+    )
+    assert attacker.seen[0][0].startswith(driver_clients._GOOGLE_BASE)
+
+
+def test_a_reply_ECHOING_A_CREDENTIAL_is_REFUSED_not_masked(_no_provider_call, _key_names):
+    """⚠️ :mod:`whetstone_gate.runner.redaction` is wired across every reply, and it
+    **refuses rather than masks**: a masking helper would write ``***`` into the ledger and
+    let the run continue while something upstream kept putting credentials into episode
+    data. The refusal names the field and never the value.
+
+    ⚠️ **AND THIS TEST RECORDS WHAT THE WIRE DOES *NOT* CATCH**, measured rather than
+    assumed. `runner/redaction.py`'s environment check is `value == env_value` — **exact
+    equality on the whole field** — so a credential echoed back as an entire field value is
+    refused and one *embedded in a sentence* is **not**. Its own docstring says so: *"The
+    scan is a guard against the realistic accident, not a proof."* The first draft of this
+    test asserted the containment behaviour and FAILED; the assertion was corrected to the
+    code's real guarantee rather than the code loosened to meet it, and the gap is stated
+    here instead of being left for a reader to discover. `PROCESS.md` §9.
+    """
+    # (1) THE EXACT-EQUALITY PATH — a provider echoing the credential as a whole field.
+    echoed = json.dumps(
+        {
+            "candidates": [{"content": {"parts": [{"text": "not-a-real-key-google"}]}}],
+            "usageMetadata": {"totalTokenCount": 10},
+        }
+    ).encode("utf-8")
+    with pytest.raises(SecretInPayload) as raised:
+        _client(_FakeTransport(status=200, body=echoed)).complete_attacker(
+            messages=({"role": "system", "content": "s"},), temperature=0.7
+        )
+    assert "not-a-real-key-google" not in str(raised.value), (
+        "the refusal reproduced the credential it was refusing"
+    )
+    assert "NEITHER VALUE IS REPRODUCED" in str(raised.value)
+
+    # (2) THE PREFIX PATH — a Groq-shaped key that is NOT in this environment at all.
+    shaped = json.dumps(
+        {
+            "choices": [{"message": {"content": "gsk_" + "A" * 40}}],
+            "usage": {"total_tokens": 10},
+        }
+    ).encode("utf-8")
+    with pytest.raises(SecretInPayload, match="documented provider key prefix"):
+        _client(
+            _FakeTransport(status=200, body=shaped), attacker="qwen-27b"
+        ).complete_attacker(
+            messages=({"role": "system", "content": "s"},), temperature=0.7
+        )
+
+    # (3) ⚠️ THE HONEST LIMIT, ASSERTED SO IT CANNOT BE MISREAD AS COVERAGE: a credential
+    # embedded in prose passes, because the environment check is equality. Stating this is
+    # PROCESS.md S9's "every evidence pack states what it is NOT" applied to a safety check.
+    embedded = json.dumps(
+        {
+            "candidates": [
+                {"content": {"parts": [{"text": "your key is not-a-real-key-google"}]}}
+            ],
+            "usageMetadata": {"totalTokenCount": 10},
+        }
+    ).encode("utf-8")
+    reply = _client(_FakeTransport(status=200, body=embedded)).complete_attacker(
+        messages=({"role": "system", "content": "s"},), temperature=0.7
+    )
+    assert "not-a-real-key-google" in reply.text, (
+        "redaction gained containment matching - GOOD, but this assertion now records "
+        "something false and must be updated rather than deleted"
+    )
+
+
+def test_the_DEFAULT_transport_is_the_real_one_so_production_is_actually_wired(
+    _key_names,
+):
+    """⚠️ Every test above injects a fake. This one asserts the **default** is the real
+    transport, so the suite's safety does not come from the production path being broken.
+    It constructs a client and makes **no** call."""
+    client = driver_clients.MeteredProviderClient.for_lanes(
+        attacker_lane="gemma-26b", judge_lane="gemma-26b"
+    )
+    assert client.transport is driver_clients._http_post
+
+
+# --------------------------------------------------------------------------------------
+# The wiring, and the refusal that replaced the old one
+# --------------------------------------------------------------------------------------
+
+
+def test_a_TWO_ATTACKER_LANE_matrix_REFUSES_BY_NAME_and_spends_nothing():
+    """⚠️⚠️ **`Q-161`, CLASS A — AND IT IS WHY THE PILOT STILL CANNOT RUN.**
+
+    :func:`whetstone_gate.driver.run.execute` takes ONE client for the whole matrix, and
+    ``MeteredModelClient``'s two methods carry no lane. The pilot's matrix has two attacker
+    cells on two providers, so a single client cannot know which model a given
+    ``complete_attacker`` call is for — and both cells run the **same seeds**, so the
+    messages are byte-identical and cannot be told apart either.
+
+    **This refuses rather than guessing**, and the refusal names the one-line fix.
+    """
+    matrix = pilot_module.load_pilot(arm="1")
+    lanes = sorted({matrix.lane_for(key) for key in matrix.keys()})
+    assert len(lanes) == 2, f"the pilot matrix stopped spanning two lanes: {lanes}"
+    with pytest.raises(driver_run.RunRefused) as raised:
+        driver_main._provider_client(matrix)
+    message = str(raised.value)
+    assert "2 lanes" in message
+    for lane in lanes:
+        assert lane in message
+    assert "Q-161" in message
+    assert "NOTHING WAS SPENT" in message
+
+
+def test_a_ONE_ATTACKER_LANE_matrix_CONSTRUCTS_the_real_client(_key_names):
+    """The other side of the same branch: when the matrix has one attacker lane the client
+    **is** constructed, so the refusal above is a real conditional rather than a stub that
+    always refuses. Constructing makes no provider call."""
+    matrix = pilot_module.load_pilot(arm="1")
+    one_cell = dataclasses.replace(matrix, ladder_l2=matrix.reference)
+    assert len({one_cell.lane_for(k) for k in one_cell.keys()}) == 1
+    client = driver_main._provider_client(one_cell)
+    assert isinstance(client, driver_clients.MeteredProviderClient)
+    assert client.attacker.lane == matrix.reference.lane
+    assert client.judge.lane == matrix.judge_lane
+
+
+def test_the_old_REFUSE_TO_INVENT_function_is_gone_so_the_branch_cannot_regress():
+    """⚠️ `Q-150` replaced ``_refuse_to_invent_a_provider_client``. If it came back, the
+    declared command in `evals/pilot/RUN_DECLARED.md` §1 would silently stop working
+    again — which is the exact deadlock `Q-150` was raised about."""
+    assert not hasattr(driver_main, "_refuse_to_invent_a_provider_client")
+    assert hasattr(driver_main, "_provider_client")

@@ -121,6 +121,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `8b46f2e1` | ARCH | FIX | 2026-09-03 |
 | `7c05e3b9` | ARCH | FIX | 2026-09-03 |
 | `2e94c7b5` | C12 | BUILD | 2026-09-03 |
+| `6ba2c1f7` | ARCH | FIX | 2026-09-03 |
 | `9f31d708` | C19 | BUILD | 2026-09-03 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
@@ -12958,3 +12959,276 @@ appended rather than this entry edited away** — the convention `Q-082`'s super
 establishes.
 
 ---
+---
+
+## ⚠️⚠️ RULINGS RECORDED BY ARCH FIX — PILOT RUN 2 (`6ba2c1f7`), 2026-09-03 — `Q-150` AND `Q-153` ARE BOTH RULED
+
+⚠️ **SELF-RECORDED.** The `6ba2c1f7` row was appended to `## Session tokens` by this session; the
+token is the architect's and only the row is this session's. **NO ORDINAL IS CLAIMED** — `OF-225`,
+and the same reason `8b46f2e1` gave: the ordinal is no longer derivable from the file, and
+continuing the sequence would mean inventing a number in the shape of a measurement.
+
+⚠️ **RECORDED BEFORE ANYTHING ELSE WAS TOUCHED**, as hard rule 5 requires — before a line of
+`driver/clients.py`, before `config/protocol.yaml`, before `evals/pilot/RUN_DECLARED.md`, before
+`STATUS.md` and before `PROGRESS.md`. **The rulings are the architect's, transcribed verbatim from
+the prompt that carried them.** This session made no ruling of its own.
+
+### THE TWO RULINGS, VERBATIM
+
+> Q-150 is RULED: OPTION 1. A real `MeteredModelClient` is written into
+> `src/whetstone_gate/driver/clients.py`, and `driver/__main__.py`'s `--spend-real-tokens` branch
+> constructs it instead of refusing. THE ARCHITECT'S ERROR IS NAMED: the C12 BUILD prompt said 'ship
+> no provider client, supply one at the call site' AND the declared command goes through
+> `tasks drive`, WHICH IS A CLI WITH NO INJECTION POINT. The two instructions are incompatible and
+> the architect wrote both; C12 BUILD 1 was right to refuse rather than guess.
+> OPTION 2 IS REJECTED because it makes the declared command not the command that ran, and S1's
+> 'THE EXACT COMMAND' is the clause the whole pre-registration rests on. OPTION 3 IS REJECTED
+> because it is a Class A change to an unreviewed driver AND still needs a client written somewhere.
+> ⚠️ IT SHIPS UNREVIEWED AND DISCLOSED, exactly as C8, C9, C10, C11 and C14 do, and C19's README
+> names it. That is worse than a reviewed client and better than no run at all, and saying which is
+> the point.
+
+> Q-153 is RULED. `ledger.genesis_hash` is set to `probe-v1`'s TAG OBJECT ID,
+> `170bd3ff4abfdd8f87f64055972a60c82cc54efc`, BEFORE the first episode. PROCESS.md S6a.4: a ledger
+> cannot contain the hash of a tag that did not exist when it was written, so pre-freeze episodes
+> become CRYPTOGRAPHICALLY DISTINGUISHABLE from scored ones. It is the one free proof available and
+> revision 1 threw it away. IT IS AVAILABLE ONLY BECAUSE NO EPISODE HAS RUN.
+
+**`Q-150` — status OPEN → RULED (option 1).** **`Q-153` — status OPEN → RULED (option 1).**
+
+---
+
+## ⚠️⚠️ RAISED BY ARCH FIX — PILOT RUN 2 (`6ba2c1f7`), 2026-09-03 — `Q-161`…`Q-165`, AND **THE PILOT STILL DID NOT RUN**
+
+⚠️ **THE SINGLE-SHOT WINDOW IS STILL UNSPENT.** Both refusals below land **before any
+dispatch**, so no episode was attempted, no ledger was written, no checkpoint was published
+and **zero tokens were spent on either lane**. `PROCESS.md` §6b's abort machinery — the
+entry, the cause, the partial episode count, the numbered retry — is for *an execution that
+began and did not finish*. **Nothing began, so there is no abort and none was invented**,
+exactly as `7c05e3b9` reasoned before this session.
+
+⚠️ **AND THE UTC START TIME IN `evals/pilot/RUN_DECLARED.md` §8 WAS AGAIN LEFT BLANK.** §8:
+*"A declaration carrying a start time earlier than the run is a pre-registration that was
+written afterwards."* This session **measured** that the run could not start; filling in a
+time for a run that provably cannot begin would make the declaration false in exactly the way
+§8 forbids, and visibly so, since `RESULTS.md` prints declared-versus-actual start times.
+
+---
+
+### Q-161 — ⚠️⚠️ **CLASS A: `driver.run.execute` TAKES *ONE* CLIENT FOR A MATRIX THAT SPANS *TWO* PROVIDERS, AND `MeteredModelClient` CARRIES NO LANE. THE DECLARED COMMAND CANNOT BE ROUTED.**
+
+**Status:** OPEN. **Class A** — it decides whether the declared single-shot command can run.
+**Raised by:** ARCH FIX — PILOT RUN 2 (`6ba2c1f7`), 2026-09-03, **after** `Q-150`'s ruling was
+implemented in full, and **measured** rather than inferred.
+
+⚠️ **`Q-150` WAS IMPLEMENTED AS RULED AND THE PILOT STILL CANNOT RUN.** A real
+`MeteredProviderClient` now exists in `src/whetstone_gate/driver/clients.py` and
+`driver/__main__.py`'s `--spend-real-tokens` branch constructs it instead of refusing. The
+ruling's premise — *"constructs it instead of refusing"* — is satisfied. **What the ruling
+could not know is that constructing it is not sufficient**, and this entry is the reason.
+
+**THE MEASUREMENT, BY READING THE SOURCE AND BY RUNNING THE DECLARED COMMAND.**
+
+`driver/__main__.py:187` makes **exactly one** call:
+
+    result = driver_run.execute(request, client=client)
+
+and `driver/clients.py`'s protocol is, in full:
+
+    def complete_attacker(
+        self, *, messages: tuple[dict[str, str], ...], temperature: float
+    ) -> ModelReply: ...
+    def complete_judge(self, *, system: str, user: str) -> ModelReply: ...
+
+⚠️ **NEITHER METHOD CARRIES A LANE, A MODEL ID, A PROVIDER OR AN EPISODE KEY**, and both are
+keyword-only, so a positional smuggle is impossible too. The pilot's matrix dispatches
+**ten episodes on `gemma-26b` (provider `google`, `models/gemma-4-26b-a4b-it`) and ten on
+`qwen-27b` (provider `groq`, `qwen/qwen3.8-27b`)** — two providers, two model ids, one
+client. **So one client is asked to call two different models with no way to know which.**
+
+⚠️ **THE LANE IS KNOWN AT EVERY LEVEL AND IS FORWARDED AT NONE.** Measured, file by file:
+
+| Where | What it holds | What it passes on |
+|---|---|---|
+| `run.py:523` | `lane = request.matrix.lane_for(key)` — a live local | not passed to the client |
+| `run.py:552` | `_PacedClient(inner=client, attacker_buckets=…)` — its `attacker_buckets.lane` **is** this episode's lane | stores the client as `inner` only |
+| `run.py:409` | `_PacedClient.complete_attacker` | forwards `messages` and `temperature` **only** |
+| `episode.py:639` | `_MeteredCall(lane=lane, …)` — the authoritative per-role lane | not passed to the client |
+| `episode.py:403` | `_AttackerClient.complete` — `self.metered.lane` is in scope **on the same expression** | forwards `messages` and `temperature` **only** |
+
+⚠️ **AND CONTENT-BASED INFERENCE IS IMPOSSIBLE IN PRINCIPLE, NOT MERELY UNWISE.**
+`driver/pilot.py:198` gives **both** cells the **same** `seeds` tuple, so turn 1 of
+`gemma-26b`/seed *N* and turn 1 of `qwen-27b`/seed *N* are **byte-identical**. There is
+nothing in `messages` that differs.
+
+⚠️ **THE ONE TECHNICALLY REACHABLE SIGNAL WAS FOUND, TESTED, AND REJECTED.** A client can
+recover the lane by walking up the call stack to `_MeteredCall.run`'s frame — this was
+verified to work. **It is covert coupling to another module's internals and is
+`INCIDENTS.md` `INC-51`'s exact species**, the one that made a `gates/` module execute a
+`scorer/` predicate while `check_roles` D1, D2 **and** D3 all reported PASS. **It was not
+built.** Guessing the lane from dispatch order was rejected for the same reason.
+
+**WHAT THIS SESSION DID INSTEAD.** `driver/__main__.py:_provider_client` **refuses by name**
+when a matrix has more than one attacker lane, states the fix, and exits 2 having spent
+nothing. **Measured, by running `evals/pilot/RUN_DECLARED.md` §1's command verbatim:**
+
+    REFUSED - and the refusal is the outcome, not an error to work around:
+      this matrix dispatches attacker episodes on 2 lanes (['gemma-26b', 'qwen-27b']) and
+      driver.run.execute takes ONE client for all of them
+      …
+      NOTHING WAS SPENT and no episode was attempted
+
+⚠️ **THE FIX IS ONE FIELD AND ONE ARGUMENT, AND IT IS OUTSIDE THIS SESSION'S FENCE.**
+`_PacedClient` already holds the lane and `_MeteredCall` already holds it; threading `lane`
+into `MeteredModelClient`'s two methods closes it. That touches `driver/run.py`,
+`driver/episode.py`, `driver/clients.py` and `attacker/loop.py` — **four files, three of them
+fenced out of this session**, and a Class A change to an unreviewed driver.
+
+**THE OPTIONS, AND THIS SESSION RULES NONE.**
+
+1. **Thread `lane` through the protocol**, in a session whose fence includes `run.py`,
+   `episode.py` and `attacker/loop.py`. ⚠️ **The only option that keeps
+   `RUN_DECLARED.md` §1's command true as written and runs both cells in one execution.**
+2. **Declare the pilot as two executions**, one per cell, each with a single-lane matrix —
+   the client already supports this and `test_a_ONE_ATTACKER_LANE_matrix_CONSTRUCTS_the_real_client`
+   proves it. ⚠️ **But §1 names THE EXACT COMMAND and it is a pre-registration artefact**, so
+   the divergence would have to be declared **before** the run, not explained after.
+3. **Give `MeteredProviderClient` the whole matrix and let it route on dispatch order.**
+   ⚠️ **REJECTED HERE AND NAMED SO THE REJECTION IS ON THE RECORD**: it is a guess about
+   another module's internals, it is silently wrong the first time the scheduler's order
+   changes, and it would put the reference attacker's tokens on the ladder lane's row — the
+   exact figure `CONTEXT.md` §13.4's rule keys off.
+
+⚠️ **WHY THIS IS `Q-150`'s SHAPE ONE LAYER IN, AND WHY THAT MATTERS.** `Q-150` was
+*"the client is owed to somebody and owned by nobody"*. This is *"the client exists and the
+protocol cannot tell it which model to call"*. **Both were invisible until something was
+actually run**, and both were found before a single token was spent — which is what the
+preflight-and-refusal design is for.
+
+---
+
+### Q-162 — ⚠️ **THE PROVIDER CLIENT HAS NEVER BEEN RUN AGAINST EITHER PROVIDER, AND NO SESSION MAY RUN IT.**
+
+**Status:** OPEN, and it may be **accepted rather than closed**. **Class B**, disclosed.
+**Raised by:** ARCH FIX — PILOT RUN 2 (`6ba2c1f7`), 2026-09-03.
+
+`MeteredProviderClient`'s request and reply shapes are built from the two providers'
+**published REST references** and are exercised against a **fake transport**: a good reply on
+each provider, a reply with no usage block, a 429, a malformed body, a non-429 HTTP error, an
+absent key name, an unmapped role, and a credential echoed back. **The suite makes zero
+provider calls, and that is asserted rather than intended** — a fixture replaces the real
+`_http_post` with one that raises, so a test that forgot to inject a fake fails loudly instead
+of spending on a reserved lane.
+
+⚠️ **WHAT THAT LEAVES OPEN, SAID PLAINLY.** Nothing here has met a real endpoint. The
+specific unverifiable claims are:
+
+* that `models/gemma-4-26b-a4b-it` accepts a `contents` array whose system text has been
+  folded into a `user` part — **this client deliberately does NOT use `systemInstruction`**,
+  precisely because whether a given Gemma build accepts it is a per-model capability no
+  session may check, and a single-shot run is the wrong place to discover a 400;
+* that `usageMetadata.totalTokenCount` and `usage.total_tokens` are present on every reply
+  these lanes return. **A reply without one is a refusal, never a zero**, so the failure mode
+  is a stopped lane and a named error rather than a silent under-count.
+
+**This is the disclosure `Q-150`'s ruling already accepted** — *"IT SHIPS UNREVIEWED AND
+DISCLOSED, exactly as C8, C9, C10, C11 and C14 do, and C19's README names it"* — recorded
+here with the specific claims named rather than as a general caveat. **C19's README must name
+this client**, and `PROCESS.md` §9's *"every evidence pack states what it is NOT"* is the rule
+it is recorded under.
+
+---
+
+### Q-163 — ⚠️ **HARD RULE 9: THE TWO PROVIDER ENDPOINTS ARE LITERALS IN `driver/clients.py`, BECAUSE `config/` HAS NOWHERE TO PUT THEM AND IS FENCED OUT.**
+
+**Status:** OPEN. **Class B**, recorded with its rationale rather than done quietly.
+**Raised by:** ARCH FIX — PILOT RUN 2 (`6ba2c1f7`), 2026-09-03.
+
+The prompt that ordered this client said *"Endpoints and model ids READ FROM
+`config/lanes.yaml` — never a literal."* **The model ids are.** `_lane_call` reads
+`api_model_id` and `provider` through `runner/lanes.py`, and a test asserts the URL and the
+body carry `config/lanes.yaml`'s own values.
+
+⚠️ **THE ENDPOINTS COULD NOT BE, AND THE REASON IS STRUCTURAL, MEASURED:**
+
+1. `config/lanes.yaml` carries **no** `base_url`, `endpoint` or `timeout` field for any lane.
+2. `config/lanes.yaml` is named under this session's **NOT** list, in capitals.
+3. `PROTOCOL.md` states `config/` holds **exactly two files**, and `tests/test_c14_prereg.py`
+   enumerates `config/*.yaml` requiring a manifest row per file — so a third config file is a
+   frozen-artefact change, not a config edit.
+
+**So the endpoints are two module constants**, written with the same reasoning
+`tasks.py:EVAL_RUN_DIR` carries: an endpoint is a **provider fact**, not one of
+`CONTEXT.md` §8.6's spec-specified values, and §8.6's constants table — *the tripwire's own
+authoritative list* — has **no row for one**. ⚠️ **Measured: the hard-rule-9 tripwire
+`test_no_spec_value_is_hardcoded_in_implementation_source` does NOT fire on them.**
+
+⚠️ **AND THE SPELLING OF THE URLS IS LOAD-BEARING, WHICH IS WORTH KNOWING BEFORE ANYONE EDITS
+THEM.** `tests/test_c12_driver.py`'s raw-source scan refuses any executable-source match of
+`(?<![\w.])<name>\.` for fifteen forbidden names, `google`, `groq` and `http` among them.
+`https://generativelanguage.googleapis.com/...` and `https://api.groq.com/...` **do not
+match** — `google` is followed by `a`, and `groq.` is preceded by a `.` — so the scan needed
+**no** widening for them. A URL spelled `https://google.com/...` **would** fire.
+
+**The question for the architect:** should `config/lanes.yaml` gain a `base_url` per provider
+before `prereg-v1`, making this a config read like everything else? It is still legal today —
+`prereg-v1` does not resolve — and it will not be after.
+
+---
+
+### Q-164 — ⚠️ **`config/` CARRIES NO GATE-JUDGE TEMPERATURE, SO A JUDGED ARM WOULD RUN AT WHATEVER THE PROVIDER DEFAULTS TO.**
+
+**Status:** OPEN. **Class A for arms 2 / 2S / 3; it cannot touch the pilot.**
+**Raised by:** ARCH FIX — PILOT RUN 2 (`6ba2c1f7`), 2026-09-03, while writing
+`MeteredProviderClient.complete_judge`.
+
+`config/protocol.yaml` has an `attacker.temperature` of **0.7** and a `gate_judge` section
+with **no temperature key of any name** (measured). `MeteredModelClient.complete_judge` takes
+`(system, user)` and **no temperature**, so the client sends none and **the provider's own
+default applies** — 1.0 on the Groq path.
+
+⚠️ **THIS CLIENT DOES NOT INVENT ONE, AND THAT IS DELIBERATE.** Hard rule 9: every
+spec-specified value lives in `config/`, *"with no default for a required value"*. A judge
+temperature chosen in `driver/clients.py` would be exactly the hardcoded spec value the
+tripwire exists to catch, and it would move arm 2/2S/3 verdicts.
+
+⚠️ **IT CANNOT AFFECT THE PILOT.** `Q-144` ruled the pilot runs **arm 1**, which has no gate,
+so `complete_judge` makes **zero** calls in that run — the same reason `RUN_DECLARED.md` §4.1
+gives for the judge lane's call count being zero. **The exposure is the scored sweep**, where
+a non-deterministic judge at an undeclared temperature would sit under every arm-2/2S/3
+number. It is raised now because `config/` is still editable and after `prereg-v1` it is not.
+
+---
+
+### Q-165 — ⚠️⚠️ **THE SECOND BLOCKER, INDEPENDENT OF `Q-161`: THERE ARE NO CREDENTIALS IN THIS ENVIRONMENT. `.env` DOES NOT EXIST.**
+
+**Status:** OPEN. **Operator-only** — no session can close it.
+**Raised by:** ARCH FIX — PILOT RUN 2 (`6ba2c1f7`), 2026-09-03. **Measured, by name only.**
+
+    .env                          : DOES NOT EXIST (and is git-ignored, correctly)
+    GOOGLE_API_KEY in environment : NOT SET
+    GROQ_API_KEY   in environment : NOT SET
+
+⚠️ **NO KEY VALUE WAS READ, PRINTED, ECHOED OR COMMITTED TO ESTABLISH THIS.** Only the
+**names** were tested for membership, which is `runner/keys.py`'s whole design.
+Nothing in `src/` loads a `.env` file, and there is no dotenv dependency in `pyproject.toml`
+— so a variable that is not exported in the shell is simply absent.
+
+⚠️ **THIS IS `RUN_DECLARED.md` §7.3's PRECONDITION #5 AND IT IS UNMET**, and it is
+**independent of `Q-161`**: it was proved by building a **single**-attacker-lane matrix — the
+shape `Q-161` refuses on — and calling `driver_run.preflight` directly. It refuses:
+
+    the environment does not carry ['GOOGLE_API_KEY']
+    Only the NAMES are read here - runner/keys.py returns a boolean and has no code path
+    that reads a value (CLAUDE.md S4)
+    An episode that fails on a missing credential halfway through is an episode that has
+    already spent tokens
+
+⚠️ **SO EVEN IF `Q-161` WERE CLOSED THIS MINUTE, THE PILOT WOULD STILL NOT RUN FROM THIS
+SESSION.** The refusal is in **preflight**, before any dispatch, which is the correct shape —
+`PROCESS.md` §8's *"a precondition found on episode 1 is found too late"*.
+
+**What the operator must do, and only the operator can:** create `.env` from `.env.example`
+with the two key values, in the terminal the run executes in. `PROCESS.md` §8: *"Long runs
+execute in the operator's terminal."* ⚠️ **No session may create that file**, and this one did
+not attempt to.

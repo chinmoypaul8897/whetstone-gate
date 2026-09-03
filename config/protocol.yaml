@@ -360,7 +360,7 @@ ledger:
   # A ledger cannot contain the hash of a tag that did not exist when it was written, so
   # pre-freeze episodes are CRYPTOGRAPHICALLY DISTINGUISHABLE from scored ones. This is
   # the one free proof available and it costs a single line.
-  genesis_hash: PRE-FREEZE
+  genesis_hash: 170bd3ff4abfdd8f87f64055972a60c82cc54efc
 
 # ── N: a decision rule, not a number ──────────────────────────────────────────
 # Both branches are written out BEFORE the pilot, so the pilot SELECTS a branch rather
