@@ -7260,20 +7260,58 @@ asserts, in terms:
 > snapshot **adds NO `Raised by:` line at all**, so there is no foreign entry in it to name."*
 
 **Both sentences are literally true and the conclusion is false.** The snapshot added **147 lines
-to `INCIDENTS.md`** where this session's own edit accounts for about thirty-five, and the
-difference is a **127-line entry belonging to C9** — the entry now numbered `INC-88`, which C9 had
-written into the shared working tree between this session's `git read-tree` and its `git add`.
+to `INCIDENTS.md`**, and it decomposes into exactly two hunks:
+
+```
+@@ -6998,6 +6998,115 @@   ->  +109 / -0   the entry belonging to C9, now `INC-88`
+@@ -7031,11 +7140,44 @@   ->  +38  / -5   this session's own edit
+                              109 + 38 = 147, which is what `git show --numstat` prints
+```
+
+**So a 109-line entry belonging to C9** — written into the shared working tree between this
+session's `git read-tree` and its `git add` — **rode in under this session's token.**
 **This session's own `git show --numstat` prints `147  5  INCIDENTS.md` and would have said so at
 any point.**
+
+⚠️ **AND THE TWO FIGURES ABOVE ARE THEMSELVES A CORRECTION, MADE AFTER AN ADVERSARIAL
+RE-MEASUREMENT OF THIS ENTRY.** As first committed this paragraph read *"this session's own edit
+accounts for **about thirty-five**"* and *"the difference is a **127-line** entry belonging to
+C9"*. **Both numbers were wrong and the second was wrong in the way this entry exists to
+condemn.** The edit was **38** lines, not "about thirty-five"; the swept entry was **109** lines
+when it was swept and is **126** at `HEAD` — **it has never been 127 at any commit in history**.
+⚠️ **`127` is the length of a DIFFERENT OBJECT IN A DIFFERENT FILE SWEPT BY A DIFFERENT COMMIT IN
+THE OPPOSITE DIRECTION**: it is this session's own `## C8 — FIX 1` entry in `PROGRESS.md`, 127
+lines and 9,299 bytes, which **C9's `42faed5` swept from this session** — and `INC-88` states that
+figure three times, which is where it was borrowed from. **The entry's own arithmetic refuted it
+and nobody read it**: `147 − 127 = 20`, and `147 −` "about thirty-five" `= 112`, neither of which
+is the other. **`INC-47`'s ruling — a claim bound to a command must be read off the command — was
+broken a second time inside the entry written to record the first breach**, and it was found only
+because this session ran an independent adversarial audit over its own published claims before
+printing them.
 
 **Action:** ⚠️ **NOTHING IS UNDONE** — history is never rewritten here (`CLAUDE.md` §5) — so
 `58e9299` stands, the mis-attribution is corrected by **record**, and **the swept content was first
 verified INTACT rather than assumed intact**: `git diff HEAD -- INCIDENTS.md` is EMPTY and
-`INC-88` is present and complete at `HEAD`. ⚠️ **C9 had already resolved the id collision from its
-own side, correctly and without being asked** — its entry was drafted as `INC-87`, found this
-session's `INC-87` occupying the number, and **renumbered ITSELF to `INC-88` with the renumber
-recorded inside the entry**. There is no duplicate in the file: `grep -oE "^## INC-[0-9]+" | sort |
-uniq -d` returns nothing.
+`INC-88` is present and complete at `HEAD`.
+
+⚠️ **AND THE ID COLLISION WAS THIS SESSION'S TO CREATE AND ANOTHER SESSION'S TO CLEAN, WHICH THE
+FIRST VERSION OF THIS PARAGRAPH DID NOT SAY.** It credited C9 with resolving the collision and
+stopped there. **Measured at `58e9299` — this session's own commit — `INCIDENTS.md` carried TWO
+`## INC-87` headings and `docs/reviews/OPEN_FINDINGS.md` TWO `**OF-203**` rows:**
+
+```
+git show 58e9299:INCIDENTS.md                  | grep -c '^## INC-87'      ->  2
+git show 58e9299:docs/reviews/OPEN_FINDINGS.md | grep -c '^| \*\*OF-203\*\*'  ->  2
+```
+
+**This session published both duplicates**, by committing another session's draft alongside its
+own under the same numbers. **C9 then resolved both, correctly and without being asked** — its
+entry had been drafted as `INC-87`, found this session's `INC-87` occupying the number, and
+**renumbered ITSELF to `INC-88` with the renumber recorded inside the entry** — in `7d70b19`,
+which carries `Session-Token: 3f8b2d56`. There is no duplicate at `HEAD`: `grep -oE
+"^## INC-[0-9]+" | sort | uniq -d` returns nothing, and the 89 headings are exactly `01`…`89`.
+**The tidy end state is not this session's work, and recording it as though it were would be the
+same species of error as the `127`.**
 
 **Expectation:** the `Swept:` line is a **measurement**, not a conclusion — `INC-47`'s ruling, that
 *a claim bound to a command must be read off the command*, and `INC-68`'s own summary of the same

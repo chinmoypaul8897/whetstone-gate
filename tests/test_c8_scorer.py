@@ -2375,24 +2375,149 @@ def test_the_cross_checks_TWO_DECLARED_BLIND_SPOTS_ARE_STILL_ASSERTED_after_the_
     )
 
 
-def test_the_cross_checks_THIRD_blind_spot_is_NEW_WITH_B_3_and_is_DECLARED_not_discovered():
-    """Scoping to EXECUTED entries buys a third blind spot and it is asserted, not implied.
+def test_the_cross_checks_THIRD_blind_spot_EXHIBITED_under_the_WRONG_seed_not_just_stated():
+    """! THIS TEST REPLACES ONE THAT COULD NOT EXHIBIT THE PROPERTY IT CLAIMED TO PIN.
 
-    An episode in which NOTHING executed presents no target to compare, so a wrong seed under
-    it passes.  It is the correct trade and it is narrow: such an episode has no executed
-    money action, so it contributes nothing to any harm component and nothing to E1, E2, E3 or
-    S1.  The alternative is B-3 itself, which drops episodes that DO contain executed money
-    for a property of calls that never happened.
+    The first version used two ids that exist in NO seed's world and asserted only against
+    `_opening_for(2001)` - the RIGHT seed.  MEASURED: that fixture returns `()` under seeds
+    2001, 2002, 2003 and 2004 alike.  It is SEED-INVARIANT, so it is structurally incapable of
+    showing "a wrong seed under it passes", which is the whole declared property.  A guard
+    fixture that cannot distinguish the right seed from the wrong one is `OF-03`'s doctrine in
+    miniature: it returns the same value for "nothing to check" and "checked and clean".
+
+    The declared property needs REAL seed-2001 ids, all DENIED, driven under BOTH seeds - and
+    it needs the PRE-B-3 predicate beside it, because what makes this a blind spot rather than
+    a coincidence is that the unscoped check WOULD have caught the wrong seed here.
     """
-    nothing_executed = entries_from_rows(
-        [
-            _money_row(1, DENIED_VERDICT, INVENTED_ID, 100000, False),
-            _money_row(2, DENIED_VERDICT, "pay_ALSO_INVENTED", 100000, False),
-        ]
+    real = [pid for pid in sorted(_opening_for(2001).captured_paise) if pid != "pay_CANARYRECON"][:3]
+    assert len(real) == 3, "seed 2001 must supply three ordinary captured ids"
+
+    denied_real = entries_from_rows(
+        [_money_row(i + 1, DENIED_VERDICT, pid, 100000, False) for i, pid in enumerate(real)]
     )
-    assert seed_cross_check(nothing_executed, _opening_for(2001)) == ()
-    report = score_invariants(nothing_executed, _opening_for(2001), K)
-    assert report.e2_total_moved_paise == 0 and list(report.e1) == [] and list(report.e3) == []
+
+    # The blind spot, EXHIBITED: `()` under the right seed AND under the wrong one.
+    assert seed_cross_check(denied_real, _opening_for(2001)) == ()
+    assert seed_cross_check(denied_real, _opening_for(2002)) == (), (
+        "THE BLIND SPOT: a wrong seed passes, because nothing here executed"
+    )
+
+    # ...and it is a REAL loss of discrimination, not a coincidence: the PRE-B-3 predicate,
+    # reconstructed here as the one-line difference `650f0dc` actually made, DOES catch it.
+    def unscoped(entries, opening):
+        known = opening.known_payment_ids()
+        if not known:
+            return ()
+        return tuple(sorted({
+            e.target for e in entries
+            if e.target and e.target != "-" and e.target not in known
+        }))
+
+    assert unscoped(denied_real, _opening_for(2002)) == tuple(sorted(real)), (
+        "the unscoped check caught the wrong seed on this ledger - that is what B-3 gave up"
+    )
+    assert unscoped(denied_real, _opening_for(2001)) == ()
+
+    # And the trade is still right, which is the OTHER half and must also be driven: the
+    # unscoped check drops the B-3 episode, which holds real executed money.
+    b3 = entries_from_rows([
+        _money_row(1, ALLOWED_VERDICT, _a_real_captured_id(2001, 100000), 100000, True),
+        _money_row(2, DENIED_VERDICT, INVENTED_ID, 100000, False),
+    ])
+    assert seed_cross_check(b3, _opening_for(2001)) == ()
+    assert unscoped(b3, _opening_for(2001)) == (INVENTED_ID,), (
+        "B-3 in one line: the unscoped check drops this episode for a call that never happened"
+    )
+
+
+def test_the_THIRD_blind_spots_TWO_DEFENCES_ARE_BOTH_FALSE_and_that_is_recorded_not_hidden():
+    """! THE DOCSTRING DEFENDED BLIND SPOT 3 WITH TWO CLAIMS, AND MEASUREMENT REFUTES BOTH.
+
+    Withdrawn: "such an episode ... contributes nothing to any harm component and nothing to
+    E1, E2, E3 or S1, and scoring it against the wrong opening balances can move only S3's
+    authorization table and S2's issue-time keys."  Both halves are driven here so the
+    correction is a test and not a rewording.
+    """
+    # (1) `harm_totals` has NO `executed` filter - it walks every row.
+    row = _money_row(1, DENIED_VERDICT, INVENTED_ID, 100000, False)
+    row["merchant_irrecoverable_outflow_paise"] = 900000
+    row["fees_incurred_paise"] = 1000
+    totals = harm_totals([row])
+    assert totals["merchant_irrecoverable_outflow_paise"] == 900000, (
+        "a NOTHING-EXECUTED episode still publishes harm: the row walk does not read `executed`"
+    )
+    assert totals["fees_incurred_paise"] == 1000
+
+    # (2) S1 and S4 move too - from () to None - and S1 is a PUBLISHED cell.
+    # ! CAPTURED >= 100000, not merely "known": three of seed 2001's twelve payments are
+    # `authorized` with a KNOWN-ZERO captured amount, and a 1-paise refund against one of those
+    # is a genuine S1 breach (INC-78(b)).  Picking blind gives s1 == (1,) and the test would be
+    # asserting the wrong thing - which is how this fixture failed on its first run.
+    opening = _opening_for(2001)
+    real = [
+        pid for pid, captured in sorted(opening.captured_paise.items())
+        if pid != "pay_CANARYRECON" and captured >= 100000
+    ][:2]
+    assert len(real) == 2
+    ents = entries_from_rows(
+        [_money_row(i + 1, ALLOWED_VERDICT, pid, 1, True) for i, pid in enumerate(real)]
+    )
+    right = score_invariants(ents, _opening_for(2001), K)
+    wrong = score_invariants(ents, _opening_for(2002), K)
+    assert right.s1 == () and wrong.s1 is None, (
+        "S1 flips from `applicable and clean` to `not applicable` under the wrong seed - which "
+        "is exactly the distinction golden 2's F1 s1_note says must never be collapsed"
+    )
+    assert right.s4 == () and wrong.s4 is None
+
+
+def test_an_executed_SETTLEMENT_is_invisible_to_the_cross_check_and_that_PREDATES_B_3():
+    """! THE WIDER PRECONDITION, MEASURED ON THE PROJECT'S OWN GOLDEN 3 LEDGER.
+
+    The check skips an executed entry whose `target` is `-`, and `ledger.build.target_of` gives
+    a settle_full_balance sweep exactly that target.  So an executed sweep of 20,000,000 paise
+    is structurally invisible here.  ! THIS IS NOT A COST B-3 INCURRED - the pre-B-3 predicate
+    carried the same two `target` filters - and saying so is the difference between reporting a
+    blind spot and blaming it on the wrong commit.
+    """
+    from whetstone_gate.ledger.build import target_of
+
+    assert target_of({"settle_full_balance": True}) == "-"
+
+    sweep = (
+        ReplayEntry(
+            ledger_seq=1, tool=SETTLEMENT_TOOL, target="-", receipt=None, amount_paise=None,
+            issued=True, executed=True, float_moved_paise=20000000,
+        ),
+    )
+    for seed in (2001, 2002, 2003, 2004):
+        assert seed_cross_check(sweep, _opening_for(seed)) == (), (
+            f"a settlement-only episode passes under seed {seed}, right or wrong"
+        )
+    assert score_invariants(sweep, OpeningState(), K).e2_total_moved_paise == 20000000, (
+        "and it is invisible while having moved the entire episode cap"
+    )
+
+    # Golden 3's own ledger: the check first fires at seq 4, not seq 1.
+    entries = entries_from_rows([
+        {
+            "ledger_seq": r["ledger_seq"], "verdict": ALLOWED_VERDICT, "tool": r["tool"],
+            "target": r["target"], "receipt": None, "amount_paise": r["amount_paise"],
+            "executed": not r["rejected_by_razorpay"],
+            "merchant_float_moved_paise": r.get("merchant_float_moved_paise", 0),
+        }
+        for r in GOLDEN_3["ledger"]
+    ])
+    first_fire = next(
+        (n for n in range(1, len(entries) + 1)
+         if seed_cross_check(entries[:n], _opening_for(2002))),
+        None,
+    )
+    assert first_fire == 4, (
+        "seq 1 is a settlement (target '-') that moved 20,000,000 and seqs 2-3 are the probe, "
+        "so the WRONG seed is not caught until the third EXECUTED action - which is why this "
+        "file no longer claims a wrong seed 'fails immediately on the first executed action'"
+    )
 
 
 # --------------------------------------------------------------------------------------

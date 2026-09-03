@@ -341,7 +341,7 @@ truth is worse in both directions.**
    `INC-87` itself, `OF-203`, `OF-204`, the ten `OF-188`…`OF-198` status edits, the `STATUS.md`
    C8 row and this entire `PROGRESS.md` entry. **Measured: every byte landed and nothing was
    lost** (`git diff HEAD` over the four files is EMPTY); only the token the log names is wrong.
-2. ⚠️ **AND THEN THIS SESSION DID SWEEP C9 — in `58e9299`, carrying C9's 127-line entry (now
+2. ⚠️ **AND THEN THIS SESSION DID SWEEP C9 — in `58e9299`, carrying C9's 109-line entry (now
    `INC-88`) — AND ITS `Swept: NOTHING` LINE ON THAT COMMIT IS FALSE.** That is **`INC-89`**, and
    it is the most self-incriminating of the three, because **nothing was missing**: `INC-65` had
    already published the correct one-line check — *"is any OTHER issued token in this diff"*,
@@ -363,6 +363,44 @@ The remedy this session proposes is still a rule
 about **time**, not about git: *a journal edit is committed before its author starts any
 measurement longer than a minute* — this session's token row and `INC-85` were, and were not
 swept; `Q-110` was not, and was.
+
+### ⚠️ THIS SESSION AUDITED ITS OWN PUBLISHED CLAIMS BEFORE PRINTING THEM, AND TWO WERE WRONG
+
+**Eleven factual claims this session intended to publish were put to an adversarial audit** —
+two independent auditors per claim, each told to **REFUTE** by measurement and to default to
+REFUTED where the evidence did not positively establish the claim, each required to quote raw
+command output, and none permitted to write to the repository. **Nine claims were CONFIRMED by
+both auditors. TWO WERE REFUTED BY BOTH, INDEPENDENTLY, AND BOTH REFUTATIONS WERE RE-MEASURED BY
+THIS SESSION AND ARE CORRECT.**
+
+1. ⚠️ **`INC-89` CONTAINED A FABRICATED-BY-IMPORT NUMBER, IN THE ENTRY WHOSE WHOLE SUBJECT IS A
+   FALSE CLAIM PRODUCED BY CONCLUDING INSTEAD OF MEASURING.** It said the entry `58e9299` swept
+   was **127 lines**. **It was 109** — the diff decomposes into `+109/-0` (C9's entry) and
+   `+38/-5` (this session's own), summing to the 147 the entry quotes correctly. **`127` is a
+   different object in a different file swept by a different commit in the opposite direction:**
+   this session's own `PROGRESS.md` entry, which C9 swept. **The entry's own arithmetic refuted
+   it** — `147 − 127 = 20` — **and nobody read it.** `INC-47` broken a second time inside the
+   entry written to record the first breach. Corrected in place with both wrong figures quoted.
+2. ⚠️ **THE `B-3` BLIND-SPOT-3 TEST COULD NOT EXHIBIT THE PROPERTY IT CLAIMED TO PIN, AND THE
+   DOCSTRING DEFENDING THAT BLIND SPOT MADE TWO FALSE CLAIMS.** The fixture used ids present in
+   **no** seed's world and asserted only under the **right** seed — measured **seed-invariant**
+   across 2001–2004, so it was structurally incapable of showing *"a wrong seed under it
+   passes"*. And the defence was false twice: **`harm_totals` has no `executed` filter**, so a
+   nothing-executed episode still published **900,000 paise** of irrecoverable outflow and
+   **1,000** of fees; and **S1 and S4 also move** under a wrong seed, `()` → `None`, with **S1 a
+   published cell**. ⚠️ **The audit also found the precondition is WIDER than declared** — an
+   executed `create_instant_settlement` has `target` `"-"` and is invisible to the check, so on
+   **golden 3's own ledger** under seed 2002 the check first fires at **seq 4**, the third
+   executed action — **and that half PREDATES `B-3`**, which the entry now says rather than
+   letting `B-3` carry it. The test was **replaced** with one that drives real seed-2001 ids
+   denied under both seeds *and* the pre-`B-3` predicate beside it, plus two new tests that
+   drive the two false defences. The claim *"a wrong seed fails immediately on the first
+   EXECUTED action"* is **withdrawn** and quoted where it stood.
+
+⚠️ **BOTH DEFECTS WERE THIS SESSION'S OWN AND NEITHER WAS FOUND BY THE MUTANTS.** Twenty-three
+mutants, zero real survivors, and they saw nothing here — because a mutant tests whether the code
+does what the tests say, and both of these were the **tests and the prose** being wrong about the
+code. **That is the limit of a mutation gate, measured on this session rather than argued.**
 
 **TOKEN SPEND: ZERO. No provider call of any kind. No lane touched.**
 
