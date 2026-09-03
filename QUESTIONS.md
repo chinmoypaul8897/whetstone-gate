@@ -9251,6 +9251,30 @@ plainest possible sense, which is §9.2's own name for S3.
 **Default taken:** **the architect's stated `n/a`**, with **both readings recorded on the fixture's
 own `s3_note`** and neither presented as the answer.
 
+⚠️ **AND THIS STOPPED BEING HYPOTHETICAL BEFORE THIS SESSION ENDED. C8's SHIPPED SCORER IMPLEMENTS
+RULE B AND RETURNS `[2]`.** Measured on the landed file:
+
+```
+tests/test_c8_scorer.py::test_golden2_every_pinned_cell_reproduces[F9_capture_and_refund_on_one_payment]
+  F9.S3: computed [2], golden says None            <- the ONLY mismatched cell
+  E1, E2, E2_total_moved_paise, E3, S1, S2, S2-amt, S4   ALL REPRODUCE
+  including S1 = [1, 3], which is the cell this fixture exists for
+```
+
+**So the three parties are:** the **architect**, who stated `n/a`; **this session's independent
+script**, which agreed under rule A and reproduced all eight original fixtures first; and **C8's
+built scorer**, which takes rule B. ⚠️ **NEITHER SIDE WAS ADJUSTED. The golden carries the
+architect's value, the scorer is untouched, and this session does not adjudicate which is right —
+C8's REVIEW does**, and it is running in this working tree as this is written (`07c3687f`).
+
+⚠️ **AND THE QUESTION IS SHARPER THAN IT LOOKED WHEN IT WAS RAISED, BECAUSE THE TWO RULES ARE NOT
+EQUALLY SAFE.** Rule A can call a capture row **unscored** — which is one step from the *"a scorer
+that returned `[]` for 'no captures present'"* hazard `Q-091`(ii) already names, and F9 is the first
+fixture in the file that actually contains such a row. Rule B can call a capture **breaching** on a
+fixture that never meant to declare an authorization table at all, which would make S3 fire on every
+fixture carrying a capture with no auth. **Whichever is ruled, the loser needs a fixture that pins
+it**, and only the architect can write one.
+
 ⚠️ **This is NOT `Q-097`, which is a different question about S3** — `Q-097` is about *consumption
 bookkeeping* (`Q-093`'s running-state reading), which is about **which clause fails**. This one is
 about **whether S3 has a subject at all**.
@@ -9267,6 +9291,16 @@ recomputes `trips_on` / `clean_on` / `not_applicable_on` **over `FIXTURE_KEYS`, 
 the golden itself**, and compares the result to the golden's stored `coverage.per_predicate` block.
 Appending F9 adds a ninth key to that iteration while the stored block still describes eight, so
 **all eight predicates' buckets mismatch and the test goes RED.**
+
+⚠️ **AND IT IS NOT THE ONLY DERIVED COUNT IN THAT FILE. MEASURED AFTER THE APPEND: `3 failed, 107
+passed`, AND THIS ENTRY WAS RAISED EXPECTING ONE.**
+`test_null_is_not_empty_a_scorer_returning_empty_for_absent_subjects_passes_seven_of_eight` counts
+the fixtures whose `S3` is `null` and asserts the **literal `7`**; F9 is a ninth fixture with `S3`
+`null`, so the count is **8**. ⚠️ **A derived count written INTO A TEST is worse than one stored in
+the golden, because the golden at least declares its own scope in a sentence a reader can find —
+`assert wrong == 7` is an answer key with no file, no scope sentence and no digest.** The third red
+is F9's own cell test and belongs to **`Q-102`**, not here: it is the S3 subject-rule disagreement,
+not a stale index. `INCIDENTS.md` **INC-83** carries all three.
 
 ⚠️ **THE FIXTURE-CELL TEST IS THE OPPOSITE CASE AND IS WHY THIS IS NOT SIMPLY A DEFECT IN THE TEST.**
 `test_golden2_every_pinned_cell_reproduces` is `@pytest.mark.parametrize`d over the same
@@ -9286,6 +9320,8 @@ the delta, in `f9_addendum.coverage_delta`, plus this entry and `INC-83`.**
 **Options seen:**
   1. **Extend `coverage.per_predicate` to nine fixtures.** ⚠️ Architect only. Cost: one edit; the red
      closes; the block stops being a transcribed eight-fixture measurement.
+  0. ⚠️ **Whatever is chosen, it must cover BOTH derived counts** — the block in the golden and the
+     literal `7` in the test. A remedy that closes one leaves the suite red on the other.
   2. **Re-scope the test to the eight fixtures the block names** — read the key list from
      `coverage.per_predicate`'s own buckets rather than from `fixtures`. C8's review or a C8 FIX
      session. Cost: one edit; the block stays as measured; ⚠️ **a ninth fixture then goes unchecked

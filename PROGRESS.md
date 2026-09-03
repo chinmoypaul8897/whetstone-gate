@@ -63,9 +63,20 @@ either way."* Read strictly, **the second conjunct makes `branch_a_n: 50` unreac
 `config/`.** **Deadline: BEFORE C14's PILOT SELECTS A BRANCH.** No value on either side was touched.
 
 **⚠️ TWO INCIDENTS, BOTH THIS SESSION'S OWN.**
-**`INC-83`** — appending the fixture `INC-78` **asked for** turns
-`tests/test_c8_scorer.py::test_golden2_coverage_block_reproduces` **RED**, because golden 2 carries a
-**DERIVED INDEX over its own fixture list** and the test recomputes it over the live list. The
+**`INC-83`** — appending the fixture `INC-78` **asked for** turns **THREE** tests in
+`tests/test_c8_scorer.py` **RED** — measured **`3 failed, 107 passed`** — **where this session
+predicted ONE**, and the undercount is the same mistake the incident is about. **(a)**
+`test_golden2_coverage_block_reproduces`, because golden 2 carries a **DERIVED INDEX over its own
+fixture list** and the test recomputes it over the live list — predicted. **(b)**
+`test_null_is_not_empty_..._passes_seven_of_eight`, which asserts the **literal count 7** of fixtures
+whose `S3` is `null`; F9 makes it **8** — ⚠️ **a second derived count over the same list, this one
+written INTO A TEST, where it has no file, no scope sentence and no digest. Not predicted.**
+**(c)** ⚠️ **F9's own cell test, which belongs to `Q-102` rather than to the stale-index class:
+against C8's shipped scorer F9 mismatches on EXACTLY ONE CELL — `S3`, computed `[2]` against the
+golden's `null` — while `E1`, `E2`, `E2_total_moved_paise`, `E3`, `S1`, `S2`, `S2-amt` and `S4` ALL
+REPRODUCE, `S1` = `[1, 3]` included, which is the cell the fixture exists for.** The architect stated
+`n/a`, this session's independent script agreed under subject rule A, **C8's scorer takes rule B**,
+and **neither side was adjusted — C8's REVIEW adjudicates it, not this session.** The
 `coverage` block was **not** extended: this session's fence reads **`golden2_invariants.json` (ONE
 FIXTURE APPENDED)**, the block is the architect's transcribed measurement scoped by its own sentence
 to *"the eight fixtures"*, and `tests/` is under **NOT** with hard rule 6 forbidding a weakening

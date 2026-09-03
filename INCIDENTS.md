@@ -6627,13 +6627,32 @@ is a **ninth golden-2 fixture** carrying a capture and a refund on one payment �
 `tests/goldens/` is read-only to every session, so **only the architect can write it**."* This
 session appended that fixture, **F9**, as a pure textual append: `git diff --stat` reads **71
 insertions, 0 deletions**, and the whole file up to F8's closing brace hashes identically before and
-after (`35d476ba…da17de`, 22,149 bytes). **Appending it turns
-`tests/test_c8_scorer.py::test_golden2_coverage_block_reproduces` RED.**
+after (`35d476ba…da17de`, 22,149 bytes). **Appending it turns THREE tests in
+`tests/test_c8_scorer.py` RED — `3 failed, 107 passed` — and this session predicted ONE of them.**
 
-Measured rather than predicted: that test derives `FIXTURE_KEYS` **from the golden itself**,
-recomputes `trips_on` / `clean_on` / `not_applicable_on` over **every** fixture, and compares the
-result to the golden's stored `coverage.per_predicate` block, which describes **eight**. F9 lands in
-one bucket of each of the eight predicates, so **all eight comparisons mismatch.**
+⚠️ **THE ENTRY AS FIRST DRAFTED SAID *"turns `test_golden2_coverage_block_reproduces` RED"*, SINGULAR,
+AND THAT IS CORRECTED HERE RATHER THAN REWORDED, BECAUSE THE UNDERCOUNT IS THE SAME MISTAKE THE
+ENTRY IS ABOUT.** Measured after the append:
+
+1. **`test_golden2_coverage_block_reproduces`** — derives `FIXTURE_KEYS` **from the golden itself**,
+   recomputes `trips_on` / `clean_on` / `not_applicable_on` over **every** fixture, and compares the
+   result to the stored `coverage.per_predicate` block, which describes **eight**. F9 lands in one
+   bucket of each of the eight predicates, so **all eight comparisons mismatch. PREDICTED.**
+2. **`test_null_is_not_empty_a_scorer_returning_empty_for_absent_subjects_passes_seven_of_eight`** —
+   counts the fixtures whose `S3` is `null` and asserts the **literal 7**. F9 is a ninth fixture with
+   `S3` `null`, so the count is **8**. ⚠️ **A SECOND DERIVED COUNT OVER THE SAME FIXTURE LIST,
+   HARDCODED AGAINST EIGHT, IN THE SAME FILE — AND NOT PREDICTED.** The diagnosis below was written
+   about one instance and there were two.
+3. ⚠️ **`test_golden2_every_pinned_cell_reproduces[F9_capture_and_refund_on_one_payment]` — F9's own
+   cell test, and it is a DIFFERENT INCIDENT'S SHAPE, recorded here because the same run produced
+   it.** Against C8's shipped scorer F9 mismatches on **exactly one cell — `S3`, computed `[2]`
+   against the golden's `null`.** That is **`Q-102`'s subject-rule question, live and no longer
+   hypothetical**: the architect stated `n/a`, this session's independent script agreed under subject
+   rule A (*applicable only where an authorization TABLE is declared*), and **C8's scorer implements
+   subject rule B** (*applicable wherever a CAPTURE ROW exists*). ⚠️ **EVERY OTHER F9 CELL REPRODUCES
+   AGAINST THAT SCORER — `E1`, `E2`, `E2_total_moved_paise`, `E3`, `S1`, `S2`, `S2-amt` and `S4`,
+   INCLUDING `S1` = `[1, 3]`, the cell this fixture exists for.** **NEITHER SIDE IS ADJUSTED AND THIS
+   SESSION DOES NOT ADJUDICATE IT: C8's REVIEW does.**
 
 ⚠️ **AND THE SISTER TEST IS THE OPPOSITE CASE, WHICH IS WHY THIS IS NOT SIMPLY A BAD TEST.**
 `test_golden2_every_pinned_cell_reproduces` is `parametrize`d over the **same** derived
@@ -6670,9 +6689,12 @@ block and was in this session's mandatory read order, and its own text quotes th
 sentence — so the block's existence as a **derived** artefact was directly in front of this session
 and was read as content rather than as a dependency.
 
-**Diagnosis:** golden 2 contains a **derived index over its own fixture list** — a second answer key
-computed from the first — and a test recomputes that index over the live list, so extending the list
-without regenerating the index makes the file disagree with itself, whatever the extension's merit.
+**Diagnosis:** golden 2 contains **derived counts over its own fixture list** — second answer keys
+computed from the first, one stored **in the golden** (`coverage.per_predicate`) and one written
+**into a test** (the literal `7`) — and each is checked against the live list, so extending that list
+without regenerating them makes the file disagree with itself, whatever the extension's merit. ⚠️ **A
+derived count in a TEST is the worse of the two, because the golden at least declares its own scope
+in a sentence a reader can find.**
 
 **Fix:** ⚠️ **NO SHA, AND NONE IS OWED BY THIS SESSION.** The remedy is one of `Q-103`'s four options
 and every one of them lies outside this session's fence: extending `coverage` is the architect's
@@ -6685,11 +6707,16 @@ GOLDEN MAY NOT CARRY A DERIVED INDEX OVER ITS OWN FIXTURES UNLESS THE INDEX NAME
 WAS DERIVED FROM.** A block that says *"S3 trips on F7 and is n/a on the other seven"* is checkable
 against any fixture list; a block that says *"S3 trips on F7 and is n/a on F1, F2, F3, F4, F5, F6,
 F8"* is only checkable against the list it was written for, and it is **silent about which list that
-was**. The same shape is already present elsewhere and is named here so it is not found twice more:
-golden 2's `published_finding` counts (**unaffected by F9, checked**), and golden 9's own
-`allowed_seqs` / `denied_seqs` / `indeterminate_seqs` — which this session **therefore re-read off
-the sixteen verdict fields and asserted to partition them 8 / 7 / 1**, rather than trusting the list
-it had just typed. **A derived index inside an answer key is a second answer key.**
+was**. ⚠️ **AND THE RULE HAS A SECOND HALF THIS SESSION LEARNED THE HARD WAY: THE SAME APPLIES TO A
+DERIVED COUNT WRITTEN INTO A TEST.** `assert wrong == 7` is an answer key with no file, no scope
+sentence and no digest, and nothing about adding a fixture points at it. **The two together are why
+this entry undercounted its own blast radius by a factor of two.** The same shape is present
+elsewhere and is named here so it is not found twice more: golden 2's `published_finding` counts
+(**unaffected by F9, checked**), and golden 9's own `allowed_seqs` / `denied_seqs` /
+`indeterminate_seqs` — which this session **therefore re-read off the sixteen verdict fields and
+asserted to partition them 8 / 7 / 1**, rather than trusting the list it had just typed. **A derived
+index inside an answer key is a second answer key; a derived count inside a test is a second answer
+key nobody can find.**
 
 ---
 

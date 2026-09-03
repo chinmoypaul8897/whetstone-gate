@@ -703,7 +703,7 @@ transcribing session may not settle it.** `QUESTIONS.md` **Q-107**.
 
 ### Golden 2 — `golden2_invariants.json` — ⚠️ **F9 APPENDED, 2026-09-03**
 
-**SHA-256 `c1399b7957862db57757a58f80e02a373989389a93901878b9b5adf5d1bd20a3`** · **49,362 bytes** ·
+**SHA-256 `f4431a52f5f597ca97e853d3fa163d75f5dd49bba3c202f1bbcdf2afd981ca6a`** · **50,663 bytes** ·
 **0 CR bytes**. ⚠️ **BOTH FIGURES MOVED AND THE SUPERSEDED ONES ARE NAMED RATHER THAN OVERWRITTEN
 SILENTLY: `bcd8cbcd…78ae1` / 38,253 bytes was the file as first landed** (ARCH FIX `a72f5d81`), and
 a **ninth fixture** was appended to it by ARCH FIX `e1956729`.
@@ -740,15 +740,34 @@ file.** F9 is the first fixture where they differ: `S1` is `[1, 3]` and **`S4` i
 breaches were visible to a live read. **`S3` is `n/a` and F9 does NOT close `Q-091`(ii)'s gap** — S3
 still trips on one fixture and is applicable-and-clean on none.
 
-⚠️ **ONE MEASURED CONSEQUENCE, PUBLISHED HERE RATHER THAN DISCOVERED BY THE NEXT SESSION.** Golden 2
-carries a **`coverage` block — a DERIVED INDEX over its own fixture list** — and
-`tests/test_c8_scorer.py::test_golden2_coverage_block_reproduces` **recomputes those buckets over
-every fixture in the file** and compares them to it. The block's own opening sentence scopes it to
-*"WHAT THE EIGHT FIXTURES DO AND DO NOT COVER"*, it is the architect's transcribed measurement over
-those eight, and **editing it is outside the placing session's fence, which reads *"ONE FIXTURE
-APPENDED"***. So F9's coverage delta is recorded in `f9_addendum` instead **and the committed C8 test
-goes RED**. It is **not weakened** — `tests/` is under **NOT** and hard rule 6 forbids it in any case
-— and the red is attributed by file and test id. `INCIDENTS.md` **INC-83**, `QUESTIONS.md` **Q-103**.
+⚠️ **THREE MEASURED CONSEQUENCES, PUBLISHED HERE RATHER THAN DISCOVERED BY THE NEXT SESSION —
+AND THE PLACING SESSION PREDICTED ONE OF THEM, WHICH IS WHY THE OTHER TWO ARE WRITTEN DOWN.**
+Running `tests/test_c8_scorer.py` after F9 landed gives **3 failed, 107 passed**, and **all three
+reds are caused by this append**:
+
+1. **`test_golden2_coverage_block_reproduces`** — golden 2 carries a **`coverage` block, a DERIVED
+   INDEX over its own fixture list**, and this test **recomputes those buckets over every fixture in
+   the file** and compares them to it. The block's own opening sentence scopes it to *"WHAT THE EIGHT
+   FIXTURES DO AND DO NOT COVER"*, it is the architect's transcribed measurement over those eight,
+   and **editing it is outside the placing session's fence, which reads *"ONE FIXTURE APPENDED"***.
+   F9's delta went into `f9_addendum` instead. **This one was predicted.**
+2. **`test_null_is_not_empty_a_scorer_returning_empty_for_absent_subjects_passes_seven_of_eight`** —
+   asserts the **literal count seven** of fixtures whose `S3` is `null`. F9 makes it **eight**. ⚠️
+   **A SECOND DERIVED COUNT OVER THE SAME FIXTURE LIST, HARDCODED AGAINST EIGHT, AND IT WAS NOT
+   PREDICTED** — which is the whole of `INC-83`'s point, found twice in one file.
+3. ⚠️ **`test_golden2_every_pinned_cell_reproduces[F9…]` — F9's own cell test, and it is the one
+   that matters.** Against C8's shipped scorer F9 mismatches on **exactly one cell: `S3`, where the
+   scorer computes `[2]` and the golden says `null`.** That is **`Q-102`'s subject-rule question,
+   live**: the architect stated `n/a`, the placing session's independent script agreed under subject
+   rule A, and **C8's scorer takes subject rule B**. ⚠️ **Every other F9 cell reproduces against that
+   scorer — `E1`, `E2`, `E2_total_moved_paise`, `E3`, `S1`, `S2`, `S2-amt` and `S4`, INCLUDING
+   `S1` = `[1, 3]`, which is the cell this fixture exists for.** **What that means is C8's REVIEW's
+   to say and not the placing session's**, and it is reported here because a suite run is a mandatory
+   end-of-session measurement and a measurement is reported faithfully or not at all.
+
+**None of the three is weakened** — `tests/` is under **NOT** and hard rule 6 forbids it in any case
+— and each is attributed by test id. `INCIDENTS.md` **INC-83**, `QUESTIONS.md` **Q-102** and
+**Q-103**.
 
 ### ⚠️ STATUS, RESTATED AS OF 2026-09-03 — the Status table above is SUPERSEDED and is kept unedited
 
