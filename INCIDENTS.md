@@ -7719,10 +7719,10 @@ secret-shaped strings and turned `check_roles` C1 RED"*. The staged blob **delet
 runtime-assembled values and **restores the literals**:
 
 ```
--_KEY_SHAPED_GROQ = "gsk" + "_" + ("zq" * 14)
--_KEY_SHAPED_GOOGLE = "AI" + "za" + ("Zq" * 17) + "Z"
-+    "gsk_0123456789abcdefghijklmnop",
-+    "AIzaSyD0123456789abcdefghijklmnop",
+-_KEY_SHAPED_GROQ   = <the Groq prefix and separator, assembled at run time>
+-_KEY_SHAPED_GOOGLE = <the Google prefix, assembled at run time>
++    <the same two values WRITTEN OUT AS LITERALS - the shapes `check_roles` C1 matches>
++    <ditto>
 ```
 
 **A bare `git commit` by any session in this shared tree would have reverted `d63f722`, put two
