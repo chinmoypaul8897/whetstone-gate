@@ -3,10 +3,11 @@ C11 BUILD 1 - THE LANE-AWARE CHECKPOINTED RUNNER - FINAL OUTPUT
 SESSION-TOKEN: 86ee1e45 | 2026-09-03 | BUILT, UNREVIEWED, NO TAG
 ================================================================================
 
-PUSHED SHA, THIS FILE: <FILLED BY THE COMMIT THAT FOLLOWS THIS ONE AND BY NOTHING
-                        ELSE - the `e022c86` precedent. A SHA IS NOT WRITTEN BEFORE
-                        IT EXISTS.>
-PUSHED SHA, THE WORK:  0a77db1   (this file's own commit follows it)
+PUSHED SHA, THIS FILE: 12f6c6f   (filled by the commit that follows it and by nothing
+                        else - the `e022c86` precedent. A SHA IS NOT WRITTEN BEFORE IT
+                        EXISTS, and this file was committed BEFORE it was printed.)
+PUSHED SHA, THE WORK:  0a77db1   (the last commit before this file's own)
+PUSHED SHA, FINAL:     <this line's own commit - the SHA-fill commit itself>
 
 VERDICT: BUILT, UNREVIEWED, NOT TAGGED. `c11-pass` DOES NOT EXIST.
          NOTHING IS SELF-CERTIFIED. A FRESH ADVERSARIAL REVIEW FOLLOWS.
