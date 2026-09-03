@@ -329,8 +329,37 @@ A concurrent **C9 BUILD 1** (`3f8b2d56`) shared this working tree throughout and
 swept into `d6cdb2e` under C9's token** — content verified **intact**, 5,603 characters, both
 clauses, all four options and its stated default — and that is **`INC-87`** and **`OF-204`**:
 `INC-68`'s private index **held on both sides and the sweep happened anyway**, because it
-isolates by *file* and both sessions needed the same file. **This session then swept in the
-other direction and names it rather than being caught at it.** The remedy it proposes is a rule
+isolates by *file* and both sessions needed the same file.
+
+⚠️ **AND THIS PARAGRAPH IS CORRECTED IN PLACE, BECAUSE ITS FIRST VERSION WAS A PREDICTION AND
+THE PREDICTION WAS FALSIFIED WITHIN THE HOUR.** It read: *"This session then swept in the other
+direction and names it rather than being caught at it."* **That is not what happened, and the
+truth is worse in both directions.**
+
+1. **The sweep of this session happened a SECOND time and took everything.** Before this session
+   could stage its journals, C9 committed **`42faed5`** and swept **all four** of them at once —
+   `INC-87` itself, `OF-203`, `OF-204`, the ten `OF-188`…`OF-198` status edits, the `STATUS.md`
+   C8 row and this entire `PROGRESS.md` entry. **Measured: every byte landed and nothing was
+   lost** (`git diff HEAD` over the four files is EMPTY); only the token the log names is wrong.
+2. ⚠️ **AND THEN THIS SESSION DID SWEEP C9 — in `58e9299`, carrying C9's 127-line entry (now
+   `INC-88`) — AND ITS `Swept: NOTHING` LINE ON THAT COMMIT IS FALSE.** That is **`INC-89`**, and
+   it is the most self-incriminating of the three, because **nothing was missing**: `INC-65` had
+   already published the correct one-line check — *"is any OTHER issued token in this diff"*,
+   against the `## Session tokens` table — and this session read `INC-65` in its mandatory read
+   order and ran the query `INC-65`'s own `Diagnosis` had already proved useless. **Measured:
+   `grep -cE '^\*\*Raised by:\*\*' INCIDENTS.md` returns `0`**, so no incident sweep can ever be
+   visible to the `Raised by:` query, and `OPEN_FINDINGS.md` attributes by a table **column** —
+   **two of the five journals `Q-063` governs are structurally invisible to clause (ii) as this
+   session ran it.** `INC-65`'s check, run retroactively over this session's six commits against
+   **added patch lines only**, reports `0 · 1 · 0 · 0 · 0` for the five clean ones (the `1` being
+   `INC-85` legitimately **citing** `07c3687f`) and lights up **only `58e9299`**. It was then run
+   on every commit after it, and its output published in each message.
+3. **C9 resolved the id collision from its own side without being asked** — its entry was drafted
+   as `INC-87`, found this session's `INC-87` there, and renumbered **itself** to `INC-88` with
+   the renumber recorded inside the entry. `grep -oE "^## INC-[0-9]+" | sort | uniq -d` returns
+   nothing.
+
+The remedy this session proposes is still a rule
 about **time**, not about git: *a journal edit is committed before its author starts any
 measurement longer than a minute* — this session's token row and `INC-85` were, and were not
 swept; `Q-110` was not, and was.
