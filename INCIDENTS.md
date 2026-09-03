@@ -6887,8 +6887,11 @@ than redundant.
 **MEASUREMENT**, and the only tool where the two differ is the only tool the answer key omits; the
 same reading-for-the-wrong-thing let a written hand-off naming this chunk pass unimplemented.
 
-**Fix:** `<SHA>` (B-2 and B-4), with B-1, B-3 and the `INDETERMINATE` catcher in the commits
-beside it — all under `Session-Token: 9e4a71c2`, all ending `(unreviewed)`.
+**Fix:** **`650f0dc`** — all four blockers, `G-1` and `Q-102`'s cell, in one commit because they
+interleave inside four files and `Q-109` orders B-4 after B-2; its catchers are `3b0ed41` and
+`c35e2ad`. All three carry `Session-Token: 9e4a71c2` and all three end `(unreviewed)`.
+⚠️ **This field was written as the placeholder `<SHA>` by the commit that landed this entry and
+filled by the commit that follows the fix, because a commit cannot name its own SHA.**
 
 **Systemic guardrail:** ⚠️ **ONE LANDS HERE AND THE ONE THAT WOULD CLOSE IT CANNOT.** *What
 lands:* the scorer no longer **skips** an executed money action it cannot price — it **REFUSES**
@@ -6904,5 +6907,180 @@ this fix is pinned by tests this session wrote, which is the same standing `INC-
 landed.** A test written by the session that fixed the defect is weaker evidence than a fixture
 written by the architect who did not, and the difference is exactly the one this project exists to
 argue about.
+
+---
+
+## INC-86 — GOLDEN 9's SIXTEEN ROWS REPRODUCED 16/16 ON THE FIRST RUN AND TWO SENTENCES OF ITS OWN `discriminators` BLOCK ARE FALSE: one set of totals sums to fifteen rows, and the other names a wrong kernel the file's own arithmetic proves cannot fail that way
+
+**Date:** 2026-09-03 (C9 BUILD 1, `3f8b2d56`, **after** this session's first build commit.
+Found by **building the wrong kernels the block names and running them**, not by reading. Fix SHA
+under **Fix**.)
+
+**Event:** `tests/goldens/golden9_arm4_kernel.json` is arm 4's oracle and it is right: all sixteen
+verdicts, all sixteen reasons, all sixteen `episode_paise_moved_after` values, the seven-value
+moved series and the totals **8 ALLOWED / 7 DENIED / 1 INDETERMINATE** reproduced against the
+shipped kernel **exactly, zero mismatches, on the first run.** Its `discriminators` block then
+names, for each of three discriminators, *"the wrong implementation it kills and what that
+implementation returns"* — and **two of those stated returns are wrong**:
+
+```
+(i)  discriminator 1, pessimistic S3 ("a kernel that GUESSES"):
+       golden 9 says   7 ALLOWED / 8 DENIED / 0 INDETERMINATE      <- 7 + 8 + 0 = 15
+       MEASURED        8 ALLOWED / 8 DENIED / 0 INDETERMINATE      <- and the file has 16 rows
+       (the optimistic half of the same discriminator is EXACTLY RIGHT: the moved total at
+        seq 7 becomes 4,900,000, the figure the file predicts, and that was verified too)
+
+(ii) discriminator 2, `>` at E3:
+       golden 9 says   "seq 15 is allowed and the episode ends at 20,000,100 - OVER the
+                        pre-registered episode cap"
+       MEASURED        seq 15 DENIED, reason `E2 episode cap`, episode ends at 20,000,000.
+                       E2 fires on 20,000,000 + 100 and the cap is NOT crossed.
+```
+
+**Action:** ⚠️ **BOTH WRONG KERNELS WERE BUILT AND RUN OVER THE SAME SIXTEEN ROWS THROUGH THE SAME
+WALK AS THE SUBJECT**, which is golden 4's own recorded convention — *"the wrong answers were
+DRIVEN not asserted"*. Neither side was adjusted: `tests/goldens/` is read-only to every session
+but the architect, and the shipped kernel is correct against every cell. The tests assert the
+**measured** values with the discrepancy named beside each, and — the part that matters —
+`test_discriminator_1_...` **asserts that golden 9 still contains the string `7 ALLOWED / 8 DENIED
+/ 0 INDETERMINATE`**, so the moment the file is corrected the test goes red and the next session is
+told this entry can close. A third kernel was built for (ii) — the *"one comparison for E2 and
+E3"* the block's own `kills` line describes — and it does cross the cap, at **20,800,000**, by
+letting **seq 13** through first: worse than the file predicts, and by a different row.
+
+**Expectation:** a `discriminators` block whose stated wrong returns are reproducible, because its
+whole purpose is that *"a fixture that cannot fail is the defect this project keeps finding"* — so
+a reader implementing a kernel checks their wrong answers against those numbers.
+
+**Missing:** ⚠️ **any check that a golden's own PROSE is consistent with its own ROWS.** Every
+mechanism this repository has points at the rows: `test_golden2_coverage_block_reproduces`
+recomputes a stored index, `test_c4_goldens` recomputes values, and hard rule 3 makes the fixture
+independent of the code. **Nothing recomputes a claim written in English inside the answer key**,
+and both of these are arithmetic sitting in a sentence. (i) is checkable by **addition alone** —
+7 + 8 + 0 against a stated `rows: 16` two blocks above it — and no tool in this repository adds
+them up.
+
+**Missed:** ⚠️ **THE FILE CONTRADICTS ITSELF IN PLACE AND SAYS SO IN CAPITALS.** Golden 9's own
+`per_row_arithmetic["15"]` reads *"THIS IS THE ONE ROW IN THE FILE WHERE MORE THAN ONE CLAUSE
+FIRES: E2 also fires (20,000,000 + 100 > 20,000,000) and so does S1"*, and its
+`clause_isolation_measured_and_ONE_ROW_DOES_NOT_ISOLATE` block says the same thing a third time
+with the 720-ordering measurement behind it. **Any of those three passages refutes discriminator
+2's sentence, and all three were read by this session before the kernel was written.** They were
+read as being *about the reason column*, which is what they are also about. ⚠️ **And the second
+missed signal is `INC-84`, the entry immediately above `INC-83`**, which is *the same file, the
+same block, the same failure*: a method claim written into golden 9 before the check that would
+have tested it, and then falsified by that check. This is `INC-84`'s class, one block over, in the
+half of the file `INC-84` did not re-run.
+
+**Diagnosis:** the `discriminators` block's stated wrong returns were **reasoned about rather than
+executed** — the architect's own transcription session ran the sixteen rows and the 720 orderings,
+but never ran the mutants the block names — so a kernel's wrong output was predicted from the
+predicate in isolation, which is exactly the mistake a *six-clause* fixture punishes: at seq 15
+three clauses fire, so breaking one of them changes nothing a verdict column can see.
+
+**Fix:** **`b50e9b3`** — no code change is possible or needed: the kernel is correct against all
+sixteen rows, and the golden is read-only. What lands is the **measurement**, as two tests that
+build the wrong kernels and assert what they really return, plus the **pinning assertion** on the
+golden's own wrong sentence so the correction cannot land silently. The correction itself is the
+architect's: `QUESTIONS.md` **Q-116**, `docs/reviews/OPEN_FINDINGS.md` **OF-199** and **OF-200**.
+
+**Systemic guardrail:** ⚠️ **ONE, AND ITS LIMIT IS STATED WITH IT.** *What lands:* the convention
+that **a golden's named mutant is BUILT AND RUN, never quoted** — this session's three
+discriminator tests each construct the wrong kernel and drive it, and that is the only reason
+either sentence was found. It costs about ten lines per discriminator and it turns a fixture's
+commentary from prose into something the suite executes. ⚠️ *What does NOT close:* **a golden's
+prose is still unchecked in general.** The guardrail catches a wrong claim about a **mutant**,
+because a mutant can be built; it catches nothing about a claim with no executable content, and
+`INC-84` plus this entry are now two instances in one file in one day. **The mechanical check that
+would close (i) specifically is trivial and does not exist: assert that every stated verdict-total
+triple in a golden sums to that golden's stated row count.** It belongs to whichever chunk owns
+the repository-wide tripwires (`OF-99`'s address), and it is named here rather than gestured at.
+
+---
+
+## INC-87 — `INC-82` RECURRED, AGAIN INSIDE ONE DAY, AND AGAIN THE SWEPT SESSION IS THE ONLY ONE THAT CAN SEE IT: this session's `Q-110` was committed by a concurrent C9 BUILD under C9's token — ⚠️ **AND THE SWEEPING SESSION WAS USING THE PRIVATE INDEX, BECAUSE THE PRIVATE INDEX ISOLATES BY FILE AND BOTH SESSIONS NEEDED THE SAME FILE**
+
+**Date:** 2026-09-03 (**found by the session that was swept**, C8 FIX 1 `9e4a71c2` — which is
+again the only session that can find it, exactly as `INC-65` and `INC-82` both predicted. The
+sweeping commit is **`d6cdb2e`**, the concurrent **C9 BUILD 1** session `3f8b2d56`. **No Fix SHA;
+see `Fix`.**)
+
+**Event:** this session wrote `Q-110` into `QUESTIONS.md` and left it uncommitted for the twenty
+minutes it took to run a mutation pass and a full suite. In that window `d6cdb2e` landed. Measured,
+not inferred:
+
+```
+git log --oneline -S "Q-110 " -- QUESTIONS.md      ->  d6cdb2e
+git log -1 --format=%B d6cdb2e | git interpret-trailers --parse
+                                                   ->  Session-Token: 3f8b2d56
+git show HEAD:QUESTIONS.md  | (the Q-110 block)    ->  5,603 characters
+   clause (i) present · clause (ii) present · all FOUR options present ·
+   "Default taken: OPTION 1" present
+```
+
+⚠️ **THE CONTENT IS INTACT AND WAS VERIFIED INTACT RATHER THAN ASSUMED INTACT** — the block is
+this session's, character for character, including the ⚠️ marks and the two measured tables.
+**What is wrong is only whose token the log says put it there**, and this entry is how a reader
+learns which is which. ⚠️ **AND THE SWEEPING COMMIT'S OWN `Swept:` LINE IS HONEST AND STILL
+MISSED IT**, which is the sharp part: `d6cdb2e`'s message names its snapshot and its token row
+correctly. `Q-110`'s `Raised by:` line says `C8 FIX 1 (9e4a71c2)` in plain text — so the clause
+(ii) check *could* have seen it and did not fire, because a session reading its own staged
+snapshot for **somebody else's** `Raised by:` token has to be looking for a token it has never
+been told exists.
+
+**Action:** ⚠️ **NOTHING IS UNDONE.** History is never rewritten here (`CLAUDE.md` §5) — a rewrite
+would destroy `probe-v1`, `prereg-v1` and every `cN-pass` tag — so `d6cdb2e` stands and the
+mis-attribution is corrected by **record**, which is `INC-65`'s and `INC-82`'s own handling, third
+iteration. **This session then swept in the other direction and says so rather than being caught
+at it:** its journal commit carries C9's uncommitted `INC-86` and `OF-199`…`OF-202`, named on the
+commit and in its report under `Q-063` clause (ii), which rules *"YOU STILL COMMIT — waiting
+deadlocks two sessions — but the commit message carries a `Swept:` line naming EVERY foreign entry
+and its token."*
+
+**Expectation:** `INC-68`'s systemic guardrail — a **PRIVATE INDEX** — was supposed to close this.
+Both sessions used it. **It held, and the sweep happened anyway.**
+
+**Missing:** ⚠️ **`INC-68` NAMES THE SHARED INDEX AND ITS REMEDY ISOLATES BY *FILE*, AND NOTHING IN
+IT SAYS THAT TWO SESSIONS WANTING THE SAME FILE ARE OUTSIDE ITS REACH.** Its own text says the
+remedy *"protects a session that uses it"* and warns only that a session **not** using it can still
+sweep — so a reader concludes that two disciplined sessions are safe. They are not: a private index
+makes `git add -- QUESTIONS.md` stage **the working tree's `QUESTIONS.md`**, and the working tree is
+still shared. **The one thing that would have closed this is the one thing declined twice with its
+reason recorded — separate worktrees** — and after `INC-36`, `INC-65`, `INC-68`, `INC-82` and this,
+the recorded reason (*"it is 1 September, C14 is imminent"*) is now three days old.
+
+**Missed:** ⚠️ **THIS SESSION READ `INC-68` AND `INC-82` IN ITS MANDATORY READ ORDER, USED THE
+RECIPE ON EVERY COMMIT, AND STILL LEFT A JOURNAL EDIT UNCOMMITTED ACROSS A TWENTY-MINUTE
+MEASUREMENT.** `INC-65`'s closing sentence is the signal and it is unambiguous: *"nothing can warn
+the session being swept … a `Swept:` line tells the READER afterwards; it cannot tell the session
+losing its attribution at the time."* **The actionable form of that sentence — commit a journal
+edit BEFORE starting any long-running measurement, because the window is what kills you — is
+nowhere written down, and this session inferred the wrong lesson from a rule it had read twice.**
+It committed its token row and its incident promptly, and then relaxed the same discipline for
+`Q-110` because the mutation harness was the interesting thing.
+
+**Diagnosis:** the private index removes the *index* race and leaves the *working-tree* race
+untouched, so an uncommitted edit to a shared journal is still exposed for exactly as long as it
+stays uncommitted — and the exposure window is set by how long its author is busy elsewhere, which
+is the one variable no guardrail in this repository measures.
+
+**Fix:** ⚠️ **NO SHA, AND NONE IS OWED FOR THE SWEEP ITSELF** — `d6cdb2e` is not amended and not
+reverted, the content at `HEAD` is correct, and only the attribution is wrong. What this session
+changed is its own remaining behaviour, under **Systemic guardrail**.
+
+**Systemic guardrail:** ⚠️ **ONE, IT IS NARROW, IT IS FREE, AND IT IS A RULE ABOUT TIME RATHER THAN
+ABOUT GIT: A JOURNAL EDIT IS COMMITTED BEFORE ITS AUTHOR STARTS ANY MEASUREMENT LONGER THAN A
+MINUTE, NEVER AFTER.** `QUESTIONS.md`, `INCIDENTS.md`, `OPEN_FINDINGS.md`, `STATUS.md` and
+`PROGRESS.md` are the five shared journals; every one of the five sweeps recorded in this file
+happened in a window its author opened by doing something else. This session's token row and
+`INC-85` were committed within a minute of being written and neither was touched by `d6cdb2e`;
+`Q-110` was not, and was. **The rule is one sentence and it is the difference between those two
+outcomes.** ⚠️ **What this does NOT close, stated so it is not oversold:** it shortens the window
+and cannot remove it — two sessions can still write the same file in the same minute — and it is
+**a habit until it is in `PROCESS.md` §7 and in every prompt's GIT section, both of which are the
+ARCHITECT'S.** `Q-063` clause (iii)'s **E6** remains OPEN and assigned to **C11**, and E6 would not
+have caught this either: `Q-110`'s `Raised by:` token differs from `d6cdb2e`'s trailer, so E6 would
+have **failed that commit** — which is a fourth session's problem, after the fact, rather than a
+prevention. **Recorded as `OF-204`.**
 
 ---
