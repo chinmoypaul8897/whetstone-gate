@@ -119,6 +119,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `3d7e50ba` | C12 | BUILD | 2026-09-03 |
 | `c1f0a4d8` | ARCH | FIX | 2026-09-03 |
 | `8b46f2e1` | ARCH | FIX | 2026-09-03 |
+| `7c05e3b9` | ARCH | OPERATOR-DELEGATED | 2026-09-03 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -11824,3 +11825,182 @@ architect's, and `PROTOCOL.md` is a frozen-set artefact this session may not edi
 `Q-143` (no machine-readable pilot-role key in `config/lanes.yaml`) both ask for a `config/` change
 before `prereg-v1`; **this session's fence excludes `config/`**, so neither could be actioned here
 even had it been ruled.
+
+---
+
+## ⚠️ RECORDED BY ARCH — PILOT RUN (`7c05e3b9`), 2026-09-03 — ONE AMENDMENT APPLIED, `Q-150` AND `Q-151` RAISED, AND THE PILOT **DID NOT RUN**
+
+⚠️ **SELF-RECORDED.** The `7c05e3b9` row was appended to `## Session tokens` by this session, in the
+operator's working tree at `C:\Users\chinm\whetstone-gate` (`INC-54` requires a session to say which
+tree). ⚠️ **NO ORDINAL IS CLAIMED, and `OF-225` is why:** `Q-025`'s self-record numbering stopped at
+row 43 and the ordinal is no longer derivable from the file. **The token is the architect's; only the
+row is this session's.**
+
+⚠️ **A CONCURRENT BENIGN-SOLVER SESSION (`2e94c7b5`) HOLDS `src/whetstone_gate/benign/` AND
+`tests/test_c12_benign.py` AND MAY BE CLAIMING `Q-` NUMBERS IN THIS SAME FILE.** `Q-150` and `Q-151`
+below were **written before they were cited anywhere**, which is the ordering `INC-107`..`INC-109`
+exist to enforce. If that session lands the same numbers, this block is the later one and its
+numbers move — the **content** is what binds, not the label.
+
+---
+
+### ⚠️ THE AMENDMENT TO `PROCESS.md` §1, RECORDED VERBATIM AS ISSUED, BEFORE IT WAS APPLIED
+
+**Hard rule 5:** *"RULINGS ARE RECORDED VERBATIM in QUESTIONS.md before anything else is touched."*
+The text below is the architect's, transcribed as issued with the operator's authorisation, and it
+was written here **before** `PROCESS.md` was opened.
+
+> "THE ARCHITECT AMENDS PROCESS.md S1, WITH THE OPERATOR'S AUTHORISATION, 2026-09-03. The clause
+> 'long runs execute in the operator's terminal, never inside a session that might close' is
+> NARROWED, NOT DELETED:
+>
+>     A run MAY execute inside a session IF it is CHECKPOINTED AND RESUMABLE and ANY ABORT IS
+>     RECORDED BEFORE A RETRY. A run expected to exceed roughly TWO HOURS executes in the operator's
+>     terminal, because a session has limits a terminal does not.
+>
+> REASON, AND IT IS A MEASUREMENT RATHER THAN A CONVENIENCE: C12 BUILD 1 demonstrated kill-and-resume
+> on this very driver — three passes, ZERO duplicates, ZERO re-runs, and the denominator reading 20
+> on all three. A session that dies leaves a checkpoint AND writes a report; a closed terminal leaves
+> neither. The clause was protecting against a run dying where nobody notices, and for a checkpointed
+> run a session is the better-observed place, not the worse one.
+>
+> ⚠️ WHAT IS NOT AMENDED, STATED SO NOBODY READS THIS AS TOUCHING IT: PROCESS.md S6b IS UNCHANGED.
+> 'The first execution that runs to completion IS the run' holds WHEREVER it runs. This amendment
+> changes WHERE a run may happen and changes NOTHING about WHICH run counts. An abort is still
+> recorded in INCIDENTS.md before any retry, and two completed pilot runs existing is still a process
+> violation published as one.
+>
+> ⚠️ AND THE SWEEP STILL GOES IN THE OPERATOR'S TERMINAL. It is hours long and it is the scored run."
+
+**Applied to `PROCESS.md` §1 by APPENDING**, so a reader sees what the rule WAS and what it BECAME.
+The original bullet is **not** overwritten and is **not** struck: the amendment is a new bullet
+immediately beneath it, in the shape §1's own 2026-08-31 concurrent-reviews amendment already uses.
+
+⚠️ **TWO OTHER COPIES OF THIS CLAUSE EXIST AND THIS SESSION'S FENCE REACHES NEITHER. NAMED RATHER
+THAN LEFT TO BE DISCOVERED:**
+
+| File | The clause, as it still reads | In this session's fence? |
+|---|---|---|
+| `PROCESS.md` §1 (line 141) | **AMENDED — both readings now present** | ✅ yes, and only this one |
+| `CLAUDE.md` §4 | *"**Long runs execute in the operator's terminal**, never inside a session that might close."* | ❌ **NO — UNAMENDED** |
+| `PROCESS.md` §8 | *"**Long runs execute in the operator's terminal.** A session that closes mid-sweep loses nothing because the runner checkpoints, but the sweep is not a session's job."* | ❌ **NO — outside "S1's ONE clause"** |
+
+⚠️ **SO THE PROJECT NOW CARRIES THE NARROWED RULE IN ONE PLACE AND THE ORIGINAL IN TWO, AND
+`CLAUDE.md` IS THE FILE EVERY SESSION READS FIRST.** That is a real inconsistency and it is recorded
+as one rather than worked around by editing outside the fence. **It does not block any session:**
+the amendment is permissive, so a session obeying the unamended `CLAUDE.md` §4 is obeying the
+*stricter* reading and cannot violate the narrowed one. **The propagation is owed to the architect.**
+Note also that **`PROCESS.md` §8's copy is already narrower in scope** — it says *"the sweep is not a
+session's job"*, which the amendment's own final paragraph **agrees with** — so §8 may need no change
+at all, and that is the architect's call and not this session's.
+
+---
+
+### Q-150 — ⚠️⚠️ **THE PILOT CANNOT RUN: THE DECLARED COMMAND REFUSES AT EXIT 2 BECAUSE THIS PACKAGE SHIPS NO PROVIDER CLIENT, AND `src/` IS OUTSIDE EVERY SESSION FENCE THAT HAS BEEN ISSUED FOR IT.**
+
+**Status:** OPEN. **Class A** — it decides whether a single-shot pre-registered run happens at all.
+**Raised by:** ARCH — PILOT RUN (`7c05e3b9`), 2026-09-03, **before** the UTC start time was declared
+and **before** any token was spent.
+
+**MEASURED IN THIS TREE, BY READING THE SOURCE.** `evals/pilot/RUN_DECLARED.md` §1's command is
+
+    python -m whetstone_gate.tasks drive -- --spend-real-tokens \
+      --arm 1 --s3-binding authorization-is-the-payment \
+      --call-ceiling 200 --token-ceiling 600000 \
+      --sanction-lane gemma-26b --sanction-lane qwen-27b
+
+and `src/whetstone_gate/driver/__main__.py:182-187` reads:
+
+    client = (
+        _transcript_client(arguments, matrix)
+        if not arguments.spend_real_tokens
+        else _refuse_to_invent_a_provider_client()
+    )
+    result = driver_run.execute(request, client=client)
+
+⚠️ **SO ON THE `--spend-real-tokens` BRANCH THE CLIENT EXPRESSION IS A REFUSAL, NOT A CLIENT.**
+`_refuse_to_invent_a_provider_client()` (line 197) raises `RunRefused` with the text
+*"--spend-real-tokens needs a provider client and this package deliberately ships none: it imports no
+model client and makes no provider call, asserted two ways in tests/test_c12_driver.py."* **The run
+exits 2 having produced ZERO episodes, ZERO ledgers, ZERO checkpoints and ZERO tokens.**
+
+⚠️ **THIS IS NOT A DEFECT AND IT IS NOT A SURPRISE. IT IS ITEM 7 OF THE DECLARATION'S OWN §7.3**,
+which this session read before starting, and C12 BUILD 1's reason for it is itself a single-shot
+argument: *"Writing an untested provider client into this chunk would put an unexercised code path
+between the operator and a SINGLE-SHOT run."* **`RUN_DECLARED.md` §7.3 calls it "A DELIBERATE
+DELIVERABLE, NOT A GAP" and it is right.**
+
+⚠️ **WHAT IS NEW, AND IT IS THE QUESTION:** every prompt issued against the pilot so far has fenced
+`src/` **OUT**. C12 BUILD 1 was told not to write the client. `ARCH FIX — PILOT DECLARED` (`8b46f2e1`)
+could not write it. **This session's fence says `NOT: src/` in capitals.** So the client is owed to
+somebody and **is owned by nobody**, and the declaration's *"the operator supplies it at the call
+site"* names a **call site that the declared command does not reach**: `tasks drive` is a CLI, it
+constructs its own client, and it accepts no injection point.
+
+**THE OPTIONS, AS THIS SESSION SEES THEM. IT RULES NONE OF THEM.**
+
+1. **A build session whose fence INCLUDES `src/whetstone_gate/driver/clients.py`** writes a real
+   `MeteredModelClient` against the two provider APIs, with its own review — and it is reviewed
+   **before** the pilot, because §6b makes the pilot's first completed execution the record.
+   ⚠️ **This is the only option that keeps the declared command in §1 true as written.**
+2. **The operator supplies the client outside the package** — a short script that imports
+   `whetstone_gate.driver.run.execute` and passes its own client. ⚠️ **Then `RUN_DECLARED.md` §1's
+   declared command is NOT the command that ran**, and §1 is a pre-registration artefact naming *"THE
+   EXACT COMMAND"*. That divergence would have to be declared **before** the run, not explained after.
+3. **`--spend-real-tokens` gains an argument naming an importable client** (e.g.
+   `--client pkg.mod:Factory`). Keeps the package importing no model client, keeps the declared
+   command shape, and is a **Class A** change to a driver whose chunk is unreviewed.
+
+⚠️ **WHY THIS SESSION STOPPED HERE RATHER THAN PICKING ONE.** Hard rule 1, and the prompt's own final
+gate: *"If anything seems to require touching … files outside your task's scope: STOP and report
+instead of working around it."* Writing a provider client from inside a session fenced out of `src/`
+would be a **silent Class A deviation on the one code path the whole run passes through**, written by
+a session with no review behind it, against a **single-shot** run. **The two-hour amendment this
+session applied does not touch this: the run's problem is not where it executes, it is that it
+refuses in the first second wherever it executes.**
+
+⚠️ **AND `Q-145` IS NOW SETTLED IN THE OTHER DIRECTION, WHICH IS THE ONE GOOD THING HERE.** The
+corpora are **fetched and pin-verified in this tree** by this session (Task 1), so the precondition
+`Q-145` names no longer stands between a pushed declaration and a preflight refusal. **`Q-150` is
+`Q-145`'s exact shape one layer in, and it is worse:** `Q-145`'s refusal was fixable by four HTTP
+fetches inside any session's fence; this one is not fixable inside any fence yet issued.
+
+---
+
+### Q-151 — **`HOLES.md`'s HEADER SAYS IT IS NEVER EDITED AFTER `probe-v1`; ITS OWN §3.5 SAYS THE CALIBRATION WRITES THE THRESHOLD *INTO THIS FILE*. AFTER THE TAG, ONE OF THOSE IS WRONG.**
+
+**Status:** OPEN. **Class A** — it decides whether the calibration may write into a tagged artefact.
+**Raised by:** ARCH — PILOT RUN (`7c05e3b9`), 2026-09-03, **before `probe-v1` was cut**, because
+after the tag the file is unamendable and the question would be unanswerable from inside it.
+
+**THE TWO SENTENCES, BOTH FROM `HOLES.md`, QUOTED VERBATIM.**
+
+> **Header:** *"**Frozen artefact.** From `probe-v1` onward this file is not edited, even if it turns
+> out to be wrong (`PROCESS.md` §6)."*
+
+> **§3.5, step 2:** *"The void threshold is the LOWER BOUND of the 95% Wilson interval on the observed
+> arm-1 probe-breach rate, ROUNDED DOWN to the nearest 5 pp. The observed rate, the interval and the
+> resulting threshold are written into `PROTOCOL.md` **and into this file**, committed and tagged."*
+
+⚠️ **A SESSION READING THE HEADER LITERALLY AFTER `probe-v1` WOULD REFUSE TO WRITE THE THRESHOLD, AND
+IT WOULD BE CITING THE FILE'S OWN FIRST PAGE TO DO IT.** The threshold would then live only in
+`PROTOCOL.md`, and `HOLES.md` §3.5 would ship reading `TODO_C14_CALIBRATION` beside a rule that says
+the number was written into it.
+
+**THIS SESSION'S READING, OFFERED AND NOT RULED — and hard rule 4 is why it is only a reading.**
+`CONTEXT.md` §15.1 is **the law** and outranks `HOLES.md`. Its table gives `prereg-v1` as *"the full
+frozen set of §15.0, including the pilot-selected N branch and **the calibration-set void
+threshold**"*, and §15.2 lists `HOLES.md` among `prereg-v1`'s contents. ⚠️ **So `HOLES.md` is tagged
+TWICE ON PURPOSE — once with the predicates fixed and the number unknown, once with the number in
+it — and that is the entire stated reason there are two tags rather than one.** On that reading the
+header's *"not edited"* means **its predicates are not edited**, and adding the threshold between the
+two tags is what §15.1 requires rather than a violation of it.
+
+⚠️ **BUT THE HEADER DOES NOT SAY THAT, AND AFTER `probe-v1` NOBODY CAN MAKE IT SAY THAT.** Hence this
+entry, written **before** the tag: the ruling can then be cited by the calibration session, and
+`probe-v1` freezes a file whose ambiguity is **recorded outside it**. **This is `Q-098`'s shape** —
+*"the architect must confirm it before `probe-v1` is cut"* — and it is raised the same way and for
+the same reason.
+
+**⚠️ THIS SESSION DID NOT EDIT `HOLES.md`.** Its fence says *"YOU VERIFY IT AND DO NOT EDIT IT"*, and
+`git diff probe-v1 -- HOLES.md` is empty at this session's last commit.

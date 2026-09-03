@@ -140,6 +140,36 @@ checks, not for rulings.
 - Build and review are **never the same session**, and the architect is never the reviewer.
 - Long runs (the sweep, the pilot, the calibration, the CaMeL branch test, the ladder windows)
   execute in the **operator's terminal**, never inside a session that might close mid-run.
+- ⚠️ **AMENDMENT, 2026-09-03 — WHERE A LONG RUN MAY EXECUTE. Authorised by the OPERATOR on
+  2026-09-03.** The bullet immediately above is **NARROWED, NOT DELETED**, and it is left standing
+  rather than struck so that a reader sees what the rule **WAS** and what it **BECAME**. **AMENDED
+  TO:**
+
+  > **A run MAY execute inside a session IF it is CHECKPOINTED AND RESUMABLE and ANY ABORT IS
+  > RECORDED BEFORE A RETRY. A run expected to exceed roughly TWO HOURS executes in the operator's
+  > terminal, because a session has limits a terminal does not.**
+
+  **REASON, AND IT IS A MEASUREMENT RATHER THAN A CONVENIENCE:** **C12 BUILD 1 demonstrated
+  kill-and-resume on this very driver — three passes, ZERO duplicates, ZERO re-runs, and the
+  denominator reading 20 on all three** (`docs/sessions/c12-build-1.txt` §4). **A session that dies
+  leaves a checkpoint AND writes a report; a closed terminal leaves neither.** The clause was
+  protecting against a run dying **where nobody notices**, and for a checkpointed run a session is
+  the **better-observed** place, not the worse one.
+
+  ⚠️ **WHAT IS NOT AMENDED, STATED SO NOBODY READS THIS AS TOUCHING IT: §6b IS UNCHANGED.**
+  *"The first execution that runs to completion IS the run"* holds **WHEREVER it runs.** This
+  amendment changes **WHERE** a run may happen and changes **NOTHING** about **WHICH** run counts. An
+  abort is still recorded in `INCIDENTS.md` **before** any retry, and **two completed pilot runs
+  existing is still a process violation published as one.**
+
+  ⚠️ **AND THE SWEEP STILL GOES IN THE OPERATOR'S TERMINAL. It is hours long and it is the scored
+  run.** The two-hour test is what puts it there, and §8's own copy of this clause — *"the sweep is
+  not a session's job"* — agrees.
+
+  **Recorded verbatim in `QUESTIONS.md`** under `## ⚠️ RECORDED BY ARCH — PILOT RUN (7c05e3b9)`,
+  **before this bullet was written**, per hard rule 5. ⚠️ **That entry also names the two copies of
+  the original clause this amendment does NOT reach — `CLAUDE.md` §4 and §8 below — both outside the
+  amending session's fence, and the propagation is owed to the architect.**
 - The architect may propose changes to the spec, but a **pre-registered artefact is frozen** (§6) —
   that is the one thing nobody may unilaterally change.
 - **The operator does not open the submission form until the C21 review returns PASS** (§12).
