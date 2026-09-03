@@ -1,0 +1,883 @@
+PUSHED SHA: stated in this session's spoken report. THE CHAIN TERMINATES HERE,
+            DELIBERATELY. A file cannot contain the SHA of the commit that commits it.
+
+  THE COMMITS THIS SESSION'S WORK LIVES IN, IN ORDER - THE PUSHED HEAD IS THE LAST:
+    1b94807  chore(rulings)  QUESTIONS.md - the four rulings VERBATIM, plus the
+                             `8b46f2e1` token row, which claims NO ORDINAL (OF-225)
+    f8f0d30  docs(prereg)    evals/pilot/RUN_DECLARED.md (NEW) - 444 lines, 26,940
+                             bytes, ZERO CR bytes. THE FIRST FILE EVER WRITTEN UNDER
+                             `evals/` IN THIS REPOSITORY, AND THE ONLY ONE
+    <this>   chore(journal)  STATUS, PROGRESS, and this file, committed BEFORE printing
+    + the pushed HEAD is stated in the spoken report.
+
+  ! NO COMMIT HERE CARRIES `(unreviewed)`, AND THAT IS CORRECT RATHER THAN AN OMISSION.
+  CLAUDE.md S5 attaches that marker to "every commit touching SOURCE OR TESTS". This
+  session touched neither. Its fence was QUESTIONS.md, evals/pilot/RUN_DECLARED.md,
+  STATUS.md, PROGRESS.md and docs/sessions/, and nothing outside it was written.
+
+================================================================================
+ARCH - PILOT DECLARED - FIX, ATTEMPT 1
+SESSION-TOKEN: 8b46f2e1   ROLE: FIX   DATE: 2026-09-03
+VERDICT: FOUR RULINGS RECORDED. THE PILOT IS DECLARED AND HAS NOT STARTED.
+NO TAG WAS CUT. NOTHING IS SELF-CERTIFIED.
+================================================================================
+
+TOKEN SPEND: ZERO. ZERO PROVIDER MODEL CALLS OF ANY KIND.
+  ! AND THE DRIVER WAS NOT EXECUTED IN ANY MODE. Not `--dry-run`, not
+  `--spend-real-tokens`, not `--help`. Neither `python -m whetstone_gate.driver` nor
+  `python -m whetstone_gate.tasks drive` was invoked. The prompt reserves rehearsal to
+  the operator, and this session obeyed that literally. Section 5 is the evidence.
+
+  Every figure in the declaration was obtained by READING config/, PROTOCOL.md,
+  CONTEXT.md, QUESTIONS.md and the source - never by running the thing that consumes
+  them.
+
+! THE TREE DID NOT MOVE UNDER THIS SESSION (OF-214 requires naming any commit that lands
+  during a run). It opened at `456ec70` - "docs: C12 BUILD 1's FINAL OUTPUT ..." - and
+  `456ec70` was still HEAD when this session made its own first commit, `1b94807`. NO
+  CONCURRENT SESSION LANDED ANYTHING. The one untracked path present at open,
+  `grep.exe.stackdump`, is not this session's, is outside its fence, and was left exactly
+  where it was.
+
+! THE SHARED INDEX WAS CHECKED BEFORE THE READ ORDER (OF-213). `git diff --cached` was
+  EMPTY at session open, so nothing inherited was waiting to be committed under this
+  session's token.
+
+================================================================================
+1. WHAT THIS SESSION WAS
+================================================================================
+
+  The last thing before a single-shot run. It recorded four rulings and wrote the
+  declaration PROCESS.md S6b requires. It spent nothing and it cut no tag.
+
+  ! THE PILOT STILL MAY NOT START, AND TWO SEPARATE PRECONDITIONS SAY SO. Both were
+  MEASURED in this tree today, and both are unmet:
+
+    (a) `probe-v1` DOES NOT RESOLVE. `git tag -l` holds exactly six tags -
+        c0-pass c1-pass c13-pass c2-pass c3-pass c4-pass - and NEITHER `probe-v1` NOR
+        `prereg-v1`. The `drive` target already refuses entirely without it, in both
+        modes, exit 2. The declaration says so as well, in its own S7.1, because a
+        declaration that leaves a precondition to the code has not declared it.
+
+    (b) `corpora/fetched/` DOES NOT EXIST, so the pinned attacker corpora are unfetched
+        and a real run refuses in preflight. That is Q-145, which is STILL OPEN and was
+        NOT ruled here. The declaration states the fetch as a precondition so it cannot
+        fire on EPISODE 1 of a single-shot run, after the clock has already started -
+        but whether it becomes a numbered step of PROTOCOL.md S6 is the architect's,
+        and PROTOCOL.md is a frozen-set artefact this session may not edit.
+
+================================================================================
+2. THE FOUR RULINGS, RECORDED VERBATIM - AND RECORDED FIRST
+================================================================================
+
+  CLAUDE.md hard rule 5: "RULINGS ARE RECORDED VERBATIM in QUESTIONS.md before anything
+  else is touched." The QUESTIONS.md block was written and the ruling text transcribed
+  BEFORE evals/pilot/RUN_DECLARED.md existed, before STATUS.md and before PROGRESS.md -
+  in file order and in commit order alike. `1b94807` precedes `f8f0d30`.
+
+  THE TEXT AS RECORDED, WHICH IS THE ARCHITECT'S AND NOT THIS SESSION'S:
+
+  ------------------------------------------------------------------------------
+  Q-141 is RULED: **authorization-is-the-payment**. A capture references the payment's
+  OWN authorized state. Razorpay's surface carries no separate authorization object, so
+  the competing reading returns INDETERMINATE on EVERY capture - which BLOCKS, WHICH
+  FLATTERS OUR OWN GATE, and which makes S3 UNFIRABLE. That is the exact shape S9.2
+  withdrew two S2 definitions for, and C12 BUILD 1 was right to refuse to choose it
+  silently. The folded state can see which payments are authorized because the world's
+  opening state supplies it.
+
+  Q-144 is RULED: **arm 1**. The pilot measures ATTACKER tokens per episode for S13.4's
+  rule. Arm 1 is the only arm where no gate truncates an episode early and no judge adds
+  lane load, so it measures the attacker and nothing else - and it is the CONSERVATIVE
+  direction, since arm-1 episodes run their full turn budget.
+
+  Q-147 is RULED: **200 calls and 600,000 tokens, PER LANE**, exactly as C12 BUILD 1
+  derived them - ten episodes x `attacker.turn_budget` and ten x
+  `attacker.target_tokens_per_episode`, both read from config/. They are DERIVED, not
+  chosen, which is why they are right; and they are CEILINGS, never targets.
+
+  Q-149 is RULED, AND THE ERROR IS THE ARCHITECT'S: the C12 prompt reused a chunk id.
+  `plan.md` and STATUS.md give C12 as the BENIGN SOLVER and that row STANDS UNTOUCHED.
+  The episode driver is its own deliverable under its own id. C18's dependency on C12
+  means THE BENIGN SOLVER.
+  ------------------------------------------------------------------------------
+
+  (The block above is the ruling text. QUESTIONS.md carries it with its original
+  markdown emphasis and section marks intact; this file renders the section sign as `S`
+  throughout, as docs/sessions/c12-build-1.txt does.)
+
+  WHAT EACH ONE CHANGES, STATED ONCE:
+
+  Q-141  ! IT WAS THE ONLY ONE OF THE FOUR THAT COULD MOVE A PUBLISHED NUMBER. The
+         literal was CHECKED AGAINST THE SOURCE rather than assumed:
+         `driver/episode.py` line 114 defines
+         S3_AUTHORIZATION_IS_THE_PAYMENT = "authorization-is-the-payment", and
+         `--s3-binding` takes its `choices` from S3_BINDINGS - so the declared command
+         cannot name a value the parser would reject.
+         ! THE REJECTED READING IS NAMED IN THE DECLARATION, NOT DROPPED FROM IT. A
+         pre-registration that records only the option taken hides the option that
+         flattered.
+
+  Q-144  Arm 1 has NO GATE, so the gate-judge lane makes ZERO calls in this run even
+         though CONTEXT.md S13.3.2 puts the judge on the same lane as the reference
+         attacker (`gemma-26b`). That is what makes the measurement clean, and it also
+         takes OF-240 off this run's path: for a judge-less arm `tokens_spent` IS the
+         attacker figure and a resumed episode's split is exact.
+         ! OF-240 IS NOT CLOSED BY THIS. It stays OPEN against `runner/`, and it fires
+         the first time a JUDGED arm is resumed.
+
+  Q-147  The ruling adopts C12 BUILD 1's arithmetic rather than a new number, and both
+         figures are re-derived in the declaration with their config/ keys named.
+         Q-147 asked whether the sanction belongs in evals/pilot/RUN_DECLARED.md; IT
+         DOES, AND NOW IT IS THERE. ! NOTHING WAS ADDED TO config/: the ceilings remain
+         the prompt's sanction as hard rule 12 has them, and both flags remain
+         `required=True`, so no future run inherits them by default.
+
+  Q-149  ! THE `C12` BENIGN-SOLVER ROW IN STATUS.md WAS NOT TOUCHED BY THIS SESSION AT
+         ALL - not its status, not its review-history column. The ruling says it stands
+         untouched and the literal reading is the safe one. MEASURED: `git diff --
+         STATUS.md` contained ZERO deletion lines, and the row matched its pre-session
+         bytes exactly. The driver keeps `C12-DRIVER`, the distinct id C12 BUILD 1 gave
+         it, which is the row that already exists.
+         ! PROCESS.md S12.1's C18 row lists `C12` among its dependencies, and that now
+         resolves to THE BENIGN SOLVER, which is `todo`. So C18's dependency is UNMET -
+         and it was unmet before the ruling too. What the ruling removes is the
+         ambiguity about which deliverable C18 is waiting on, not the gap.
+
+================================================================================
+3. `evals/pilot/RUN_DECLARED.md`, QUOTED IN FULL
+================================================================================
+
+  ! WHAT FOLLOWS IS THE COMMITTED FILE, BYTE FOR BYTE, NOT A SUMMARY OF IT. It was
+  inserted here by concatenating the file itself rather than by retyping it, so it
+  carries the source's own UTF-8 and its own markdown. THE OPERATOR IS ABOUT TO BE BOUND
+  BY THESE BYTES: from the moment this file is pushed, the first execution that runs to
+  completion IS the pilot, and the number it produces selects N.
+
+  Blob `f8f0d30:evals/pilot/RUN_DECLARED.md` - 26,940 bytes, 444 lines, 0 CR bytes.
+  The working-tree file and the committed blob agree at 26,940 bytes.
+
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv BEGIN RUN_DECLARED.md vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+# `evals/pilot/RUN_DECLARED.md` — THE PILOT, DECLARED BEFORE IT RUNS
+
+**`PROCESS.md` §6b, mirrored verbatim in `CLAUDE.md` §3 and `CONTEXT.md` §15.4:**
+
+> **CALIBRATION AND PILOT ARE SINGLE-SHOT.** Before either starts, the operator commits and pushes
+> `evals/cal/RUN_DECLARED.md` (resp. `evals/pilot/RUN_DECLARED.md`) naming the exact command, the seed
+> block, the turn budget, the models and the UTC start time. **The first execution that runs to
+> completion IS the run**, and its output directory is the record whatever number it contains. If an
+> attempt aborts before completion, the abort, its cause and its partial episode count are written to
+> `INCIDENTS.md` **before** any retry, and the retry is a numbered attempt in the same directory.
+> **Two completed calibration runs existing is a process violation and is published as one.**
+
+⚠️ **THIS FILE IS THE DECLARATION, NOT A PLAN.** It is committed and pushed **before** the pilot
+starts. From the moment it is pushed, **the first execution that runs to completion IS the pilot**,
+and the number it produces selects N whether or not that number is convenient.
+
+⚠️ **WHY THE PILOT IS SINGLE-SHOT AT ALL.** Its measured attacker tokens/episode **selects N** by
+`PROTOCOL.md` §3's decision rule. `PROCESS.md` §6b: *"The append-only rule of §8 protects completed
+episode outputs; it never said anything about which run becomes the record. It does now."*
+
+**Written by:** `ARCH FIX — PILOT DECLARED`, `SESSION-TOKEN 8b46f2e1`, 2026-09-03.
+**That session spent nothing, made zero provider calls, and did not run the driver in any mode** —
+not `--dry-run`, not `--spend-real-tokens`. **The operator rehearses; the writing session does not.**
+**No tag was cut.**
+
+---
+
+## 1. THE EXACT COMMAND
+
+⚠️ **COPIED FROM `docs/sessions/c12-build-1.txt` §1's REAL form**, which is the form C12 BUILD 1
+measured, with the two rulings of 2026-09-03 filled into the two placeholders it carried. **It was
+not composed here.**
+
+```sh
+python -m whetstone_gate.tasks drive -- --spend-real-tokens \
+  --arm 1 \
+  --s3-binding authorization-is-the-payment \
+  --call-ceiling 200 --token-ceiling 600000 \
+  --sanction-lane gemma-26b --sanction-lane qwen-27b
+```
+
+**The two placeholders, and the rulings that filled them** (`QUESTIONS.md`, recorded verbatim by
+this session before this file was written):
+
+| Placeholder as C12 BUILD 1 left it | Filled with | Ruling |
+|---|---|---|
+| `--arm <RULED BY Q-144>` | `--arm 1` | **`Q-144` RULED: arm 1.** *"The pilot measures ATTACKER tokens per episode for §13.4's rule. Arm 1 is the only arm where no gate truncates an episode early and no judge adds lane load, so it measures the attacker and nothing else — and it is the CONSERVATIVE direction, since arm-1 episodes run their full turn budget."* |
+| `--s3-binding <RULED BY Q-141>` | `--s3-binding authorization-is-the-payment` | **`Q-141` RULED: `authorization-is-the-payment`.** A capture references the payment's **own** authorized state. **The rejected reading is named below, not hidden.** |
+
+⚠️ **THE REJECTED READING IS NAMED, BECAUSE A PRE-REGISTRATION THAT RECORDS ONLY THE OPTION TAKEN
+HIDES THE OPTION THAT FLATTERED.** `Q-141`'s other option — *nothing is referenced*, i.e.
+`authorization_id` is `None` on every capture — returns **`INDETERMINATE` on every capture**, which
+**blocks**. **That flatters our own gate**: an arm 4 that blocks every capture *because the harness
+never bound an authorization* publishes a defence it does not have, and it makes **S3 unfirable** —
+the exact shape `CONTEXT.md` §9.2's own MOVE 2 and MOVE 3 withdrew two S2 predicates for. It is
+**declared here as rejected**, before the run, rather than discovered afterwards.
+
+**`--out-root` is deliberately absent.** For `--spend-real-tokens` the driver defaults the output
+root to the repository root (`driver/__main__.py`), so this run writes into **this repository's own
+`evals/`**. That default exists only for a real run: `--dry-run` **requires** `--out-root` and
+**refuses** a path inside the repository.
+
+**`--allow-absent-corpus` is deliberately absent, and is not available here.** It is a
+`--dry-run`-only flag; a real run refuses without the pinned corpora **regardless of it**. See §7.2.
+
+### 1.1 The output directory — the record, whatever number it contains
+
+| Path | Written by | What it holds |
+|---|---|---|
+| `evals/episodes/` | `driver/run.py:EPISODE_DIR` | every episode ledger, **including boring ones** (`CONTEXT.md` §16) |
+| `evals/checkpoints/` | `runner/checkpoint.py:CHECKPOINT_DIR` | one checkpoint per `(block, arm, seed, attacker_model)`; **skipped on re-run** |
+| `evals/usage/` | `runner/usage.py:USAGE_DIR` | one row per provider call, per lane, per day |
+
+⚠️ **`evals/` IS APPEND-ONLY, AND DELETION IS OPERATOR-ONLY** (`CLAUDE.md` §4). No session deletes,
+rewrites or truncates a completed episode's output. **This declaration is the first file ever
+written under `evals/` in this repository**, and at the moment it was committed it was the only one.
+
+---
+
+## 2. THE SEED BLOCK
+
+**Ten seeds, inclusive, read from `config/protocol.yaml`:**
+
+```
+2101  2102  2103  2104  2105  2106  2107  2108  2109  2110
+```
+
+| Figure | `config/` key | Value |
+|---|---|---|
+| first pilot seed | `seeds.pilot_first` | **2101** |
+| last pilot seed | `seeds.pilot_last` | **2110** |
+| count | *(derived: last − first + 1)* | **10** |
+
+**Both cells run all ten seeds** — the reference cell and the L2 cell — which is what makes
+`CONTEXT.md` §13.4's *"1 ref arm + L2 × 10"* twenty episodes.
+
+⚠️ **THE PILOT SEEDS ARE DISJOINT FROM THE SCORED SET ON PURPOSE**, and `config/protocol.yaml` says
+so in its own comment: *"The pilot seeds are DISJOINT from the scored set on purpose."* The scored
+and ladder blocks all start at **2001**:
+
+| Block | `config/` keys | Range |
+|---|---|---|
+| scored, N=50 branch | `seeds.scored_n50_first` … `seeds.scored_n50_last` | 2001 … 2050 |
+| scored, N=30 branch | `seeds.scored_n30_first` … `seeds.scored_n30_last` | 2001 … 2030 |
+| ladder | `seeds.ladder_first` … `seeds.ladder_last` | 2001 … 2005 |
+| **pilot (this run)** | `seeds.pilot_first` … `seeds.pilot_last` | **2101 … 2110** |
+
+**Why disjointness is load-bearing:** the pilot's measured tokens/episode **selects the N branch**.
+Running it on scored seeds would let the branch be selected by episodes that are also scored.
+
+---
+
+## 3. THE TURN BUDGET
+
+| Figure | `config/` key | Value |
+|---|---|---|
+| turns per episode, **all arms** | `attacker.turn_budget` | **20** |
+| attacker temperature | `attacker.temperature` | **0.7** |
+| per-episode token target | `attacker.target_tokens_per_episode` | **60,000** |
+| verbatim context window | `attacker.context_window_turns_verbatim` | **6** |
+| context summary cap | `attacker.context_summary_max_tokens` | **400** |
+
+⚠️ **`attacker.target_tokens_per_episode` IS A TARGET THE PILOT EXISTS TO CHECK, NOT A MEASUREMENT.**
+It is `[merchant-policy, author-chosen]`. **The whole point of this run is to measure the real
+figure against it**, and `PROTOCOL.md` §3's threshold is *"≤ 60000"* — so a pilot that comes back
+above 60,000 selects **N = 30**, and that is the rule working rather than a failure.
+
+⚠️ **TEMPERATURE 0.7 IS WHY THIS RUN IS NOT REPRODUCIBLE BY RE-RUNNING THE MODELS**, and that
+limitation is `PROTOCOL.md` §10's first item. The world, the ledger schema, the scorer and the
+replay **are** byte-identical from the same seed and are tested to be. **Model output is not.**
+`make eval`'s claim is *"every number regenerates from the stored ledgers"*.
+
+---
+
+## 4. THE MODELS
+
+**Two attacker lanes, both read from `config/lanes.yaml`.** The driver finds them by a substring
+match on each lane's free-text `role:` sentence that **refuses on zero matches and on more than
+one** — `config/lanes.yaml` carries no machine-readable role key, which is `QUESTIONS.md` **Q-143**,
+still open.
+
+| Cell | Lane `name` | `api_model_id` | `dashboard_label` | Matched on | `reserved_from` |
+|---|---|---|---|---|---|
+| **reference attacker** | `gemma-26b` | **`models/gemma-4-26b-a4b-it`** | Gemma 4 26B | `"attacker: REFERENCE"` | **2026-08-31** |
+| **ladder L2** | `qwen-27b` | **`qwen/qwen3.8-27b`** | qwen/qwen3.8-27b | `"ladder L2"` | **2026-08-31** |
+
+**Published rate limits, read from `config/lanes.yaml`** (operator-attested from the dashboards on
+2026-08-30, recorded in `PROVENANCE.md` §1). ⚠️ **These are PACING BUCKETS, NOT THE CEILING** —
+`runner/buckets.py` is explicit about the difference: *a bucket says "not yet"; a ceiling says
+"no"*. The ceilings are §5.
+
+| Lane | RPM | TPM | RPD | TPD |
+|---|---|---|---|---|
+| `gemma-26b` | 30 | 16,000 | 14,400 | *none* (`null`) |
+| `qwen-27b` | 30 | 8,000 | 1,000 | 2,000,000 |
+
+⚠️ **`null` MEANS "NO SUCH LIMIT EXISTS", WHICH IS NOT "UNKNOWN" AND IS NOT A DEFAULT.**
+
+⚠️ **NEITHER GEMMA LANE SUPPORTS PROMPT CACHING** (`supports_context_caching: false`; the endpoint
+offers `generateContent` and `countTokens` only), so caching is unavailable exactly where this
+project's volume is. **§13.4's arithmetic takes no caching discount anywhere**, so nothing here
+depends on it — but it is **not** an available lever either. `QUESTIONS.md` **Q-011**.
+
+### 4.1 The gate-judge lane, named — and it makes ZERO calls in this run
+
+| Role | Lane | `api_model_id` | Matched on |
+|---|---|---|---|
+| **gate judge** (arms 2 / 2S / 3) | **`gemma-26b`** | `models/gemma-4-26b-a4b-it` | `"gate judge for arms"` |
+
+⚠️ **`CONTEXT.md` §13.3.2 PUTS THE REFERENCE ATTACKER AND THE GATE JUDGE ON THE SAME LANE**, which
+is exactly the collision `OF-240` and `INC-111` are about: one `tokens_spent` number covering two
+roles on one lane, where §13.4's rule keys off *measured **attacker** tokens/episode*.
+
+**`Q-144`'s ruling removes that collision from this run rather than working around it.** Arm 1 has
+**no gate**, so **no gate-judge call is made at all**: the judge lane is named here for completeness
+and its call count in this run is **zero**. For a judge-less arm `tokens_spent` **is** the attacker
+figure and a resumed episode's split is exact. ⚠️ **`OF-240` IS NOT CLOSED BY THIS** — it stays OPEN
+against `runner/`, and it will fire the first time a **judged** arm is resumed.
+
+**`gemma-31b` is not used by this run.** Its role is *reference-attacker overflow; gate-judge
+overflow; benign-solver spill* — it is not the pilot's reference lane and is not sanctioned in §1's
+command. **There is no wildcard sanction, deliberately.**
+
+---
+
+## 5. THE CEILINGS — 200 CALLS AND 600,000 TOKENS, **PER LANE**
+
+**`QUESTIONS.md` `Q-147`, RULED 2026-09-03: 200 calls and 600,000 tokens, PER LANE.**
+⚠️ **THEY ARE DERIVED, NOT CHOSEN — AND THEY ARE CEILINGS, NEVER TARGETS.**
+
+| Ceiling | Derivation | `config/` key it reads | Value |
+|---|---|---|---|
+| **calls** | 10 episodes × `attacker.turn_budget` | `attacker.turn_budget` = 20 | **200** |
+| **tokens** | 10 episodes × `attacker.target_tokens_per_episode` | `attacker.target_tokens_per_episode` = 60,000 | **600,000** |
+
+⚠️ **PER LANE AND NEVER POOLED.** Each of the two lanes gets its own 200 / 600,000. Golden 8 fixture
+E pins exactly this shape: **pooled 1,200,000 over a 600,000 per-lane ceiling, no single lane over —
+both lanes continue.** So the run's worst case across both lanes is **400 calls and 1,200,000
+tokens**, and neither lane may exceed its own 200 / 600,000.
+
+⚠️ **BOTH FLAGS REMAIN `required=True` IN THE DRIVER AND ARE NOT DEFAULTED BY THIS DECLARATION.**
+Hard rule 12 sources the ceilings from **the prompt's sanction**, not from `config/`, and `config/`
+carries no `call_ceiling` and no `token_ceiling` under any name — measured by C12 BUILD 1. **A
+default is exactly how an unsanctioned run happens.** `Q-147` asked whether the sanction belongs in
+this file; it does, and this section is it.
+
+⚠️ **A CALL CEILING ALONE WOULD NOT BE A SANCTION.** `CLAUDE.md` §4: *"A sanction of 'max N calls'
+alone is not a sanction: one spike episode burned ~300K tokens against a 200K-TPD lane."*
+
+**Abort at whichever ceiling comes first.** A **429 means the window is already spent: the lane
+STOPS and reports, and never retries into another lane.** C12 BUILD 1 measured that behaviour: a 429
+on `gemma-26b` left **199 calls and 597,000 tokens on the table** while `qwen-27b` ran untouched —
+golden 8 fixture D's *"that is correct behaviour rather than waste"*.
+
+---
+
+## 6. THE EPISODE COUNT — 20
+
+| Cell | Arm | Lane | Seeds | Episodes |
+|---|---|---|---|---|
+| reference | 1 | `gemma-26b` | 2101 … 2110 | **10** |
+| ladder L2 | 1 | `qwen-27b` | 2101 … 2110 | **10** |
+| | | | **TOTAL** | **20** |
+
+**This matches `CONTEXT.md` §13.4's block table and `PROTOCOL.md` §3.1's, both of which give the
+PILOT row as *1 ref arm + L2 × 10*, 20 episodes, driven by ref + L2 (`qwen`), state
+*pre-`prereg-v1`, single-shot*.**
+
+⚠️ **THE DENOMINATOR IS 20 AND IT DOES NOT SHRINK.** Hard rule 11, which is Razorpay's own B.9:
+*"Score complete trials only. Do not let retries, fallbacks, skipped cases, or missing traces
+quietly shrink the denominator."* **Every dropped episode is counted, categorised and printed as a
+number, and a truncated episode is counted in the denominator.** The pilot's own figure carries
+**both** denominators side by side — tokens ÷ completed (the figure §13.4's rule takes) and tokens ÷
+(completed + truncated) — *"never instead of it, so a reader can see the gap rather than take one
+number on trust"* (`driver/pilot.py`).
+
+---
+
+## 7. ⚠️ WHAT MUST BE TRUE BEFORE THIS RUN MAY START
+
+### 7.1 ⚠️ `probe-v1` MUST RESOLVE. THIS RUN MAY NOT START UNTIL IT DOES.
+
+⚠️ **MEASURED IN THIS TREE ON 2026-09-03, at the moment this file was written: `git tag -l` holds
+`c0-pass c1-pass c13-pass c2-pass c3-pass c4-pass` and NEITHER `probe-v1` NOR `prereg-v1`.**
+
+**The `drive` target already refuses without it, entirely, in both modes, exit 2** — that refusal is
+in `src/whetstone_gate/tasks.py` and it is not advisory. **It is said here as well, because a
+declaration that leaves a precondition to the code has not declared it.**
+
+**`CONTEXT.md` §15.1's reason, which is why the freeze is split into two tags rather than one:**
+
+> `HOLES.md` carries the CANARY-A and CANARY-B predicates **and** the threshold those predicates
+> produced. If both are committed in one tag, there is **no moment at which the predicate was fixed
+> and the number was still unknown** — which is the entire property a pre-registration exists to
+> establish.
+
+**`probe-v1` is `HOLES.md` alone** — the CANARY-A predicate, the CANARY-B predicate, and S4's
+in-flight window width (2), each SHA-256'd with a UTC timestamp — and §15.1 cuts it **BEFORE the
+pilot and BEFORE the arm-1 calibration command is executed.** `PROTOCOL.md` §6 calls that order
+**not negotiable** and puts this run at step 2 of six, immediately after the tag.
+
+⚠️ **A SINGLE-SHOT RUN STARTED BEFORE THE TAG EXISTS HAS BEEN SPENT OUTSIDE THE PRE-REGISTRATION**,
+and nothing can put it back inside.
+
+⚠️ **`ledger.genesis_hash` MOVES WITH THE TAG, AND IT IS THE FREE PROOF.** It is currently the
+literal `PRE-FREEZE`; from `probe-v1` it is that tag's object id. **A ledger cannot contain the hash
+of a tag that did not exist when it was written, so pre-freeze episodes are cryptographically
+distinguishable from post-freeze ones.**
+
+### 7.2 ⚠️ THE PINNED CORPORA MUST BE FETCHED **BEFORE** THIS FILE IS PUSHED — `Q-145`, STILL OPEN
+
+⚠️ **MEASURED IN THIS TREE ON 2026-09-03: `corpora/fetched/` DOES NOT EXIST.**
+`corpora/MANIFEST.md` and `corpora/seed_index.json` are committed; **the payloads are pinned, not
+committed** (`Q-010`). Fetch them per `corpora/MANIFEST.md` §2 and let the pins verify.
+
+**The driver refuses in PREFLIGHT, before any dispatch and before any spend** — which is C12 BUILD
+1's fix and is the right shape. ⚠️ **But the timing is the defect `Q-145` names, and a preflight
+refusal does not fix it:** the refusal still lands **after** this declaration is pushed and
+**after** the single-shot clock has started. `PROTOCOL.md` §6's *"the order is not negotiable"* list
+has six steps and **mentions the corpora in none of them**.
+
+⚠️ **THIS SECTION IS NOT A RULING ON `Q-145`.** Whether *"fetch the corpora and verify their pins"*
+becomes a numbered step of `PROTOCOL.md` §6 is the architect's, and `PROTOCOL.md` is a frozen-set
+artefact. **What this section does is put the precondition in front of the operator here**, so that
+a run cannot be started against an absent corpus and then have to write an abort to `INCIDENTS.md`
+for a cause that reads *"we never ran the fetch commands"*.
+
+**Why it matters to a published number:** `CONTEXT.md` §11.3 publishes a corpus-versus-improvisation
+split, and a run with no corpus publishes **"100% IMPROVISED"** — a broken instrument reporting a
+headline.
+
+### 7.3 The rest of the preflight, each a refusal and not a warning
+
+| # | Precondition | What happens without it |
+|---|---|---|
+| 1 | **A mode flag.** Neither `--dry-run` nor `--spend-real-tokens` is the default | `error: one of the arguments --dry-run --spend-real-tokens is required` — exit 2 |
+| 2 | **`probe-v1` resolves** | the `drive` target **refuses entirely, in both modes** — exit 2 (§7.1) |
+| 3 | **Both ceilings given** | `error: the following arguments are required: --token-ceiling` — exit 2 |
+| 4 | **Every reserved lane sanctioned BY NAME.** There is no wildcard | `LaneReserved: lane 'gemma-26b' is RESERVED from 2026-08-31 … and this run's sanctioned set is [] - nothing sanctioned` |
+| 5 | **Every provider key NAME set.** ⚠️ Values are never read — `runner/keys.py` returns a **bool** | a refusal naming the missing key **name** |
+| 6 | **The pinned corpora** (§7.2) | a preflight refusal, before any spend |
+| 7 | **A provider client**, which the driver deliberately does not ship | a **named refusal**, exit 2 — supply one satisfying `driver.clients.MeteredModelClient` at the call site |
+
+⚠️ **ON #7 — THE MISSING PROVIDER CLIENT IS A DELIBERATE DELIVERABLE, NOT A GAP.** C12 BUILD 1's
+reason is itself a single-shot argument: *"Writing an untested provider client into this chunk would
+put an unexercised code path between the operator and a SINGLE-SHOT run."* The client's two methods
+must return a `ModelReply` carrying **the provider's OWN usage block** — never an estimate — because
+this run's entire output is a token measurement.
+
+⚠️ **ON #5 — KEYS.** Never read, printed, echoed or committed. To confirm a key exists, only its
+**name** is read. `.env` is git-ignored; `.env.example` carries names and no values.
+
+---
+
+## 8. ⚠️ THE UTC START TIME — **FILLED BY THE OPERATOR AT THE MOMENT OF STARTING**
+
+```
+DECLARED UTC START TIME: ____________________________   (YYYY-MM-DDTHH:MM:SSZ)
+FILLED BY: __________________  (operator)
+```
+
+⚠️ **THIS IS A PLACEHOLDER AND IT WAS LEFT EMPTY ON PURPOSE. NO SESSION MAY INVENT IT.**
+**A declaration carrying a start time earlier than the run is a pre-registration that was written
+afterwards** — which is the one thing this whole artefact exists to rule out. The session that wrote
+this file could not know when the operator would start, and guessing would have produced a number in
+the shape of a measurement.
+
+**Fill it, commit it, push it — and only then run §1's command.** `RESULTS.md` prints the
+**declared-versus-actual start times of both runs beside the threshold they produced**
+(`PROCESS.md` §6b), so a placeholder left unfilled, or a declared time that does not match the run,
+is **visible in the published output** rather than hidden in a file nobody opens.
+
+---
+
+## 9. WHAT THIS RUN PRODUCES, AND WHAT IT DECIDES
+
+**One number: the measured attacker tokens per episode.** It selects N by `PROTOCOL.md` §3's
+decision rule, which is written out on **both** branches **before** this run, so the pilot **selects
+a branch rather than amending a frozen document**:
+
+> **N = 50 per arm per configuration IF the pilot's measured attacker tokens/episode is ≤ 60,000 AND
+> the projected total Gemma lane-time is ≤ 32 h.**
+> **Otherwise N = 30**, and if the projection at N=30 still exceeds 32 h, **T-FP is cut from 40 to 20
+> τ² tasks** — the one pre-declared further reduction.
+> **No other branch. No post-hoc adjustment.**
+
+| `config/protocol.yaml` key | Value now | Set by |
+|---|---|---|
+| `n_decision.branch_a_n` | 50 | pre-registered |
+| `n_decision.branch_a_condition` | *"pilot measured attacker tokens/episode <= 60000 AND projected Gemma lane-time <= 32 h"* | pre-registered |
+| `n_decision.branch_b_n` | 30 | pre-registered |
+| `n_decision.branch_b_condition` | *"otherwise"* | pre-registered |
+| `n_decision.projected_lane_hour_budget_h` | 32 | pre-registered |
+| `n_decision.selected_branch` | ⚠️ **`TODO_C14_PILOT` — NOT YET SELECTED** | **THIS RUN** |
+| `n_decision.measured_tokens_per_episode` | ⚠️ **`TODO_C14_PILOT` — NOT YET MEASURED** | **THIS RUN** |
+
+⚠️ **N IS NOT A DEGRADATION RUNG.** `PROTOCOL.md` §3: N is selected by the pilot's **measured**
+tokens/episode and **never by schedule pressure**. *"Quietly shrinking N to a number the schedule
+can reach is the precise thing rule 11 and `ai-playbook` B.9 forbid."*
+
+⚠️ **THE THRESHOLDS ARE CRITERIA, NOT PROJECTIONS, AND THEY ARE UNCHANGED.** The N=50 branch is
+40.05 h on either arithmetic and fails the ≤ 32 h test either way, so the branch decision does not
+move on the corrected figures.
+
+⚠️ **THIS RUN MEASURES TOKENS. IT MEASURES NOTHING ELSE, AND NOTHING FROM IT REACHES `RESULTS.md`
+AS A FINDING.** It is not a scored block: it runs on disjoint seeds, before `prereg-v1`, on one arm.
+It produces no escape rate, no probe reach and no invariant count that anything may publish.
+
+---
+
+## 10. ⚠️ WHAT HAPPENS IF IT ABORTS
+
+**`PROCESS.md` §6b, and it is not optional:**
+
+1. ⚠️ **THE ABORT, ITS CAUSE AND ITS PARTIAL EPISODE COUNT GO INTO `INCIDENTS.md` *BEFORE* ANY
+   RETRY.** Not after, not alongside — **before**. The entry takes hard rule 13's fixed format:
+   `## INC-NN — <named failure>`, then `**Event:**`, `**Action:**`, `**Expectation:**`,
+   `**Missing:**`, `**Missed:**`, `**Diagnosis:**`, `**Fix:**` with its commit SHA, and
+   `**Systemic guardrail:**` — or the words *"none — accepted, because …"*.
+   ⚠️ **An entry with an empty `Diagnosis` or `Missed` is not an entry.**
+2. **The partial episode count is a NUMBER, and it is stated.** Not *"it aborted early"*. How many
+   of the 20 completed, how many were truncated, how many never started, and per lane.
+3. ⚠️ **THE RETRY IS A NUMBERED ATTEMPT IN THE SAME DIRECTORY.** It does not get a fresh directory,
+   it does not overwrite the partial one, and the partial output is **not deleted** — `evals/` is
+   append-only with **operator-only** deletion, and there is no deletion path in the driver at all.
+4. **The retry resumes rather than restarting.** Each `(block, arm, seed, attacker_model)` has its
+   own checkpoint and is **skipped on re-run**, so a crash costs one episode and not the run, and
+   the denominator still reads **20**. C12 BUILD 1 measured it: kill after 3 → resume skips 3, runs
+   17, **zero duplicates**, every pass-1 checkpoint byte-identical; a third pass runs 0 episodes and
+   makes 0 model calls.
+
+⚠️ **A 429 IS NOT AN ABORT.** Within its own lane the runner backs off and re-queues. **A session
+that meets one STOPS and reports, and never retries into another lane.** A lane stopped by a 429
+stops **that lane**, and the other continues.
+
+### ⚠️ 10.1 TWO COMPLETED PILOT RUNS EXISTING IS A PROCESS VIOLATION AND IS PUBLISHED AS ONE
+
+**`PROCESS.md` §6b says it of the calibration in those words, and §6b binds the pilot identically**
+— `CONTEXT.md` §15.4: *"binding on both the calibration and the pilot (whose measured
+tokens/episode selects N)"*.
+
+⚠️ **AND THE INCENTIVE IS EXACT AND POINTS ONE WAY, WHICH IS WHY THIS RULE EXISTS AT ALL.** A high
+measured tokens/episode selects **N = 30** and a smaller sweep; a low one selects **N = 50** and a
+headline with tighter intervals. **Re-running until the number comes out convenient is rational,
+invisible, and was forbidden by nothing.** It is forbidden now. **The first execution that runs to
+completion IS the run, and its output directory is the record whatever number it contains.**
+
+---
+
+## 11. WHERE EVERY FIGURE IN THIS FILE CAME FROM
+
+⚠️ **NOT ONE NUMBER HERE WAS CHOSEN BY THE SESSION THAT WROTE IT.** Every row was read from
+`config/`, from a frozen document, or from a recorded ruling, and each names its source.
+
+| Figure | Value | Source, named |
+|---|---|---|
+| the command | §1 | `docs/sessions/c12-build-1.txt` §1, REAL form — **copied, not composed** |
+| the arm | 1 | `QUESTIONS.md` **`Q-144`**, RULED 2026-09-03 |
+| the S3 binding | `authorization-is-the-payment` | `QUESTIONS.md` **`Q-141`**, RULED 2026-09-03; the literal checked against `driver/episode.py:S3_AUTHORIZATION_IS_THE_PAYMENT` |
+| first pilot seed | 2101 | `config/protocol.yaml:seeds.pilot_first` |
+| last pilot seed | 2110 | `config/protocol.yaml:seeds.pilot_last` |
+| turn budget | 20 | `config/protocol.yaml:attacker.turn_budget` |
+| temperature | 0.7 | `config/protocol.yaml:attacker.temperature` |
+| per-episode token target | 60,000 | `config/protocol.yaml:attacker.target_tokens_per_episode` |
+| call ceiling | 200 | **derived**: 10 × `attacker.turn_budget`; ruled `Q-147` |
+| token ceiling | 600,000 | **derived**: 10 × `attacker.target_tokens_per_episode`; ruled `Q-147` |
+| reference lane id | `models/gemma-4-26b-a4b-it` | `config/lanes.yaml`, lane `gemma-26b`, `api_model_id` |
+| L2 lane id | `qwen/qwen3.8-27b` | `config/lanes.yaml`, lane `qwen-27b`, `api_model_id` |
+| gate-judge lane | `gemma-26b` | `config/lanes.yaml`, the lane whose `role` says *"gate judge for arms 2/2S/3"* |
+| lane rate limits | §4 | `config/lanes.yaml`, operator-attested 2026-08-30, `PROVENANCE.md` §1 |
+| episode count | 20 | `CONTEXT.md` §13.4 and `PROTOCOL.md` §3.1, both *"1 ref arm + L2 × 10"* |
+| the N rule | §9 | `PROTOCOL.md` §3; `CONTEXT.md` §13.4 |
+| the single-shot rule | §10 | `PROCESS.md` §6b; `CLAUDE.md` §3; `CONTEXT.md` §15.4 |
+| the tag order | §7.1 | `CONTEXT.md` §15.1; `PROTOCOL.md` §6 |
+| **UTC start time** | ⚠️ **BLANK** | **the operator, at the moment of starting. §8.** |
+
+⚠️ **`config/` WAS NOT EDITED BY THE SESSION THAT WROTE THIS FILE, AND `git diff -- config/` WAS
+EMPTY AT ITS COMMIT.** `config/` is a pre-registration artefact whose every file is listed in
+`PROTOCOL.md` with the SHA-256 of its git blob, and `make check-prereg` recomputes them.
+
+---
+
+**END OF DECLARATION.** The next thing that happens in this directory is either the run, or an
+`INCIDENTS.md` entry explaining why it did not finish.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ END RUN_DECLARED.md ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+================================================================================
+4. EVERY FIGURE IN THE DECLARATION, AND WHERE IT WAS READ FROM
+================================================================================
+
+  ! NOT ONE NUMBER IN THAT FILE WAS CHOSEN BY THIS SESSION. Each was read from config/,
+  from a frozen document, or from a recorded ruling. This is the same table the
+  declaration carries as its own S11, restated here so the operator does not have to
+  cross-reference to check it.
+
+  FIGURE                        VALUE                        READ FROM
+  --------------------------    -------------------------    -------------------------
+  the command                   see S1 of the declaration    docs/sessions/c12-build-1.txt
+                                                             S1, the REAL form - COPIED,
+                                                             NOT COMPOSED
+  the arm                       1                            QUESTIONS.md Q-144, RULED
+  the S3 binding                authorization-is-the-        QUESTIONS.md Q-141, RULED;
+                                payment                      literal checked against
+                                                             driver/episode.py:114
+  first pilot seed              2101                         config/protocol.yaml
+                                                               seeds.pilot_first
+  last pilot seed               2110                         config/protocol.yaml
+                                                               seeds.pilot_last
+  seed count                    10                           derived: last - first + 1
+  turn budget                   20                           config/protocol.yaml
+                                                               attacker.turn_budget
+  temperature                   0.7                          config/protocol.yaml
+                                                               attacker.temperature
+  per-episode token target      60,000                       config/protocol.yaml
+                                                               attacker.
+                                                               target_tokens_per_episode
+  verbatim context window       6                            config/protocol.yaml
+                                                               attacker.context_window_
+                                                               turns_verbatim
+  context summary cap           400                          config/protocol.yaml
+                                                               attacker.context_summary_
+                                                               max_tokens
+  CALL CEILING                  200                          DERIVED: 10 episodes x
+                                                             attacker.turn_budget (20).
+                                                             Ruled Q-147
+  TOKEN CEILING                 600,000                      DERIVED: 10 episodes x
+                                                             attacker.target_tokens_per_
+                                                             episode (60,000).
+                                                             Ruled Q-147
+  reference lane                gemma-26b                    config/lanes.yaml, the lane
+                                                             whose `role` says
+                                                             "attacker: REFERENCE"
+  reference api_model_id        models/gemma-4-26b-a4b-it    config/lanes.yaml
+                                                               lanes[gemma-26b]
+                                                               .api_model_id
+  ladder L2 lane                qwen-27b                     config/lanes.yaml, the lane
+                                                             whose `role` says
+                                                             "ladder L2"
+  L2 api_model_id               qwen/qwen3.8-27b             config/lanes.yaml
+                                                               lanes[qwen-27b]
+                                                               .api_model_id
+  GATE-JUDGE LANE               gemma-26b                    config/lanes.yaml, the lane
+                                                             whose `role` says "gate
+                                                             judge for arms 2/2S/3".
+                                                             ZERO CALLS under arm 1
+  gemma-26b rate limits         rpm 30, tpm 16,000,          config/lanes.yaml,
+                                rpd 14,400, tpd null         operator-attested
+                                                             2026-08-30, PROVENANCE.md S1
+  qwen-27b rate limits          rpm 30, tpm 8,000,           config/lanes.yaml, same
+                                rpd 1,000, tpd 2,000,000     provenance
+  both lanes reserved from      2026-08-31                   config/lanes.yaml
+                                                               reserved_from - which is
+                                                             why both are named in
+                                                             --sanction-lane
+  EPISODE COUNT                 20 (2 cells x 10 seeds)      CONTEXT.md S13.4's block
+                                                             table and PROTOCOL.md S3.1,
+                                                             both "1 ref arm + L2 x 10"
+  the N decision rule           branch A n=50 / branch B     PROTOCOL.md S3;
+                                n=30; threshold <= 60,000    config/protocol.yaml
+                                tokens/ep AND <= 32 h        n_decision.* , including
+                                                             projected_lane_hour_budget_h
+                                                             = 32
+  what the pilot SETS           n_decision.selected_branch   both currently the sentinel
+                                and n_decision.measured_     TODO_C14_PILOT; the loader
+                                tokens_per_episode           RAISES on each rather than
+                                                             substituting (hard rule 9)
+  UTC START TIME                ! BLANK, ON PURPOSE          the operator, at the moment
+                                                             of starting. NOT INVENTED.
+
+  ! ONE FIGURE IS DELIBERATELY NOT A MEASUREMENT AND THE DECLARATION SAYS SO.
+  `attacker.target_tokens_per_episode` = 60,000 is `[merchant-policy, author-chosen]`,
+  and PROTOCOL.md S3's branch-A threshold is "<= 60000". THE PILOT EXISTS TO MEASURE THE
+  REAL FIGURE AGAINST IT. A pilot that comes back above 60,000 selects N=30, and that is
+  the rule working rather than a failure.
+
+================================================================================
+5. THE DRIVER WAS RUN IN NO MODE - THE CONFIRMATION, IN THE FORM THE PROMPT ASKED FOR
+================================================================================
+
+  ! ZERO PROVIDER MODEL CALLS. ZERO TOKENS. AND ZERO EXECUTIONS OF THE DRIVER, IN ANY
+  MODE.
+
+    `python -m whetstone_gate.driver --dry-run ...`         NOT RUN
+    `python -m whetstone_gate.driver --spend-real-tokens`   NOT RUN
+    `python -m whetstone_gate.tasks drive -- ...`           NOT RUN
+    `python -m whetstone_gate.driver --help`                NOT RUN
+    any provider call, on any lane, by any route            NONE
+
+  The prompt: "DO NOT RUN THE DRIVER IN ANY MODE, not even `--dry-run` - the operator
+  rehearses, not you." It was obeyed literally, including the `--help` form, because a
+  `--help` invocation is still an execution of the module and the instruction said ANY
+  mode.
+
+  ! THE ONE PYTHON COMMAND THIS SESSION DID RUN was `python -m whetstone_gate.tasks
+  check-roles`, which the prompt's VERIFY block requires. It makes no provider call,
+  reads no key value and does not touch the driver: it walks git history, the module
+  graph and config/. Exit 0.
+
+  HOW THE DECLARATION'S FIGURES WERE OBTAINED WITHOUT RUNNING ANYTHING: by reading
+  config/protocol.yaml and config/lanes.yaml as text, PROTOCOL.md, CONTEXT.md,
+  PROCESS.md, QUESTIONS.md and docs/sessions/c12-build-1.txt, and by reading
+  src/whetstone_gate/driver/*.py to CHECK - not to execute - the two literals the
+  declared command depends on: the `--s3-binding` choice list and the fact that
+  `--out-root` defaults to the repository root for a real run.
+
+================================================================================
+6. THE VERIFY BLOCK - EVERY ITEM THE PROMPT NAMED, MEASURED
+================================================================================
+
+  THE TREE: C:\Users\chinm\whetstone-gate  (INC-54 requires a session to say which tree.)
+
+  (a) TAGS - UNCHANGED, AND HOLDING NEITHER FREEZE TAG.
+      `git tag -l` before AND after, 6 tags either time:
+        first : c0-pass
+        last  : c4-pass
+        full  : c0-pass c1-pass c13-pass c2-pass c3-pass c4-pass
+      ! NEITHER `probe-v1` NOR `prereg-v1` IS PRESENT. NO TAG WAS CUT BY THIS SESSION
+      AND NONE WAS ASKED FOR.
+
+  (b) `git status --porcelain evals/`
+      BEFORE the commit : `?? evals/`   - and `find evals -type f` returned EXACTLY ONE
+                          path, `evals/pilot/RUN_DECLARED.md`. No other file was created
+                          under `evals/` at any point.
+      AFTER the commit  : EMPTY - the one file is committed and nothing else is there.
+      ! THIS MATTERS BECAUSE `evals/` IS APPEND-ONLY WITH OPERATOR-ONLY DELETION. A
+      second file written there by mistake could not have been removed by any session.
+
+  (c) `git diff -- config/`                  EMPTY.
+      `git status --porcelain config/`       EMPTY.
+
+  (d) GOLDENS UNTOUCHED.
+      `git status --porcelain tests/goldens/`  EMPTY.
+
+  (e) `make check-roles`  ->  EXIT 0.
+      21 passed, 0 failed, 3 n/a. "OK - no structural invariant is broken."
+      E1 clean: 71 issued row(s) covering 71 token(s) parsed from QUESTIONS.md - the
+      `8b46f2e1` row is among them, so no commit of this session carries an unissued
+      token. E2 and E3 clean. The three `n/a` are the pre-existing E4, F4 and the
+      D-series entry, none of them this session's.
+
+  (f) CR COUNTED AS BYTES, with `tr -cd '\r' | wc -c`, never as lines:
+        evals/pilot/RUN_DECLARED.md, working tree      0 CR bytes  (26,940 bytes)
+        evals/pilot/RUN_DECLARED.md, COMMITTED BLOB    0 CR bytes  (26,940 bytes)
+        QUESTIONS.md                                   0 CR bytes
+        STATUS.md                                      0 CR bytes
+        PROGRESS.md                                    0 CR bytes
+      The blob and the working-tree file agree at 26,940 bytes exactly.
+      (.gitattributes is `* text=auto eol=lf`, so LF is the tree's own convention and a
+      CR here would be the defect INC-16 recorded.)
+
+  (g) OF-214 - THE TREE, AND ANY COMMIT THAT LANDED DURING THIS RUN.
+      Session opened at HEAD `456ec70`. `456ec70` was STILL HEAD when this session made
+      its own first commit `1b94807`. ! NO CONCURRENT SESSION LANDED ANYTHING WHILE THIS
+      ONE RAN. The tree did not move under it, which is the first time in several
+      sessions that sentence has been true.
+
+  (h) ADDITIONS ONLY, IN THE TWO FILES THAT ALREADY EXISTED AND ARE APPEND-ONLY IN
+      PRACTICE:
+        `git diff --numstat -- STATUS.md`     59 added, 0 deleted
+        `git diff --numstat -- PROGRESS.md`  138 added, 0 deleted
+        `git diff -- STATUS.md | grep -c '^-[^-]'`     0
+        `git diff -- PROGRESS.md | grep -c '^-[^-]'`   0
+      And the `C12` benign-solver row matched its pre-session bytes EXACTLY, which is
+      Q-149's "STANDS UNTOUCHED" checked rather than asserted.
+
+  (i) THE SHARED INDEX, PROVED CLEAN AFTER EVERY COMMIT (PROCESS.md S7b step 5).
+      `env -u GIT_INDEX_FILE git diff --cached --quiet` exited 0 after each commit.
+      ! STEP 4 WAS SPELLED `env -u`, NEVER `VAR=`. Every commit was staged from a
+      PRIVATE index in a fresh OS temp directory outside the repository, and stage,
+      snapshot and commit were ONE command (OF-205).
+
+================================================================================
+7. EVERY `Swept:` LINE THIS SESSION WROTE
+================================================================================
+
+  ! ALL THREE SAY "nothing", AND THAT IS A MEASUREMENT RATHER THAN A FORM OF WORDS: the
+  shared index was EMPTY at session open (OF-213), no concurrent session landed anything
+  while this one ran, and every commit was staged from a private index over explicit
+  paths. NO LINE COUNTS APPEAR IN ANY OF THEM (OF-216): the message heredoc is composed
+  BEFORE the `--stat` prints, so any number in it would be a PREDICTION. `git show
+  --numstat` is authoritative, free, and cannot be wrong.
+
+  1b94807  chore(rulings)
+    Swept: nothing. Staged from a private index over one explicit path; `env -u
+    GIT_INDEX_FILE git reset` after. Line counts are deliberately absent (OF-216).
+
+  f8f0d30  docs(prereg)
+    Swept: nothing. Staged from a private index over one explicit path; `env -u
+    GIT_INDEX_FILE git reset` after. Line counts are deliberately absent (OF-216).
+
+  <this>   chore(journal)
+    Swept: nothing. Staged from a private index over three explicit paths; `env -u
+    GIT_INDEX_FILE git reset` after. Line counts are deliberately absent (OF-216).
+
+================================================================================
+8. WHAT THIS SESSION COULD NOT DO, AND WHAT IT DID NOT DECIDE
+================================================================================
+
+  COULD NOT:
+   - Cut `probe-v1`. It is the OPERATOR's, it is step 1 of PROTOCOL.md S6's
+     non-negotiable order, and this prompt says NO TAG. Until it resolves the pilot may
+     not start, and the `drive` target already refuses without it.
+   - Fetch the corpora. `corpora/fetched/` does not exist and fetching is an operator
+     step. It is written into the declaration's preconditions so it cannot fire on
+     episode 1 of a single-shot run.
+   - Fill the UTC start time. Only the operator knows it, and inventing one would make
+     the declaration a pre-registration written afterwards.
+   - Add `make drive`. The Makefile is outside this fence, so Q-148 stays open. The
+     declared command is the `python -m whetstone_gate.tasks drive` form, which works
+     today.
+   - Act on Q-140 or Q-143. Both ask for a change to `config/`, which is outside this
+     fence - so neither could have been actioned here even had it been ruled.
+   - Close OF-240. `runner/checkpoint.py` and `runner/usage.py` are outside this fence.
+     Q-144's arm-1 ruling takes it off THIS run's path; it does not close it.
+   - Rehearse. The prompt reserves that to the operator, in any mode.
+
+  DID NOT DECIDE - and each is left exactly as C12 BUILD 1 left it:
+   - Q-145, which STILL BLOCKS THE PILOT. The declaration states the corpus fetch as a
+     precondition; whether it becomes a numbered step of PROTOCOL.md S6 is the
+     architect's.
+   - Q-140, Q-142, Q-143, Q-146, Q-148.
+
+  DID NOT WRITE AN INCIDENTS.md ENTRY, AND THE REASON IS STATED RATHER THAN LEFT AS A
+  SILENCE. Nothing broke: no test failed, no artefact was found wrong, and no command
+  produced an unexpected result. The one failure this session hit was its own - a
+  heredoc too long for a single shell invocation, which wrote NO partial file (`ls
+  evals/` confirmed the directory did not exist) and was reissued through a different
+  tool. That is a tool slip with no repository consequence. ! INVENTING AN INCIDENT FOR
+  IT WOULD BE THE DRAMATISATION HARD RULE 13 NAMES: "the pressure runs BOTH ways - to
+  under-report a failure that costs a fix session, and to DRAMATISE one that reads well."
+
+================================================================================
+9. ONE THING A REVIEWER SHOULD ATTACK FIRST
+================================================================================
+
+  THE DECLARATION IS A CLAIM ABOUT A COMMAND NOBODY HAS RUN. Its S1 was COPIED from
+  docs/sessions/c12-build-1.txt S1's REAL form, and that form was measured by C12 BUILD
+  1 against a TRANSCRIPT FIXTURE, not a provider. This session then deliberately did not
+  run it either. So the chain from "these flags are right" to "these flags work" rests
+  on one session's offline rehearsal and one session's reading.
+
+  ! THE ONE THING THAT WOULD HURT MOST IS A FLAG THE REAL PATH REQUIRES AND THE
+  DECLARATION OMITS - because the cost of finding it is an ABORT ON A SINGLE-SHOT RUN,
+  an INCIDENTS.md entry written before any retry, and a numbered attempt in the same
+  directory. Two candidates a reviewer should check FIRST, by reading
+  `driver/__main__.py`'s parser rather than by trusting this file:
+    (a) `--out-root` is absent from the declared command because it DEFAULTS to the
+        repository root for `--spend-real-tokens`. If that default is wrong, the pilot
+        writes somewhere else and `evals/` is not the record.
+    (b) `--sanction-lane` is given exactly twice. There is no wildcard, deliberately.
+        If any THIRD lane is reachable on this path - overflow, spill, or the judge on a
+        different lane than the one whose `role` sentence matched - the run refuses in
+        preflight, which is safe, or spends where it was not sanctioned, which is not.
+
+  SECOND: this session RECORDED four rulings it did not make. If any transcription
+  differs from what the architect wrote, the declaration inherits the error and the
+  freeze is built on it. The QUESTIONS.md block and this file's S2 carry the same text
+  and can be diffed against each other and against the prompt.
+
+================================================================================
+END OF FINAL OUTPUT - ARCH PILOT DECLARED - SESSION-TOKEN 8b46f2e1
+NO TAG. NOT SELF-CERTIFIED. THE PILOT IS DECLARED AND HAS NOT STARTED.
+================================================================================

@@ -1,3 +1,62 @@
+*⚠️ **UPDATE, ARCH FIX — PILOT DECLARED (`8b46f2e1`), 2026-09-03 — THE FOUR RULINGS ARE RECORDED
+AND `evals/pilot/RUN_DECLARED.md` EXISTS. THE PILOT IS NOW DECLARED AND HAS NOT STARTED.
+ZERO PROVIDER MODEL CALLS. ZERO TOKENS. ⚠️ THE DRIVER WAS NOT RUN IN ANY MODE, NOT EVEN
+`--dry-run`. NO TAG. NOT SELF-CERTIFIED.***
+
+**(1) FOUR RULINGS RECORDED VERBATIM, BEFORE ANYTHING ELSE WAS TOUCHED** (hard rule 5).
+`QUESTIONS.md`, new block at the end of file. **`Q-141`** RULED **`authorization-is-the-payment`**
+(Class A — it was the only one of the four that could move a published number; the rejected reading
+returns `INDETERMINATE` on every capture, which blocks, flatters our own gate and makes S3
+unfirable). **`Q-144`** RULED **arm 1** — the only arm where no gate truncates an episode early and
+no judge adds lane load. **`Q-147`** RULED **200 calls and 600,000 tokens, PER LANE**, derived from
+`config/` rather than chosen. **`Q-149`** RULED, **and the error is the architect's**: the C12
+prompt reused a chunk id.
+
+**(2) ⚠️ `Q-149` — THE `C12` BENIGN-SOLVER ROW BELOW WAS NOT TOUCHED BY THIS SESSION AT ALL.**
+Not its status, not its review-history column. The ruling says that row **stands untouched** and the
+literal reading is the safe one. The episode driver keeps the distinct id C12 BUILD 1 gave it,
+**`C12-DRIVER`**, which is the row that already exists. ⚠️ **`PROCESS.md` §12.1's C18 row lists
+`C12` among its dependencies, and that now resolves to THE BENIGN SOLVER — which is `todo`.** So
+C18's dependency is **unmet**, and it was unmet before the ruling too; what the ruling removes is the
+ambiguity about which deliverable C18 is waiting on, not the gap.
+
+**(3) `evals/pilot/RUN_DECLARED.md` IS WRITTEN — 26,940 bytes, 444 lines, ZERO CR bytes.** It is
+**the first file ever written under `evals/` in this repository and it is the only one**;
+`git status --porcelain evals/` showed exactly that. It carries §1's exact command **copied from
+`docs/sessions/c12-build-1.txt` §1's REAL form** with the two rulings filled into its two
+placeholders, the seed block (`seeds.pilot_first` 2101 … `seeds.pilot_last` 2110, ten seeds,
+disjoint from the scored set on purpose), the turn budget (`attacker.turn_budget` 20), both lanes
+with their `api_model_id` read from `config/lanes.yaml`, the gate-judge lane named, the episode
+count 20, the abort protocol, and the `probe-v1` precondition. **Every figure names the `config/`
+key or frozen document it came from, in a table of its own (§11).**
+
+**(4) ⚠️ THE UTC START TIME IS AN EXPLICIT BLANK AND WAS NOT INVENTED.** A declaration carrying a
+start time earlier than the run is a pre-registration written afterwards, which is the one thing the
+artefact exists to rule out. **The operator fills it at the moment of starting**, and `RESULTS.md`
+prints declared-versus-actual start times beside the threshold they produced.
+
+**(5) ⚠️ THE PILOT STILL MAY NOT START, AND THE DECLARATION SAYS SO IN TWO PLACES.**
+**MEASURED:** `git tag -l` holds `c0-pass c1-pass c13-pass c2-pass c3-pass c4-pass` — **neither
+`probe-v1` nor `prereg-v1`** — and the `drive` target refuses entirely without `probe-v1`, in both
+modes. **MEASURED:** `corpora/fetched/` **does not exist**, so the pinned attacker corpora are
+unfetched and a real run refuses in preflight (`Q-145`, still OPEN). ⚠️ **`Q-145` WAS NOT RULED
+HERE** — the declaration states the corpus fetch as a precondition so it cannot fire on episode 1 of
+a single-shot run, but whether it becomes a numbered step of `PROTOCOL.md` §6 is the architect's,
+and `PROTOCOL.md` is frozen-set.
+
+**(6) ZERO SPEND, AND THE DRIVER WAS NOT EXECUTED.** No provider model call of any kind, and
+**`python -m whetstone_gate.driver` and `python -m whetstone_gate.tasks drive` were never invoked —
+not with `--dry-run`, not with `--spend-real-tokens`, not with `--help`.** The prompt reserves
+rehearsal to the operator. Every value in the declaration was read from `config/`, `PROTOCOL.md`,
+`CONTEXT.md` or the source, by reading the files.
+
+**(7) FENCE HELD.** Only `QUESTIONS.md`, `evals/pilot/RUN_DECLARED.md` (new), `STATUS.md`,
+`PROGRESS.md` and `docs/sessions/` were written. `git diff -- config/` was **EMPTY**;
+`tests/goldens/` untouched; no frozen artefact, no `src/`, no `tests/`, no `CONTEXT.md`, no
+`PROCESS.md`, **no tag**.
+
+---
+
 *⚠️ **UPDATE, ARCH FIX — EVAL WIRING (`c1f0a4d8`), 2026-09-03 — `Q-126`'s RED IS GONE AND
 `make eval` NO LONGER PRINTS A PLACEHOLDER. BOTH BRANCHES DRIVEN. ⚠️ AND AN ADVERSARIAL PASS
 FOUND FIVE DEFECTS IN THIS SESSION'S OWN COMMITTED WORK, ALL FIVE CORRECTED BEFORE THE PUSH.

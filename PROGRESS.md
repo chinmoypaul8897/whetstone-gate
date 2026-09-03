@@ -6,6 +6,144 @@ not a record; this file is.
 
 ---
 
+## ARCH — **FIX, PILOT DECLARED** — 2026-09-03 — 🟢 **FOUR RULINGS RECORDED AND THE PILOT IS DECLARED. IT HAS NOT STARTED, AND THIS SESSION DID NOT RUN THE DRIVER IN ANY MODE.**
+
+**SESSION-TOKEN:** `8b46f2e1` · ⚠️ **SELF-RECORDED** into `QUESTIONS.md`'s `## Session tokens`
+table, in the operator's working tree at `C:\Users\chinm\whetstone-gate` (`INC-54` requires a
+session to say which tree). **NO ORDINAL IS CLAIMED, and `OF-225` is why:** `Q-025`'s self-record
+numbering stopped at row 43 and the ordinal is no longer derivable from the file, so continuing the
+sequence would mean inventing a number in the shape of a measurement. **The token is the
+architect's; only the row is this session's.**
+
+⚠️ **THE TREE DID NOT MOVE UNDER THIS SESSION** (`OF-214` requires naming any commit that lands
+during a run). It opened at `456ec70` — *"docs: C12 BUILD 1's FINAL OUTPUT …"* — and `456ec70` was
+still `HEAD` at this session's own first commit. **No concurrent session landed anything.** The one
+untracked path in the tree at open, `grep.exe.stackdump`, is not this session's, is outside its
+fence, and was left exactly where it was.
+
+**VERDICT: RULINGS RECORDED, DECLARATION WRITTEN, NOTHING CERTIFIED.** ⚠️ **NO TAG WAS CUT AND NONE
+WAS ASKED FOR** — the prompt says `NO TAG`, and `git tag -l` is byte-identical before and after:
+`c0-pass c1-pass c13-pass c2-pass c3-pass c4-pass`. ⚠️ **It holds NEITHER `probe-v1` NOR
+`prereg-v1`**, which is exactly why the run this session declared may not yet start.
+
+⚠️ **TOKEN SPEND: ZERO. NO PROVIDER MODEL CALL OF ANY KIND. AND THE DRIVER WAS NOT EXECUTED —
+NOT IN ANY MODE.** Neither `python -m whetstone_gate.driver` nor `python -m whetstone_gate.tasks
+drive` was invoked, with `--dry-run`, with `--spend-real-tokens`, or with `--help`. **The prompt
+reserves rehearsal to the operator and this session obeyed it literally.** Every figure in the
+declaration was obtained by **reading** `config/`, `PROTOCOL.md`, `CONTEXT.md`, `QUESTIONS.md` and
+the source — never by running the thing that consumes them.
+
+### The four rulings, recorded first
+
+Hard rule 5 — *"RULINGS ARE RECORDED VERBATIM in `QUESTIONS.md` before anything else is touched"* —
+so the `QUESTIONS.md` block was written and the ruling text transcribed **before**
+`evals/pilot/RUN_DECLARED.md` existed, before `STATUS.md` and before this entry.
+
+* ⚠️ **`Q-141` — CLASS A, RULED `authorization-is-the-payment`.** A capture references the payment's
+  **own** authorized state. **The rejected reading is named in the declaration as well as the
+  accepted one**, because a pre-registration that records only the option taken hides the option
+  that flattered: *nothing is referenced* returns `INDETERMINATE` on **every** capture, which
+  **blocks**, which flatters our own gate, and which makes S3 **unfirable** — the exact shape
+  `CONTEXT.md` §9.2's own MOVE 2 and MOVE 3 withdrew two S2 predicates for. **C12 BUILD 1 was right
+  to refuse to choose it silently.** The literal was **checked against the source** —
+  `driver/episode.py:S3_AUTHORIZATION_IS_THE_PAYMENT` — so the declared command cannot name a value
+  the parser would reject.
+* **`Q-144` — RULED arm 1.** The pilot measures **attacker** tokens per episode, and arm 1 is the
+  only arm where no gate truncates an episode early and no judge adds lane load. ⚠️ **It also takes
+  `OF-240` off this run's path without closing it:** §13.3.2 puts the reference attacker and the
+  gate judge on the **same** lane (`gemma-26b`), and for a **judged** arm one `tokens_spent` number
+  covers two roles and cannot be split back. Arm 1 has no gate, so the judge lane makes **zero**
+  calls and a resumed episode's figure is exact. **`OF-240` stays OPEN against `runner/`.**
+* **`Q-147` — RULED 200 calls and 600,000 tokens, PER LANE.** Derived, not chosen: ten episodes ×
+  `attacker.turn_budget` (20) and ten × `attacker.target_tokens_per_episode` (60,000). `Q-147` asked
+  whether the sanction belongs in `RUN_DECLARED.md`; **it does, and now it is there** — with the
+  derivation printed beside it. **Nothing was added to `config/`**, both flags stay `required=True`,
+  and the ceilings remain the prompt's sanction as hard rule 12 has them.
+* **`Q-149` — RULED, and the error is the architect's:** the C12 prompt reused a chunk id. ⚠️ **The
+  `C12` benign-solver row in `STATUS.md` was not touched by this session at all** — not its status,
+  not its review-history column — because the ruling says it stands untouched and the literal
+  reading is the safe one. The driver keeps `C12-DRIVER`, the distinct id C12 BUILD 1 gave it.
+  ⚠️ **`PROCESS.md` §12.1's C18 row lists `C12` among its dependencies, and that now resolves to
+  the BENIGN SOLVER, which is `todo`** — so C18's dependency is unmet, and was unmet before the
+  ruling; what the ruling removes is the ambiguity, not the gap.
+
+### `evals/pilot/RUN_DECLARED.md` — the first file ever written under `evals/`
+
+**26,940 bytes, 444 lines, ZERO CR bytes.** `git status --porcelain evals/` showed **only** that
+path. ⚠️ **`evals/` is append-only with operator-only deletion**, so a second file written here by
+mistake could not have been removed by any session.
+
+**§1's command was COPIED from `docs/sessions/c12-build-1.txt` §1's REAL form, not composed**, with
+its two placeholders filled by `Q-144` and `Q-141`:
+
+```
+python -m whetstone_gate.tasks drive -- --spend-real-tokens \
+  --arm 1 \
+  --s3-binding authorization-is-the-payment \
+  --call-ceiling 200 --token-ceiling 600000 \
+  --sanction-lane gemma-26b --sanction-lane qwen-27b
+```
+
+Every other figure is read, and §11 is a table naming the source of each: the seeds
+(`seeds.pilot_first` 2101 … `seeds.pilot_last` 2110 — **ten seeds, disjoint from the scored set on
+purpose**, which start at 2001), the turn budget (`attacker.turn_budget` 20), the temperature
+(`attacker.temperature` 0.7 — and the reason model output is **not** reproducible), the two lanes
+with their `api_model_id` from `config/lanes.yaml` (`models/gemma-4-26b-a4b-it` and
+`qwen/qwen3.8-27b`), the gate-judge lane **named** (`gemma-26b`, **zero calls under arm 1**), and
+the episode count **20** = 2 cells × 10 seeds.
+
+⚠️ **THE UTC START TIME IS AN EXPLICIT BLANK.** It was not invented and no session may invent it:
+**a declaration carrying a start time earlier than the run is a pre-registration written
+afterwards**, which is the one property the artefact exists to establish. `RESULTS.md` prints
+declared-versus-actual start times beside the threshold they produced, so an unfilled placeholder is
+visible in the published output.
+
+### ⚠️ Two preconditions, both MEASURED, and the run may not start against either
+
+* **`probe-v1` does not resolve.** `git tag -l` holds six `cN-pass` tags and neither freeze tag. The
+  `drive` target already refuses entirely without it, in both modes; **the declaration says so as
+  well**, because a declaration that leaves a precondition to the code has not declared it. §15.1's
+  reason is carried in full: `HOLES.md` holds the CANARY predicates **and** the threshold they
+  produced, so a single tag would leave **no moment at which the predicate was fixed and the number
+  was still unknown**.
+* **`corpora/fetched/` does not exist**, so the pinned attacker corpora are unfetched and a real run
+  refuses in **preflight**. ⚠️ **`Q-145` WAS NOT RULED HERE.** The declaration states the fetch as a
+  precondition so it cannot fire on **episode 1 of a single-shot run**, after the clock has already
+  started; whether it becomes a numbered step of `PROTOCOL.md` §6 is the architect's, and
+  `PROTOCOL.md` is a frozen-set artefact this session may not edit.
+
+### What this session did NOT do
+
+* **Ruled nothing else.** `Q-140`, `Q-142`, `Q-143`, `Q-145`, `Q-146` and `Q-148` stay exactly as
+  C12 BUILD 1 left them. `Q-140` and `Q-143` both ask for a `config/` change before `prereg-v1`, and
+  **`config/` is outside this session's fence**, so neither could have been actioned here even had
+  it been ruled.
+* **Touched `config/`, `src/`, `tests/`, the frozen artefacts, `CONTEXT.md`, `PROCESS.md` or any
+  tag.** `git diff -- config/` was **EMPTY**; `tests/goldens/` untouched.
+* **Cut a tag, or self-certified anything.**
+* **Added `make drive`.** The `Makefile` is outside this fence, so `Q-148` is still open and the
+  declared command is the `python -m whetstone_gate.tasks drive` form, which works today.
+* **Written an `INCIDENTS.md` entry.** Nothing broke: no test was run that failed, no artefact was
+  found wrong, and no command this session issued produced an unexpected result. The one shell
+  failure it hit was its own — a heredoc too long for one invocation, which wrote **no** partial
+  file (`ls evals/` confirmed the directory did not exist) and was simply reissued through a
+  different tool. **That is a tool slip with no repository consequence, not an incident**, and
+  inventing one would be the dramatisation hard rule 13 names.
+
+### Counts this session measured
+
+* `make check-roles` — **exit 0**.
+* `evals/pilot/RUN_DECLARED.md` — 26,940 bytes, 444 lines, **0 CR bytes**.
+* `git status --porcelain evals/` — **one path**, the new file.
+* `git diff --numstat -- STATUS.md` before commit — **59 added, 0 deleted**; `git diff -- STATUS.md`
+  contained **zero** deletion lines, and the `C12` benign-solver row matched its pre-session bytes
+  exactly.
+* `git tag -l` — six tags, first `c0-pass`, last `c4-pass`, **unchanged**, holding neither
+  `probe-v1` nor `prereg-v1`.
+* `git diff -- config/` — **empty**.
+
+---
+
 ## C12 — **BUILD, attempt 1** — 2026-09-03 — 🟡 **THE EPISODE DRIVER IS BUILT. NOTHING IN THIS PROJECT COULD SPEND A TOKEN UNTIL IT EXISTED, AND IT STILL HAS NOT SPENT ONE.**
 
 **SESSION-TOKEN:** `3d7e50ba` · **DATA ROW 70** of `QUESTIONS.md`'s `## Session tokens` table,
