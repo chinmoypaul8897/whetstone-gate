@@ -423,6 +423,46 @@ TOKEN SPEND: ZERO. NO PROVIDER MODEL CALL OF ANY KIND.
 
   `af5118e` is NOT amended. The numbers above are the repair.
 
+12c. THE FINAL SUITE RUN, AND WHY IT IS **NOT** THE NUMBER IN SECTION 12 - OF-214 AGAIN
+--------------------------------------------------------------------------------
+
+  Section 12's `4 failed, 1183 passed` was measured BEFORE this session renumbered
+  `INC-91`->`INC-92` and `OF-208`->`OF-209` in four source docstrings. That renumber is
+  docstring text only, but two of this chunk's own tests scan SOURCE TEXT, so the honest
+  thing was to re-measure the suite against exactly what was pushed. IT WAS RE-RUN.
+
+    tests/test_c10_probe.py, after the renumber      53 passed   (twice, before and after)
+    make check-roles, after the renumber             EXIT 0, 21 passed / 0 failed / 3 n/a
+    FULL SUITE, re-run                               7 failed, 1180 passed, 880.83 s
+
+  !! THE 7 IS NOT A MEASUREMENT OF ANYTHING. It took 14 minutes 40 seconds, and DURING IT
+  A LIVE `ARCH FIX` SESSION PUSHED TWO COMMITS ON TOP OF `90aa76c` - `fdb8801`
+  (fix(scorer), Q-110 RULED) and `59adcfc` (chore(journal), INC-98). The run started on
+  one tree and finished on another. THIS IS `INC-94` / `OF-214` FIRING A SECOND TIME, IN
+  THE SAME SESSION THAT RAISED IT, AND IT IS REPORTED RATHER THAN RE-RUN UNTIL IT LOOKED
+  BETTER.
+
+  THE THREE EXTRA FAILURES, EACH RE-RUN INDIVIDUALLY AND ATTRIBUTED:
+
+    test_c14_prereg::test_the_working_tree_agrees_with_the_object_store_for_config
+    test_repo_invariants::test_the_object_store_and_the_working_tree_agree
+        BOTH PASS ON RE-RUN. Transient - the mid-run tree. `config/` was never touched by
+        this session; `check-roles` A3 and A4 are GREEN.
+
+    test_tripwire_registry::test_every_s86_row_reaches_the_registry
+        STILL RED, AND IT IS NOT THIS SESSION'S. MEASURED: it fails because `CONTEXT.md`
+        S8.6 now carries a row - "projected lane-hour budget (the n decision rule's second
+        threshold)" - that `spec_constants.py` has never heard of. `git log -S` puts that
+        row in `fdb8801`, an ARCH FIX commit made AFTER this session's push. And
+        `git log` over `CONTEXT.md` and `spec_constants.py` shows ZERO commits carrying
+        token `bc69e8d7`: this session never touched either file. It is a NEW RED, dated
+        after `90aa76c`, and it belongs to the session that opened it.
+
+  SO THE FOUR KNOWN REDS REMAIN THE FOUR KNOWN REDS FOR THIS CHUNK'S WORK, and section 12's
+  `4 failed, 1183 passed` stands as the last count taken on a tree that held still. A COUNT
+  IN THIS SHARED TREE IS NOT REPRODUCIBLE - which is exactly what `OF-214` says, now with a
+  second measurement behind it.
+
 13. EVERY `Swept:` LINE, COMPOSED FROM THE STAGED SNAPSHOT AND NOTHING ELSE
 --------------------------------------------------------------------------------
 
