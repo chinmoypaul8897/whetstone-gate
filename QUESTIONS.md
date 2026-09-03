@@ -115,6 +115,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `bc69e8d7` | C10 | BUILD | 2026-09-03 |
 | `4c8d9b03` | ARCH | FIX | 2026-09-03 |
 | `ff6d79ae` | ARCH | FIX | 2026-09-03 |
+| `5a2c81df` | C18 | BUILD | 2026-09-03 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -11134,3 +11135,169 @@ this entry are the same finding at three depths: **a constant's artefacts have d
 `PROTOCOL.md`. **This session's fence spanned all four and the set still did not close, because
 there is a FIFTH: the tests that pin the value's TYPE.** No fence in this project has ever contained
 all five, and `INC-100` records that rather than treating it as this session's bad luck.
+
+---
+
+## ⚠️ QUESTIONS AND DEFAULTS RECORDED BY C18 BUILD 1 (`5a2c81df`), 2026-09-03 — `Q-127`…`Q-129`
+
+**Written before this session's first commit**, as hard rule 5 requires. Nothing below is a ruling;
+each is a STOP or a Class B default with its measurement attached.
+
+---
+
+### ⚠️ THE TOKEN ROW `5a2c81df` IS SELF-RECORDED, AND IT IS **ROW 69**.
+
+The C18 BUILD prompt opened with `SESSION-TOKEN: 5a2c81df`, put `QUESTIONS.md` inside this session's
+fence, and **did not say whether the row already existed.** ⚠️ **MEASURED, BEFORE ANY COMMIT:** the
+token appeared **nowhere** in this file — `grep -n "5a2c81df" QUESTIONS.md` returned **zero
+matches** — and `make check-roles` reported **`67 issued row(s) covering 67 token(s)`**. Without the
+row, `check_roles` **E1 fails on every commit this session makes** (`FORGED/UNISSUED`), which is the
+identical red `Q-021`, `Q-025` and every self-record paragraph above records. So the choice is
+between a self-recorded row and a red `make check-roles`, and the row is written **and labelled**.
+
+⚠️ **COUNTED FROM THE FILE IMMEDIATELY BEFORE APPENDING, NOT INHERITED** — a concurrent **ARCH FIX —
+PRE-FREEZE 2** session (`ff6d79ae`) holds this file, and a row landing in between would make an
+inherited count wrong, which is `OF-67`'s finding exactly. **Measured: 68 data rows, `ff6d79ae`
+last, so this is row 69.** (68 rows against `check-roles`'s 67 *issued tokens* is not a discrepancy:
+the extra row is `WG-2026-08-30-CTX-13.4-A`, which is not 8 hex and is `Q-014 (iv)`'s recorded
+one-off.)
+
+⚠️ **NO SELF-RECORD ORDINAL IS CLAIMED, AND THE REASON IS A MEASUREMENT RATHER THAN A SHRUG.** The
+numbered sequence in this file runs to **`363a2e9f`, "THE TWENTY-EIGHTH SELF-RECORDED ROW … ROW
+43"**, and **stops there**: every self-record since — seven of them, at lines 8621, 8940, 9599,
+9721, 9911, 10159 and 10634 of the pre-append file — says **`⚠️ SELF-RECORDED.`** and claims no
+ordinal. Continuing the sequence would mean asserting how many of rows 44–68 were self-recorded,
+which **cannot be derived from this file**: those seven paragraphs do not say, and the remaining
+rows say nothing at all. **An invented ordinal would be a number presented in the shape of a
+measurement, which is `363a2e9f`'s own recorded correction against itself.** So: **self-recorded,
+row 69, ordinal NOT DERIVABLE — and stated as not derivable rather than continued.** ⚠️ **AND THAT
+IS ITSELF A FINDING**: the numbering `Q-025` installed has lapsed, silently, across twenty-five
+rows. `OPEN_FINDINGS.md` **OF-225**.
+
+**MEASURED AFTER THE APPEND, RUN RATHER THAN INFERRED:** `make check-roles` → **`21 passed, 0
+failed, 3 n/a`, exit 0**; **E1 clean**; **D1, D2, D3 and D4 all PASS**.
+
+---
+
+### Q-127 — ⚠️ **C18 IS A `full` CHUNK AND NO ENTRY IN THIS FILE NAMES WHICH GOLDEN IS ITS OWN. HARD RULE 3 SAYS A `full` CHUNK WITH NO GOLDEN MAY NOT BE BUILT.**
+
+**Status: DEFAULT TAKEN, RECORDED. Class B, and named as Class B rather than assumed to be.**
+**Blocking: nothing — the session built.** **Raised by: C18 BUILD 1 (`5a2c81df`).**
+
+**The conflict, in three lines that disagree:**
+
+* `CLAUDE.md` hard rule 3: *"**A `full` chunk with no golden may not be built.**"*
+* `PROCESS.md` §12.1's C18 row: review type **`full`**.
+* `PROCESS.md` §5.2 assigns its nine goldens to **C2, C4, C7, C8, C9, C10, C11 and C18** — C18 is
+  named in the list — but **no golden file names C18 in its `consumed_by` key**, and no entry in
+  this file says which of the nine is C18's. C1, C3, C6 and C13 each needed a ruling to be built
+  golden-less (`Q-016`, `Q-020`, `Q-031`, `Q-056`); **C18 has had none, and it is not golden-less
+  either — it is *unassigned*, which is a third state nobody has ruled on.**
+
+**What this session did, and why it is not an assumption.** The C18 BUILD prompt names four goldens
+in its READ order — **golden 2, golden 3, golden 4 and golden 8** — and its VERIFY block requires
+*"the assembler runs end to end on SYNTHETIC ledgers **and on golden 3's**"*. That is an instruction
+to build **against hand-computed answer keys**, which is what hard rule 3 exists to secure; what is
+missing is only the bookkeeping that says which key is *C18's own*. So the session built, and the
+goldens were used as answer keys rather than as decoration:
+
+* **golden 3's own ledger** is replayed through the assembler's own path and its stated
+  `episode_totals` — `merchant_float_moved_paise` **20,000,000**, `fees_incurred_paise` **50,000**,
+  the other two **0** — and its `productive_actions` **3** are reproduced
+  (`test_golden_3s_episode_totals_reproduce_through_the_assembler`).
+* **golden 4's five arms** are replayed and its `expected.per_arm` table reproduces cell for cell —
+  reach **8 / 6 / 4 / 3 / 0**, breach ENTRIES **3 / 1 / 0 / 1 / 0**, CONFOUNDED **no / no / no / YES
+  / YES** at a floor of exactly **4**
+  (`test_golden_4s_reach_and_breach_reproduce_through_the_assemblers_own_path`).
+* **golden 2's `published_finding`** is read from the file — NOISY **2** (F4, F5), BLIND **1** (F6)
+  — and pinned as the delta's own headline unit
+  (`test_golden_2s_published_finding_is_NOISY_TWO_AND_BLIND_ONE`).
+* ⚠️ **golden 8 is NOT consumed, and the absence is stated.** Its subject is the token and
+  N-decision arithmetic, which `runner/n_rule.py` owns and `tests/test_c11_runner.py` already pins;
+  C18 **prints** the decision's own lines rather than recomputing them, so there is nothing here for
+  golden 8 to key. **A golden consumed decoratively would be worse than one not consumed.**
+
+**Options seen:**
+  1. **Build against goldens 2, 3 and 4 as the prompt names them, and record the gap.** **TAKEN.**
+  2. STOP and refuse to build until a golden is assigned. ⚠️ **Rejected**: the prompt is explicit
+     that C18 must be built now — *"Build it now, against golden and synthetic inputs, so the
+     sweep's output plugs straight in rather than being assembled at 3am by the session with the
+     most incentive to soften it"* — and the ambiguity is bookkeeping, not a missing answer key.
+  3. Author a golden for C18. ⚠️ **Rejected outright — `tests/goldens/` is READ-ONLY to a build
+     session (hard rule 3), and a golden authored by the session it judges is the exact circularity
+     `tests/goldens/README.md` exists to prevent.**
+
+**What the architect must settle:** whether C18's `full` review is satisfied by consuming other
+chunks' goldens, or whether a **golden 10** — a hand-computed `RESULTS.md` fragment over a stated
+ledger — is owed **before C18's review**. `OPEN_FINDINGS.md` **OF-223**.
+
+---
+
+### Q-128 — ⚠️ **`make eval` STILL PRINTS "NOT YET IMPLEMENTED". THE ASSEMBLER EXISTS AND NOTHING WIRES IT, BECAUSE `tasks.py` AND THE `Makefile` ARE OUTSIDE C18's FENCE.**
+
+**Status: STOP, RECORDED. Class A in effect — it decides whether a published command does what the
+README says it does.** **Blocking: `make eval` only.** **Raised by: C18 BUILD 1 (`5a2c81df`).**
+
+`PROCESS.md` §12.1's C18 row is *"**`RESULTS.md` + `make eval`**"*, and its done-when is *"`make
+eval` (and `python -m whetstone_gate.tasks eval`) regenerate EVERY number in `RESULTS.md` from the
+stored ledgers, byte-identically."* ⚠️ **THE C18 BUILD PROMPT'S FENCE NAMES ONLY
+`src/whetstone_gate/results/` AND `tests/test_c18_results.py` AS NEW CODE.**
+`src/whetstone_gate/tasks.py` is named under **neither** FENCE nor NOT — it is simply absent — and
+`CLAUDE.md` §4 is explicit that a session which finds itself needing a file outside its task's scope
+**STOPS and reports instead of working around it.**
+
+**MEASURED, at HEAD `42491bf`:** `src/whetstone_gate/tasks.py:task_eval` prints *"NOT YET
+IMPLEMENTED. Owned by C18, which builds RESULTS.md and this pipeline"* and returns `prereg`. **So
+today `make eval` runs `check-prereg` and prints a placeholder**, while the assembler it names is
+complete, tested, and runnable as **`python -m whetstone_gate.results <run-dir>`**.
+
+**What this session did instead of reaching outside the fence.** The assembler ships with its own
+entry point, so the pipeline exists and is exercised end to end on a real run directory; wiring it is
+**one function body** in a file this session may not open. ⚠️ **AND THE ENTRY POINT WRITES TO STDOUT
+BY DEFAULT, NOT TO `RESULTS.md`** — that file is written **by the run**, is named under this
+session's **NOT**, and a build session that created one would be publishing numbers no sweep
+produced.
+
+**Options seen:**
+  1. **Build the assembler with its own `__main__`, report the wiring as owed.** **TAKEN.**
+  2. Edit `tasks.py`. ⚠️ **Rejected — outside the fence.** §4: *"If anything seems to require
+     touching … files outside your task's scope: STOP and report instead of working around it."*
+  3. Put the logic in the `Makefile`. ⚠️ **Rejected twice over**: also outside the fence, and the
+     `Makefile`'s own header says *"IF YOU ARE ABOUT TO ADD LOGIC HERE, PUT IT IN
+     `src/whetstone_gate/tasks.py` INSTEAD"*, because logic there is logic a reviewer without `make`
+     cannot run — which *"silently breaks the reproducibility claim in `CONTEXT.md` §20."*
+
+**The remedy, written so the owner pastes rather than guesses.** `task_eval()` calls
+`whetstone_gate.results.__main__.main([<run-dir>, "--output", "RESULTS.md"])` after
+`task_check_prereg()` and returns the larger of the two return codes. ⚠️ **It also needs a run
+directory to exist**, which is RUN-3/RUN-4's output and does not exist today — so the wiring lands
+**with, or after, the sweep**, not before it. `OPEN_FINDINGS.md` **OF-224**.
+
+---
+
+### Q-129 — ⚠️ **THE C18 PROMPT SAYS "ELEVEN REAL FAILs ARE IN `docs/reviews/`". MEASURED: THERE ARE FOURTEEN.**
+
+**Status: MEASURED, NOT A DEFAULT — the code counts and does not assert.** **Blocking: nothing.**
+**Raised by: C18 BUILD 1 (`5a2c81df`).**
+
+The prompt's item 9 reads *"Eleven real FAILs are in `docs/reviews/` and that trail is stronger
+evidence than a wall of passes would have been."* ⚠️ **COUNTED FROM THE FILES, one verdict per
+review artefact, at HEAD `42491bf`:**
+
+```
+FAIL 14   REVIEW_C0, REVIEW_C1_1, REVIEW_C6_1..REVIEW_C6_6, REVIEW_7_1, REVIEW_7_2,
+          REVIEW_8_1, REVIEW_13_1, REVIEW_13_2, REVIEW_13_3
+PASS  6   REVIEW_C0_2, REVIEW_C1_2, REVIEW_C2_1, REVIEW_C3_1, REVIEW_C4_1, REVIEW_13_4
+```
+
+**Nothing is adjusted toward the prompt.** `results/trail.py` **counts the verdicts out of the
+review files' own text** and publishes whatever the repository holds on the day `RESULTS.md` is
+assembled; `test_the_review_trail_counts_FOURTEEN_FAILS_AND_SIX_PASSES_FROM_THE_FILES` pins today's
+figure so a later change is a failing test rather than a silent drift. ⚠️ **The prompt's sentence is
+the weaker claim and adopting it would have been the safer-looking move; it was still not adopted**,
+because a remembered number in a `RESULTS.md` is precisely what this chunk exists to prevent.
+
+⚠️ **AND ARRIVING AT FOURTEEN COST TWO DEFECTS IN THIS SESSION'S OWN PARSER, BOTH MEASURED** — see
+`INCIDENTS.md` **INC-102**. The first draft reported **FAIL 10** with three FAILs as `UNRECORDED`;
+the second reported six more as `AMBIGUOUS`. **The count only became trustworthy once the parser was
+built to refuse rather than to guess.**

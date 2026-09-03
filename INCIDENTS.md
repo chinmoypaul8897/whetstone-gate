@@ -8387,3 +8387,141 @@ it**, which is three self-witnessing powers in one fence. **The honest remedy is
 a correction to a list**: `Q-125`'s enumeration should say **five**, and `OF-221` carries that so the
 next session that lands a `config/` value is told where the fifth one is before it starts rather
 than after.
+
+---
+
+## INC-102 — the chunk built to stop `RESULTS.md` publishing a remembered number wrote a verdict parser that published **FAIL 10** where the repository holds **14**, then a second one that reported six real FAILs as `AMBIGUOUS`, and both drafts looked clean because every review file it could not read simply vanished from the count
+
+**Date:** 2026-09-03 (C18 BUILD 1, `5a2c81df`. Found by this session against its own work, **before
+any commit**, by printing the per-file verdicts instead of the total. **Fix:** in this session; see
+**Fix**.)
+
+**Event:** `results/trail.py` publishes the review trail — *"for every chunk, whether it was
+adversarially reviewed, how many times, whether it PASSED"* — by reading each `docs/reviews/
+REVIEW_*.md`'s own verdict line. **Three drafts, three different answers, all from the same twenty
+files:**
+
+```
+DRAFT 1  regex `verdict[:—-]{0,2}\s*\**\s*(PASS|FAIL)`, plus `^REVIEW_(C?)(\d+)_(\d+)\.md$`
+         -> FAIL 10 * PASS 6 * UNRECORDED 3        and REVIEW_C0.md NOT COUNTED AT ALL
+DRAFT 2  + a heading form, bounded at "12 characters after the #"
+         -> FAIL  8 * PASS 6 * AMBIGUOUS 6
+DRAFT 3  both forms, each bounded to non-word characters only
+         -> FAIL 14 * PASS 6 * AMBIGUOUS 0 * UNRECORDED 0   <- agrees with a hand count
+```
+
+**Action:** the per-file verdicts were printed, one row per artefact, and each disagreement was
+driven to its cause rather than tuned away. Four causes, all measured:
+
+1. **`REVIEW_C0.md` HAS NO ATTEMPT SUFFIX.** The first review this project ever wrote is
+   `REVIEW_C0.md`, not `REVIEW_C0_1.md`. A pattern requiring `_<attempt>` **dropped the file
+   silently** — and it is a **FAIL**, so C0 published as *"reviewed once, PASSED"*.
+2. **THREE FAILs RECORD THEIR VERDICT AS A HEADING, NOT AS A `VERDICT:` LINE.** `REVIEW_7_1`,
+   `REVIEW_7_2` and `REVIEW_8_1` open with *"VERDICT: recorded in §15, at the foot of this file.
+   Nothing above it is a verdict"* and then carry `# ⚠️ FAIL.` or `> # ⚠️ **FAIL** — FOUR
+   BLOCKERS …`. The inline-only regex correctly matched **nothing** on the pointer sentence and so
+   reported all three `UNRECORDED`.
+3. **A PROSE HEADING ABOUT THE BAR MATCHED AS A VERDICT.** `## 8. WHAT A PASS REQUIRED, ITEM BY
+   ITEM` sits in **all six** `REVIEW_C6_*` files, whose verdicts are **FAIL**. A heading pattern
+   allowing twelve characters of run-up reached the word `PASS` and reported six FAILs `AMBIGUOUS`.
+4. **A SENTENCE ABOUT A *PREDICTION* MATCHED AS A VERDICT.** `REVIEW_C6_6` contains
+   `verdict: **P-48 predicted PASS.**` — a review scoring its own pre-registered prediction. A
+   32-character inline window reached that `PASS` and made that file `AMBIGUOUS` too.
+
+**Expectation:** the trail should have reported **FAIL 14 / PASS 6** from the first draft, because
+every one of the twenty artefacts records a verdict and a reader can find each in seconds by eye.
+
+**Missing:** ⚠️ **any assertion that every review file resolves.** Drafts 1 and 2 had a passing test
+for the *shape* of the parse and none for its *coverage*, so a file the parser could not read did not
+fail anything — **it left the count**. There was also no shared statement anywhere in the repository
+of what a verdict line looks like: twenty artefacts, written by many sessions, in **two** shapes and
+one pointer form, with the convention living only in the files.
+
+**Missed:** ⚠️ **`REVIEW_7_1`'s and `REVIEW_7_2`'s OWN SECOND LINE SAYS SO, IN CAPITALS.** *"VERDICT:
+§15, at the foot of this file. **Nothing above it is a verdict.**"* This session read both files
+while gathering context — they are named in its own read order — and still wrote a parser that looks
+only where those files say the verdict is **not**. The instruction was in the input, in the sentence
+immediately adjacent to the thing being parsed.
+
+**Diagnosis:** the parser was written from **one** observed verdict shape and no coverage assertion,
+so every file it could not read was silently absent from a total that still looked plausible — which
+is the same mechanism as a shrinking denominator, applied to evidence instead of episodes.
+
+**Fix:** `results/trail.py` now tries **both** shapes; each is bounded so that only punctuation and
+whitespace may sit between the anchor and the verdict; the filename pattern makes the attempt suffix
+optional; a file whose two shapes **disagree** returns `AMBIGUOUS` and one that resolves to neither
+returns `UNRECORDED`, and **neither is `PASS`**. `tests/test_c18_results.py` adds
+`test_every_review_file_records_a_verdict_this_parser_can_read`, which asserts
+`AMBIGUOUS == 0 and UNRECORDED == 0` over the real directory — the coverage assertion that was
+missing — plus four negative controls carrying the exact strings that fooled drafts 1 and 2. **Fix
+SHA: this session's build commit, stated in `docs/sessions/c18-build-1.txt` §1.**
+
+**Systemic guardrail:** ⚠️ **a coverage assertion, and it generalises past this parser.**
+`test_every_review_file_records_a_verdict_this_parser_can_read` makes *"the parser could not read
+this file"* a **red test** rather than a quietly smaller number, and the same shape is now applied to
+the other two things C18 parses: the degradation ladder **refuses** on anything but six rungs
+(`test_a_ladder_with_the_wrong_number_of_rungs_is_a_REFUSAL_and_is_DRIVEN`), and `STATUS.md`'s chunk
+table refuses on zero rows. ⚠️ **The rule this session would give the architect for `PROCESS.md` §9:
+every parser this project publishes a number from must assert its own COVERAGE, not only its
+correctness on the rows it managed to read** — because a parser is a denominator, and hard rule 11
+already says what happens to those.
+
+---
+
+## INC-103 — the assembler's first escape rate divided by episodes the scorer had **DROPPED**, so an unscored episode would have published as a clean one: hard rule 11's shrinkage running backwards, where it flatters instead of deflating
+
+**Date:** 2026-09-03 (C18 BUILD 1, `5a2c81df`. Found while reading this session's own first rendered
+`RESULTS.md`, **before any commit**. **Fix:** in this session; see **Fix**.)
+
+**Event:** the first end-to-end render over synthetic ledgers printed arm 4's escape cell as
+**`0/1`**. ⚠️ **MEASURED: that arm had exactly one ledger episode and the scorer had DROPPED it.**
+Golden 4's arm-4 rows name `pay_OTHER` and `pay_CANARYRECONX`, neither of which exists in seed
+2001's world, so C8's `seed_cross_check` dropped the episode as `SEED_MISMATCH` — correctly, and the
+drop table said so three sections lower:
+
+```
+THE TABLE SAID   arm 4  escape 0/1 = 0.0% - 95.0% upper bound 95.0%
+THE DROP TABLE SAID   arm 4  offered 1 * scored 0 * dropped 1 (SEED_MISMATCH 1)
+```
+
+**Action:** `ArmRow` gained a second episode column. The escape rate is now over **scored** episodes
+and is `None` — printing *"n/a — 0 of this arm's 1 ledger episode(s) were SCORED. See the drop table;
+this is not a zero"* — when none were scored; CANARY-A and CANARY-B keep the **ledger**-episode
+denominator, because `HOLES.md` §3.1 is frozen on *"divide by arm 1's episode count"* and the probe
+reads a dropped episode's rows like any other. **Both denominators print, and the table states in
+terms that they are different and that the difference is the drop count.**
+
+**Expectation:** an episode the scorer refused to score must not appear in the denominator of a rate
+about what the scorer found, in either direction.
+
+**Missing:** ⚠️ **any statement anywhere that §12.1's escape column and §10.2's CANARY columns have
+different denominators.** `CONTEXT.md` §12.1 gives both as columns of one table with one row per arm
+and never says the denominators differ; the drop counter and the probe counter were built by
+different chunks (C8 and C10) and neither had reason to name the other's population. **The first
+artefact in which the two meet is this one.**
+
+**Missed:** ⚠️ **this session had already written the sentence that names the defect, in its own
+`denominator.py` docstring, hours earlier** — *"a truncated episode is COUNTED in the denominator …
+filing truncation under 'dropped' would be the exact shrinkage the rule forbids, wearing the rule's
+own clothes."* Having reasoned about which episodes belong in a denominator and in what direction the
+error runs, it then wrote `max(episodes, 1)` into the escape figure and did not ask which `episodes`
+that was.
+
+**Diagnosis:** one `episodes` field served two populations — the arm's published ledgers and the
+arm's scored episodes — so the wider one silently became the denominator of the narrower one's rate,
+and the direction of the error was **toward a smaller reported escape rate**.
+
+**Fix:** `results/table.py` carries `episodes` and `scored_episodes` as separate fields with separate
+docstrings; `results/pipeline.py` divides the escape count by `len(scores)`; an arm with no scored
+episodes gets a stated absence rather than a zero, and so does its money block.
+`tests/test_c18_results.py` adds
+`test_the_ESCAPE_denominator_is_SCORED_episodes_and_the_PROBE_denominator_is_LEDGER_episodes`, which
+asserts on the real synthetic run that `episodes − scored_episodes == dropped`. **Fix SHA: this
+session's build commit, stated in `docs/sessions/c18-build-1.txt` §1.**
+
+**Systemic guardrail:** ⚠️ **the identity is now asserted rather than the two numbers merely being
+separate:** the difference between the two episode columns **must equal** that arm's drop count, and
+a test computes both sides from the same run. A future field that quietly re-merges the populations
+breaks that identity rather than producing a plausible smaller rate. ⚠️ **What is NOT closed, and is
+named rather than accepted quietly:** nothing forces a *future* rate added to this table to declare
+which population it is over. `OPEN_FINDINGS.md` **OF-226**.

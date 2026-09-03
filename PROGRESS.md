@@ -6,6 +6,166 @@ not a record; this file is.
 
 ---
 
+## C18 — **BUILD, attempt 1** — 2026-09-03 — 🟡 **THE RESULTS ASSEMBLER IS BUILT. `RESULTS.md` IS NOT WRITTEN, AND MUST NOT BE — IT IS WRITTEN BY THE RUN.**
+
+**SESSION-TOKEN:** `5a2c81df` · **DATA ROW 69** of `QUESTIONS.md`'s `## Session tokens` table,
+⚠️ **COUNTED FROM THE TABLE ITSELF** in the operator's working tree at
+`C:\Users\chinm\whetstone-gate`, at `HEAD` = `42491bf` when this session began writing (`INC-54`
+requires a session to say which tree). ⚠️ **The tree moved under this session**: it opened at
+`b8e1ecb` and a concurrent **ARCH FIX — PRE-FREEZE 2** session (`ff6d79ae`) landed `469fd21`,
+`b762090` and `42491bf` during it. **The row did not exist and this session self-recorded it**;
+`check_roles` **E1** fails on a token that is not in that table. **The token is the architect's;
+only the row is this session's.** No self-record ordinal is claimed — see `Q-127`'s heading and
+`OF-225` for why the sequence is no longer derivable.
+
+**VERDICT: BUILT, UNREVIEWED, NOT TAGGED.** ⚠️ **NO TAG WAS CUT AND NONE WAS ASKED FOR** — the
+prompt says `NO TAG`, and `git tag -l` is byte-identical before and after: `c0-pass c1-pass
+c13-pass c2-pass c3-pass c4-pass`. **This session does not self-certify.** A fresh adversarial
+review follows, and under degradation **rung 1** (`INC-61`, `Q-083`) that review also absorbs
+**C15's folded `code` review**.
+
+⚠️ **TOKEN SPEND: ZERO. NO PROVIDER MODEL CALL OF ANY KIND.** The prompt sanctioned none and none
+was made. This chunk **replays stored ledgers and never asks a model**, and that is asserted rather
+than promised: `tests/test_c18_results.py` walks `results/`'s **transitive first-party import
+graph** and **scans its raw source text**, and **fires each walk at a planted module** built to
+break it. `evals/usage/` was not read because nothing was spent; the per-model token row below is
+therefore **zero by construction, not by measurement of a lane**.
+
+⚠️ **`git diff --cached` WAS THE FIRST COMMAND OF THE SESSION, BEFORE THE READ ORDER** (`OF-213`).
+The shared index was **clean**, so nothing inherited was carried into a commit.
+
+---
+
+### 1. WHAT WAS BUILT
+
+`src/whetstone_gate/results/` — **eleven modules**, and `tests/test_c18_results.py` — **91 tests,
+all green.** Nothing else in `src/` was touched.
+
+| module | what it refuses to publish without |
+|---|---|
+| `figures.py` | **a ceiling on every figure.** §12.4's table regenerated **by computation** — 6.0% at N=50, 10.0% at N=30, 45.1% at n=5 — with **both branches printed and the one taken named**, or `UNDECIDED` |
+| `denominator.py` | **a reconciling denominator**, every declared drop category **including the zeros**, truncation **counted in**, and the **pre-registered-N shortfall as a number** |
+| `table.py` | **the productive-actions confound, per row**; and CANARY-A published **twice, labelled** |
+| `money.py` | the four **never summed**; **A5 beside them**; the **structural zero with its mechanism** |
+| `delta.py` | the S2/S2-amt delta **in both directions**, and an S2 zero **as a result** |
+| `blocks.py` | the **void determination** with C10's banner **verbatim**, §12.1's four mandatory-alongside outputs, and `Q-032`'s corpus split |
+| `degradation.py` | the rung table **parsed from `PROTOCOL.md`**, never assumed |
+| `trail.py` | the review trail **counted from the files**, never asserted |
+| `camel.py` | **P1–P3 scored**, with P2's pre-registered non-reproduction as its **own outcome** |
+| `document.py` | section order, the three refusals, and the determinism claim **scoped exactly** |
+| `loader.py` + `pipeline.py` + `__main__.py` | the thin outer shell — **the only place that touches a file or a subprocess** |
+
+⚠️ **`RESULTS.md` WAS NOT CREATED.** It is named under this session's **NOT**, it is written **by
+the run**, and the entry point defaults to **stdout** for exactly that reason: a build session that
+created one would be publishing numbers no sweep produced.
+
+---
+
+### 2. THE TEN THINGS THE PROMPT ASKED FOR, EACH WITH ITS EVIDENCE
+
+1. **EVERY FIGURE CARRIES ITS CEILING.** Not *"zero escapes"* — `0/50 = 0.0% - 95.0% upper bound
+   6.0% [rule of three (3/n)]`, and the N=30 branch's `10.0%`, **both printed with the branch
+   taken named**. A bare count **raises `CeilingMissing`** at the renderer *and* at a
+   document-level sweep, and **both refusals are driven**.
+2. **HARD RULE 11.** The identity **can fail and is driven**; every declared category prints
+   including the zeros; a truncated episode is **counted in the denominator**; and
+   ⚠️ **the episodes the pre-registered N registered and the sweep never reached print as a
+   number** — the term no ledger can carry.
+3. **THE PRODUCTIVE-ACTIONS CONFOUND** is a **required cell**; a row without it refuses, driven.
+   `Q-067`'s ledger reading is quoted **with the word MONEY absent**, and the count comes from C8's
+   own predicate rather than a second one written here.
+4. **THE VOID BANNER IS PRINTED VERBATIM** — asserted character-for-character against
+   `probe.banner.banner_if_void`. Today's state is **`UNDETERMINED`**, not *"not void"*, because
+   `Q-106`'s threshold is a sentinel and a verdict computed from an absence is what hard rule 9
+   forbids. ⚠️ **`Q-122` is RULED, and it landed mid-session**: both CANARY-A readings publish,
+   labelled, and the `HOLES.md` version read is **recorded** — commit `469fd21`, blob `0fb1e5cd…`.
+5. **THE S2/S2-amt DELTA, BOTH DIRECTIONS**, against golden 2's own `published_finding`:
+   **NOISY 2 episodes** (F4 instalments, F5 goodwill) and **BLIND 1** (F6). The **episode** count is
+   the headline unit and the **seq** count prints beside it, because F4 alone contributes two seqs
+   and counting seqs would publish three false positives where golden 2 states two.
+6. **A5 BESIDE THE FOUR**, never inside one — **AST walk, per component, fired at a dirty file and
+   at `OF-196`'s four evasion shapes**, with a clean negative control.
+7. **P1–P3 SCORED.** P2's pre-registered non-reproduction has its **own outcome constant**, so a
+   Branch-A run blocking nothing on banking **cannot be expressed as `FAILED`** — asserted.
+8. **THE DEGRADATION RECORD IS PARSED, NOT ASSUMED.** Rungs **1/3/5 FIRED**, **2/4/6 NOT**, read
+   from `PROTOCOL.md` §5.1; **C16 / AD-CMP named NOT RUN with why**; a shortened table **refuses**.
+9. **THE REVIEW TRAIL IS A PUBLISHED RESULT** — verdicts **counted from the files**, the unreviewed
+   chunks named in the table, and the tag treated as the authority on a PASS.
+10. **BOTH N ARITHMETICS AND THE PILOT'S FIGURE.** The branch taken prints as
+    **`UNDECIDED - the pilot has not run (Q-107, Q-121)`**, and the break-even **31,908** is
+    `runner/n_rule.py`'s, printed rather than recomputed here.
+
+---
+
+### 3. ⚠️ TWO DEFECTS THIS SESSION FOUND IN ITS OWN WORK, BOTH MEASURED, BOTH BEFORE ANY COMMIT
+
+**`INC-102` — the verdict parser.** Three drafts gave three answers over the same twenty files:
+**FAIL 10** (three FAILs `UNRECORDED`, `REVIEW_C0.md` not counted at all), then **FAIL 8** (six real
+FAILs `AMBIGUOUS`), then **FAIL 14**, which agrees with a hand count. Four causes, each driven:
+`REVIEW_C0.md` has no attempt suffix; three FAILs record their verdict as a **heading** because their
+own second line says *"nothing above it is a verdict"*; `## 8. WHAT A PASS REQUIRED` matched as a
+verdict in all six `REVIEW_C6_*`; and `verdict: **P-48 predicted PASS.**` matched in `REVIEW_C6_6`.
+⚠️ **The guardrail is a COVERAGE assertion** — `UNRECORDED == 0 and AMBIGUOUS == 0` over the real
+directory — because a file the parser could not read was **silently absent from a total that still
+looked plausible**, which is a shrinking denominator applied to evidence.
+
+**`INC-103` — the escape denominator.** The first rendered document printed arm 4's escape as
+**`0/1`** for an arm whose **single episode the scorer had DROPPED** as `SEED_MISMATCH`. **Hard rule
+11's shrinkage running backwards, where it flatters.** `ArmRow` now carries `episodes` (the arm's
+published ledgers — CANARY-A's and CANARY-B's denominator, frozen in `HOLES.md` §3.1) and
+`scored_episodes` (the escape rate's) as **separate fields**, both print, the table says they
+differ, and **a test asserts `episodes − scored_episodes == dropped` on a real run.**
+
+⚠️ **Both were found by reading this session's own rendered output rather than its tests.** The
+tests were green through both defects, because a green test proves what it asserts and nothing else.
+
+---
+
+### 4. ⚠️ WHAT THIS SESSION COULD NOT DO, NAMED RATHER THAN WORKED AROUND
+
+* **`make eval` still prints "NOT YET IMPLEMENTED"** (`Q-128`, `OF-224`). `PROCESS.md` §12.1's C18
+  row is *"`RESULTS.md` **+ `make eval`**"*, but `src/whetstone_gate/tasks.py` is in **neither** the
+  prompt's FENCE nor its NOT list. `CLAUDE.md` §4 says STOP and report rather than work around, so
+  the pipeline ships behind its own entry point and the **one-function** wiring is written out for
+  its owner. ⚠️ It also needs a run directory, which is RUN-3/RUN-4's output, so it lands **with or
+  after the sweep** — until then the placeholder is honest rather than broken.
+* **C18 is a `full` chunk and no artefact says which golden is its own** (`Q-127`, `OF-223`). Built
+  against goldens **2, 3 and 4** as the prompt names them, each used as an answer key and pinned;
+  **golden 8 is not consumed and that is stated**, because a golden consumed decoratively is worse
+  than one not consumed.
+* **The prompt's *"eleven real FAILs"* is measured at FOURTEEN** (`Q-129`). Nothing was adjusted
+  toward the prompt; the code counts and a test pins today's figure.
+* **`make check-prereg` still fails open** (`OF-185`, `Q-100`) while hard rule 9 wants its PASS/FAIL
+  line in `RESULTS.md`. The assembler prints what the target **actually** produces —
+  `NOT-YET-FROZEN` — **labelled as not a PASS**, and names the finding's owner in the same string.
+
+---
+
+### 5. THE SUITE, MEASURED BY THIS SESSION
+
+⚠️ **A concurrent session was live in this tree throughout**, so the suite figure is a measurement
+of a moving tree and is reported as one — `c10-build-1.txt` §12c's precedent. **Attribution by
+file, and none of the failures is this chunk's**; the exact counts and every failing test id are in
+`docs/sessions/c18-build-1.txt` §5, which is committed **before** this entry is printed.
+`tests/test_c18_results.py`: **91 passed, 0 failed**, run alone and again inside the suite.
+`make check-roles`: **21 passed, 0 failed, 3 n/a, exit 0**, with **D1, D2, D3 and D4 all PASS**.
+`git status --porcelain tests/goldens/`: **EMPTY**; all nine golden diffs empty.
+
+---
+
+### 6. WHAT THE NEXT SESSION SHOULD KNOW
+
+The assembler is **complete and exercised but has never seen a real ledger** — its inputs so far are
+golden 3's own five rows, golden 4's five arms, and a synthetic run directory built from them. ⚠️
+**The first real `RESULTS.md` is the sweep's, and the shapes most likely to bite are the ones no
+fixture here could produce**: an arm with episodes in both states, a `run.json` block whose owner
+never filled it in (which **refuses**, by design, naming the owner), and a turn curve over rows
+whose `turn` field the runner writes rather than this session's fixture. **A review should point the
+assembler at RUN-3's output the moment it exists**, and should read §4 above first, because two of
+its four items decide whether `make eval` does what the README will say it does.
+
+---
+
 ## ARCH — **FIX — PRE-FREEZE 2** — 2026-09-03 — 🟢 **THE THREE REDS ARE GONE. `Q-122` AND `Q-123` RULED AND LANDED; `Q-125` CLOSED. THE FENCE SPANNED ALL FOUR ARTEFACTS OF A CONSTANT AND FOUND A FIFTH.**
 
 **SESSION-TOKEN:** `ff6d79ae` · **DATA ROW 68 / 8-HEX ROW 67** of `QUESTIONS.md`'s
