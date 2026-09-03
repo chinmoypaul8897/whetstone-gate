@@ -95,6 +95,38 @@
 
   E1 IS NOW GREEN: "clean - 78 issued row(s) covering 78 token(s)".
 
+2.1 ! AND THEN THIS FILE WAS DELETED FROM `HEAD` BY THE OTHER INSTANCE, WHICH IS
+    `INC-88`/`INC-91`'s FAILURE ARRIVING FOR REAL RATHER THAN AS A PRECAUTION.
+
+    This block was committed at `68f970f` - CLAUDE.md S6.1's "the FILE is the
+    record" - and pushed. Commit `fd67082`, 47 seconds later, carries:
+
+      docs/sessions/arch-night-1.txt | 763 -----------------------------------
+
+    THE ENTIRE SESSION RECORD, DELETED, BY A COMMIT WHOSE OWN SUBJECT IS ANOTHER
+    DELETION IT HAD JUST DISCOVERED IN ITS OWN WORK. Its index had been seeded
+    from a `HEAD` older than `68f970f`, so `git commit` on the whole index
+    reverted a file it had never heard of. That is PROCESS.md S7b's first
+    sentence, exactly: "A bare `git commit` commits THE WHOLE INDEX and not your
+    paths, so it can commit - or DELETE - another session's work under YOUR token."
+
+    ! MEASURED AT THE SAME MOMENT, and it is the same defect pointing the other
+      way: the SHARED index then held a snapshot that would DELETE 136 lines of
+      INCIDENTS.md and 53 lines of tests/test_c12_driver.py - i.e. `fd67082`'s own
+      INC-138 fix. A bare commit by anyone would have ping-ponged the two sessions'
+      work indefinitely. THIS SESSION DID NOT TOUCH THE SHARED INDEX: it is not
+      this session's staging, S7b step 4 resets only one's own paths, and a
+      `git reset` across it would have destroyed the other instance's work to
+      protect this one's.
+
+    RESTORED by the next commit, which re-adds the file from this session's
+    working tree. ! NO HISTORY WAS REWRITTEN to do it - the file is simply added
+    again, which is the only remedy S7 permits and the correct one.
+    ! AND NOTHING WAS LOST: the blob survives at `68f970f`
+      (`c834f18896cf870cb77d9cb9df585a4270fabd42`), and the working-tree copy was
+      never touched. The cost was visibility, not content - which is precisely
+      `INC-65`'s uncloseable half: "NOTHING CAN WARN THE SESSION BEING SWEPT."
+
 ================================================================================
 3. GATE 1 - THE PILOT. SKIPPED AT 1b. VERBATIM.
 ================================================================================
@@ -376,7 +408,7 @@
     them". Before the tag it recomputes nothing. THE TIMING IS EXACTLY BACKWARDS:
     silent while the row is FIXABLE, loud once the row is FROZEN. What DID catch
     it is the suite - test_every_config_file_is_in_PROTOCOL_mds_manifest_and_its_
-    blob_sha_RECOMPUTES - which recomputes unconditionally. INC-137, Q-181.
+    blob_sha_RECOMPUTES - which recomputes unconditionally. INC-139, Q-181.
     ! check-prereg ITSELF WAS NOT CHANGED: that moves what a published PASS/FAIL
       means in RESULTS.md, which is Class A.
 
@@ -639,7 +671,10 @@
 
   MEASUREMENT UPDATES, not new numbers: Q-163 (verified unchanged), Q-164
   (superseded by Q-183), Q-169 (re-measured; residual now zero).
-  INCIDENT: INC-137. ! INC-134, INC-135, INC-136 and the other Q-180 ARE THE
+  INCIDENT: INC-139, written as INC-137 and RENUMBERED after the concurrent
+  session committed an INC-137 of its own FIRST - the landed-second rule, as at
+  Q-187. ! Three commit messages cite it as INC-137 and are NOT rewritten.
+  ! INC-134, INC-135, INC-136, INC-137, INC-138 and the other Q-180 ARE THE
   CONCURRENT SESSION'S and are not claimed here.
 
 ================================================================================
@@ -751,7 +786,7 @@
 ================================================================================
 
   90b6d6f  GATE 3a and 3b - the ten genesis assertions and the manifest row
-  d982632  GATE 4 - the secret scan, INC-137, Q-181..Q-187, the token row
+  d982632  GATE 4 - the secret scan, INC-139 (as INC-137), Q-181..Q-187, token row
   <next>   this FINAL OUTPUT, committed VERBATIM before it is printed
 
   ! `f45721d` and `0e3a69f` CARRY THIS TOKEN AND ARE NOT THIS SESSION'S. They are

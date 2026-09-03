@@ -63,7 +63,9 @@ OBSERVED TO FAIL.** ⚠️ **No golden was edited and `config/` was not touched.
 The prompt named `a4a9a02…`/30,960 as the stale value; it is the **true** value at `HEAD`, and the
 published row (`44e19ac5…`/30,930) was the stale one. Proved by **diffing the two blobs**: one line
 differs, and it is `Q-153`'s. `30,930 + (40−10) = 30,960` exactly. Row re-measured; derivation
-written beside it. `INC-137`. ⚠️ **`make check-prereg` exited 0 over the defect**, recomputing
+written beside it. `INC-139` (written as `INC-137`; renumbered after the concurrent session
+committed an `INC-137` of its own first — the landed-second rule, as at `Q-187`).
+⚠️ **`make check-prereg` exited 0 over the defect**, recomputing
 nothing, because its recompute is gated on a tag that does not exist — `Q-181`.
 
 **3c — `Q-163` verified unchanged; `Q-164` is not merely open, it is WRONG.** `config/` untouched

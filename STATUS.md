@@ -31,7 +31,8 @@ edited; `git status --porcelain tests/goldens/ config/` is EMPTY.**
 **(3b)** ⚠️ **THE PROMPT'S DESCRIPTION OF THE STALE ROW WAS INVERTED AND VERIFYING IT FIRST IS WHY
 THIS IS RIGHT.** `a4a9a02…`/30,960 is the **TRUE** value at `HEAD`; the **published** row
 (`44e19ac5…`/30,930) was the stale one. Proved by **diffing the two blobs** — one line differs and
-it is `Q-153`'s — and confirmed arithmetically: `30,930 + (40−10) = 30,960` exactly. `INC-137`.
+it is `Q-153`'s — and confirmed arithmetically: `30,930 + (40−10) = 30,960` exactly. `INC-139`
+(written as `INC-137`, renumbered after the concurrent session committed an `INC-137` first).
 ⚠️ **`make check-prereg` EXITED 0 OVER IT, RECOMPUTING NOTHING**, because its recompute is gated on
 a tag that does not exist. `Q-181`.
 **(3c)** `config/` **untouched** and no ruling taken. `Q-163` verified unchanged. ⚠️ **`Q-164` IS NOT

@@ -10221,9 +10221,22 @@ it cannot see.**
 
 ---
 
-## INC-137 — a frozen artefact's manifest row was stale for two days, and the target `CLAUDE.md` hard rule 9 names as the check for it exited 0 over the defect on every one of those days
+## INC-139 — a frozen artefact's manifest row was stale for two days, and the target `CLAUDE.md` hard rule 9 names as the check for it exited 0 over the defect on every one of those days
 
 **Date:** 2026-09-04 (ARCH NIGHT 1, `5d7e2b91`). Fix SHA under **Fix**.
+
+⚠️⚠️ **RENUMBERED FROM `INC-137` TO `INC-139` AFTER A DUPLICATE REACHED `HEAD`, AND THE RENUMBERING
+RULE IS STATED SO IT DOES NOT OSCILLATE.** The concurrent session holding this same token
+(`INC-136`, `QUESTIONS.md` `Q-180`/`Q-187`) allocated its **own** `INC-137` and committed it at
+`1d3f2fa`, **before** this entry landed at `d982632`; it then took `INC-138` and disclosed the
+collision risk in that entry's own opening. **The entry that landed SECOND renumbers** — which is
+the same rule this session applied to itself at `Q-180` → `Q-187`, and applying it consistently is
+what stops two sessions renumbering past each other for ever. `INC-125` records this class reaching
+`HEAD` once already; this is the second time, on the same night, in both directions.
+⚠️ **THREE COMMIT MESSAGES — `90b6d6f`, `d982632` and `68f970f` — CITE THIS ENTRY AS `INC-137`, AND
+THEY ARE NOT REWRITTEN.** `PROCESS.md` §7 forbids a history rewrite outright, and a rewrite here
+would destroy `probe-v1` and every `cN-pass` tag to tidy a number. **The stale citation is left
+standing and explained here**, which is the same trade the permanent `(unreviewed)` markers make.
 
 **Event:** `PROTOCOL.md` §1.1's manifest row for `config/protocol.yaml` published
 `44e19ac5c79cd99ca5fc67cd1dd2a0558be4ee98b9ac41aab5cfb72ff4ab3d05`, **30,930 bytes**, git blob

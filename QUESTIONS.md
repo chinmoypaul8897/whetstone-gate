@@ -13845,7 +13845,9 @@ finding, in the same file, in the minutes between that survey and this append.**
 one event and belong side by side; see `Q-187` for the full account.
 `Q-181`…`Q-186` keep their numbers because `PROTOCOL.md` already cites `Q-181` in a committed line.
 ⚠️ **`INC-134`, `INC-135` and `INC-136` ARE THE OTHER SESSION'S**, measured in the working tree
-before this block was appended, so this session's incident is **`INC-137`**. `INC-125` records this
+before this block was appended, so this session's incident was written as **`INC-137`** — and that
+collided too, because the other session committed an `INC-137` of its own first, so this session's
+is **`INC-139`**, renumbered under the same landed-second rule as `Q-187`. `INC-125` records this
 collision class reaching `HEAD` once already. If any of these still collide, the renumbering is the
 architect's and nothing here depends on the number.
 
