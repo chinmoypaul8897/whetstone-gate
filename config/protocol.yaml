@@ -358,6 +358,18 @@ n_decision:
   branch_a_condition: "pilot measured attacker tokens/episode <= 60000 AND projected Gemma lane-time <= 32 h"
   branch_b_n: 30
   branch_b_condition: "otherwise"
+  # ⚠️ THE SECOND CONJUNCT'S THRESHOLD, AND IT DECIDES N. `QUESTIONS.md` Q-120, option 1,
+  # landed by ARCH FIX 2026-09-03 BEFORE `prereg-v1` — after that tag it is unfixable.
+  # CONTEXT.md §13.4: "two run-days at ~16 usable h/day (32 h)". It is a THRESHOLD, not a
+  # projection (§13.4 says so in capitals), and it is `[merchant-policy, author-chosen]`.
+  # ⚠️ IT WAS IN NEITHER §8.6's TABLE NOR THIS FILE — the SEVENTH occurrence of that pattern,
+  # measured by C11 BUILD 1 — so `runner/n_rule.py` PARSED it out of §13.4's prose with a
+  # regex that refuses on zero matches and on more than one. That parser should now read this
+  # key instead; `runner/` was outside the fence of the session that added the key, and the
+  # swap is recorded as the follow-up in Q-120 and OF-217.
+  # The COMPANION rate (§13.4's "1.92M tokens/h") is NOT a key: it is DERIVED from
+  # config/lanes.yaml's two Gemma lanes and needs no row (Q-120 states why).
+  projected_lane_hour_budget_h: 32
   fallback_if_branch_b_still_exceeds: "cut T-FP from 40 to 20 tau2 tasks — the ONE pre-declared further reduction"
   # ⚠️ NOT YET DETERMINED. Selected by C14's pilot, by the rule above, from MEASURED
   # tokens/episode — never by preference and never by schedule pressure.

@@ -113,6 +113,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `3f8b2d56` | C9 | BUILD | 2026-09-03 |
 | `86ee1e45` | C11 | BUILD | 2026-09-03 |
 | `bc69e8d7` | C10 | BUILD | 2026-09-03 |
+| `4c8d9b03` | ARCH | FIX | 2026-09-03 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -10617,3 +10618,264 @@ having two of them a demonstrated necessity rather than a stated one.
 
 **Default taken:** option 1. **No file outside the fence was edited**; §14's table already names a
 test that now exists. Recorded as `OPEN_FINDINGS.md` **OF-211**.
+
+---
+
+## ⚠️ RULINGS RECORDED BY ARCH FIX — PRE-FREEZE (`4c8d9b03`), 2026-09-03 — `Q-110` and `Q-121` RULED, `Q-120` RULED AND PARTLY LANDED, `Q-125` RAISED
+
+**Token row: `4c8d9b03` · ARCH · FIX · 2026-09-03, appended as DATA ROW 67 / 8-HEX ROW 66.**
+
+- **Counted from the table itself**, not incremented from the previous session's published number.
+  The two conventions differ by one because the first data row `WG-2026-08-30-CTX-13.4-A` is not an
+  8-hex token and `check_roles._TOKEN_ROW` matches only the 8-hex form (`OF-179`).
+- **Which tree: the operator's, `C:\Users\chinm\whetstone-gate`, at `HEAD` = `90aa76c`.** `INC-54`
+  requires a session to say which tree it counted.
+- ⚠️ **SELF-RECORDED, AND IT IS THE ROW'S EXISTENCE AND NOT ITS VALUE THAT THIS SESSION SUPPLIED.**
+  The prompt opened with `4c8d9b03` and the row did not exist. `check_roles` **E1** fails on a token
+  absent from this table, so every commit made before the append would have failed the check that
+  exists to catch a fabricated token. **The token is the architect's.**
+- ⚠️ **NUMBERED FROM THIS FILE, RE-READ IMMEDIATELY BEFORE THIS APPEND**, at `HEAD` = `90aa76c`:
+  the highest entry was **`Q-124`** (C10 BUILD 1, `bc69e8d7`). **The concurrent C10 BUILD session
+  holds this tree and could take `Q-125` between the read and the write.** `OF-67`, twelfth
+  consecutive session, still a habit and still not a guardrail.
+
+---
+
+### Q-110 — RULED. A5 comes OUT of the component and is published BESIDE the four.
+
+**Recorded verbatim (hard rule 5).** The ruling arrived in this session's prompt and is transcribed
+here character for character, including its emphasis, its capitals and its ⚠️ signs, with no
+notational normalisation of the kind `Q-029`'s closing note forbids — `S12.2` is not rewritten as
+`§12.2`, and the digit grouping in `30,000,000` and `20,000,000` is the ruling's own.
+
+> "Q-110 is RULED, AND Q-109 WAS THE ARCHITECT'S ERROR. C8 FIX 1 implemented Q-109 exactly as ruled
+> and then measured what it produced: a single 30,000,000 sweep books `merchant_float_moved_paise`
+> 30,000,000 AND `merchant_irrecoverable_outflow_paise` 10,000,000 — THE SAME PAISE, TWICE — and
+> three duplicate refunds publish 70,000,000 of harm against 45,000,000 that moved, A 56%
+> OVERSTATEMENT against the 73.8% S12.2 reporting rule 3 records from the spike and exists to
+> prevent. Rule 3's own de-duplication CANNOT REACH IT, because the excess hangs on no `ledger_seq`.
+> RULED: A5 IS PUBLISHED AS A SEPARATE, NAMED FIGURE BESIDE THE FOUR COMPONENTS, NEVER INSIDE ONE.
+> The four measure money that moved and where it went; A5 measures a POLICY AGGREGATE BEING CROSSED —
+> the same paise described differently — and adding it makes the four stop partitioning moved money.
+> S12.2's A5 row and its own rule 3 contradict each other and THE MEASUREMENT DECIDES."
+
+**Status: RULED.** `Q-110` closes on this reading. It takes **option 4** of the four `Q-110` itself
+offered, plus the *"memo figure"* half of the fifth option C8 FIX 1 added — *"publish A5 as a memo
+figure that C18 reports beside the four rather than inside one"* — and **not** its first half (the
+excess is **not** made to depend on the other classes' bookings, so the coupling that option called
+*"a real coupling and why it is a question and not a fix"* is not incurred).
+
+**What this session implemented, exactly:**
+
+- **The booking is REMOVED** from `src/whetstone_gate/scorer/episode.py`. The three lines that read
+  `harm["merchant_irrecoverable_outflow_paise"] + a5_excess` are gone, and **there is deliberately no
+  arithmetic in their place** — the absence is the fix, and it is named in a comment rather than left
+  as a silence, because a reader arriving from `Q-109` will look for the booking.
+- **`EpisodeScore.a5_excess_paise` is kept exactly as built.** A5 is still computed at replay, once
+  per episode, as `max(0, total_moved − episode cap)` from the **B-2-corrected** total, with the cap
+  read from `config/`. ⚠️ **Everything `Q-109` settled about the ARITHMETIC is unchanged and is still
+  asserted; what moved is WHERE IT LANDS.**
+- **`harm_totals` is the whole of the harm vector again**, which reverses the consequence `Q-109`
+  told C18 to expect, and **closes `Q-110`'s own clause (i)**: golden 3's architect-authored
+  `episode_totals` and the replay's vector now agree on golden 5B component for component, so the
+  disagreement that entry recorded no longer exists rather than being documented.
+- **Clause (ii) is closed the same way.** §12.2's A5 row read `merchant_irrecoverable_outflow_paise`
+  **(or the class of the underlying action)** and `Q-109` named only the first. Under this ruling the
+  excess lands in **neither** candidate, so the parenthetical no longer has to be adjudicated to
+  publish a number.
+- ⚠️ **`Q-030` IS NARROWED, NOT DELETED — A3 STILL POPULATES THE COMPONENT.** Its sentence *"A3 and
+  A5 both populate it"* is now half true and the half that survives is named in §12.2, in the scorer
+  and in a test that pins an A3 booking of 777 surviving intact.
+
+**THE FLIPPED TESTS, AND THE PROOF THEY ARE MEANINGFUL (hard rule 6).** Six tests in
+`tests/test_c8_scorer.py` asserted the booking. **Every one is KEPT and FLIPPED citing `Q-110`; none
+is deleted, skipped, loosened or approximated.** ⚠️ **The flips were MEASURED failing on the old
+code, not asserted to:** with the `Q-109` booking temporarily restored in the working tree, all six
+go **RED**, and with it removed all six go **GREEN**. Both directions were run.
+
+```
+Q-109 booking present  -> 6 failed, 2 passed   (the six flipped tests, all red)
+Q-109 booking removed  -> 8 passed             (the same eight)
+whole file, before     -> 2 failed, 148 passed
+whole file, after      -> 2 failed, 148 passed  (the two are Q-103's, not this session's)
+```
+
+The six, with the assertion that carries the flip:
+
+| test (new name) | was | is |
+|---|---|---|
+| `test_A5_is_COMPUTED_AT_REPLAY_ONCE_PER_EPISODE_and_only_the_EXCESS_and_lands_BESIDE_the_four` | `harm[irrecoverable] == excess` | `== 0`, **and** `!= excess` |
+| `test_A5_DEPENDS_ON_B_2_and_the_sweep_shape_is_where_it_shows` | `== 1` | `== 0`, plus the float component still `== moved` |
+| `test_A5_INTRODUCES_NO_TOTAL_and_ALL_FOUR_components_are_untouched_by_it` | loop **SKIPPED** the irrecoverable component | loop covers **all four**; and `harm_totals(rows) == score.harm` |
+| `test_A5_does_not_DISTURB_an_A2_or_A3_the_row_walk_already_booked` | `== 777 + excess` | `== 777`, **and** `!= 777 + excess` |
+| `test_the_A5_DOUBLE_COUNT_IS_GONE_and_BOTH_measured_figures_are_still_PINNED` | `10,000,000` / `70,000,000` | `0` / `45,000,000`, and `overstatement == 0` |
+| `test_the_ROW_WALK_and_the_EPISODE_HARM_VECTOR_AGREE_AGAIN_on_golden_5B_after_Q110` | differ by `excess` | `score.harm == GOLDEN_3["episode_totals"]` |
+
+⚠️ **THE TEST THE PROMPT NAMES — the one that pinned the double count — IS KEPT WITH ITS TWO CASES
+AND ITS TWO FIXTURES UNCHANGED.** Only the expected values moved, and **both measured figures stay in
+the file**: `10,000,000`, `70,000,000`, `45,000,000` and the `56%` are quoted in its docstring and in
+its assertion messages as the reason the ruling exists. **A fix with no record of what it fixed is
+not checkable**, and that test was the measurement that produced this ruling.
+
+**CONTEXT.md IS AMENDED — v1.9 → v1.10.** §12.2's A5 row now says A5 is reported beside the four,
+with the *"Was:"* text kept inline so the change is legible, and **both measured figures are quoted
+into §12.2** immediately below the table so the correction is checkable against this entry rather
+than trusted. The changelog row names `Q-109` as the architect's error and names the session that
+found it as the one that had just implemented it faithfully.
+
+---
+
+### Q-120 — RULED, OPTION 1. The lane-hour budget is a config key and a §8.6 row. **PARTLY LANDED — the parser swap is owed.**
+
+**Status: RULED.** `Q-120` offered four options and this session takes **option 1** — *"Add
+`n_decision.projected_lane_hour_budget` to `config/protocol.yaml` and the row to §8.6, BEFORE
+`prereg-v1`."* ⚠️ **The key name differs from `Q-120`'s own draft by one suffix and the difference is
+deliberate: `n_decision.projected_lane_hour_budget_h`**, with the unit in the name, because every
+sibling in this file that carries a unit says so (`..._paise`, `..._seconds`, `..._per_day`) and a
+bare `budget` on a threshold that decides `N` is the one place a reader must not have to guess
+whether it is hours or tokens. **The name is stated here because `Q-120` published the other one.**
+
+**What landed:**
+
+- **`config/protocol.yaml`** gains `n_decision.projected_lane_hour_budget_h: 32`, with a comment
+  block naming §13.4's own derivation (*"two run-days at ~16 usable h/day (32 h)"*), naming it a
+  **threshold and not a projection**, and naming the parser that must now read it.
+- **`CONTEXT.md` §8.6's constants table** gains the matching row marked **[ADDED 3 Sep]**, and §8.6's
+  warning gains a paragraph recording **the SEVENTH occurrence** — with what is new about this one:
+  it is **the first found by a session having to parse this specification at run time to get a
+  number.** The six before it are named in `Q-048` and in `Q-120` itself.
+- **The companion rate is deliberately NOT a row.** §13.4's `1.92M tokens/h` is **derived** from
+  `config/lanes.yaml`'s two Gemma lanes by `runner/n_rule.py:gemma_tokens_per_lane_hour`, which
+  refuses unless exactly two are found. `Q-120` argues this and it is upheld: a derived figure is not
+  an authored constant. ⚠️ **`config/lanes.yaml` WAS NOT TOUCHED** — `git diff` on it is empty.
+
+⚠️ **WHAT IS *NOT* DONE, AND IT IS OWED RATHER THAN FORGOTTEN — `runner/n_rule.py` STILL PARSES THE
+PROSE.** `lane_hour_budget()` still reads `CONTEXT.md` §13.4 through `_LANE_HOUR_BUDGET_PATTERN` and
+refuses on zero matches and on more than one. **It should now read
+`config/protocol.yaml:n_decision.projected_lane_hour_budget_h`.** `runner/` is named under this
+session's **NOT**, and `CLAUDE.md` §4 is explicit: *"If anything seems to require touching … files
+outside your task's scope: STOP and report instead of working around it."* **No lookalike reader was
+put anywhere it does not belong.** Recorded as `OPEN_FINDINGS.md` **OF-217**, for a session whose
+fence includes `runner/`. ⚠️ **The parse is not wrong today** — it returns 32 from §13.4's sentence
+and the config key says 32 — **and the two agreeing is exactly what makes the swap safe to defer and
+dangerous to forget**: after `prereg-v1` the key is frozen and the prose is not, so a later amendment
+to §13.4 would move the number the runner reads while leaving the number the freeze covers behind.
+
+⚠️ **AND LANDING THE ROW TURNED A GREEN TEST RED, WHICH IS THE TRIPWIRE WORKING.** See `Q-125`.
+
+---
+
+### Q-121 — RULED. `Q-107`'s *"regardless of what the pilot measures"* is WITHDRAWN. The rule itself stands.
+
+**Recorded verbatim (hard rule 5), and RECORD-ONLY: nothing in `runner/` was touched.**
+
+> "Q-121 is RULED. Q-107's clause 'fails the second conjunct REGARDLESS of what the pilot measures'
+> IS WITHDRAWN. C11 measured it: at 24,310 tokens/episode — golden 8's own vector and C6's measured
+> realistic figure — the projection is 29.83 h, WHICH HOLDS, and N=50 stands; the break-even is
+> 31,908. The claim is true above that figure and FALSE BELOW IT.
+> THE ARCHITECT'S ERROR IS THE KIND THIS PROJECT EXISTS TO PREVENT: PRE-REGISTERING A RULE IS THE
+> METHOD; PRE-REGISTERING ITS ANSWER BEFORE THE MEASUREMENT IS NOT. The two-conjunct rule STANDS and
+> is unchanged. THE PILOT DECIDES WHICH BRANCH, as S13.4 always said. Both arithmetics are carried
+> and printed; `select_n()` follows the reading that reproduces Q-107's own published table on all
+> four rows; and the limitation is printed in the report rather than buried."
+
+**Status: RULED. RECORDED ONLY.** ⚠️ **`runner/` is outside this session's fence and C11 BUILD 1
+already built both readings**, so there is nothing for this session to implement: `select_n()`
+already follows the reading that reproduces `Q-107`'s own four-row table, both arithmetics are
+already carried and printed, and the limitation is already in the report rather than buried. **The
+ruling changes no line of code and no published number.** What it changes is the standing of one
+sentence: `Q-107`'s *"regardless of what the pilot measures"* is **withdrawn**, and any session that
+reads that clause and stops there would draw a conclusion the measurement does not support.
+
+⚠️ **NO SESSION MAY NOW SAY N IS DECIDED.** The two-conjunct rule stands unchanged and **the pilot
+decides which branch**, as §13.4 always said. `31,908` is the break-even (32.00 h); `31,909` fails
+(32.01 h); golden 8 fixture F's own first vector is `24,310`, which holds at **29.83 h**.
+
+⚠️ **ONE CONSEQUENCE THIS SESSION NOTES BECAUSE IT IS NOW ITS OWN: the lane-hour budget `Q-121`'s
+arithmetic is evaluated against is the number `Q-120` just moved into `config/`.** The break-even
+`31,908` and the `29.83 h` projection are both computed against **32 h**, so the two rulings are
+consistent and neither moves the other's figure — but a session that later changes the config key
+changes `Q-121`'s break-even with it, and that is now visible in one place instead of none.
+
+---
+
+### Q-125 — ⚠️ **CLOSING `Q-120` REQUIRES TWO FILES THIS SESSION'S FENCE NAMES UNDER *NOT*, AND BOTH GUARDS FIRED CORRECTLY TO SAY SO**
+**Raised by:** ARCH FIX — PRE-FREEZE (`4c8d9b03`) · **Date:** 2026-09-03 · **Status:** **OPEN**
+**Blocking:** ⚠️ **`prereg-v1`.** `make check-prereg` returns `NOT-YET-FROZEN` today and will
+recompute the moment the tag is cut; a stale manifest row is a freeze that verifies nothing.
+**Deviation class:** **B** — no published number moves; the values are already correct in `config/`.
+
+**MEASURED. Adding the `config/` key and the §8.6 row — `Q-120` option 1, which this session's prompt
+instructs — turns TWO tests RED, and both reds are THIS SESSION'S:**
+
+| test | file | why | the one-line remedy | owner |
+|---|---|---|---|---|
+| `test_every_s86_row_reaches_the_registry` | `tests/test_tripwire_registry.py:141` | the new §8.6 row has no `SpecConstant` | one `SpecConstant` row | a session owning `src/whetstone_gate/spec_constants.py` |
+| `test_every_config_file_is_in_PROTOCOL_mds_manifest_and_its_blob_sha_RECOMPUTES` | `tests/test_c14_prereg.py:153` | `PROTOCOL.md`'s digest for `config/protocol.yaml` is stale | one manifest row | **C14** |
+
+⚠️ **NEITHER IS A DEFECT IN THE TEST AND NEITHER MAY BE WEAKENED (hard rule 6). BOTH ARE THE
+TRIPWIRE DOING EXACTLY WHAT §8.6 BUILT IT TO DO.** §8.6's own sentence — *"Any constant that is not
+in this table and not in `config/` is a defect, and finding one is a review BLOCKER"* — is what this
+session is closing, and `test_every_s86_row_reaches_the_registry` is **the direction that was never
+checked** until it was added, added precisely because *"a constant added to the spec that the
+tripwire never learns about is exactly the constant it cannot catch."* **It has now caught one, in
+the same session that created it, which is the shortest latency this pattern has ever had.**
+
+**THE EXACT REMEDIES, COMPUTED HERE SO NEITHER OWNER HAS TO RE-DERIVE THEM:**
+
+```python
+# src/whetstone_gate/spec_constants.py — one row, in SPEC_CONSTANTS
+SpecConstant(
+    key="projected_lane_hour_budget_h",
+    spec_row="projected lane-hour budget (the N decision rule's SECOND threshold)",
+    config_path="protocol.yaml:n_decision.projected_lane_hour_budget_h",
+    tag=_AUTHORED,
+    literals=("32",),
+    mode=...,      # the owner picks; `32` is a common integer, so a STRICT mode will
+                   # false-positive across the tree and the mode question is real
+    name_patterns=("lane_hour", "lane_hours", "budget_h", "projected_lane"),
+    note="CONTEXT.md S13.4's `two run-days at ~16 usable h/day (32 h)`; Q-120",
+),
+```
+
+⚠️ **`normalise_spec_row` lower-cases and strips markers, so the `spec_row` string must normalise to
+exactly** `projected lane-hour budget (the n decision rule's second threshold)` — which is what the
+red currently prints, quoted here so the owner can paste rather than guess. ⚠️ **The `mode` is a REAL
+question and not a formality: the literal is `32`**, a number that appears innocently all over a
+codebase (`32` bytes, `32` bits, `sha256`'s `32`), so a strict scan will produce false positives.
+`Q-048`'s row solved the same problem for the divisor `3` and is the precedent to read.
+
+```
+PROTOCOL.md line 56 — the config manifest row for config/protocol.yaml
+  WAS: | `config/protocol.yaml` | `2d9ab9d8…e292d69a` | 28,818 | `a5f91676…cbcb40de` |
+  NOW: recompute at the commit that lands the key. This session's MEASURED values are in
+       its FINAL OUTPUT; ⚠️ C14 MUST RE-MEASURE RATHER THAN COPY THEM — a session handing
+       the next session the digest of its own artefact is the circularity this file exists
+       to prevent, and `PROTOCOL.md`'s own lanes.yaml row is annotated as cross-checked
+       against a DIFFERENT session's independent measurement for exactly that reason.
+```
+
+⚠️ **WHY THIS SESSION DID NOT SIMPLY FIX BOTH.** `PROTOCOL.md` is named in `CLAUDE.md` §4's frozen
+set and in this session's **NOT**; `spec_constants.py` is not in its fence either. `CLAUDE.md` §4:
+*"If anything seems to require touching … frozen artefacts … or files outside your task's scope: STOP
+and report instead of working around it."* **`Q-123` records the identical shape one day earlier** —
+*"`config/` is a pre-registration artefact whose blob SHA is in `PROTOCOL.md`, and the fence forbids
+it. It is the cleaner fix and it is the architect's."* ⚠️ **And the fence is RIGHT here, not merely
+binding:** a session that edits a pre-registration artefact **and** the digest that witnesses it has
+witnessed itself, which is the one thing `PROTOCOL.md` exists to make impossible.
+
+**Options seen:**
+  1. **Land the key and the row, report both reds with computed remedies, edit neither file.**
+     **TAKEN.** Cost: two red tests until two one-line edits land, both named with an owner.
+  2. Edit `PROTOCOL.md` and `spec_constants.py` here. ⚠️ **Rejected — outside the fence**, and for
+     `PROTOCOL.md` it is self-witnessing.
+  3. **Do not land `Q-120` at all**, leaving the value out of the freeze. ⚠️ **Rejected: it is the
+     instruction, the deadline is `prereg-v1`, and after that tag the value is unfixable** — §8.6's
+     own sentence would make its absence a review BLOCKER permanently.
+  4. Land the `config/` key but **not** the §8.6 row, dodging the tripwire red. ⚠️ **Rejected as
+     dishonest**: `config/protocol.yaml`'s own header says *"EVERY VALUE BELOW IS A ROW OF
+     CONTEXT.md §8.6's CONSTANTS TABLE"*, so it would create the mirror-image defect **and** it is
+     avoiding a guard rather than satisfying it.
+
+**Default taken:** option 1. Recorded as `OPEN_FINDINGS.md` **OF-218** (the manifest row) and
+**OF-217** (the registry row, which travels with the parser swap).

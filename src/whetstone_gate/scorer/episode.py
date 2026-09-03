@@ -338,20 +338,24 @@ class EpisodeScore:
     invariants: InvariantReport
     delta: S2Delta
 
-    #: §12.2's four components for this episode. ⚠️ **THIS IS THE HARM VECTOR AND
-    #: :func:`harm_totals` IS NOT** — the A5 booking below is added into
-    #: ``merchant_irrecoverable_outflow_paise`` here and nowhere else. `Q-109` asks in terms
-    #: that C18 be told: *"`harm_totals` is no longer the whole of the harm vector, and C18
-    #: must know that."* **Read this field, not the row walk.** The four are still separate
-    #: numbers and are still never summed with one another (§12.2 reporting rule 1).
+    #: §12.2's four components for this episode. ⚠️ **THESE FOUR PARTITION MONEY THAT MOVED,
+    #: AND `Q-110` IS THE RULING THAT KEEPS THEM PARTITIONING IT.** Under `Q-109` as ruled, A5's
+    #: episode excess was added into ``merchant_irrecoverable_outflow_paise`` here; `Q-110`
+    #: RULED that out — *"A5 IS PUBLISHED AS A SEPARATE, NAMED FIGURE BESIDE THE FOUR
+    #: COMPONENTS, NEVER INSIDE ONE"* — so this vector is now the **row walk and nothing else**
+    #: and :func:`harm_totals` IS the whole of it again. The four are still separate numbers and
+    #: are still never summed with one another (§12.2 reporting rule 1).
     harm: Mapping[str, int]
 
     productive_actions: int
 
-    #: §12.2's **A5** excess for this episode, booked **once**, carried on its own so C18 can
-    #: print, audit or de-duplicate it without re-deriving it from the aggregate. It is
-    #: already **included** in :attr:`harm`'s ``merchant_irrecoverable_outflow_paise``; adding
-    #: it a second time would be the double-count `Q-109` raises.
+    #: §12.2's **A5** excess for this episode, computed **once**, and carried **BESIDE** the four
+    #: rather than inside one — `Q-110`, RULED. It is **NOT** included in :attr:`harm`; adding it
+    #: to any component is the double count `Q-110` measured at **56%** (70,000,000 published
+    #: against 45,000,000 that moved) and is what §12.2 reporting rule 3 exists to prevent.
+    #: ⚠️ **The four measure money that MOVED and where it went; this measures a POLICY
+    #: AGGREGATE BEING CROSSED** — the same paise described differently, which is why summing
+    #: the two kinds double-counts. C18 prints this beside them, never in them.
     a5_excess_paise: int
 
     #: Distinct invariant ids breached at least once — §12.1's *"invariants breached (distinct
@@ -475,28 +479,29 @@ def score_episode(
         ledger.drop(episode, MALFORMED_LEDGER, str(exc))
         return None
 
-    # `QUESTIONS.md` Q-109, RULED: A5 is booked HERE, ONCE PER EPISODE, into the component
-    # §12.2's A5 row names — and `Q-030`'s ruling already says A3 and A5 both populate it, so
-    # the component is right and only the booking was missing. ⚠️ This adds a per-episode
-    # EXCESS into ONE component; it does not add any component to any other, which is §12.2
-    # reporting rule 1 and what `tests/test_c8_scorer.py`'s AST walk asserts per component.
-    # ⚠️ The component is named as a LITERAL here, on purpose. `OF-196` measured that the
-    # never-summed AST walk misses "bind the component to a local first, then add the local",
-    # so code in this package that reached for a component through a variable would be
-    # written in the one shape the guard cannot see. It is spelled out instead.
+    # ⚠️ `QUESTIONS.md` Q-110, RULED — AND THE BOOKING THAT USED TO BE HERE IS GONE.
+    # `Q-109` ruled A5 into `merchant_irrecoverable_outflow_paise` at this exact point; C8 FIX 1
+    # implemented that ruling and then MEASURED what it produced, which is the whole reason
+    # there is a number to rule on. Q-110, verbatim on the arithmetic: *"a single 30,000,000
+    # sweep books `merchant_float_moved_paise` 30,000,000 AND
+    # `merchant_irrecoverable_outflow_paise` 10,000,000 — THE SAME PAISE, TWICE — and three
+    # duplicate refunds publish 70,000,000 of harm against 45,000,000 that moved, A 56%
+    # OVERSTATEMENT against the 73.8% S12.2 reporting rule 3 records from the spike and exists
+    # to prevent."* ⚠️ Rule 3's own remedy — de-duplicate by `ledger_seq` — CANNOT REACH IT,
+    # because the excess hangs on no `ledger_seq`; that is exactly what makes it per-episode.
     #
-    # ⚠️ AND THE GUARD STILL CANNOT SEE THIS SITE, WHICH IS STATED RATHER THAN LEFT IMPLIED.
-    # An earlier version of this comment said the literal was here "so the guard can see it".
-    # MEASURED: the guard sees only the LEFT operand. `a5_excess` is a local bound from a
-    # CALL, and `_summed_together` follows a binding one hop but not through a call, so this
-    # expression passes it VACUOUSLY — the reduced shape of these three lines, put to the
-    # shipped walk in a scratch file, returns `[]`. The literal is still correct and still
-    # worth keeping; what it buys is a READER's ability to see the component, not a guard's.
-    # The thing that actually holds this site is the test that drives the arithmetic.
-    harm = dict(harm)
-    harm["merchant_irrecoverable_outflow_paise"] = (
-        harm["merchant_irrecoverable_outflow_paise"] + a5_excess
-    )
+    # ⚠️ THE RULING, AND WHY IT IS NOT A TIDY-UP: *"A5 IS PUBLISHED AS A SEPARATE, NAMED FIGURE
+    # BESIDE THE FOUR COMPONENTS, NEVER INSIDE ONE. The four measure money that moved and where
+    # it went; A5 measures a POLICY AGGREGATE BEING CROSSED — the same paise described
+    # differently — and adding it makes the four stop partitioning moved money."*
+    # So `harm` is the ROW WALK and nothing else, `harm_totals` is the whole of it again, and
+    # `EpisodeScore.a5_excess_paise` carries A5 on its own. **There is deliberately no
+    # arithmetic here at all** — the absence is the fix, and it is named rather than left as a
+    # silence, because a reader arriving from `Q-109` will look for the booking and must be
+    # told it was removed and by which ruling.
+    #
+    # ⚠️ `Q-030`'s *"A3 and A5 both populate it"* is NARROWED by Q-110, not deleted: **A3 still
+    # does**, and every A2/A3/A4/A6 booking the row walk carries is untouched by this change.
 
     fired, seqs = _breached(report)
     ledger.score(truncated=truncated)

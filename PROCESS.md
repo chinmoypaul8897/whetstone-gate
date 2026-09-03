@@ -839,6 +839,71 @@ declared-vs-actual start times of both runs beside the threshold they produced.
   > it `cN-pass`. The tag chain is the spine, and `docs/reviews/` is the trail — including the
   > failures, which are numbered attempts that were never overwritten.*
 
+---
+
+### 7b. ⚠️ COMMITTING FROM A SHARED WORKING TREE — THE PRIVATE-INDEX RECIPE, IN ITS CORRECTED FORM
+
+**Two or more sessions run in one working tree, and they also share ONE `.git/index`.** A bare
+`git commit` commits **the whole index** and not your paths, so it can commit — or **delete** —
+another session's work under **your** token. This recipe is not optional and it is not advice.
+`INCIDENTS.md` **INC-65**, **INC-68**, **INC-82**, **INC-88**, **INC-91**, **INC-93**, **INC-95**,
+**INC-97**; `docs/reviews/OPEN_FINDINGS.md` **OF-205**, **OF-208**, **OF-213**, **OF-215**,
+**OF-216**. ⚠️ **Every line below is a MEASUREMENT from this repository, not a precaution.**
+
+```sh
+# 1. A private index, in a FRESH OS temp directory — never inside the repository.
+export GIT_INDEX_FILE="$(mktemp -d)/index"
+
+# 2. Seed it from HEAD, so it holds nothing anybody else staged.
+git read-tree HEAD
+
+# 3. ⚠️ STAGE, SNAPSHOT AND COMMIT IN **ONE** COMMAND. Not three. (OF-205.)
+git add -- <this session's explicit paths> \
+  && git diff --cached --stat \
+  && git commit -F <message file>
+
+# 4. ⚠️ STEP 4 IS THE ONE THAT WAS WRONG IN EVERY PROMPT. `env -u`, NEVER `VAR=`.
+env -u GIT_INDEX_FILE git reset -- <THE SAME explicit paths>
+
+# 5. Prove the shared index is clean. A non-zero exit is a hard-rule-1 STOP.
+env -u GIT_INDEX_FILE git diff --cached --quiet
+```
+
+⚠️ **WHY STEP 4 IS SPELLED `env -u` AND WHY THE OTHER SPELLING IS WORSE THAN USELESS.**
+`GIT_INDEX_FILE= git reset` is **WRONG**. **`env -u` REMOVES the variable; `VAR=` SETS IT TO THE
+EMPTY STRING**, and git reads the empty value as a **PATH** — it opens an empty index there, and
+**every tracked file then reads as DELETED**. `INC-91`, measured: `GIT_INDEX_FILE= git diff --cached
+--stat` reported **the whole repository staged for deletion** (`CONTEXT.md 2361-`, `QUESTIONS.md
+10489-`, `PROGRESS.md 9770-`, every file in the tree) — on the very command meant to *verify* the
+fix. ⚠️ **And the bare `git reset` it replaces fails a different way:** if the recipe is folded into
+one compound shell command, the `export` in step 1 is **still in force**, so `git reset` lands on the
+**private** index and the **shared** one keeps stale blobs. `INC-91`, measured: **419 lines of the
+session's own committed work left staged for DELETION across six files**, with a concurrent session
+live in the same tree.
+
+⚠️ **AND `git diff --cached` IS ALSO THE FIRST COMMAND OF A SESSION, BEFORE THE READ ORDER**
+(`OF-213`). A non-empty result on a path you do not own is inherited, not yours: a bare commit by
+anyone would land it. **Measured:** a session began with the shared index holding a stale blob that
+was the **reverse of `HEAD`**, which would have re-introduced two secret-shaped literals a commit had
+just removed — while `git diff HEAD` on the path was **empty**, so only the index was wrong.
+
+⚠️ **COMPOSE THE `Swept:` LINE FROM THE STAGED SNAPSHOT ALONE, AND PUT NO LINE COUNTS IN IT.**
+Step 3's `--stat` is the only true statement of what is about to be committed. `INC-88`, measured: a
+clause-(i) diff read **182** `PROGRESS.md` lines two tool calls before the `add`, the commit landed
+**309**, and the 127-line difference was a concurrent session's complete journal entry — *the read
+was true when it ran and false when the add ran.* ⚠️ **But the message heredoc is composed BEFORE
+step 3's `--stat` prints, so any number in it is a PREDICTION** (`OF-216`). `INC-97`, measured: a
+`Swept:` line claimed `+67/-2` and `+45/-0` where the snapshot said `111/0` and `51/0`. **So state
+what you can verify before the commit — the paths, the mode, the headings added, or the words
+"swept nothing" — and leave the arithmetic to `git show --numstat`, which is authoritative, free and
+cannot be wrong.**
+
+⚠️ **IF THE SNAPSHOT LISTS FEWER FILES THAN YOU STAGED, YOU HAVE BEEN SWEPT** (`OF-215`). `git
+status` reports such a path **CLEAN**, which is indistinguishable from *"you never edited it"*, and a
+session trusting it writes a duplicate row. Find it with `git log -1 -- <path>`, **verify the content
+INTACT**, and record the SHA and the token that carried it. ⚠️ **Nothing can warn the session being
+swept** — `INC-65`'s uncloseable half — and this closes only the detection side.
+
 **AI attribution: permitted and encouraged.** The operator's template bans it; that rule is
 **deliberately dropped here.** Razorpay's engineering culture is explicitly AI-native — their
 Agent Studio is built on the Claude Agent SDK, their public `ai-playbook` is an AI-engineering
