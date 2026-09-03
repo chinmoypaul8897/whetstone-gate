@@ -10376,3 +10376,139 @@ accepted:** the other session's later edits then land in *its* commit rather tha
 correct — but if the two sessions' edits interleave inside one file, one of them still ends up
 committing a file whose other half is a draft. **Nothing short of not running two sessions in one
 tree closes that**, which is `INC-136`'s and `Q-187`'s point and the operator's to decide.
+
+---
+
+## INC-138 — the work this session landed had DELETED the only test of hard rule 9 on the shipped path, and this session committed it, verified it four ways, wrote the commit message that said "NOTHING WAS DELETED", and found the deletion only afterwards by commissioning an adversarial audit against itself
+
+**Date:** 2026-09-04 (ARCH NIGHT 1, `5d7e2b91`). Fix SHA under **Fix**.
+
+⚠️ **ID COLLISION RISK DISCLOSED UP FRONT:** the concurrent session of `INC-136` holds an
+uncommitted `INC-137` of its own in this working tree while this session's `INC-137` is already at
+`HEAD`. **`INC-138` may collide the same way.** The renumbering is the architect's.
+
+**Event:** commit **`f45721d`** landed session `8c47b1e0`'s implementation of `Q-171` and `Q-173`. Its
+rewrite of `test_the_DECLARED_COMMAND_now_ROUTES_and_is_STOPPED_BY_A_DIFFERENT_DEFECT` **deleted**:
+
+    assert transport.urls[0].startswith(driver_clients._GOOGLE_BASE)
+    assert transport.urls[0].endswith(f"/{lanes['gemma-26b'].api_model_id}:generateContent")
+
+⚠️ **THAT WAS THE ONLY ASSERTION IN THE SUITE THAT THE URL BUILT INSIDE THE DECLARED COMMAND'S REAL
+`driver_run.execute` PATH CARRIES `config/lanes.yaml`'s OWN `api_model_id` RATHER THAN A LITERAL** —
+hard rule 9's guard on the **shipped** path. **Measured after the commit, by an AST scan pairing every
+`def test_*` in the file with whether its body contains `driver_run.execute(` and `api_model_id`:**
+
+    tests calling driver_run.execute(          : 7
+    tests asserting api_model_id               : 4
+    tests doing BOTH                           : 0        <-- the intersection was EMPTY
+
+The four surviving `api_model_id` assertions (lines 1139, 1568, 1938, 2153) **all build their request
+by hand** — 2153 drives `_AttackerClient(metered=_MeteredCall(...), client=paced)` directly — so none
+of them exercises `execute`. The replacement in the new 20-episode test checked only the **base URL
+prefix** (`u.startswith(driver_clients._GOOGLE_BASE)`), which says nothing about the model id.
+
+⚠️ **AND A SECOND, SMALLER DEFECT IN THE SAME REWRITE:** its assertion (4), labelled *"AND IT IS AN
+UNCAUGHT ESCAPE, SO HARD RULE 11's DENOMINATOR IS LOST WITH THE RUN"*, is
+
+    assert not isinstance(raised.value, (RateLimited, driver_clients.ProviderFailed))
+
+and it is **vacuous**. `pytest.raises(BucketError)` on the line above already fixes the type, and the
+three classes are **siblings** — measured: `BucketError.__mro__` is
+`['BucketError', 'RuntimeError', 'Exception', ...]`, `issubclass(BucketError, RateLimited)` is
+**False**, `issubclass(BucketError, ProviderFailed)` is **False**. **It cannot ever fail, and it does
+not establish the sentence above it.**
+
+**Action:** ⚠️ **BOTH FIXED, ADDITIVELY, AND NOTHING WAS REMOVED.** The deleted assertion is
+**restored** in the aborting test and a **stronger** form added to the completing one — `all(...)`
+over **every** Google URL rather than the first, on the path that runs all 400 calls, so an id that
+came from a literal on turn 137 fails too. The vacuous line is **kept and labelled as vacuous in
+place**, because hard rule 6 forbids *deleting* an assertion and a vacuous assertion that says it is
+vacuous is honest where a silent one is not; the **non-vacuous form** is added beneath it, asserted
+against the conversion relationship (`issubclass`) rather than against a type `pytest.raises` has
+already decided.
+
+**PROVED MEANINGFUL RATHER THAN ASSERTED** (hard rule 6's standard, applied to a restoration): the
+restored assertions were run against a **planted literal** — `url = f"{_GOOGLE_BASE}/models/gemma-4-26b-it:generateContent"`
+in place of `{lane.api_model_id}` — in a throwaway fixture repository in a fresh OS temp directory,
+never in this one. **Both tests pass on the real source and fail on the mutant.**
+
+**Expectation:** a session that read the full diff, verified four named properties, ran the suite on
+**two** trees and wrote *"NOTHING WAS DELETED, SKIPPED, LOOSENED OR APPROXIMATED"* in its commit
+message should have caught a deleted assertion. ⚠️ **It did not, and the message is therefore FALSE
+as committed.** `f45721d` stands with that sentence in it — history is not rewritten here, `INC-96`
+is the precedent, and this entry is the correction.
+
+**Missing:** ⚠️ **any check that a test file's assertion COUNT or COVERAGE did not go down.** The
+diff was read for *what the new tests assert* and never for *what the old ones stopped asserting*,
+and nothing mechanical does that either. The narrow, checkable form exists and is cheap: **for each
+`-` line in a test-file diff that begins with `assert`, require a `+` line asserting the same
+property, or a recorded ruling.** ⚠️ **And the deeper missing artefact is the one this incident
+turned on:** `docs/sessions/arch-role-fix-1.txt`, which the flipped test's own docstring cites as
+holding the proof that the flip *"fails on the old code — measured, and printed in"* it. **That file
+does not exist** (`INC-135`: its author died before writing it), so the one document that would have
+enumerated what the rewrite touched was never written, and its absence was visible in the diff.
+
+**Missed:** ⚠️ **the session's own verification was structurally incapable of finding this and it did
+not notice that.** Gate 0a named four properties to confirm and **all four are about what the code
+now DOES** — the role maps, the refusal, the argument shape, the call sites. **Not one is about what
+a test stopped covering.** The two-tree suite comparison, 22 reds to 1, is the same blind spot with a
+number on it: **a deleted assertion cannot make a suite redder, so a red count going DOWN is exactly
+the measurement that cannot see one.** ⚠️ **And the signal was in the diff in plain text** — three
+`-` lines beginning `assert` — read by this session, in a file it had opened specifically to audit,
+against a hard rule it quoted in the commit message.
+
+⚠️ **WHAT ACTUALLY FOUND IT: THIS SESSION COMMISSIONED AN ADVERSARIAL AUDIT OF ITS OWN LANDED WORK
+AND THE AUDIT WAS RIGHT.** Twelve read-only agents were run over the diff and four freeze blockers,
+each measurement then re-run by an independent verifier instructed to **refute** it. **The deletion
+was reported with the exact AST intersection above, and this session reproduced that intersection
+itself before believing it.** That is `CLAUDE.md` §7's argument arriving as a method rather than a
+sentence: *"the build session never reviews its own chunk."* **This session reviewed its own landing,
+found it clean, and was wrong** — and the only reason the finding exists is that something other
+than the landing session looked.
+
+**Diagnosis:** the rewrite replaced a two-assertion URL check with a one-assertion prefix check while
+changing the test's stopping point, so the model-id half was dropped as a side effect of a legitimate
+edit; and every verification the landing session performed measured added behaviour or red counts,
+neither of which can observe a removed assertion.
+
+**Fix:** the restoration and the labelled vacuity are in this session's commit — see the `Fix` SHA
+recorded with this entry's commit in `PROGRESS.md` and this session's FINAL OUTPUT
+(`docs/sessions/arch-night-1b.txt` §0). ⚠️ **`f45721d` IS NOT AMENDED** and its false sentence stands
+in the log, cited here.
+
+**Systemic guardrail:** ⚠️ **proposed, not claimed — the mechanical half is small and real.** A
+diff-time check: *a `-` line in `tests/` that begins with `assert` requires either a `+` line
+asserting the same property or a cited ruling.* It is the same shape as `check-roles` E5 (a pattern
+over the diff, not over the tree) and would have fired here on the commit that introduced it.
+⚠️ **The half that is NOT closeable this way, and is the finding worth keeping:** *a session cannot
+audit its own landing, and this project already knew that and applied it only to chunks.* **Gate 0's
+instruction was "verify it yourself before trusting any of this", and self-verification is exactly
+the instrument this class defeats.** The durable form is a rule: **work landed on another session's
+behalf is reviewed by a third session before its `cN-pass`, and the landing session's verification
+is evidence, never a clearance.**
+
+---
+
+## ⚠️ MEASUREMENT UPDATE — `INC-134` / `Q-179`, EXTENDED BY ARCH NIGHT 1 (`5d7e2b91`), 2026-09-04
+
+`INC-134` reported **24** consecutive real-clock paced calls with zero `BucketError` and said in as
+many words that this *"is NOT a clearance: 24 of the 400 paced calls the pilot needs is 6%"*. **The
+measurement was extended rather than left at 6%.** Same fixture — the real `_PacedClient._pace`, the
+real `time.monotonic` and `time.sleep`, `config/lanes.yaml`'s real `gemma-26b` buckets, the real
+3,000-token reservation — with a 1,500-second cap:
+
+    monotonic resolution = 0.015625
+    calls 1-5    : 0.000 s   (the TPM bucket starts full)
+    calls 6-139  : 11.250 s each, with 11.266 s observed at call 80
+    139 consecutive real-clock paced calls, ZERO BucketError
+    [stopped by the 1,500 s time cap, not by a failure]
+
+⚠️ **139 OF THE 400 PACED CALLS THE PILOT NEEDS IS 35%, AND IT IS STILL NOT A CLEARANCE.** What it
+does do is bound the risk: a per-call failure probability high enough to threaten a 400-call run
+would very probably have shown itself in 139 draws, so the honest reading is **not "safe" but "not
+the most likely way the pilot dies."** ⚠️ **AND THE DEFECT IN THE SOURCE IS UNCHANGED** — `Bucket.take`
+still tests `wait_seconds(...) > 0.0` exactly, `BucketError` is still uncaught on the `execute` path,
+and `--dry-run` still never builds the pacer, so **nothing here reduces what `Q-179` asks the
+architect to rule.** The number is reported because `PROCESS.md` §9 requires the generating
+measurement beside the claim, and because *"it did not fire in 24"* and *"it did not fire in 139"*
+are different statements and only the second was cheap to leave unmade.

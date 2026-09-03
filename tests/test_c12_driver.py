@@ -2328,7 +2328,47 @@ def test_the_DECLARED_COMMAND_now_ROUTES_and_is_STOPPED_BY_A_DIFFERENT_DEFECT(
 
     # (4) ⚠️ AND IT IS AN UNCAUGHT ESCAPE, SO HARD RULE 11's DENOMINATOR IS LOST WITH
     #     THE RUN — `Q-174`'s finding, unchanged, now reached by a second route.
+    #
+    # ⚠️⚠️ THE LINE BELOW IS **VACUOUS AND IS LABELLED AS SUCH RATHER THAN DELETED.**
+    #     `INCIDENTS.md` INC-138. `pytest.raises(BucketError)` above already FIXES the
+    #     type, and `BucketError`, `RateLimited` and `ProviderFailed` are three SIBLING
+    #     subclasses of `RuntimeError` — measured:
+    #         issubclass(BucketError, RateLimited)    -> False
+    #         issubclass(BucketError, ProviderFailed) -> False
+    #     so this assertion is TRUE BY CONSTRUCTION and CANNOT EVER FAIL. It does NOT
+    #     establish the sentence above it. ⚠️ It is KEPT because hard rule 6 forbids
+    #     DELETING an assertion, and a vacuous assertion that says so is honest where a
+    #     silent one is not; the NON-vacuous form is added beneath it.
     assert not isinstance(raised.value, (RateLimited, driver_clients.ProviderFailed))
+
+    # ⚠️ THE NON-VACUOUS FORM, WHICH IS WHAT (4) MEANT TO SAY: the escape is not booked
+    #    by `_MeteredCall.run`, so nothing on the dispatch path CONVERTS it. Asserted
+    #    against the CONVERSION TABLE itself rather than against the raised object's
+    #    type, which the `pytest.raises` above has already decided.
+    assert not issubclass(BucketError, (RateLimited, driver_clients.ProviderFailed)), (
+        "if BucketError ever became a subclass of either converted failure, "
+        "_MeteredCall.run WOULD book it and Q-174's finding would be closed by "
+        "accident rather than by a ruling"
+    )
+
+    # (5) ⚠️⚠️ RESTORED BY `5d7e2b91` UNDER HARD RULE 6 — `INCIDENTS.md` INC-138.
+    #     The rewrite of this test DELETED, and did not replace, the ONLY assertion in
+    #     this suite that the URL built inside the declared command's REAL
+    #     `driver_run.execute` path carries `config/lanes.yaml`'s own `api_model_id`
+    #     rather than a literal. Measured after the deletion: the intersection of
+    #     {tests that call driver_run.execute} and {tests that assert api_model_id} was
+    #     **EMPTY** — the three surviving `api_model_id` assertions all build their
+    #     request BY HAND and never go through `execute`, so hard rule 9's guard on the
+    #     SHIPPED path had no test at all. It is restored here, unchanged in substance
+    #     from the line the diff removed, and it is additive: nothing above is weakened.
+    lanes = runner_lanes.load_lanes()
+    assert transport.urls[0].startswith(driver_clients._GOOGLE_BASE)
+    assert transport.urls[0].endswith(
+        f"/{lanes['gemma-26b'].api_model_id}:generateContent"
+    ), (
+        "the first episode is a gemma-26b one, so the first request is Google's, and "
+        "its URL must carry config/lanes.yaml's model id and never a literal"
+    )
 
 
 def test_the_DECLARED_COMMAND_COMPLETES_ALL_TWENTY_EPISODES_when_the_clock_is_exact(
@@ -2372,6 +2412,19 @@ def test_the_DECLARED_COMMAND_COMPLETES_ALL_TWENTY_EPISODES_when_the_clock_is_ex
     # ⚠️ BOTH PROVIDERS WERE REACHED, WHICH IS Q-161'S DELIVERABLE STILL HOLDING.
     google = [u for u in transport.urls if u.startswith(driver_clients._GOOGLE_BASE)]
     groq = [u for u in transport.urls if u == driver_clients._GROQ_CHAT_URL]
+
+    # ⚠️⚠️ ADDED BY `5d7e2b91` UNDER HARD RULE 6 — `INCIDENTS.md` INC-138. `_GOOGLE_BASE`
+    #     alone is a PREFIX test and says nothing about the model id, which is the half
+    #     hard rule 9 is about. Asserted over EVERY Google URL rather than the first, and
+    #     over the completing path rather than the aborting one, so a lane whose id came
+    #     from a literal on turn 137 fails here.
+    lanes = runner_lanes.load_lanes()
+    expected = f"/{lanes['gemma-26b'].api_model_id}:generateContent"
+    assert all(u.endswith(expected) for u in google), (
+        f"every Google URL on the declared command's real path must end {expected!r}, "
+        f"read from config/lanes.yaml and never a literal; got "
+        f"{sorted({u for u in google if not u.endswith(expected)})}"
+    )
     assert len(google) == 200 and len(groq) == 200, (
         f"expected 10 seeds x 20 turns on each lane; got {len(google)} google, "
         f"{len(groq)} groq"
