@@ -1,4 +1,6 @@
-PUSHED SHA, THIS FILE: <filled by the commit that follows this one, and by nothing else>
+PUSHED SHA, THIS FILE: 8a816b5   (this file's own commit. Filled by the commit that
+                                 FOLLOWS it and by nothing else - a SHA cannot contain
+                                 itself. Pushed: 68499e7..8a816b5 main -> main.)
 PUSHED SHA, THE WORK:  ac2f72d  (this session's own commits: d6cdb2e, e51614d, b50e9b3,
                                  42faed5, 7d70b19 - ac2f72d is the tree HEAD, which a
                                  concurrent session also committed to)
