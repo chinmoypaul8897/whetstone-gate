@@ -854,7 +854,7 @@ SPEC_CONSTANTS: tuple[SpecConstant, ...] = (
             "codebase, so a strict scan will produce false positives.' MEASURED BEFORE CHOOSING, "
             "over 80 first-party modules: STRICT gives FIVE hits in FIVE files and ALL FIVE ARE "
             "LEGITIMATE CODE WITH NO LEGITIMATE REMEDY - check_roles.py's secret-scanning regex "
-            "`sk-[A-Za-z0-9]{32,}` (an API-key LENGTH, and firing there would land on the "
+            "`\\bsk-[A-Za-z0-9]{32,}` (an API-key LENGTH, and firing there would land on the "
             "SECRET SCANNER), world/prng.py's `U32_RANGE = 1 << 32` (mulberry32's word width), "
             "world/semantics.py and world/selftest.py's Razorpay rule id `RS-32`, and n_rule.py's "
             "own quoted prose about the threshold. A regex quantifier, a PRNG word width and a "

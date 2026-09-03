@@ -47,13 +47,44 @@ editable numbers freezes nothing.** The turn budget, the seeds, the temperature,
 selected N branch, the calibrated void threshold, the 0.50 CONFOUNDED ratio and the exact model id
 strings all live here.
 
-**Digests taken at HEAD `405d247`, 2026-09-02T21:56:28Z, and RE-MEASURED UNCHANGED at `daf038a`.**
+**`config/lanes.yaml`'s digest was taken at HEAD `405d247`, 2026-09-02T21:56:28Z, RE-MEASURED
+UNCHANGED at `daf038a`, and RE-MEASURED UNCHANGED AGAIN at `469fd21`** (below).
+**`config/protocol.yaml`'s digest was RE-MEASURED at `469fd21`, 2026-09-03, by ARCH FIX —
+PRE-FREEZE 2 (`ff6d79ae`)**, because that session's own commit changed the file: `Q-120`'s
+lane-hour budget key landed at `fdb8801` and `Q-123`'s quoting of
+`probe.arm_confounded_reach_fraction` landed at `469fd21`.
 `make check-prereg` recomputes them inside **both** `make eval` and `make test`.
+
+⚠️ **THE ROW BELOW WAS RE-MEASURED, NOT COPIED, AND THE DISTINCTION IS THIS FILE'S WHOLE JOB.**
+`docs/sessions/arch-prefreeze-1.txt` §9 published a digest for `config/protocol.yaml` and said in
+the same breath that its successor **must re-measure rather than copy it** — *"a session handing the
+next session the digest of its own pre-registration artefact is the self-witnessing `PROTOCOL.md`
+exists to prevent."* So the successor session measured **twice**, and the two measurements answer
+two different questions:
+
+| | Question | Result |
+|---|---|---|
+| **CONTROL** | does the published digest reproduce, in a second hand, on the **same** bytes? | `git cat-file blob $(git rev-parse fdb8801:config/protocol.yaml) \| sha256sum` → `28352efedcfc604041292019fd0b7260afe7fb4a80e7538cbc3cc3c85efa1440`, **29,818 bytes, 0 CR** — ✅ **agrees exactly** with `arch-prefreeze-1.txt` §9(2) |
+| **THE ROW** | what do the bytes hash to **after** `Q-123`'s edit? | the `config/protocol.yaml` row below, measured at `469fd21` |
+
+⚠️ **THE TWO FIGURES NECESSARILY DIFFER AND THAT IS NOT A DISAGREEMENT.** `Q-123` changed the file,
+so a digest taken after it **must** differ from one taken before it — a digest that had *not* moved
+would mean the edit never landed. **The disagreement that would matter is one about the same bytes,
+and the CONTROL row is the test for it. It agrees.**
+
+⚠️ **AND THE SELF-WITNESSING OBJECTION IS DISCHARGED RATHER THAN INHERITED.** `QUESTIONS.md` `Q-125`
+and `INC-99` record that a `config/` constant needs **four** artefacts to agree —
+`config/protocol.yaml`, `CONTEXT.md` §8.6, `spec_constants.py` and this manifest — and that **no
+chunk's fence contains all four**, so the set could only ever be closed by a relay. The session that
+closed it was given a fence spanning all four **deliberately**, which means it edited a
+pre-registration artefact *and* the digest that witnesses it. **That is stated here rather than left
+for a reviewer to find:** the CONTROL above is a genuine second hand on the previous session's
+bytes, and it is also the same hand that then changed them.
 
 | Path | SHA-256 of the git blob | Bytes | Git blob id |
 |---|---|---|---|
 | `config/lanes.yaml` | `23b8db927cf66d0b0876a9a393c523b3e5287f2bb392b8efdb3d9f52accea0bd` | 13,622 | `ab6f0f266fa010c8b4b7be08b713dc4fa836264a` |
-| `config/protocol.yaml` | `2d9ab9d8a660dc92ed37d8cc62d2f52a38aaafdf75647e7c31b12b62e292d69a` | 28,818 | `a5f9167640de0b524355efcb0201d3f1cbcb40de` |
+| `config/protocol.yaml` | `44e19ac5c79cd99ca5fc67cd1dd2a0558be4ee98b9ac41aab5cfb72ff4ab3d05` | 30,930 | `d3d8e1805cc2dac47221e2da50addff27aa4c02b` |
 
 ⚠️ **`config/lanes.yaml`'s digest is CROSS-CHECKED AGAINST A DIFFERENT SESSION'S INDEPENDENT
 MEASUREMENT.** C13 FIX 2 (`91eb51c1`) recorded the **AFTER** blob SHA-256 of that file in its FINAL
