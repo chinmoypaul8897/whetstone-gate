@@ -14026,7 +14026,7 @@ it in capitals:** *"⚠️ **NO TEMPERATURE IS SENT, BECAUSE `config/` CARRIES N
 ⚠️ **BOTH SENTENCES ARE FALSE FOR THE CONFIGURATION THIS RUN DECLARES**, and the reason is three
 lines apart in one file:
 
-    driver/clients.py:783   body = _google_body(messages, temperature if temperature is not None else 0.0)
+    driver/clients.py:782   body = _google_body(messages, temperature if temperature is not None else 0.0)
     driver/clients.py:513   return {"contents": contents, "generationConfig": {"temperature": temperature}}
 
 `complete_judge` passes `None`; **`_send`'s Google branch substitutes a literal `0.0`**, and
