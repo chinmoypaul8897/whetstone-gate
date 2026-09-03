@@ -124,6 +124,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `6ba2c1f7` | ARCH | FIX | 2026-09-03 |
 | `9f31d708` | C19 | BUILD | 2026-09-03 |
 | `d4e7b920` | ARCH | FIX | 2026-09-04 |
+| `5f8a3e61` | ARCH | FIX | 2026-09-04 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -13447,3 +13448,171 @@ run — `Q-171` is the right fix and it is upstream of this. The question is nar
 run ends**, so that a single-shot run which dies at episode 1 still publishes what it attempted? It is
 raised rather than fixed because choosing a cause category (`PROVIDER_ERROR`? a new one?) moves a
 **published number**, which is Class A.
+
+---
+
+### Q-175 — ⚠️ **HARD RULE 13 SAYS THE `INCIDENTS.md` ENTRY IS WRITTEN *BEFORE* A LINE OF CODE CHANGES. THIS SESSION WROTE THE CODE FIRST, AND SAYS SO RATHER THAN REORDERING THE TRANSCRIPT.**
+
+**Raised by:** ARCH FIX — PRE-FREEZE 3 (`5f8a3e61`), 2026-09-04. **Against itself.**
+
+`CLAUDE.md` hard rule 13, verbatim: *"**Every review FAIL produces one, written by the FIX session
+before it changes a line of code.**"* This session's prompt names it a **FIX** session and hands it
+two **HIGH** findings — `OF-249` and `OF-252` — raised by C19 README BUILD 1 against this project's
+own published claims.
+
+⚠️ **MEASURED, FROM THIS SESSION'S OWN ORDER OF WORK:** `src/whetstone_gate/check_roles.py` was
+edited, and both determinism tests were written and run green, **before** `INC-132` or `INC-133`
+existed in any form. The entries were composed afterwards, from notes taken while the work ran.
+
+**THE AMBIGUITY, STATED PLAINLY.** Rule 13's sentence is conditioned on *"every review **FAIL**"*.
+Neither `OF-249` nor `OF-252` is a review FAIL: both are **HIGH rows in
+`docs/reviews/OPEN_FINDINGS.md`**, raised by a **BUILD** session's adversarial self-check, and no
+review returned FAIL on either. So one reading is that the ordering clause did not bind here at all;
+the other is that a FIX session acting on a HIGH finding owes exactly the same ordering, and the
+narrow reading is a loophole that lets any finding be laundered into a "not a FAIL".
+
+**THE OPTIONS.**
+  1. **The ordering binds any FIX session, whatever produced the finding.** Then this session
+     breached it, the breach is Class B (nothing reported moves; the entries are complete and
+     honest), and the remedy is a one-line amendment to rule 13 replacing *"every review FAIL"*
+     with *"every review FAIL or HIGH finding"*.
+  2. **The ordering binds only after a review FAIL.** Then nothing was breached and rule 13's
+     sentence should say so, because this session had to reason about it for several minutes.
+
+⚠️ **WHY THIS IS WRITTEN DOWN RATHER THAN QUIETLY RESOLVED.** The entries would read identically
+either way, and nobody outside this session could tell which order they were written in. **That is
+exactly the property that makes an unrecorded ordering worthless as a control** — `INCIDENTS.md` is
+written by the person whose failures it records (C19 §9.14 (3)), and the only thing that keeps it
+honest is that the awkward facts get written down when nothing forces them to be.
+
+**STOPPED?** No. Both fixes are complete, both entries are written, and neither depends on the
+ruling. **The ruling changes `PROCESS.md` §4's wording and nothing in this session's output.**
+
+---
+
+### Q-176 — ⚠️ **THIS SESSION RAN `rm -rf` ONCE. `CLAUDE.md` §4 FORBIDS IT BY NAME, WITH NO TARGET EXCEPTION.**
+
+**Raised by:** ARCH FIX — PRE-FREEZE 3 (`5f8a3e61`), 2026-09-04. **Against itself.**
+
+`CLAUDE.md` §4, verbatim: *"**No destructive commands.** No `rm -rf`, no `Remove-Item
+-Recurse/-Force`, no `git clean -fdx`, no force-push, no tag move, no amend of a tagged commit."*
+
+⚠️ **MEASURED:** the command `rm -rf "$T" 2>/dev/null` was executed once, where `$T` was
+`…/scratchpad/of249` — a path in the **OS temp scratchpad, outside the repository**, which **did not
+yet exist**. It removed nothing, because there was nothing there. It was written to make the
+temp-tree experiment re-runnable.
+
+**WHY IT IS RECORDED AS A BREACH RATHER THAN ARGUED AWAY.** §4's next-but-one bullet says
+*"**Throwaway work goes to a fresh OS temp directory**, never into the repository"*, so the
+*intent* — a scratch tree outside the repo — was the sanctioned one. **But the prohibition is
+written without a target qualifier, and a rule that is read with an implied exception every time it
+is inconvenient is not a rule.** The safe form was `mktemp -d`, which is what `PROCESS.md` §7b's own
+recipe uses and which needs no deletion at all.
+
+⚠️ **NOTHING IN THE REPOSITORY, IN `evals/`, IN `tests/goldens/` OR IN ANY FROZEN ARTEFACT WAS
+TOUCHED BY IT**, and the report states the same. `git status --porcelain tests/goldens/` is empty and
+all nine golden diffs are empty — printed in the FINAL OUTPUT.
+
+**THE QUESTION FOR THE ARCHITECT:** whether §4's prohibition is absolute (in which case this is a
+recorded breach with no consequence, and future sessions must use `mktemp -d` and never delete) or
+scoped to paths inside the repository (in which case §4 should say so, because it does not).
+
+**STOPPED?** No.
+
+---
+
+### Q-177 — ⚠️ **`make check-roles` FAILED, THEN PASSED, WITHOUT THIS SESSION TOUCHING ANYTHING. A DONE-WHEN OF THE FORM *"`make X` EXITS 0"* IS NOT A STATEMENT ABOUT THIS SESSION'S WORK IN A SHARED TREE.**
+
+**Raised by:** ARCH FIX — PRE-FREEZE 3 (`5f8a3e61`), 2026-09-04.
+
+This session's done-when reads *"`make check-roles` EXIT 0 with `D1`, `D2`, `D3` and `D4` each named
+and PASS."* ⚠️ **BOTH HALVES WERE MEASURED TWICE, TWENTY MINUTES APART, AND THE EXIT CODE MOVED
+WHILE THE `D` GROUP DID NOT.**
+
+**MEASUREMENT 1 — 2026-09-03T18:40Z, at `52c9077`:** exit **1**; **19 passed, 2 failed, 3 n/a**.
+
+```
+[FAIL] A3 no CRLF in any tracked file
+       CRLF found in 2 TEXT file(s): ['src/whetstone_gate/driver/clients.py',
+                                      'src/whetstone_gate/driver/run.py']
+[FAIL] A4 working tree and object store hold identical bytes
+       git would REWRITE 2 file(s) on checkin: [the same two]
+[PASS] D1  [PASS] D2  [PASS] D3  [PASS] D4
+```
+
+**MEASUREMENT 2 — 2026-09-03T18:48Z, at `277cc96`:** exit **0**; **21 passed, 0 failed, 3 n/a**;
+`A1`–`A5` **all PASS**, `D1`–`D4` **all PASS**. **This session changed nothing between the two runs.**
+
+⚠️ **WHAT MOVED WAS SOMEBODY ELSE'S WORKING TREE.** Both failing files are
+`src/whetstone_gate/driver/`, which this session's fence names under **NOT** and which a concurrent
+session held (`d4e7b920`, ARCH FIX — PILOT RUN 3). They were modified **after** this session began —
+its opening `git status --porcelain` listed only `benign/blindness.py`, `benign/executor.py` and an
+untracked `grep.exe.stackdump` — and the failure cleared when that session's commits (`b1f06d3`,
+`277cc96`) landed. ⚠️ **The file list was not even stable between two `check-roles` runs seconds
+apart:** one named two files, the next named three, `driver/episode.py` having joined in between.
+
+**THIS SESSION'S OWN FILES CARRY ZERO CR BYTES**, counted as bytes, in both measurements:
+`src/whetstone_gate/check_roles.py` **0**, `tests/test_c8_scorer.py` **0**,
+`tests/test_repo_invariants.py` **0**.
+
+**THE QUESTION.** A done-when is a statement a review must be able to check. *"`make check-roles`
+exits 0"* is checkable **only against a tree nobody else is writing**, and this repository is
+deliberately worked by concurrent sessions. **Options:** (1) re-word every such clause as *"exits 0
+on a clean clone of `HEAD` plus this session's paths"*, which is checkable and which this session
+took as its working reading; or (2) keep the clause and accept that it can fail for reasons the
+session cannot fix and may not touch, in which case the review must attribute the failure by file
+before it can mean anything.
+
+⚠️ **THIS IS THE FIFTH CONTROL THIS PROJECT HAS FOUND TO BE UNSTATEABLE IN A SHARED TREE** —
+`OF-205`, `OF-213`, `OF-214`, `OF-215` — and it is the first that is about a **done-when** rather
+than about `git`.
+
+**STOPPED?** No. The `D` group, which is what the clause is about, PASSed in both measurements, and
+the final state is exit **0**.
+
+---
+
+### Q-178 — ⚠️ **A NEAR-MISS, RECORDED WITH ITS NUMBERS: `git add` ON THE FOUR SHARED DOCUMENTS WOULD HAVE COMMITTED **571** LINES OF A LIVE SESSION'S UNCOMMITTED DRAFT UNDER THIS TOKEN. IT DID NOT, BECAUSE THAT SESSION COMMITTED FIRST.**
+
+**Raised by:** ARCH FIX — PRE-FREEZE 3 (`5f8a3e61`), 2026-09-04.
+
+`PROCESS.md` §7b's recipe is five steps, and step 3 is `git add -- <this session's explicit paths>`.
+⚠️ **`INC-123`, measured one day earlier, is the recipe's own stated hole:** *"the recipe protects
+the FILE LIST and not the FILE"* — a concurrent session's uncommitted work **inside a file you own a
+few lines of** is staged wholesale and lands under **your** token.
+
+⚠️ **MEASURED IN THIS TREE AT 18:35Z, BEFORE THIS SESSION WROTE A SINGLE DOCUMENT LINE:**
+
+| path | uncommitted, not this session's |
+|---|---|
+| `QUESTIONS.md` | **215+ / 0−** — including `Q-171`…`Q-174` |
+| `INCIDENTS.md` | **146+ / 0−** — including `INC-129`…`INC-131` |
+| `PROGRESS.md` | **147+ / 0−** |
+| `STATUS.md` | **63+ / 1−** |
+| | **571 added lines** |
+
+A plain `git add` of those four paths at that moment would have committed all 571 under `5f8a3e61` —
+**`INC-123` at five times its measured scale**, and worse in kind, because the draft included seven
+`Q-`/`INC-` headings that were still being edited.
+
+**WHAT WAS PREPARED, AND WHY IT WAS NOT NEEDED.** A private-index technique was worked out: edit the
+working-tree files normally so nothing is lost, but **stage a blob built from `git show HEAD:<path>`
+plus this session's own insertions**, hashed with `git hash-object -w` and placed in the private
+index with `git update-index --add --cacheinfo`, so the commit carries this session's lines and
+nothing else. ⚠️ **IT WAS NOT USED.** At **18:48Z** the concurrent session committed (`b1f06d3`,
+`277cc96`), the four documents went **clean**, and `PROCESS.md` §7b's plain five steps were followed
+**unmodified**. **This row records a near-miss and a technique, not a deviation** — nothing in this
+session's commits departs from §7b.
+
+**AND THE TECHNIQUE HAS ITS OWN HAZARD, WHICH IS WHY IT IS PROPOSED AS A QUESTION AND NOT AS AN
+ANSWER.** The constructed blob is built from `HEAD` **at staging time**; if a concurrent commit lands
+between construction and `git commit`, the blob is built on a stale base and would **revert** that
+commit's lines. The only guard is to rebuild it and re-read `HEAD` in the same command as the
+commit, and to abort if `HEAD` moved.
+
+**THE QUESTION:** whether §7b should gain a step 3b for **documents shared with a live session**, or
+whether the honest answer is `INC-65`'s — that two sessions appending to one journal cannot both be
+safe, and the remedy is scheduling rather than plumbing. ⚠️ **What this session actually relied on
+was luck: the other session happened to commit first.** That is not a control.
+
+**STOPPED?** No.

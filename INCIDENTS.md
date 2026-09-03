@@ -9826,3 +9826,170 @@ run, before review, before commit. ⚠️ **Recorded anyway, and deliberately**,
 is that a build which produced no failure worth recording must say so: this one did produce one, the
 guardrail caught it in seconds, and an incident log containing only the failures that escaped their
 guardrails would misrepresent how often the guardrails fire.
+
+---
+
+## INC-132 — the line `CLAUDE.md` calls "the whole moat" printed **PASS on all four checks** over a live `gates/` → `scorer/` reach, because its two halves scanned different sets and the smaller one was the half meant to cover the other's known blind spot
+
+**Date:** 2026-09-04 (ARCH FIX — PRE-FREEZE 3, `5f8a3e61`. Predicted as **`OF-249`** by **C19 README
+BUILD 1** (`9f31d708`) *structurally*, from reading the call site; **exploited and measured here**,
+in a throwaway clone. Fix SHA recorded under **Fix**.)
+
+**Event:** `OF-249` recorded that `D1`–`D3` walk the **transitive closure** of `gates/` and
+`scorer/` while `D4` — the source-text half added for `OF-110` and `INC-51`, and added *precisely
+because an AST import walk cannot see a call expression* — walked the two package **directories**.
+C19 measured this tree with the walker itself and reported **118 first-party modules indexed,
+`gates/` closure 15, `scorer/` closure 6, intersection EMPTY**, and
+`(gates_closure ∪ scorer_closure) − gates_dir − scorer_dir` = **`{whetstone_gate.config}`**. C19 also
+stated, correctly, that **no hop had been planted** and that its evidence was therefore **weaker
+than `INC-51`'s**. ⚠️ **`CLAUDE.md` hard rule 8 calls this line "the whole moat" and `CONTEXT.md` §7
+makes it the submission's central argument.**
+
+**Action:** ⚠️ **THE CLOSURE FIGURES WERE RE-MEASURED FIRST AND REPRODUCED EXACTLY** — 118 / 15 / 6 /
+empty / `{whetstone_gate.config}`. Then, in a `git clone` of `HEAD` in a **fresh OS temp directory,
+never in this repository** (`INC-11`, `INC-17`), a dynamic hop was planted **in `config.py`** and a
+gates module written that calls it and **names no refused form of its own**:
+
+| tree | `check_roles.py` | plant | D1 | D2 | D3 | D4 |
+|---|---|---|---|---|---|---|
+| `old_hop` | `HEAD`'s — directories | `importlib` hop in `config.py`, called from `gates/of249_probe.py` | **PASS** | **PASS** | **PASS** | ⚠️ **PASS** |
+| `new_hop` | this session's — closure | the same plant | PASS | PASS | PASS | **FAIL** |
+| `new_inc51` | this session's | `INC-51`'s shape: `importlib` **inside** `gates/` | PASS | PASS | PASS | **FAIL** |
+| `new_clean` | this session's | none | PASS | PASS | PASS | **PASS** |
+
+⚠️ **AND THE REACH IS LIVE, NOT DEAD CODE, EXACTLY AS `INC-51` REQUIRED OF ITSELF:**
+`gates.of249_probe.decide(6_000_000, 5_000_000)` returned **`'DENY'`**, computed by
+`scorer/invariants.py`, whose `__file__` was printed **from the same subprocess as the measurement**
+(`INC-69`) alongside `whetstone_gate.__file__` and `config.repo_root()`, all three resolving inside
+the temp tree. **The pre-fix `D4`'s own printed detail on that tree read** *"neither package names
+any of the 14 refused dynamic-reach forms in its source text."*
+
+**Expectation:** `D4` exists to catch what `D1`–`D3` cannot see. It should have refused a dynamic
+`gates/` → `scorer/` reach wherever the hop sits, since **the closure is the set `D1`–`D3` already
+treat as "inside the moat"**. Instead the two halves disagreed about what "inside" meant, and the
+disagreement was exactly one module wide — on the **gate** side.
+
+**Missing:** ⚠️ **nothing asserted that `D4`'s scan set and `D1`–`D3`'s walk set were the same set.**
+Six tests across four files pointed `_dynamic_reach_hits` at a package **directory** — which is what
+each of them meant — and not one compared it to the closure. A single test asserting *"every module
+in either closure is named in `D4`'s detail"* would have failed on the day `gates/shell.py` first
+imported `whetstone_gate.config`, with no hop planted and nothing to exploit.
+
+**Missed:** ⚠️ **`OF-110`'s own remedy said "the package set", and the fix implemented "the package
+directories".** The distinction was available in the source the day `D4` was written:
+`_walk_isolation` had `gate_closure` and `scorer_closure` **as local variables, eleven lines above
+the `D4` block**, and the `D4` block reached past them for `gates` and `scorer` — the two `Path`s.
+⚠️ **And `INC-51`'s own entry contains the sentence that should have caught it:** it records `D3`
+being defeated *transitively*, and then adds a text scan that is not transitive at all. **The
+asymmetry was written down in the same file, in the same session, and nobody read the two halves
+against each other.**
+
+**Diagnosis:** `D4` was added as a patch to a *symptom* (`gates/` and `scorer/` could name
+`importlib`) rather than to the *property* (`D1`–`D3`'s closure is unscanned for dynamic reach), so
+its scan set was chosen from the two `Path`s already in scope instead of from the closure the same
+function had just computed.
+
+**Fix:** ``1fd0877`` — `D4`'s scan set is now the **union of both package directories and every
+first-party module in either transitive closure**, deduplicated by resolved path;
+`_dynamic_reach_hits` is unchanged (four other chunks' tests point it at their own directory, which
+is what they mean) and a new `_dynamic_reach_hits_in_modules` scans an explicit module set, both
+through one `_refused_dynamic_lines` so the two callers cannot drift into refusing different
+vocabularies. `D4`'s printed detail now **names the closure-only modules it scanned**.
+⚠️ **`MOAT_ALLOW_LIST` IS STILL `frozenset()` AND `MOAT_REFUSED_DYNAMIC` STILL HOLDS 14 NAMES** —
+adding to the first or narrowing the second is Class A and this session asked for neither.
+Three tests in `tests/test_repo_invariants.py`: the closure-versus-detail assertion, a **RED** drive
+on a hop one module outside both directories which also asserts that the **directory-only scan still
+reads that tree clean**, and a clean-tree negative control. **All three were run against `HEAD`'s
+`check_roles.py` in a `PYTHONPATH`-pinned temp tree and two of the three FAILED there**, so they are
+measurements and not decoration.
+
+**Systemic guardrail:** `test_d4_text_scans_every_module_in_either_closure_not_just_the_two_directories`
+fails whenever a module enters either closure without entering `D4`'s printed scan set, **hop or no
+hop**. That is the general form; the two red-drive tests are the specific one.
+⚠️ **WHAT IT DOES NOT CLOSE, because a guardrail is worth only what its limit is honest about:** the
+closure is built from **static imports**, so a first-party module that `gates/` reaches through a
+**third-party** indirection — an entry point, a registry, a callback handed to a library — is in
+neither closure nor directory and is scanned by neither half. `OF-253`.
+
+---
+
+## INC-133 — `INVARIANTS.md` §5.2 said four components are byte-identical from a seed "and are **tested** to be", and two of them were; the document that carries this project's determinism claim outran its own suite for four days
+
+**Date:** 2026-09-04 (ARCH FIX — PRE-FREEZE 3, `5f8a3e61`. Raised as **`OF-252`**, HIGH, by **C19
+README BUILD 1** (`9f31d708`), 2026-09-03 — **a limitation that session measured against this project
+and published although nothing asked it to.** Fix SHA recorded under **Fix**.)
+
+**Event:** `INVARIANTS.md` §5 item 2, verbatim: *"The **world, the ledger schema, the scorer and the
+replay** are byte-identical from the same seed and are **tested** to be."* C19 measured the suite
+and found **two of the four** had a two-run byte comparison — `tests/test_c2_world.py:608` and
+`tests/test_c7_ledger.py:1353`. **`tests/test_c8_scorer.py` held 102 tests and not one was a
+determinism, byte-identity or two-run test, and there was no dedicated replay-determinism test
+anywhere in the suite.**
+
+**Action:** ⚠️ **`OF-252`'s remedy (1) WAS TAKEN AND REMEDY (2) WAS REFUSED, ON C19's OWN
+REASONING.** The two missing tests are written and `INVARIANTS.md` is **NOT** edited: narrowing a
+true-but-untested claim to a smaller tested one loses a property the project actually has, and hard
+rule 10 makes the four-component claim in the first place. Both new tests are **two-run byte
+comparisons in the shape the two existing ones use**, and both compare **serialised bytes without
+`sort_keys`**, so insertion order is part of what is compared.
+⚠️ **BOTH WERE PROVED ABLE TO FAIL, IN CLONES OUTSIDE THIS REPOSITORY**, each against its own
+planted defect and with an untouched control clone staying green:
+
+| clone | plant | scorer test | replay test |
+|---|---|---|---|
+| `det_control` | none | PASS | PASS |
+| `det_scorer` | `harm_totals` emits the same four pairs in a different order on the 2nd call | **FAIL** | PASS |
+| `det_replay` | `opening_state_from_payments` folds the payments in reverse on the 2nd call | PASS | **FAIL** |
+
+⚠️ **AND THE PLANT PROVED WHY THE COMPARISON IS OF BYTES AND NOT OF OBJECTS.** Under
+`det_scorer`'s defect, measured in that tree: `a == b` on the frozen `EpisodeScore` returned
+**`True`**, `a.harm == b.harm` returned **`True`**, and the two serialisations **differed** —
+`a.harm` keys `['customer_overcharge_paise', 'merchant_irrecoverable_outflow_paise',
+'merchant_float_moved_paise', 'fees_incurred_paise']` against `b.harm` keys in the reverse order.
+**A test written with `==` would have been green over a scorer whose published harm vector rendered
+differently on every other run.**
+
+**Expectation:** a sentence in a pre-registration artefact that says *"and are tested to be"* should
+name four tests. It named two, and the other two did not exist.
+
+**Missing:** ⚠️ **nothing checks that a claim in a frozen or near-frozen artefact has a test behind
+it.** `tests/test_c14_prereg.py` compares `INVARIANTS.md`'s predicate prose to golden 2's predicate
+block **term by term** — a real and unusual control — but it is about **agreement between two
+statements of one predicate**, not about whether a claimed *property* is asserted anywhere. There is
+no mechanism that would have noticed, and the finding arrived because one build session read its own
+document adversarially.
+
+**Missed:** ⚠️ **the sentence was written in the same session that wrote hard rule 10's scope
+paragraph, which lists the same four components and is careful to the byte about what is NOT
+claimed** — *"Model output is **NOT** … do not write, and do not let the README write, that
+re-running the models reproduces the run."* **The care went entirely into the exclusion and none
+into the four inclusions**, and the four were never counted against the suite. ⚠️ **And a near-miss
+was recorded and not followed:** C19's own first draft tried to close this with a **golden**, caught
+itself, and wrote `INC-124` — *a golden is a **correctness oracle** and says nothing about computing
+the same bytes twice.* That entry names the conflation and stops one step short of asking how many
+of the four had the other kind of test.
+
+**Diagnosis:** the claim was written from the **design intent** — four pure components, therefore
+four deterministic components — and never from the **test file listing**, so it was true about the
+code and false about the suite, which is the precise gap between *"is deterministic"* and *"is
+tested to be"*.
+
+**Fix:** ``1fd0877`` — `tests/test_c8_scorer.py` gains
+`test_two_runs_of_one_seed_produce_a_BYTE_IDENTICAL_SCORE` (scores one seed's episode twice, compares
+the `EpisodeScore` **and the drop ledger** as bytes, because hard rule 11's `offered == scored +
+dropped` is a published number too) and
+`test_two_replays_of_one_STORED_episode_are_BYTE_IDENTICAL` (writes the episode to disk with
+`store.write`, then replays it twice — reading the file back and regenerating the world **from the
+seed the document itself carries** — because *"the replay"* is what a stranger runs against a stored
+ledger, and `make eval`'s claim is *"every number regenerates from the stored ledgers"*).
+**Neither component turned out to be non-deterministic:** both passed on the first run, in the real
+tree and in the untouched control clone.
+⚠️ **NEITHER TEST IS A GOLDEN COMPARISON AND EACH SAYS SO IN ITS OWN DOCSTRING** (`INC-124`), and each
+states the scope exactly: **model output is not deterministic — the attacker runs at temperature 0.7
+against a hosted provider — and these four components are, and nothing more.**
+
+**Systemic guardrail:** ⚠️ **none for the general class — accepted, because the general form is
+"every claim in a frozen artefact has a test", which is a judgement about English and not a check
+this repository can run.** What now exists is the specific one: `INVARIANTS.md` §5.2's four
+components have four tests, one per component, each named in `OF-252`'s row and each proved able to
+fail. The general gap stays open and is published as a limitation.
