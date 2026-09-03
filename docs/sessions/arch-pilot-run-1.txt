@@ -6,7 +6,8 @@ PUSHED SHA: see the printed report's first line. This file is committed BEFORE i
   is printed (CLAUDE.md S6.1), so it cannot contain the SHA of its own commit. The
   chain is 34a8548 (open) -> 01ea31f -> aa9e24c -> 4ce8f56 -> this file's commit.
   A follow-up one-line commit writes the real SHA into the line below.
-  FINAL PUSHED SHA: <filled by the follow-up commit>
+  FINAL PUSHED SHA: 4788184 carries this file. THIS one-line commit is the last, and
+  the printed report's first line names it. Both are pushed to origin/main.
 
 VERDICT: THREE OF FIVE TASKS DONE IN FULL. TASKS 3 AND 4 NOT DONE.
   probe-v1 IS CUT AND PUSHED. THE CORPORA ARE FETCHED AND PIN-VERIFIED.
