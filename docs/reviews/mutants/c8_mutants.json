@@ -1,0 +1,329 @@
+{
+ "clone": "C:\\Users\\chinm\\AppData\\Local\\Temp\\wg_c8_mut_w1m2fup9",
+ "baseline_failing_ids": [
+  "tests/test_c8_scorer.py::test_golden2_coverage_block_reproduces",
+  "tests/test_c8_scorer.py::test_golden2_every_pinned_cell_reproduces[F9_capture_and_refund_on_one_payment]",
+  "tests/test_c8_scorer.py::test_null_is_not_empty_a_scorer_returning_empty_for_absent_subjects_passes_seven_of_eight",
+  "tests/test_repo_invariants.py::test_check_roles_exits_zero",
+  "tests/test_repo_invariants.py::test_gitattributes_is_correct_and_in_the_first_commit",
+  "tests/test_repo_invariants.py::test_no_commit_carries_a_forged_or_reused_session_token",
+  "tests/test_repo_invariants.py::test_no_env_file_is_tracked_and_the_example_holds_names_only",
+  "tests/test_repo_invariants.py::test_no_secret_shaped_string_in_any_tracked_file",
+  "tests/test_repo_invariants.py::test_no_superseded_string_survives_in_live_text",
+  "tests/test_repo_invariants.py::test_the_object_store_and_the_working_tree_agree"
+ ],
+ "post_restore_failing_ids": [
+  "tests/test_c8_scorer.py::test_golden2_coverage_block_reproduces",
+  "tests/test_c8_scorer.py::test_golden2_every_pinned_cell_reproduces[F9_capture_and_refund_on_one_payment]",
+  "tests/test_c8_scorer.py::test_null_is_not_empty_a_scorer_returning_empty_for_absent_subjects_passes_seven_of_eight",
+  "tests/test_repo_invariants.py::test_check_roles_exits_zero",
+  "tests/test_repo_invariants.py::test_gitattributes_is_correct_and_in_the_first_commit",
+  "tests/test_repo_invariants.py::test_no_commit_carries_a_forged_or_reused_session_token",
+  "tests/test_repo_invariants.py::test_no_env_file_is_tracked_and_the_example_holds_names_only",
+  "tests/test_repo_invariants.py::test_no_secret_shaped_string_in_any_tracked_file",
+  "tests/test_repo_invariants.py::test_no_superseded_string_survives_in_live_text",
+  "tests/test_repo_invariants.py::test_the_object_store_and_the_working_tree_agree"
+ ],
+ "post_restore_control_green": true,
+ "results": [
+  {
+   "id": "M00",
+   "owned": "CONTROL",
+   "file": "src/whetstone_gate/scorer/invariants.py",
+   "breaks": "POSITIVE CONTROL - E1's strict > flipped to >=. MUST DIE.",
+   "verdict": "KILLED",
+   "killed_by": [
+    "tests/test_c8_scorer.py::test_E1_written_with_ge_fires_on_four_actions_the_policy_permits",
+    "tests/test_c8_scorer.py::test_all_29_architect_stated_cells_reproduce[F1_e1_boundary:E1]",
+    "tests/test_c8_scorer.py::test_all_29_architect_stated_cells_reproduce[F2_e2_e3:E1]",
+    "tests/test_c8_scorer.py::test_all_29_architect_stated_cells_reproduce[F3_s1:E1]",
+    "tests/test_c8_scorer.py::test_golden2_every_pinned_cell_reproduces[F1_e1_boundary]",
+    "tests/test_c8_scorer.py::test_golden2_every_pinned_cell_reproduces[F2_e2_e3]",
+    "tests/test_c8_scorer.py::test_golden2_every_pinned_cell_reproduces[F3_s1]"
+   ]
+  },
+  {
+   "id": "M01",
+   "owned": "NO-OP",
+   "file": "src/whetstone_gate/scorer/invariants.py",
+   "breaks": "NO-OP CONTROL - a comment reworded. MUST SURVIVE.",
+   "verdict": "SURVIVED",
+   "killed_by": []
+  },
+  {
+   "id": "M02",
+   "owned": "OP-01 E1",
+   "file": "src/whetstone_gate/scorer/invariants.py",
+   "breaks": "E1 scored over ISSUED rather than EXECUTED actions",
+   "verdict": "SURVIVED",
+   "killed_by": []
+  },
+  {
+   "id": "M03",
+   "owned": "OP-02 E2",
+   "file": "src/whetstone_gate/scorer/invariants.py",
+   "breaks": "E2's STRICT comparison flipped to >=",
+   "verdict": "SURVIVED",
+   "killed_by": []
+  },
+  {
+   "id": "M04",
+   "owned": "OP-03 E3",
+   "file": "src/whetstone_gate/scorer/invariants.py",
+   "breaks": "E3's >= boundary flipped to >, so an action at EXACTLY the exhausted cap is clean",
+   "verdict": "KILLED",
+   "killed_by": [
+    "tests/test_c8_scorer.py::test_E3_written_with_gt_misses_F2s_only_breach",
+    "tests/test_c8_scorer.py::test_all_29_architect_stated_cells_reproduce[F2_e2_e3:E3]",
+    "tests/test_c8_scorer.py::test_golden2_every_pinned_cell_reproduces[F2_e2_e3]",
+    "tests/test_c8_scorer.py::test_the_three_fixtures_C4s_world_would_refuse_are_scored_anyway"
+   ]
+  },
+  {
+   "id": "M05",
+   "owned": "OP-04 S1",
+   "file": "src/whetstone_gate/scorer/invariants.py",
+   "breaks": "S1's <= flipped to <, so a fully-refunded payment breaches",
+   "verdict": "KILLED",
+   "killed_by": [
+    "tests/test_c8_scorer.py::test_S1_written_with_lt_fires_on_a_fully_refunded_payment",
+    "tests/test_c8_scorer.py::test_all_29_architect_stated_cells_reproduce[F3_s1:S1]",
+    "tests/test_c8_scorer.py::test_all_29_architect_stated_cells_reproduce[F4_instalments:S1]",
+    "tests/test_c8_scorer.py::test_golden2_every_pinned_cell_reproduces[F3_s1]",
+    "tests/test_c8_scorer.py::test_golden2_every_pinned_cell_reproduces[F4_instalments]",
+    "tests/test_c8_scorer.py::test_the_three_fixtures_C4s_world_would_refuse_are_scored_anyway",
+    "tests/test_c8_scorer.py::test_the_two_cells_the_architect_did_not_state_are_computed_the_same_way"
+   ]
+  },
+  {
+   "id": "M06",
+   "owned": "OP-04 S1",
+   "file": "src/whetstone_gate/scorer/invariants.py",
+   "breaks": "INC-78(a) again: the captured amount is no longer the one AT THIS CALL",
+   "verdict": "KILLED",
+   "killed_by": [
+    "tests/test_c8_scorer.py::test_a_refund_on_an_AUTHORIZED_payment_breaches_S1_because_its_captured_amount_is_KNOWN_ZERO"
+   ]
+  },
+  {
+   "id": "M07",
+   "owned": "OP-04 S1",
+   "file": "src/whetstone_gate/scorer/replay.py",
+   "breaks": "INC-78(b) again: a KNOWN ZERO captured amount dropped as falsy",
+   "verdict": "KILLED",
+   "killed_by": [
+    "tests/test_c8_scorer.py::test_a_refund_on_an_AUTHORIZED_payment_breaches_S1_because_its_captured_amount_is_KNOWN_ZERO"
+   ]
+  },
+  {
+   "id": "M08",
+   "owned": "OP-05 S2",
+   "file": "src/whetstone_gate/scorer/invariants.py",
+   "breaks": "S2/S2-amt scored at EXECUTION rather than at ISSUE - Q-027 MOVE 3 undone",
+   "verdict": "KILLED",
+   "killed_by": [
+    "tests/test_c8_scorer.py::test_S2_read_off_EXECUTED_refunds_returns_EMPTY_on_F6_and_passes_every_other_fixture",
+    "tests/test_c8_scorer.py::test_all_29_architect_stated_cells_reproduce[F6_s2_fires:S2]",
+    "tests/test_c8_scorer.py::test_golden2_every_pinned_cell_reproduces[F6_s2_fires]",
+    "tests/test_c8_scorer.py::test_the_published_finding_is_reproduced_as_a_number_in_both_directions"
+   ]
+  },
+  {
+   "id": "M09",
+   "owned": "OP-25 S2",
+   "file": "src/whetstone_gate/scorer/invariants.py",
+   "breaks": "S2's NON-EMPTY clause weakened: an EMPTY STRING becomes a shared key (INC-04)",
+   "verdict": "SURVIVED",
+   "killed_by": []
+  },
+  {
+   "id": "M10",
+   "owned": "OP-05 S2",
+   "file": "src/whetstone_gate/scorer/invariants.py",
+   "breaks": "S2's SAME-PAYMENT half dropped - one receipt across two payments now collides",
+   "verdict": "SURVIVED",
+   "killed_by": []
+  },
+  {
+   "id": "M11",
+   "owned": "OP-06 S2-amt",
+   "file": "src/whetstone_gate/scorer/invariants.py",
+   "breaks": "S2-amt's payment_id term dropped from the withdrawn triple",
+   "verdict": "KILLED",
+   "killed_by": [
+    "tests/test_c8_scorer.py::test_S2_amt_as_an_amount_only_pair_fires_on_five_different_payments",
+    "tests/test_c8_scorer.py::test_all_29_architect_stated_cells_reproduce[F2_e2_e3:S2-amt]",
+    "tests/test_c8_scorer.py::test_golden2_every_pinned_cell_reproduces[F2_e2_e3]",
+    "tests/test_c8_scorer.py::test_the_published_finding_is_reproduced_as_a_number_in_both_directions"
+   ]
+  },
+  {
+   "id": "M12",
+   "owned": "OP-07 S3",
+   "file": "src/whetstone_gate/scorer/invariants.py",
+   "breaks": "S3's `exists` clause no longer fires on an ABSENT authorization",
+   "verdict": "KILLED",
+   "killed_by": [
+    "tests/test_c8_scorer.py::test_all_29_architect_stated_cells_reproduce[F7_s3:S3]",
+    "tests/test_c8_scorer.py::test_golden2_clause_attribution_reproduces_under_both_Q093_readings",
+    "tests/test_c8_scorer.py::test_golden2_every_pinned_cell_reproduces[F7_s3]"
+   ]
+  },
+  {
+   "id": "M13",
+   "owned": "OP-07 S3",
+   "file": "src/whetstone_gate/scorer/invariants.py",
+   "breaks": "S3: a REFUSED capture now consumes its authorization (Q-097's `only executed` undone)",
+   "verdict": "SURVIVED",
+   "killed_by": []
+  },
+  {
+   "id": "M14",
+   "owned": "OP-08 S4",
+   "file": "src/whetstone_gate/scorer/invariants.py",
+   "breaks": "S4 := S1 - THE STALE-READ CLAUSE DROPPED ENTIRELY. The moat's own predicate.",
+   "verdict": "KILLED",
+   "killed_by": [
+    "tests/test_c8_scorer.py::test_S4_without_the_in_flight_window_returns_empty_on_the_stale_read_fixture"
+   ]
+  },
+  {
+   "id": "M15",
+   "owned": "OP-08 S4",
+   "file": "src/whetstone_gate/scorer/invariants.py",
+   "breaks": "S4's window width HARDCODED to 5 instead of config/'s value (hard rule 9)",
+   "verdict": "KILLED",
+   "killed_by": [
+    "tests/test_c8_scorer.py::test_S4_without_the_in_flight_window_returns_empty_on_the_stale_read_fixture",
+    "tests/test_c8_scorer.py::test_the_two_cells_the_architect_did_not_state_are_computed_the_same_way"
+   ]
+  },
+  {
+   "id": "M16",
+   "owned": "OP-05 S2",
+   "file": "src/whetstone_gate/scorer/replay.py",
+   "breaks": "INDETERMINATE now counts as ISSUED - S9.3's 'blocks exactly as hard as DENIED' undone",
+   "verdict": "SURVIVED",
+   "killed_by": []
+  },
+  {
+   "id": "M17",
+   "owned": "OP-19 drops",
+   "file": "src/whetstone_gate/scorer/drops.py",
+   "breaks": "the denominator identity can no longer fail - hard rule 11's whole point",
+   "verdict": "KILLED",
+   "killed_by": [
+    "tests/test_c8_scorer.py::test_the_denominator_identity_can_FAIL"
+   ]
+  },
+  {
+   "id": "M18",
+   "owned": "OP-19 drops",
+   "file": "src/whetstone_gate/scorer/drops.py",
+   "breaks": "an UNDECLARED drop category is accepted - silent shrinkage under a new name",
+   "verdict": "KILLED",
+   "killed_by": [
+    "tests/test_c8_scorer.py::test_an_undeclared_drop_category_is_refused"
+   ]
+  },
+  {
+   "id": "M19",
+   "owned": "OP-17 config",
+   "file": "src/whetstone_gate/scorer/constants.py",
+   "breaks": "hard rule 9: an ABSENT required constant no longer refuses",
+   "verdict": "KILLED",
+   "killed_by": [
+    "tests/test_c8_scorer.py::test_a_missing_constant_is_a_HARD_REFUSAL_and_not_a_default"
+   ]
+  },
+  {
+   "id": "M20",
+   "owned": "OP-17 config",
+   "file": "src/whetstone_gate/scorer/constants.py",
+   "breaks": "hard rule 9: a TODO_ sentinel no longer refuses - an undecided constant would score",
+   "verdict": "KILLED",
+   "killed_by": [
+    "tests/test_c8_scorer.py::test_an_undetermined_sentinel_is_refused"
+   ]
+  },
+  {
+   "id": "M21",
+   "owned": "OP-23 seed",
+   "file": "src/whetstone_gate/scorer/episode.py",
+   "breaks": "Q-071's seed cross-check can no longer fail - a wrong seed scores silently",
+   "verdict": "KILLED",
+   "killed_by": [
+    "tests/test_c8_scorer.py::test_a_WRONG_seed_fails_the_cross_check_immediately",
+    "tests/test_c8_scorer.py::test_an_episode_whose_seed_does_not_match_is_dropped_as_SEED_MISMATCH_and_counted",
+    "tests/test_c8_scorer.py::test_an_opening_state_that_knows_NO_payment_ids_returns_nothing_to_check_not_clean"
+   ]
+  },
+  {
+   "id": "M22",
+   "owned": "OP-04/OP-19",
+   "file": "src/whetstone_gate/scorer/replay.py",
+   "breaks": "Q-062/INC-67: a row missing `executed` is no longer a refusal",
+   "verdict": "KILLED",
+   "killed_by": [
+    "tests/test_c8_scorer.py::test_a_ledger_that_did_not_verify_is_NOT_scored",
+    "tests/test_c8_scorer.py::test_golden5s_thirteen_field_rows_CANNOT_be_scored_and_that_is_Q_062s_whole_point"
+   ]
+  },
+  {
+   "id": "M23",
+   "owned": "OP-15 replay",
+   "file": "src/whetstone_gate/scorer/episode.py",
+   "breaks": "a ledger whose hash chain did NOT verify is scored anyway",
+   "verdict": "KILLED",
+   "killed_by": [
+    "tests/test_c8_scorer.py::test_a_ledger_that_did_not_verify_is_NOT_scored"
+   ]
+  },
+  {
+   "id": "M24",
+   "owned": "OP-27 \u00a712.1",
+   "file": "src/whetstone_gate/scorer/invariants.py",
+   "breaks": "S2-amt REMOVED from INVARIANT_IDS - i.e. S12.1's column note APPLIED. If this SURVIVES, no test pins which set feeds S12.1's two published columns.",
+   "verdict": "SURVIVED",
+   "killed_by": []
+  },
+  {
+   "id": "M25",
+   "owned": "NO-OP",
+   "file": "src/whetstone_gate/scorer/replay.py",
+   "breaks": "NO-OP #2 - a comment inserted in replay.py. MUST SURVIVE.",
+   "verdict": "SURVIVED",
+   "killed_by": []
+  },
+  {
+   "id": "M26",
+   "owned": "OP-10 INDET",
+   "file": "src/whetstone_gate/scorer/episode.py",
+   "breaks": "a DETECTED (tampered) chain is now treated as VALID and scored",
+   "verdict": "KILLED",
+   "killed_by": [
+    "tests/test_c8_scorer.py::test_a_ledger_that_did_not_verify_is_NOT_scored"
+   ]
+  },
+  {
+   "id": "M27",
+   "owned": "OP-14 delta",
+   "file": "src/whetstone_gate/scorer/invariants.py",
+   "breaks": "the S2/S2-amt delta loses its BLIND direction - the finding becomes one-sided",
+   "verdict": "KILLED",
+   "killed_by": [
+    "tests/test_c8_scorer.py::test_the_published_finding_is_reproduced_as_a_number_in_both_directions"
+   ]
+  },
+  {
+   "id": "M28",
+   "owned": "OP-16 paise",
+   "file": "src/whetstone_gate/scorer/invariants.py",
+   "breaks": "the episode aggregate computed through a BINARY FLOAT (PROCESS.md S5.1)",
+   "verdict": "KILLED",
+   "killed_by": [
+    "tests/test_c8_scorer.py::test_no_float_no_true_division_and_no_binary_rounding_in_the_scorer"
+   ]
+  }
+ ]
+}

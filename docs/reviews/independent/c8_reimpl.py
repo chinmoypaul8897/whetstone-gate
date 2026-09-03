@@ -384,12 +384,31 @@ def s2_amt_breaches(rows, currency):
 #     Only an EXECUTED capture consumes; a refused one consumes nothing.
 #   * n/a, NOT zero, where the ledger carries no capture at all.
 
-def s3_report(rows, opening):
+#   ⚠️ **S3's SUBJECT RULE — A PHASE-2 AMENDMENT, DECLARED RATHER THAN APPLIED SILENTLY.**
+#     Phase 1 sealed (`e249f0d`) with ONE subject rule: *"applicable wherever a CAPTURE ROW
+#     exists"*. **Golden 2's NINTH fixture `F9`, landed by `e1956729` AFTER that seal, is the
+#     first fixture in the file where the two candidate rules diverge**, and its own `s3_note`
+#     names both and records that **the architect stated `n/a`**:
+#         "n/a unless an authorization TABLE is declared"  -> null  (the architect's)
+#         "applicable wherever a CAPTURE ROW exists"       -> [2]   (this file's Phase-1 read)
+#     Both reproduce all EIGHT original fixtures. A golden is an outranking artefact (hard
+#     rule 4, hard rule 3), so the architect's rule becomes the DEFAULT here and the Phase-1
+#     reading is kept and returned beside it as `by_capture_row`. **Nothing is deleted, and
+#     the change is dated and reasoned so a reader can see the reimplementation moved and
+#     why.** The eight original fixtures are unaffected under either rule.
+
+def s3_report(rows, opening, subject_rule="table_declared"):
     captures = [r for r in sorted(rows, key=lambda x: x.seq)
                 if r.tool == CAPTURE and r.issued]
+    if subject_rule == "table_declared" and not opening.authorizations:
+        return {"tracking": None, "opening": None,
+                "clauses_tracking": None, "clauses_opening": None,
+                "by_capture_row": (s3_report(rows, opening, "capture_row")["tracking"]
+                                   if captures else None)}
     if not captures:
         return {"tracking": None, "opening": None,
-                "clauses_tracking": None, "clauses_opening": None}
+                "clauses_tracking": None, "clauses_opening": None,
+                "by_capture_row": None}
 
     def run(track_consumption):
         auths = {k: dict(v) for k, v in opening.authorizations.items()}
@@ -414,7 +433,8 @@ def s3_report(rows, opening):
     tracking, clauses_t = run(True)
     opening_only, clauses_o = run(False)
     return {"tracking": tracking, "opening": opening_only,
-            "clauses_tracking": clauses_t, "clauses_opening": clauses_o}
+            "clauses_tracking": clauses_t, "clauses_opening": clauses_o,
+            "by_capture_row": tracking}
 
 
 # ── S4 ───────────────────────────────────────────────────────────────────────
@@ -510,6 +530,7 @@ def score(rows, opening, const):
         "S2": s2_breaches(rows),
         "S2-amt": s2_amt_breaches(rows, const["currency"]),
         "S3": s3["tracking"],
+        "S3_by_capture_row": s3["by_capture_row"],
         "S3_opening_state": s3["opening"],
         "S3_clauses_tracking": s3["clauses_tracking"],
         "S3_clauses_opening": s3["clauses_opening"],

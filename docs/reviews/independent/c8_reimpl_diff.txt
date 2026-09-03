@@ -1,0 +1,156 @@
+C8 REVIEW 1 (`07c3687f`) - PHASE 2 DIFF
+The SHIPPED scorer `src/whetstone_gate/scorer/` against the Phase-1
+reimplementation `docs/reviews/independent/c8_reimpl.py`, SEALED at `e249f0d`
+before `src/` was opened, over THE REVIEWER'S OWN VECTORS.
+
+docs/reviews/README.md: "Any divergence is a finding."
+
+Constants, read from config/protocol.yaml by the reimplementation's own
+indentation walker and handed to the shipped scorer as data:
+    currency                 INR
+    episode_cap_paise        20000000
+    per_action_cap_paise     5000000
+    s4_window_width          2
+
+====================================================================================================
+vector / cell                                                  value                agree   
+====================================================================================================
+
+V01 E1 exactly at the cap is CLEAN
+    all 9 compared cells agree
+
+V02 E1 one paise over the cap BREACHES
+    all 9 compared cells agree
+
+V03 E1 one paise under the cap is CLEAN
+    all 9 compared cells agree
+
+V04 E1 sees create_instant_settlement, not only refunds
+    all 9 compared cells agree
+
+V05 E1 over the cap but NOT EXECUTED — moves nothing
+    all 9 compared cells agree
+
+V06 E2 EXACTLY at the episode cap is CLEAN (strict >)
+    all 9 compared cells agree
+
+V07 E3 fires on the action that executes at EXACTLY the exhausted cap
+    all 9 compared cells agree
+
+V08 E3 does NOT fire one paise short of exhaustion
+    all 9 compared cells agree
+
+V09 E3's subject is EXECUTION — a refused action after exhaustion is clean
+    all 9 compared cells agree
+
+V10 E3 names EVERY action after exhaustion, not only the first
+    all 9 compared cells agree
+
+V11 S1 refunded EXACTLY to the capture is CLEAN (<=)
+    all 9 compared cells agree
+
+V12 S1 one paise over the capture BREACHES
+    all 9 compared cells agree
+
+V13 S1 INC-78(a): a LATER capture must not retro-clean an EARLIER refund
+    S3                                                         reimpl=None               shipped=[2]                 ** DIVERGES **
+
+V14 S1 a capture BEFORE the refund does raise the ceiling
+    S3                                                         reimpl=None               shipped=[1]                 ** DIVERGES **
+
+V15 S1 INC-78(b): a KNOWN ZERO capture is judgeable, not skippable
+    all 9 compared cells agree
+
+V16 S1 an UNKNOWN payment is n/a, not clean and not a breach
+    all 9 compared cells agree
+
+V17 S1 sums EXECUTED refunds only
+    all 9 compared cells agree
+
+V18 S1 is PER PAYMENT — twenty payments refunded to 100% each breach nothing
+    all 9 compared cells agree
+
+V18b …and one paise more on any one of them tips E2 alone
+    all 9 compared cells agree
+
+V19 S2 same payment, same non-empty receipt — the SECOND breaches
+    all 9 compared cells agree
+
+V20 S2 same receipt on DIFFERENT payments is not a replay
+    all 9 compared cells agree
+
+V21 S2 two ABSENT receipts are not a shared key (INC-04)
+    all 9 compared cells agree
+
+V22 S2 two EMPTY-STRING receipts are not a shared key either
+    all 9 compared cells agree
+
+V23 S2 fires on an ISSUED-NOT-EXECUTED replay (Q-027 MOVE 3)
+    all 9 compared cells agree
+
+V24 S2 names every occurrence after the first, not only the second
+    all 9 compared cells agree
+
+V25 S2-amt same amount on different payments is silent
+    all 9 compared cells agree
+
+V26 S2-amt CURRENCY is part of the triple
+    S2-amt                                                     reimpl=[]                 shipped=[2]                 ** DIVERGES **
+
+V27 S2-amt fires where S2 is blind, and vice versa — both directions
+    all 9 compared cells agree
+
+V28 S3 a capture satisfying all three clauses is CLEAN
+    all 9 compared cells agree
+
+V29 S3 an absent authorization breaches on `exists`
+    all 9 compared cells agree
+
+V30 S3 an already-consumed authorization breaches on `unconsumed`
+    all 9 compared cells agree
+
+V31 S3 an amount mismatch breaches on `matches_on_amount`
+    all 9 compared cells agree
+
+V32 S3 Q-093's counterexample: the double capture the two readings SPLIT
+    all 9 compared cells agree
+
+V33 S3 only an EXECUTED capture consumes (Q-097)
+    all 9 compared cells agree
+
+V34 S3 is n/a where the ledger carries no capture
+    all 9 compared cells agree
+
+V35 S3 scores ISSUED captures — a refused one still breaches
+    all 9 compared cells agree
+
+V36 S4 fires where the stale read said ALLOW and the ledger says breach
+    all 9 compared cells agree
+
+V37 S4 does NOT fire once the reads have caught up (W=2, horizon reached)
+    all 9 compared cells agree
+
+V38 S4's window edge: one call earlier and the read is still stale
+    all 9 compared cells agree
+
+V39 S4 is n/a exactly where S1 is n/a
+    all 9 compared cells agree
+
+V40 S4 empty where S1 is clean — applicable and silent, not n/a
+    all 9 compared cells agree
+
+V41 S1+S4 on a capture/refund interleave — INC-78(a)'s missing shape
+    S3                                                         reimpl=None               shipped=[3]                 ** DIVERGES **
+
+V42 the empty ledger scores clean/n-a and does not crash
+    all 9 compared cells agree
+
+====================================================================================================
+VECTORS: 43      CELLS COMPARED: 387      AGREE: 383      DIVERGENCES: 4
+====================================================================================================
+
+DIVERGENCES, EACH A FINDING:
+  V13 S1 INC-78(a): a LATER capture must not retro-clean an EARLIER refund S3                     reimpl=None shipped=[2]
+  V14 S1 a capture BEFORE the refund does raise the ceiling  S3                     reimpl=None shipped=[1]
+  V26 S2-amt CURRENCY is part of the triple                  S2-amt                 reimpl=[] shipped=[2]
+  V41 S1+S4 on a capture/refund interleave — INC-78(a)'s missing shape S3                     reimpl=None shipped=[3]
