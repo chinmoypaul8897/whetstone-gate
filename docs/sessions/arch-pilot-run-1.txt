@@ -646,3 +646,104 @@ NOT SELF-CERTIFIED. prereg-v1 NOT CUT. CALIBRATION NOT STARTED. SWEEP NOT STARTE
 ================================================================================
 END OF ARCH -- PILOT RUN 1
 ================================================================================
+
+================================================================================
+11. ! ADDENDUM, AFTER THIS FILE WAS FIRST COMMITTED AND PUSHED AT 4788184
+================================================================================
+
+  ! EVERYTHING BELOW HAPPENED AFTER S1-S10 WERE COMMITTED. IT IS APPENDED, NOT
+    WOVEN IN, SO THE FILE SHOWS WHAT WAS KNOWN WHEN AND A READER CAN SEE THE
+    CORRECTION RATHER THAN A CLEAN STORY. Recorded in full in QUESTIONS.md at
+    cc8a221; this is the summary.
+
+  (A) ! THIS SESSION SWEPT ANOTHER SESSION'S WORK INTO ITS OWN COMMIT.
+      git log -S"### Q-154" -- QUESTIONS.md names 4788184 -- THIS session's commit,
+      trailer Session-Token: 7c05e3b9. Q-154...Q-160 were authored by the concurrent
+      C12 BENIGN SOLVER session 2e94c7b5, whose own entries say so, and were absent
+      from QUESTIONS.md at 34a8548.
+      ! PROCESS.md S7b's RECIPE WAS FOLLOWED EXACTLY ON EVERY COMMIT AND WAS NOT
+        ENOUGH: THE RECIPE PROTECTS THE FILE LIST, NOT THE FILE. `git add --
+        QUESTIONS.md` takes the path, so a concurrent append to a file this session
+        legitimately owned a hunk of rode in.
+      ! AND THE SIGNAL WAS PRINTED AND WALKED PAST. Step 3's --stat said
+        `QUESTIONS.md | 446 ++++` where this session had written roughly a hundred
+        lines. S7b calls that snapshot "the only true statement of what is about to
+        be committed." It was true. It was read. IT WAS NOT QUESTIONED.
+      ! INC-88 IS THIS EXACT FAILURE FROM THE OTHER SIDE -- 182 read, 309 committed,
+        the difference a concurrent session's whole journal entry -- and INCIDENTS.md
+        is in this session's own prescribed read order.
+      CONTENT INTACT, VERIFIED NOT ASSUMED: Q-160's block ends coherently, all seven
+      carry their own `Raised by: 2e94c7b5` line, none truncated, and none of this
+      session's commits carried any of 2e94c7b5's INCIDENTS.md entries. NOTHING WAS
+      LOST. WHAT IS WRONG IS ATTRIBUTION, and check-roles E1-E5 cannot see it because
+      they key off COMMIT TRAILERS, never off who wrote the content.
+      NOT UNDOABLE AND NOT UNDONE -- CLAUDE.md S5 forbids the rewrite and probe-v1
+      was cut minutes earlier. The remedy is the record.
+
+  (B) ! AND THEN IT HAPPENED TO THIS SESSION -- INC-65's UNCLOSEABLE HALF.
+      E1 was found FAILING: check_roles.py:1052's _TOKEN_ROW admits only
+      (BUILD|REVIEW|FIX) and the row read `ARCH | OPERATOR-DELEGATED`, which is THE
+      ROLE THIS SESSION'S PROMPT ISSUED, so E1 called all five commits
+      FORGED/UNISSUED. The row was corrected, E1 measured GREEN -- and two tool calls
+      later the row was back to OPERATOR-DELEGATED and E1 was RED, with
+      `git diff HEAD` EMPTY: overwritten from another session's buffer before it was
+      committed. INC-65: "Nothing can warn the session being swept."
+      THIS SESSION'S LESSON AGAINST ITSELF: COMMIT A FIX IN THE SAME COMMAND THAT
+      MAKES IT (OF-205). A VERIFIED-BUT-UNCOMMITTED FIX IN A SHARED TREE IS NOT A FIX.
+      Re-applied and committed in one command at cc8a221. check-roles now:
+        21 passed, 0 failed, 3 n/a -- OK, no structural invariant broken.
+      ! CLASS B, DISCLOSED: the row says FIX and the prompt said OPERATOR-DELEGATED.
+        PROCESS.md S7a documents three roles and the parser enforces three; c1f0a4d8
+        and 8b46f2e1, both operator-delegated ARCH sessions, are both `ARCH | FIX`.
+        Leaving it unparseable would make E1 assert something FALSE AND FAR WORSE --
+        that five real commits carry a forged token. Relaxing _TOKEN_ROW was not an
+        option: hard rule 6, and src/ is outside this fence.
+        THE UNDERLYING MISMATCH IS THE ARCHITECT'S: a role was issued that the
+        project's own identity record cannot hold.
+
+  (C) ! b0a7bba LANDED WHILE THIS SESSION RAN, AND IT SWEPT NOTHING. OF-214.
+      "feat(benign): C12 - the BENIGN SOLVER ... (unreviewed)", trailer
+      Session-Token: 2e94c7b5. FIFTEEN PATHS, EVERY ONE ITS OWN -- the fourteen
+      modules of src/whetstone_gate/benign/ plus tests/test_c12_benign.py, 6,421
+      insertions, 0 deletions -- AND NOT ONE JOURNAL FILE. INC-114, Q-150...Q-153,
+      the probe-v1 record and this file were each verified still present at HEAD.
+      ! THE COMPARISON IS NOT FLATTERING TO THIS SESSION AND IS RECORDED ANYWAY.
+
+  (D) THREE STATEMENTS ALREADY IN THIS FILE AND IN PROGRESS.md ARE HEREBY CORRECTED,
+      IN THE RECORD, RATHER THAN EDITED AWAY:
+      1. PROGRESS.md's "landed nothing while this session ran" IS FALSE. It landed
+         seven questions, inside this session's own commit 4788184.
+      2. S9 item 6 above says "NO CONCURRENT COMMIT LANDED WHILE IT RAN." LITERALLY
+         TRUE WHEN WRITTEN AND NOW FALSE (b0a7bba), AND IT WAS MATERIALLY MISLEADING
+         EVEN THEN: the concurrent CONTENT had already landed inside 4788184. THE
+         DISTINCTION BETWEEN "NO CONCURRENT COMMIT" AND "NO CONCURRENT CONTENT" IS
+         THE WHOLE OF (A), AND THAT LINE DOES NOT DRAW IT.
+      3. The concurrency note names the two source paths this session correctly never
+         touched, and is SILENT ABOUT THE FOUR JOURNALS BOTH SESSIONS WERE WRITING AT
+         ONCE. The fence named what not to touch; it did not name the shared journals,
+         and this session did not infer it.
+
+  (E) ! THE INCIDENTS.md ENTRY FOR (A) AND (B) IS OWED AND DELIBERATELY NOT WRITTEN,
+      AND THE REASON IS THE DEFECT ITSELF. INCIDENTS.md is DIRTY with 2e94c7b5's
+      eight uncommitted entries INC-115...INC-122; appending and staging it would
+      commit all eight under this session's token -- EXACTLY THE THING BEING
+      RECORDED. The full eight-field text is in QUESTIONS.md at cc8a221 for whoever
+      commits that file next. THE NUMBER IS LEFT AS INC-NN ON PURPOSE: guessing a
+      number in a file another live session holds is INC-65/INC-68's renumbering
+      class. PROGRESS.md and STATUS.md are dirty with their work too and were
+      likewise left unstaged -- not this session's to commit OR to revert.
+
+  (F) NOTHING ELSE MOVED. probe-v1 still 170bd3ff4abfdd8f87f64055972a60c82cc54efc
+      and resolving. evals/ still holds ONLY RUN_DECLARED.md. Its S8 placeholder is
+      still blank, verified after all of the above. The corpora still verify: three
+      trees at their pins and load_entries() returning 498 entries with all five
+      hashes checked. TOKEN SPEND STILL ZERO.
+
+  ! WHAT (A) AND (B) ADD TO THIS SESSION'S REPORT, STATED PLAINLY: THIS SESSION
+    STOPPED THE PILOT CORRECTLY AND THEN MISHANDLED ITS OWN COMMITS. The first is
+    what it was asked to judge; the second is a defect it caused, found itself,
+    measured, and could not undo. Both are in the record under its own token.
+
+================================================================================
+END OF ADDENDUM. END OF ARCH -- PILOT RUN 1.
+================================================================================
