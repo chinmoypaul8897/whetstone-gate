@@ -14236,3 +14236,60 @@ undeclared — it would be declared WRONGLY.** `Q-164` and the client's own docs
 no temperature is sent and the provider's default applies; **`Q-183` measures a hardcoded `0.0` on
 the wire for the only lane the judge uses.** A limitation can be published; a false statement in the
 artefact a reviewer reads cannot.
+
+---
+
+## ⚠️ CORRECTION — `Q-180` AND `INC-136`, BY THE SESSION THAT WROTE THEM, 2026-09-04 (ARCH NIGHT 1, `5d7e2b91`)
+
+⚠️ **A CLAIM THIS SESSION COMMITTED AT `0e3a69f` IS WRONG ON ITS FACE AND IS CORRECTED HERE RATHER
+THAN LEFT TO A REVIEWER.** `Q-180` and `INCIDENTS.md` `INC-136` both say of the duplicate token that
+*"there is nothing for the check to fire on"*. ⚠️ **`make check-roles` E1 DID FIRE**, and the other
+holder of `5d7e2b91` measured it at `f45721d`, recorded verbatim at `Q-187`:
+
+    [FAIL] E1 no commit carries an UNISSUED token
+           FORGED/UNISSUED: {'5d7e2b91': ['f45721d', '90b6d6f']} - not present in
+           QUESTIONS.md ## Session tokens
+
+**THE CORRECTION IS NARROWER THAN "IT WAS WRONG", AND THE NARROWNESS IS THE POINT.**
+
+1. ⚠️ **E1 FIRED ON A DIFFERENT DEFECT.** It failed because `5d7e2b91` had **no row in
+   `## Session tokens` at all** — an *unissued* token, which is E1's actual subject. It named both
+   commits as a consequence of listing every commit carrying the unregistered token, **not because
+   it noticed there were two of them.** A single session with an unregistered token would have
+   produced the same FAIL with one SHA in the list.
+
+2. ⚠️ **AND THE STRUCTURAL CLAIM IS NOW MEASURED RATHER THAN ARGUED, AND IT STANDS.** The other
+   session has since appended the `5d7e2b91` row. This session then ran `make check-roles` **at that
+   moment, with two live sessions holding the token**:
+
+       [PASS] E1 no commit carries an UNISSUED token
+              clean - 78 issued row(s) covering 78 token(s) parsed from QUESTIONS.md;
+              75 token(s) appear in the log
+       [PASS] E2 no token shared by a chunk's BUILD and REVIEW    clean - 78 issued row(s) checked
+       [PASS] E3 no token reused across roles
+              clean - no token holds more than one (chunk, role) pair across 78 row(s)
+       21 passed, 0 failed, 3 n/a
+       OK - no structural invariant is broken.
+
+   ⚠️⚠️ **THE SUITE IS GREEN AND THE DUPLICATION IS STILL TRUE.** Recording the token — the correct
+   and required action — **removed the only signal that existed**, and it removed it for a reason
+   unrelated to duplication. **E2 and E3 both key off `(chunk, role)` pairs, and both sessions are
+   `ARCH`/`FIX`**, so neither can see this at all. That is exactly what `Q-180` and `INC-136` say,
+   and it is now a measurement rather than a reading of the source.
+
+3. **SO THE TWO ENTRIES SHOULD BE READ TOGETHER AND NEITHER SUPERSEDES THE OTHER.** `Q-187` found the
+   collision through an instrument; `Q-180` found it by watching `git status` change; **and this
+   correction adds the third fact neither had — that the instrument goes quiet the moment the record
+   is repaired.** `PROCESS.md` §7a's own limit is the right frame and it is honest: *"It does **not**
+   prove the sessions were different; nothing can … It makes reuse visible."* ⚠️ **It made an
+   ABSENCE visible. It never made the REUSE visible, and after the row was added it cannot.**
+
+⚠️ **WHAT IS NOT CORRECTED, BECAUSE IT IS NOT WRONG.** `INC-136`'s `Missing` field — *"any mechanism
+by which a session can learn that another session holds its token"* — and its `Systemic guardrail` —
+which proposes exactly *"more than one commit carrying one token where the token's row names one
+session"* as a check `check-roles` **could** make — both survive this correction unchanged. **The
+proposed check is precisely the one that does not exist**, and E1's green line above is the proof.
+
+**See also `INCIDENTS.md` `INC-137`**, which records that `0e3a69f` — the commit carrying the claim
+corrected here — also swept 420 lines of the other session's unfinished draft, including the
+`Q-180`-numbered form of what is now `Q-187`.

@@ -10218,3 +10218,81 @@ one session"* is a check it could make — but it can only ever fire **after** b
 is after the damage it would report. ⚠️ **The prevention half is uncloseable from inside a session**,
 which is `INC-65`'s and `INC-135`'s shape a third time: **nothing can tell a process about a process
 it cannot see.**
+
+---
+
+## INC-137 — `OF-215` fired against this session on the commit whose own message cited it: a `numstat` read two tool calls before the `add` said 137 lines and the commit landed 557, carrying a concurrent session's entire unfinished draft under this session's token
+
+**Date:** 2026-09-04 (ARCH NIGHT 1, `5d7e2b91`). Fix SHA under **Fix**.
+
+**Event:** commit **`0e3a69f`** was intended to carry this session's own appends: **225** lines to
+`INCIDENTS.md` (`INC-134`, `INC-135`, `INC-136`) and **137** to `QUESTIONS.md` (`Q-179`, `Q-180`).
+`git diff --numstat` was run immediately before composing the message and reported exactly
+`225 0 INCIDENTS.md` / `137 0 QUESTIONS.md`. `PROCESS.md` §7b's recipe was followed exactly — private
+index in a fresh OS temp directory, seeded from `HEAD`, stage-snapshot-commit in **one** command,
+`env -u GIT_INDEX_FILE git reset` on the same explicit paths, shared index proved clean. **The
+snapshot printed `557` for `QUESTIONS.md`.** `git show --numstat 0e3a69f` confirms it: `225 0
+INCIDENTS.md`, `557 0 QUESTIONS.md`. **420 of those lines were not this session's.**
+
+**What was carried:** the concurrent session of `INC-136`'s complete in-progress `QUESTIONS.md`
+draft — its `Q-180`…`Q-186`, and three `MEASUREMENT UPDATE` sections on `Q-169`, `Q-163` and `Q-164`.
+⚠️ **AND IT WAS CARRIED IN AN UNFINISHED STATE, WHICH IS THE PART THAT MATTERS.** That session
+subsequently **renumbered its own `Q-180` to `Q-187`** to avoid colliding with this session's, and
+the renumbered entry says in its own words: *"THIS ENTRY WAS WRITTEN AS `Q-180` AND RENUMBERED TO
+`Q-187` **BEFORE IT WAS COMMITTED**."* **That sentence is false against the log, and it is false
+because of this incident:** `git show 0e3a69f:QUESTIONS.md | grep -c '^### Q-180 — .*TWO CONCURRENT
+SESSIONS'` returns **1**. The `Q-180` form was committed — by this session, twenty minutes before
+its author renumbered it — and the working tree now carries the `Q-187` form as a modification on
+top. **Neither session can now make that sentence true, and history is not rewritten here.**
+
+**Action:** ⚠️ **Nothing was reverted, deleted or amended.** `OF-215`'s remedy is followed exactly:
+the swept content was located, **verified INTACT** (`git show --numstat 0e3a69f` reports **zero**
+deleted lines on both files — the draft was carried *early*, never damaged and never lost), and the
+**SHA and the token that carried it are recorded here**: `0e3a69f`, `Session-Token: 5d7e2b91`.
+`QUESTIONS.md` was **not** touched again to tidy it, because a second read-modify-write against a
+live writer is the same race a second time.
+
+**Expectation:** `PROCESS.md` §7b's recipe should make a shared-tree commit carry the committer's
+paths and only the committer's content. ⚠️ **IT DOES NOT AND IT DOES NOT CLAIM TO.** §7b protects the
+**file list**; `INC-123` already recorded that *"the recipe protects the FILE LIST and not the FILE"*.
+This session read that sentence, cited `OF-215` and `INC-97` **in the very message that swept**, and
+was swept anyway.
+
+**Missing:** ⚠️ **any way to stage a specific *revision* of a shared path.** `git add -- <path>`
+means *whatever that file holds at the instant the index is written*, and there is no form of it that
+means *the 137 lines I measured*. The available primitive exists — `git hash-object -w` on a snapshot
+taken at read time, then `git update-index --cacheinfo` — and **no session has ever used it here**,
+because §7b does not name it. That is the concrete missing mechanism, not an attitude.
+
+**Missed:** ⚠️ **this session had already been told, in writing, in its own prompt, and had already
+seen the file change under it once.** The prompt says *"compare the `--stat` (INC-123)"*. `INC-136`
+— written by this session **into the same commit** — records `git status` going from 8 paths to 12
+mid-read. **The evidence that this file had a live second writer was in the incident being committed,
+and the commit still staged that file.** ⚠️ **And the mitigation was available and was half-taken:**
+the appends were made with `>>` precisely to avoid a lost-update race on the *content*, which worked
+— nothing was lost. **The `>>` protects the other session's bytes; it does nothing about which commit
+they land in**, and those are two different problems that this session treated as one.
+
+**Diagnosis:** `git add` resolves a path to its current bytes, not to the bytes the committer
+measured, so any interval between the measurement and the `add` is a window in which a concurrent
+writer's content joins the commit — and the window cannot be closed by ordering, only by staging a
+content hash captured at read time.
+
+**Fix:** ⚠️ **none — the commit stands.** `0e3a69f` carries 420 lines it should not, they are intact,
+and both the SHA and the token are named here and in this session's FINAL OUTPUT. **The correction
+that IS made is to the record rather than to the history:** `Q-180` and `INC-136`'s claim that
+`make check-roles` *"has nothing to fire on"* is corrected in `QUESTIONS.md` under this incident's
+number, because the other session measured E1 **failing** on this exact pair of commits.
+
+**Systemic guardrail:** ⚠️ **one exists, it is small, and it is proposed rather than claimed as
+done** — this session may not edit `PROCESS.md`. The durable form is one extra line in §7b's recipe:
+
+    # 3a. For a SHARED document, stage the bytes you MEASURED, not the bytes on disk:
+    blob=$(git hash-object -w -- <path>)          # at READ time, before composing anything
+    git update-index --add --cacheinfo 100644,$blob,<path>
+
+**That closes the window completely for the staging half.** ⚠️ **What it does NOT close, and what is
+accepted:** the other session's later edits then land in *its* commit rather than this one, which is
+correct — but if the two sessions' edits interleave inside one file, one of them still ends up
+committing a file whose other half is a draft. **Nothing short of not running two sessions in one
+tree closes that**, which is `INC-136`'s and `Q-187`'s point and the operator's to decide.
