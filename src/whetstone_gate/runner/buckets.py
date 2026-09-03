@@ -1,0 +1,196 @@
+"""**INDEPENDENT TOKEN BUCKETS FOR RPM, TPM AND RPD — refilled on their own clocks.**
+
+`CONTEXT.md` §13.5(1) and `PROTOCOL.md` §2.4, verbatim:
+
+    **Token-bucket pacing per model, per limit.** Independent buckets for RPM, TPM and RPD,
+    refilled on their own clocks. **A call is admitted only when all three buckets permit it.**
+
+**PURE.** ⚠️ **THE CLOCK IS AN ARGUMENT.** Hard rule 8 forbids a clock inside core logic, and a
+rate limiter is exactly the module that wants one. Every method here takes ``now`` — a float
+of monotonic seconds — from its caller, so a whole day's pacing can be driven deterministically
+in a test at whatever instants the test chooses, and the shell (:mod:`.scheduler`) is the only
+place a real clock is read.
+
+--------------------------------------------------------------------------------------
+⚠️ THESE ARE PACING BUCKETS. THEY ARE NOT THE CEILING, AND THE DISTINCTION IS THE CHUNK
+--------------------------------------------------------------------------------------
+
+Two different mechanisms live next to each other here and confusing them would defeat both:
+
+  * **These buckets** are the **provider's** published rate limits — RPM, TPM, RPD from
+    `config/lanes.yaml`, which came off the operator's own dashboards. They say *"not yet"*:
+    a call they refuse can be made a moment later, when the bucket has refilled.
+  * :mod:`.budget`'s ceilings are **hard rule 12's sanction** — the call ceiling and token
+    ceiling this run was granted. They say ***"no"***: a call they refuse stops the lane.
+
+A refusal from a bucket is a **wait**; a refusal from the budget is an **abort**. An
+implementation that treated a bucket refusal as an abort would park a lane that is merely
+pacing; one that treated a budget refusal as a wait would spin against a ceiling forever and
+spend past it the moment the bucket refilled. :meth:`Buckets.wait_seconds` returns the first
+and :class:`.budget.Admission` returns the second, and nothing converts between them.
+
+--------------------------------------------------------------------------------------
+⚠️ ``tpd: null`` MEANS "NO SUCH LIMIT EXISTS", NOT "UNKNOWN" AND NOT "ZERO"
+--------------------------------------------------------------------------------------
+
+`config/lanes.yaml`'s own header, and `config.py`'s ``NULL_IS_A_VALUE`` records it as a
+**determined** value. Google's free tier publishes no daily token cap at all. A bucket built
+from ``None`` as zero would park both Gemma lanes — which carry almost all of the sweep's
+volume — permanently, on the first call. :class:`Buckets` therefore has **no TPD bucket at all**
+when ``tpd`` is ``None``, rather than one with a capacity of zero, and :meth:`Buckets.limits`
+prints which buckets exist so a reader can see that a lane has three rather than four.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+
+#: Seconds in the window each limit is expressed over. Not spec constants; unit conversions.
+_SECONDS_PER_MINUTE = 60.0
+_SECONDS_PER_DAY = 24.0 * 60.0 * 60.0
+
+
+class BucketError(RuntimeError):
+    """A bucket was built or driven wrongly. Always a refusal."""
+
+
+@dataclass
+class Bucket:
+    """One limit: ``capacity`` units per ``window_seconds``, refilled continuously.
+
+    Continuous refill rather than a hard window reset, because a hard reset lets a lane spend
+    a whole window's allowance in the last second of one window and again in the first second
+    of the next — twice the rate the provider published, which is how a runner earns a 429 it
+    did not have to.
+    """
+
+    name: str
+    capacity: int
+    window_seconds: float
+    available: float = field(init=False)
+    last_refill: float = 0.0
+
+    def __post_init__(self) -> None:
+        if self.capacity <= 0:
+            raise BucketError(
+                f"bucket {self.name!r} has capacity {self.capacity}. A zero-capacity bucket "
+                f"parks its lane forever; if the limit does not exist, do not build a bucket "
+                f"for it (see this module's docstring on `tpd: null`)"
+            )
+        if self.window_seconds <= 0:
+            raise BucketError(f"bucket {self.name!r} has window {self.window_seconds}")
+        self.available = float(self.capacity)
+
+    @property
+    def refill_per_second(self) -> float:
+        return self.capacity / self.window_seconds
+
+    def refill_to(self, now: float) -> None:
+        """Advance this bucket's own clock to ``now``. **Its own** — hence *independent*."""
+        if now < self.last_refill:
+            raise BucketError(
+                f"bucket {self.name!r} was asked to refill to {now}, which is BEFORE its last "
+                f"refill at {self.last_refill}. Time does not run backwards and a runner that "
+                f"accepted this would credit itself an allowance it never earned"
+            )
+        elapsed = now - self.last_refill
+        self.last_refill = now
+        self.available = min(float(self.capacity), self.available + elapsed * self.refill_per_second)
+
+    def wait_seconds(self, cost: float, now: float) -> float:
+        """How long until ``cost`` units are available. ``0.0`` means *now*.
+
+        A cost larger than the whole capacity is a refusal rather than an infinite wait: no
+        amount of waiting makes it admissible, and returning a very large number would look
+        like patience.
+        """
+        if cost > self.capacity:
+            raise BucketError(
+                f"bucket {self.name!r} was offered a cost of {cost}, which exceeds its whole "
+                f"capacity of {self.capacity}. Waiting cannot help. A single call larger than "
+                f"a per-minute limit must be made smaller, not retried"
+            )
+        self.refill_to(now)
+        if self.available >= cost:
+            return 0.0
+        return (cost - self.available) / self.refill_per_second
+
+    def take(self, cost: float, now: float) -> None:
+        """Spend ``cost``. **Refuses** if the bucket does not currently permit it."""
+        if self.wait_seconds(cost, now) > 0.0:
+            raise BucketError(
+                f"bucket {self.name!r} does not permit {cost} now ({self.available:.2f} "
+                f"available). Ask wait_seconds() first; a bucket refusal is a WAIT, not an "
+                f"abort, and the two must not be confused (see this module's docstring)"
+            )
+        self.available -= cost
+
+
+@dataclass
+class Buckets:
+    """One lane's three (or four) independent buckets. **All must permit a call.**
+
+    RPM and RPD are request buckets; TPM and TPD are token buckets. TPD exists only when the
+    lane publishes one.
+    """
+
+    lane: str
+    rpm: Bucket
+    tpm: Bucket
+    rpd: Bucket
+    tpd: Bucket | None
+
+    @classmethod
+    def for_lane(
+        cls, *, name: str, rpm: int, tpm: int, rpd: int, tpd: int | None
+    ) -> "Buckets":
+        return cls(
+            lane=name,
+            rpm=Bucket(f"{name}.rpm", rpm, _SECONDS_PER_MINUTE),
+            tpm=Bucket(f"{name}.tpm", tpm, _SECONDS_PER_MINUTE),
+            rpd=Bucket(f"{name}.rpd", rpd, _SECONDS_PER_DAY),
+            tpd=None if tpd is None else Bucket(f"{name}.tpd", tpd, _SECONDS_PER_DAY),
+        )
+
+    def limits(self) -> dict[str, int]:
+        """Which buckets this lane actually has, and their capacities. ⚠️ A lane with no
+        published daily token cap has **three**, and this is how a reader sees that."""
+        found = {"rpm": self.rpm.capacity, "tpm": self.tpm.capacity, "rpd": self.rpd.capacity}
+        if self.tpd is not None:
+            found["tpd"] = self.tpd.capacity
+        return found
+
+    def wait_seconds(self, *, tokens: int, now: float) -> float:
+        """The longest wait across every bucket. ⚠️ **The MAXIMUM, never the sum.**
+
+        A call is admitted only when **all** buckets permit it, so the wait is however long the
+        slowest one needs — the buckets refill in parallel, on their own clocks, and adding
+        their waits would idle a lane for a stretch none of its limits asked for.
+        """
+        waits = [
+            self.rpm.wait_seconds(1, now),
+            self.tpm.wait_seconds(tokens, now),
+            self.rpd.wait_seconds(1, now),
+        ]
+        if self.tpd is not None:
+            waits.append(self.tpd.wait_seconds(tokens, now))
+        return max(waits)
+
+    def permits(self, *, tokens: int, now: float) -> bool:
+        return self.wait_seconds(tokens=tokens, now=now) == 0.0
+
+    def take(self, *, tokens: int, now: float) -> None:
+        """Spend one request and ``tokens`` tokens across every bucket. **Atomic in effect:**
+        it checks all of them before spending any, so a partial take cannot leave a lane's
+        buckets disagreeing about what happened."""
+        if not self.permits(tokens=tokens, now=now):
+            raise BucketError(
+                f"lane {self.lane!r} does not permit a {tokens}-token call now; "
+                f"wait {self.wait_seconds(tokens=tokens, now=now):.2f}s. A bucket refusal is "
+                f"a WAIT, not an abort"
+            )
+        self.rpm.take(1, now)
+        self.tpm.take(tokens, now)
+        self.rpd.take(1, now)
+        if self.tpd is not None:
+            self.tpd.take(tokens, now)
