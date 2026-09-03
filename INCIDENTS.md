@@ -6998,6 +6998,115 @@ the repository-wide tripwires (`OF-99`'s address), and it is named here rather t
 
 ---
 
+## INC-87 — the `Swept:` line said "the other three files carry NOTHING of theirs, checked line by line before staging" and the commit swept a 127-line entry into one of them: the read was TRUE when it ran and FALSE when `git add` ran, and a PRIVATE INDEX cannot close that gap because the gap is on the READER's side
+
+**Date:** 2026-09-03 (C9 BUILD 1, `3f8b2d56`, **after** this session's first build commit. The
+sweeping commit is **`42faed5`**; the swept session is the concurrent **C8 FIX 1** (`9e4a71c2`).
+**Found by this session**, from its own `git show --stat`, before pushing. **No Fix SHA for the
+sweep itself; see `Fix`.**)
+
+**Event:** `42faed5` committed `INCIDENTS.md`, `STATUS.md`, `PROGRESS.md` and
+`docs/reviews/OPEN_FINDINGS.md` through a private index. Its `Swept:` line names **one** thing —
+the C8 row of `STATUS.md` — and then says, in terms:
+
+> *"The other three files in this commit carry **NOTHING of theirs**, checked line by line before
+> staging."*
+
+⚠️ **`PROGRESS.md` carried a complete 127-line, 9,299-byte `## C8 — FIX 1` entry belonging to
+`9e4a71c2`, and this commit committed it.** Measured, not inferred:
+
+```
+git diff --stat -- ... PROGRESS.md      (the clause-(i) read)   ->  PROGRESS.md | 182 ++++
+git show --stat 42faed5 -- PROGRESS.md  (what actually landed)  ->  PROGRESS.md | 309 ++++
+git show 42faed5 -- PROGRESS.md | grep '^+## '                  ->  TWO entries: C9 BUILD 1
+                                                                    and C8 FIX 1 (`9e4a71c2`)
+```
+
+**182 lines were read. 309 were committed. The 127-line difference is somebody else's session
+journal**, and it arrived in the window between the read and the `git add`.
+
+**Action:** ⚠️ **nothing is undone.** History is never rewritten here (`CLAUDE.md` §5) — a rewrite
+would destroy `probe-v1`, `prereg-v1` and every `cN-pass` tag — so `42faed5` stands and the
+mis-attribution is corrected by **record**, which is `INC-65`'s and `INC-68`'s own handling.
+⚠️ **The swept content was verified INTACT rather than assumed intact**, which `INC-68` records as
+the required step: the entry is **byte-identical between `HEAD` and the working tree**
+(`sha256(PROGRESS.md)` matches on both, `74bb6d0d…`), it is **127 lines / 9,299 bytes**, it opens
+with its own `SESSION-TOKEN: 9e4a71c2` and it **ends cleanly on its own horizontal rule**. So the
+C8 FIX 1 entry is **in the repository and correct**; what is wrong is only whose token the log
+says put it there, and this entry is how a reader learns which is which.
+
+**Expectation:** `Q-063` clause (ii) and `INC-68`'s guardrail, together: a private index so no path
+of another session's can be carried, plus a `Swept:` line that names every foreign entry **inside
+what is actually being committed**.
+
+**Missing:** ⚠️ **any way to derive the `Swept:` line FROM THE STAGED SNAPSHOT rather than from an
+earlier read.** The clause-(i) diff and the `git add` were **two separate tool calls minutes
+apart**, and nothing in `Q-063`, `INC-65` or `INC-68` says they must be one. A check that ran
+**after** staging and **before** `git commit` — `git diff --cached` under the private index, read
+for foreign tokens — would have caught this exactly, and it is four words of procedure that
+nobody had written down.
+
+**Missed:** ⚠️ **`INC-68` DESCRIBES THIS INCIDENT IN ADVANCE, IN THE HALF OF ITSELF THIS SESSION
+DID NOT APPLY.** Its `Expectation` field reads: *"The rule is sound and it is **directional**: it
+protects the reader of the index from committing somebody else's work **at the instant it is
+read**. It cannot protect the writer of the index during the window between `git add` and `git
+commit`."* This session read that sentence, adopted the private index it recommends — **which
+works, and did work: `git diff --cached` under it showed exactly four paths** — and then reasoned
+about the window in the **direction `INC-68` names** (writer-side) while walking into it from the
+**other** direction (reader-side, between the *diff* and the *add*). ⚠️ **And a second signal was
+inside the swept text itself:** the C8 FIX 1 entry's own closing lines read *"swept; `Q-110` was
+not, and was."* — that session was writing about being swept, in the file this commit swept it in.
+`INC-82` is that shape and it is three entries above this one. ⚠️ **The sharpest miss is the
+class, not the instance: `INC-68`'s own diagnosis of `ef1fb7e` is "its own message says the
+opposite", and `INC-47` ruled that a claim bound to a command must be READ OFF THE COMMAND. This
+session wrote "checked line by line before staging" — a claim about a check — and the check it
+named had been run against a different tree state.** That is the fourth field of `INC-47`'s
+pattern in the file that records it.
+
+**Diagnosis:** two sessions in one working tree share one working tree as well as one index, so a
+foreign edit can land **between** the clause-(i) diff and the `git add` that snapshots it; the
+`Swept:` line was then composed from the earlier read and asserted a property of a snapshot that
+no longer existed. The private index prevented committing another session's **staged** paths and
+cannot prevent committing another session's **file contents**, because the sweep is by path and
+the path was legitimately this session's to commit.
+
+**Fix:** ⚠️ **NO SHA FOR THE SWEEP, AND NONE IS OWED — `42faed5` IS NOT AMENDED AND NOT REVERTED.**
+The content is correct at `HEAD` and only its attribution is wrong. What this session **did**
+change is its own remaining commits, and the mechanism is under **Systemic guardrail** because it
+is a general remedy rather than a repair of this instance. The correction of the false sentence is
+this entry, and the FINAL OUTPUT in `docs/sessions/c9-build-1.txt` names it too, so a reader who
+reads only the report is told as well as a reader who reads only the log.
+
+**Systemic guardrail:** ⚠️ **ONE, IT IS MECHANICAL, IT COSTS NOTHING, AND IT IS THE `INC-47`
+DISCIPLINE APPLIED TO THE ONE FIELD THAT DID NOT HAVE IT — `Swept:` IS DERIVED FROM
+`git diff --cached`, IN THE SAME COMMAND AS THE `git add`, UNDER THE PRIVATE INDEX:**
+
+```
+export GIT_INDEX_FILE=<a path in this session's own OS temp directory>
+git read-tree HEAD
+git add -- <this session's explicit paths>
+git diff --cached                 # <-- READ THIS. It is the SNAPSHOT, not an earlier tree.
+                                  #     Compose `Swept:` from THIS, and from nothing else.
+git commit
+unset GIT_INDEX_FILE
+git reset -- <the same explicit paths>          # INC-68's step 5, unchanged
+```
+
+**The difference from `INC-68`'s recipe is one line and one word: the diff is read AFTER staging
+and BEFORE committing, and the `Swept:` line is read off it.** `Q-063` clause (i) says *"immediately
+before any commit … run `git diff -- <those paths>` AND READ IT"*, and **"immediately before" was
+satisfied by a human reading of the words and defeated by two tool calls minutes apart** — so the
+remedy is to make the read part of the same command rather than a step of the same intention.
+⚠️ **WHAT IT DOES NOT CLOSE, SAID PLAINLY:** it still cannot warn the session **being** swept —
+`INC-65`'s uncloseable half, restated by `INC-68` and unchanged by this — and it cannot stop the
+sweep, only make the `Swept:` line **true**. A session that does not use it sweeps as before.
+⚠️ **AND IT WANTS TO BE A RULE IN `PROCESS.md` §7 AND A LINE IN EVERY PROMPT'S GIT SECTION, BOTH OF
+WHICH ARE THE ARCHITECT'S** — `PROCESS.md` is outside this session's fence, exactly as `INC-68`
+records of its own remedy. Until then it is one session's habit, which is what `OF-67` says about
+the last five of these. **Recorded as `OF-203`.**
+
+---
+
 ## INC-87 — `INC-82` RECURRED, AGAIN INSIDE ONE DAY, AND AGAIN THE SWEPT SESSION IS THE ONLY ONE THAT CAN SEE IT: this session's `Q-110` was committed by a concurrent C9 BUILD under C9's token — ⚠️ **AND THE SWEEPING SESSION WAS USING THE PRIVATE INDEX, BECAUSE THE PRIVATE INDEX ISOLATES BY FILE AND BOTH SESSIONS NEEDED THE SAME FILE**
 
 **Date:** 2026-09-03 (**found by the session that was swept**, C8 FIX 1 `9e4a71c2` — which is
@@ -7031,11 +7140,44 @@ been told exists.
 **Action:** ⚠️ **NOTHING IS UNDONE.** History is never rewritten here (`CLAUDE.md` §5) — a rewrite
 would destroy `probe-v1`, `prereg-v1` and every `cN-pass` tag — so `d6cdb2e` stands and the
 mis-attribution is corrected by **record**, which is `INC-65`'s and `INC-82`'s own handling, third
-iteration. **This session then swept in the other direction and says so rather than being caught
-at it:** its journal commit carries C9's uncommitted `INC-86` and `OF-199`…`OF-202`, named on the
-commit and in its report under `Q-063` clause (ii), which rules *"YOU STILL COMMIT — waiting
-deadlocks two sessions — but the commit message carries a `Swept:` line naming EVERY foreign entry
-and its token."*
+iteration.
+
+⚠️ **AND THIS FIELD IS CORRECTED IN PLACE, WITH THE WITHDRAWN SENTENCE QUOTED IN FULL, BECAUSE IT
+WAS WRITTEN AS A PREDICTION AND THE PREDICTION WAS FALSIFIED WITHIN THE HOUR.** As first
+committed it read:
+
+> *"This session then swept in the other direction and says so rather than being caught at it:
+> its journal commit carries C9's uncommitted `INC-86` and `OF-199`…`OF-202`, named on the commit
+> and in its report under `Q-063` clause (ii)."*
+
+**That never happened.** Before this session could stage its journals, the concurrent C9 session
+committed **`42faed5`** — *"docs: C9 BUILD 1's journals"* — and **swept ALL FOUR of this session's
+journal files at once**: `INC-87` itself, `OF-203`, `OF-204` and the ten `OF-188`…`OF-198` status
+edits, the `STATUS.md` C8 row, and the entire `PROGRESS.md` **C8 — FIX 1** entry. Measured:
+
+```
+git log -1 --format=%B 42faed5 | git interpret-trailers --parse  ->  Session-Token: 3f8b2d56
+git show HEAD:INCIDENTS.md              | grep -c "INC-87"       ->  1
+git show HEAD:docs/reviews/OPEN_FINDINGS.md | grep -c "OF-203"   ->  2
+git show HEAD:STATUS.md   | grep -c "FIXED - AWAITING RE-REVIEW" ->  1
+git show HEAD:PROGRESS.md | grep -c "C8 - \*\*FIX 1\*\*"         ->  1
+git diff HEAD -- <the four journals>                             ->  EMPTY
+```
+
+**Every byte landed and nothing was lost** — the last line is the check that says so, and it was
+run rather than assumed. **What is wrong is again only the token the log names.** ⚠️ **So the
+sweep this entry records happened TWICE in one session, in the same direction both times, and the
+second instance took everything this session had written rather than one question** — including
+**this entry's own text**, which is now in the repository under a token that is not its author's.
+`INC-81`'s discipline applies to the correction itself: the withdrawn sentence is quoted above
+rather than reworded away, because a paraphrase on the way is exactly what the record exists to
+make detectable.
+
+⚠️ **AND THE LESSON SHARPENS RATHER THAN SOFTENS.** `Q-063` clause (ii) rules *"YOU STILL COMMIT —
+waiting deadlocks two sessions — but the commit message carries a `Swept:` line naming EVERY
+foreign entry and its token."* **This session never got to apply it, because the race was decided
+before its `git add`** — which is the half of the problem no `Swept:` discipline can reach, stated
+by `INC-65` in advance and now measured twice in one afternoon.
 
 **Expectation:** `INC-68`'s systemic guardrail — a **PRIVATE INDEX** — was supposed to close this.
 Both sessions used it. **It held, and the sweep happened anyway.**
