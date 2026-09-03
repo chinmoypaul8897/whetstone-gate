@@ -5,7 +5,12 @@ Committed to docs/sessions/c8-review-1.txt BEFORE it is printed (CLAUDE.md 6.1).
 The file is the record; the printed copy is the convenience.
 ================================================================================
 
-PUSHED SHA: <filled by the commit that follows this file; see the last line>
+PUSHED SHA: 4139b1d   (origin/main after the push that landed this review's
+            substance - every artefact, every journal and this file's own S14
+            re-measurement.  The commit that fills in THIS LINE necessarily lands
+            after it, so the two differ by one commit and that is stated rather
+            than papered over; the SHA printed to the architect is origin/main
+            after this session's FINAL push and is the later of the two.)
 
 VERDICT: **FAIL**.  NO TAG.  `c8-pass` DOES NOT EXIST AFTER THIS SESSION.
          FOUR BLOCKERS + ONE GATE ITEM.  ZERO PROVIDER MODEL CALLS.
