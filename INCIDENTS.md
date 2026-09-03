@@ -9440,3 +9440,69 @@ over this session's own draft in which the default assumption was that each clai
 `INCIDENTS.md` `INC-109` is the same method catching five defects in another session's own committed
 work, and `INC-73` is it catching four. **Three sessions running, the thing that worked was a habit;
 a habit is not a systemic guardrail and this field will not call it one.**
+
+---
+
+## INC-125 — two sessions allocated `Q-161`…`Q-165` for different questions, and for the first time the duplicate reached `HEAD`, because this session's commit landed between the other session's draft and its commit
+
+**Date:** 2026-09-03 (C19 README BUILD 1, `9f31d708`). Fix SHA under **Fix**.
+
+**Event:** This session measured the highest allocated `QUESTIONS.md` id at **`Q-160`**, on the tree
+at `a691d13`, **with the working tree already holding `6ba2c1f7`'s uncommitted block** — so the
+measurement included that session's work as it stood. It drafted `Q-161`…`Q-165` and committed them at
+**`68dc891`**. **In the interval between the measurement and the commit, ARCH FIX — PILOT RUN 2
+(`6ba2c1f7`) wrote its own `Q-161`…`Q-165` into the same working-tree file** — five different
+questions, about the driver's provider client, the missing credentials and two hard-rule-9 gaps.
+**`68dc891` landed first.** The result: `HEAD` carries this session's `Q-161`…`Q-165` while
+`6ba2c1f7`'s five sit uncommitted beside them, **two `### Q-161` headings in one file**.
+
+**Action:** the collision was found by grepping `^### Q-16[0-9]` in the working tree and in `HEAD`
+**immediately after the commit**, as part of this session's `INC-123` verification step — the check
+that asks *"is anything of mine missing and is anything of theirs swept."* **Nothing was swept: the
+commit was staged from a constructed blob** (`HEAD`'s content plus this session's own append) **and
+`6ba2c1f7`'s block is intact, uncommitted, and untouched — not a heading, not a line.** This session
+then **renumbered its own five to `Q-166`…`Q-170`** in a follow-up commit, updated its own references
+in `STATUS.md`, `PROGRESS.md` and `docs/reviews/OPEN_FINDINGS.md`, and **left a pointer paragraph in
+`QUESTIONS.md`** so a reader following `68dc891`'s message finds the move. **`68dc891` was NOT
+amended** and its headings stand in history.
+
+**Expectation:** two sessions writing one append-only file do not claim the same identifier. The
+discipline in force — *re-read immediately before appending* — is stated in `OF-232` and `OF-248` and
+**was followed**: the measurement was taken minutes before the write and was correct when it was taken.
+
+**Missing:** ⚠️ **an atomic claim.** `OF-248` already names the remedy — *"a session claims its next id
+by committing a one-line reservation before it drafts, or `check_roles` refuses a duplicate
+`Q-`/`INC-`/`OF-` heading"* — and **neither is built**, so a re-read remains the only defence and a
+re-read cannot cover the window between itself and the commit. **Also missing: nothing compares a
+commit's new headings against `HEAD`'s existing ones.** The duplicate was legal at `git commit` and
+would have stayed legal for ever.
+
+**Missed:** ⚠️ **this session's own preamble predicted it, in writing, in the block that collided.**
+It reads: *"THE Q- NUMBERS BELOW WERE COUNTED AT A NAMED MOMENT AND A CONCURRENT SESSION MAY COLLIDE …
+`OF-179` records this exact collision class happening to a previous session that re-read immediately
+before appending, and the discipline did not prevent it."* **The hazard was named, the mitigation was
+delegated to the architect in the same sentence, and the session committed anyway.** ⚠️ **And
+`OF-248` — raised the same day, by the concurrent session, describing this exact collision between
+these exact two files — was in this session's prescribed reading and was read.** Knowing the failure
+mode precisely is not the same as acting on it, and this entry exists to say so.
+
+**Diagnosis:** id allocation is read-then-write with no lock, so the window between the read and the
+commit is unguarded by construction; **every previous occurrence was caught inside that window and so
+was fixable in a draft, which made the class look smaller than it is.**
+
+**Fix:** `Q-161`…`Q-165` → `Q-166`…`Q-170` across `QUESTIONS.md`, `STATUS.md`, `PROGRESS.md` and
+`docs/reviews/OPEN_FINDINGS.md`, plus the pointer paragraph — in this entry's own commit; the SHA is
+recorded in `PROGRESS.md`'s `9f31d708` entry and in `docs/sessions/c19-build-1.txt`, because it could
+not exist while this field was being written. **No file of `6ba2c1f7`'s was edited and no commit was
+amended.**
+
+**Systemic guardrail:** ⚠️ **NONE NEW — and the honest form of that is a correction to how the class
+was graded, not a shrug.** `OF-248`'s two proposed remedies stand unbuilt and both are outside this
+chunk's fence (`check_roles.py` is named under **NOT**). **What this occurrence adds is that the
+class is worse than `OF-248` records it:** every prior instance was caught **before** a commit, so the
+remedy read as *"renumber the draft."* **This one reached `HEAD`**, which makes the duplicate
+permanent in history and the resolution a forward commit that a reader must follow. **The cheap check
+is now specific enough to write in one line: refuse a commit that introduces a `### Q-`, `## INC-` or
+`| **OF-` heading whose id already exists in `HEAD`.** That is a pre-commit comparison against
+`HEAD`, not a re-read of the working tree, and **it is the only form that closes the window this
+entry is about.** Recorded as owed.

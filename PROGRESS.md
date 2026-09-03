@@ -92,7 +92,7 @@ earlier *"eleven"* measures at **fourteen** and nothing was adjusted toward it (
 three C7 HIGHs the disposition prompt's stated range did not cover.**
 
 ⚠️ **And the seeded-defect test — §14's never-cut item, *"the only evidence the PASS verdicts mean
-anything"* — did not run at C7 and no artefact shows it running since** (`Q-165`). **So the fourteen
+anything"* — did not run at C7 and no artefact shows it running since** (`Q-170`). **So the fourteen
 FAILs are evidence that reviews find things, not that they would find a thing deliberately hidden,
 and the README states the weaker claim.**
 
@@ -108,15 +108,15 @@ bridge would be *our* claim about what a τ² task means. Mock world: **3 of 30*
 ### FIVE THINGS THIS SESSION COULD NOT DO
 
 1. ⚠️ **`AGENTS.md`, `docs/adr/`, `bench/` NOT created** — the C19 card names them, the fence excludes
-   them. **Hard-rule-1 STOP: `Q-161`**, unblocked work continued.
+   them. **Hard-rule-1 STOP: `Q-166`**, unblocked work continued.
 2. ⚠️ **The PROVENANCE final pass NOT done** — outside the fence, and `PROVENANCE.md` is frozen-set.
-3. ⚠️ **The clean-clone test NOT executed** (`Q-163`). All three bootstrap steps are **printed**
+3. ⚠️ **The clean-clone test NOT executed** (`Q-168`). All three bootstrap steps are **printed**
    verbatim from `vendor/MANIFEST.md` §2. **`CONTEXT.md` §20's first box stays FALSE.**
-4. ⚠️ **§6a.3's verification NOT run — and it CANNOT be** (`Q-162`). It is C19's one surviving
+4. ⚠️ **§6a.3's verification NOT run — and it CANNOT be** (`Q-167`). It is C19's one surviving
    `full`-grade check under the rung-5 downgrade, it hashes `prereg-v1`, and **that tag does not
    exist**. **Owed, and named as owed.**
 5. ⚠️ **`OPEN_FINDINGS.md` not emptied** — **193 OPEN** by the parser `RESULTS.md` uses, **185 of 239**
-   by a row-by-row resolution. **The two counts disagree and both are published** (`Q-164`): six rows
+   by a row-by-row resolution. **The two counts disagree and both are published** (`Q-169`): six rows
    are closed in prose while their rows read OPEN, `OF-229` is HIGH-and-OPEN but is a prose section a
    row scan misses, ~2 could not be reconstructed and is named, and `ACCEPTED` reads 0 while three
    findings are accepted in prose.

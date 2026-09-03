@@ -12734,9 +12734,29 @@ allocated id was **`Q-160`**. `OF-179` records this exact collision class happen
 session that re-read immediately before appending, *"and the discipline did not prevent it."* If these
 ids collide, the renumbering is the architect's and nothing here depends on the number.
 
+⚠️⚠️ **RENUMBERED `Q-161`…`Q-165` → `Q-166`…`Q-170`, AND THE REASON IS `OF-248`'s HAZARD HAPPENING
+TO THIS SESSION.** The paragraph above warned that these ids *"were counted at a named moment and a
+concurrent session may collide."* **They did.** Measured at `a691d13` the highest allocated id was
+`Q-160`; between that measurement and this session's write, **ARCH FIX — PILOT RUN 2 (`6ba2c1f7`)
+allocated `Q-161`…`Q-165` in the working tree for its own five questions**, and this session's commit
+`68dc891` landed **first**, putting *this* session's `Q-161`…`Q-165` into `HEAD` while `6ba2c1f7`'s
+five sat uncommitted beside them in the same file.
+
+⚠️ **THE DISCOVERING SESSION MOVES, AND THAT IS THIS ONE.** `INC-123`'s precedent is exactly this:
+`2e94c7b5` renumbered **its own** ids twice on finding `7c05e3b9` had taken them. **Nothing of
+`6ba2c1f7`'s was touched** — not a heading, not a line — and its five questions keep the numbers it
+chose. ⚠️ **`68dc891` IS NOT AMENDED AND ITS `Q-161`…`Q-165` HEADINGS STAND IN HISTORY**, because
+history is never rewritten here; **the renumbering is a forward commit and this paragraph is the
+pointer a reader following `68dc891`'s message will need.**
+
+⚠️ **AND THE FIRST-MOVER TWIST IS WORTH ONE LINE, BECAUSE IT IS NEW.** `OF-248` records the collision
+being caught *before* a write. **Here it was caught after a commit** — so for the first time the
+duplicate reached `HEAD`, and the remedy stopped being *"renumber the draft"* and became *"renumber in
+a follow-up commit and leave the first one legible."* `INC-125`.
+
 ---
 
-### Q-161 — ⚠️ **THE C19 CARD AND THE C19 PROMPT'S FENCE DISAGREE ON THREE DELIVERABLES, AND HARD RULE 1 SAYS STOP.**
+### Q-166 — ⚠️ **THE C19 CARD AND THE C19 PROMPT'S FENCE DISAGREE ON THREE DELIVERABLES, AND HARD RULE 1 SAYS STOP.**
 
 **Raised by:** C19 README BUILD 1 (`9f31d708`), 2026-09-03. **Class:** B (scope, not meaning).
 **Blocking:** three named deliverables. **Not blocking:** the README, which was built.
@@ -12773,7 +12793,7 @@ as not done.
 
 ---
 
-### Q-162 — ⚠️⚠️ **C19's ONE SURVIVING `full`-GRADE VERIFICATION IS UNSATISFIABLE TODAY, BECAUSE `prereg-v1` DOES NOT EXIST.**
+### Q-167 — ⚠️⚠️ **C19's ONE SURVIVING `full`-GRADE VERIFICATION IS UNSATISFIABLE TODAY, BECAUSE `prereg-v1` DOES NOT EXIST.**
 
 **Raised by:** C19 README BUILD 1 (`9f31d708`), 2026-09-03. **Class:** A — it is a done-when clause the
 plan singles out as surviving a ladder downgrade. **Blocking:** C19's done-when. **OPEN.**
@@ -12815,7 +12835,7 @@ and is named as owed.**
 
 ---
 
-### Q-163 — ⚠️ **C19's CLEAN-CLONE DONE-WHEN WAS NOT EXECUTED, AND THE FENCE AND THE SPEND SANCTION BOTH POINT AWAY FROM IT.**
+### Q-168 — ⚠️ **C19's CLEAN-CLONE DONE-WHEN WAS NOT EXECUTED, AND THE FENCE AND THE SPEND SANCTION BOTH POINT AWAY FROM IT.**
 
 **Raised by:** C19 README BUILD 1 (`9f31d708`), 2026-09-03. **Class:** B. **OPEN.**
 
@@ -12850,7 +12870,7 @@ and says the Definition of Done's first box is FALSE until it runs.**
 
 ---
 
-### Q-164 — ⚠️ **`docs/reviews/OPEN_FINDINGS.md` IS NOT EMPTY, C19's DONE-WHEN SAYS THAT BLOCKS THIS CHUNK, AND THE FILE'S TWO HONEST COUNTS DISAGREE.**
+### Q-169 — ⚠️ **`docs/reviews/OPEN_FINDINGS.md` IS NOT EMPTY, C19's DONE-WHEN SAYS THAT BLOCKS THIS CHUNK, AND THE FILE'S TWO HONEST COUNTS DISAGREE.**
 
 **Raised by:** C19 README BUILD 1 (`9f31d708`), 2026-09-03. **Class:** B. **OPEN.**
 
@@ -12895,7 +12915,7 @@ another chunk's findings from inside a README fence is the shape of thing `OF-18
 
 ---
 
-### Q-165 — ⚠️⚠️ **THE SEEDED-DEFECT TEST IS ON §14's NEVER-CUT LIST, IT DID NOT RUN AT C7, IT WAS RULED TO "RELOCATE TO A LATER CHUNK", AND NO ARTEFACT SHOWS IT HAVING RUN SINCE.**
+### Q-170 — ⚠️⚠️ **THE SEEDED-DEFECT TEST IS ON §14's NEVER-CUT LIST, IT DID NOT RUN AT C7, IT WAS RULED TO "RELOCATE TO A LATER CHUNK", AND NO ARTEFACT SHOWS IT HAVING RUN SINCE.**
 
 **Raised by:** C19 README BUILD 1 (`9f31d708`), 2026-09-03. **Class:** A — it bears on what the review
 trail's fourteen FAILs are evidence *of*. **OPEN.**
