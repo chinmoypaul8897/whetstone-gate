@@ -795,3 +795,181 @@ def test_the_package_under_test_is_the_tree_under_test(pytestconfig):
         "⚠️ pytest's rootdir is not the tree this test file belongs to. The suite and the "
         "file disagree about which repository is under test." + observed + remedy
     )
+
+
+# -- D4's scan set: the CLOSURE, not the two directories (OF-249) -----------------------
+#
+# ⚠️ **THE LINE `CLAUDE.md` HARD RULE 8 CALLS "THE WHOLE MOAT", AND UNTIL 2026-09-03 ITS TWO
+# HALVES SCANNED DIFFERENT SETS.** `D1`–`D3` walk the **transitive closure** of both
+# packages; `D4` — the source-text half added for `OF-110` / `INC-51`, precisely because the
+# AST walk cannot see a call expression — walked the two package **directories**. Any
+# first-party module inside a closure but outside both directories was therefore scanned by
+# **nothing**, and `OF-249` measured that there was exactly one: `whetstone_gate.config`, on
+# the **gate** side, reached by `gates/shell.py`.
+#
+# ⚠️ **THAT IS `INC-51`'S MEASURED CLASS, ONE MODULE FURTHER OUT** — and this session
+# planted the hop in a throwaway clone and watched the pre-fix `D4` print **PASS** over a
+# live `gates/` → `scorer/` reach that really returned `DENY` computed by
+# `scorer/invariants.py`. `INCIDENTS.md` **INC-132**.
+
+
+def _closure_of(root: Path) -> tuple[set[str], set[str], dict[str, Path]]:
+    """The two closures and the module index, computed with `check_roles`' OWN walker.
+
+    Re-implementing the walk here would prove something about a second implementation.
+    """
+    src_root = root / "src"
+    package_roots = {"whetstone_gate", "gates", "scorer"} | {
+        p.name for p in src_root.iterdir() if p.is_dir()
+    }
+    known = check_roles._first_party_modules(src_root)
+    graph = {
+        module: check_roles._resolve_imports(py, module, known, package_roots)
+        for module, py in known.items()
+    }
+
+    def under(prefix: str) -> set[str]:
+        return {m for m in known if m == prefix or m.startswith(prefix + ".")}
+
+    gates = check_roles._transitive_closure(under("whetstone_gate.gates"), graph)
+    scorer = check_roles._transitive_closure(under("whetstone_gate.scorer"), graph)
+    return gates, scorer, known
+
+
+def test_d4_text_scans_every_module_in_either_closure_not_just_the_two_directories(
+    repo_root,
+):
+    """⚠️ `OF-249`. The two halves of the moat must scan the SAME SET or they do not compose.
+
+    `D4` exists to cover a blind spot `D1`–`D3` have **by construction**. A `D4` whose scan
+    set is *smaller* than the set `D1`–`D3` walk cannot do that job on the difference, and
+    the difference is not hypothetical: it is `whetstone_gate.config`, inside the gate side
+    of the moat, imported by `gates/shell.py`.
+
+    This test measures the difference with `check_roles`' own walker and asserts every
+    module in it is **named in `D4`'s own printed detail** — so the day a sixth module joins
+    the closure, this assertion sees it whether or not it carries a hop.
+    """
+    gate_closure, scorer_closure, known = _closure_of(repo_root)
+    gates_dir = repo_root / "src" / "whetstone_gate" / "gates"
+    scorer_dir = repo_root / "src" / "whetstone_gate" / "scorer"
+    in_a_directory = {
+        py.resolve() for package in (gates_dir, scorer_dir) for py in package.rglob("*.py")
+    }
+    outside = sorted(
+        module
+        for module in gate_closure | scorer_closure
+        if module in known and known[module].resolve() not in in_a_directory
+    )
+
+    results = _results(check_roles.check_gate_scorer_isolation(repo_root))
+    d4 = results["D4 no dynamic import in gates/ or scorer/"]
+    if d4.ok is None:
+        pytest.skip("gates/ and scorer/ do not both exist in this tree")
+
+    assert d4.ok is True, d4.detail
+    for module in outside:
+        assert module in d4.detail, (
+            f"{module} is inside a package's TRANSITIVE CLOSURE and outside both package "
+            f"DIRECTORIES, and D4's detail does not name it as scanned. That is OF-249: "
+            f"D1-D3 would walk it and D4 would not, so a dynamic hop placed there passes "
+            f"all four over a live gates->scorer reach (INC-51's class, one module further "
+            f"out). D4 said: {d4.detail}"
+        )
+
+
+def _closure_hop_tree(tmp_path: Path, shim_body: str) -> Path:
+    """A throwaway tree whose `gates/` reaches a module OUTSIDE both package directories.
+
+    ⚠️ **NOTHING IS PLANTED IN THIS REPOSITORY** (`INCIDENTS.md` `INC-11`, `INC-17`). The
+    shape is `OF-249`'s exactly: `gates/arm4_kernel.py` names **no refused form at all**, so
+    a directory-only scan of `gates/` and `scorer/` reads clean; the reach lives one module
+    out, in `whetstone_gate.settings_shim`, which is in the gate closure and in neither
+    directory.
+    """
+    root = tmp_path / "tree"
+    pkg = root / "src" / "whetstone_gate"
+    for sub in ("gates", "scorer"):
+        (pkg / sub).mkdir(parents=True, exist_ok=True)
+        (pkg / sub / "__init__.py").write_text("", encoding="utf-8")
+    (pkg / "__init__.py").write_text("", encoding="utf-8")
+    (pkg / "settings_shim.py").write_text(shim_body, encoding="utf-8")
+    (pkg / "gates" / "arm4_kernel.py").write_text(
+        "from whetstone_gate import settings_shim\n"
+        "def decide(paise, cap):\n"
+        "    return settings_shim.reach(paise, cap)\n",
+        encoding="utf-8",
+    )
+    (pkg / "scorer" / "replay.py").write_text(
+        "def over_cap(paise, cap):\n    return paise > cap\n", encoding="utf-8"
+    )
+    return root
+
+
+_CLEAN_SHIM = "def reach(paise, cap):\n    return paise > cap\n"
+_HOP_SHIM = (
+    "import importlib\n"
+    "def reach(paise, cap):\n"
+    '    module = importlib.import_module("whetstone_gate.scorer.replay")\n'
+    "    return module.over_cap(paise, cap)\n"
+)
+
+
+def test_d4_goes_RED_on_a_dynamic_hop_one_module_OUTSIDE_both_directories(tmp_path):
+    """⚠️ `PROCESS.md` §5.4: a gate that has never gone red is only decorative. This is it.
+
+    Three assertions, and the middle one is the finding:
+
+      * **`D1`, `D2` and `D3` still PASS** — a call expression is not an `ast.Import` node,
+        so the module graph cannot see this reach, exactly as `INC-51` measured.
+      * **the DIRECTORY-ONLY scan still returns NOTHING** — `check_roles._dynamic_reach_hits`
+        pointed at the two package directories, which is what `D4` used to be, reads the
+        planted tree **clean**. That is `OF-249`, measured rather than argued.
+      * **`D4` now FAILS and names the module** — the closure half sees what the directory
+        half cannot.
+    """
+    root = _closure_hop_tree(tmp_path, _HOP_SHIM)
+    results = _results(check_roles.check_gate_scorer_isolation(root))
+
+    assert results["D1 gates/ imports nothing from scorer/"].ok is True, (
+        "D1 caught a dynamic reach - if that is now true, INC-51's measurement has changed "
+        "and D4's justification must be re-read, not deleted"
+    )
+    assert results["D3 no shared first-party module"].ok is True, "see the note on D1"
+
+    directory_only = check_roles._dynamic_reach_hits(
+        {
+            "src/whetstone_gate/gates": root / "src/whetstone_gate/gates",
+            "src/whetstone_gate/scorer": root / "src/whetstone_gate/scorer",
+        }
+    )
+    assert directory_only == [], (
+        "the pre-OF-249 D4 - a scan of the two package DIRECTORIES - was supposed to read "
+        f"this planted tree CLEAN, and it did not: {directory_only}. If that is now false "
+        "the premise of this test has changed and OF-249 must be re-measured, not deleted."
+    )
+
+    d4 = results["D4 no dynamic import in gates/ or scorer/"]
+    assert d4.ok is False, (
+        f"D4 did NOT refuse a dynamic gates->scorer hop placed one module outside both "
+        f"package directories. That is OF-249, reopened: {d4.detail}"
+    )
+    assert "whetstone_gate.settings_shim" in d4.detail, (
+        f"D4 must NAME the closure module it refused: {d4.detail}"
+    )
+
+
+def test_d4_does_not_fire_on_the_same_tree_with_a_CLEAN_module_outside_both_directories(
+    tmp_path,
+):
+    """The negative control. A widened scan that refuses everything is not a check.
+
+    Same tree, same `gates/` → `settings_shim` → `scorer/` topology, shim written without a
+    refused form: all four must PASS. Without this, `test_d4_goes_RED_...` above would be
+    satisfied by a `D4` that had simply been broken.
+    """
+    root = _closure_hop_tree(tmp_path, _CLEAN_SHIM)
+    results = check_roles.check_gate_scorer_isolation(root)
+    assert {r.check.split()[0] for r in results} == {"D1", "D2", "D3", "D4"}
+    for result in results:
+        assert result.ok is True, f"{result.check}: {result.detail}"

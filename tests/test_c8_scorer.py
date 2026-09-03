@@ -3103,3 +3103,240 @@ def test_RULE_A_does_not_move_F7_which_is_the_fixture_that_HAS_an_authorization_
         "8 captured / 3 authorized / 1 probe (S8.6a) - the divergence is unreachable on any "
         "ledger the world can produce, and F9 is the only place it is reachable at all"
     )
+
+
+# ======================================================================================
+# 11. DETERMINISM - THE TWO HALVES OF `INVARIANTS.md` S5.2 THAT NOTHING TESTED. OF-252.
+# ======================================================================================
+#
+# `INVARIANTS.md` S5 item 2, verbatim: "The WORLD, THE LEDGER SCHEMA, THE SCORER AND THE
+# REPLAY are byte-identical from the same seed and are TESTED to be." C19 README BUILD 1
+# (`9f31d708`) MEASURED that two of the four were:
+#
+#     world  -> tests/test_c2_world.py   test_two_runs_of_one_seed_are_byte_identical
+#     ledger -> tests/test_c7_ledger.py  test_two_runs_of_one_seed_produce_byte_identical_ledgers
+#     scorer -> NOTHING  (102 tests in this file, and not one of them a two-run test)
+#     replay -> NOTHING  (no dedicated determinism test anywhere in the suite)
+#
+# ! A CLAIM IN A NEAR-FROZEN ARTEFACT THAT OUTRAN ITS TESTS IS THE EXACT DEFECT THIS
+# PROJECT EXISTS TO EXPOSE, POINTED AT US. `INVARIANTS.md` is byte-identical at `probe-v1`
+# but is NOT frozen by it - the five-file set is `prereg-v1`'s, and `prereg-v1` does not
+# exist - so it was legal to fix today and would have been illegal tomorrow. OF-252's own
+# remedy (1) was chosen over remedy (2): THE TWO MISSING TESTS ARE WRITTEN AND THE SENTENCE
+# IS NOT NARROWED. Narrowing a true-but-untested claim to a smaller tested one loses a
+# property the project actually has.
+#
+# ! AND A GOLDEN DOES NOT CLOSE IT. A golden is a CORRECTNESS ORACLE and says nothing about
+# computing the same bytes TWICE. That conflation reached C19's own first draft and is
+# `INCIDENTS.md` INC-124; neither test below is a golden comparison.
+#
+# ! SCOPE, STATED EXACTLY, BECAUSE THE LOOSER CLAIM IS FALSE (hard rule 10). Four
+# components are byte-identical from a seed and NOTHING MORE. MODEL OUTPUT IS NOT: the
+# attacker runs at TEMPERATURE 0.7 AGAINST A HOSTED PROVIDER, and re-running the models does
+# not reproduce the run. `make eval`'s claim is "every number regenerates from the STORED
+# LEDGERS", which is true, checkable and enough.
+
+
+def _determinism_bytes(payload: dict) -> bytes:
+    """Serialise a scorer or replay result to bytes for a two-run comparison.
+
+    ! KEYS ARE **NOT** SORTED, DELIBERATELY, AND THAT IS THE WHOLE POINT OF COMPARING BYTES
+    RATHER THAN OBJECTS. `sort_keys=True` would normalise away a mapping built by iterating
+    an unordered collection - the commonest shape of exactly the defect these two tests
+    exist to catch, and one that `==` on the dataclass CANNOT SEE, because two dicts holding
+    the same pairs in different orders are EQUAL and do not serialise the same. Insertion
+    order is therefore part of what is compared.
+
+    ! THE ONE NORMALISATION, AND WHY IT IS NOT A LOOPHOLE. A `frozenset` - the replay's
+    `OpeningState.payment_ids` - has no order to be faithful to, and CPython's iteration
+    order for a set of strings depends on `PYTHONHASHSEED`, which is process-wide state and
+    not the scorer's. It is sorted; EVERYTHING ELSE IS COMPARED AS BUILT. Any other type
+    JSON cannot encode raises here rather than falling back to `str()`, so a field that
+    starts carrying an object breaks this comparison loudly instead of stringifying two
+    different objects into agreement.
+    """
+
+    def default(value):
+        if isinstance(value, (set, frozenset)):
+            return sorted(value)
+        raise TypeError(
+            f"{type(value).__name__} is not JSON-serialisable, so this two-run comparison "
+            f"cannot see it. Add an explicit rule - never a str() fallback, which makes two "
+            f"different objects compare equal."
+        )
+
+    return json.dumps(payload, default=default).encode("utf-8")
+
+
+def _protocol_constants() -> ScoringConstants:
+    """The scoring constants read from `config/`, not from golden 2's copy of them.
+
+    Hard rule 9: every spec-specified value lives in `config/`, loaded through one loader,
+    with NO DEFAULT for a required value - `require` raises on a missing key.
+    """
+    protocol = cfg.load("protocol")
+    return constants_from(
+        {
+            "per_action_cap_paise": protocol.require("money.per_action_cap_paise"),
+            "episode_cap_paise": protocol.require("money.episode_cap_paise"),
+            "s4_in_flight_window_width": protocol.require(
+                "invariants.s4_in_flight_window_width"
+            ),
+            "currency": protocol.require("world.currency"),
+        }
+    )
+
+
+def _episode_from_seed(seed: int):
+    """One episode's stored rows and opening state, regenerated from `seed` ALONE.
+
+    Three calls that between them reach every invariant class: a settlement that exhausts
+    the episode cap, an over-cap refund, and a full refund. They are the SAME THREE
+    `tests/test_c7_ledger.py`'s ledger determinism test uses, so the two tests read one
+    episode from two sides rather than each inventing its own.
+    """
+    from whetstone_gate.ledger import build, store
+    from whetstone_gate.ledger.entry import ALLOWED, ARM_1
+    from whetstone_gate.world import surface
+
+    protocol = cfg.load("protocol")
+    world_spec = load_world_spec(protocol)
+    generated = generator.generate(seed, world_spec)
+    world = semantics.build(
+        generated, settings.load_semantics_spec(protocol), oracle_module.load()
+    )
+    probe = protocol.require("probe.payment_id")
+    world.call(surface.CREATE_INSTANT_SETTLEMENT, {"amount": 20000000})
+    world.call(surface.CREATE_REFUND, {"payment_id": probe, "amount": 6000000})
+    world.call(surface.CREATE_REFUND, {"payment_id": probe})
+
+    written = Ledger(spec=load_chain_spec(protocol), seed=seed, arm=ARM_1)
+    build.append_log(
+        written, world.log, turn_index_of=lambda row: 0, verdict_of=lambda row: ALLOWED
+    )
+    opening = opening_state_from_payments(
+        [dataclasses.asdict(payment) for payment in generated.payments]
+    )
+    return store.stored_entries(json.loads(store.render(written))), opening, ARM_1
+
+
+def test_two_runs_of_one_seed_produce_a_BYTE_IDENTICAL_SCORE():
+    """`INVARIANTS.md` S5.2's THIRD component, untested until OF-252. Hard rule 10.
+
+    Scores the SAME episode - regenerated from ONE seed - twice, and compares the two
+    results as BYTES. `EpisodeScore` is a frozen dataclass, so `first == second` would pass
+    on two objects whose rendered output differs: `harm` is a `Mapping`, and two dicts with
+    the same pairs in different orders ARE equal and DO NOT serialise the same. C18 renders
+    that vector into a published table, so its order is not cosmetic.
+
+    ! WHAT IS ASSERTED AND WHAT IS NOT. The scorer is deterministic; THE ATTACKER IS NOT -
+    it runs at TEMPERATURE 0.7 against a HOSTED PROVIDER, and re-running the models does not
+    reproduce the run. This test makes no claim about model output. It also makes no claim
+    that the scorer is CORRECT: golden 2 is the correctness oracle and this is not a golden
+    comparison. A deterministic scorer that is WRONG passes this test, which is why the
+    other tests in this file exist (`PROCESS.md` S5.2; `INCIDENTS.md` INC-124).
+
+    ! THE DROP LEDGER IS SERIALISED WITH THE SCORE, not beside it. Hard rule 11's identity -
+    `offered == scored + dropped` - is a published number too, and a scorer whose drop
+    CATEGORISATION varied between runs while its score did not would still be moving the
+    denominator this project promises never to shrink silently.
+    """
+    seed = cfg.load("protocol").require("seeds.scored_n50_first")
+    constants = _protocol_constants()
+
+    def score_once() -> bytes:
+        rows, opening, arm = _episode_from_seed(seed)
+        counter = DropLedger()
+        score = score_episode(
+            "determinism-probe",
+            rows,
+            seed=seed,
+            arm=arm,
+            opening=opening,
+            constants=constants,
+            chain_status=CHAIN_VALID,
+            truncated=False,
+            ledger=counter,
+        )
+        assert score is not None, "the episode must SCORE, or this compares two refusals"
+        counter.reconcile()
+        return _determinism_bytes(
+            {
+                "score": dataclasses.asdict(score),
+                "drops": counter.by_category(),
+                "scored": counter.scored,
+                "dropped": counter.dropped,
+            }
+        )
+
+    first, second = score_once(), score_once()
+    assert first == second, (
+        "two runs of the SCORER over one seed did not produce identical bytes. "
+        "INVARIANTS.md S5.2 claims they do and hard rule 10 is what it rests on. "
+        f"first={first[:400]!r} second={second[:400]!r}"
+    )
+
+
+def test_two_replays_of_one_STORED_episode_are_BYTE_IDENTICAL(tmp_path):
+    """`INVARIANTS.md` S5.2's FOURTH component, untested until OF-252.
+
+    ! THE EPISODE IS WRITTEN TO DISK AND READ BACK, because "the replay" is what a stranger
+    runs against a STORED LEDGER and `make eval`'s whole claim is *"every number regenerates
+    from the stored ledgers"*. Replaying an in-memory object would be testing a different
+    sentence.
+
+    Each replay re-reads the same file, rebuilds the scorer's read model
+    (`entries_from_rows`), and rebuilds the opening state by REGENERATING THE WORLD FROM THE
+    SEED THE DOCUMENT ITSELF CARRIES - which is the path `score_episode`'s seed cross-check
+    (Q-071) depends on. Both halves are compared as bytes.
+
+    ! SCOPE, as above: the replay is deterministic, THE ATTACKER IS NOT (temperature 0.7,
+    hosted provider), and this test claims nothing about model output.
+    """
+    from whetstone_gate.ledger import build, store
+    from whetstone_gate.ledger.entry import ALLOWED, ARM_1
+    from whetstone_gate.world import surface
+
+    protocol = cfg.load("protocol")
+    world_spec = load_world_spec(protocol)
+    seed = protocol.require("seeds.scored_n50_first")
+    probe = protocol.require("probe.payment_id")
+
+    generated = generator.generate(seed, world_spec)
+    world = semantics.build(
+        generated, settings.load_semantics_spec(protocol), oracle_module.load()
+    )
+    world.call(surface.CREATE_INSTANT_SETTLEMENT, {"amount": 20000000})
+    world.call(surface.CREATE_REFUND, {"payment_id": probe, "amount": 6000000})
+    world.call(surface.CREATE_REFUND, {"payment_id": probe})
+    written = Ledger(spec=load_chain_spec(protocol), seed=seed, arm=ARM_1)
+    build.append_log(
+        written, world.log, turn_index_of=lambda row: 0, verdict_of=lambda row: ALLOWED
+    )
+
+    stored = tmp_path / "episode.json"
+    assert store.write(stored, written) is True, "the episode must actually reach disk"
+
+    def replay_once() -> bytes:
+        document = store.read_document(stored)
+        entries = entries_from_rows(store.stored_entries(document))
+        regenerated = generator.generate(int(document["seed"]), world_spec)
+        opening = opening_state_from_payments(
+            [dataclasses.asdict(payment) for payment in regenerated.payments]
+        )
+        return _determinism_bytes(
+            {
+                "entries": [dataclasses.asdict(entry) for entry in entries],
+                "opening": dataclasses.asdict(opening),
+            }
+        )
+
+    first, second = replay_once(), replay_once()
+    assert first == second, (
+        "two replays of ONE stored episode did not produce identical bytes. "
+        "INVARIANTS.md S5.2 claims they do. "
+        f"first={first[:400]!r} second={second[:400]!r}"
+    )
+    assert len(entries_from_rows(store.stored_entries(store.read_document(stored)))) == 3, (
+        "the positive control: an EMPTY replay would compare two empty results and pass"
+    )

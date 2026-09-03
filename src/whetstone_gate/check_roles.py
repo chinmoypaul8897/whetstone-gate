@@ -686,12 +686,32 @@ MOAT_REFUSED_DYNAMIC: tuple[tuple[str, str], ...] = (
 )
 
 
+def _refused_dynamic_lines(where: str, text: str) -> list[tuple[str, int, str, str]]:
+    """Every :data:`MOAT_REFUSED_DYNAMIC` name appearing in one file's SOURCE TEXT.
+
+    The single place the refusal is actually applied, so that the two callers below — the
+    package-directory walk and the transitive-closure walk — cannot drift into scanning
+    for *different* vocabularies. ``OF-249`` is what a scan set that drifts looks like.
+    """
+    hits: list[tuple[str, int, str, str]] = []
+    for number, line in enumerate(text.splitlines(), start=1):
+        for name, pattern in MOAT_REFUSED_DYNAMIC:
+            if re.search(pattern, line):
+                hits.append((where, number, name, line.strip()[:120]))
+    return hits
+
+
 def _dynamic_reach_hits(packages: dict[str, Path]) -> list[tuple[str, int, str, str]]:
     """Every :data:`MOAT_REFUSED_DYNAMIC` name appearing in either package's SOURCE TEXT.
 
     Returns ``(relative path, line number, refused name, the line)``, sorted. The scan is
     over **raw text**, deliberately: the whole point of `OF-110` is that the AST cannot see
     these forms, so a second AST pass would reproduce the blind spot in a different shape.
+
+    ⚠️ **THIS FUNCTION WALKS DIRECTORIES, AND A DIRECTORY IS NOT THE MOAT'S SCAN SET.** It
+    is kept, unchanged, because four other chunks' tests point it at *their own* package
+    directory, which is exactly what they mean. **D4 no longer uses it alone** — see
+    :func:`_dynamic_reach_hits_in_modules` and `OF-249`.
     """
     hits: list[tuple[str, int, str, str]] = []
     for label, package in packages.items():
@@ -701,11 +721,50 @@ def _dynamic_reach_hits(packages: dict[str, Path]) -> list[tuple[str, int, str, 
             except OSError as exc:  # pragma: no cover - unreadable file, reported not skipped
                 hits.append((f"{label}/{py.name}", 0, "UNREADABLE", f"{type(exc).__name__}"))
                 continue
-            where = f"{label}/{py.relative_to(package).as_posix()}"
-            for number, line in enumerate(text.splitlines(), start=1):
-                for name, pattern in MOAT_REFUSED_DYNAMIC:
-                    if re.search(pattern, line):
-                        hits.append((where, number, name, line.strip()[:120]))
+            hits.extend(
+                _refused_dynamic_lines(f"{label}/{py.relative_to(package).as_posix()}", text)
+            )
+    return sorted(hits)
+
+
+def _dynamic_reach_hits_in_modules(
+    modules: dict[str, Path],
+) -> list[tuple[str, int, str, str]]:
+    """The same refusal, applied to an EXPLICIT set of first-party modules by dotted name.
+
+    ⚠️ **THIS EXISTS BECAUSE `OF-249` MEASURED THE TWO HALVES OF THE MOAT SCANNING
+    DIFFERENT SETS, AND THE SMALLER SET WAS THE ONE MEANT TO COVER THE OTHER'S KNOWN BLIND
+    SPOT.** `D1`–`D3` walk the **transitive closure** of both packages; `D4` walked the two
+    package **directories**. C19 README BUILD 1 (`9f31d708`) measured this tree: 118
+    first-party modules indexed, ``gates/`` closure 15, ``scorer/`` closure 6, intersection
+    empty — and ``(gates_closure | scorer_closure) - gates_dir - scorer_dir`` was
+    ``{whetstone_gate.config}``. **Exactly one module, inside the gate side of the moat,
+    text-scanned by nothing: a dynamic hop planted there would have passed D1, D2, D3 AND
+    D4 over a live ``gates/`` → ``scorer/`` reach**, which is `INC-51`'s measured class one
+    module further out.
+
+    ⚠️ **`OF-249` AS RAISED WAS STRUCTURAL, NOT EXPLOITED** — C19 read the call site and
+    measured the closure difference, and its own row says that is weaker evidence than
+    `INC-51`'s planted reach. **This session then planted it**, in a `git clone` in a fresh
+    OS temp directory: the pre-fix `D4` printed **PASS** while
+    ``gates.of249_probe.decide(6_000_000, 5_000_000)`` returned ``DENY`` computed by
+    ``scorer/invariants.py``. ⚠️ **NOTHING WAS EVER PLANTED IN THIS REPOSITORY** (`INC-11`,
+    `INC-17`), so what is demonstrated is a breach of the **check**, in a throwaway tree —
+    not a breach that existed in this tree's own history. `INCIDENTS.md` `INC-132` records
+    both facts and all four drives.
+
+    Returns the same ``(where, line number, refused name, the line)`` tuple shape, with
+    ``where`` the **dotted module name** so a reader can tell a closure-only hit from a
+    directory hit at a glance.
+    """
+    hits: list[tuple[str, int, str, str]] = []
+    for where, py in sorted(modules.items()):
+        try:
+            text = py.read_text(encoding="utf-8", errors="replace")
+        except OSError as exc:  # pragma: no cover - unreadable file, reported not skipped
+            hits.append((where, 0, "UNREADABLE", f"{type(exc).__name__}"))
+            continue
+        hits.extend(_refused_dynamic_lines(where, text))
     return sorted(hits)
 
 
@@ -918,8 +977,35 @@ def _walk_isolation(
         )
     )
 
-    # ⚠️ D4 — THE SOURCE-TEXT HALF. OF-110 / INC-51. See MOAT_REFUSED_DYNAMIC.
-    dynamic = _dynamic_reach_hits({gates_rel: gates, scorer_rel: scorer})
+    # ⚠️ D4 — THE SOURCE-TEXT HALF, OVER THE SAME SET D1–D3 WALK. OF-110 / INC-51 / OF-249.
+    #
+    # ⚠️ THE SCAN SET IS THE CLOSURE, NOT THE TWO DIRECTORIES, AND THAT IS THE WHOLE OF
+    # OF-249's REMEDY. Until 2026-09-03 this line read
+    # `_dynamic_reach_hits({gates_rel: gates, scorer_rel: scorer})` — two directories —
+    # while D1–D3 walked the transitive closure. Any first-party module inside a closure
+    # but outside both directories was therefore scanned by NOTHING, and there was exactly
+    # one: `whetstone_gate.config`, on the GATE side. The directories are still walked as
+    # well, so a `.py` file that no import reaches — dead in the graph, live on disk — is
+    # not silently dropped by widening.
+    directory_hits = _dynamic_reach_hits({gates_rel: gates, scorer_rel: scorer})
+    in_a_directory = {
+        py.resolve()
+        for package in (gates, scorer)
+        for py in package.rglob("*.py")
+    }
+    closure_only = {
+        module: known[module]
+        for module in sorted(gate_closure | scorer_closure)
+        if module in known and known[module].resolve() not in in_a_directory
+    }
+    dynamic = sorted(directory_hits + _dynamic_reach_hits_in_modules(closure_only))
+    scan_set = (
+        f"SCANNED: both package directories PLUS the {len(closure_only)} module(s) inside "
+        f"either TRANSITIVE CLOSURE but outside them "
+        f"({sorted(closure_only) if closure_only else 'none'}) — OF-249, which measured "
+        f"that scanning the directories alone left exactly one closure module "
+        f"(whetstone_gate.config, on the GATE side) text-scanned by nothing"
+    )
     results.append(
         Result(
             "D4 no dynamic import in gates/ or scorer/",
@@ -927,7 +1013,7 @@ def _walk_isolation(
             f"neither package names any of the {len(MOAT_REFUSED_DYNAMIC)} refused "
             f"dynamic-reach forms in its source text. D1–D3 walk the AST, which cannot see "
             f"a call expression BY CONSTRUCTION; this walks the text, which cannot see "
-            f"semantics. Neither is the moat alone (OF-110, INC-51)"
+            f"semantics. Neither is the moat alone (OF-110, INC-51). {scan_set}"
             if not dynamic
             else (
                 "REFUSED DYNAMIC REACH: "
@@ -946,7 +1032,7 @@ def _walk_isolation(
                 "not a result, it is a definition. Write it statically so D1–D3 can see "
                 "it, or write it twice on purpose. Removing a name from "
                 "MOAT_REFUSED_DYNAMIC is a CLASS A deviation requiring an architect "
-                "ruling in QUESTIONS.md"
+                "ruling in QUESTIONS.md. " + scan_set
             ),
         )
     )
