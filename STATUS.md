@@ -2100,3 +2100,29 @@ and stating the matrix cell by cell **with a mutant id per cell**), **INC-71** (
 `Fix:` SHA recorded by append as **`754a91a`**, and `OF-152`'s own description of the exclusion
 corrected — the two 40-hex strings are `INC-24`'s **git BLOB hashes**, not vendor pins), **INC-72**
 (this session's harness).
+
+---
+
+## ⚠️ ARCH NIGHT 1 — **SECOND INSTANCE** of `SESSION-TOKEN 5d7e2b91` — 2026-09-04
+
+⚠️ **TWO LIVE SESSIONS RAN ONE PROMPT UNDER ONE TOKEN IN ONE TREE** (`INC-136`, `Q-180`, `Q-187`).
+The rows and figures above belong to the other instance; **this section is appended rather than
+merged into them**, because editing another live session's rows is how `INC-137` happened.
+**Full record: `docs/sessions/arch-night-1b.txt`.**
+
+| Gate | This instance | Result |
+|---|---|---|
+| **0** — land the dead session's work | **RAN** | `f45721d`. Six files, 586 insertions, verified four ways, measured on **two trees** (HEAD: **22 failed, 113 passed**; this tree: **1 failed, 136 passed, 2 skipped**). The survivor is `INC-127`'s benign purity walk, **pre-existing at HEAD, confirmed two ways**. `INC-135` written. |
+| **1** — the pilot | ⚠️ **SKIPPED at 1a** | `preflight` refused: *"the environment does not carry ['GOOGLE_API_KEY', 'GROQ_API_KEY']"*. Both names **ARE** set at Windows User scope; neither is in this process's environment. **A STALE ENVIRONMENT, NOT AN ABSENCE — not a code problem.** **1b ran and PASSED: 20 of 20, exit 0, nothing under `evals/`.** ⚠️ **But `--dry-run` never builds the pacer** (`INC-134`/`Q-179`), so the rehearsal cannot de-risk the run. **ZERO TOKENS. The single-shot window is UNSPENT.** |
+| **2** — the calibration | **SKIPPED** | Gated on Gate 1. `evals/cal/RUN_DECLARED.md` still absent. |
+| **3** — the freeze blockers | **NOT REDONE** | Done by the other instance. Independently re-run: `check-roles` **21 passed, 0 failed, 3 n/a**; `check-prereg` **NOT-YET-FROZEN, exit 0, recomputing nothing**; `selftest` 1 failed (deliberate); full suite **6 failed, 1420 passed, 2 skipped**. |
+| **4** — the secret scan | **NOT REDONE** | Done by the other instance and committed to `docs/submission/`. **The repository was NOT flipped public.** |
+
+**REVIEW HISTORY — APPENDED, NEVER OVERWRITTEN.** ⚠️ **THREE FINDINGS AGAINST ITSELF:** `INC-138`
+(the landed work had **deleted** the only test of hard rule 9 on the shipped path; **restored and
+proved on a mutant**; found by an adversarial audit this instance commissioned against itself, **not**
+by its own verification, which passed) · `INC-137` (`OF-215` fired on the commit that cited it — 137
+lines measured, **557** committed) · `INC-139` (its own one-commit-old guardrail was applied to the
+**base tree** and **reverted the other instance's entire FINAL OUTPUT, 763 lines**; restored
+byte-for-byte at `fa73b76`). ⚠️ **`INCIDENTS.md` carries two `## INC-139` headings.** Renumbering is
+the architect's. **NOT SELF-CERTIFIED. NO TAG. `prereg-v1` NOT CUT.**

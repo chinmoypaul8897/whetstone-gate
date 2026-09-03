@@ -1,3 +1,75 @@
+## SESSION-TOKEN 5d7e2b91 — ARCH, NIGHT 1 — **SECOND INSTANCE** — 2026-09-04
+
+**Role:** FIX. **Chunk:** ARCH. **Everything below ships UNREVIEWED. Not self-certified. No tag.**
+⚠️ **FULL RECORD: `docs/sessions/arch-night-1b.txt`** — a **distinct filename**, because the entry
+directly below this one is the *other* holder of this token and both prompts name `arch-night-1.txt`.
+
+⚠️⚠️ **TWO LIVE SESSIONS RAN THIS PROMPT UNDER THIS TOKEN IN THIS TREE.** Each found the other
+independently. `INC-136` and `Q-180` are this instance's; `INC-139`(theirs) and `Q-187` are the
+other's. **This entry describes only what THIS instance did.**
+
+**TOKEN SPEND: ZERO. NO PROVIDER CALL OF ANY KIND, ON ANY LANE.** `evals/` unchanged except by
+nothing: `git status --porcelain evals/ tests/goldens/ config/` EMPTY throughout. The pilot's UTC
+start time in `evals/pilot/RUN_DECLARED.md` §8 is **BLANK for the fourth time** and the single-shot
+window is **UNSPENT**.
+
+**COMMITS, IN ORDER:** `f45721d` (Gate 0 — landed the dead session's work) · `0e3a69f` (Gate 0d,
+Gate 1, `INC-134`/`135`/`136`, `Q-179`/`180`) · `1d3f2fa` (`INC-137` + the `Q-180` correction) ·
+`fd67082` (`INC-138` + the restored assertion) · `fa73b76` (**restoration of damage this commit's
+predecessor did**) · `913129a` (`INC-139`).
+
+**GATE 0 — LANDED AND PUSHED.** Session `8c47b1e0`'s `Q-171`/`Q-173` work, six files, 586
+insertions, verified four ways before being trusted, then measured on **two trees**: HEAD exported
+with `git archive` to a fresh OS temp dir with `PYTHONPATH` pinned to it → **22 failed, 113 passed**;
+this tree → **1 failed, 136 passed, 2 skipped**. The one survivor is `INC-127`'s benign purity walk,
+**pre-existing at HEAD, confirmed two ways** (the record, and execution against a tree holding none
+of this work). `INC-135` is the session-death entry.
+
+**GATE 1 — SKIPPED AT 1a, AND THE REASON IS NOT A CODE PROBLEM.** `preflight` refused verbatim:
+*"the environment does not carry ['GOOGLE_API_KEY', 'GROQ_API_KEY']"*. ⚠️ **Both names ARE set at
+Windows User scope** (`HKCU:\Environment` value NAMES only — no value read, printed or echoed) and
+**neither is in this process's environment block**. **A STALE ENVIRONMENT, NOT AN ABSENCE.**
+**1b ran anyway and PASSED** — the full 20-episode `--dry-run` to a fresh OS temp dir: **20 of 20,
+exit 0, denominator reconciling 20 == 20 + 0 + 0, nothing written under the repository's `evals/`.**
+
+⚠️⚠️ **AND THAT REHEARSAL PROVES LESS THAN IT LOOKS — `INC-134` / `Q-179`, THIS INSTANCE'S OWN
+FINDING.** `driver/run.py:592-602` builds `_PacedClient` **only** when `spend_real_tokens` is true,
+so **`--dry-run` never constructs the pacer at all**. `_pace` reads a monotonic clock either side of
+a sleep and hands the second reading to `Bucket.take`, which refuses on an exact `> 0.0`; the
+resulting `BucketError` is neither `RateLimited` nor `ProviderFailed`, so it escapes `execute`
+**uncaught** — no report, no denominator. Measured on the real clock at the real buckets:
+**139 consecutive real-clock paced calls, ZERO `BucketError`** (11.25 s each; stopped by a 1,500 s
+cap, not a failure). **139 of 400 is 35% and is NOT a clearance.**
+
+**GATE 2 — SKIPPED**, gated on Gate 1. `evals/cal/RUN_DECLARED.md` still does not exist.
+
+**GATES 3 AND 4 — DONE BY THE OTHER INSTANCE AND DELIBERATELY NOT REDONE HERE.** Independently
+re-run for the record: `make check-roles` **21 passed, 0 failed, 3 n/a**; `make check-prereg`
+**`NOT-YET-FROZEN — the prereg-v1 tag does not resolve`, exit 0, recomputing nothing** (`Q-181`);
+`make selftest` 1 failed — the deliberate camel-branch red; full suite **6 failed, 1420 passed,
+2 skipped**.
+
+⚠️⚠️ **THREE FINDINGS THIS INSTANCE MADE AGAINST ITSELF, WHICH ARE THE PART WORTH READING.**
+1. **`INC-138`** — the work it landed had **DELETED** the only assertion in the suite that the URL
+   built inside the declared command's real `driver_run.execute` path carries `config/lanes.yaml`'s
+   own `api_model_id` rather than a literal. Measured: {tests calling `execute`} ∩ {tests asserting
+   `api_model_id`} was **EMPTY**. Its own commit message said *"NOTHING WAS DELETED"*. **Restored,
+   and proved on a planted-literal mutant in a throwaway repo.** ⚠️ **It was found by an adversarial
+   audit this instance commissioned against itself, not by its own verification, which passed.**
+2. **`INC-137`** — `OF-215` fired on the commit whose own message cited it: a `numstat` read said 137
+   lines and the commit landed **557**, carrying 420 lines of the other instance's unfinished draft.
+3. **`INC-139`** — the guardrail invented in (2) was applied to the **base tree** as well as the
+   content (`read-tree <pinned sha>` for `read-tree HEAD`), and **silently reverted the other
+   instance's entire FINAL OUTPUT, 763 lines**. The `--stat` printed `764 deletions` under a message
+   saying *"Swept: NOTHING, by construction"*. **Restored byte-for-byte at `fa73b76`**, verified two
+   ways. ⚠️ **Sixth incident in this family and the first to damage a COMPLETED, COMMITTED artefact.**
+
+⚠️ **KNOWN DEFECT LEFT IN THE RECORD:** `INCIDENTS.md` carries **two `## INC-139` headings** — the
+other instance's stale-manifest entry and this one's. Neither is edited; the renumbering is the
+architect's. `Q-169` also carries two independent measurement updates, and a third figure this one
+found: the parser counts `OF-157` OPEN although its status cell opens `CLOSED`, so the raw OPEN count
+is **one too high (194, not 195)** — and this instance's own auditor reported that population as
+**24 rows** where the true count is **6**, corrected here rather than published.
 ## SESSION-TOKEN 5d7e2b91 — ARCH, NIGHT 1 — 2026-09-04
 
 **Role:** FIX. **Chunk:** ARCH. **Review owed:** everything below ships **UNREVIEWED**.

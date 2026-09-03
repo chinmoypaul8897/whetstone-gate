@@ -14327,3 +14327,54 @@ proposed check is precisely the one that does not exist**, and E1's green line a
 **See also `INCIDENTS.md` `INC-137`**, which records that `0e3a69f` — the commit carrying the claim
 corrected here — also swept 420 lines of the other session's unfinished draft, including the
 `Q-180`-numbered form of what is now `Q-187`.
+
+---
+
+## ⚠️ MEASUREMENT UPDATE — `Q-169`, A SECOND HAND ON THE COUNT, BY ARCH NIGHT 1 (`5d7e2b91`), 2026-09-04
+
+⚠️ **THE OTHER HOLDER OF THIS TOKEN RE-MEASURED `Q-169` INDEPENDENTLY AND ITS UPDATE IS ABOVE.**
+This one was taken **before** that one was visible and is kept as a **second hand on the same
+question**, which is `PROTOCOL.md`'s own standard for a number that matters. ⚠️ **Where the two
+disagree, that is the finding, and neither should be quietly dropped.** `INC-136`, `Q-180`, `Q-187`.
+
+**THE COUNT, MEASURED AT `913129a`, WITH THE COMMAND:**
+
+    rows matching '^| **OF-'                  : 265
+    rows whose status cell contains 'OPEN'     : 195
+      ... and ALSO contains 'CLOSED'           : 6
+      ... 'OPEN' only                          : 189
+
+⚠️ **AND THE INSTRUMENT'S OWN RULE SAYS IT MEANS TO DO THAT.** `src/whetstone_gate/results/loader.py:316-332`
+counts a row open when its status cell contains ``OPEN``, and its docstring declares the direction:
+*"a partially-closed row that still says OPEN is counted as open."* **Five of the six are exactly
+that case and are counted correctly on purpose** — `OF-09` *"OPEN — PARTIALLY CLOSED"*, `OF-11`
+*"OPEN — HALF CLOSED"*, `OF-15`, `OF-19`, `OF-123` *"CLOSED for the instance … the CLASS is OPEN"*.
+
+⚠️⚠️ **THE SIXTH IS A GENUINE MIS-SCORE AND IT IS AN OFF-BY-ONE IN A PUBLISHED NUMBER.**
+
+    OF-157  status cell : ✅ **CLOSED — this row IS the correction. `OF-57` and `OF-61` remain
+                             OPEN as LIMITATIONS**, …
+    OF-157  Closed-by   : *(this append)*
+
+**`OF-157` IS CLOSED.** Its status opens with `CLOSED`, its `Closed by` cell is filled, and the word
+`OPEN` in it refers to **two other findings**. The substring test cannot tell a row's own status from
+a row's commentary about somebody else's, so **`OF-157` is counted OPEN and the true figure is 194,
+not 195.** ⚠️ **This is not the direction the docstring accepts:** the documented conservatism is
+*"partially closed still counts as open"*, which is deliberately pessimistic; **this is a fully
+closed row counted as open because of a cross-reference**, which nothing declared.
+
+⚠️ **A CORRECTION AGAINST THIS SESSION'S OWN INSTRUMENT, STATED BECAUSE IT IS THE HONEST HALF.**
+This measurement was commissioned as a twelve-agent read-only audit whose verifier reported **24**
+rows containing both words. ⚠️ **That number is WRONG and this session re-ran it rather than
+publishing it: the count is 6.** The verifier's larger figure and its own conclusion — *"every number
+in this dispute, on both sides, treats a spectrum of partial closure as a boolean"* — are a **true
+observation carried on a false count**, and both halves are reported here rather than only the one
+that survived. **The observation is right; the arithmetic was not checked before it was written
+down**, which is `INC-54`'s and `INC-60`'s standing lesson in this repository: *a number is not a
+measurement, and a prediction is not a result.*
+
+**WHAT THIS ADDS TO `Q-169`, IN ONE LINE:** the 193-versus-185 disagreement is about *which
+adjustments to apply*; **this is a third figure neither side computed** — the raw parser count itself
+is one too high, for a reason that is a defect in the parser rather than a judgement about a finding.
+⚠️ **It is NOT fixed here.** `src/whetstone_gate/results/loader.py` is outside this session's fence,
+and changing how open findings are counted moves a number `README.md` publishes, which is Class A.
