@@ -195,54 +195,38 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def _provider_client(matrix: pilot_module.PilotMatrix) -> MeteredProviderClient:
-    """⚠️ **CONSTRUCT THE REAL PROVIDER CLIENT — `Q-150`, RULED 2026-09-03, OPTION 1.**
+    """⚠️ **CONSTRUCT THE REAL PROVIDER CLIENT, FOR EVERY LANE THE MATRIX DISPATCHES ON.**
 
-    This function replaced ``_refuse_to_invent_a_provider_client``, which raised on every
-    ``--spend-real-tokens`` invocation and made `evals/pilot/RUN_DECLARED.md` §1's declared
-    command unrunnable. The ruling names the architect's own error — *"the C12 BUILD prompt
-    said 'ship no provider client, supply one at the call site' AND the declared command
-    goes through `tasks drive`, WHICH IS A CLI WITH NO INJECTION POINT"* — and takes option
-    1 because it is the only one that keeps §1's command **true as written**.
+    **`Q-150`, RULED 2026-09-03, option 1** put a real client here in place of
+    ``_refuse_to_invent_a_provider_client``, which raised on every ``--spend-real-tokens``
+    invocation and made `evals/pilot/RUN_DECLARED.md` §1's declared command unrunnable.
 
-    ⚠️⚠️ **AND IT STILL REFUSES ON THIS MATRIX, FOR A DIFFERENT AND UNRELATED REASON.**
-    :class:`whetstone_gate.driver.clients.MeteredModelClient` has exactly two methods,
-    ``complete_attacker`` and ``complete_judge``. They distinguish the **role**; nothing in
-    either signature distinguishes a **lane**. :func:`whetstone_gate.driver.run.execute`
-    takes **one** client for the whole matrix, and the pilot's matrix has **two attacker
-    cells on two different providers** — ``gemma-26b`` on Google and ``qwen-27b`` on Groq.
-    So a single client is asked to call two different models with no way to know which, and
-    **there is no signal anywhere on the call path that would tell it**: ``lane`` is a live
-    local in ``run.py``'s dispatch loop and in ``_MeteredCall``, and neither forwards it.
+    ⚠️⚠️ **AND `Q-161`, RULED 2026-09-03, option 1, REMOVED THE SECOND REFUSAL THAT STOOD
+    HERE.** Between the two rulings this function refused **by name** whenever a matrix
+    dispatched on more than one attacker lane, because
+    :class:`whetstone_gate.driver.clients.MeteredModelClient`'s two methods distinguished the
+    **role** and carried nothing that distinguished a **lane** — so one client could not know
+    which of `gemma-26b` (Google) and `qwen-27b` (Groq) a given ``complete_attacker`` call was
+    for, and `driver/pilot.py` gives both cells the **same** seed block, so the messages are
+    byte-identical and could not be told apart either.
 
-    ⚠️ **BOTH CELLS ALSO RUN THE SAME SEED BLOCK**, so turn 1 of ``gemma-26b``/seed *N* and
-    turn 1 of ``qwen-27b``/seed *N* are **byte-identical**: the payload cannot distinguish
-    the lanes even in principle. Inferring the lane from dispatch order, or reaching up the
-    call stack for it, would be a guess about another module's internals — `INCIDENTS.md`
-    **INC-51**'s exact species, which walked past `check_roles` D1, D2 **and** D3.
+    **The refusal is gone because its cause is.** ``lane`` is now a required, undefaulted
+    argument on both protocol methods, threaded from ``episode._MeteredCall``'s authoritative
+    per-role value and cross-checked against the pacing buckets in ``run.py``. ⚠️ **The
+    rejected alternatives stay rejected and are recorded in `Q-161`:** inferring the lane from
+    dispatch order, or reaching up the call stack for it — the latter verified to work and
+    **not built**, because it is `INCIDENTS.md` **INC-51**'s exact species, which walked past
+    `check_roles` D1, D2 **and** D3.
 
-    **So this refuses, by name, and states the one-line fix** (`QUESTIONS.md` **Q-161**,
-    Class A). A single-attacker-lane matrix constructs and runs normally, which is the
-    path this code takes when the fix lands or when a matrix has one cell.
+    ⚠️ **THE OPTION NOT TAKEN, NAMED SO THE CHOICE IS ON THE RECORD.** `Q-161`'s option 2 was
+    to declare the pilot as **two executions**, one per cell, which the client already
+    supported. It was rejected because `RUN_DECLARED.md` §1 names **the exact command**, and a
+    pre-registration whose declared command is not the command that ran is a pre-registration
+    written afterwards.
     """
     attacker_lanes = sorted({matrix.lane_for(key) for key in matrix.keys()})
-    if len(attacker_lanes) != 1:
-        raise driver_run.RunRefused(
-            f"this matrix dispatches attacker episodes on {len(attacker_lanes)} lanes "
-            f"({attacker_lanes}) and driver.run.execute takes ONE client for all of them. "
-            f"MeteredModelClient's two methods distinguish the ROLE (attacker vs judge) and "
-            f"carry NO lane, NO model id and NO episode key, so a single client cannot know "
-            f"which provider a given complete_attacker call is for - and both cells run the "
-            f"SAME seeds, so the messages are byte-identical and cannot be told apart "
-            f"either. This REFUSES rather than guessing from dispatch order or reading the "
-            f"caller's frame, which would be INCIDENTS.md INC-51's exact species. "
-            f"THE FIX IS ONE FIELD AND ONE ARGUMENT, and it is OUTSIDE this session's "
-            f"fence: _PacedClient already holds the lane (its attacker_buckets.lane) and "
-            f"_MeteredCall already holds it too, so threading `lane` into "
-            f"MeteredModelClient's two methods closes it. QUESTIONS.md Q-161, Class A. "
-            f"NOTHING WAS SPENT and no episode was attempted"
-        )
-    return MeteredProviderClient.for_lanes(
-        attacker_lane=attacker_lanes[0], judge_lane=matrix.judge_lane
+    return MeteredProviderClient.for_lane_names(
+        attacker_lanes=attacker_lanes, judge_lane=matrix.judge_lane
     )
 
 

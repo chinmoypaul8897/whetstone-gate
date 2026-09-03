@@ -123,6 +123,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `2e94c7b5` | C12 | BUILD | 2026-09-03 |
 | `6ba2c1f7` | ARCH | FIX | 2026-09-03 |
 | `9f31d708` | C19 | BUILD | 2026-09-03 |
+| `d4e7b920` | ARCH | FIX | 2026-09-04 |
 
 ⚠️ **THE `365deaf7` ROW IS SELF-RECORDED, IT IS THE FIFTH, AND IT IS NOT A BATCH.** *(This heading
 said "THE ROW ABOVE" until `8e0f4a13` was appended beneath it on 2026-08-31; the token is now named
@@ -13232,3 +13233,217 @@ SESSION.** The refusal is in **preflight**, before any dispatch, which is the co
 with the two key values, in the terminal the run executes in. `PROCESS.md` §8: *"Long runs
 execute in the operator's terminal."* ⚠️ **No session may create that file**, and this one did
 not attempt to.
+---
+
+## ⚠️ RULING RECORDED VERBATIM — `Q-161`, RULED 2026-09-03, **OPTION 1** (ARCH FIX — PILOT RUN 3, `d4e7b920`)
+
+**Hard rule 5: recorded here, verbatim, BEFORE a line of code was touched.** Copied from this
+session's prompt exactly as issued, including its emphasis:
+
+> "Q-161 is RULED: OPTION 1. `lane` is threaded through `MeteredModelClient`'s two methods, so the
+> client knows which provider each call is for. OPTION 2 — two executions, one per cell — works with
+> the client as built but CHANGES THE EXACT COMMAND, and `RUN_DECLARED.md` S1's 'THE EXACT COMMAND'
+> is the clause the whole pre-registration rests on; a declared command that is not the command that
+> ran is a pre-registration written afterwards.
+> ARCH FIX PILOT RUN 2 LOCATED THE FIX AND IT IS SMALL: `_PacedClient` already holds the lane in its
+> `attacker_buckets.lane` and `_MeteredCall` already holds it too, so the value is in hand at both
+> call sites and nothing needs to be inferred. ⚠️ AND ITS OWN REFUSAL TEXT NAMES WHY IT REFUSED
+> RATHER THAN GUESSING: deriving the lane from dispatch order or from the caller's frame would be
+> INC-51's exact species — a dynamic reach that works until it silently does not."
+
+**`Q-161` IS CLOSED. IT WAS IMPLEMENTED AS RULED AND IT IS TESTED.** `lane` is a **required,
+undefaulted, keyword-only** argument on both protocol methods, threaded from
+`episode._MeteredCall.lane` — the authoritative per-role value — through `_AttackerClient`,
+`_JudgeClient` and `_PacedClient` into `MeteredProviderClient`, which resolves it against a map
+built from `config/lanes.yaml` and **refuses an unknown lane by name rather than falling back**.
+`driver/__main__.py`'s two-attacker-lane refusal is **gone**, and the declared command now builds and
+routes its first request. ⚠️ **Nine tests, every one of them proved to FAIL on `52c9077`'s code**
+(measured in a fresh OS temp directory with `PYTHONPATH` pinned to `HEAD`'s tree, because an editable
+install otherwise silently tests the working tree).
+
+⚠️ **AND THE PILOT STILL DID NOT RUN.** Two further blockers were **measured**, both before any
+dispatch, and each is independently sufficient: `Q-165` (no credentials — unchanged, operator-only)
+and the **new** `Q-171` below. **Zero tokens were spent on any lane.** `PROCESS.md` §6b's abort
+machinery is for *an execution that began and did not finish*; **nothing began, so there is no abort
+and none was invented** — the same reasoning `7c05e3b9` and `6ba2c1f7` gave before this session.
+
+⚠️ **THE UTC START TIME IN `evals/pilot/RUN_DECLARED.md` §8 IS BLANK FOR THE THIRD TIME, AND THAT IS
+STILL THE RIGHT ANSWER.** §8: *"A declaration carrying a start time earlier than the run is a
+pre-registration that was written afterwards."* This session's prompt made the order explicit —
+*"Fill the UTC start time … with the time you are ABOUT TO start"* — and gated it on Gate 2, which
+**failed**. Writing a time for a run that provably cannot begin is the exact falsehood §8 forbids,
+and `RESULTS.md` prints declared-versus-actual side by side.
+
+---
+
+## ⚠️⚠️ RAISED BY ARCH FIX — PILOT RUN 3 (`d4e7b920`), 2026-09-04 — `Q-171`…`Q-174`
+
+⚠️ **THE Q- AND INC- NUMBERS BELOW WERE COUNTED AT A NAMED MOMENT AND A CONCURRENT SESSION MAY
+COLLIDE.** Measured at `52c9077` with the working tree also holding **`9f31d708`**'s (C19) uncommitted
+edits to `benign/blindness.py`, `benign/executor.py` and `check_roles.py`: the highest allocated ids
+were **`Q-170`** and **`INC-128`**. `INC-125` records this exact collision reaching `HEAD` one session
+ago. If these collide, the renumbering is the architect's and nothing here depends on the number.
+
+---
+
+### Q-171 — ⚠️⚠️ **CLASS A: THE `tool` ROLE HAS NO MAPPING ON *EITHER* PROVIDER, SO NO EPISODE CAN REACH TURN 2. THIS IS NOW THE FIRST THING THE DECLARED COMMAND HITS.**
+
+**Status:** OPEN. **Class A** — it decides what text is sent to a model, and it decides whether the
+single-shot pilot can complete one episode. **Raised by:** ARCH FIX — PILOT RUN 3 (`d4e7b920`),
+2026-09-04. ⚠️ **Found by a test this session wrote, not by reading**, and it was invisible until the
+lane threading let a run get far enough to build a second request.
+
+**THE MEASUREMENT**, taken out of tree against a fake transport with the real `_http_post` replaced by
+one that raises, driving `evals/pilot/RUN_DECLARED.md` §1's own matrix through `driver_run.execute`:
+
+    EXECUTE RAISED: whetstone_gate.driver.clients.DriverClientError
+    MESSAGE: role 'tool' has no Google equivalent. The legal values are
+             ['assistant', 'system', 'user']. This is a refusal rather than a coercion ...
+    requests built: 1
+      google: 1   groq: 0   other: 0
+      first google url: https://generativelanguage.googleapis.com/v1beta/models/gemma-4-26b-a4b-it:generateContent
+
+⚠️ **ONE REQUEST. THE RUN DIED ON THE SECOND CALL OF THE FIRST EPISODE.**
+
+**THE CAUSE, READ FROM THE SOURCE.** `attacker/context.py:505` builds every tool result as
+`ContextPart(Origin.WORLD, "tool", turn.tool_result_text, …)`, so **every turn after the first**
+carries a message whose role is `"tool"`. And `driver/clients.py:386-387`:
+
+    _GOOGLE_ROLE = {"system": "user", "user": "user", "assistant": "model"}
+    _GROQ_ROLE   = {"system": "system", "user": "user", "assistant": "assistant"}
+
+⚠️ **NEITHER HAS A `"tool"` KEY.** Both refuse — measured on the Groq side directly, because the run
+never reached it: `role 'tool' has no Groq equivalent`. **So this is not a Google problem and it is
+not a lane problem. Every episode on every lane stops at turn 2.**
+
+⚠️ **THE REFUSAL ITSELF IS CORRECT AND SHOULD NOT BE WEAKENED.** Its own message says why: *"silently
+rewriting a role sends a different prompt on one lane than on another, and CONTEXT.md S10.1 forbids
+differential information across arms."* The defect is the **missing mapping**, not the refusal.
+
+**WHY THIS SESSION DID NOT FIX IT.** The fence reads *"clients.py, run.py, __main__.py — the **LANE
+THREADING ONLY**"*. Adding a role mapping is not lane threading, and it is a **Class A** choice about
+what a model sees, with no obviously-right answer:
+
+1. **Fold a `tool` part into a `user` turn on both providers.** Google's `contents[].role` has
+   **exactly two** legal values and `tool` is not one, so there is no faithful mapping; folding is
+   what the client already does for `system`. ⚠️ Groq's OpenAI-compatible schema *does* have a `tool`
+   role — but it **requires a `tool_call_id`** that this driver never mints, so the faithful-looking
+   option is the one that 400s.
+2. **Fold on Google, and emit a real `tool` role on Groq.** ⚠️ **REJECTED HERE AND NAMED SO THE
+   REJECTION IS ON THE RECORD:** it sends *differentially shaped* context to the two attacker cells,
+   which is `CONTEXT.md` §10.1's own prohibition, and the two cells' numbers would no longer be
+   comparable.
+3. **Something else the architect names.**
+
+⚠️ **THIS IS `Q-150` → `Q-161`'s SHAPE ONE LAYER FURTHER IN, AND THE PATTERN IS NOW WORTH NAMING.**
+`Q-150`: *the client is owed to somebody and owned by nobody.* `Q-161`: *the client exists and cannot
+be told which model to call.* `Q-171`: *the client can be told, and cannot encode a tool result.*
+**All three were invisible until something was actually run, all three were found before a token was
+spent, and each was uncovered only by fixing the one before it.** That is the preflight-and-refusal
+design working — and it is also three consecutive sessions in which *"one small fix, then the pilot"*
+was not one small fix.
+
+---
+
+### Q-172 — ⚠️ **THE FENCE NAMED THREE FILES AND THE RULING NEEDED FOUR. `driver/episode.py` WAS TOUCHED, AND HERE IS EXACTLY WHAT WAS DONE TO IT.**
+
+**Status:** OPEN, **disclosed rather than asked for permission after the fact**. **Class B** (scope,
+not meaning) — the precedent is `Q-166`, which classed a card-versus-fence disagreement the same way.
+**Raised by:** ARCH FIX — PILOT RUN 3 (`d4e7b920`), 2026-09-04.
+
+**The fence:** *"ONLY `src/whetstone_gate/driver/` (`clients.py`, `run.py`, `__main__.py` — the LANE
+THREADING ONLY)"*. **`driver/episode.py` is not in the parenthetical. It is also not in the `NOT`
+list**, and it *is* inside the directory the `ONLY` clause names.
+
+⚠️ **THE RULING CANNOT BE OBEYED WITHOUT IT, AND THE RULING'S OWN TEXT SAYS SO.** *"pass it at every
+call site"*, and *"`_MeteredCall` already holds it too, so the value is in hand at **both** call
+sites."* `_MeteredCall`, `_AttackerClient` and `_JudgeClient` all live in `episode.py`; they are the
+only callers of the two protocol methods on the driver's path. `Q-161`'s own table listed
+`driver/episode.py` as one of the four files. **A required argument with no default that nobody
+passes is a `TypeError` on the first turn.**
+
+**EXACTLY WHAT CHANGED THERE — two expressions, one per adapter, and nothing else:**
+
+    _AttackerClient.complete : ... complete_attacker(messages=…, temperature=…, lane=self.metered.lane)
+    _JudgeClient.complete    : ... complete_judge(system=…, user=…, lane=self.metered.lane)
+
+plus the docstring/comment that says why the lane is read off the **role's** meter rather than the
+episode's lane (`INC-111`: §13.3.2 puts two roles on one lane, so they diverge).
+⚠️ **No other line of `episode.py` was touched**, and `attacker/loop.py` — which `Q-161` also listed,
+and which this session's fence puts under `NOT` — **needed no change at all**: C6's `ModelClient`
+protocol is `complete(*, messages, temperature) -> str` and knows nothing about lanes. That is a
+measurement, not a claim: the threading stops at the adapter by design.
+
+**The question for the architect:** ratify the four-file scope, or say which of the two expressions
+above should be undone and how the ruling is then to be satisfied.
+
+---
+
+### Q-173 — ⚠️⚠️ **THE RULING BREAKS `benign/`, WHICH IS FENCED OUT — AND THIS IS `INC-127`'s FINDING HAPPENING AGAIN, NOW ON *SOURCE* RATHER THAN A TEST.**
+
+**Status:** OPEN. ⚠️ **BLOCKING for `benign/`**, not for the driver. **Class A** in effect (it changes
+whether a package runs at all). **Raised by:** ARCH FIX — PILOT RUN 3 (`d4e7b920`), 2026-09-04.
+
+`MeteredModelClient` has **two** consumers, not one. `benign/shell.py:91` and `benign/solve.py:61`
+both import it, and each wraps it in an adapter that calls the protocol **without a lane**:
+
+    benign/solve.py:153   reply = self.inner.complete_attacker(messages=messages, temperature=temperature)
+    benign/shell.py:264   reply = self.inner.complete_judge(system=system, user=user)
+
+**MEASURED, by constructing each adapter around a `TranscriptClient` and calling it:**
+
+    MeteredSolverClient : BROKEN -> TranscriptClient.complete_attacker() missing 1 required
+                                    keyword-only argument: 'lane'
+    _JudgeAdapter       : BROKEN -> TranscriptClient.complete_judge() missing 1 required
+                                    keyword-only argument: 'lane'
+
+⚠️ **THE FENCE FORBIDS FIXING IT.** *"NOT: … `benign/` … any other test file"*, and `CLAUDE.md` §4:
+*"If anything seems to require touching … files outside your task's scope: STOP and report instead of
+working around it."* **Nothing in `benign/` or `tests/test_c12_benign.py` was touched.** A concurrent
+session (`9f31d708`) additionally holds `benign/blindness.py` and `benign/executor.py` uncommitted in
+this working tree, so touching that package would also have swept its work.
+
+⚠️ **THE ACCOMMODATION WAS AVAILABLE AND WAS DELIBERATELY NOT TAKEN, AND THIS IS THE PART THE
+ARCHITECT SHOULD WEIGH.** Giving `TranscriptClient` a **defaulted** lane would have kept `benign/`
+green, because the only clients it ever holds are transcripts and test fakes, and a transcript routes
+nothing. **It was rejected for two reasons:** the ruling says *"IT IS A REQUIRED ARGUMENT WITH NO
+DEFAULT"* and that is an ⚠️ instruction, not a rationale a session may re-derive; and
+`TranscriptClient`'s own docstring says it exists so that *"the accounting path under test is
+**exactly** the one a provider would drive"* — a dry run whose client tolerated a missing lane would
+prove the wiring on a shape the scored run does not use. **A loud break is detectable. A silent
+accommodation is not.**
+
+**THE REMEDY, for whoever owns `benign/`** — two expressions, the same shape as `Q-172`'s: the benign
+runner knows its own lane, so `MeteredSolverClient` and `_JudgeAdapter` each take a `lane` and forward
+it. **Three or four call sites in `tests/test_c12_benign.py` then take the keyword.**
+
+⚠️ **AND THE GENERALISABLE FINDING IS `INC-127`'s, NOW FOR THE SECOND TIME IN TWO SESSIONS:** *"a
+fence that permits a change whose **necessary** consequence lands outside it is a fence that cannot be
+honoured."* `INC-127` was a purity **assertion** going red. This is **production source** raising
+`TypeError`. **The class did not just recur; it got worse**, and the reason is the same both times:
+`benign/` imports a type from `driver/`, and nothing in either fence knows that.
+
+---
+
+### Q-174 — ⚠️ **A MID-EPISODE `DriverClientError` ESCAPES `run.execute` UNCAUGHT, SO HARD RULE 11's DENOMINATOR IS LOST ALONG WITH THE RUN.**
+
+**Status:** OPEN. **Class B**, disclosed. **Raised by:** ARCH FIX — PILOT RUN 3 (`d4e7b920`),
+2026-09-04, as a **separable** second finding of `Q-171`'s measurement.
+
+`episode._MeteredCall.run` converts exactly two client failures into a counted outcome: `RateLimited`
+→ `LaneStopped(RATE_LIMIT_429)`, and `ProviderFailed` → `LaneStopped(PROVIDER_ERROR)`.
+⚠️ **`DriverClientError` is neither.** It is what the client raises for a shape it cannot honestly
+encode — an unmappable role, a lane it was not built for, a reply with no usage block — and it
+propagates straight out of `execute`.
+
+**Measured:** the run ended with a traceback, **no report, no denominator, and no
+`LIMITATIONS, PUBLISHED` block** — after one request had been built and the first episode had already
+spent a call. Hard rule 11 is *"every dropped episode is counted, categorised and printed as a
+number"*; here **twenty** episodes are dropped and none is printed.
+
+⚠️ **THIS IS NOT A REQUEST TO SWALLOW IT.** A client that cannot encode the request should stop the
+run — `Q-171` is the right fix and it is upstream of this. The question is narrower: **should a
+`DriverClientError` reaching the dispatch loop be booked as a counted, categorised outcome before the
+run ends**, so that a single-shot run which dies at episode 1 still publishes what it attempted? It is
+raised rather than fixed because choosing a cause category (`PROVIDER_ERROR`? a new one?) moves a
+**published number**, which is Class A.

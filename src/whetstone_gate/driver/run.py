@@ -407,14 +407,53 @@ class _PacedClient:
     sleep: Callable[[float], None]
 
     def complete_attacker(
-        self, *, messages: tuple[dict[str, str], ...], temperature: float
+        self, *, messages: tuple[dict[str, str], ...], temperature: float, lane: str
     ) -> ModelReply:
+        self._agree(lane, self.attacker_buckets, role="attacker")
         self._pace(self.attacker_buckets, self.attacker_reservation)
-        return self.inner.complete_attacker(messages=messages, temperature=temperature)
+        return self.inner.complete_attacker(
+            messages=messages, temperature=temperature, lane=lane
+        )
 
-    def complete_judge(self, *, system: str, user: str) -> ModelReply:
+    def complete_judge(self, *, system: str, user: str, lane: str) -> ModelReply:
+        self._agree(lane, self.judge_buckets, role="judge")
         self._pace(self.judge_buckets, self.judge_reservation)
-        return self.inner.complete_judge(system=system, user=user)
+        return self.inner.complete_judge(system=system, user=user, lane=lane)
+
+    @staticmethod
+    def _agree(lane: str, buckets: Any, *, role: str) -> None:
+        """⚠️⚠️ **Q-161: THE TWO INDEPENDENT COPIES OF THE LANE MUST AGREE, AND THIS IS THE
+        ONLY PLACE IN THE RUN WHERE BOTH ARE IN SCOPE AT ONCE.**
+
+        The threaded ``lane`` comes down the call chain from
+        :class:`whetstone_gate.driver.episode._MeteredCall`, which was built with
+        ``lane=request.matrix.lane_for(key)``. ``buckets.lane`` came the other way, from
+        ``lane_states[lane]`` in this module's dispatch loop. **Both derive from the same
+        source and neither reads the other**, so a disagreement means the pacing this call
+        was charged for belongs to a different lane than the call itself — which is
+        `INCIDENTS.md` **INC-112**'s shape, where a 429 stopped ten episodes of an arm that
+        makes no call on the lane that raised it.
+
+        ⚠️ **THIS IS NOT DEFENSIVE PADDING; IT IS THE ONE CHECK THE THREADING EARNS.** Before
+        the ruling the client had no lane and there was nothing to disagree with. Now there
+        are two paths carrying it, so agreement is checkable — and a check that could only
+        ever pass would not be worth the line.
+        """
+        # ⚠️ READ STATICALLY. The first draft of this line used `getattr(buckets, "lane",
+        # None)` and the RAW_SOURCE_SCAN tripwire refused it by name: a dynamic reach is
+        # INC-51's species and is invisible to an AST walk. `runner/buckets.py`'s LaneBuckets
+        # declares `lane` as a field, so there is nothing to be defensive about.
+        held = buckets.lane
+        if held != lane:
+            raise DriverError(
+                f"a {role} call arrived threaded with lane {lane!r} while its pacing buckets "
+                f"are lane {held!r}. These are two independent copies of one value — the "
+                f"threaded one from episode._MeteredCall, the bucket one from this module's "
+                f"lane_states — and a disagreement means this call is paced against one "
+                f"lane's limits and dispatched to another provider. It stops here rather "
+                f"than spending: a misroute is invisible until the per-lane token figures "
+                f"are read (QUESTIONS.md Q-161)"
+            )
 
     def _pace(self, buckets: Any, tokens: int) -> None:
         wait = buckets.wait_seconds(tokens=tokens, now=self.clock())

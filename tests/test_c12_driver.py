@@ -1449,6 +1449,7 @@ def test_a_good_GOOGLE_reply_returns_the_text_and_the_PROVIDERS_OWN_total(
     reply = _client(fake).complete_attacker(
         messages=({"role": "system", "content": "s"}, {"role": "assistant", "content": "a"}),
         temperature=0.7,
+        lane="gemma-26b",
     )
     assert reply.text == "the reply"
     assert reply.usage["total_tokens"] == 1234
@@ -1463,7 +1464,8 @@ def test_a_good_GROQ_reply_returns_the_text_and_the_PROVIDERS_OWN_total(
     """Same rule on the other provider: parts 900 + 50 = 950, reported total **987**."""
     fake = _FakeTransport(status=200, body=_groq_ok())
     reply = _client(fake, attacker="qwen-27b").complete_attacker(
-        messages=({"role": "system", "content": "s"},), temperature=0.7
+        messages=({"role": "system", "content": "s"},), temperature=0.7,
+        lane="qwen-27b",
     )
     assert reply.text == "the reply"
     assert usage_total_tokens(reply.usage) == 987
@@ -1486,7 +1488,8 @@ def test_a_reply_with_NO_USAGE_BLOCK_is_a_REFUSAL_and_never_a_zero(
     fake = _FakeTransport(status=200, body=body)
     with pytest.raises(driver_clients.ProviderFailed, match="REFUSAL, NOT A ZERO"):
         _client(fake, attacker=lane).complete_attacker(
-            messages=({"role": "system", "content": "s"},), temperature=0.7
+            messages=({"role": "system", "content": "s"},), temperature=0.7,
+            lane=lane,
         )
     assert fake.calls == 1, "a refusal must not have retried"
 
@@ -1498,7 +1501,8 @@ def test_a_429_RAISES_RateLimited_AND_IS_NEVER_RETRIED(_no_provider_call, _key_n
     fake = _FakeTransport(status=429, body=b'{"error":{"code":429}}')
     with pytest.raises(driver_clients.RateLimited, match="WINDOW IS ALREADY SPENT"):
         _client(fake).complete_attacker(
-            messages=({"role": "system", "content": "s"},), temperature=0.7
+            messages=({"role": "system", "content": "s"},), temperature=0.7,
+            lane="gemma-26b",
         )
     assert fake.calls == 1, "the client RETRIED a 429, which hard rule 12 forbids"
 
@@ -1511,7 +1515,8 @@ def test_a_MALFORMED_body_is_a_named_refusal_that_does_not_reproduce_the_body(
     fake = _FakeTransport(status=200, body=b"<html>not json at all</html>")
     with pytest.raises(driver_clients.ProviderFailed) as raised:
         _client(fake).complete_attacker(
-            messages=({"role": "system", "content": "s"},), temperature=0.7
+            messages=({"role": "system", "content": "s"},), temperature=0.7,
+            lane="gemma-26b",
         )
     assert "not json at all" not in str(raised.value)
     assert "NOT reproduced" in str(raised.value)
@@ -1526,7 +1531,8 @@ def test_a_NON_429_HTTP_ERROR_is_ProviderFailed_and_is_not_retried(
     fake = _FakeTransport(status=500, body=b'{"error":"boom"}')
     with pytest.raises(driver_clients.ProviderFailed, match="PROVIDER_ERROR"):
         _client(fake).complete_attacker(
-            messages=({"role": "system", "content": "s"},), temperature=0.7
+            messages=({"role": "system", "content": "s"},), temperature=0.7,
+            lane="gemma-26b",
         )
     assert fake.calls == 1
 
@@ -1540,7 +1546,8 @@ def test_the_KEY_VALUE_never_appears_in_the_request_URL_only_in_a_HEADER(
     traceback. Google's key goes in ``x-goog-api-key``; Groq's in ``Authorization``."""
     fake = _FakeTransport(status=200, body=_google_ok())
     _client(fake).complete_attacker(
-        messages=({"role": "system", "content": "s"},), temperature=0.7
+        messages=({"role": "system", "content": "s"},), temperature=0.7,
+        lane="gemma-26b",
     )
     url, _body, headers = fake.seen[0]
     assert "not-a-real-key-google" not in url
@@ -1549,7 +1556,8 @@ def test_the_KEY_VALUE_never_appears_in_the_request_URL_only_in_a_HEADER(
 
     groq = _FakeTransport(status=200, body=_groq_ok())
     _client(groq, attacker="qwen-27b").complete_attacker(
-        messages=({"role": "system", "content": "s"},), temperature=0.7
+        messages=({"role": "system", "content": "s"},), temperature=0.7,
+        lane="qwen-27b",
     )
     url, _body, headers = groq.seen[0]
     assert "not-a-real-key-groq" not in url
@@ -1565,7 +1573,8 @@ def test_the_URL_and_MODEL_ID_come_from_config_lanes_yaml_and_are_never_literals
     lanes = runner_lanes.load_lanes()
     fake = _FakeTransport(status=200, body=_google_ok())
     _client(fake).complete_attacker(
-        messages=({"role": "system", "content": "s"},), temperature=0.7
+        messages=({"role": "system", "content": "s"},), temperature=0.7,
+        lane="gemma-26b",
     )
     url = fake.seen[0][0]
     assert url.endswith(f"/{lanes['gemma-26b'].api_model_id}:generateContent")
@@ -1573,7 +1582,8 @@ def test_the_URL_and_MODEL_ID_come_from_config_lanes_yaml_and_are_never_literals
 
     groq = _FakeTransport(status=200, body=_groq_ok())
     _client(groq, attacker="qwen-27b").complete_attacker(
-        messages=({"role": "system", "content": "s"},), temperature=0.7
+        messages=({"role": "system", "content": "s"},), temperature=0.7,
+        lane="qwen-27b",
     )
     sent = json.loads(groq.seen[0][1].decode("utf-8"))
     assert sent["model"] == lanes["qwen-27b"].api_model_id
@@ -1588,7 +1598,8 @@ def test_an_ABSENT_KEY_NAME_is_a_refusal_that_names_the_NAME_and_no_value(
     fake = _FakeTransport(status=200, body=_google_ok())
     with pytest.raises(driver_clients.DriverClientError, match="GOOGLE_API_KEY"):
         _client(fake).complete_attacker(
-            messages=({"role": "system", "content": "s"},), temperature=0.7
+            messages=({"role": "system", "content": "s"},), temperature=0.7,
+            lane="gemma-26b",
         )
     assert fake.calls == 0, "the client called the provider without a credential"
 
@@ -1601,7 +1612,8 @@ def test_an_UNMAPPED_ROLE_is_a_refusal_and_never_a_silent_coercion(
     fake = _FakeTransport(status=200, body=_google_ok())
     with pytest.raises(driver_clients.DriverClientError, match="no Google equivalent"):
         _client(fake).complete_attacker(
-            messages=({"role": "tool", "content": "s"},), temperature=0.7
+            messages=({"role": "tool", "content": "s"},), temperature=0.7,
+            lane="gemma-26b",
         )
     assert fake.calls == 0
 
@@ -1621,6 +1633,7 @@ def test_GOOGLE_gets_only_user_and_model_roles_with_consecutive_parts_MERGED(
             {"role": "assistant", "content": "three"},
         ),
         temperature=0.7,
+        lane="gemma-26b",
     )
     sent = json.loads(fake.seen[0][1].decode("utf-8"))
     assert [c["role"] for c in sent["contents"]] == ["user", "model"]
@@ -1641,6 +1654,7 @@ def test_GROQ_keeps_the_system_role_and_never_emits_an_unsupported_field(
     _client(fake, attacker="qwen-27b").complete_attacker(
         messages=({"role": "system", "content": "s"}, {"role": "assistant", "content": "a"}),
         temperature=0.7,
+        lane="qwen-27b",
     )
     sent = json.loads(fake.seen[0][1].decode("utf-8"))
     assert [m["role"] for m in sent["messages"]] == ["system", "assistant"]
@@ -1659,7 +1673,7 @@ def test_the_JUDGE_method_calls_the_JUDGE_lane_and_sends_no_temperature(
     **zero** judge calls, so this cannot touch that run."""
     fake = _FakeTransport(status=200, body=_groq_ok())
     client = _client(fake, attacker="gemma-26b", judge="qwen-27b")
-    reply = client.complete_judge(system="you are a judge", user="allow or deny?")
+    reply = client.complete_judge(system="you are a judge", user="allow or deny?", lane="qwen-27b")
     assert reply.text == "the reply"
     sent = json.loads(fake.seen[0][1].decode("utf-8"))
     assert "temperature" not in sent
@@ -1668,13 +1682,16 @@ def test_the_JUDGE_method_calls_the_JUDGE_lane_and_sends_no_temperature(
 
 
 def test_the_two_methods_use_the_two_DIFFERENT_lanes(_no_provider_call, _key_names):
-    """The protocol's two methods are the ONLY signal this client gets, and they carry the
-    **role**. That is enough to separate attacker from judge — and it is exactly why it is
-    NOT enough to separate two attacker lanes. See `Q-161`."""
+    """The two methods carry the **role**, which separates attacker from judge. ⚠️ **That
+    sentence used to end** *"and it is exactly why it is NOT enough to separate two attacker
+    lanes"* — true when written, **false since `Q-161` was ruled**, because ``lane`` is now
+    a required argument on both. Corrected rather than left standing; the assertion below
+    is unchanged, and it still measures that the role alone routes the two methods apart."""
     attacker = _FakeTransport(status=200, body=_google_ok())
     client = _client(attacker, attacker="gemma-26b", judge="qwen-27b")
     client.complete_attacker(
-        messages=({"role": "system", "content": "s"},), temperature=0.7
+        messages=({"role": "system", "content": "s"},), temperature=0.7,
+        lane="gemma-26b",
     )
     assert attacker.seen[0][0].startswith(driver_clients._GOOGLE_BASE)
 
@@ -1703,7 +1720,8 @@ def test_a_reply_ECHOING_A_CREDENTIAL_is_REFUSED_not_masked(_no_provider_call, _
     ).encode("utf-8")
     with pytest.raises(SecretInPayload) as raised:
         _client(_FakeTransport(status=200, body=echoed)).complete_attacker(
-            messages=({"role": "system", "content": "s"},), temperature=0.7
+            messages=({"role": "system", "content": "s"},), temperature=0.7,
+            lane="gemma-26b",
         )
     assert "not-a-real-key-google" not in str(raised.value), (
         "the refusal reproduced the credential it was refusing"
@@ -1721,7 +1739,8 @@ def test_a_reply_ECHOING_A_CREDENTIAL_is_REFUSED_not_masked(_no_provider_call, _
         _client(
             _FakeTransport(status=200, body=shaped), attacker="qwen-27b"
         ).complete_attacker(
-            messages=({"role": "system", "content": "s"},), temperature=0.7
+            messages=({"role": "system", "content": "s"},), temperature=0.7,
+            lane="qwen-27b",
         )
 
     # (3) ⚠️ THE HONEST LIMIT, ASSERTED SO IT CANNOT BE MISREAD AS COVERAGE: a credential
@@ -1736,7 +1755,8 @@ def test_a_reply_ECHOING_A_CREDENTIAL_is_REFUSED_not_masked(_no_provider_call, _
         }
     ).encode("utf-8")
     reply = _client(_FakeTransport(status=200, body=embedded)).complete_attacker(
-        messages=({"role": "system", "content": "s"},), temperature=0.7
+        messages=({"role": "system", "content": "s"},), temperature=0.7,
+        lane="gemma-26b",
     )
     assert "not-a-real-key-google" in reply.text, (
         "redaction gained containment matching - GOOD, but this assertion now records "
@@ -1761,28 +1781,46 @@ def test_the_DEFAULT_transport_is_the_real_one_so_production_is_actually_wired(
 # --------------------------------------------------------------------------------------
 
 
-def test_a_TWO_ATTACKER_LANE_matrix_REFUSES_BY_NAME_and_spends_nothing():
-    """⚠️⚠️ **`Q-161`, CLASS A — AND IT IS WHY THE PILOT STILL CANNOT RUN.**
+def test_a_TWO_ATTACKER_LANE_matrix_now_CONSTRUCTS_a_client_that_serves_BOTH(_key_names):
+    """⚠️⚠️ **THE FLIP. `Q-161` RULED 2026-09-03, OPTION 1 — hard rule 6's sanctioned case.**
 
-    :func:`whetstone_gate.driver.run.execute` takes ONE client for the whole matrix, and
-    ``MeteredModelClient``'s two methods carry no lane. The pilot's matrix has two attacker
-    cells on two providers, so a single client cannot know which model a given
-    ``complete_attacker`` call is for — and both cells run the **same seeds**, so the
-    messages are byte-identical and cannot be told apart either.
+    ⚠️ **WHAT THIS TEST USED TO ASSERT, KEPT VERBATIM SO THE TRAIL IS READABLE:**
 
-    **This refuses rather than guessing**, and the refusal names the one-line fix.
+        *"`Q-161`, CLASS A — AND IT IS WHY THE PILOT STILL CANNOT RUN.*
+        *`driver.run.execute` takes ONE client for the whole matrix, and*
+        *`MeteredModelClient`'s two methods carry no lane. The pilot's matrix has two*
+        *attacker cells on two providers, so a single client cannot know which model a*
+        *given `complete_attacker` call is for — and both cells run the same seeds, so the*
+        *messages are byte-identical and cannot be told apart either. This refuses rather*
+        *than guessing, and the refusal names the one-line fix."*
+
+    Hard rule 6: *"No deleting, skipping, loosening, or approximating an assertion to get
+    green. If a ruling legitimately changes behaviour, the test flips citing the ruling —
+    and the flip must be **provably** meaningful (it fails on the old code)."* **It does:**
+    on `b1bab1c` this body raises ``RunRefused`` at the ``_provider_client`` line, and
+    `MeteredProviderClient` has no ``lanes`` attribute to assert against.
+
+    ⚠️ **THE FLIP IS NOT A LOOSENING.** The old test asserted a refusal; this asserts the
+    stronger property the refusal stood in for — that **both** of the pilot's attacker
+    lanes are resolved, from `config/lanes.yaml`, onto **two different providers**, before
+    any episode runs. `test_an_UNKNOWN_LANE_is_a_named_refusal_and_never_a_fallback` keeps
+    the refusing half alive on the case that is still a wiring bug.
     """
     matrix = pilot_module.load_pilot(arm="1")
     lanes = sorted({matrix.lane_for(key) for key in matrix.keys()})
     assert len(lanes) == 2, f"the pilot matrix stopped spanning two lanes: {lanes}"
-    with pytest.raises(driver_run.RunRefused) as raised:
-        driver_main._provider_client(matrix)
-    message = str(raised.value)
-    assert "2 lanes" in message
-    for lane in lanes:
-        assert lane in message
-    assert "Q-161" in message
-    assert "NOTHING WAS SPENT" in message
+
+    client = driver_main._provider_client(matrix)
+
+    assert isinstance(client, driver_clients.MeteredProviderClient)
+    # every attacker lane the matrix dispatches on, plus the judge lane, and nothing else
+    assert sorted(client.lanes) == sorted({*lanes, matrix.judge_lane})
+    # ⚠️ AND THEY ARE ON DIFFERENT PROVIDERS — the fact that made one lane-less client
+    # unroutable in the first place. If this ever became one provider the whole question
+    # would be moot, so it is asserted rather than assumed.
+    assert {client.lanes[name].provider for name in lanes} == {"google", "groq"}
+    for name in lanes:
+        assert client.lanes[name].lane == name
 
 
 def test_a_ONE_ATTACKER_LANE_matrix_CONSTRUCTS_the_real_client(_key_names):
@@ -1794,8 +1832,10 @@ def test_a_ONE_ATTACKER_LANE_matrix_CONSTRUCTS_the_real_client(_key_names):
     assert len({one_cell.lane_for(k) for k in one_cell.keys()}) == 1
     client = driver_main._provider_client(one_cell)
     assert isinstance(client, driver_clients.MeteredProviderClient)
-    assert client.attacker.lane == matrix.reference.lane
-    assert client.judge.lane == matrix.judge_lane
+    # ⚠️ Q-161 replaced the single `attacker`/`judge` pair with a lane MAP. The assertion
+    # is the same one — both lanes resolved, by name — read off the new shape.
+    assert client.lanes[matrix.reference.lane].lane == matrix.reference.lane
+    assert client.lanes[matrix.judge_lane].lane == matrix.judge_lane
 
 
 def test_the_old_REFUSE_TO_INVENT_function_is_gone_so_the_branch_cannot_regress():
@@ -1804,3 +1844,400 @@ def test_the_old_REFUSE_TO_INVENT_function_is_gone_so_the_branch_cannot_regress(
     again — which is the exact deadlock `Q-150` was raised about."""
     assert not hasattr(driver_main, "_refuse_to_invent_a_provider_client")
     assert hasattr(driver_main, "_provider_client")
+
+
+# ======================================================================================
+# ⚠️⚠️ Q-161 — THE LANE, THREADED. RULED 2026-09-03, OPTION 1.
+#
+# These are the tests the ruling exists for. The pilot's two cells run the **same seed
+# block** (`driver/pilot.py`), so turn 1 of `gemma-26b`/seed N and turn 1 of `qwen-27b`/
+# seed N are BYTE-IDENTICAL. Every test below therefore sends the SAME messages to BOTH
+# providers and asserts that the routing came from the `lane` argument and from nothing
+# else — because there is nothing else it COULD have come from, which is precisely why
+# the old design could not tell the two cells apart.
+#
+# ⚠️ Every one drives a FAKE transport, and `_no_provider_call` makes the real one raise.
+# ======================================================================================
+
+
+@dataclasses.dataclass
+class _RoutingTransport:
+    """A fake transport that answers **according to the URL it is given**.
+
+    ⚠️ **IT IS NOT A ROUTER AND IT DOES NOT KNOW ABOUT LANES.** It looks at the URL the
+    client built and returns that provider's reply shape, recording every request. A test
+    can then assert which endpoint each call reached — the only externally visible
+    consequence of the lane argument, and the one a misroute would change.
+    """
+
+    seen: list = dataclasses.field(default_factory=list)
+
+    def __call__(self, url, body, headers):
+        self.seen.append((url, json.loads(body.decode("utf-8")), dict(headers)))
+        is_google = url.startswith(driver_clients._GOOGLE_BASE)
+        return driver_clients.HttpResponse(
+            status=200, body=_google_ok() if is_google else _groq_ok()
+        )
+
+    @property
+    def urls(self):
+        return [url for url, _body, _headers in self.seen]
+
+
+def test_the_SAME_MESSAGES_go_to_DIFFERENT_PROVIDERS_when_the_LANE_differs(
+    _no_provider_call, _key_names
+):
+    """⚠️⚠️ **THIS IS THE TEST `Q-161` EXISTS FOR, AND THE PAYLOAD IS THE CONTROL.**
+
+    The two calls below are byte-identical in every argument **except ``lane``** — same
+    messages, same temperature, same client, same transport. That is not a contrived
+    setup: `driver/pilot.py` hands both pilot cells the **same seeds**, so turn 1 of each
+    genuinely is byte-identical, and `Q-161` records that content-based inference is
+    therefore impossible **in principle** rather than merely unwise.
+
+    So if the two calls land on two different endpoints with two different model ids, the
+    lane argument is the only thing that could have carried the difference.
+    """
+    lanes = runner_lanes.load_lanes()
+    transport = _RoutingTransport()
+    client = driver_clients.MeteredProviderClient.for_lane_names(
+        attacker_lanes=("gemma-26b", "qwen-27b"),
+        judge_lane="gemma-26b",
+        transport=transport,
+    )
+
+    messages = ({"role": "system", "content": "identical on both lanes"},)
+    google_reply = client.complete_attacker(
+        messages=messages, temperature=0.7, lane="gemma-26b"
+    )
+    groq_reply = client.complete_attacker(
+        messages=messages, temperature=0.7, lane="qwen-27b"
+    )
+
+    google_url, google_body, google_headers = transport.seen[0]
+    groq_url, groq_body, groq_headers = transport.seen[1]
+
+    # (1) THE ENDPOINTS ARE THE TWO PROVIDERS'.
+    assert google_url.startswith(driver_clients._GOOGLE_BASE)
+    assert groq_url == driver_clients._GROQ_CHAT_URL
+
+    # (2) THE MODEL IDS ARE `config/lanes.yaml`'s OWN, never literals in this test.
+    assert google_url.endswith(f"/{lanes['gemma-26b'].api_model_id}:generateContent")
+    assert groq_body["model"] == lanes["qwen-27b"].api_model_id
+    assert lanes["gemma-26b"].api_model_id != lanes["qwen-27b"].api_model_id
+
+    # (3) THE CREDENTIALS ARE THE TWO PROVIDERS' OWN, BY NAME — a misroute would present
+    #     Google's key to Groq, which is a 401 at best and a leaked credential at worst.
+    assert "x-goog-api-key" in google_headers and "Authorization" not in google_headers
+    assert "Authorization" in groq_headers and "x-goog-api-key" not in groq_headers
+
+    # (4) ⚠️ AND THE MESSAGES REALLY WERE IDENTICAL, so nothing but `lane` distinguished
+    #     them. Each provider's wire shape differs, so the assertion is on the TEXT.
+    assert google_body["contents"][0]["parts"][0]["text"] == "identical on both lanes"
+    assert groq_body["messages"][0]["content"] == "identical on both lanes"
+
+    # (5) Each reply carries its own provider's own total — 1234 Google, 987 Groq.
+    assert google_reply.usage["total_tokens"] == 1234
+    assert groq_reply.usage["total_tokens"] == 987
+    assert len(transport.seen) == 2, "one call per lane, and no retry"
+
+
+def test_the_LANE_is_REQUIRED_and_has_NO_DEFAULT_on_BOTH_methods(
+    _no_provider_call, _key_names
+):
+    """⚠️⚠️ **`Q-161`: *'IT IS A REQUIRED ARGUMENT WITH NO DEFAULT.'*** The ruling's reason
+    is exact: *"a defaulted lane sends one provider's traffic to another and the 429 rule
+    would stop the wrong lane."*
+
+    A default is invisible — it produces a working call that goes to the wrong place — so
+    its absence is asserted rather than assumed, on **both** methods and on **both**
+    implementations of the protocol. A `TypeError` from the language is the enforcement;
+    this test is what stops someone restoring the default to make a caller compile.
+    """
+    provider = _client(_FakeTransport(status=200, body=_google_ok()))
+    transcript = TranscriptClient(
+        attacker_replies=(("a", 1),), judge_replies=(("j", 1),)
+    )
+    for client in (provider, transcript):
+        with pytest.raises(TypeError, match="lane"):
+            client.complete_attacker(
+                messages=({"role": "system", "content": "s"},), temperature=0.7
+            )
+        with pytest.raises(TypeError, match="lane"):
+            client.complete_judge(system="s", user="u")
+
+    # ⚠️ AND IT IS KEYWORD-ONLY, so a positional argument cannot be mistaken for the lane.
+    with pytest.raises(TypeError):
+        provider.complete_attacker(
+            ({"role": "system", "content": "s"},), 0.7, "gemma-26b"
+        )
+
+
+def test_an_EMPTY_lane_is_a_named_refusal_and_is_never_substituted(
+    _no_provider_call, _key_names
+):
+    """⚠️ The language enforces *presence*; it does not enforce *content*. ``lane=""``
+    satisfies the signature and carries no routing information at all, and on a lane map
+    that is a bare ``KeyError`` rather than a named refusal. Every available substitute —
+    a first lane, a default lane, the last lane used — is a **guess about which provider
+    the traffic belongs to**, which is the whole of what `Q-161` prevents."""
+    provider = _client(_FakeTransport(status=200, body=_google_ok()))
+    for bad in ("", None):
+        with pytest.raises(driver_clients.DriverClientError, match="NEVER SUBSTITUTED"):
+            provider.complete_attacker(
+                messages=({"role": "system", "content": "s"},),
+                temperature=0.7,
+                lane=bad,
+            )
+    with pytest.raises(driver_clients.DriverClientError, match="NEVER SUBSTITUTED"):
+        TranscriptClient(attacker_replies=(("a", 1),)).complete_attacker(
+            messages=(), temperature=0.7, lane=""
+        )
+
+
+def test_an_UNKNOWN_LANE_is_a_named_refusal_and_never_a_fallback(
+    _no_provider_call, _key_names
+):
+    """⚠️ **THE REFUSING HALF OF THE FLIPPED TEST, KEPT ALIVE ON THE CASE THAT IS STILL A
+    BUG.** `Q-161` removed the refusal on a *two-lane matrix* because that is now routable.
+    A call naming a lane the client was **not built for** is still a wiring bug, and
+    routing it to any lane in the map would put one provider's traffic on another
+    provider's published row."""
+    transport = _RoutingTransport()
+    client = driver_clients.MeteredProviderClient.for_lane_names(
+        attacker_lanes=("gemma-26b",), judge_lane="gemma-26b", transport=transport
+    )
+    with pytest.raises(driver_clients.DriverClientError) as raised:
+        client.complete_attacker(
+            messages=({"role": "system", "content": "s"},),
+            temperature=0.7,
+            lane="qwen-27b",
+        )
+    message = str(raised.value)
+    assert "REFUSAL, NOT A FALLBACK" in message
+    assert "qwen-27b" in message and "gemma-26b" in message
+    assert transport.seen == [], "the client called a provider on an unroutable lane"
+
+
+def test_for_lane_names_RESOLVES_EVERY_LANE_UP_FRONT_and_refuses_an_empty_set(
+    _no_provider_call, _key_names
+):
+    """⚠️ Resolution happens at CONSTRUCTION, so an unknown lane or an unsupported provider
+    is a refusal **before** the first episode of a single-shot run rather than partway
+    through one that has already spent tokens (`PROCESS.md` §8: *"a precondition found on
+    episode 1 is found too late"*)."""
+    with pytest.raises(driver_clients.DriverClientError, match="zero attacker lanes"):
+        driver_clients.MeteredProviderClient.for_lane_names(
+            attacker_lanes=(), judge_lane="gemma-26b"
+        )
+    with pytest.raises(driver_clients.DriverClientError, match="not in config/lanes.yaml"):
+        driver_clients.MeteredProviderClient.for_lane_names(
+            attacker_lanes=("gemma-26b", "no-such-lane"), judge_lane="gemma-26b"
+        )
+    # ⚠️ The judge lane is resolved too — it is not a lane the attacker cells happen to
+    # cover, and CONTEXT.md S13.3.2 may put it anywhere.
+    with pytest.raises(driver_clients.DriverClientError, match="not in config/lanes.yaml"):
+        driver_clients.MeteredProviderClient.for_lane_names(
+            attacker_lanes=("gemma-26b",), judge_lane="no-such-lane"
+        )
+
+
+def test_the_PACED_CLIENT_forwards_the_lane_and_REFUSES_a_lane_its_BUCKETS_disagree_with():
+    """⚠️⚠️ **TWO INDEPENDENT COPIES OF ONE VALUE, AND THE DISAGREEMENT IS CHECKED.**
+
+    ``_PacedClient`` receives the threaded lane from ``episode._MeteredCall`` and holds a
+    second copy on ``buckets.lane``, which reached it the other way, through ``run.py``'s
+    ``lane_states``. **Neither reads the other.** A disagreement means the call is paced
+    against one lane's published limits and dispatched to a different provider — which is
+    `INCIDENTS.md` **INC-112**'s shape, where a 429 stopped ten episodes of an arm that
+    makes no call on the lane that raised it.
+
+    This is the one check the threading earns: before `Q-161` the client had no lane and
+    there was nothing to disagree with.
+    """
+    recorded = []
+
+    class _Recorder:
+        def complete_attacker(self, *, messages, temperature, lane):
+            recorded.append(("attacker", lane))
+            return driver_clients.ModelReply(text="ok", usage={"total_tokens": 1})
+
+        def complete_judge(self, *, system, user, lane):
+            recorded.append(("judge", lane))
+            return driver_clients.ModelReply(text="ok", usage={"total_tokens": 1})
+
+    class _Buckets:
+        def __init__(self, lane):
+            self.lane = lane
+
+        def wait_seconds(self, *, tokens, now):
+            return 0.0
+
+        def take(self, *, tokens, now):
+            return None
+
+    paced = driver_run._PacedClient(
+        inner=_Recorder(),
+        attacker_buckets=_Buckets("qwen-27b"),
+        judge_buckets=_Buckets("gemma-26b"),
+        attacker_reservation=1,
+        judge_reservation=1,
+        clock=lambda: 0.0,
+        sleep=lambda _seconds: None,
+    )
+
+    # (1) IT FORWARDS THE LANE IT WAS GIVEN, on both methods and to the right role.
+    paced.complete_attacker(messages=(), temperature=0.7, lane="qwen-27b")
+    paced.complete_judge(system="s", user="u", lane="gemma-26b")
+    assert recorded == [("attacker", "qwen-27b"), ("judge", "gemma-26b")]
+
+    # (2) AND IT REFUSES THE CROSSED PAIR, which is exactly the misroute Q-161 prevents.
+    with pytest.raises(driver_episode.DriverError, match="paced against one lane"):
+        paced.complete_attacker(messages=(), temperature=0.7, lane="gemma-26b")
+    with pytest.raises(driver_episode.DriverError, match="paced against one lane"):
+        paced.complete_judge(system="s", user="u", lane="qwen-27b")
+    assert len(recorded) == 2, "a refused call still reached the inner client"
+
+
+def test_the_FULL_ADAPTER_CHAIN_routes_TWO_LANES_to_TWO_PROVIDERS(
+    _no_provider_call, _key_names
+):
+    """⚠️⚠️ **THE PRODUCTION CHAIN, ASSEMBLED EXACTLY AS `episode.py` ASSEMBLES IT.**
+
+    ``_MeteredCall`` → ``_AttackerClient`` → ``_PacedClient`` → ``MeteredProviderClient``.
+    Every link is the real class; only the transport and the clock are fakes. Two lanes are
+    driven with the **same messages and the same temperature**, and each lands on its own
+    provider's endpoint with its own model id from `config/lanes.yaml`.
+
+    ⚠️ **THIS IS WHERE THE THREADING IS PROVED, LINK BY LINK**, because the lane leaves
+    ``_MeteredCall.lane``, crosses two adapters that were previously lane-blind, and shows
+    up as an endpoint. `QUESTIONS.md` **Q-161**.
+    """
+    lanes = runner_lanes.load_lanes()
+    transport = _RoutingTransport()
+    provider = driver_clients.MeteredProviderClient.for_lane_names(
+        attacker_lanes=("gemma-26b", "qwen-27b"),
+        judge_lane="gemma-26b",
+        transport=transport,
+    )
+
+    class _Buckets:
+        def __init__(self, lane):
+            self.lane = lane
+
+        def wait_seconds(self, *, tokens, now):
+            return 0.0
+
+        def take(self, *, tokens, now):
+            return None
+
+    messages = ({"role": "system", "content": "identical on both lanes"},)
+    for name in ("gemma-26b", "qwen-27b"):
+        paced = driver_run._PacedClient(
+            inner=provider,
+            attacker_buckets=_Buckets(name),
+            judge_buckets=_Buckets("gemma-26b"),
+            attacker_reservation=1,
+            judge_reservation=1,
+            clock=lambda: 0.0,
+            sleep=lambda _seconds: None,
+        )
+        attacker = driver_episode._AttackerClient(
+            metered=driver_episode._MeteredCall(
+                lane=name,
+                budget=LaneBudget(
+                    model=name,
+                    ceilings=Ceilings(call_ceiling=10, token_ceiling=100_000),
+                ),
+                reservation_tokens=1,
+                on_usage=lambda _lane, _tokens, _outcome: None,
+            ),
+            client=paced,
+        )
+        # ⚠️ C6's protocol — text in, text out, NO LANE. The attacker loop is unchanged by
+        # Q-161 and knows nothing about providers; the lane is read off the meter instead.
+        assert attacker.complete(messages=messages, temperature=0.7) == "the reply"
+
+    google_url, google_body, _ = transport.seen[0]
+    groq_url, groq_body, _ = transport.seen[1]
+    assert google_url.endswith(f"/{lanes['gemma-26b'].api_model_id}:generateContent")
+    assert groq_url == driver_clients._GROQ_CHAT_URL
+    assert groq_body["model"] == lanes["qwen-27b"].api_model_id
+    assert google_body["contents"][0]["parts"][0]["text"] == "identical on both lanes"
+    assert groq_body["messages"][0]["content"] == "identical on both lanes"
+    assert len(transport.seen) == 2
+
+
+def test_the_DECLARED_COMMAND_now_ROUTES_and_is_STOPPED_BY_A_DIFFERENT_DEFECT(
+    tmp_path, _no_provider_call, _key_names
+):
+    """⚠️⚠️ **MEASURED, AND IT IS THE REASON THE PILOT STILL CANNOT RUN. `QUESTIONS.md`
+    `Q-171`.**
+
+    This drives `evals/pilot/RUN_DECLARED.md` §1's own matrix through the real
+    ``run.execute`` against a fake transport. **`Q-161`'s refusal is gone** — the client is
+    constructed for both lanes and the first request is built and routed to Google's
+    endpoint with `config/lanes.yaml`'s own model id.
+
+    ⚠️ **AND THE RUN THEN DIES ON THE SECOND CALL OF THE FIRST EPISODE**, because
+    `attacker/context.py:505` puts every tool result into the message list under the role
+    ``"tool"`` and **neither** ``_GOOGLE_ROLE`` **nor** ``_GROQ_ROLE`` has a key for it. So
+    no episode can reach turn 2 on **either** provider. ⚠️ It is not a `RateLimited` and not
+    a `ProviderFailed`, so ``_MeteredCall.run`` does not convert it to a ``LaneStopped``:
+    it escapes ``execute`` **uncaught**, and the run ends with a traceback and **no report**
+    — which is hard rule 11's denominator lost as well as the episodes.
+
+    ⚠️ **THIS TEST ASSERTS THE DEFECT ON PURPOSE, AND MUST BE UPDATED RATHER THAN DELETED
+    WHEN IT IS RULED.** Pinning it is `PROCESS.md` §9's *"every evidence pack states what
+    it is NOT"*: the alternative is a suite that is green while the declared command
+    cannot complete one episode. Fixing it needs a decision about what a tool result looks
+    like to each provider — Google's ``contents[]`` has no ``tool`` role at all, and Groq's
+    requires a ``tool_call_id`` this driver never mints — which is a Class A change to what
+    is sent to a model, not a lane-threading edit.
+    """
+    transport = _RoutingTransport()
+    matrix = pilot_module.load_pilot(arm="1")
+    attacker_lanes = sorted({matrix.lane_for(key) for key in matrix.keys()})
+    client = driver_clients.MeteredProviderClient.for_lane_names(
+        attacker_lanes=attacker_lanes,
+        judge_lane=matrix.judge_lane,
+        transport=transport,
+    )
+
+    with pytest.raises(driver_clients.DriverClientError) as raised:
+        driver_run.execute(
+            driver_run.RunRequest(
+                matrix=matrix,
+                out_root=tmp_path,
+                ceilings=Ceilings(call_ceiling=400, token_ceiling=2_000_000),
+                s3_binding="authorization-is-the-payment",
+                spend_real_tokens=True,
+                sanctioned_lanes=frozenset(attacker_lanes) | {matrix.judge_lane},
+                allow_absent_corpus=True,
+            ),
+            client=client,
+        )
+
+    assert "role 'tool' has no Google equivalent" in str(raised.value)
+
+    # (1) ⚠️ THE ROUTING WORKED ON THE CALL THAT HAPPENED — Q-161's own deliverable. The
+    #     first episode is a `gemma-26b` one, so the first request is Google's, and it
+    #     carries config/lanes.yaml's model id rather than a literal.
+    lanes = runner_lanes.load_lanes()
+    assert len(transport.seen) == 1, (
+        "exactly one request was built before the tool-role defect stopped the run; a "
+        "different count means the failure point moved and this test must be re-measured"
+    )
+    assert transport.urls[0].startswith(driver_clients._GOOGLE_BASE)
+    assert transport.urls[0].endswith(
+        f"/{lanes['gemma-26b'].api_model_id}:generateContent"
+    )
+
+    # (2) ⚠️ AND THE OTHER PROVIDER IS BLOCKED BY THE SAME DEFECT, NOT BY ROUTING. Asserted
+    #     directly so the reader does not have to infer it from a run that never got there.
+    with pytest.raises(driver_clients.DriverClientError, match="no Groq equivalent"):
+        client.complete_attacker(
+            messages=({"role": "tool", "content": "a tool result"},),
+            temperature=0.7,
+            lane="qwen-27b",
+        )

@@ -395,14 +395,24 @@ class _MeteredCall:
 
 @dataclass
 class _AttackerClient:
-    """Adapts a :class:`.clients.MeteredModelClient` down to C6's text-only protocol."""
+    """Adapts a :class:`.clients.MeteredModelClient` down to C6's text-only protocol.
+
+    ⚠️ **Q-161: THIS IS WHERE THE LANE ENTERS THE CLIENT, AND IT IS `self.metered.lane`.**
+    That field is the authoritative per-role lane — ``_MeteredCall`` is built one function
+    below with ``lane=lane`` from ``run.py``'s dispatch loop, and it is the same value the
+    budget and the usage log are keyed on. **C6's own protocol is unchanged**: the attacker
+    loop is asked for text and knows nothing about lanes, which is why the threading stops
+    here rather than reaching into ``attacker/loop.py``.
+    """
 
     metered: _MeteredCall
     client: MeteredModelClient
 
     def complete(self, *, messages: tuple[dict[str, str], ...], temperature: float) -> str:
         return self.metered.run(
-            lambda: self.client.complete_attacker(messages=messages, temperature=temperature)
+            lambda: self.client.complete_attacker(
+                messages=messages, temperature=temperature, lane=self.metered.lane
+            )
         )
 
 
@@ -416,7 +426,15 @@ class _JudgeClient:
 
     def complete(self, *, system: str, user: str) -> str:
         self.calls += 1
-        return self.metered.run(lambda: self.client.complete_judge(system=system, user=user))
+        # ⚠️ Q-161. The judge's lane, not the attacker's: this adapter's own _MeteredCall was
+        # built with `lane=judge_lane`, and CONTEXT.md S13.3.2 puts two roles on one lane, so
+        # reading the lane off the ROLE's meter is the only reading that stays right when
+        # they diverge. INC-111 is the incident where a lane-based split dropped a role.
+        return self.metered.run(
+            lambda: self.client.complete_judge(
+                system=system, user=user, lane=self.metered.lane
+            )
+        )
 
 
 # --------------------------------------------------------------------------------------

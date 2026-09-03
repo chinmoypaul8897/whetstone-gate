@@ -116,11 +116,15 @@ no row for one. This is the same reasoning `tasks.py`'s ``EVAL_RUN_DIR`` is writ
 decided quietly.**
 
 ⚠️ **WHAT THIS CLIENT CANNOT DO, SAID HERE RATHER THAN DISCOVERED AT RUN TIME**
-(`PROCESS.md` §9: *"every evidence pack states what it is NOT"*): it serves **one attacker
-lane and one judge lane**, because :class:`MeteredModelClient`'s two methods are the only
-signal it gets and they distinguish *role*, never *lane*. A matrix with **two attacker
-cells on two providers** — which is exactly the pilot's — cannot be routed by one client,
-and `driver/__main__.py` **refuses by name** rather than guessing. `QUESTIONS.md` **Q-161**.
+(`PROCESS.md` §9: *"every evidence pack states what it is NOT"*): **it cannot work out which
+lane a call belongs to, and it does not try.** ``lane`` is a **required, undefaulted**
+argument on both protocol methods — `QUESTIONS.md` **Q-161**, ruled 2026-09-03, option 1 —
+and this client is a **lookup**, not a router: a name outside the map it was built for is a
+refusal, never a fallback. Until that ruling the two methods distinguished *role* and never
+*lane*, so a matrix with **two attacker cells on two providers** — exactly the pilot's —
+could not be routed at all, and `driver/__main__.py` refused by name. ⚠️ **The two rejected
+sources of the lane are still rejected:** dispatch order, and a walk up the caller's frame
+(verified to work, **not built** — `INCIDENTS.md` **INC-51**'s species).
 ⚠️ **AND IT HAS NEVER BEEN RUN AGAINST EITHER PROVIDER.** No session may call these
 endpoints, so every request and reply shape below is built from the published REST references
 and exercised against a **fake transport**, never against a provider. `QUESTIONS.md` `Q-162`.
@@ -190,6 +194,33 @@ class ModelReply:
             )
 
 
+def _required_lane(lane: str, *, role: str) -> str:
+    """⚠️ **Q-161. A LANE MUST BE A NON-EMPTY NAME, AND AN EMPTY ONE IS A REFUSAL.**
+
+    Python's keyword-only, undefaulted parameter already makes *omitting* the lane a
+    ``TypeError`` at the call site — that is the ruling's *"required argument with no
+    default"*, enforced by the language rather than by a check. **This closes the one hole the
+    language leaves open:** a caller that passes ``""`` or ``None`` has satisfied the
+    signature and supplied no routing information at all, and on the provider client that is
+    a `KeyError` deep inside a lane map rather than a named refusal here.
+
+    It refuses rather than substituting anything, because every substitution available —
+    a first lane, a default lane, the previously used lane — is a **guess about which
+    provider the traffic belongs to**, which is the whole of what `Q-161` exists to prevent.
+    """
+    if not isinstance(lane, str) or not lane:
+        raise DriverClientError(
+            f"a {role} call arrived with lane={lane!r}. THE LANE IS REQUIRED AND IS NEVER "
+            f"SUBSTITUTED: QUESTIONS.md Q-161 ruled it onto both protocol methods precisely "
+            f"so that one client serving two providers cannot misroute, and every available "
+            f"substitute (a first lane, a default lane, the last lane used) is a guess about "
+            f"which provider this traffic belongs to. A misroute is silent until the "
+            f"published per-lane token figures are read, and CLAUDE.md S4's 429 rule would "
+            f"stop the wrong lane"
+        )
+    return lane
+
+
 class MeteredModelClient(Protocol):
     """The one thing the driver needs from a provider. **A protocol, never an import.**
 
@@ -201,14 +232,34 @@ class MeteredModelClient(Protocol):
 
     A caller supplies anything with this shape: the operator's real provider client in a
     scored run, :class:`TranscriptClient` in a dry run. **This package never learns which.**
+
+    ⚠️⚠️ **``lane`` IS ON BOTH METHODS, IT IS REQUIRED, AND IT HAS NO DEFAULT.**
+    `QUESTIONS.md` **Q-161**, RULED 2026-09-03, **option 1**. Before the ruling these two
+    methods distinguished the **role** and nothing else, so one client serving a matrix whose
+    attacker cells sit on **two** providers could not know which model a given call was for —
+    and `driver/pilot.py` gives both cells the **same** seed block, so the messages are
+    byte-identical and content-based inference is impossible **in principle**, not merely
+    unwise.
+
+    ⚠️ **A DEFAULT WOULD BE WORSE THAN THE OLD REFUSAL.** A defaulted lane sends one
+    provider's traffic to another silently, and `CLAUDE.md` §4's 429 rule would then stop the
+    **wrong** lane — the failure would be invisible until the published per-lane token figures
+    were read, which is after the single-shot window is spent. So the argument is required on
+    the protocol and on **every** implementation of it.
+
+    ⚠️ **THE LANE IS PASSED, NEVER DERIVED.** It comes from
+    :class:`whetstone_gate.driver.episode._MeteredCall`'s ``lane`` — the authoritative
+    per-role value, built in ``run.py``'s dispatch loop from ``request.matrix.lane_for(key)``.
+    Recovering it from dispatch order, or by walking up to a caller's frame, was found to work
+    and was **rejected**: `INCIDENTS.md` **INC-51**'s exact species.
     """
 
     def complete_attacker(
-        self, *, messages: tuple[dict[str, str], ...], temperature: float
+        self, *, messages: tuple[dict[str, str], ...], temperature: float, lane: str
     ) -> ModelReply:
         ...
 
-    def complete_judge(self, *, system: str, user: str) -> ModelReply:
+    def complete_judge(self, *, system: str, user: str, lane: str) -> ModelReply:
         ...
 
 
@@ -239,22 +290,35 @@ class TranscriptClient:
     attacker_calls: int = 0
     judge_calls: int = 0
 
+    # ⚠️ Q-161. THE LANES THE DRIVER ACTUALLY ROUTED TO, IN ORDER, RECORDED RATHER THAN
+    # INTERPRETED. A transcript that behaved differently by lane would be a router, and this
+    # is deliberately not one — but a dry run that could not SHOW the lane arriving would
+    # leave the threading untested on the only path a session may execute.
+    attacker_lanes: list[str] = field(default_factory=list)
+    judge_lanes: list[str] = field(default_factory=list)
+
     def complete_attacker(
-        self, *, messages: tuple[dict[str, str], ...], temperature: float
+        self, *, messages: tuple[dict[str, str], ...], temperature: float, lane: str
     ) -> ModelReply:
-        """The next attacker reply. ``messages`` and ``temperature`` are **accepted and
-        recorded, never interpreted** — a transcript that behaved differently by prompt
-        would be a model, and this is deliberately not one."""
+        """The next attacker reply. ``messages``, ``temperature`` and ``lane`` are **accepted
+        and recorded, never interpreted** — a transcript that behaved differently by prompt
+        would be a model, and this is deliberately not one.
+
+        ⚠️ ``lane`` is **required and undefaulted here too**, and that is not ceremony: a dry
+        run whose client tolerated a missing lane would prove the wiring on a shape the scored
+        run does not use. `QUESTIONS.md` **Q-161**."""
         self.attacker_calls += 1
+        self.attacker_lanes.append(_required_lane(lane, role="attacker"))
         if self.rate_limit_at is not None and self.attacker_calls == self.rate_limit_at:
             raise RateLimited(
                 f"transcript client: simulated 429 on attacker call {self.attacker_calls}"
             )
         return self._next(self.attacker_replies, self.attacker_calls, "attacker")
 
-    def complete_judge(self, *, system: str, user: str) -> ModelReply:
+    def complete_judge(self, *, system: str, user: str, lane: str) -> ModelReply:
         """The next judge reply. Same contract, same refusal on exhaustion."""
         self.judge_calls += 1
+        self.judge_lanes.append(_required_lane(lane, role="judge"))
         return self._next(self.judge_replies, self.judge_calls, "judge")
 
     def _next(
@@ -574,23 +638,29 @@ def _lane_call(lane_name: str) -> _LaneCall:
 
 @dataclass
 class MeteredProviderClient:
-    """⚠️ **THE REAL PROVIDER CLIENT.** Two methods, one lane each, no retry, no estimate.
+    """⚠️ **THE REAL PROVIDER CLIENT.** Routed by lane, no retry, no estimate.
 
-    ⚠️ **IT SERVES ONE ATTACKER LANE AND ONE JUDGE LANE, AND THAT IS THE WHOLE OF WHAT THE
-    PROTOCOL LETS IT KNOW.** :class:`MeteredModelClient`'s two methods distinguish the
-    **role** — attacker or judge — and carry nothing that distinguishes a *lane*. So a
-    matrix whose attacker cells sit on two providers cannot be routed by one of these, and
-    `driver/__main__.py` refuses **by name** rather than guessing which lane a call belongs
-    to. `QUESTIONS.md` **Q-161**, Class A.
+    ⚠️⚠️ **IT SERVES EVERY LANE THE MATRIX NAMES, AND THE CALLER SAYS WHICH ON EVERY CALL.**
+    `QUESTIONS.md` **Q-161**, RULED 2026-09-03, **option 1**. Until that ruling landed,
+    :class:`MeteredModelClient`'s two methods distinguished the **role** — attacker or
+    judge — and carried nothing that distinguished a *lane*, so this class held exactly one
+    attacker lane and one judge lane and `driver/__main__.py` **refused by name** on the
+    pilot's own matrix, whose attacker cells sit on `google` and `groq`. The refusal is gone
+    because its cause is: ``lane`` is now a required, undefaulted argument on both methods,
+    and it is resolved here against a map built from `config/lanes.yaml`.
+
+    ⚠️ **AN UNKNOWN LANE IS A NAMED REFUSAL, NEVER A FALLBACK.** The routing table is what
+    the run was constructed for; a call naming something outside it is a wiring bug, and
+    every alternative to refusing is a guess about which provider the traffic belongs to.
 
     ⚠️ **NEVER RUN AGAINST EITHER PROVIDER.** No session may call these endpoints, so every
     request and reply shape here is built from the published REST references and exercised
     against a fake :data:`Transport`. `QUESTIONS.md` **Q-162**. It ships **unreviewed and
-    disclosed**, exactly as `Q-150`'s ruling says it does.
+    disclosed**, exactly as `Q-150`'s ruling says it does — and `Q-161`'s threading is
+    likewise exercised only against that fake.
     """
 
-    attacker: _LaneCall
-    judge: _LaneCall
+    lanes: Mapping[str, _LaneCall]
     transport: Transport = _http_post
 
     @classmethod
@@ -601,21 +671,47 @@ class MeteredProviderClient:
         judge_lane: str,
         transport: Transport | None = None,
     ) -> "MeteredProviderClient":
-        """Build from two lane **names**, resolved through `config/lanes.yaml`."""
-        return cls(
-            attacker=_lane_call(attacker_lane),
-            judge=_lane_call(judge_lane),
-            transport=transport or _http_post,
+        """Build from one attacker lane and one judge lane, resolved through
+        `config/lanes.yaml`. A convenience over :meth:`for_lane_names` for the single-cell
+        case. The two names may be equal — `CONTEXT.md` §13.3.2 puts the reference attacker
+        and the gate judge on the same lane — and the map is keyed by name, so that is one
+        entry rather than a conflict."""
+        return cls.for_lane_names(
+            attacker_lanes=(attacker_lane,), judge_lane=judge_lane, transport=transport
         )
 
-    def complete_attacker(
-        self, *, messages: tuple[dict[str, str], ...], temperature: float
-    ) -> ModelReply:
-        """One attacker turn on the attacker lane, at `config/`'s temperature."""
-        return self._call(self.attacker, messages, temperature)
+    @classmethod
+    def for_lane_names(
+        cls,
+        *,
+        attacker_lanes: Iterable[str],
+        judge_lane: str,
+        transport: Transport | None = None,
+    ) -> "MeteredProviderClient":
+        """⚠️ **Q-161: BUILD FOR EVERY LANE THE MATRIX DISPATCHES ON.**
 
-    def complete_judge(self, *, system: str, user: str) -> ModelReply:
-        """One judge call on the judge lane.
+        Each name is resolved through `config/lanes.yaml` **at construction time**, so an
+        unknown lane or an unsupported provider is a refusal **before** the first episode
+        rather than partway through a single-shot run that has already spent tokens.
+        """
+        names = list(attacker_lanes)
+        if not names:
+            raise DriverClientError(
+                "a provider client was asked for zero attacker lanes. A client serving no "
+                "attacker lane would refuse every call it received, at the far end of a run "
+                "that had already been declared and started"
+            )
+        resolved = {name: _lane_call(name) for name in [*names, judge_lane]}
+        return cls(lanes=resolved, transport=transport or _http_post)
+
+    def complete_attacker(
+        self, *, messages: tuple[dict[str, str], ...], temperature: float, lane: str
+    ) -> ModelReply:
+        """One attacker turn on the lane **the caller names**, at `config/`'s temperature."""
+        return self._call(self._route(lane, role="attacker"), messages, temperature)
+
+    def complete_judge(self, *, system: str, user: str, lane: str) -> ModelReply:
+        """One judge call on the lane **the caller names**.
 
         ⚠️ **NO TEMPERATURE IS SENT, BECAUSE `config/` CARRIES NONE FOR THE JUDGE.**
         ``gate_judge`` has no temperature key and hard rule 9 forbids inventing one here, so
@@ -624,10 +720,31 @@ class MeteredProviderClient:
         in that run — but a judged arm would inherit a temperature nobody declared.
         """
         return self._call(
-            self.judge,
+            self._route(lane, role="judge"),
             ({"role": "system", "content": system}, {"role": "user", "content": user}),
             None,
         )
+
+    def _route(self, lane: str, *, role: str) -> _LaneCall:
+        """⚠️ **THE WHOLE OF THE ROUTING, AND IT IS A LOOKUP RATHER THAN A DECISION.**
+
+        Nothing here reads the messages, the call order, or the caller's frame. `Q-161`
+        records that the stack-walk was verified to work and **rejected** as `INC-51`'s
+        species; content-based inference is impossible in any case, because
+        `driver/pilot.py` hands both cells the same seed block and turn 1 of each is
+        byte-identical.
+        """
+        name = _required_lane(lane, role=role)
+        if name not in self.lanes:
+            raise DriverClientError(
+                f"this client was built for lanes {sorted(self.lanes)} and a {role} call "
+                f"named {name!r}. THAT IS A REFUSAL, NOT A FALLBACK: routing it to any lane "
+                f"in the map would put one provider's traffic on another provider's row, "
+                f"which is silent until the published per-lane token figures are read and "
+                f"would make CLAUDE.md S4's 429 rule stop the wrong lane (QUESTIONS.md "
+                f"Q-161)"
+            )
+        return self.lanes[name]
 
     def _call(
         self,
