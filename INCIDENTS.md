@@ -7243,3 +7243,99 @@ have **failed that commit** — which is a fourth session's problem, after the f
 prevention. **Recorded as `OF-204`.**
 
 ---
+
+## INC-89 — ⚠️ **`INC-65` PUBLISHED THE CORRECT ONE-LINE CHECK, THIS SESSION READ `INC-65` IN ITS MANDATORY READ ORDER, AND THEN RAN THE EXACT QUERY `INC-65` HAD ALREADY PROVED USELESS — so its own `Swept: NOTHING` line is false, refuted by its own `git show --stat`, which is the sin `INC-68` names in capitals**
+
+**Date:** 2026-09-03 (C8 FIX 1, `9e4a71c2`. **Found by this session, from its own
+`git show --numstat`, before pushing** — and found only because the insertion count looked too
+large for the edit it had made. The sweeping commit is this session's own **`58e9299`**; the swept
+session is the concurrent **C9 BUILD 1** (`3f8b2d56`). **No Fix SHA for the sweep itself; see
+`Fix`.**)
+
+**Event:** `58e9299` was staged through a private index with `INC-68`'s step 5, and its message
+asserts, in terms:
+
+> *"**Swept: NOTHING.** … The STAGED SNAPSHOT read under `git diff --cached` — `Q-063` clause
+> (ii)'s direction — is TWO files, `INCIDENTS.md` and `docs/reviews/OPEN_FINDINGS.md`, and the
+> snapshot **adds NO `Raised by:` line at all**, so there is no foreign entry in it to name."*
+
+**Both sentences are literally true and the conclusion is false.** The snapshot added **147 lines
+to `INCIDENTS.md`** where this session's own edit accounts for about thirty-five, and the
+difference is a **127-line entry belonging to C9** — the entry now numbered `INC-88`, which C9 had
+written into the shared working tree between this session's `git read-tree` and its `git add`.
+**This session's own `git show --numstat` prints `147  5  INCIDENTS.md` and would have said so at
+any point.**
+
+**Action:** ⚠️ **NOTHING IS UNDONE** — history is never rewritten here (`CLAUDE.md` §5) — so
+`58e9299` stands, the mis-attribution is corrected by **record**, and **the swept content was first
+verified INTACT rather than assumed intact**: `git diff HEAD -- INCIDENTS.md` is EMPTY and
+`INC-88` is present and complete at `HEAD`. ⚠️ **C9 had already resolved the id collision from its
+own side, correctly and without being asked** — its entry was drafted as `INC-87`, found this
+session's `INC-87` occupying the number, and **renumbered ITSELF to `INC-88` with the renumber
+recorded inside the entry**. There is no duplicate in the file: `grep -oE "^## INC-[0-9]+" | sort |
+uniq -d` returns nothing.
+
+**Expectation:** the `Swept:` line is a **measurement**, not a conclusion — `INC-47`'s ruling, that
+*a claim bound to a command must be read off the command*, and `INC-68`'s own summary of the same
+failure: *"the sweeping session wrote `Swept: NOTHING` while its own `git show --stat` would have
+printed four files."*
+
+**Missing:** ⚠️ **NOTHING WAS MISSING. THAT IS WHAT MAKES THIS ENTRY WORTH WRITING.** Every other
+sweep in this file could point at an absent guardrail. This one cannot: the check existed, in
+writing, in a file this session was required to read.
+
+**Missed:** ⚠️ **`INC-65`'s `Systemic guardrail` IS THE ANSWER, IT IS ONE LINE, AND IT WAS READ AND
+NOT APPLIED.** Verbatim: *"the correct query is not **'is my token in this diff'** but **'is any
+OTHER issued token in this diff'** — the `## Session tokens` table is the authoritative list, so the
+check is `git diff --cached -- <journal paths>` grepped against **every other row of that table**."*
+**This session ran the other one.** It grepped the staged snapshot for added `Raised by:` lines —
+and `INC-65`'s own **`Diagnosis`**, two paragraphs above the remedy, says why that returns nothing:
+*"clause (ii) is written as a test over a `Raised by:` **token field**, but a token-table row has no
+such field and **an incident's attribution is prose**, so the check has no mechanical subject."*
+**Measured here, so it is a number and not a paraphrase: `grep -cE '^\*\*Raised by:\*\*'
+INCIDENTS.md` returns `0`** — hard rule 13's eight-field format has no such field, so **no incident
+sweep can ever be visible to the query this session chose**, and `docs/reviews/OPEN_FINDINGS.md`
+attributes by a table **column** rather than a line, so it is blind there too. **Two of the five
+journals `Q-063` governs are structurally invisible to clause (ii) as this session ran it.**
+
+⚠️ **AND `INC-65`'s CHECK, RUN RETROACTIVELY OVER THIS SESSION'S SIX COMMITS, CATCHES EXACTLY THE
+RIGHT ONE** — 63 issued tokens from the `## Session tokens` table, matched against **added patch
+lines only**:
+
+```
+ed7e7cf  0        2127370  1  (07c3687f - INC-85 CITING the review that declared it)
+650f0dc  0        3b0ed41  0        c35e2ad  0
+58e9299  4  (3f8b2d56)   <- THE SWEEP, and the only one
+```
+
+**Four clean commits report zero, the citation reports a name a human reads in one second, and the
+sweep is the single commit that lights up.** The check works, it costs one command, and this
+session did not run it.
+
+**Diagnosis:** the session followed the *ruling* (`Q-063` clause (ii), which names `Raised by:`)
+instead of the *incident that had already measured the ruling to be unimplementable as written*
+(`INC-65`), so it executed a query with no mechanical subject and read its empty result as evidence
+of absence.
+
+**Fix:** ⚠️ **NO SHA, AND NONE IS OWED FOR THE SWEEP ITSELF.** `58e9299` is not amended and not
+reverted; the content at `HEAD` is correct and complete and only the token the log names is wrong.
+**What this entry fixes is the false sentence**, and it fixes it the only way this repository
+permits — by naming it here, where a reader of `58e9299` will be sent.
+
+**Systemic guardrail:** ⚠️ **ONE, AND IT IS NOT A NEW IDEA — IT IS `INC-65`'s IDEA, PROMOTED FROM
+PROSE TO A COMMAND THIS SESSION ACTUALLY RAN AND PUBLISHED THE OUTPUT OF.** Before every remaining
+commit: extract the 8-hex tokens from `QUESTIONS.md`'s `## Session tokens` table, drop your own, and
+grep the **added lines** of `git diff --cached` for each. It has a mechanical subject, it is blind
+to neither `INCIDENTS.md` nor `OPEN_FINDINGS.md`, and **a clean result cannot be clean for the wrong
+reason.** It over-reports — a legitimate citation of a finished session's token trips it, as
+`2127370` shows — and **that is the correct direction for this check to fail in.**
+⚠️ **What this does NOT close:** it is still a habit and not a guardrail. `Q-063` clause (iii)'s
+**E6** is C11's and remains unlanded, `src/whetstone_gate/check_roles.py` is outside this session's
+fence, and E6 as specified keys on the same `Raised by:` field — **so E6, when it lands, will be
+blind to `INCIDENTS.md` for exactly the reason this entry is about**, and that is now a stated
+input to C11 rather than something C11 discovers. ⚠️ **And the half `INC-36` named as uncloseable is
+uncloseable still: nothing can warn the session being swept.** This session was swept twice
+(`INC-87`) and swept once (this entry) inside four hours, in one working tree, with both sessions
+using the private index correctly the whole time. **Recorded against `OF-204` and `OF-205`.**
+
+---
