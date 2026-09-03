@@ -453,17 +453,78 @@ def test_the_writer_and_the_verifier_agree_on_a_ledger_THIS_package_wrote(
         assert list(produced.to_dict()) == list(CONTENT_FIELDS) + list(CHAIN_FIELDS)
 
 
-def test_the_genesis_the_golden_names_is_the_one_config_carries(
+def test_the_genesis_the_golden_names_is_a_PRE_FREEZE_root_and_config_has_MOVED_ON(
     golden: dict, spec: chain.ChainSpec
 ) -> None:
-    """Today they agree. ⚠️ **C14 changes `config/` to the `prereg-v1` tag object id and this
-    assertion is then expected to fail** — at which point golden 5 is a *pre-freeze* chain,
-    which is the distinction `config/protocol.yaml`'s own comment exists to create. The test
-    is written so that moment is loud rather than silent."""
-    assert golden["genesis_hash"] == spec.genesis_hash, (
-        "config/protocol.yaml's ledger.genesis_hash no longer matches golden 5's root. If "
-        "C14 has run, this is expected and golden 5 is a pre-freeze artefact by construction; "
-        "record it rather than editing either file."
+    """⚠️⚠️ **THE PREDICTED MOMENT ARRIVED. FLIPPED UNDER HARD RULE 6, CITING `Q-153`.**
+
+    ⚠️ **THE OLD TEST, VERBATIM, BECAUSE IT WAS RIGHT AND IT DID ITS JOB:**
+
+        def test_the_genesis_the_golden_names_is_the_one_config_carries(golden, spec):
+            \"\"\"Today they agree. ⚠️ C14 changes `config/` to the `prereg-v1` tag object id
+            and this assertion is then expected to fail — at which point golden 5 is a
+            *pre-freeze* chain, which is the distinction `config/protocol.yaml`'s own comment
+            exists to create. The test is written so that moment is loud rather than
+            silent.\"\"\"
+            assert golden["genesis_hash"] == spec.genesis_hash, (
+                "config/protocol.yaml's ledger.genesis_hash no longer matches golden 5's "
+                "root. If C14 has run, this is expected and golden 5 is a pre-freeze artefact "
+                "by construction; record it rather than editing either file."
+            )
+
+    **It pre-declared its own failure and then failed exactly as declared** — `INCIDENTS.md`
+    **INC-126**: *"Its own docstring PRE-DECLARED this failure … It worked exactly as
+    designed."* `Q-153` moved the root at **`probe-v1`** rather than at `prereg-v1`, which is
+    one tag earlier than the old docstring guessed and changes nothing else.
+
+    ⚠️ **NEITHER FILE WAS EDITED, WHICH IS WHAT THE OLD MESSAGE ASKED FOR.**
+    `tests/goldens/` is read-only under hard rule 3 and `config/` is right. What changed is the
+    **assertion**, from *"these two agree"* — a sentence that is now false by design — to the
+    relationship that actually holds and that nothing else in this suite pins.
+
+    ⚠️ **THIS IS A STRENGTHENING AND THE TEST NAME SAYS SO.** The old form asserted ONE thing:
+    equality. This asserts **four**, and the last two did not exist anywhere before:
+
+      1. golden 5's root is the literal ``PRE-FREEZE`` — it is a *pre-freeze* artefact, pinned;
+      2. `config/`'s root is **not** ``PRE-FREEZE`` — the freeze actually moved it;
+      3. they therefore **differ**, and that difference is the property `PROCESS.md` §6a calls
+         *"the one free proof available"*: **a ledger cannot contain the hash of a tag that did
+         not exist when it was written**;
+      4. the two roots differ **only** in the root — the hash ALGORITHM is unchanged, so the
+         pre- and post-freeze chains stay comparable and the split is a *root* split rather
+         than a silent change of chain.
+
+    ⚠️ **AND IT STILL GOES RED ON THE FAILURE THE OLD ONE GUARDED.** The old test would have
+    fired if `config/` drifted to some third value; so does this one, at clause 3 and 4 — a
+    config root that is neither ``PRE-FREEZE`` nor a real root still fails, and a changed
+    algorithm now fails too, which the old form could not see at all.
+
+    ⚠️ **PROVABLY MEANINGFUL, PER HARD RULE 6 — IT FAILS ON THE OLD CODE**, measured against a
+    `config/` fixture carrying the pre-`Q-153` value. See `docs/sessions/arch-night-1.txt`.
+    """
+    assert golden["genesis_hash"] == "PRE-FREEZE", (
+        "golden 5 is a PRE-FREEZE artefact by construction and its root is the literal "
+        "PRE-FREEZE. tests/goldens/ is READ-ONLY under hard rule 3: if this fires, a golden "
+        "has been edited and that is the finding, not this assertion"
+    )
+    assert spec.genesis_hash != "PRE-FREEZE", (
+        "config/protocol.yaml's ledger.genesis_hash is still the pre-Q-153 literal. Q-153 is "
+        "RULED and b1bab1c landed it; a config/ that has been reverted is the defect here"
+    )
+    assert golden["genesis_hash"] != spec.genesis_hash, (
+        "golden 5's root and config/'s must now DIFFER. That difference IS the free proof of "
+        "PROCESS.md S6a: a ledger cannot contain the hash of a tag that did not exist when it "
+        "was written, so pre-freeze episodes are cryptographically distinguishable from "
+        "scored ones. If these two agree again, that distinction has been destroyed"
+    )
+    assert spec.algorithm.replace("-", "").lower() in golden["hash_rule"].replace(
+        "-", ""
+    ).lower(), (
+        f"the ROOT moved at the freeze; the ALGORITHM did not, and must not. golden 5 states "
+        f"its construction in prose - {golden['hash_rule']!r} - and config/ says "
+        f"{spec.algorithm!r}. A root split keeps the two chains comparable; a changed "
+        f"algorithm would make golden 5 evidence about a different construction entirely, "
+        f"which no assertion here would otherwise see"
     )
 
 
@@ -2287,23 +2348,56 @@ def test_two_refunds_ISSUED_with_the_SAME_receipt_were_INVISIBLE_and_now_are_NOT
     clean = episode("RCP-DIFFERENT")
 
     # -- BEFORE: the same two episodes under the pre-Q-066 schema, recomputed ---------------
-    def pre_q066_head(led: chain.Ledger) -> str:
-        head = spec.genesis_hash
+    # ⚠️⚠️ THE ROOT IS A PARAMETER, AND THAT IS THE FIX `INC-126` NAMED AS OWED.
+    #
+    # It used to read `head = spec.genesis_hash`, i.e. it took the root from `config/`. `Q-153`
+    # then moved `config/`'s root from the literal `PRE-FREEZE` to `probe-v1`'s tag object id
+    # (`b1bab1c`), and this assertion went red -- ninth of INC-126's nine, and the one its own
+    # blast-radius survey MISSED, because it pins a digest in the TEST BODY rather than reading
+    # a golden.
+    #
+    # ⚠️ THE LITERAL BELOW IS A HISTORICAL MEASUREMENT AND MUST NOT BE RE-BASELINED.
+    # It was measured against the tree at `7787e96`, where the root WAS `PRE-FREEZE`. Replacing
+    # it with today's recomputed value would be the precise thing its own message forbids --
+    # "the 'before' would then be a story". So the ROOT is restored to the one the measurement
+    # was taken under, and the measurement stands untouched.
+    #
+    # ⚠️ THIS IS INC-126's "Missing" FIELD, APPLIED: *"a declared pre-freeze/post-freeze split
+    # in the assertions themselves"*, and it is the shape the seventeen SURVIVING tests in this
+    # file already use -- root from the artefact under test, ALGORITHM from `config/`.
+    PRE_Q066_MEASURED_ROOT = "PRE-FREEZE"
+
+    def pre_q066_head(led: chain.Ledger, *, root: str) -> str:
+        head = root
         for written in led.entries:
             body = {k: v for k, v in written.body().items() if k != RECEIPT}
             assert len(body) == 14, "the pre-Q-066 body is this schema minus `receipt`"
             head = chain.entry_digest(head, body, algorithm=spec.algorithm)
         return head
 
-    assert pre_q066_head(breached) == pre_q066_head(clean), (
-        "the BEFORE half of this test has stopped reproducing: under the 14-field schema an "
-        "S2 breach and a clean episode were the same bytes, and that is the defect Q-066 fixed"
+    # ⚠️ STRENGTHENED, NOT WEAKENED: the invisibility defect is now asserted under BOTH roots.
+    # It was a property of the 14-field SCHEMA and never of the root, and the old single-root
+    # form could not tell those two apart. If Q-066's defect were ever root-dependent, this
+    # would say so and the old assertion would not have.
+    for root in (PRE_Q066_MEASURED_ROOT, spec.genesis_hash):
+        assert pre_q066_head(breached, root=root) == pre_q066_head(clean, root=root), (
+            f"the BEFORE half of this test has stopped reproducing under root {root!r}: under "
+            f"the 14-field schema an S2 breach and a clean episode were the same bytes, and "
+            f"that is the defect Q-066 fixed"
+        )
+    assert spec.genesis_hash != PRE_Q066_MEASURED_ROOT, (
+        "Q-153 moved config/'s root off PRE-FREEZE at b1bab1c. If these are equal again, the "
+        "loop above has silently collapsed to ONE root and is asserting half of what it reads"
     )
-    assert pre_q066_head(breached) == (
+
+    assert pre_q066_head(breached, root=PRE_Q066_MEASURED_ROOT) == (
         "2e2b9ec45b20c2b069bc9855fa6f69eaa10588a2e9a36698e255fb541edb934d"
     ), (
         "the recomputed pre-Q-066 head does not match the one MEASURED against the tree at "
-        "7787e96 before this session changed a line; the 'before' would then be a story"
+        "7787e96 before this session changed a line; the 'before' would then be a story. "
+        "NOTE: the root is pinned to PRE-FREEZE here ON PURPOSE - that is the root the "
+        "measurement was taken under, and Q-153 has since moved config/'s. Re-baselining this "
+        "literal to today's value would destroy the measurement rather than repair it"
     )
 
     # -- AFTER: they differ, and in exactly one content field --------------------------------

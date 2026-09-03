@@ -979,12 +979,94 @@ def test_the_scorer_reads_no_file_no_clock_and_no_randomness():
 
 
 def _chain_spec_for(golden: dict) -> ChainSpec:
+    """The chain a golden's hand-derived digests were computed under. ⚠️ **ROOTED AT THE
+    GOLDEN, ALGORITHM FROM `config/`.**
+
+    ⚠️⚠️ **FLIPPED UNDER HARD RULE 6 BY `Q-153`. THIS ONE HELPER CARRIES NINE TESTS**, which is
+    why `INCIDENTS.md` **INC-126** could name six `test_c8_scorer.py` failures with one cause:
+    every digest assertion in §4 funnels through here.
+
+    ⚠️ **THE OLD BODY, VERBATIM:**
+
+        spec = load_chain_spec()
+        assert spec.genesis_hash == golden["genesis_hash"], (
+            "the golden's genesis root and config/'s must agree, or the digests below are "
+            "being computed under a different chain"
+        )
+        return spec
+
+    **Its guard was correct and its premise expired.** `Q-153` moved
+    `config/protocol.yaml:ledger.genesis_hash` from the literal ``PRE-FREEZE`` to `probe-v1`'s
+    tag object id (`b1bab1c`), so *"the golden's root and `config/`'s agree"* became false **by
+    design** — that divergence is the freeze, and `PROCESS.md` §6a calls it *"the one free
+    proof available"*.
+
+    ⚠️ **NOTHING WAS WEAKENED AND NO GOLDEN WAS TOUCHED.** `tests/goldens/` is read-only under
+    hard rule 3, and INC-126 records why regenerating one would be worse than useless: the
+    goldens *"hardcode `PRE-FREEZE` as their root and every hand-derived digest in both files
+    chains from it"* — they are answer keys **for a pre-freeze chain**, and re-rooting them
+    would destroy the very distinction the change exists to create.
+
+    ⚠️ **THE SHAPE IS NOT INVENTED HERE — IT IS THE ONE SEVENTEEN SURVIVING TESTS ALREADY
+    USE.** INC-126's own **Missing** field says so: the tests that came through the change
+    unharmed *"take the root from `golden["genesis_hash"]` and only the **algorithm** from
+    `config/`, so they stay self-consistent for ever"*, and `tests/test_c7_ledger.py` spells it
+    `genesis_hash=golden["genesis_hash"]` in eleven places. **The surviving shape was already
+    in the tree; the nine were simply written the other way.**
+
+    ⚠️ **AND THE GUARD IS NOT DROPPED — IT IS MOVED TO THE RELATIONSHIP THAT IS ACTUALLY
+    TRUE**, and it now asserts THREE things where the old form asserted one:
+
+      1. the golden's root is the literal ``PRE-FREEZE`` — it is a pre-freeze answer key,
+         pinned, so a silently re-rooted golden fails here rather than passing quietly;
+      2. `config/`'s root has **moved off** ``PRE-FREEZE`` — a reverted `config/` fails;
+      3. the **algorithm** still agrees between the golden and `config/` — which is the half
+         of the old guard that never expired, and the half that actually protects the digests
+         below. *A changed algorithm would make every digest in §4 wrong, and the old
+         assertion could not see it: it compared roots only.*
+    """
     spec = load_chain_spec()
-    assert spec.genesis_hash == golden["genesis_hash"], (
-        "the golden's genesis root and config/'s must agree, or the digests below are being "
-        "computed under a different chain"
+    assert golden["genesis_hash"] == "PRE-FREEZE", (
+        "this golden is a PRE-FREEZE answer key and its root is the literal PRE-FREEZE. "
+        "tests/goldens/ is READ-ONLY under hard rule 3 (INC-126): if this fires, a golden has "
+        "been re-rooted, and that is the finding rather than this assertion"
     )
-    return spec
+    assert spec.genesis_hash != "PRE-FREEZE", (
+        "config/protocol.yaml's ledger.genesis_hash is still the pre-Q-153 literal, so the "
+        "pre-freeze/post-freeze split this helper encodes does not exist. Q-153 is RULED and "
+        "b1bab1c landed it"
+    )
+    assert spec.algorithm == _golden_algorithm(golden), (
+        f"the golden's hash algorithm and config/'s must agree, or the digests below are "
+        f"being computed under a different construction. The ROOT is expected to differ after "
+        f"Q-153; the ALGORITHM is not. config/ says {spec.algorithm!r}"
+    )
+    # ⚠️ The digests below are the GOLDEN's, so the chain they are checked against must be the
+    #    GOLDEN's. Rooting this at config/ would compute them under the post-freeze chain and
+    #    compare the answers to a pre-freeze key -- which is exactly the nine reds INC-126 has.
+    return ChainSpec(genesis_hash=golden["genesis_hash"], algorithm=spec.algorithm)
+
+
+def _golden_algorithm(golden: dict) -> str:
+    """The hash algorithm a golden declares, from whichever field it uses to declare it.
+
+    ⚠️ **THE TWO GOLDENS SPELL IT DIFFERENTLY AND NEITHER IS EDITABLE.** Golden 5 states its
+    construction in prose under ``hash_rule``; golden 5B carries ``hash_algorithm``. Hard rule
+    3 makes both read-only, so this reads what is there rather than requiring one shape — and
+    it **refuses** rather than defaulting when a golden declares neither, because a silent
+    default here would switch off assertion (3) above without anything going red.
+    """
+    if "hash_algorithm" in golden:
+        return str(golden["hash_algorithm"])
+    rule = str(golden.get("hash_rule", ""))
+    for candidate in ("sha256", "sha512", "sha1", "blake2b"):
+        if candidate in rule.replace("-", "").lower():
+            return candidate
+    raise AssertionError(
+        "this golden declares no hash algorithm, in `hash_algorithm` or in `hash_rule`. That "
+        "is a refusal rather than a default: defaulting it would silently disable the "
+        "algorithm agreement check that protects every digest in this section"
+    )
 
 
 def test_golden5b_three_digests_reproduce_from_the_ledger_writer():

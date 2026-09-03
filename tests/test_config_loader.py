@@ -17,8 +17,10 @@ project's central control would be inert, and **nothing would have raised**.
 
 from __future__ import annotations
 
+import subprocess
 import textwrap
 from fractions import Fraction
+from pathlib import Path
 
 import pytest
 
@@ -188,16 +190,65 @@ def test_pilot_seeds_are_disjoint_from_every_scored_seed():
     assert len(scored) == 50 and len(pilot) == 10 and len(ladder) == 5
 
 
-def test_genesis_hash_is_pre_freeze_and_is_never_absent():
+def test_genesis_hash_is_the_PROBE_TAGS_OBJECT_ID_and_is_never_absent():
     """`PROCESS.md` §6a's genesis binding — the one free proof available.
 
-    Before the freeze the chain root is the literal ``PRE-FREEZE``; at ``prereg-v1`` C14
-    sets it to that tag's object id. A ledger cannot contain the hash of a tag that did
-    not exist when it was written, so **pre-freeze episodes are cryptographically
-    distinguishable from scored ones**. What must never happen is the value going missing
-    and something defaulting it — hence ``require``.
+    ⚠️⚠️ **FLIPPED UNDER HARD RULE 6 BY `Q-153`, WHICH IS RULED AND LANDED (`b1bab1c`).
+    NOT WEAKENED — IT ASSERTS STRICTLY MORE THAN IT DID.** `INCIDENTS.md` **INC-126** names
+    this test as one of nine that went red when `config/protocol.yaml:ledger.genesis_hash`
+    moved from the literal ``PRE-FREEZE`` to `probe-v1`'s **tag object id**.
+
+    ⚠️ **THE OLD ASSERTION, VERBATIM, SO THE TRAIL IS READABLE:**
+    ``assert cfg.load("protocol").require("ledger.genesis_hash") == "PRE-FREEZE"``.
+    Its docstring already described the flip as future work — *"Before the freeze the chain
+    root is the literal `PRE-FREEZE`; at `prereg-v1` C14 sets it to that tag's object id"* —
+    and this is that moment arriving, one tag earlier than the sentence guessed: `Q-153` ruled
+    the root moves at **`probe-v1`**, not at `prereg-v1`.
+
+    ⚠️ **WHY THE NEW FORM IS STRONGER, AND NOT A LITERAL SWAP.** Replacing one hardcoded
+    string with another would assert only that somebody typed forty hex characters into
+    `config/`. This resolves `probe-v1` **out of git** and requires `config/` to agree with it,
+    so it now catches three things the old form could not: a root that is a *commit* id rather
+    than the **tag object** id (INC-126 records that `git cat-file -t probe-v1` was checked
+    rather than assumed); a root copied from a prompt instead of measured; and a root that
+    silently stops tracking the tag. **The `require` half — never absent, never defaulted —
+    is untouched, because that was never the defect.**
+
+    ⚠️ **PROVABLY MEANINGFUL, PER HARD RULE 6 — IT FAILS ON THE OLD CODE.** Measured against a
+    `config/` fixture carrying the pre-`Q-153` value ``PRE-FREEZE``; the numbers are in
+    `docs/sessions/arch-night-1.txt`.
     """
-    assert cfg.load("protocol").require("ledger.genesis_hash") == "PRE-FREEZE"
+    genesis = cfg.load("protocol").require("ledger.genesis_hash")
+
+    # ⚠️ The half that did not change: present, and never defaulted. `require` raises.
+    assert genesis, "ledger.genesis_hash is present and non-blank"
+
+    # ⚠️ The half Q-153 moved: it is probe-v1's TAG OBJECT id, resolved from git, not typed.
+    repo_root = Path(__file__).resolve().parents[1]
+
+    def _git(*args: str) -> str:
+        done = subprocess.run(
+            ["git", *args], cwd=repo_root, capture_output=True, text=True, check=False
+        )
+        assert done.returncode == 0, f"git {' '.join(args)} failed: {done.stderr.strip()}"
+        return done.stdout.strip()
+
+    assert _git("cat-file", "-t", "probe-v1") == "tag", (
+        "probe-v1 must be an ANNOTATED tag: Q-153 binds the chain root to the tag OBJECT id, "
+        "which is a different value from the commit the tag points at, and a lightweight tag "
+        "has no object id of its own to bind to"
+    )
+    assert genesis == _git("rev-parse", "probe-v1"), (
+        "config/protocol.yaml's ledger.genesis_hash must BE probe-v1's tag object id. "
+        "Q-153 ruled it there and b1bab1c landed it; PROCESS.md S6a calls this the one free "
+        "proof available - a ledger cannot contain the hash of a tag that did not exist when "
+        "it was written, so pre-freeze episodes are cryptographically distinguishable from "
+        "scored ones. That property is worth exactly as much as this assertion"
+    )
+    assert genesis != "PRE-FREEZE", (
+        "the pre-Q-153 root. If this fires, config/ has been reverted rather than this test "
+        "being wrong"
+    )
 
 
 #: ⚠️ **THE KNOWN-UNDECIDED SET, AND IT IS A CEILING RATHER THAN A SNAPSHOT.**

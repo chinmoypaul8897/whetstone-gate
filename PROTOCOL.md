@@ -84,7 +84,42 @@ bytes, and it is also the same hand that then changed them.
 | Path | SHA-256 of the git blob | Bytes | Git blob id |
 |---|---|---|---|
 | `config/lanes.yaml` | `23b8db927cf66d0b0876a9a393c523b3e5287f2bb392b8efdb3d9f52accea0bd` | 13,622 | `ab6f0f266fa010c8b4b7be08b713dc4fa836264a` |
-| `config/protocol.yaml` | `44e19ac5c79cd99ca5fc67cd1dd2a0558be4ee98b9ac41aab5cfb72ff4ab3d05` | 30,930 | `d3d8e1805cc2dac47221e2da50addff27aa4c02b` |
+| `config/protocol.yaml` | `a4a9a02ddd556d599807e2b2ded8f7d35d8ca8c7707deebfa7a9397ff4c3886e` | 30,960 | `8688b87cf8ce0ac440234b9aed9fac5bb419cb53` |
+
+⚠️ **`config/protocol.yaml`'s ROW WAS RE-MEASURED ON 2026-09-03 BY ARCH NIGHT 1 (`5d7e2b91`),
+BECAUSE `Q-153`'s RULING MOVED THE BYTES AND THE ROW DID NOT MOVE WITH THEM.** The previous row
+read `44e19ac5c79cd99ca5fc67cd1dd2a0558be4ee98b9ac41aab5cfb72ff4ab3d05`, **30,930 bytes**, blob
+`d3d8e1805cc2dac47221e2da50addff27aa4c02b`, and it was **stale** — `INCIDENTS.md` **INC-126** named
+it as owed and it stayed owed for two sessions.
+
+⚠️ **THE STALENESS IS PROVED, NOT ASSERTED, AND IT IS PROVED TWICE OVER.** The two blobs were
+diffed against each other rather than re-hashed and compared:
+
+```
+$ diff <(git cat-file blob d3d8e1805cc2dac47221e2da50addff27aa4c02b) \
+       <(git cat-file blob HEAD:config/protocol.yaml)
+363c363
+<   genesis_hash: PRE-FREEZE
+---
+>   genesis_hash: 170bd3ff4abfdd8f87f64055972a60c82cc54efc
+```
+
+**ONE LINE DIFFERS AND IT IS `Q-153`'s LINE.** And the byte count is the same fact arriving a second
+way: `len("170bd3ff…") − len("PRE-FREEZE")` is `40 − 10 = 30`, and `30,930 + 30 = 30,960` **exactly**.
+A row that had moved by any other amount would mean something *else* had also changed.
+
+⚠️ **`make check-prereg` DID NOT CATCH THIS, AND THAT IS ITS OWN FINDING — `QUESTIONS.md` `Q-181`.**
+Run against this tree it printed `STATUS: NOT-YET-FROZEN - the prereg-v1 tag does not resolve` and
+**exited 0**, recomputing nothing. The recompute is gated on the tag, so the check that exists to
+catch a stale row is inert for exactly as long as the row is still fixable, and becomes live at the
+moment the freeze makes it unfixable. **What did catch it is the suite** —
+`tests/test_c14_prereg.py::test_every_config_file_is_in_PROTOCOL_mds_manifest_and_its_blob_sha_RECOMPUTES`
+— which is why that red was load-bearing rather than noise.
+
+⚠️ **THIS ROW IS FIXABLE ONLY BECAUSE `prereg-v1` DOES NOT YET RESOLVE.** `CLAUDE.md` §4:
+*"Never edit a frozen artefact after its tag exists."* Measured at the moment of this edit:
+`git rev-parse prereg-v1` → `fatal: ambiguous argument 'prereg-v1': unknown revision`. **After the
+tag, a stale row is not corrected — it is published as a defect.**
 
 ⚠️ **`config/lanes.yaml`'s digest is CROSS-CHECKED AGAINST A DIFFERENT SESSION'S INDEPENDENT
 MEASUREMENT.** C13 FIX 2 (`91eb51c1`) recorded the **AFTER** blob SHA-256 of that file in its FINAL
