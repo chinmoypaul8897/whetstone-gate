@@ -119,8 +119,18 @@
       `git reset` across it would have destroyed the other instance's work to
       protect this one's.
 
-    RESTORED by the next commit, which re-adds the file from this session's
-    working tree. ! NO HISTORY WAS REWRITTEN to do it - the file is simply added
+    RESTORED - AND BY THE OTHER INSTANCE, NOT BY THIS ONE, WHICH IS RECORDED
+    BECAUSE THIS SESSION'S OWN COMMIT MESSAGE SAYS OTHERWISE. `fa73b76`
+    ("! `fd67082` DELETED THE CONCURRENT SESSION'S ENTIRE FINAL OUTPUT") re-added
+    the file at 02:42:55. This session's `f67a7a0` landed at 02:43:14 - NINETEEN
+    SECONDS LATER - and was therefore an EDIT of a file already back, not the
+    re-add its message claims. ! THAT MESSAGE IS PERMANENT AND IS NOT REWRITTEN;
+    the correction lives here, in the file S6.1 calls the record, which is exactly
+    what "a paraphrase on the way is then detectable against it" is for.
+    THIRD INDEPENDENT MUTUAL DETECTION OF THE NIGHT: the token collision, the
+    duplicate ids, and now the deletion - each found twice, by two instruments,
+    within a minute.
+    ! NO HISTORY WAS REWRITTEN by either restore - the file is simply added
     again, which is the only remedy S7 permits and the correct one.
     ! AND NOTHING WAS LOST: the blob survives at `68f970f`
       (`c834f18896cf870cb77d9cb9df585a4270fabd42`), and the working-tree copy was
