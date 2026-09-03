@@ -7377,3 +7377,127 @@ uncloseable still: nothing can warn the session being swept.** This session was 
 using the private index correctly the whole time. **Recorded against `OF-204` and `OF-205`.**
 
 ---
+
+## INC-90 — the test that proves ⚠️ **NO KEY VALUE CAN REACH A CHECKPOINT** committed two secret-shaped strings and turned `check_roles` **C1** RED: a test for a secret guard reproduced, in its own tracked source, the thing the guard exists to prevent
+
+**Date:** 2026-09-03 (C11 BUILD 1, `86ee1e45`, **after** this session's second commit `a4d422d`
+and **before** any push. **Found by this session**, by running the full suite and attributing its
+failures BY FILE — which its own prompt required — rather than by any check that names this
+class. Fix SHA under **Fix**.)
+
+**Event:** `tests/test_c11_runner.py::test_NO_KEY_VALUE_CAN_REACH_A_CHECKPOINT_OR_A_USAGE_ROW`
+drove `runner/redaction.py`'s refusal with three poisoned payloads, written out as literals:
+
+```
+"gsk" + "_" + <26 alphanumerics>          <- Groq key SHAPE
+"AIza" + <29 alphanumerics>               <- Google key SHAPE
+"GROQ" + "_API_KEY=" + <16 hex>           <- an echoed dotenv line
+```
+
+⚠️ **AND THOSE THREE LINES ARE WRITTEN IN PARTS BECAUSE THE CLASS FIRED A SECOND TIME, IN THIS
+ENTRY, WHILE THIS ENTRY WAS BEING WRITTEN.** The first draft of the block above **quoted the
+offending literals in full**, and `check_roles` **C1** went red again on
+`INCIDENTS.md:7392 - Groq API key`. **The incident report reproduced the defect it reports.**
+That is recorded here rather than quietly corrected, because it is the sharpest available
+evidence for this entry's own `Diagnosis`: the rule is about **tracked file content**, and a
+session thinking about *runtime values* walks into it twice in a row — once in a test, once in
+the prose about the test. Nothing about `INCIDENTS.md` being documentation exempts it; C1 scans
+**every tracked file**, correctly, and the 4 September history scan will read this file too.
+
+`make test` had been **3 failed / 1067 passed** before this chunk (all three known, none this
+session's). After `a4d422d` it was **5 failed / 1127 passed**, and the two new ones were
+**mine**. Measured, in `check_roles`' own words:
+
+```
+C1 no secret-shaped string in any tracked file
+  HITS: tests/test_c11_runner.py:1255 - Groq API key
+        tests/test_c11_runner.py:1273 - Groq API key
+```
+
+and `test_check_roles_exits_zero` went red **downstream of it**, which is a second failure with
+one cause.
+
+⚠️ **`check_roles` **C1** was RIGHT and the test was WRONG.** `SECRET_PATTERNS` matches
+`\bgsk_[A-Za-z0-9]{20,}` — a **shape**, deliberately, and its own comment says why the shapes
+require a payload rather than a bare prefix: *"this repository's own prose … mention `rzp_live_`
+as a word, and a scanner that fired on the word would be untrustworthy on its first run and
+disabled by its second."* Neither string is anybody's key and both are obviously fake. **That is
+beside the point**: a scanner that tried to tell a real key from a fake one is a scanner nobody
+could trust, and this repository goes **public on 4 September** after a git-history secret scan
+whose method (`PROCESS.md` §8) is exactly this pattern set over `git log -p --all`. A committed
+`gsk_`-shaped string is a hit in that scan's output too, and history is never rewritten here.
+
+**Action:** ⚠️ **The pattern was NOT widened and no exemption was added.** Hard rule 6 forbids
+weakening an assertion to get green, and `config.py`'s `NULL_IS_A_VALUE` comment states the
+general form: *"an exemption list is where a check dies quietly."* The three strings are now
+**assembled at runtime from parts** — `"gsk" + "_" + ("zq" * 14)` and
+`"AI" + "za" + ("Zq" * 17) + "Z"` — so `redaction.py` is still driven against a genuinely
+`gsk_`-prefixed 32-character value and a genuinely `AIza`-prefixed 39-character one (**4 + 35**,
+the documented Google shape, verified against C1's own regex at 39 characters) while **no
+secret-shaped literal exists in any tracked file**. A comment block above them records the
+measurement rather than the conclusion, so the next session that reaches for a literal is told
+what happened rather than told a rule.
+
+**Expectation:** that the tests a chunk writes to prove a safety property would not **violate a
+different safety property of the same repository**. `CLAUDE.md` §4 is unambiguous — *"Secrets
+never in the repo, never in logs, never in reports"* — and this session had read it, quoted it
+in `runner/redaction.py`'s module docstring, and built a refusal around it, all before writing
+the literal that broke it eleven hundred lines away in another file.
+
+**Missing:** ⚠️ **any check that runs `check_roles` C1 over a chunk's OWN new files at the moment
+they are written.** C1 exists, it is correct, it is wired into `make test`, and it caught this —
+but it caught it **at the end of a six-minute full-suite run, one commit after the file
+landed**. Nothing runs it over a staged diff, and nothing in the git-commit path consults it,
+so the window between *writing a secret-shaped literal* and *learning about it* is however long
+the author waits before running the whole suite. **A `git`-side hook, or a `make` target that
+scans only the staged paths, would have closed it in under a second** — and this session's own
+private-index recipe (`INC-88`'s guardrail) already runs `git diff --cached` in the same command
+as the `git add`, so there is a place to put it that a session is already looking at. That is
+four words of procedure and it is not written down anywhere.
+
+**Missed:** ⚠️ **THIS SESSION WROTE THE SCANNER'S OWN PREFIX LIST INTO `redaction.py` — `gsk_`
+AND `AIza` — AND THEN WROTE THE SAME TWO PREFIXES, WITH PAYLOADS, INTO A TRACKED TEST, AND THEN
+DID IT AGAIN IN THIS ENTRY.** The
+module docstring it had just finished says *"Groq issues `gsk_`-prefixed keys and Google's AI
+Studio keys begin `AIza`. Both are public, documented prefixes; neither is a secret"* — which is
+true of the **prefix** and became false of the **prefix plus twenty characters** on the next
+file. ⚠️ **And a second signal was in the same test's own assertion**, three lines below the
+literal: `assert poisoned not in str(raised.value)`, with the comment *"the refusal must NOT
+reproduce the value — that would put the secret in the traceback, the pytest output and every CI
+log that caught it."* This session reasoned carefully about the value reaching a **log** and did
+not ask whether it was already in the **file**. ⚠️ **The sharpest miss is the class, and it is
+this project's own subject one level down:** a test written to prove a guard works reproduced,
+in its own committed source, the exact artefact the guard exists to keep out — the same shape as
+`INC-51` (the moat scanner blind to the shapes a re-implementation actually has) and `INC-32`
+(the verifier that hashed a fixed field list, so the golden had no case that would ever have
+caught it).
+
+**Diagnosis:** the secret-shape rule is enforced at the level of *tracked file content* and this
+session applied it at the level of *runtime values*, so a string that was never going to reach a
+log was written straight into the repository instead — twice, the second time in the prose
+explaining the first. Two safety properties with the same subject and different scopes, and only
+one of them was in mind while either file was written.
+
+**Fix:** `d63f722` — the three poisoned payloads in the test are assembled at runtime. ⚠️ **AND A
+SECOND FIX FOR THE SECOND FIRING**, in this file: the `Event` block above writes the shapes in
+parts too, because quoting them turned C1 red on `INCIDENTS.md` itself. **After both, no
+secret-shaped literal remains in any tracked file** — C1 re-measured: *PASS, scanned 368 tracked
+files against 8 patterns*. Re-measured after it: `check_roles` **21 passed / 0 failed /
+3 n/a, exit 0**, `tests/test_c11_runner.py` **64 passed**, and `make test` back to its three
+known reds (`OF-183`, and `Q-103`'s two, all pre-existing and none this session's).
+
+**Systemic guardrail:** ⚠️ **NONE LANDED, AND THE REASON IS A FENCE RATHER THAN A JUDGEMENT.**
+The remedy that would close this class is a `make`-level or hook-level scan of the **staged**
+paths with `check_roles.check_secrets`, and `src/whetstone_gate/check_roles.py`, the `Makefile`
+and `src/whetstone_gate/tasks.py` are all outside C11's scope fence — the same position
+`INC-88`'s guardrail records of its own remedy (*"it wants to be a rule in `PROCESS.md` §7 …
+which is the architect's"*). **What DID land is smaller and is honest about being smaller:** the
+comment block above the assembled strings states the measurement, so the next author reaching
+for a literal reads what happened here. ⚠️ **What it does NOT close, said plainly:** it protects
+this one file, by one session's habit, and `OF-67`'s sentence about the last five of these
+applies unchanged. Recorded as **`OF-207`**. ⚠️ **AND THE DEADLINE IS REAL:** C21 flips the
+repository **PUBLIC on 4 September** after a git-history secret scan using this exact pattern
+set, and history is never rewritten here — so a shape committed today is a shape in that scan's
+committed output forever. This one was caught before the push; the next one might not be.
+
+---

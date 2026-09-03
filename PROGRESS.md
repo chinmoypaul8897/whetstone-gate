@@ -6,6 +6,243 @@ not a record; this file is.
 
 ---
 
+## C11 — **BUILD 1** — 2026-09-03 — 🟡 **BUILT. ALL SIX GOLDEN-8 FIXTURES REPRODUCE FIELD FOR FIELD, THE 429 STOPS WITH NINE CALLS AND 99,000 TOKENS UNSPENT, AND `Q-107`'s RULING IS TRUE OF ONE OF ITS TWO ARITHMETICS AND FALSE OF THE OTHER**
+
+**SESSION-TOKEN:** `86ee1e45` · **DATA ROW 65 / 8-HEX ROW 64** of `QUESTIONS.md`'s
+`## Session tokens` table — both figures because the two conventions in use differ by one
+(`OF-179`), and ⚠️ **COUNTED FROM THE TABLE ITSELF**, in the operator's working tree at
+`C:\Users\chinm\whetstone-gate`, `HEAD` = `2a5c5e3` (`INC-54` requires a session to say which
+tree). ⚠️ **THE ROW DID NOT EXIST AND THIS SESSION SELF-RECORDED IT AT `1bc8b4d`, IN THE SAME
+COMMIT AS `Q-107`'s RULING AND BEFORE ANY LINE OF SOURCE** — `check_roles` **E1** fails on a
+token that is not in that table.
+
+**VERDICT: BUILT, UNREVIEWED, NOT TAGGED. `c11-pass` DOES NOT EXIST.**
+⚠️ **TOKEN SPEND: ZERO. NO PROVIDER MODEL CALL OF ANY KIND.** Every lane is reserved; the runner
+was built and **not run**.
+
+---
+
+### THE DONE-WHEN, CLAUSE BY CLAUSE — AND ONE OF THE SIX IS NOT SATISFIABLE
+
+`PROCESS.md` §12.1's C11 row: *"kill mid-run and resume with **zero duplicates and zero re-runs
+of completed episodes**; the usage file reconciles against API-reported totals; golden 8
+reproduces (incl. the 429 and truncated-episode cases); **every dropped, errored, retried and
+truncated episode is counted, categorised and printable** (rule 11); a day-boundary resume is
+demonstrated, not asserted; **a runner checkpoint and an episode output are `git status`-visible
+against the committed `.gitignore`, demonstrated** (`Q-003`'s rider)."*
+
+- **Kill mid-run and resume.** ⚠️ **Driven, not asserted:** six episodes, three published, the
+  process "dies", the same command runs again — the second pass dispatches **exactly the three
+  remaining**, the third pass dispatches **none**, and the directory holds **six files**.
+- **The usage file reconciles.** `UsageLog.reconcile` re-adds the model-day's own rows and
+  compares them to the provider's reported total. ⚠️ **It compares; it never corrects.** A
+  reconciliation that adopted one side could not fail, which is golden 8 fixture E's own
+  complaint about a fixture that discriminates nothing.
+- **Golden 8 reproduces — the recorded response, A, B, C1, C2, D and E.** See the next section.
+- **Rule 11's counter.** Seven declared causes, **every one printed including the zeros**,
+  truncation **counted in the denominator** with its **non-zero** token cost beside it, and an
+  identity — `attempted == completed + truncated + not_started` — that **refuses** rather than
+  warns.
+- **The day-boundary resume, DEMONSTRATED.** A lane spends 88,000 of 100,000 on day 1; the run
+  stops; day 2 opens a **new UTC file**. ⚠️ **The discriminator is the seed:** a lane seeded from
+  the day's real state **refuses** 88,000+22,000 while an unseeded one **admits** it and would
+  run the whole ceiling a second time. Both are driven side by side, and the eight day-1
+  episodes are **not** re-run on day 2.
+- ⚠️ **`Q-003`'s RIDER, DEMONSTRATED IN A FRESH OS TEMP DIRECTORY** carrying this repository's
+  **committed** `.gitignore` (`git show HEAD:.gitignore`). `git status --porcelain
+  --untracked-files=all` shows **`evals/checkpoints/…json`** and **`evals/episodes/…json`** and
+  does **not** show the in-flight `.partial`. ⚠️ **`--untracked-files=all` is load-bearing and
+  was found by measurement:** bare `--porcelain` collapses the whole tree to one `?? evals/`
+  line, which would have let the test pass while saying nothing about which files are visible.
+  **Nothing was written into `evals/` in the real tree** — `CLAUDE.md` §4.
+
+⚠️ **AND THE CLAUSE THAT IS NOT SATISFIABLE, SAID FIRST RATHER THAN LAST.** *"golden 8
+reproduces (incl. the … truncated-episode case)"* **cannot be satisfied against golden 8 as
+landed**: the file carries no truncated-episode case at all, its own
+`what_this_file_does_NOT_pin` block says so in capitals, and `Q-108` was raised with a deadline
+of ***before C11 builds***. **No seventh fixture arrived.** This session built the handling,
+wrote its own fixture, marked it as its own at every use, and **raised the gap again as
+`Q-117`** rather than reading the clause as discharged — which `Q-108` itself calls *"the good
+case"*, adding that it is only the good case for as long as the entry stays **OPEN**. It is.
+
+---
+
+### GOLDEN 8 — ALL SIX FIXTURES, AND EVERY WRONG ACCUMULATOR *DRIVEN*
+
+⚠️ **THIS IS THE FIRST TEST PERMITTED TO CONSUME GOLDEN 8.** The golden's own closing note:
+*"no test consumes this file. DELIBERATE. C11's BUILD is the FIRST session permitted to write
+one."* Comparison is against `LaneBudget.state()` **in golden 8's own field names**, so a rename
+on either side is a failing test rather than a quiet mismatch.
+
+| fixture | reproduced | the WRONG accumulator, **run** |
+|---|---|---|
+| **recorded response** | `calls_used 1 / unused 9 / spent 22,000 / unspent 78,000 / stopped_by null` | a block whose parts **do not** sum to its total returns **777**, not 200 — `total_tokens` **and nothing else** |
+| **A tokens bind first** | 4 admitted, **six calls unused**, 88,000 / 12,000, `token ceiling` at call 5 | calls-only runs all five and spends **110,000** against a 100,000 ceiling |
+| **B calls bind first** | 10 admitted, 0 unused, 50,000 / 50,000 — **exactly half** — `call ceiling` at call 11 | tokens-only admits **all twelve**: 60,000 ≤ 100,000 |
+| **C1 token boundary** | 50,000 + 50,000 = **100,000 EXACTLY, LEGAL, `stopped_by: null`**; then one more token **REFUSED** | `>=` admits **one** call and reports **50,000**, leaving half the sanctioned budget unusable |
+| **C2 call boundary** | tenth admitted, eleventh refused, 10,000 spent | — |
+| **D the 429 at call 2** | **1,000 spent, 99,000 UNSPENT, NINE of ten calls unused**, `stopped_by: "429"` | a retrying or spilling accumulator reports a **HIGHER** number and violates hard rule 12 to do it |
+| **E per model, never pooled** | pooled **110,000 > 100,000** while **neither model alone exceeds it** → **BOTH LANES CONTINUE** | pooling **aborts a lane that has budget**; and the architect's **withdrawn** `30,000×3` vector is re-measured as **discriminating nothing** |
+
+⚠️ **THE UNSPENT BUDGET IS PINNED AS THE POINT, NOT AS WASTE**, because that is the only thing
+that separates a correct implementation from a plausible one on fixture D: `retried: false` and
+`other_lane_used: false` are asserted as **properties of the type** — a stopped lane refuses the
+next offer outright, and a `LaneBudget` holds exactly one model's figures, so there is no
+argument by which a caller could reach another lane's budget.
+
+**Tokens are `usage.total_tokens` and nothing else.** A block without it is a **refusal**, never
+a reconstruction from `prompt_tokens + completion_tokens`: providers differ on whether the total
+includes reasoning or cached-read tokens. **The admission test is PROSPECTIVE** — hard rule 12
+says ABORT, not *"overspend and then abort"* — and the one place the fixture's framing and a live
+provider come apart is stated rather than papered over: the live path admits against a
+**reservation** and settles at the **provider's own** number, with the gap carried as a
+**counted** `reservation_shortfall_tokens` rather than a silence.
+
+⚠️ **THE 429 IS TRUE AT TWO LEVELS AND IS TWO METHODS, NOT ONE METHOD WITH A FLAG.**
+`record_429()` is the **SESSION** rule and stops the lane (fixture D); `record_429_requeued_in_lane()`
+is the **RUNNER** rule and does not (`CONTEXT.md` §13.5(3)). A flag is how the session rule would
+eventually be switched off by a caller in a hurry. A 429 storm across a **two-lane** run is driven
+end to end: backoffs `2.0 / 4.0 / 8.0` at fixed jitter, the lane **parked**, and the re-queued
+episode on **its own lane** with the other lane holding **nothing**.
+
+---
+
+### `Q-107` — RULED, IMPLEMENTED, AND ITS OWN PREMISE RE-MEASURED
+
+The ruling is in `QUESTIONS.md` **verbatim, before a line of it was implemented** (hard rule 5),
+with its own `S13.4` spelling preserved because `Q-029`'s closing note forbids normalising it.
+
+**BOTH conjuncts are implemented, which one BOUND is recorded, and the boundary is INCLUSIVE.**
+The projection reproduces **all THREE** of §13.4's published branch totals from **one** component
+table — **76.90M / 40.05 h**, **69.10M / 35.99 h**, **59.30M / 30.89 h**, with episode counts
+550/350/510/370 → 450/350/450/370 → 450/250/390/270 — which is the control on transcribing it: a
+wrong cell would have to be wrong in a way that leaves three independent sums right. The
+lane-hour **rate** is **computed** from `config/lanes.yaml` (16,000 + 16,000 TPM × 60 =
+**1,920,000/h**) and **refuses** unless exactly two Gemma lanes are found.
+
+Golden 8 fixture F's four vectors still reproduce **under the first conjunct alone** — the
+conjunct `PROCESS.md` §5.2 names golden 8 as pinning. The ruled two-conjunct rule is asserted
+**separately**, and the **one** vector on which they diverge (**60,000**) is **pinned as an
+assertion**. `tests/goldens/` is read-only; **neither side is adjusted.**
+
+⚠️ **AND `Q-121`, CLASS A, DEADLINE BEFORE C14's PILOT: the ruling's own sentence is true of one
+of its two arithmetics and false of the other, and this session MEASURED which.** *"Fails the
+second regardless of what the pilot measures"* holds if the second conjunct is read against
+§13.4's **fixed published N=50 table** (always 40.05 h) — `Q-107`'s option 3. Read the way
+`Q-107`'s **own published table** reads it — recomputed from the measured figure, option 2 — it
+does not:
+
+| measured tokens/episode | projected | lane-hours | conjunct 2, RECOMPUTED |
+|---|---|---|---|
+| **24,310** — golden 8 fixture F's own first vector | 57.27M | **29.83 h** | **HOLDS** → N=50 |
+| **31,908** — the break-even, found by binary search | 61.4494M | **32.00 h** | **HOLDS** → N=50 |
+| **31,909** — one token over it | 61.4500M | **32.01 h** | **FAILS** → N=30 |
+| 60,000 | 76.90M | 40.05 h | FAILS → N=30 |
+
+**So the two readings disagree at and below 31,908 and agree above it**, and 24,310 — roughly
+40% of the pre-registered target, and the vector the architect chose as the plausible case — is
+below the break-even. ⚠️ **BOTH ARE COMPUTED, BOTH ARE CARRIED ON `NDecision`, BOTH PRINT, AND
+THIS SESSION SETTLES NEITHER.** `select_n().n` follows the RECOMPUTED reading because it
+reproduces the architect's own table on **4 of 4** rows, and that choice is **declared as a
+default under hard rule 1**, not as a reading of the ruling's intent, so C14 can overturn it in
+one line rather than discover it in a single-shot branch selection.
+
+**`config/` IS NOT EDITED and NO sentinel is resolved** — asserted by a test that requires
+`n_decision.selected_branch` to still **RAISE**. `Q-107`'s last sentence is honoured as a string
+the report **prints**: `render_run_report`'s `limitations` argument has **no default**, because a
+default of `[]` is precisely how a limitation gets buried.
+
+---
+
+### THE THREE THINGS THIS PACKAGE DOES *ON PURPOSE* THAT LOOK LIKE OMISSIONS
+
+- ⚠️ **THE DENOMINATOR IS WRITTEN TWICE.** `scorer/drops.py` already implements one and this
+  package does **not** import it (`Q-119`, Class B recorded with its rationale). Importing it
+  would have passed `check_roles` D1–D3 — the moat's closures run **downward** from `gates/` and
+  `scorer/`, so a third package importing scorer adds nothing to either — and it would have
+  **removed a free cross-check**: the runner counts episodes **as they run against the live
+  provider**, the scorer counts them **at replay off the stored ledgers**, and sharing a class
+  means **they could not disagree**. That is hard rule 8's own spike argument (*"the invariant
+  could not have fired unless the gate had a bug: that is not a result, it is a definition"*)
+  applied one step out. The two vocabularies are **not** copies and neither is the other's
+  subset, and the module docstring says so, so the drift to look for is a **mapping** defect.
+- ⚠️ **THERE IS NO DELETION PATH AT ALL** — no `unlink`, `rmtree`, `truncate` or `shutil`, and no
+  `force=` flag — **asserted by an AST walk over every module**, because `evals/` is append-only
+  and deletion is operator-only, and a `force=True` parameter is how that rule gets got round.
+- ⚠️ **`keys.py` RETURNS A BOOLEAN AND HAS NO CODE PATH THAT READS A VALUE**, asserted by AST: no
+  `os.environ[…]`, no `getenv`, no `.env` in code anywhere in the package. `redaction.py` is the
+  second half — it **REFUSES rather than masks**, and the refusal names the **field** and
+  **never the value**, because a refusal that printed what it found would put the secret in the
+  traceback, the pytest output and every log that caught it. It also **states what it does not
+  close**, which is `PROCESS.md` §9's rule applied to a guard.
+
+---
+
+### RULINGS RECORDED, QUESTIONS RAISED, INCIDENT WRITTEN
+
+**`Q-107` RULED** and recorded verbatim before implementation. **Five raised**, each with a
+deadline in a chunk that would otherwise discover it: · `Q-117` — `Q-108`'s truncated-episode
+gap is **still open** and the fixture C11 built against is **the implementer's own**, which is a
+weaker oracle than golden 8's other six · `Q-118` — `Q-063` clause (iii)'s **E6 is assigned to
+C11 and C11's fence names `check_roles.py` under NOT**, and `Q-072`, E6's own design question, is
+**still open**, so even a permissive fence would have landed the wrong E6 · `Q-119` — the
+written-twice denominator, as the Class B record hard rule 2 requires · `Q-120` — ⚠️ **the
+lane-hour budget that decides `N` is in NEITHER §8.6's constants table NOR `config/`**, which
+`config/protocol.yaml`'s own header calls **a review BLOCKER**, and it is the **seventh**
+occurrence of that pattern; it is **parsed out of §13.4's own sentence**, refusing on zero
+matches and on more than one · `Q-121` — the ruling's *"regardless"* clause, measured.
+
+**`INC-90`, this session's own, found before push.** The test that proves *no key value can reach
+a checkpoint* **committed two `gsk_`-shaped literals** and turned `check_roles` **C1** RED,
+taking `test_check_roles_exits_zero` with it. **C1 was right and the test was wrong**: it matches
+a *shape*, deliberately, because a scanner that tried to tell a real key from a fake one is one
+nobody could trust. ⚠️ **The pattern was NOT widened and no exemption was added** (hard rule 6);
+the strings are **assembled at runtime**, so `redaction` is still driven against genuinely
+`gsk_`- and `AIza`-prefixed values while **no secret-shaped literal exists in a tracked file**.
+Fixed at `d63f722`. The class is this project's own subject one level down — a test for a guard
+reproducing, in its own committed source, the artefact the guard exists to keep out, which is
+`INC-51`'s and `INC-32`'s shape. **`OF-207`** records that C1 runs only at the **end of a
+six-minute suite** and that **C21 flips this repository PUBLIC on 4 September** after a
+git-history scan using that exact pattern set, with history never rewritten.
+
+---
+
+### MEASUREMENTS, AND WHAT THIS SESSION DID NOT DO
+
+- **`make test` BEFORE** (at `2a5c5e3`, before a line was written): **`3 failed, 1067 passed,
+  2 deselected`** in 233.7 s. **AFTER** (at `d63f722`): **`4 failed, 1128 passed, 2 deselected`**
+  in 377.9 s, the fourth being `test_the_object_store_and_the_working_tree_agree` naming
+  **`QUESTIONS.md`**, this session's own uncommitted journal at the time of the run — it clears
+  on commit. **+61 tests, all C11's, all green. Attributed BY FILE in the FINAL OUTPUT; every
+  other failure is another file's and none was touched.**
+- **`make check-roles`: 21 passed / 0 failed / 3 n/a, exit 0.** **D1, D2, D3 and D4 all PASS**
+  with the runner present, which is `Q-119`'s own claim measured rather than asserted.
+- **`git status --porcelain tests/goldens/` EMPTY** and **all nine golden diffs EMPTY.**
+- **TOKEN SPEND: ZERO.** No provider call of any kind, and the package **imports no model
+  client** — asserted by an AST import walk over every module and over the test file. The
+  reservation is **enforced with the refusal as the default**: all five reserved lanes refuse
+  against an empty sanctioned set, and there is no wildcard.
+- **Every commit went through a PRIVATE INDEX with `INC-68`'s step 5, and every `Swept:` line was
+  composed from `git diff --cached` in the SAME COMMAND as the `git add`** — `INC-88`'s
+  guardrail, `OF-205`. All four commits swept **NOTHING**, and the one foreign 8-hex token in the
+  first commit's added lines (`3f8b2d56`) is a **citation** inside this session's own numbering
+  paragraph, not an entry — the distinction `Q-072` exists to record.
+- ⚠️ **NOT DONE, AND NAMED — `check-roles` E6.** `Q-063` clause (iii) assigns it to C11 and this
+  session's fence names `check_roles.py` under **NOT**. **E6 was not written, not worked around,
+  and no lookalike check was put somewhere it does not belong** (`CLAUDE.md` §4). `Q-118`,
+  `OF-206`. The `Swept:` discipline therefore stays what `INC-36` called it — *"a habit, not a
+  guardrail"*.
+- ⚠️ **NOT DONE, AND NAMED — the truncated-episode ORACLE.** `Q-108` is **still OPEN** and this
+  session did not close it. What C11 delivers on that clause, stated at its own expense:
+  *truncation handling is BUILT and TESTED, the truncated episode is COUNTED IN THE DENOMINATOR
+  and printed, and its oracle is this session's own, not the architect's.*
+- ⚠️ **NOT DONE, AND NAMED — `Q-121` is not settled.** A default was taken because a runner must
+  return a number; it is declared as a default and both readings are printed.
+- **NOT TAGGED. NOT SELF-CERTIFIED.** Both `src/` and `tests/` commits end `(unreviewed)`.
+
+---
+
+
 ## C9 — **BUILD 1** — 2026-09-03 — 🟡 **BUILT. GOLDEN 9 REPRODUCES 16/16 ON THE FIRST RUN, THE MOAT IS GREEN AGAINST A REAL `gates/` FOR THE FIRST TIME, AND THE ANSWER KEY'S OWN COMMENTARY IS WRONG IN TWO PLACES**
 
 **SESSION-TOKEN:** `3f8b2d56` · **DATA ROW 64 / 8-HEX ROW 63** of `QUESTIONS.md`'s
