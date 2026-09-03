@@ -9272,3 +9272,94 @@ the FINAL OUTPUT.
 assertion needs a suite-level convention this session's fence does not reach. What this session does
 instead is name, in its FINAL OUTPUT, the exact D1–D4 lines it read **out of `make check-roles`'s own
 output** rather than out of its own test — two independent readings of the same property.
+
+---
+
+## INC-123 — `PROCESS.md` §7b's recipe was followed exactly and a concurrent session's seven questions were still committed under the wrong token, because the recipe protects the FILE LIST and not the FILE
+
+⚠️ **THIS ENTRY WAS OWED AND COULD NOT BE WRITTEN WHEN IT WAS DUE, AND THE REASON WAS THE DEFECT
+ITSELF.** When ARCH — PILOT RUN (`7c05e3b9`) found this, `INCIDENTS.md` held **eight uncommitted
+entries belonging to the concurrent session `2e94c7b5`** (`INC-115`…`INC-122`), so appending here and
+running `git add -- INCIDENTS.md` **would have committed all eight under this session's token — which
+is precisely the defect being recorded.** The full eight-field text was therefore written into
+`QUESTIONS.md` at **`cc8a221`** with the number left as `INC-NN`, because guessing a number in a file
+another live session is actively writing is `INC-65`/`INC-68`'s renumbering class. **`2e94c7b5` then
+committed its own journal at `acfa919`**, `INCIDENTS.md` went clean, and the entry lands here as
+`INC-123`. **The delay is part of the record, not an omission from it.**
+
+**Event:** `7c05e3b9` committed **`4788184`** after staging four explicit paths. Step 3's `--stat`
+printed **`QUESTIONS.md | 446 ++++`** where the session had written roughly a hundred lines. **It read
+the number, did not question it, and committed.** `git log -S"### Q-154" -- QUESTIONS.md` later named
+`4788184` as the commit that introduced **`Q-154`…`Q-160` — all seven authored by the concurrent
+session `2e94c7b5`**, whose own entries say so (*"Raised by: C12 BENIGN SOLVER BUILD 1 (`2e94c7b5`)"*),
+and **absent from `QUESTIONS.md` at `34a8548`**, this session's open.
+
+**Action:** verified the swept content **INTACT rather than assuming it** — `Q-160`'s block ends
+coherently on *"What the architect must settle:"*, all seven carry their own `Raised by:` line, none
+is truncated; confirmed **none** of this session's commits carried any of `2e94c7b5`'s `INCIDENTS.md`
+entries; recorded the SHA and the true author in `QUESTIONS.md`; corrected three now-false statements
+in its own already-pushed journal **in the record rather than by editing them away**; and **did not
+attempt to undo it.**
+
+**Expectation:** a session's commit contains that session's work. `PROCESS.md` §7b's recipe is titled
+*"THE PRIVATE-INDEX RECIPE, IN ITS CORRECTED FORM"* and every one of its five steps was followed on
+every commit — private index in a fresh OS temp dir, `git read-tree HEAD`, stage-snapshot-commit in
+**one** command, step 4 as `env -u GIT_INDEX_FILE git reset` and never `VAR=`, and
+`git diff --cached --quiet` exiting 0 afterwards. **The expectation that this is sufficient is what
+was wrong.**
+
+**Missing:** ⚠️ **a check that the staged snapshot matches what the session believes it wrote.** §7b
+prints the `--stat` and calls it *"the only true statement of what is about to be committed"* — **but
+nothing compares it to an expectation, so a wrong number is information nobody is required to act
+on.** One pre-declared line-count expectation printed beside the actual would have made
+446-versus-~100 impossible to walk past. **`--stat` is a report; it is not a gate.** Also missing: the
+fence named the paths this session must not touch and **said nothing about the four journals both
+concurrent sessions would be writing at once**, which is the collision the append-only clause exists
+for.
+
+**Missed:** ⚠️ **`INC-88` IS THIS EXACT FAILURE FROM THE OTHER SIDE — *"a clause-(i) diff read 182
+`PROGRESS.md` lines two tool calls before the `add`, the commit landed 309, and the 127-line
+difference was a concurrent session's complete journal entry"* — and `INCIDENTS.md` is item 7 of this
+session's own prescribed read order.** The session also **read its prompt's warning that `2e94c7b5`
+was live in the tree**, and drew from it exactly one conclusion — do not touch
+`src/whetstone_gate/benign/` — **while missing that the warning's real scope was every file both
+sessions would write.** ⚠️ **And `OF-215` names the mirror image** — *"if the snapshot lists fewer
+files than you staged, you have been swept"* — **so the project had already learned to read the
+snapshot for a number that is too SMALL, and nobody had written down that a number too LARGE is the
+same instrument reporting the same class.**
+
+**Diagnosis:** `git add -- <path>` stages the whole path, so a concurrent append to a file this
+session legitimately owned a hunk of rode into this session's commit; the private index prevents
+committing **unnamed** files and has no effect whatever on **named** ones.
+
+**Fix:** ⚠️ **NOT UNDOABLE AND NOT UNDONE.** `CLAUDE.md` §5 forbids force-push, history rewrite and
+amending, and a rewrite would destroy `probe-v1` — cut minutes earlier — and every `cN-pass` tag.
+**Nothing was lost or corrupted; what is wrong is attribution**, and `make check-roles` E1–E5 cannot
+see it because they key off **commit trailers**, never off who wrote the content. The correction is
+therefore **in the record**: `QUESTIONS.md` at **`cc8a221`** names `4788184`, names `2e94c7b5` as the
+true author of `Q-154`…`Q-160`, and says the checker is blind to this class.
+**This entry's commit SHA is the one carrying it.** This is `PROCESS.md` §8's own doctrine applied to
+authorship instead of to a leaked key — *"a revoked key in a public history is a recorded incident; a
+rewritten history is a destroyed pre-registration."*
+
+**Systemic guardrail:** ⚠️ **NONE, AND THE HONEST FORM OF THAT IS A DESIGN CHANGE RATHER THAN A
+RESOLUTION.** Three things would each close it and **none is in the recording session's fence.**
+**(1)** One journal file per session. `docs/sessions/` already works that way and **it is the only
+shared-tree artefact this session could not have swept.** Append-only-plus-rebase manages
+**conflicts**; it does nothing about **authorship**. **(2)** A `check-roles` **E6** that flags a commit
+touching a journal path whose diff introduces another *issued* token's self-record heading — cheap,
+and it would have gone red on `4788184` immediately. **(3)** Concurrency stops being permitted for
+sessions that write the same journal: `PROCESS.md` §1's concurrency clause requires *"disjoint SCOPE
+FENCEs"*, and **the journals silently violate that for every concurrent pair ever approved.**
+⚠️ **AND THE OTHER HALF IS THE ONE `INC-65` ALREADY CALLS UNCLOSEABLE — *"nothing can warn the session
+being swept"* — WHICH THIS SESSION ALSO MET, TWENTY MINUTES LATER**, when its own verified `check-roles`
+E1 fix was overwritten from another session's buffer before it was committed, with
+`git diff HEAD` reading **empty**. Its own lesson against itself, and the only part it could act on:
+**commit a fix in the same command that makes it (`OF-205`) — a verified-but-uncommitted fix in a
+shared tree is not a fix.**
+
+⚠️ **AND THE COMPARISON THAT IS NOT FLATTERING TO THIS SESSION, RECORDED ANYWAY:** the concurrent
+session's own commits did the thing this one failed to do. **`b0a7bba` touched fifteen paths and every
+one of them was its own** — fourteen `benign/` modules plus its test file, **6,421 insertions, 0
+deletions, and not one journal file** — and it kept its journal work for a separate commit,
+`acfa919`, under its own token.
