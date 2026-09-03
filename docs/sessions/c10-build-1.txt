@@ -310,6 +310,7 @@ TOKEN SPEND: ZERO. NO PROVIDER MODEL CALL OF ANY KIND.
   FULL SUITE, after the build                     4 failed, 1183 passed, 581.18 s
   FULL SUITE, baseline before any C10 line        6 failed, 1128 passed, 364.30 s
   make check-roles                                EXIT 0 - 21 passed, 0 failed, 3 n/a
+                                                  (measured TWICE - see the correction below)
 
   D1  gates/ imports nothing from scorer/         PASS
   D2  scorer/ imports nothing from gates/         PASS
@@ -342,6 +343,51 @@ TOKEN SPEND: ZERO. NO PROVIDER MODEL CALL OF ANY KIND.
     all NINE golden diffs                     EMPTY (golden1, 2, 3, 4, 5, 5b, 8, 9,
                                               world_seed_2001)
   grep.exe.stackdump                          NOT DELETED, still present, still untracked
+
+12a. !! A CORRECTION TO 12, MADE IN PLACE, TO THIS FILE, AFTER IT WAS COMMITTED - INC-96
+--------------------------------------------------------------------------------
+
+  THE LINE ABOVE WAS TRUE WHEN MEASURED AND FALSE WHEN THIS FILE WAS COMMITTED, AND THE
+  COMMITS THAT CARRIED THIS FILE ARE PART OF WHAT MADE IT FALSE. Stated rather than
+  silently replaced, because this file exists so a spoken paraphrase can be checked
+  against it, and a file that quietly self-corrects is worth nothing for that.
+
+    measured, before the journal commits      21 passed, 0 failed, 3 n/a   <- line above
+    measured, one last look before pushing    18 passed, 3 FAILED, 3 n/a
+    measured, after `17ad52a`                 21 passed, 0 failed, 3 n/a   <- final
+
+  THE THREE FAILURES WERE MINE, NOT ANY CONCURRENT SESSION'S:
+
+  C1  no secret-shaped string in any tracked file   RED on INCIDENTS.md:7724
+      !! MY OWN `INC-93` PASTED THE DIFF HUNK CONTAINING THE TWO SECRET-SHAPED LITERALS,
+      inside the entry that is ABOUT those literals, quoting `d63f722`'s subject line two
+      lines above them. THAT IS `INC-90`'s CLASS FIRING A THIRD TIME, IN THE SESSION THAT
+      READ `INC-90` THAT MORNING. The remedy is NOT to widen C1's pattern (hard rule 6);
+      it is to stop putting the shape in a tracked file - `d63f722`'s own remedy, one file
+      over. The literals are now bracketed descriptions that match nothing and the entry
+      still says exactly what the stale blob restored.
+
+  A3  no CRLF in any tracked file                   RED on 5 files
+  A4  working tree and object store hold same bytes RED on the same 5
+      PROGRESS.md, QUESTIONS.md, STATUS.md, docs/reviews/OPEN_FINDINGS.md and THIS FILE
+      were written through Python's `Path.write_text` and an editor tool, both opening in
+      TEXT MODE with `newline=None`, so every LF became CRLF on Windows. !! THE COMMITTED
+      BLOBS WERE CORRECT THROUGHOUT - `.gitattributes`' `* text=auto eol=lf` normalises on
+      checkin, so `git diff HEAD` was EMPTY for all five and `git status` ALONE NEVER
+      SHOWED A THING. Rewritten byte-level, CRLF -> LF, with an assertion that the content
+      with all newlines stripped is BYTE-IDENTICAL before and after.
+
+  MISSED: git printed "CRLF will be replaced by LF" on FOUR separate `git add` calls in
+  this session's own transcript, directly above `--stat` output the session was reading
+  carefully for `OF-205`. And `OF-207` - raised by the C11 session HOURS EARLIER against
+  its own commit of the same class - names the exact gap: C1 runs only at the end of a
+  six-minute suite and nothing runs it over a chunk's own new files as they are written.
+  IT HAS NOW FIRED TWICE, IN TWO SESSIONS, ON TWO FILES, WITHIN HOURS. This session adds
+  no new finding for it and recommends one line on `OF-207`'s remedy: RUN `make
+  check-roles` IMMEDIATELY BEFORE EVERY COMMIT, not once at the end of a session.
+
+  Nothing is amended and no history is rewritten. `412447e`, `2dba017` and `106cda8`
+  stand with the defect in them; `17ad52a` is the fix and `INC-96` is the record.
 
 13. EVERY `Swept:` LINE, COMPOSED FROM THE STAGED SNAPSHOT AND NOTHING ELSE
 --------------------------------------------------------------------------------
@@ -470,6 +516,11 @@ TOKEN SPEND: ZERO. NO PROVIDER MODEL CALL OF ANY KIND.
     world/, attacker/, check_roles.py, CONTEXT.md, PROCESS.md, config/ and the frozen
     artefacts are all untouched.
   - DID NOT spend a token. Zero provider model calls of any kind.
+  - !! SHIPPED TWO DEFECTS OF ITS OWN INTO ITS OWN JOURNAL COMMITS AND FOUND THEM ONLY ON
+    A LAST-LOOK `check-roles` BEFORE PUSHING - two secret-shaped literals inside `INC-93`
+    and CRLF in five tracked files. Fixed at `17ad52a`, recorded as `INC-96`, corrected in
+    this file at section 12a. NOT AMENDED AWAY: `412447e`, `2dba017` and `106cda8` stand
+    with the defect in them.
   - !! DID TOUCH SHARED STATE ONCE, AND IT IS DISCLOSED RATHER THAN BURIED: it unstaged
     `tests/test_c11_runner.py` from the SHARED index (INC-93). That path is outside this
     session's fence. The action changed NO working-tree byte, the blob was backed up first

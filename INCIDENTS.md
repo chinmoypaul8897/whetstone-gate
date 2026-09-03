@@ -7924,3 +7924,114 @@ concurrent session has already committed one of yours; find it with `git log -1 
 record the SHA and the token"* — a `PROCESS.md` §7 line, which is the **architect's**, exactly as
 `INC-68`, `OF-205` and `INC-91` record of their own remedies. `OF-67`, and it is still a habit.
 Raised as `OF-215`.
+
+---
+
+## INC-96 — the session that had just written **three** incidents about vigilance in a shared tree committed **two secret-shaped literals** into `INCIDENTS.md` — inside `INC-93`, the entry that is ABOUT those exact literals — and **CRLF into five tracked files**; `make check-roles` went **21/0 → 18/3** and this session's own FINAL OUTPUT file asserted **21 passed, 0 failed** while it was **18 passed, 3 failed**
+
+**Date:** 2026-09-03 (C10 BUILD 1, `bc69e8d7`, **after** this session's first build commit
+`d07c67f` and after **all four** of its journal commits. Found by **re-running `make check-roles`
+one last time before pushing**, which the prompt requires and which this session had already run
+green two hours earlier. Fix SHA under **Fix**.)
+
+**Event:** two independent defects, both this session's, both landed in `412447e`, `2dba017` and
+`106cda8`, and both invisible until the final re-run.
+
+**(i) `INC-93` quoted the secret shapes it exists to describe.** The entry narrates a stale index
+blob that *"restores the two secret-shaped literals `d63f722` had just removed"* — and, to show what
+that meant, **pasted the diff hunk containing them**:
+
+```
++    <the Groq shape, written out in full>      <- as committed, verbatim
++    <the Google shape, written out in full>
+```
+
+`check_roles` **C1 — no secret-shaped string in any tracked file — went RED**, on
+`INCIDENTS.md:7724`, which is inside `INC-93`.
+
+⚠️ **THIS IS `INC-90`'s CLASS, FIRING FOR THE THIRD TIME, IN THE SESSION THAT READ `INC-90` THAT
+MORNING.** `INC-90` is the C11 session recording the same defect in `tests/test_c11_runner.py`;
+`d63f722` fixed it by assembling the values at run time; `INC-90`'s own text records the class
+firing a second time *inside `INC-90`*. This session read all of it during its read order, quoted
+`d63f722`'s subject line **in the very entry that then reproduced the defect**, and did not notice
+that a journal is a tracked file too.
+
+**(ii) CRLF in five tracked files.** `PROGRESS.md`, `QUESTIONS.md`, `STATUS.md`,
+`docs/reviews/OPEN_FINDINGS.md` and `docs/sessions/c10-build-1.txt` were written through
+`pathlib.Path.write_text` and an editor tool, both of which open in **text mode with
+`newline=None`**, so every `\n` became `\r\n` on Windows. **A3** (no CRLF in any tracked file) and
+**A4** (working tree and object store hold identical bytes) both went RED on all five.
+⚠️ **The committed blobs were CORRECT throughout** — `.gitattributes`' `* text=auto eol=lf`
+normalises on checkin, which is why `git diff HEAD` was empty for all five and **`git status` alone
+never showed a thing**. The damage was confined to the working tree, and A3/A4 exist precisely
+because a working tree that disagrees with the object store makes a fingerprint depend on which OS
+computed it (`PROCESS.md` §6a).
+
+⚠️ **(iii) AND THE FINAL OUTPUT FILE ASSERTED THE WRONG NUMBER.** `docs/sessions/c10-build-1.txt`
+§12 was committed at `2dba017` stating *"make check-roles EXIT 0 - 21 passed, 0 failed, 3 n/a"*.
+That was **true when measured** and **false when committed** — the very commits that carried the
+file, and the journal commit before them, are what turned A3, A4 and C1 red. **The file that exists
+so a spoken paraphrase can be checked against it was itself carrying a stale measurement.**
+
+**Action:** ⚠️ **THE REMEDY IS NOT TO WIDEN C1'S PATTERN** (hard rule 6 — a test is never weakened
+to get green); it is to stop putting the shape in a tracked file, which is `d63f722`'s own remedy
+applied one file over. The two literals in `INC-93` were replaced by bracketed descriptions that
+carry the same meaning and match nothing: the entry still says exactly what the stale blob restored.
+The five files were rewritten **byte-level**, `\r\n → \n`, with an assertion that the content with
+all newlines stripped was **byte-identical before and after**, so nothing but line endings moved —
+and `git diff HEAD` for all five is **EMPTY**, confirming the blobs never changed. `check-roles`
+re-run: **21 passed, 0 failed, 3 n/a**. §12 of the FINAL OUTPUT file was then corrected **in place,
+with the wrong figure named and this entry cited**, rather than silently replaced.
+
+**Expectation:** a journal entry about secret-shaped strings does not contain secret-shaped strings.
+A session that writes files on Windows writes LF. And the file that IS the record does not assert a
+measurement that stopped being true before it was committed.
+
+**Missing:** ⚠️ **anything that runs `check-roles` — or even C1 alone — at the moment a file is
+written, rather than when a session remembers.** This is `OF-207` **exactly**, raised by the C11
+session hours earlier against its own commit of the same class: *"C1 runs only at the end of a
+six-minute full suite, and nothing runs it over a chunk's own new files at the moment they are
+written."* The finding was **open, in this repository, describing this failure**, and this session
+read it. ⚠️ **And for the CRLF half: nothing warns a session that its file-writing tool translates
+newlines.** Git printed *"CRLF will be replaced by LF the next time Git touches it"* on **four
+separate `git add` invocations** in this session's own transcript.
+
+⚠️ **AND IT FIRED A FOURTH TIME, INSIDE THIS ENTRY, WHILE THIS ENTRY WAS BEING WRITTEN.**
+The paragraph above originally quoted the two literals *again* - to show what `INC-93` had
+quoted - and `check_roles` **C1 went RED on `INCIDENTS.md:7945`**, which is inside `INC-96`.
+It was caught by the habit this entry's own **Systemic guardrail** recommends: running
+`make check-roles` immediately before the commit rather than at the end of the session.
+**The defect is now four-for-four across two sessions - `INC-90`, `INC-90`'s own second
+firing, `INC-93`, and here - and every one of the four was written by somebody who had just
+read about the previous one.** That is not carelessness repeated; it is a **structural**
+property of a journal whose subject is the contents of tracked files, and it is the
+strongest available evidence for `OF-207`.
+
+**Missed:** ⚠️ **git's own warning, four times, in this session's own output.** It is a `warning:`
+line above a `git add` whose `--stat` the session was reading carefully for `OF-205` — the eye went
+to the file list underneath it. ⚠️ **And `OF-207`, which this session had read and which names the
+gap that let (i) through.** ⚠️ **And `INC-90` itself**, whose subject line this session **quoted**
+inside the entry that reproduced it. Three signals, all present, all read, none connected.
+
+**Diagnosis:** the session treated "secret-shaped string" as a property of *source files* and
+"line endings" as a property of *tools it was not thinking about*, when both are properties of
+**every tracked file**, and a journal entry that quotes a defect verbatim **is** that defect one
+copy over. The deeper mechanism is that all three checks run at the **end** of a long suite, so the
+window between writing a defect and hearing about it is measured in hours and spans several commits.
+
+**Fix:** ⚠️ **`17ad52a`.** ⚠️ **NOTHING IS AMENDED AND NO HISTORY IS REWRITTEN** — `412447e`,
+`2dba017` and `106cda8` stand with the defect in them, and this entry plus the corrected §12 are
+how the record is repaired. **The `(unreviewed)`-marked history is the evidence, and a tidy history
+would be worth less.**
+
+**Systemic guardrail:** ⚠️ **NONE NEW, AND THAT IS DELIBERATE, BECAUSE THE RIGHT ONE IS ALREADY
+RAISED AND IS NOT THIS SESSION'S TO LAND:** `OF-207` asks for exactly the check that would have
+caught (i) at the moment of writing, and it is the **architect's** (`check_roles.py` and
+`PROCESS.md` are under this session's **NOT**). ⚠️ **This entry's contribution is to record that
+`OF-207` has now fired TWICE, in two different sessions, on two different files, within hours** —
+which moves it from a plausible gap to a measured one, and it should be read as evidence for
+`OF-207` rather than as a new finding. **What this session did adopt as a habit, and what it
+recommends be added to `OF-207`'s remedy, is one line: run `make check-roles` IMMEDIATELY BEFORE
+EVERY COMMIT, not once at the end of the session** — it takes seconds, it is the only check that
+sees A3, A4 and C1 together, and every one of this session's four journal commits would have caught
+this. Recorded against `OF-207` rather than as a new row.
