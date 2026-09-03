@@ -1,4 +1,4 @@
-PUSHED SHA: <filled by the commit that follows this one, and by nothing else>
+PUSHED SHA: 2dba017   <- the commit that CONTAINS this file, filled by the commit that FOLLOWS it
 
   !! THE SHA CHAIN TERMINATES HERE, DELIBERATELY, AND IS SAID RATHER THAN LEFT AS A
   PLACEHOLDER. A file cannot contain the SHA of the commit that commits it. This file is
