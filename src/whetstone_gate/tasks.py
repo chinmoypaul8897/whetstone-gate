@@ -9,7 +9,8 @@
   2. **C0 installs a `make` shim** on the operator's machine, so ``make eval`` works here
      too.
 
-Targets: ``test`` · ``eval`` · ``selftest`` · ``check-prereg`` · ``check-roles``.
+Targets: ``test`` · ``eval`` · ``selftest`` · ``check-prereg`` · ``check-roles`` ·
+``drive``.
 """
 
 from __future__ import annotations
@@ -23,7 +24,7 @@ from . import check_roles as _check_roles
 from . import config as cfg
 from ._console import say
 
-TARGETS = ("test", "eval", "selftest", "check-prereg", "check-roles")
+TARGETS = ("test", "eval", "selftest", "check-prereg", "check-roles", "drive")
 
 #: ⚠️ **THE RUN DIRECTORY `make eval` READS, AND WHY IT IS A LITERAL, NOT A CONFIG KEY.**
 #: `CONTEXT.md` §16 names ``evals/results/`` as the raw per-episode JSON, and the
@@ -215,6 +216,56 @@ def task_eval() -> int:
     return max(rc, prereg)
 
 
+def task_drive(argv: list[str]) -> int:
+    """⚠️ **THE EPISODE DRIVER — the only target in this file that can spend money.**
+
+    ``python -m whetstone_gate.tasks drive -- <flags>``; every flag is
+    :mod:`whetstone_gate.driver.__main__`'s and is documented by ``drive -- --help``.
+
+    ⚠️ **TWO REFUSALS ARE ENFORCED HERE, BEFORE THE DRIVER IS EVEN CONSTRUCTED:**
+
+    1. **NO ARGUMENT SPENDS MONEY BY DEFAULT.** Exactly one of ``--dry-run`` /
+       ``--spend-real-tokens`` must be typed; the driver's own parser makes the group
+       required, so an empty invocation is a usage error rather than a provider call.
+    2. ⚠️ **THIS TARGET REFUSES ENTIRELY IF `probe-v1` DOES NOT RESOLVE**, in **either**
+       mode. `CONTEXT.md` §15.1 cuts that tag **before the pilot and before the arm-1
+       calibration** and `PROTOCOL.md` §6 calls the order *"not negotiable"*; both runs are
+       **single-shot** (`PROCESS.md` §6b), so a run started before the tag exists has spent
+       it **outside the pre-registration** and nothing can undo that.
+
+       **The rehearsal has its own door, and it is a different one.**
+       ``python -m whetstone_gate.driver --dry-run …`` runs the same code, makes **no
+       network call at all**, refuses to write inside this repository, and prints the tag's
+       status — so an operator can rehearse **today**, before `probe-v1` exists, which is
+       what the rehearsal is for. That split is recorded at `QUESTIONS.md` **Q-146**: this
+       target takes the instruction literally and the module entry point keeps the
+       rehearsal reachable.
+    """
+    from .driver import run as driver_run
+
+    root = cfg.repo_root()
+    say("-- drive - the episode driver ------------------------------------------------")
+    resolves = driver_run.probe_tag_resolves(root)
+    say(f"  {driver_run.PROBE_TAG} resolves : {resolves}")
+    if not resolves:
+        say("  REFUSED, ENTIRELY, and the refusal is the outcome:")
+        say(f"    {driver_run.PROBE_TAG} does not resolve. CONTEXT.md S15.1 cuts it BEFORE")
+        say("    the pilot and BEFORE the arm-1 calibration, and PROTOCOL.md S6 calls that")
+        say("    order 'not negotiable'. Both runs are SINGLE-SHOT (PROCESS.md S6b): the")
+        say("    first execution that runs to completion IS the run, so one started before")
+        say("    the tag exists has spent it OUTSIDE the pre-registration.")
+        say("  To REHEARSE before the tag exists - no network call, nothing written inside")
+        say("  this repository - use the module entry point instead:")
+        say("    python -m whetstone_gate.driver --dry-run --out-root <dir outside the repo>")
+        say("      --arm <arm> --s3-binding <binding> --call-ceiling N --token-ceiling T")
+        say("  See QUESTIONS.md Q-146.")
+        return 2
+
+    from .driver.__main__ import main as driver_main
+
+    return driver_main(argv)
+
+
 # --------------------------------------------------------------------------------------
 
 _DISPATCH = {
@@ -224,6 +275,9 @@ _DISPATCH = {
     "check-prereg": task_check_prereg,
     "check-roles": task_check_roles,
 }
+
+#: The one target that takes its own arguments. Everything else is a bare verb.
+_TAKES_ARGV = ("drive",)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -235,7 +289,22 @@ def main(argv: list[str] | None = None) -> int:
         ),
     )
     parser.add_argument("target", choices=TARGETS, help="the target to run")
+    # ⚠️ `drive` carries its own flags. REMAINDER rather than a second parser, so that
+    # `drive -- --help` reaches the driver's own help instead of this one, and so no flag
+    # meant for the driver is silently eaten here.
+    parser.add_argument(
+        "rest",
+        nargs=argparse.REMAINDER,
+        help="arguments for `drive`; see `drive -- --help`",
+    )
     args = parser.parse_args(argv)
+    if args.target in _TAKES_ARGV:
+        rest = list(args.rest)
+        if rest and rest[0] == "--":
+            rest = rest[1:]
+        return task_drive(rest)
+    if args.rest:
+        parser.error(f"target {args.target!r} takes no arguments; got {args.rest}")
     return _DISPATCH[args.target]()
 
 
