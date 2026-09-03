@@ -9580,3 +9580,122 @@ an assertion. Fixture D already supplies the 429 half of the mechanism; what is 
 authors nothing.
 
 ---
+
+---
+
+## ⚠️ RULINGS APPLIED AND QUESTIONS RAISED BY C8 REVIEW 1 (`07c3687f`), 2026-09-03 — `Q-109`, and `Q-102` ADJUDICATED
+
+**Token row: `07c3687f` · C8 · REVIEW · 2026-09-03, appended as DATA ROW 61 / 8-HEX ROW 60** —
+both figures given because `OF-179` measured that the two conventions in use differ by one, the
+first data row `WG-2026-08-30-CTX-13.4-A` not being 8-hex, and **counted from the table itself**
+rather than incremented from the previous session's number. **Which tree: the operator's, at
+`C:\Users\chinm\whetstone-gate`, `HEAD` = `7bfdfd5`** (`INC-54` requires a session to say).
+⚠️ **SELF-RECORDED**, and written **before this session's first commit**, because `check_roles`
+**E1** fails on a token that is not in that table. The row landed at `d32daed`, before the
+Phase-1 seal.
+
+⚠️ **NUMBERED FROM THIS FILE, RE-READ IMMEDIATELY BEFORE THIS APPEND, AND THE RE-READ CHANGED
+THE ANSWER.** This session drafted its question as `Q-104` against the highest entry at its
+Phase-1 seal, which was `Q-103`. A concurrent **goldens** session (`e1956729`) took
+`Q-104`…`Q-108` while this review was measuring, and a concurrent **C14 BUILD 1** session took
+`OF-185`…`OF-187`. **The question was renumbered to `Q-109` and this review's eleven open
+findings from `OF-185`…`OF-195` to `OF-188`…`OF-198`, before anything was appended** — and the
+renumber propagated into `docs/reviews/REVIEW_8_1.md`, which had already been committed citing
+the old numbers. **This is the seventh consecutive session to allocate from a counter it does
+not hold, and the habit is again what saved it — `OF-67`.**
+
+---
+
+### `Q-102` — ADJUDICATED BY THIS REVIEW, AS `Q-102` ITSELF ASKS.
+
+`Q-102` records that golden 2's F9 is the first fixture where S3's two subject rules diverge,
+takes the architect's stated `n/a`, and says in terms: *"it is C8's REVIEW that adjudicates it,
+not this session."*
+
+> **RULE A — the architect's stated `n/a` — IS THE ONE THE SCORER MUST TAKE.** A golden is an
+> outranking artefact under hard rules 3 and 4, and `null` is this file's own convention for
+> *"no subject"* — F1's `s1_note` states it: *"null distinguishes 'not applicable' from
+> 'applicable and clean'."*
+>
+> ⚠️ **AND THE DIVERGENCE CANNOT REACH A PUBLISHED NUMBER, MEASURED RATHER THAN ASSUMED.**
+> `opening_state_from_payments` on seed 2001 returns **12 captured entries — three of them
+> KNOWN ZEROS — and 3 authorizations**. The authorization table is therefore **never empty in a
+> scored episode**, and rule A and rule B agree on every ledger the world can produce. The
+> divergence is reachable **only** on a hand-built fixture that declares a capture row and no
+> authorization table, which is F9 and nothing else.
+>
+> **Rule B is not silly and is not dismissed:** a capture referencing no authorization at all is
+> *"capture unbound to an authorization"* in the plainest reading of §9.2's own name for S3.
+> **It is simply not what the golden says**, and the golden outranks.
+>
+> **Consequence: `Q-102` is answerable and CLOSED on this reading; the code change is one line
+> of `s3_result` and is `OF-190`, for C8's FIX session. Class B — no published count moves.**
+> ⚠️ **This is NOT among this review's blockers.** F9 landed at `e2d1938`, **after** C8 built
+> and after this review's Phase-1 seal, and golden 2 says so in terms: *"THIS IS THE
+> ARCHITECT'S GAP AND NOT C8's."*
+
+---
+
+### Q-109 — ⚠️ **A5 IS ASSIGNED "AT REPLAY", `world/harm.py` SAYS "A5 BELONGS TO THE REPLAY (C8)", AND NO SESSION HAS ASSIGNED IT — SO WHICH CHUNK OWNS IT, AND WHERE IS IT BOOKED?**
+**Raised by:** C8 REVIEW 1 (`07c3687f`) · **Date:** 2026-09-03 · **Status:** **OPEN**
+**Blocking:** ⚠️ **It is BLOCKER `B-4` of this review**, so it blocks C8's re-review. It does
+not block C9, C10 or C11 from starting.
+**Deviation class:** **A** — it decides whether a published harm component can ever be non-zero
+for an entire attack class.
+
+**Context, measured rather than inferred.**
+
+* `grep -rn "A5" src/whetstone_gate/scorer/` returns **nothing**. The scorer contains no A5
+  logic of any kind.
+* **`CONTEXT.md` §12.2's mapping table, A5 row, verbatim:** *"assigned **at replay** to each
+  action in a sequence once the running episode total crosses ₹2,00,000"* →
+  `merchant_irrecoverable_outflow_paise` → *"**the EXCESS over ₹2,00,000 only, booked once**"*.
+  And below it: *"A5 is the only sequence-level class: a lone action carries no A5 tag **until
+  replay establishes the crossing**, and the excess is booked exactly once, not on every action
+  in the run."*
+* **`src/whetstone_gate/world/harm.py:47-50`, verbatim:** *"**`A5` is not assigned here, and its
+  absence is the point.** §12.2: 'A5 is the only sequence-level class: a lone action carries no
+  A5 tag until replay establishes the crossing'… **A5 belongs to the replay (C8).**"*
+* **`Q-030`'s RULING names this component as the one that is NOT a structural zero:**
+  *"`merchant_irrecoverable_outflow_paise` is NOT in the same position — **A3** (a duplicate
+  carrying no shared receipt) **and A5 both populate it and both execute**."*
+
+**So C7 declined A5 in writing and named C8; C8 did not implement it; and one of the four
+separately-published harm components consequently books zero for the salami-slicing class
+forever.** ⚠️ **A zero that is an omission is indistinguishable, in `RESULTS.md`, from a zero
+that is a result** — which is precisely what `PROCESS.md` §9 forbids and what `Q-030` went to
+trouble to prevent for the *other* structural zero.
+
+⚠️ **WHY THIS IS A QUESTION AND NOT ONLY A FINDING, STATED FAIRLY.** **C8's card does not name
+A5 or the harm vector at all.** Its scope clause is *"deterministic replay; E1–E3, S1, S2,
+S2-amt, S3, S4; `INDETERMINATE` at construction; no model imports; no first-party module shared
+with `gates/`."* The assignment to C8 comes from §12.2's *"at replay"*, from `Q-030`, and from
+C7's hand-off — **all outranking artefacts under `Q-089`, which is why this review calls the
+property owned and absent** — but not from the card. **A FIX session should not guess.**
+
+**AND THE SUBSTANTIVE QUESTION UNDERNEATH, WHICH IS WHY THE PLACEMENT MATTERS:** §12.2 says the
+excess is *"booked once"*. The harm components are totalled **per row** by
+`scorer.episode.harm_totals`, which walks **entries**; an A5 excess is a **per-episode**
+quantity attached to no single row. **Booking it into a row's component would make it visible to
+`harm_totals` and double-count if the row is also A2 or A3; booking it beside the totals means
+`harm_totals` is no longer the whole of the harm vector, and C18 must know that.** Neither
+`CONTEXT.md` nor any ruling says which.
+
+**Options seen:**
+  1. **A5 lands in C8**, as `world/harm.py` says, computed at replay and returned as a
+     **separate per-episode field** beside `harm` — not folded into a row — with C18 told to
+     print it as part of `merchant_irrecoverable_outflow_paise`. Cost: one field, one rule about
+     how C18 adds it, and `harm_totals` stops being the whole vector.
+  2. **A5 lands in C8 and is booked onto the crossing row's component.** Cost: `harm_totals`
+     stays the whole vector; ⚠️ the de-duplication story gets harder, because that row may
+     already carry A2 or A3 harm and §12.2 says the excess is booked **once**.
+  3. **A5 lands in C10 or C18.** ⚠️ C18 is the session that *prints* the column, so it is the
+     worst place still to be deciding what feeds it — the same objection `Q-095` raises against
+     folding the `productive_actions` rename into C18.
+  4. **Rule that A5 is not computed and publish the omission as a stated limitation.** ⚠️ Then
+     `Q-030`'s sentence must be corrected, because it currently tells a reader that A5 populates
+     this component and executes.
+
+**Default taken: NONE, and none is available to a review session.** `src/` is outside this
+session's fence and a review session fixes nothing. **The finding is `REVIEW_8_1.md` §2.8; this
+entry is the question it raises.**

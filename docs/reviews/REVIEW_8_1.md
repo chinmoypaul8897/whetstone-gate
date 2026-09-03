@@ -257,8 +257,8 @@ That is why the instrument is the reviewer's own code and not the shipped code.
 | 3 | **E2**'s comparison is STRICT `>` (`M-B03`) | ✅ **YES** |
 | 4 | **E1/E2/E3 range over `create_instant_settlement`** (`M-B04`) — golden 2 contains **no settlement row at all** | ⚠️ **NO — THIS IS BLOCKER B-2.** The tool *is* in `MONEY_TOOLS`, but the action is filtered out by `amount_paise is not None` and never scored |
 | 5 | **E3** fires only on EXECUTED actions after exhaustion (`M-B05`) | ✅ **YES** |
-| 6 | **S2**'s SAME-PAYMENT half (`M-B06`) — no fixture reuses one receipt across two payments | ✅ **YES** — keys on `(target, receipt)`. **Unpinned** → `OF-186` |
-| 7 | **S2**'s NON-EMPTY clause vs the empty string (`M-B07`) | ✅ **YES** — `if not entry.receipt` is falsy-wide. **Unpinned** → `OF-185` |
+| 6 | **S2**'s SAME-PAYMENT half (`M-B06`) — no fixture reuses one receipt across two payments | ✅ **YES** — keys on `(target, receipt)`. **Unpinned** → `OF-189` |
+| 7 | **S2**'s NON-EMPTY clause vs the empty string (`M-B07`) | ✅ **YES** — `if not entry.receipt` is falsy-wide. **Unpinned** → `OF-188` |
 | 8 | **S2-amt**'s CURRENCY term (`M-B08`) | ✅ **YES** *for this world*, and the code says so in terms rather than exploiting it |
 | 9 | **S3**'s in-episode consumption (`M-B09`) | ✅ **YES** — both readings computed and carried |
 | 10 | **S4**'s window width comes from `config/` (`M-B12`) — any `W ≥ 2` gives identical cells | ✅ **YES** — `constants.s4_in_flight_window_width` |
@@ -270,7 +270,7 @@ That is why the instrument is the reviewer's own code and not the shipped code.
 *"a scorer that returned `[]` for 'no captures present' would pass those seven fixtures without
 implementing S3 at all."* **Measured: it would not.** `M-B10` returns `[]` where the file pins
 `null`, and dies on **8 cells**. The file discriminates the very case its own prose says it
-cannot. Recorded as `OF-190` (LOW, the architect's).
+cannot. Recorded as `OF-193` (LOW, the architect's).
 
 **Nine of the thirteen blind spots the shipped code gets RIGHT, and that is to C8's credit** —
 they are correct *because the build re-read its code against `CONTEXT.md` rather than against
@@ -329,7 +329,7 @@ NOT C8's"*), and F9 post-dates the build. **This review adjudicates it, as `Q-10
 > not assumed: `opening_state_from_payments` on seed 2001 yields **12 captured entries (3 of
 > them known zeros) and 3 authorizations**, so the authorization table is **never empty in a
 > scored episode** and the two rules agree everywhere it matters. **Class B, one line of
-> `s3_result`, for a FIX session.** → `OF-187`.
+> `s3_result`, for a FIX session.** → `OF-190`.
 
 ---
 
@@ -543,7 +543,7 @@ comes from `CONTEXT.md` §12.2 (*"at replay"*), from `Q-030`'s ruling, and from 
 written hand-off. Under `Q-089` those are outranking artefacts and the grain is theirs, so this
 review calls it **owned and absent**. **A FIX session may reasonably need an architect ruling on
 whether A5 lands in C8, C10 or C18** — and it should ask rather than guess, because §12.2 says
-*"booked once"* and where it is booked decides whether it can be double-counted. → `Q-104`.
+*"booked once"* and where it is booked decides whether it can be double-counted. → `Q-109`.
 
 ---
 
@@ -641,7 +641,7 @@ was tested for exactly that.**
 `assert writes == set(MONEY_TOOLS)` — exact. The read side is
 `assert reads and not (reads & set(MONEY_TOOLS))` — **truthiness**, where the concrete
 two-element set was available and this review measured it as exactly
-`{fetch_payment, fetch_payments}`. Hard rule 6's *"approximating an assertion"*. → `OF-191`
+`{fetch_payment, fetch_payments}`. Hard rule 6's *"approximating an assertion"*. → `OF-194`
 (MEDIUM).
 
 ---
@@ -687,7 +687,7 @@ that from inside.
 the build's own record are accurate on this. **Blind spot 2 is `OF-03`'s doctrine violated in
 the small**: *"nothing to check"* and *"checked and clean"* are the same value to a caller. The
 build argues it is permissive on purpose because *"this function's subject is the seed and not
-the caller"* — **defensible, and it is exactly the seam `B-3` widens.** → `OF-188` (MEDIUM).
+the caller"* — **defensible, and it is exactly the seam `B-3` widens.** → `OF-191` (MEDIUM).
 
 ---
 
@@ -731,14 +731,14 @@ evasions, and I built the evasion files rather than assuming them:**
 `Name`s. **Misses every form expressed as an ATTRIBUTE call:** `math.floor(p * rate)`,
 `operator.truediv(p, 100)`, `p.__truediv__(100)`, `builtins.round(...)`, `math.fsum(...)`. My
 five-shape evasion file produced only **2** findings, both incidental float literals. →
-`OF-192`
+`OF-195`
 
 **Scanner 2 — the four components are never summed** *(and it **is** asserted **per component**,
 as the prompt requires — `@pytest.mark.parametrize` over `HARM_COMPONENTS`)*. Catches `a + b`,
 `sum([a, b])`, `t[X] += row[Y]`. **Missed ALL FOUR of my evasion shapes** —
 `functools.reduce(operator.add, …)`, `math.fsum([...])`, `a - (-b)`, and the most natural one a
 future session would actually write: **bind the components to locals first, then add the
-locals.** → `OF-193`
+locals.** → `OF-196`
 
 ⚠️ **Under `Q-082`/`Q-089` these are guard COVERAGE gaps while the guard's SUBJECT is provably
 clean — MEDIUM, published, and they do NOT hold the tag.** They are named because the next
@@ -763,11 +763,11 @@ baseline, 10 == 10. Provenance inside the clone on both checks.
 |---|---|---|---|
 | **M16** | `INDETERMINATE` counts as ISSUED | ⚠️ **OWNED — `OP-10`** | **The C8 card states it, at the card's own grain**, beside two clauses C8 *did* pin with named tests. **GATE.** → §2.9 |
 | **M24** | S2-amt removed from `INVARIANT_IDS` | ⚠️ **OWNED — `OP-27`** | §12.1 **and frozen `INVARIANTS.md`** state the seven-member set. **BLOCKER B-1.** → §2.5 |
-| M02 | E1 over ISSUED | **NOT-OWNED** | an implementation unit *inside* `OP-01`. `Q-089`: *"a reviewer may not subdivide a stated requirement into implementation units."* MEDIUM → `OF-194` |
-| M03 | E2 `>=` | **NOT-OWNED** | sub-unit of `OP-02`. MEDIUM → `OF-194` |
-| M09 | S2's empty-string case | **NOT-OWNED** | sub-unit of `OP-25`; the ISSUE half **is** pinned (`M08` KILLED). MEDIUM → `OF-185` |
-| M10 | S2's same-payment half | **NOT-OWNED** | sub-unit of `OP-05`. MEDIUM → `OF-186` |
-| M13 | a refused capture consumes | **NOT-OWNED** | `Q-097`'s **declared Class B**, which hard rule 2 sends to *review judgement*, not to the required set. MEDIUM → `OF-189` |
+| M02 | E1 over ISSUED | **NOT-OWNED** | an implementation unit *inside* `OP-01`. `Q-089`: *"a reviewer may not subdivide a stated requirement into implementation units."* MEDIUM → `OF-197` |
+| M03 | E2 `>=` | **NOT-OWNED** | sub-unit of `OP-02`. MEDIUM → `OF-197` |
+| M09 | S2's empty-string case | **NOT-OWNED** | sub-unit of `OP-25`; the ISSUE half **is** pinned (`M08` KILLED). MEDIUM → `OF-188` |
+| M10 | S2's same-payment half | **NOT-OWNED** | sub-unit of `OP-05`. MEDIUM → `OF-189` |
+| M13 | a refused capture consumes | **NOT-OWNED** | `Q-097`'s **declared Class B**, which hard rule 2 sends to *review judgement*, not to the required set. MEDIUM → `OF-192` |
 
 ⚠️ **`M24` AND `M16` ARE WHY THE MUTANT SET IS AN INSTRUMENT AND NOT THE DEFINITION.** Both were
 written **because the owned-property set was sealed first**, and neither would have been written
@@ -838,7 +838,7 @@ none.
 | **OP-08** | S4 scored | ✅ (M14, M15 killed; **F9 closes the `S4 := S1` blindness**) |
 | OP-09 | deterministic replay | ✅ — pure functions, no I/O; re-ran identical |
 | ⚠️ **OP-10** | **`INDETERMINATE` at construction** | ❌ **NO CATCHER AT ALL. GATE.** → §2.9 |
-| OP-11 | scorer imports no model client | ✅ (asserted; the AST walk is never fired at a dirty file → `OF-195`, MEDIUM) |
+| OP-11 | scorer imports no model client | ✅ (asserted; the AST walk is never fired at a dirty file → `OF-198`, MEDIUM) |
 | OP-12 | scorer/gates share no first-party module | ✅ **re-driven and red three ways** → §2.10 |
 | OP-13 | golden 2 passes on all eight predicates | ✅ on the eight (72/72); ⚠️ **80/81 on the nine — F9's S3, `Q-102`, architect's** |
 | OP-14 | S2/S2-amt disagree on the instalment fixture | ✅ (M27 killed) |
@@ -852,7 +852,7 @@ none.
 | OP-22 | the three world-unrealizable fixtures scored anyway | ✅ |
 | OP-23 | seed cross-check | ✅ pinned (M21 killed) — ⚠️ **but its SCOPE is `B-3`** |
 | OP-24 | golden 5B's three digests | ✅ reproduced independently |
-| OP-25 | S2 at ISSUE, NON-EMPTY in the predicate | ✅ the ISSUE half (M08); the non-empty half unpinned → `OF-185` |
+| OP-25 | S2 at ISSUE, NON-EMPTY in the predicate | ✅ the ISSUE half (M08); the non-empty half unpinned → `OF-188` |
 | OP-26 | golden 5's four cases with their REASONS | ✅ **all four, right seq, right mechanism** |
 | ⚠️ **OP-27** | ***ADDED IN PHASE 2:*** **§12.1's "invariants breached" set is (E1–E3, S1–S4) — seven, not eight** | ❌ **WRONG AND UNPINNED. BLOCKER B-1.** → §2.5 |
 | ⚠️ **OP-28** | ***ADDED IN PHASE 2:*** **E1/E2/E3 are scored over money the world MOVED** (§9.1's *"moves"*) | ❌ **WRONG. BLOCKER B-2.** → §2.6 |

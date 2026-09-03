@@ -6,6 +6,132 @@ not a record; this file is.
 
 ---
 
+## C8 — **REVIEW 1** — 2026-09-03 — 🔴 **FAIL. FOUR BLOCKERS, EVERY ONE MEASURED END TO END, AND NOT ONE OF THEM VISIBLE TO GOLDEN 2 — WHICH IS `INC-78`'s DIAGNOSIS STILL LIVE RATHER THAN A CLOSED INCIDENT**
+
+**SESSION-TOKEN:** `07c3687f` · **DATA ROW 61 / 8-HEX ROW 60** of `QUESTIONS.md`'s
+`## Session tokens` table — both figures because the two conventions in use differ by one
+(`OF-179`), and ⚠️ **COUNTED FROM THE TABLE ITSELF**, in the operator's working tree at
+`C:\Users\chinm\whetstone-gate`, `HEAD` = `7bfdfd5` (`INC-54` requires a session to say which
+tree). ⚠️ **THE ROW DID NOT EXIST AND THIS SESSION SELF-RECORDED IT AT `d32daed`, BEFORE THE
+PHASE-1 SEAL AND BEFORE ANY OTHER BYTE OF ANY TRACKED FILE** — `check_roles` **E1** fails on a
+token that is not in that table.
+
+**VERDICT: FAIL. NO TAG. `c8-pass` DOES NOT EXIST.**
+
+---
+
+### WHAT THE PROMPT ASKED FIRST, AND WHAT IT FOUND
+
+*"the goldens passed 72/72 while the code under them was wrong twice… Your job is to find the
+third one."* **There are three more, and a fourth thing that is not a defect but an absence.**
+
+The instrument is the point. **Sixteen wrong-but-plausible readings were applied to THIS
+REVIEW'S OWN implementation** — `docs/reviews/independent/c8_reimpl.py`, sealed at `e249f0d`
+**before `src/` was opened** — and scored against golden 2. A mutant that reproduces every cell
+proves the **ANSWER KEY** cannot express that property, which is a statement about the golden
+and is true whatever `src/` contains. **13 of 16 survived the original eight fixtures.** F9,
+which landed mid-review, closes **exactly three** — and they are exactly the three `INC-78`
+asked for. **Nine of the thirteen the shipped code gets RIGHT, to C8's credit.** The one it gets
+wrong is the one shape no fixture in the file has ever contained.
+
+**THE FOUR BLOCKERS**
+
+- **`B-1` — §12.1's TWO PUBLISHED COLUMNS COUNT `S2-amt`, THE WITHDRAWN PREDICATE.** §12.1's own
+  note: *"distinct invariants **(of E1–E3, S1–S4)**"* — **seven**. The **FROZEN** `INVARIANTS.md`
+  (hard rule 4: a frozen artefact outranks `CONTEXT.md`) is titled *"the eight **predicates**"*,
+  heads S2-amt *"the **withdrawn** amount-equality predicate"*, and names F4/F5 as *"**TWO
+  LEGITIMATE EPISODES FLAGGED**"*. `PROCESS.md`:180 places it **outside** the range with a
+  conjunction. §12.4 calls the delta **EXPLORATORY** while `has_violation` feeds a
+  **pre-registered** column. **MEASURED: on F4 and F5, `invariants_breached == ['S2-amt']` and
+  `has_violation == True`.** The submission would publish the same two episodes as false
+  positives in one section and as violations in the headline. **Mutant `M24` — which simply
+  *applies* §12.1's note — SURVIVES**, and no test in the repository names either field.
+  **OVER-report.**
+- **`B-2` — E1/E2/E3 SCORE THE `amount` ARGUMENT, NOT WHAT THE WORLD MOVED.** Measured end to
+  end against the **real** world (seed 2001), the **real** ledger writer and the **real**
+  scorer. `{settle_full_balance: true}` moves **20,000,000 paise** plus a 50,000 fee; the ledger
+  records `amount_paise: None`; `_executed_money_actions` filters on `is not None`, so the
+  action **leaves E1/E2/E3's population entirely** and `E2_total_moved_paise` publishes **0**.
+  With `amount: 100` it publishes **100**. With `amount: -19000000` the aggregate goes
+  **NEGATIVE**, making E2 and E3 *harder* to fire for the rest of the episode. **RS-13 documents
+  that `amount` is ignored**, the parameter is optional, and **golden 2 contains no settlement
+  row at all**. ⚠️ **C7 is NOT at fault** — `amount_of` is faithful to its own stated contract.
+  **UNDER-report, and attacker-steerable in both directions.**
+- **`B-3` — ONE GATE-DENIED CALL NAMING AN INVENTED ID DROPS THE WHOLE EPISODE** out of the
+  denominator as `SEED_MISMATCH`, measured on an episode holding a real, executed,
+  money-moving refund. Hard rule 11 quotes B.9 verbatim. **`Q-071`'s ruling was implemented
+  faithfully; its SCOPE is what is wrong.** ⚠️ **Whether the rate differs BY ARM is NOT
+  measured, and the review says so where it is claimed.**
+- **`B-4` — A5 IS NEVER ASSIGNED.** §12.2 assigns it *"at replay"*; `world/harm.py:47-50` says
+  in terms *"**A5 belongs to the replay (C8)**"*; `grep -rn A5 src/whetstone_gate/scorer/`
+  returns **nothing**. `merchant_irrecoverable_outflow_paise` never receives it — and `Q-030`'s
+  ruling names that component as the one that is **NOT** a structural zero. Raised as
+  **`Q-109`**, because C8's card does not name A5 and a FIX session should not guess where it
+  is booked.
+
+**AND ONE GATE ITEM: `G-1` — `INDETERMINATE` at construction is CARD-STATED and has NO CATCHER
+AT ALL.** The string appears nowhere in `scorer/` or in `tests/test_c8_scorer.py`; the behaviour
+is **correct**, and mutant `M16` (making it count as ISSUED) **SURVIVES**. `Q-084`: *"an ABSENT
+catcher for a stated property is still an unpinned property and still gates."*
+
+---
+
+### WHAT IS RIGHT, AND IT IS MOST OF IT
+
+**All 72 cells of the original eight reproduce against BOTH the shipped scorer and a
+reimplementation written from the spec text by a session that had not seen it.** **THE 29 ARE
+THE 29** — enumerated item by item out of golden 2's own *sentence* and verified as a **LIST**,
+not a count; all 29 reproduce, including F8's four items that no `expected` key holds.
+**`INC-78`'s two defects are CLOSED, and F9 now pins them: `S1 = [1, 3]` reproduces**, as does
+F9's `S4 = []`. **The moat is re-driven and RED THREE WAYS** — RED 2 is hard rule 8's own spike
+defect (D3 alone), RED 3 is `INC-51` (**D4 alone**, D1–D3 green). **The drop counter was driven
+and its identity made to FAIL.** **Golden 5's four cases reproduce with the RIGHT REASON at the
+right seq** — B a *link* failure, C and D *content*-digest failures — so `INC-34`'s defect is
+not present; **golden 5B's three digests reproduce independently.** **`Q-092`'s two readings
+were both implemented**: BROAD reproduces every pinned cell, NARROW is empty on F3 and F8, and
+**S4 ⊆ S1 holds on every fixture**. **`Q-096` judged SOUND** and all four cross-checks judged
+**genuinely independent** — with one of them weaker than it looks (`OF-194`).
+
+---
+
+### SESSION DISCIPLINE
+
+- **Two sealed phases, and the seal is a commit.** Phase 1 — the reimplementation, 43 vectors /
+  82 assertions, and the **26-property owned set argued at `Q-089`'s grain** — landed at
+  `e249f0d` and was **pushed** before `src/` was opened. Phase 2 **ADDED three properties with
+  an argument and REMOVED none**, as `Q-084`/`Q-089` require.
+- ⚠️ **TWO OF THIS REVIEWER'S OWN HAND-COMPUTED VECTOR EXPECTATIONS WERE WRONG**, and both are
+  corrected **in place with the error named** — `INC-77`'s discipline turned on the reviewer.
+  V18's `E2` (20 × 1,000,000 is *exactly* the cap and E2 is strict) and V41's `S4` (at seq 1 the
+  horizon is −2, nothing is in flight, and a first-action over-refund is not a stale read at
+  all).
+- ⚠️ **THE SEVENTH CONSECUTIVE SESSION TO ALLOCATE FROM A COUNTER IT DOES NOT HOLD — `OF-67`.**
+  This review drafted `OF-185`…`OF-195` and `Q-104`. A concurrent **C14 BUILD 1** took
+  `OF-185`…`OF-187` and a concurrent **goldens** session (`e1956729`) took `Q-104`…`Q-108`
+  while this review was measuring. **All eleven rows and the question were renumbered to
+  `OF-188`…`OF-198` and `Q-109` before anything was appended**, in **descending order** so no
+  renamed id could be renamed twice, with every citation counted before and after — and the
+  renumber propagated into `REVIEW_8_1.md`, already committed under the old numbers. **The
+  counter is still a habit and not a guardrail.**
+- **PRIVATE INDEX with STEP 5 on every commit** (`INC-68`), and **`Q-063` clause (ii) run over
+  the STAGED SNAPSHOT** rather than the working tree — the direction that protects somebody
+  else's attribution rather than the checker's own (`INC-65`, `INC-82`). **No commit of this
+  session carries a foreign entry**, measured on each snapshot.
+- **A review session fixes nothing.** `src/`, `tests/` and `tests/goldens/` were not written to.
+  **`INCIDENTS.md` was not written to** — `Q-088`: a review session declares its entry and the
+  next non-review session writes it. **The entry this session owes is declared in its FINAL
+  OUTPUT.**
+
+### MEASUREMENTS
+
+`make check-roles` **exit 0** (17 passed, 0 failed, 5 n/a) · **full suite `6 failed, 923 passed,
+1 skipped`**, every failure attributed **by file** in `REVIEW_8_1.md` §2.17 · mutants **29 run,
+20 KILLED, 9 SURVIVED, RUN VALID** with all three controls green · `evals/` **ABSENT** ·
+goldens 1/3/5/5B/world **untouched**; `tests/goldens/` shows only the **concurrent** session's
+edits · **TOKEN SPEND: ZERO. NO PROVIDER CALL OF ANY KIND.**
+
+---
+
 ## ARCH — **FIX — GOLDENS 4, 8, 9 AND GOLDEN 2's F9** — 2026-09-03 — ⚠️ **THREE GOLDENS LAND, ONE FIXTURE IS APPENDED, C9/C10/C11 ARE UNBLOCKED — AND TWO OF THE FOUR FILES ARE INCOMPLETE AGAINST `PROCESS.md` §5.2, WHICH THEY SAY THEMSELVES**
 
 **SESSION-TOKEN:** `e1956729` · **DATA ROW 62 / 8-HEX ROW 61** of `QUESTIONS.md`'s `## Session
