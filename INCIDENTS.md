@@ -8726,3 +8726,235 @@ categories, rather than dereference. `OF-229`.
 synthetic input by its own suite, and **no fixture in it has an arm whose episodes all drop**. A
 fixture in which one arm scores zero episodes -- `INC-14`'s convention that *"a check ships WITH THE
 INPUT THAT MAKES IT FAIL"* -- would have caught this before the wiring existed.
+
+---
+
+## INC-110 — the **second** run of the same command reported `episodes attempted: 0` and a pilot measurement of *zero tokens over zero episodes*: a completed 20-episode pilot reading as **nothing**, and reading **clean** while it did
+
+**Date:** 2026-09-03 (C12 BUILD 1, `3d7e50ba`. Found by this session's **own dry run**, **before any
+commit**. **Fix:** in this session; see **Fix**.)
+
+**Event:** the 20-episode dry run completed, wrote 20 ledgers and 20 checkpoints, and printed
+`DENOMINATOR (completed+trunc) : 20`. The **same command run again** — which is the resume path
+hard rule 10 exists for, and which correctly re-ran nothing — printed:
+
+```
+  episodes attempted            : 0
+  DENOMINATOR (completed+trunc) : 0
+  reconciles                    : 0 == 0 + 0 + 0
+PILOT MEASUREMENT - attacker tokens per episode (CONTEXT.md S13.4)
+  attacker tokens ... : 0
+  episodes COMPLETED  : 0
+```
+
+⚠️ **AND IT RECONCILED.** `0 == 0 + 0 + 0` is a true statement, so the counter that exists to catch
+denominator defects **agreed with the defect**.
+
+**Action:** `RunResult` gained `resumed`, and `execute()` now reads back the **checkpoint** of every
+episode it skips and records it into the `RunDenominator` **before dispatch** — so a run that
+dispatches nothing still reports the whole matrix. The report line now reads
+`episodes already checkpointed, SKIPPED : 20   (IN the denominator - hard rule 11, INC-110)`.
+Re-measured: the resumed run prints `attempted 20`, `DENOMINATOR 20`, and the same attacker-token
+total as the first run.
+
+**Expectation:** a resumed run's denominator is a property of **the matrix**, not of **which
+invocation happened to run which episode**. Restarting a run must not change any published
+denominator.
+
+**Missing:** ⚠️ **a test that ran the same command twice.** Every resume test in this repository —
+C11's included — asserts *"the second pass re-runs nothing"*, which is the **idempotence** half.
+Nothing asserted *"and still reports the same denominator"*, which is the **hard rule 11** half.
+The two are different claims and only one had a test.
+
+**Missed:** ⚠️ **this session had written the sentence that names the defect, in its own
+`driver/__init__.py`, hours before it measured it** — *"a resumed run that reported only what it
+re-ran would publish a smaller denominator every time it was restarted."* It was written as a
+**claim about the code** and was false of the code when written. **A docstring is not a mechanism**,
+and this is the second consecutive session in which that exact gap produced an incident (`INC-103`,
+same shape, same field).
+
+**Diagnosis:** the denominator was accumulated from **this invocation's in-memory episode list**,
+and a skipped episode never enters that list. The record of a skipped episode lives in its
+**checkpoint**, which nothing read back.
+
+**Fix:** `src/whetstone_gate/driver/run.py` — `RunResult.resumed`, the read-back loop in
+`execute()`, and `completed` / `truncated` / `attacker_tokens` counting resumed episodes.
+Commit **`c071578`**. Test: `test_a_RESUMED_run_still_reports_the_WHOLE_denominator`.
+
+**Systemic guardrail:** the test asserts the **second** invocation's denominator equals the
+first's, so the failure mode is now a red test rather than a quiet zero. ⚠️ **It does not
+generalise:** nothing forces a *future* runner to read checkpoints back, and the honest statement is
+that this closes the defect in this driver and not the class. The class-level guard would be a
+denominator that is constructed from the **matrix** at the start of a run rather than accumulated
+during it — recorded as `OPEN_FINDINGS.md` **OF-241** rather than built inside this fence.
+
+---
+
+## INC-111 — an arm-1 episode of 20 calls at 3,000 tokens reported **120,000**, and the pilot's own tokens/episode figure silently **dropped every reference-attacker episode** — both because the split was by LANE and `§13.3.2` puts the attacker and the judge on the same one
+
+**Date:** 2026-09-03 (C12 BUILD 1, `3d7e50ba`. Found by this session's **own dry run**, **before any
+commit**. **Fix:** in this session; see **Fix**.)
+
+**Event:** the first dry run's checkpoint for `pilot__1__2101__gemma-26b` read
+`tokens_spent: 120000` where the arithmetic is 20 calls × 3,000 = **60,000**. The run's pilot
+measurement printed `attacker tokens: 600000` over 20 episodes = **30,000/episode**, which is also
+wrong, and wrong for a **different** reason: it had counted only the **ten `qwen-27b` episodes** and
+silently excluded the ten `gemma-26b` ones.
+
+⚠️ **THE SECOND HALF IS THE SERIOUS ONE.** `CONTEXT.md` §13.4's rule keys off *"measured **attacker**
+tokens/episode"*, and the **reference attacker** is the half that rule is chiefly about. A pilot
+that measured only the ladder half would have selected the N branch off the wrong population.
+
+**Action:** the attacker/judge split moved from **lane** to **role**. `_MeteredCall` — one instance
+per role — now counts its own `tokens_settled` and `calls_settled`; `DriverEpisode` carries
+`attacker_tokens` and `judge_tokens` separately and derives `tokens_spent` from their sum;
+`RunResult.attacker_tokens` sums the per-episode **attacker** figure with **no lane filter at all**.
+Re-measured: arm 1 reports `attacker=60000 judge=0`; arm 2 reports `attacker=60000 judge=24000`
+(16 judged turns × 1,500) **on the same lane**; the pilot figure is 60,000/episode over 20.
+
+**Expectation:** an episode's cost is the sum of what its calls cost, once. And a figure about
+attacker tokens covers every episode the attacker ran.
+
+**Missing:** ⚠️ **any fixture in which the attacker lane and the judge lane are the same lane.**
+Golden 8's fixture E uses `gemma-26b` and `gpt-oss-20b` — **two different models** — because its
+subject is *"ceilings are per model and never pooled"*. Nothing in `tests/goldens/` exercises the
+configuration `CONTEXT.md` §13.3.2 actually specifies, in which **one lane carries two roles**.
+
+**Missed:** ⚠️ **`config/lanes.yaml` says it in one line, and this session had read that line.**
+`gemma-26b`'s own `role:` field reads *"attacker: REFERENCE … **AND gate judge for arms 2/2S/3**"*.
+The driver's `pilot.py` even **matches on that sentence** to find the judge lane, and then the code
+one module away treated the two roles as distinguishable by lane name.
+
+**Diagnosis:** an episode's cost was computed as the **delta of two lane budgets**, and when both
+names resolve to one `LaneBudget` object that delta counts the lane twice; the same lane-based
+reasoning then made the pilot's `attacker_tokens` filter out every episode whose lane equalled the
+judge's. **The role is what separates an attacker call from a judge call; the lane never was.**
+
+**Fix:** `src/whetstone_gate/driver/episode.py` — `_MeteredCall.tokens_settled` /
+`calls_settled`, `DriverEpisode.attacker_tokens` / `judge_tokens`, and `tokens_spent` as a derived
+property; `src/whetstone_gate/driver/run.py` — `attacker_tokens()` without a lane filter.
+Commit **`c071578`**. Test:
+`test_the_pilots_measured_figure_is_ATTACKER_tokens_only_and_is_split_BY_ROLE`, which asserts on
+**arm 2**, where the reference lane *is* the judge lane.
+
+**Systemic guardrail:** the test asserts `matrix.reference.lane == matrix.judge_lane` **explicitly**
+before checking the split, so the day that stops being true the test says so instead of quietly
+becoming easier to pass. ⚠️ **AND ONE HALF IS NOT CLOSED AND IS PUBLISHED AS A LIMITATION:**
+`runner/checkpoint.py`'s `DOCUMENT_KEYS` carries **one** `tokens_spent` and no attacker/judge split,
+and it is C11's frozen schema outside this fence — so a **resumed** episode of a judged arm cannot
+have its attacker share recovered. `RunResult.attacker_tokens` **refuses** in that case rather than
+estimating. `OPEN_FINDINGS.md` **OF-240**.
+
+---
+
+## INC-112 — a 429 on the **gate-judge** lane stopped all ten `qwen-27b` episodes of **arm 1**, an arm with no gate and no judge call, and booked them under a cause that never happened
+
+**Date:** 2026-09-03 (C12 BUILD 1, `3d7e50ba`. Found by this session's **own 429 rehearsal**,
+**before any commit**. **Fix:** in this session; see **Fix**.)
+
+**Event:** driving golden 8 fixture D's shape through the wiring — a 429 on the second attacker call
+— produced the correct lane behaviour (`gemma-26b` `stopped_by: "429"`, 1 call used, 3,000 tokens,
+99% of the budget left, and **no** spill to another lane) and then this:
+
+```
+episodes run : 1
+causes       : {'RATE_LIMIT_429': 10, 'PROVIDER_ERROR': 10}
+```
+
+⚠️ **TEN `PROVIDER_ERROR`s, AND NO PROVIDER ERROR OCCURRED.** The ten `qwen-27b` episodes were
+skipped because the **judge** lane had stopped — and arm 1 has no gate and makes no judge call —
+and each was then booked under a fallback category that describes a failure mode that did not
+happen.
+
+**Action:** two changes. (i) A stopped judge lane blocks only an arm in
+`JUDGED_ARMS = {2, 2S, 3}`. (ii) `_not_started` **raises** when the lane reports no cause, instead
+of defaulting to `PROVIDER_ERROR`. Re-measured: `gemma-26b` stops, `qwen-27b` is untouched and runs
+all ten, and the only cause printed is `RATE_LIMIT_429` × 10 — nine not-started on the stopped lane
+plus the one truncated episode. `attempted 20`, `denominator 11`.
+
+**Expectation:** a lane that has budget keeps running, and every dropped episode carries the cause
+that actually stopped it.
+
+**Missing:** ⚠️ **a rule-11 check on the cause's TRUTH rather than on its membership.**
+`runner/episodes.py` refuses a cause outside `UNFINISHED_CAUSES` — which this one was not, so
+nothing fired. Every counter in this repository verifies that a category is **declared**; none
+verifies that it is **the right one**, and a wrong category is worse than a loud stop because it
+reads as a real finding.
+
+**Missed:** ⚠️ **golden 8 fixture D's own warning, in the sentence directly above the code that was
+written wrong** — *"an accumulator that … spills into another model's lane … produces a HIGHER
+number here and violates hard rule 12 to do it"*. The converse is stated one line later and was
+read: *"a POOLING accumulator aborts a lane that HAS BUDGET, and it costs the run episodes it was
+entitled to."* **That is exactly what this did**, through a coupling the fixture does not model.
+
+**Diagnosis:** the dispatch guard tested both the attacker lane's budget and the judge lane's for
+every arm, and `§13.3.2` puts the judge on the reference lane — so one 429 on `gemma-26b` stopped an
+unrelated lane's episodes for an arm that would never have called the judge.
+
+**Fix:** `src/whetstone_gate/driver/run.py` — `JUDGED_ARMS`, the `blocking_lane` guard in
+`execute()`, and the refusal in `_not_started`. Commit **`c071578`**.
+
+**Systemic guardrail:** `_not_started` can no longer produce a cause it did not obtain — the
+fallback is deleted and its place is a `DriverError`. ⚠️ **What is NOT closed:** nothing checks that
+a cause is *accurate* when one IS obtained, and that is the general form of this defect. Recorded as
+`OPEN_FINDINGS.md` **OF-242** rather than claimed as fixed.
+
+---
+
+## INC-113 — `"INR"` was hardcoded **four lines below a docstring saying every value in that file is read from `config/`**, and the hard-rule-9 tripwire is what noticed
+
+**Date:** 2026-09-03 (C12 BUILD 1, `3d7e50ba`. Found by this session's own **full-suite** run,
+**after** its first commit `c071578` and **before** its journal commit. **Fix:** `b4454ee`.)
+
+**Event:** `tests/test_tripwire_registry.py::test_no_spec_value_is_hardcoded_in_implementation_source`
+went red on the session's own new code:
+
+```
+src/whetstone_gate/driver/rehearsal.py line 63: literal '"INR"'
+    constant : world_currency  [merchant-policy, author-chosen]
+    read from: protocol.yaml:world.currency
+```
+
+`world.currency` is a **STRICT** row of `CONTEXT.md` §8.6's constants table — a bare literal
+anywhere in first-party source fires it, no name binding required.
+
+**Action:** the value is now read — `currency = str(protocol.require("world.currency"))` — and
+passed into the rehearsal's capture call. ⚠️ **The remedy was NOT to widen
+`TRIPWIRE_SELF_EXCLUSION`**, which the test's own failure message forbids in terms: *"It is NOT to
+add an exemption: `config/` is a frozen pre-registration artefact, and a value that lives in source
+instead of `config/` is a value the freeze does not cover."* Re-measured after the fix:
+`test_tripwire_registry.py` **10 passed**; `test_c12_driver.py` **42 passed**; the 20-episode dry
+run still completes with `DENOMINATOR 20` and `20 == 20 + 0 + 0`.
+
+**Expectation:** a spec-specified value is loaded through the one loader. Hard rule 9.
+
+**Missing:** ⚠️ **nothing — and that is the point of this entry.** The guardrail this class needs
+already existed, already scanned this exact file, and already caught it. `INC-113` is recorded not
+because a check was absent but because **the check worked**, and a `Missing` field that invented a
+gap would be dramatising a failure that the process handled. (`CLAUDE.md` hard rule 13's own
+warning: *"the pressure runs BOTH ways — to under-report a failure that costs a fix session, and to
+DRAMATISE one that reads well."*)
+
+**Missed:** ⚠️ **the file's own docstring, written by this session, four lines above the defect** —
+*"⚠️ EVERY VALUE IT NEEDS IS READ FROM `config/` — the probe's id and amount, the per-action cap,
+the page size, the turn budget, the reservation — because a rehearsal that hardcoded them would
+drift from the world it is rehearsing against, and hard rule 9's tripwire scans this file like any
+other."* **Five values were read from `config/` and the sixth was typed in**, in the module whose
+docstring is that sentence. This is the **second** entry in this session's own set with the same
+shape (`INC-110` is the first): **a docstring that describes the intent is not a mechanism that
+enforces it**, and the session wrote both sentences believing them.
+
+**Diagnosis:** `currency` is the one `capture_payment` parameter with no natural source in the
+rehearsal's local variables, so it was typed inline while the other five were loaded — a lapse of
+attention in a list of six, not a misunderstanding of the rule.
+
+**Fix:** `src/whetstone_gate/driver/rehearsal.py` — `world.currency` read through
+`whetstone_gate.config`. Commit **`b4454ee`**.
+
+**Systemic guardrail:** **none needed — the guardrail already exists and it fired.** The hard rule 9
+tripwire scans every file under `src/` on every `make test`, `world_currency` is a STRICT row so no
+name binding is required to trip it, and `test_registry_covers_every_config_constant` keeps the
+registry from silently losing that row. ⚠️ **The honest residual is the one `INC-110` also names:**
+nothing catches a *docstring* that claims a property the code does not have, and this session
+produced two such docstrings in one day. That is not closeable by a scanner and is not claimed to
+be; it is what the adversarial review reads for.

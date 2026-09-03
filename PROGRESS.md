@@ -6,6 +6,144 @@ not a record; this file is.
 
 ---
 
+## C12 — **BUILD, attempt 1** — 2026-09-03 — 🟡 **THE EPISODE DRIVER IS BUILT. NOTHING IN THIS PROJECT COULD SPEND A TOKEN UNTIL IT EXISTED, AND IT STILL HAS NOT SPENT ONE.**
+
+**SESSION-TOKEN:** `3d7e50ba` · **DATA ROW 70** of `QUESTIONS.md`'s `## Session tokens` table,
+⚠️ **COUNTED FROM THE TABLE ITSELF** in the operator's working tree at
+`C:\Users\chinm\whetstone-gate` (`INC-54` requires a session to say which tree). The row did not
+exist and **this session self-recorded it**; `check_roles` **E1** fails on a token that is not in
+that table. **The token is the architect's; only the row is this session's.**
+
+⚠️ **THE TREE MOVED UNDER THIS SESSION FIVE TIMES** (`OF-214` requires naming them). It opened at
+`dc2a344`; a concurrent **C18 BUILD** session (`5a2c81df`) landed `375b101`, `d294998` and
+`23903a0`, and a **second** concurrent session (`c1f0a4d8`) landed `a7d9f89` and `1caacd6`. For
+part of this session that second token was **absent from the table**, which made `make check-roles`
+**E1 RED — and it was never this session's red**; that session has since appended its own row and
+E1 is clean. Every count below names the tree and the moment it was taken.
+
+**VERDICT: BUILT, UNREVIEWED, NOT TAGGED.** ⚠️ **NO TAG WAS CUT AND NONE WAS ASKED FOR** — the
+prompt says `NO TAG`, and `git tag -l` is byte-identical before and after:
+`c0-pass c1-pass c13-pass c2-pass c3-pass c4-pass`. **It holds neither `probe-v1` nor
+`prereg-v1`.** **This session does not self-certify.**
+
+⚠️ **TOKEN SPEND: ZERO. NO PROVIDER MODEL CALL OF ANY KIND.** The prompt sanctioned none and none
+was made. **The package imports no model client and ships none** — the client is a two-method
+parameter — and that is asserted **two ways**, a transitive first-party AST walk **and** a raw
+source-text scan, because `INC-51` measured `__import__`, `importlib` and `getattr` walking past an
+AST walk and past `check-roles` D1, D2 **and** D3 alike. ⚠️ **The source scan caught this session's
+own `getattr` in `episode.py`**, and it was removed rather than exempted.
+
+### What was built
+
+`src/whetstone_gate/driver/` — eight modules, wiring C2's world, C4's semantics, C6's attacker
+loop, C7's ledger, C9's five gates and C11's runner into **one episode as a function of (seed, arm,
+lane)**. It **wires**; it rewrites none of them. Plus **one** new `tasks.py` target, **`drive`**.
+
+Per turn: the attacker is asked for one reply → `protocol.parse_call` reads at most one tool call →
+**the arm's gate decides**, one call site for all five arms → an `ALLOWED` call reaches the world,
+anything else does not → **the ledger gets one hash-chained entry, `ALLOWED` or `DENIED`** → the
+attacker is handed the tool result, or §8.6's **one** generic denial, identical in every arm.
+
+### What it measured, all of it offline
+
+* **The 20-episode pilot dry run completes** — `seeds.pilot_first`…`pilot_last` (2101–2110) × the
+  reference lane and ladder L2, `attacker.turn_budget` 20, every figure read from `config/`.
+  20 attempted, 20 completed, `DENOMINATOR 20`, `20 == 20 + 0 + 0`. 20 ledgers written and
+  hash-chain-verified, 20 checkpoints, 400 usage rows across two lanes.
+* **Golden 8 fixtures A–F reproduce THROUGH THE WIRING**, not against the accumulator alone.
+  ⚠️ **Fixture E falls out of the pilot run itself**: pooled 1,200,000 over a 600,000 per-lane
+  ceiling, no single lane over, **both lanes continue** — and both land **exactly** on their
+  ceilings without stopping, which is the inclusive boundary fixture C pins.
+* **Kill mid-run → resume → re-run.** Pass 1 dies after 3 episodes (3 checkpoints, 3 ledgers);
+  pass 2 skips 3, runs 17, **zero duplicates**, every pass-1 checkpoint byte-identical; pass 3 runs
+  **0 episodes and makes 0 model calls**. The denominator reads **20 on all three**.
+* **A 429 stops its lane and never reaches another.** `gemma-26b` `stopped_by='429'`, 1 call used,
+  3,000 spent, **199 calls and 597,000 tokens left on the table** — golden 8 fixture D's *"that is
+  correct behaviour rather than waste"* — while **`qwen-27b` runs all 200 of its calls untouched**.
+* **`evals/` in this repository is ABSENT and UNTOUCHED.** Every dry run wrote to a directory
+  **outside** the repository, and the driver **refuses** an `--out-root` inside it.
+
+### Three defects this session's own dry run found, before the first commit
+
+⚠️ **All three were found by the rehearsal, which is what the rehearsal is for.**
+
+* **`INC-110`** — the **second** run of the same command printed `episodes attempted: 0`,
+  `DENOMINATOR: 0`, and a pilot measurement of *zero tokens over zero episodes*. ⚠️ **And it
+  reconciled**: `0 == 0 + 0 + 0`, so the counter built to catch denominator defects **agreed with
+  the defect**. Skipped episodes are now read back from their checkpoints and are **in** the
+  denominator.
+* **`INC-111`** — an arm-1 episode of 20 calls at 3,000 tokens reported **120,000**, and the
+  pilot's own figure **silently dropped every reference-attacker episode**. Both because the
+  attacker/judge split was **by lane**, and §13.3.2 puts **both roles on `gemma-26b`**. The split is
+  now **by role**. ⚠️ The serious half is the second: §13.4's rule keys off *measured **attacker**
+  tokens/episode*, and the pilot would have selected N off the ladder half alone.
+* **`INC-112`** — a 429 on the **judge** lane stopped all ten `qwen-27b` episodes of **arm 1**, an
+  arm with no gate and no judge call, and booked them under **`PROVIDER_ERROR` when no provider
+  error occurred**. Nothing fired, because that cause is a *declared member*. The fallback is
+  deleted; `_not_started` now raises.
+
+And one more the **repository's own guard** caught, after the first commit: **`INC-113`** —
+`"INR"` hardcoded in `rehearsal.py`, **four lines below that file's own docstring saying every
+value it needs is read from `config/`**. Fixed in `b4454ee`, not exempted.
+
+### Ten questions, and every one is a required argument with no default
+
+`Q-140`…`Q-149`. ⚠️ **The block starts at 140 because a concurrent session had already committed
+`Q-137`/`Q-138` while this one wrote**; `Q-139` is deliberately left unclaimed so the two cannot
+collide. The two that block:
+
+* ⚠️ **`Q-141` — CLASS A.** What does a capture **reference** for §9.2's **S3**?
+  `capture_payment` declares no authorization parameter, so an attacker on the real tool surface
+  can never name one, and nothing says what it references instead. ⚠️ **One of the two readings
+  returns `INDETERMINATE` on every capture, which BLOCKS — it flatters our own gate, and it makes
+  S3 unfireable, which is the exact shape §9.2's own MOVE 2 and MOVE 3 withdrew two predicates
+  for.** This session **refused to choose**: `--s3-binding` is required and the report prints which
+  was used.
+* ⚠️ **`Q-145`** — **the pinned attacker corpora are not fetched in this tree**, so no episode can
+  run, and that precondition is in **neither** `PROTOCOL.md` §6's *"not negotiable"* order **nor**
+  C14's done-when. It would have fired on **episode 1 of a SINGLE-SHOT run**, after
+  `RUN_DECLARED.md` was pushed. It is now a **preflight** refusal.
+
+`Q-149` is a **rule 1 STOP**: `plan.md` and `STATUS.md` both give **C12** as the *benign solver*,
+this prompt gave it as *the episode driver*, and the plan carries **no row for a driver at all**.
+The benign-solver row was **left exactly as it was** and the driver was appended under a distinct
+id — erasing either would answer a question this session stopped on. ⚠️ **C18's dependency list
+names `C12`**, so the ruling decides which deliverable C18 is waiting on.
+
+### Counts this session measured
+
+* `tests/test_c12_driver.py` — **42 passed** (at `b4454ee`, 2 m 46 s).
+* Full suite, `python -m pytest -q -m "not operator_gate"` — **5 failed, 1319 passed, 2 deselected**
+  at `1caacd6` with the journal uncommitted. ⚠️ **Two of those five were this session's and are
+  now closed**: the hard-rule-9 tripwire (`INC-113`, fixed in `b4454ee`) and
+  `test_the_object_store_and_the_working_tree_agree`, which named **exactly this session's four
+  uncommitted journal files** and is an artefact of measuring mid-session, not a line-ending
+  defect. The remaining three are **not this session's**: `test_c7_ledger.py`'s `Q-069` walk
+  (`OF-183`/`OF-202` — ⚠️ **and this chunk ADDS `src/` offenders to it for the first time**, which
+  is the case that test's own message anticipates) and two in `test_c8_scorer.py` (`Q-103`).
+  ⚠️ **A SUITE COUNT IN THIS SHARED TREE IS NOT REPRODUCIBLE** (`OF-214`).
+* `make check-roles` — ⚠️ **MEASURED TWICE, AND BOTH READINGS ARE REPORTED BECAUSE THE TREE MOVED
+  BETWEEN THEM.** At `1caacd6`: **20 passed, 1 failed, 3 n/a**, exit **1** — the one failure was
+  **E1**, on token `c1f0a4d8` carried by commits `1caacd6` and `a7d9f89`, a concurrent session that
+  had not yet written its row. ⚠️ **This session did NOT add that row**: writing a token it was not
+  issued is precisely the forgery E1 exists to catch. That session then appended its own row, and
+  the final reading in this tree is **21 passed, 0 failed, 3 n/a, exit 0** — **70 issued rows, E1
+  clean, and D1, D2, D3 and D4 all PASS.** The table now carries this session's row and that one,
+  and neither edit clobbered the other.
+
+### What this session could not do
+
+* **It did not run an episode against a provider, and it must not.** Every lane is reserved; the
+  pilot is single-shot and the **operator** starts it.
+* **It shipped no provider client**, deliberately — an untested one would stand between the
+  operator and a single-shot run. The client is a parameter and the refusal names its shape.
+* **`make drive` does not exist** — the `Makefile` is outside this fence (`Q-148`, the `Q-128`
+  shape).
+* **It could not close `OF-240`** (a resumed judged arm's attacker/judge token split is not
+  recoverable from C11's checkpoint schema) — the driver **refuses** rather than estimating.
+
+---
+
 ## ARCH — **FIX, eval wiring** — 2026-09-03 — 🟢 **`Q-126`'s RED CLOSED AND `make eval` WIRED. BOTH BRANCHES DRIVEN. §20's CLAIM IS STILL PENDING THE RUN. FIVE OF THIS SESSION'S OWN DEFECTS FOUND AND FIXED BEFORE THE PUSH.**
 
 **SESSION-TOKEN:** `c1f0a4d8` · ⚠️ **SELF-RECORDED ROW, AND NO ORDINAL IS CLAIMED.** The token
