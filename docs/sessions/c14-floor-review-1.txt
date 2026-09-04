@@ -1,0 +1,367 @@
+C14 REVIEW 1 - THE FLOOR  --  SESSION-TOKEN 2f7a6d18  --  ROLE: REVIEW  --  2026-09-04/05 UTC
+PUSHED SHA: the commit carrying THIS FILE. A file cannot contain its own commit SHA,
+            so this line names the offset: ONE commit, and nothing else.
+
+=====================================================================
+0. THE BLOCKER, IN ONE LINE, BEFORE ANYTHING ELSE
+=====================================================================
+!! ON ARMS 2, 2S AND 3 - THREE OF THE FIVE ARMS THE SWEEP RUNS - THE FLOOR BOOKS THE
+   ESCAPE AND THE RUN STILL DIES WITH NO REPORT AND NO DENOMINATOR, because
+   `driver/episode.py:837`'s `executor.counts.reconcile()` sits AFTER `run_one_episode`'s
+   `except LaneStopped` and OUTSIDE the floor, and every `LaneStopped` raised inside
+   `gate.decide` - INCLUDING A 429 - leaves attempted > decided + unparsed + off_surface.
+
+VERDICT: FAIL.   NO TAG WAS CUT. `c14-pass` does not exist and this session did not
+create it. THE SWEEP MUST NOT START ON THIS FLOOR.
+
+ZERO PROVIDER TOKENS. No sanction held, none taken, no provider call in any mode - every
+harness replaced `driver/clients.py:_http_post` with a raiser first. `evals/` was READ and
+NEVER WRITTEN. `src/`, `tests/`, `config/`, `tests/goldens/` and every frozen artefact were
+READ-ONLY. `.env` was never opened. No tag cut or moved, no history rewritten, no
+force-push.
+
+=====================================================================
+1. THE FINDING. PROVED BY EXECUTION, THREE TIMES, ON COMMITTED TREES.
+=====================================================================
+`_Executor.execute` counts a turn BEFORE it decides it - `counts.attempted += 1` at
+episode.py:655, `counts.decided += 1` at :681, `self.gate.decide(action, state)` between
+them at :680. On arms 2/2S/3 that call is `gates/judge.py:ModelGate.decide`, whose
+`self.client.complete(...)` at judge.py:237 is wrapped in NO `try` AT ALL, and which runs
+`_JudgeClient.complete` -> `_MeteredCall.run` -> THE FLOOR. `attacker/loop.py:278` has no
+handler either - the attacker loop contains no `try` at all - so the `LaneStopped` reaches
+`run_one_episode`'s `except LaneStopped` at :834, WHICH IS WHERE THE FLOOR'S PROTECTION
+ENDS. The next statement is `executor.counts.reconcile()` at :837, and it raises
+`DenominatorError` at :195, which nothing catches.
+
+  MODE       ARM  OUTCOME                                      faults judge_calls
+  none       2    RETURNED  causes=[None]                           1         400   <- control
+  timeout    2    RAISED DenominatorError @ episode.py:195          1           2
+  runtime    2    RAISED DenominatorError @ episode.py:195          1           2
+  429        2    RAISED DenominatorError @ episode.py:195          1           2
+  500        2    RAISED DenominatorError @ episode.py:195          1           2
+  bucket     2    RAISED DenominatorError @ episode.py:195          1           2
+  (every ARM 1 row RETURNED - arm 1 has no judge, which is why no test saw this)
+
+  driver/run.py:894 execute -> driver/episode.py:837 run_one_episode ->
+  driver/episode.py:195 reconcile
+  DenominatorError: turn counts do not reconcile: 2 attempted against 1 decided +
+  0 unparsed + 0 off-surface = 1
+
+!! THE `429` ROW IS THE ONE TO READ TWICE. Hard rule 12 exists to make a 429 "STOP and
+   report". On a judged arm it crashes instead. Ceiling stops take the same path, and
+   PROTOCOL.md S2.1 puts the reference attacker AND the gate judge for arms 2/2S/3 on the
+   SAME lane `gemma-26b`, so `lane_states[lane]` and `lane_states[judge_lane]` are THE SAME
+   `LaneBudget` OBJECT - which makes the ceiling case the common case, not the rare one.
+
+!! NOT HYPOTHETICAL. A 429 on `gemma-26b` fired FOR REAL TONIGHT, at 19:15:58Z. On arm 1 it
+   produced a clean reconciling report. On arms 2/2S/3 it would have produced this.
+
+!! IT IS NOT A REGRESSION, AND THE REVIEW SAYS SO. Source-segment SHA-256 of every frame on
+   the path, 67839d0 vs b01edaa:
+     run_one_episode a23b5b50/a23b5b50   _Executor.execute f72c55f5/f72c55f5
+     EpisodeCounts.reconcile c43f6b25/c43f6b25   _JudgeClient.complete d598029d/d598029d
+     run.py:execute 9003361c/9003361c   ModelGate.decide 9296ff93/9296ff93
+     _MeteredCall.run d5a9f64c/82ce6304  <- THE ONLY FRAME C14 CHANGED
+   THE FAIL IS FOR SHIPPING THE PROPERTY AS DELIVERED WHEN IT IS FALSE ON THE SWEEP'S
+   MAJORITY, WITH A TEST SUITE THAT CANNOT SEE IT - not for breaking something that worked.
+
+!! Q-202 DOES NOT NAME IT. Q-202 names world build, gate build, ledger write and `_publish`.
+   This site is INSIDE `run_one_episode`, one statement after the handler that catches the
+   floor's own exception - closer to the floor than any site the open question lists.
+
+=====================================================================
+2. EVERY RAISE SITE ON THE SWEEP'S PATH THAT IS OUTSIDE THE FLOOR - 35, ENUMERATED
+=====================================================================
+Line numbers anchored against `git show HEAD:<path>`, NOT the working tree, because a
+concurrent session dirtied `run.py` mid-review. Full table with triggers and arms:
+docs/reviews/REVIEW_C14_FLOOR_1.md S1.3.
+
+INSIDE run_one_episode (14):
+  1  episode.py:837  executor.counts.reconcile()      DenominatorError   <- THE BLOCKER
+  2  episode.py:526  the floor's OWN on_usage(...)    OSError/UsageError/SecretInPayload
+  3  episode.py:782,:788 the two DriverError preconditions
+  4  episode.py:799  opening_state(world, ...)        KeyError
+  5  episode.py:829  protocol.tool_schemas_text()     KeyError
+  6  episode.py:659  the turn-budget guard            DriverError
+  7  episode.py:667  protocol.parse_call(...)         RecursionError/CallProtocolError
+  8  episode.py:678  candidate_action(...)            UnknownTool/TypeError
+  9  episode.py:679  replace(self.state, ...)         TypeError
+ 10  episode.py:680  self.gate.decide(action, state)  ANYTHING the gate/judge/world raises
+ 11  episode.py:685  ledger_build.executed_of(...)    LedgerEntryError
+ 12  episode.py:698  ledger_build.append_call(...)    NotCanonicalisable/LedgerEntryError
+ 13  episode.py:533  usage_total_tokens(reply.usage)  BudgetError - AFTER the try closes
+ 14  episode.py:249  EpisodeOutcome(...) in outcome() DenominatorError
+
+IN run.py:execute, OUTSIDE run_one_episode (7):
+ 15  run.py:888   world_semantics.build(...)          Q-202 names it
+ 16  run.py:891   gate_shell.build_gate(...)          Q-202 names it - re-read PER EPISODE
+ 17  run.py:892   Ledger(...)                         Q-202 names it
+ 18  run.py:1085  ledger_store.write(...) in _publish Q-202 names it
+ 19  run.py:1086  checkpoints.publish(...)            Q-202 names it
+ 20  run.py:840   seed = int(key.seed_or_task)        ValueError on a TASK-KEYED block
+ 21  run.py:1019  usage_log.append(...)               THE OK PATH TOO
+
+PER TURN, in attacker/loop.py (7):
+ 22  loop.py:230  texts.attacker_system_prompt()      AuthoredTextMissing
+ 23  loop.py:235  texts.generic_denial()              AuthoredTextMissing
+ 24  loop.py:260  assemble(...)                       ValueError / config / OSError
+ 25  loop.py:297,:304 estimate_messages(...)          ZeroDivisionError / config
+ 26  loop.py:115  TurnRecord provenance guard         ValueError
+ 27  attacker/corpus.py:560 corpus selection          CorpusUnavailable
+ 28  loop.py:278  executor.execute(attacker_text)     PASSES EVERYTHING THROUGH - the carrier
+
+ONCE PER RUN (7):
+ 29  run.py:359   runner_usage.preflight(...)         before any spend - correct. !! BUT a
+                                                     partial last line from a hard kill makes
+                                                     a RESUME unable to start at all
+ 30  run.py:426   _load_corpus()                      before any spend - correct
+ 31  run.py:676   status = probe(lane)                before any spend. !! It is INC-159's OWN
+                                                     TimeoutError type and preflight has no
+                                                     floor; __main__ catches only RunRefused
+ 32  run.py:805   _lane_states(...)                   before any spend - correct
+ 33  run.py:823   checkpoints.read(key)               KeyError - read path does NOT validate
+                                                     DOCUMENT_KEYS (publish does)
+ 34  run.py:921   result.denominator.reconcile()      AFTER 17 hours. Report never rendered
+ 35  run.py:922   render(...) -> :1151 / :1158        AFTER 17 hours. NRuleError is NOT a
+                                                     PilotError so :1159's handler cannot see
+                                                     it, and lane_hour_budget() REGEX-PARSES
+                                                     CONTEXT.md PROSE requiring exactly one
+                                                     match - an edit during the run kills it
+                                                     at the finish line. Measured today: 1
+                                                     match, budget=32, 2 Gemma lanes -> SAFE
+
+THE SHAPE OF THE LIST IS THE FINDING. 29-33 raise BEFORE a token is spent and are exactly
+right - INC-157's guardrail working. 34-35 raise AFTER every token is spent. 1-28 raise
+mid-run and lose the report AND every remaining episode. THE FLOOR COVERS ONE EXPRESSION -
+`call()` - INSIDE SITE 10's CALLEE. Of the 35, Q-202 names FIVE; THIRTY are outside both the
+floor and the open question; and #1 is reachable BY THE FLOOR'S OWN NEW EXCEPTION.
+
+=====================================================================
+3. THE FINDINGS
+=====================================================================
+BLOCKER
+  B-1  The floor books the escape and the run dies anyway on arms 2/2S/3. Section 1.
+       Class A to fix (every repair moves a printed count) -> Q-207.
+
+HIGH
+  H-1  THE FLOOR CAN RAISE WHILE BOOKING - INC-160 INSIDE THE FIX FOR INC-160's CLASS.
+       An exception raised inside an `except` clause is caught by NO sibling `except`.
+       `self.on_usage(...)` -> `UsageLog.append` ends in `mkdir` + `open("a")` + `write`.
+       PROVED BY EXECUTION, in a fresh temp directory, real _MeteredCall / real _usage_sink /
+       real UsageLog / real LaneBudget:
+         control (writable)      : raised ('LaneStopped','UNEXPECTED_ERROR'), row correct
+         usage file read-only    : GOT PermissionError [Errno 13]
+         `evals` exists as a FILE: GOT FileExistsError [WinError 183]
+       The escapee is NOT a LaneStopped, so run_one_episode's only handler misses it too,
+       and the dispatch loop has no `try` at all (episode.py:469 is the driver's only
+       `except Exception`). ALL FOUR BRANCHES have the identical exposure - :383, :405,
+       :446 (INC-160's own line) and :526 - plus the OK path at :537. NOT NEW TO C14, and
+       the floor is the layer that announced it was closing this class.
+       CHECKED AND SAFE: `budget.settle(0)` cannot raise on this path (admit set the
+       reservation; 0 > reserved is false), and `LaneStopped(UNEXPECTED_ERROR)` cannot
+       raise (UNEXPECTED_ERROR is a member; 9 causes, no duplicates).
+
+  H-2  THE TEST SUITE IS STRUCTURALLY UNABLE TO SEE B-1.
+       `_run_the_matrix_with` uses `load_pilot(arm="1")` ONLY - no gate, no judge, so no
+       test drives a judge-lane _MeteredCall and none reaches gate.decide. AND the fake
+       transport returns "the reply", which `parse_call` refuses. INSTRUMENTED on the
+       file's own headline test:
+         episodes=20 transport calls=385 parse_call=384 unparsed=384 off_surface=0
+         decide=0 world.call=0 append_call=0 judge_calls=0
+       384 OF 384 TURNS ARE `unparsed`. The gate, the world and the ledger are never
+       touched. The five unit tests do not make up for it: `_metered()` passes
+       lane="gemma-26b" - WHICH IS THE JUDGE LANE - but there is no judge, no ModelGate and
+       no gate.decide anywhere in the file. THE LANE NAME CREATES THE APPEARANCE OF JUDGE
+       COVERAGE WITHOUT ANY. No test anywhere in tests/ drives a LaneStopped out of a JUDGE
+       call on a judged arm. It is the reason B-1 shipped.
+
+MEDIUM  (appended to OPEN_FINDINGS.md as OF-267..OF-269)
+  M-1 / OF-267  The floor preserves the CAUSE and discards the DIAGNOSIS. `from None`
+       drops the traceback; INC-159's own Missing field says that abort was "fully
+       diagnosable in about four minutes" - FROM THE TRACEBACK. On judged arms the
+       exception that surfaces is `DenominatorError: turn counts do not reconcile`, naming
+       neither the timeout nor the transport. Suppressing the MESSAGE is right (INC-147);
+       losing the FRAME is collateral and was not weighed.
+  M-2 / OF-268  A booked truncation enters the void-threshold denominator having had fewer
+       turns to breach. HOLES.md:210, FROZEN: "A truncated episode is one the attacker did
+       not get to finish, so it is LESS likely to carry a breach." MEASURED on the only
+       real calibration episode: the attacker's first `pay_CANARYRECON` touch is
+       `turn_index 8` of 20, so an episode truncated before turn 8 has a STRUCTURALLY ZERO
+       chance of carrying a breach and still divides as if whole. A depressed rate sets a
+       LOWER void threshold - the direction that flatters us.
+       !! THE THRESHOLD HALF IS ALREADY RAISED, BETTER, AT THE CONCURRENT SESSION'S
+          Q-206(d). This review does not compete with it; it adds the magnitude above and
+          the regime question at Q-208.
+  M-3 / OF-269  `run.py:840`'s `int(key.seed_or_task)` cannot drive a task-keyed block.
+       `runner/episodes.py:160` says seed_or_task "is a STRING in every block, deliberately"
+       and `benign/manifest.py:193` already builds `f"{domain}-{task_id}"`. LATENT today
+       (driver/ has only cal.py and pilot.py, both `str(seed)`), and RUN-3 is
+       M-ADV + T-NEG + T-FP with T-NEG and AD-CMP task-enumerated. -> Q-209.
+
+LOW  (appended as OF-270, OF-271)
+  L-1 / OF-270  The AST-EXACT table's figures for its OWN NEW FILE are one commit stale.
+       Reported 25/26/4; at b01edaa it is 27/29/5; 25/26/4 is exactly 0cfc231. The same
+       report says "8 tests", which is b01edaa's count, so the record disagrees with itself
+       by one commit. Direction is UNDER-reporting. Also: the caption says "QUALIFIED names
+       (Class.method)" but the figures are the RAW FunctionDef count including nested
+       closures (qualified non-nested: 67->67, 109->112, 20).
+  L-2 / OF-271  "A type name is a Python identifier and cannot contain a credential" is
+       true, and is not what the scan tests. redaction.py:49 refuses `gsk_`/`AIza` prefixes
+       and any string containing `_API_KEY` - all legal in an identifier.
+
+NOT THIS CHUNK'S, NAMED BECAUSE IT LANDS ON THE SAME SWEEP
+  OF-240 is a SECOND, INDEPENDENT "seventeen hours and no report" path on the judged arms
+  and is already open and already predicted. `run.py:206`'s `attacker_tokens` raises
+  RunRefused when a RESUMED run's arm is judged, and `render()` -> `_measurement_lines`
+  calls it UNGUARDED (only PilotError from decide_n is caught). RUN_DECLARED.md says it in
+  terms: "OF-240 IS NOT CLOSED BY THIS - it stays OPEN and will fire the first time a
+  JUDGED arm is resumed." The sweep spans a day boundary BY DESIGN.
+
+=====================================================================
+4. WHAT IS CORRECT - RECORDED SO IT IS NOT MISTAKEN FOR UNEXAMINED
+=====================================================================
+- KeyboardInterrupt, SystemExit AND GeneratorExit all pass through untouched, booked=0,
+  calls_settled=0. VERIFIED BY EXECUTION, not by reading. A Ctrl-C still stops the sweep.
+- Handler order proved by an `ast` walk of the try at episode.py:376:
+  ['RateLimited','ProviderFailed','BucketError','LaneStopped','Exception'] - as claimed.
+- The six exception classes are independent RuntimeError siblings; none subclasses another,
+  so the ordering cannot be subverted by inheritance.
+- THE CAUSE-LAUNDERING GUARD HOLDS AND I COULD NOT DEFEAT IT: LaneStopped(RATE_LIMIT_429)
+  raised inside call() re-raises with its cause intact and calls_settled == 0. No path
+  nests one _MeteredCall inside another. It is asserted by a test and is not dead code.
+- The floor does not retry (callable invoked exactly once), does not stop the lane
+  (budget.stopped False, rate_limited 0), introduces no new spec value, and stores only
+  `type(exc).__name__`.
+- UNEXPECTED_ERROR is a ninth member of UNFINISHED_CAUSES and prints in the denominator
+  including at zero - OBSERVED in tonight's live calibration report.
+- Cause and outcome vocabularies are DISJOINT, so INC-160's confusion still fails loudly.
+- INC-160's fix is right and its rejected alternative is rejected for the right reason.
+- HARD RULE 6 IS SATISFIED ON BOTH CHANGED TESTS. Re-derived with `ast` over committed
+  blobs, never `grep -c assert`:
+    test_c11_runner.py  functions  68->68  ast.Assert 226->228  pytest.raises 24->24
+    test_c12_driver.py  functions 135->138 ast.Assert 246->253  pytest.raises 40->40
+    FUNCTIONS REMOVED: 0 in both.  FUNCTIONS THAT LOST AN ASSERT OR A raises: 0 in both.
+    CHANGED: test_every_declared_cause_prints_even_at_zero 2->4;
+             test_a_BucketError_is_BOOKED... 7->14.  ADDED: _KilledAfter.{3 methods}.
+  Every figure the build session reported for the two CHANGED files reproduces EXACTLY.
+  The `len(UNFINISHED_CAUSES) == 8` -> `== 9` flip is PROVABLY MEANINGFUL: 67839d0's
+  episodes.py has zero `^UNEXPECTED_ERROR` lines, and two assertions are ADDED beside it
+  (membership at :887, no-duplicates at :888) and none removed.
+
+=====================================================================
+5. THE RESUME CONSEQUENCE - JUDGED, AND THIS REVIEW CORRECTED ITS OWN FIRST PASS
+=====================================================================
+VERIFIED: `CheckpointStore.completed()` is `{p.stem for p in self.root.glob("*.json")}` -
+every published checkpoint, with no reference to `truncated` or `cause`. So a booked
+UNEXPECTED_ERROR episode is checkpointed and a resume will NOT re-run it. The record is
+self-describing: `cause` distinguishes an instrument fault from a budget stop.
+
+!! THE ARITHMETIC IS NOT "ONE EPISODE VERSUS TWENTY-NINE", AND THIS REVIEW'S FIRST PASS HAD
+   IT WRONG. A crash happens before `_publish`, so the faulting episode gets NO ledger and
+   NO checkpoint, and the other episodes were never dispatched and have none either - EVERY
+   ONE OF THE THIRTY IS RE-RUNNABLE, and PROCESS.md S6b provides the procedure by name.
+   INC-159's real cost was 56,855 tokens, an incident entry and a numbered attempt - NOT 29
+   episodes. The true trade is:
+     floor absent : 1 episode re-runnable from turn 1, + 1 incident + 1 numbered attempt
+     floor present: 1 episode PERMANENTLY frozen at N of 20 turns, in the published
+                    denominator, with no recourse inside the protocol
+   CheckpointStore has no delete, no truncate and no `force`; publish refuses a differing
+   rewrite; `evals/` deletion is OPERATOR-ONLY. The degradation is irreversible.
+
+!! Q-200 GIVES ONE ANSWER FOR TWO REGIMES. For the SWEEP (510+ episodes, 11-17 h) booking
+   is plainly right and one degraded episode is noise. For a 30-episode SINGLE-SHOT
+   pre-registered block, where a crash is cheap and recoverable and a booked truncation is
+   permanent and biases a published threshold, the same choice is much harder to defend.
+   RAISED AT Q-208, NOT DECIDED. It is not a reason for the FAIL.
+
+=====================================================================
+6. FENCE, HYGIENE AND THE TWO THINGS THAT COMPLICATED THIS REVIEW
+=====================================================================
+!! `git status --porcelain src/ config/` WAS NOT EMPTY AT EVERY STEP, AND THIS REPORT SAYS
+   SO RATHER THAN CLAIMING OTHERWISE. It was EMPTY when this session opened and EMPTY again
+   around 19:20Z. At 19:42:59Z it was:
+        M src/whetstone_gate/driver/run.py
+        M src/whetstone_gate/runner/buckets.py
+   A concurrent C14 ABORT 3 session (7d4e2fa9) was writing INC-161's pacer-admission fix.
+   NEITHER FILE IS C14 ABORT 2's, and `driver/episode.py` and `runner/episodes.py` - the
+   only two files 0cfc231..b01edaa touched under src/ - were CLEAN against HEAD throughout.
+   NOTHING OF THAT SESSION'S WORK WAS TOUCHED BY THIS ONE.
+   -> The decisive proof was therefore re-run on a RECONSTRUCTED COMMITTED TREE (git archive
+      67839d0 into a fresh OS temp dir, `git show b01edaa:` overlaid for exactly the two
+      differing files), and a THIRD time after HEAD moved, overlaid with 291fd91's run.py
+      and buckets.py. IDENTICAL RESULT ALL THREE TIMES.
+   -> Every line number in section 2 was re-anchored against `git show HEAD:<path>`.
+
+!! HEAD MOVED TWICE UNDER THIS REVIEW: e8dd501 -> 291fd91 -> 625d9e9, both that session's.
+   `git diff --name-only b01edaa..625d9e9` leaves driver/episode.py and runner/episodes.py
+   UNTOUCHED, and their frame hashes are byte-identical. The finding is current at HEAD.
+
+!! THIS SESSION'S QUESTIONS.md APPEND WAS DESTROYED ONCE AND WAS REDONE. The first append
+   (token row + Q-206..Q-208) passed a tail-byte assertion against HEAD and was then
+   OVERWRITTEN WHOLESALE by that session writing QUESTIONS.md from its own earlier read,
+   which also took Q-206. INC-137's hazard, from the other side. NOTHING OF THEIRS WAS
+   EDITED OR RENUMBERED; this session's three renumber BENEATH Q-206 as Q-207/Q-208/Q-209,
+   exactly as INC-159/INC-160 did. The redone append is 157 added lines and ZERO deletions;
+   OPEN_FINDINGS.md is 27 added lines and ZERO deletions. Both verified with
+   `git diff --numstat HEAD` before staging.
+   -> QUESTIONS.md is committed here CARRYING that session's committed Q-206 text unchanged.
+      A session's token row must be committed with the commit that uses it or check-roles E1
+      goes red on a token "that was never issued" (INC-141's trap). `check_roles._issued_
+      tokens` parses the new row as ('C14','REVIEW').
+
+THE CALIBRATION WAS NEVER TOUCHED. It was also NOT RUNNING by the time this review measured
+it, and it COMPLETED. The prompt states it was live at 19:14Z. At 19:34:45Z there was NO
+driver process; the last row of evals/usage/gemma-26b-2026-09-04.jsonl is
+{"outcome":"RATE_LIMITED","total_tokens":0,"utc":"2026-09-04T19:15:58Z"}; and
+evals/cal/run-attempt3-20260904T191123Z.log ENDS WITH A COMPLETE REPORT AND A RECONCILING
+DENOMINATOR - 30 attempted, 0 completed, 1 truncated (55,887 tokens, 11 of 20 turns), 29
+never started, all under RATE_LIMIT_429, "USABLE TO SELECT N: False".
+!! THIS SESSION DID NOT RE-RUN IT, DID NOT INTERPRET IT AND DOES NOT RULE ON IT. Under
+   PROCESS.md S6b whether that is THE run is the architect's to say - and the concurrent
+   session's INC-161 records both readings. It is recorded here only because a review that
+   measured this tree at 19:34Z must say what it saw. THE CALIBRATION IS ARM 1 AND IS NOT
+   EXPOSED TO B-1.
+
+WHAT THIS REVIEW DID NOT DO: it did not run the full pytest suite - a concurrent session was
+running two suites of its own against this tree and src/ was dirty with its uncommitted
+work, and a suite total measured across that would attribute reds wrongly, which is OF-259's
+exact trap. Every claim here is a targeted first-hand measurement instead, and the two that
+matter for hard rule 6 are `ast` walks over committed blobs.
+
+=====================================================================
+7. COMMIT, AND ITS `Swept:` LINE
+=====================================================================
+ONE commit, PROCESS.md S7b's private-index recipe: GIT_INDEX_FILE in a fresh OS temp
+directory, `git read-tree HEAD` against LIVE HEAD, explicit paths, add+snapshot+commit in
+ONE command, `env -u GIT_INDEX_FILE git reset` on the same paths, shared index verified
+clean. `git diff --cached` was EMPTY at the start of this session and after the commit.
+
+  <this one>  docs/reviews/REVIEW_C14_FLOOR_1.md   (new)
+              docs/reviews/OPEN_FINDINGS.md        (append only, +27 / -0)
+              QUESTIONS.md                         (append only, +157 / -0)
+              docs/sessions/c14-floor-review-1.txt (new - THIS FILE)
+              Swept: NOTHING. FOUR paths declared, FOUR staged, FOUR in the snapshot; the
+              sets are IDENTICAL. No path outside this session's fence was staged, and no
+              other session's line was removed - both diffs are additions with ZERO
+              deletions, measured with `git diff --numstat HEAD` immediately before staging.
+
+=====================================================================
+8. WHAT IS OWED
+=====================================================================
+1. INCIDENTS.md FIRST, before a line of code, in hard rule 13's format, with Diagnosis and
+   Missed filled in. Missed has an obvious candidate: Q-202 enumerated four uncovered sites
+   and NONE OF THEM IS INSIDE run_one_episode, one statement from the handler.
+2. A RULING ON Q-207 (B-1's accounting), because every available fix moves a printed count.
+   The four options are written out there. Option 4 - catching DenominatorError - is the
+   tempting one and is the one this review would refuse: it converts a detector into a
+   silence, which is INC-159's own lesson about catch lists.
+3. B-1, then H-1, then H-2. H-2 IS NOT OPTIONAL: a fix for B-1 proved only on arm 1 would be
+   the third fix in this class to close the instance instead of the class.
+4. L-1 is one line in a record and costs nothing.
+5. Q-208 and Q-209 are the architect's, and Q-208 defers to the concurrent session's
+   Q-206(d) for the half that entry asks better.
+
+NOTHING SHOULD BE FIXED WHILE A SINGLE-SHOT RUN IS IN FLIGHT. At 19:34Z no driver process
+was running, but that is the operator's call and not this session's.
+
+NOT SELF-CERTIFIED. NO TAG CUT. A fix session, then a fresh adversarial review, follows.
