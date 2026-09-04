@@ -315,8 +315,8 @@ this run's entire output is a token measurement.
 ## 8. ⚠️ THE UTC START TIME — **FILLED BY THE OPERATOR AT THE MOMENT OF STARTING**
 
 ```
-DECLARED UTC START TIME: ____________________________   (YYYY-MM-DDTHH:MM:SSZ)
-FILLED BY: __________________  (operator)
+DECLARED UTC START TIME: 2026-09-04T03:26:24Z   (YYYY-MM-DDTHH:MM:SSZ)
+FILLED BY: Chinmoy  (operator)
 ```
 
 ⚠️ **THIS IS A PLACEHOLDER AND IT WAS LEFT EMPTY ON PURPOSE. NO SESSION MAY INVENT IT.**

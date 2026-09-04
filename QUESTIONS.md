@@ -14539,3 +14539,42 @@ named here**, which is the same trade `INC-139` made with three stale `INC-137` 
 **WHAT THE ARCHITECT IS ASKED FOR, IN ONE LINE:** the judge temperature as a **number**, for §8.6's
 constants table and `config/`, ⚠️ **while `prereg-v1` still does not resolve** — after that tag,
 hard rule 4 freezes `config/` and this is published as a limitation instead of fixed.
+
+
+---
+
+## ⚠️ RULING — `Q-186` IS RULED. RECORDED VERBATIM BEFORE THE DECLARATION WAS TOUCHED (hard rule 5)
+
+`Q-186` asked, in its own words: *"`RUN_DECLARED.md` §8's second line reads `FILLED BY:
+__________________  (operator)`. … line 318 is the time; line 319 is the name. So even had Gate 1
+completed, this session would have filled a time and left the attribution line blank, in a file
+whose §8 heading is 'FILLED BY THE OPERATOR AT THE MOMENT OF STARTING'. **The architect should say
+whether a session may fill line 319 at all**, given that the answer is `(operator)` and the filler
+would not be one."*
+
+**THE ARCHITECT'S ANSWER, TRANSCRIBED WORD FOR WORD from the `4b8e12c9` prompt, GATE 1 step 1c,
+2026-09-04:**
+
+> 1c. Fill evals/pilot/RUN_DECLARED.md line 318 with the CURRENT UTC time AND line 319 with the
+> operator's name. ⚠️ CHANGE NOTHING ELSE IN THAT FILE. Commit and push BEFORE the run.
+> ⚠️ THE TIME MUST BE THE TIME YOU ARE ABOUT TO START. Four sessions have correctly left it
+> blank because no such time existed. It exists now. S8: "a declaration carrying a start time
+> earlier than the run is a pre-registration that was written afterwards."
+
+**Class:** B — the ruling names both lines explicitly, which is the ambiguity `Q-186` raised, and it
+resolves it in the direction of filling rather than leaving blank.
+
+⚠️ **AND THE ONE THING THE RULING DOES NOT SAY, STATED HERE RATHER THAN LEFT TO BE INFERRED:
+THE KEYSTROKE WAS THIS SESSION'S, NOT THE OPERATOR'S.** Line 319 now reads `FILLED BY: Chinmoy
+(operator)` — **Chinmoy is the operator** (`PROCESS.md`:75 and `ARCHITECT_HANDOFF.md`:22 both name
+him in the OPERATOR row) and the name is therefore correct — **but it was typed by the session
+holding `4b8e12c9`, under the instruction quoted above, and not by the operator at a keyboard.**
+`Q-186`'s worry was precisely that *"the filler would not be one"*, and the ruling authorises the
+fill without dissolving that gap. It is recorded here so that a reader of `RESULTS.md`'s
+declared-versus-actual comparison knows exactly whose hand wrote the declared time, and so that no
+future session reads line 319 as evidence of an operator action that did not occur.
+
+⚠️ **THE DECLARED TIME AND THE ACTUAL START TIME ARE BOTH REPORTED, SEPARATELY AND EXACTLY.**
+`PROCESS.md` §6b makes `RESULTS.md` print them side by side; a gap between them is the honest
+artefact of committing and pushing the declaration before starting the run, which §6b requires in
+that order, and it is not smoothed over.
