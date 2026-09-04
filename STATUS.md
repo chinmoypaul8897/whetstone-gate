@@ -2342,3 +2342,72 @@ the CAL path and spent nothing toward it.** `prereg-v1` not cut · the pilot not
 and the void threshold still `TODO_` sentinels · the witness gist untouched · the repository
 still private · `RESULTS.md` / `README.md` / `docs/reviews/OPEN_FINDINGS.md` not written (all
 outside the fence; the exact words C18 and C19 must publish are in `INC-144`).
+
+---
+
+## ⚠️ ARCH PUBLISH 1 — `2e5b8a47` — 2026-09-04 — **APPENDED, NOT MERGED INTO ANY LIVE ROW**
+
+**Role FIX. Chunk ARCH. Everything below ships UNREVIEWED. No tag was cut and nothing is
+self-certified.** Full record: `docs/sessions/arch-publish-1.txt`. Commits `97fe84b`, `0287e80`,
+`4ae054a`, `a9f4150`, plus this entry's own. ⚠️ **`git rev-parse prereg-v1` DOES NOT RESOLVE** —
+verified first-hand. ⚠️ **ZERO PROVIDER CALLS AND ZERO TOKENS; this session held no sanction.**
+
+⚠️⚠️ **`RESULTS.md` EXISTS FOR THE FIRST TIME, AND CARRIES NO MEASURED NUMBER.** It discharges
+`PROCESS.md` §14's *"named in `RESULTS.md` … with why"* for **all four fired rungs** — unmet on 1,
+3 and 5 since 2026-09-02 and on 4 since 2026-09-04, because the file did not exist. **It is
+overwritten by the first successful `make eval`** (`tasks.py:202`), and `results/degradation.py`
+**parses `PROTOCOL.md` §5.1** rather than transcribing it, so rung 4 republishes itself from the
+frozen artefact. **C18 owns the results document and C18 has not run.**
+
+⚠️⚠️ **RUNG 4 IS PUBLISHED IN `README.md` AND `RESULTS.md`, IN `INC-144`'s OWN WORDS.**
+README `§9.3` (the rung-4 section, on §9.2's template), `§11`'s row and tally, `§9.4`'s new
+**T-FP / T-NEG** table; `RESULTS.md` `§1`, `§2` and `§3`. ⚠️ **τ²-bench is NOT cut — only one
+block's breadth is staged; T-NEG keeps all 34 tasks; the externally-authored-answer-key claim is
+INTACT.** ⚠️ **Fired by the OPERATOR on SCHEDULE, NOT by `CONTEXT.md` §13.4's decision rule**, whose
+input the pilot never produced. **Nothing published today implies the measurement chose the cut.**
+
+**THE README'S STATUS BOX NOW DESCRIBES WHERE THIS PROJECT ACTUALLY IS**, every row re-measured at
+`HEAD` = `3f07907`: the pilot **RAN / SPENT / IS THE RECORD** (20 == 0 + 11 + 9); **N REFUSED**; the
+**calibration never started**; **`prereg-v1` and the witness do not exist** (that sentence left
+byte-identical — it is the most creditable line in the file); **the sweep has not run**; and
+`ledger.genesis_hash` corrected to `170bd3ff…`, **now carried by all eleven pilot ledgers**, so
+§12.3's binding is exercised rather than anticipated.
+
+### ⚠️ THREE RE-MEASUREMENTS THAT CAME BACK WRONG — ONE OF THEM THIS SESSION'S OWN
+
+- **`select_n` did NOT refuse.** `driver/pilot.py:decide_n`'s `is_usable_for_n` guard raises
+  **before** `select_n` is called; `select_n` given the pilot's only figure (3,903) returns
+  **N = 50 — the LARGER N.** `INCIDENTS.md`:11040 and `QUESTIONS.md`:14860 carry the unhedged form
+  and are **outside this fence — QUESTIONS OWED.**
+- **README §10's "FAIL 10" was wrong, and no single number is right.** Header-only scans give
+  **11 / 7 / 3** by window, and a bare-token scan gives **13 while misreading a PASS as a FAIL.**
+- ⚠️ **This session's own `4ae054a` attributed a bare-`pytest` figure to `make test`; `a9f4150`
+  corrects it and does NOT amend it.** `make test` deselects 2 (`tasks.py:80`); `5 + 1451 + 2 = 1458`
+  is the full collection. **Bare `pytest` red since ≥2026-08-31 and structurally guaranteed;
+  `make test` last GREEN 2026-09-03, red ~1.5 days — the plural overstated it.**
+
+### THE SUITE
+
+**`make test` LIVE at `3f07907`: `7 failed, 1447 passed, 2 skipped, 2 deselected`, exit 1.**
+⚠️ **3 of the 7 are the shared tree, not the code** — including a check whose offender list named
+**this session's own uncommitted `README.md`.** `OF-214` demonstrated, not cited.
+
+### OPEN FINDINGS
+
+**`OF-254` HIGH** — `runner/redaction.py`'s secret scan is **prefix-anchored**; the gap is
+**POSITION, not shape**, and the module's own docstring names the passing case as a reason it
+exists. The architect's note on why it goes to a review rather than a patch is **verbatim in the
+row**. **`OF-255` HIGH** — whether Groq accepts the **shipped** `User-Agent` is **UNMEASURED**; the
+403 fix was proved with `Mozilla/5.0`, and `liveness_refusal` is still not wired into `preflight`.
+**`OF-256` MEDIUM** — the bucket models TPM as continuous refill; **RULED** to a sliding window in
+an **uncommitted** `QUESTIONS.md` block at filing time, with `runner/buckets.py` **unchanged from
+`HEAD`.** **APPEND ONLY: 29 insertions, 0 deletions, nothing renumbered, nothing closed.**
+
+### ⚠️ STILL OPEN, UNCHANGED BY THIS SESSION
+
+**Rung 4's execution in `config/`** (owed before `prereg-v1`, as one atomic act with the three test
+sites that pin 40) · `prereg-v1` **not cut** · the **witness gist** does not exist · the
+**calibration** has not run and `Q-189`'s blockers are untouched by this session · the **sweep** has
+not run · **N** and the **void threshold** are still `TODO_` sentinels · **39 placeholders unfilled**
+· the repository is **still private** · **C18 has not run** and `RESULTS.md` is a stub · **no chunk
+gained a tag and 14 remain unreviewed.**

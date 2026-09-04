@@ -1,3 +1,104 @@
+## SESSION-TOKEN 2e5b8a47 — ARCH, PUBLISH 1 — 2026-09-04
+
+**Role:** FIX. **Chunk:** ARCH. **Everything below ships UNREVIEWED. Not self-certified. No tag.**
+⚠️ **FULL RECORD: `docs/sessions/arch-publish-1.txt`.**
+⚠️ **ZERO PROVIDER CALLS AND ZERO TOKENS.** This session held **no sanction**, so `PROCESS.md` §8
+makes zero spend the only legal amount, and zero is what was spent.
+
+⚠️⚠️ **`RESULTS.md` NOW EXISTS, AND IT CONTAINS NOT ONE MEASURED NUMBER.** `PROCESS.md` §14 —
+*"a cut item is never silently lost: it is named in `RESULTS.md` and in the README as **not run**,
+with why"* — had been **unmet on rungs 1, 3 and 5 since 2026-09-02 and on rung 4 since
+2026-09-04, because the file did not exist.** What was created is the **minimum that discharges
+§14**: the four fired cuts in the words the record fixes for them, and nothing else. ⚠️ **It is
+transitional by construction** — `tasks.py:202` makes `make eval` write `root/"RESULTS.md"`, so
+the first successful eval **overwrites** it, and `results/degradation.py` **parses `PROTOCOL.md`
+§5.1's rung table** rather than transcribing it, so rung 4 is republished from the frozen artefact
+automatically. `results/__main__.py`'s own docstring — *"a build session that created one would be
+publishing numbers no sweep produced"* — is **quoted inside the file** and obeyed.
+
+⚠️⚠️ **DEGRADATION RUNG 4 IS PUBLISHED IN BOTH FILES, IN THE SHAPE RUNGS 1/3/5 ALREADY USE.**
+README §9.3 is now the rung-4 section on §9.2's own template; §11's row goes **NOT FIRED → FIRED**
+and its tally now reads four; §9.4 gains the **T-FP / T-NEG label table**, because `INC-144`'s
+mandated words assert *"the T-NEG must-not-write control keeps all 34 tasks"* and **`T-NEG`
+appeared ZERO times in the README** — the words would have introduced a term the file never
+defines. ⚠️ **§9.3 was RETITLED rather than a section inserted**, because inserting one renumbers
+§9.4 and §9.5 and breaks six in-README anchors.
+⚠️ **τ²-BENCH IS NOT CUT. ONLY ONE BLOCK'S BREADTH IS STAGED** — said at the first line under the
+§9.3 heading, in the §9.4 table, in the §11 row and in the §11 tally, so a reader who greps `tau2`
+cannot miss it. ⚠️ **THE OPERATOR FIRED IT, ON SCHEDULE — NOT `CONTEXT.md` §13.4's decision rule**,
+whose input the pilot never produced. **Nothing published today implies the measurement chose this
+cut** (`Q-099`'s class).
+
+⚠️ **AND §9.4 NOW SEPARATES TWO FACTS A CARELESS MERGE WOULD HAVE COLLAPSED:** T-FP was **cut** by
+rung 4 (a scope decision) **and** T-FP is **not runnable at any size** (a capability gap). Halving
+a block that cannot run does not make it run, and fixing why it cannot run would not restore the
+other twenty tasks.
+
+**THE STATUS BOX NOW TELLS TODAY'S TRUTH, EVERY ROW RE-MEASURED AT `HEAD` = `3f07907`.** The pilot
+**RAN, is SPENT and is the record** (20 attempted · 0 completed · 11 truncated · 9 never started ·
+20 == 0 + 11 + 9); the **N decision REFUSED**; the **calibration has not run and never started**
+(`evals/cal/` has never existed on any ref); **`prereg-v1` does not exist and there is no witness**;
+**the sweep has not run** (the distinct set of `block` values across all 11 checkpoints is
+`['PILOT']`); and **`ledger.genesis_hash`'s row was corrected** — the concurrent edit it flagged has
+landed, and **all eleven pilot ledgers carry that genesis, read from the files**, so §12.3's binding
+is now **exercised** rather than anticipated.
+
+### ⚠️ THREE THINGS THIS SESSION RE-MEASURED AND FOUND WRONG — ONE OF THEM ITS OWN, 40 MINUTES OLD
+
+- ⚠️ **`select_n` DID NOT REFUSE, AND THE RIGHT ATTRIBUTION IS LESS FLATTERING.** The prompt, and
+  `INCIDENTS.md`:11040 and `QUESTIONS.md`:14860, carry the unhedged *"`select_n` returned a
+  refusal"*. **Measured: `driver/pilot.py`'s `decide_n` raises at its `is_usable_for_n` guard
+  BEFORE `n_rule.select_n` is ever called**, and `select_n` has **no refusal of its own** — given
+  the pilot's one existing figure (**3,903**, the disclosure average over a denominator with **zero**
+  completions) it returns **N = 50, the LARGER N**, off a figure that reads LOW. Crediting `select_n`
+  credits the component that would have chosen the bigger sample. **README says `decide_n`.** The
+  two source entries are outside this fence and are **QUESTIONS OWED**.
+- ⚠️ **README §10 SAID A HEADER-ONLY PARSER "WOULD HAVE PUBLISHED FAIL 10". IT WOULD NOT — AND
+  THERE IS NO SINGLE RIGHT ANSWER.** Measured: `VERDICT`-anchored over the first 20 lines gives
+  **11**; over 10 gives **7**; over 5 gives **3**; and a bare-token scan gives **13 AND MISREADS
+  `REVIEW_C0_2`, a PASS, AS A FAIL.** The replacement is the conclusion that generalises: **no
+  header-only scan reaches 14, and one of them turns a PASS into a FAIL.**
+- ⚠️⚠️ **THIS SESSION'S OWN COMMIT `4ae054a` ATTRIBUTED A BARE-`pytest` FIGURE TO `make test`, AND
+  `a9f4150` CORRECTS IT WITHOUT AMENDING IT.** `make test` runs `pytest -q -m "not operator_gate"`
+  (`tasks.py:80`) and **deselects 2**; `5 + 1451 + 2 = 1458` is the **full collection**, and one of
+  those five failures sits in a file marked `pytestmark = pytest.mark.operator_gate` (`:56`) which
+  **`make test` cannot report.** ⚠️ **And "RED FOR DAYS" is instrument-dependent:** bare `pytest` has
+  been red since at least **2026-08-31** and is **structurally guaranteed** to be; **`make test` was
+  last GREEN on 2026-09-03** and has been red about **a day and a half** — the plural overstates it.
+  **Found by RUNNING the suite rather than citing it.**
+
+**`make test` LIVE at `3f07907`: `7 failed, 1447 passed, 2 skipped, 2 deselected`, exit 1.**
+⚠️ **3 of the 7 are the SHARED WORKING TREE, not the code** — a concurrent session's uncommitted
+`config/protocol.yaml` mid-rung-4 execution, the `assert 20 == 40` tripwire that follows from it,
+and an object-store-versus-worktree check **whose offender list named this session's own
+uncommitted `README.md`.** **`OF-214` demonstrated rather than cited.**
+
+**`docs/reviews/OPEN_FINDINGS.md`: `OF-254`, `OF-255`, `OF-256` FILED — APPEND ONLY, 29 insertions,
+0 deletions, no row renumbered, none closed.** These are the three `ARCH LANES 1` raised and said in
+its own §12 it could not file. ⚠️ **`OF-254`'s gap is stated as POSITION, NOT SHAPE**, and the
+architect's note on why it goes to a review rather than a patch is **recorded verbatim in the row**.
+⚠️ **`OF-256` is filed WITH the architect's sliding-window ruling, whose status is stated rather
+than rounded:** it was held **uncommitted** by the concurrent session at filing time, and
+`runner/buckets.py` was **byte-identical to `HEAD`** — **a ruling is not an implementation.**
+
+**COMMITS, IN ORDER:** `97fe84b` (`RESULTS.md`) · `0287e80` (`OF-254`…`OF-256`) · `4ae054a`
+(README — rung 4 + the STATUS box) · `a9f4150` (**the correction of `4ae054a`**) · plus this
+entry's own.
+
+⚠️ **ZERO PLACEHOLDERS WERE FILLED AND NO NUMBER WAS INVENTED.** `grep -c 'PENDING-RUN' README.md`
+returns **39 occurrences over 9 lines, byte-identical to `3f07907`**, measured before and after.
+⚠️ **A first draft added two PROSE mentions of the literal token, taking the grep to 41 and quietly
+falsifying `OF-250`'s pinned count; both were rewritten before any commit.** Recorded because it is
+the exact class of drift these files exist to refuse.
+
+⚠️ **ONE MORE SESSION WAS LIVE IN THIS TREE THROUGHOUT** — `8f3c72e1`, holding uncommitted
+`QUESTIONS.md`, `config/protocol.yaml`, `src/whetstone_gate/benign/`, `src/whetstone_gate/runner/buckets.py`
+and two test files. **Not one of them was staged, reverted or touched.** Every commit used a private
+index seeded from **live `HEAD`** with the name-only comparison that refuses on mismatch; **it never
+refused, and `git diff --cached --name-only` matched the declared single-path list on all five.**
+
+---
+
 ## SESSION-TOKEN 6d1a94f3 — ARCH, LANES 1 — 2026-09-04
 
 **Role:** FIX. **Chunk:** ARCH. **Everything below ships UNREVIEWED. Not self-certified. No tag.**

@@ -1,0 +1,700 @@
+================================================================================
+ ARCH PUBLISH 1     SESSION-TOKEN 2e5b8a47     ROLE: FIX        2026-09-04
+================================================================================
+
+ PUSHED SHA: a9f4150   (this file is committed on top of it; that commit's SHA
+             is the first line of the chat report)
+
+ The full record is committed VERBATIM at docs/sessions/arch-publish-1.txt
+ BEFORE this was printed. CLAUDE.md S6.1: the FILE is the record; what the
+ architect reads is the convenience copy, and a paraphrase on the way is
+ detectable against it.
+
+ ! ZERO PROVIDER CALLS. ZERO TOKENS. This session held NO SANCTION, so
+   PROCESS.md S8 makes zero the only legal spend, and zero is what was spent.
+ ! NO TAG CUT, NO TAG MOVED, NO HISTORY REWRITTEN, REPOSITORY STILL PRIVATE.
+ ! NOTHING SELF-CERTIFIED. A fresh adversarial review follows.
+
+================================================================================
+0. THE HEADLINE
+================================================================================
+
+ RESULTS.md NOW EXISTS AND CONTAINS NOT ONE MEASURED NUMBER. RUNG 4 IS
+ PUBLISHED IN BOTH FILES IN INC-144's OWN WORDS. THE README'S STATUS BOX NOW
+ DESCRIBES WHERE THIS PROJECT ACTUALLY IS. THREE FINDINGS ARE FILED. AND THREE
+ THINGS I RE-MEASURED CAME BACK WRONG - ONE OF THEM MY OWN, 40 MINUTES OLD.
+
+   ZERO placeholders filled . ZERO numbers invented . 5 commits, 5 files,
+   0 sweeps, 0 refusals of the name-only guard
+
+ PROCESS.md S14 says a cut item is "named in RESULTS.md and in the README as
+ not run, with why." RESULTS.md DID NOT EXIST. So that requirement had been
+ unmet on rungs 1, 3 and 5 since 2026-09-02 and on rung 4 since 2026-09-04 -
+ not only on the rung I was sent to publish.
+
+================================================================================
+1. GATE 1 - RUNG 4 PUBLISHED. THE EXACT WORDS, AND EVERY file:line
+================================================================================
+
+ 1a. THE WORDS ARE INC-144's, VERBATIM. NOT REWORDED, NOT SOFTENED, NOT
+     IMPROVED. Published at RESULTS.md:74, in the "the words" table:
+
+  | **T-FP, the tau2 false-positive block** | `RESULTS.md` **and** `README.md` |
+  **REDUCED - 40 tau2 write tasks -> 20, stratified 10 airline / 10 retail.**
+  Degradation rung 4, fired by the operator 2026-09-04 05:27 UTC, on
+  **schedule**, and **not** by `CONTEXT.md` S13.4's decision rule, whose input
+  the pilot never produced (`INC-142`). The surviving 20 are the **first 10 ids
+  per domain** under the same bytewise-ascending string sort that selected the
+  40, so they are an **exact prefix** of the pre-registered sample and nothing
+  was substituted in. ! **tau2-bench is NOT cut** - `PROCESS.md` S14 and
+  `CONTEXT.md` S21.4 both forbid dropping it, and **only the breadth of this one
+  block is staged**; the T-NEG must-not-write control keeps all 34 tasks and
+  **the externally-authored-answer-key claim is intact**. The false-positive
+  sample is halved, so the paired FP delta is reported on **n=20 per
+  configuration, 100 episodes**, and every table caption states that cell size.
+  `INCIDENTS.md` `INC-144` |
+
+  | **The counter-metric** | `RESULTS.md` | **NOT cut.** S14's never-cut list
+  keeps the benign solver and the paired FP delta - "a project that publishes
+  only what it blocked has published half a result". Rung 4 **narrows** it; it
+  does not remove it |
+
+     (Rendered with the real glyphs in the file; tau2 is written as the Greek
+     letter there. This block is ASCII only because the report is.)
+
+ 1b. EVERY file:line AT WHICH RUNG 4 IS NOW PUBLISHED:
+
+     RESULTS.md:39-58   S1  the six-rung ladder table, four FIRED
+     RESULTS.md:61-76   S2  "the words" - S14's rows for 1/3/5 + INC-144's for 4
+     RESULTS.md:74          the T-FP row, VERBATIM (quoted above)
+     RESULTS.md:76          the counter-metric row, VERBATIM
+     RESULTS.md:79-155  S3  the three things a reader must not get wrong
+     RESULTS.md:84      S3.1 tau2-BENCH IS NOT CUT
+     RESULTS.md:99      S3.2 the OPERATOR fired it, NOT the S13.4 rule
+     RESULTS.md:116     S3.3 declared, and not yet executed in config/
+     README.md:799      S9.3 heading - the rung-4 section
+     README.md:801-803       "the first thing to say is what it is NOT"
+     README.md:805-808       Fired 2026-09-04 05:27 UTC + INC-144 + why UTC only
+     README.md:816-821       what is intact: tau2-bench NOT cut, T-NEG all 34
+     README.md:822-831       what fired it, and what did NOT
+     README.md:833-846       the derivation and the twenty surviving ids
+     README.md:847-857       the visible consequence: config/ still read 40
+     README.md:879-882  S9.4 the T-FP / T-NEG label table
+     README.md:1371     S11  the rung-4 row, NOT FIRED -> FIRED
+     README.md:1375-1382 S11 the tally: four fired, and the tau2 sentence
+
+ 1c. ! tau2-BENCH IS NOT CUT, AND IT IS SAID WHERE A GREPPER LANDS.
+     `grep -n 'tau2\|T-FP\|T-NEG' README.md` previously put T-FP on exactly
+     three lines and T-NEG on ZERO. I measured that before writing. The label
+     table at README.md:879-882 exists BECAUSE INC-144's mandated words assert
+     "the T-NEG must-not-write control keeps all 34 tasks" and THE README HAD NO
+     `T-NEG` LABEL FOR A READER TO ATTACH THAT TO - carrying the words verbatim
+     would have introduced a term the document never defines.
+
+     ! AND S9.4 NOW SEPARATES TWO FACTS A CARELESS MERGE WOULD HAVE COLLAPSED.
+     T-FP was CUT by rung 4 (a SCOPE decision, made by the operator) and T-FP is
+     NOT RUNNABLE AT ANY SIZE (a CAPABILITY gap - Q-154, Q-155). Halving a block
+     that cannot run does not make it run, and fixing why it cannot run would
+     not restore the other twenty tasks. S9.4's heading still frames the second;
+     the first is now stated above it, with the distinction spelled out.
+
+ 1d. ! WHAT FIRED IT, AND THE THING I REFUSED TO WRITE.
+     Published in three places: the OPERATOR's decision of 2026-09-04, on
+     SCHEDULE, under PROCESS.md S14. NOT CONTEXT.md S13.4's decision rule, whose
+     input DOES NOT EXIST - the pilot completed 0 of 20 and the N decision
+     REFUSED, so n_decision.selected_branch is still TODO_C14_PILOT.
+     I grepped the two published files for any sentence that could be read as
+     the measurement choosing the cut. Every S13.4 mention in a rung-4 context
+     is adjacent to an explicit denial; the two that USE S13.4 (README.md:833,
+     RESULTS.md:142) use it for the SELECTION DERIVATION - which twenty survive
+     - which is a different question from what triggered the cut, and both say
+     so on the same screen. Q-099 is cited by name in both files.
+
+ 1e. SHAPE-MATCHING - RUNGS 1/3/5 WERE MEASURED FIRST, NOT ASSUMED.
+     S9.2 (rung 3) is the template for a rung that REDUCES WHAT IS MEASURED: no
+     table, four bolded lead-in labels in a fixed order - "Fired <date>." with
+     its citations inline, "What is lost:", "What is intact, ...", "The visible
+     consequence, named so a reader who greps `agentdojo` finds the cut and not
+     a mystery:". Rungs 1 and 5 - which only fold or downgrade a REVIEW - get a
+     line in S9.3 and a row in S11, and no section. Rung 4 reduces what is
+     measured, so it gets the S9.2 treatment. S11's table is three columns
+     (Rung | Cut | State), NOT PROCESS.md S14's four, and its FIRED rows bold
+     the Cut cell while NOT FIRED rows do not; the new row follows both.
+
+     ! S9.3 WAS RETITLED RATHER THAN A NEW SECTION INSERTED. Inserting one would
+     renumber S9.4 and S9.5 and break six in-README anchors, two of which point
+     at S9.4 from S9.14 and S11. The rungs-1-and-5 pointer is kept inside the
+     retitled section, so nothing is double-stated and nothing contradicts.
+     The new anchor was derived from the S9.2 precedent character by character
+     and the heading was made ASCII-clean for exactly that reason.
+
+     ! ONE DELIBERATE DEPARTURE FROM THE SHAPE, AND IT IS NAMED IN THE FILE.
+     S11's rows for rungs 1/3/5 stamp IST because e31f6b3 recorded them so.
+     INC-144 records rung 4 in UTC ONLY. I print 05:27 UTC and say why, rather
+     than converting it into an IST time this repository never wrote down.
+     Format consistency loses to accuracy, once, on purpose.
+
+================================================================================
+2. GATE 1d - RESULTS.md: I CREATED IT. THE REASONING, IN FULL
+================================================================================
+
+ RESULTS.md DID NOT EXIST (`ls RESULTS.md` -> No such file). I created it. The
+ prompt allowed either that or a report saying why not; here is why I chose it,
+ including the argument against.
+
+ THE ARGUMENT AGAINST, WHICH IS IN THE REPOSITORY AND IS STRONG.
+ PROCESS.md S12's C18 card makes "RESULTS.md + make eval" C18's deliverable, and
+ C18 has not run. Worse, src/whetstone_gate/results/__main__.py's OWN DOCSTRING
+ says: "IT WRITES TO STDOUT BY DEFAULT, NOT TO RESULTS.md. RESULTS.md IS WRITTEN
+ BY THE RUN, and a build session that created one would be publishing numbers no
+ sweep produced."
+
+ WHY I CREATED IT ANYWAY - four reasons, and the first is the decisive one.
+  1. S14's requirement is UNCONDITIONAL and it was UNMET FOR FOUR RUNGS, not
+     one. Rungs 1, 3 and 5 fired on 2026-09-02 and have NEVER been named in
+     RESULTS.md, because RESULTS.md has never existed. A two-day-old unmet
+     requirement is not discharged by waiting for C18.
+  2. THE DOCSTRING'S OBJECTION IS TO PUBLISHING NUMBERS. My file contains ZERO
+     measured numbers - no escape rate, no harm figure, no FP delta, no arm
+     comparison, no ladder cell, no token table, no void determination, no
+     check-prereg line. The cuts are declarations with dates and incident
+     numbers. The docstring is QUOTED INSIDE THE FILE and the obedience stated.
+  3. IT IS TRANSITIONAL BY CONSTRUCTION AND CANNOT SURVIVE INTO THE RESULTS.
+     tasks.py:202 passes `--output root/"RESULTS.md"`, so the first successful
+     `make eval` OVERWRITES it. And results/degradation.py PARSES PROTOCOL.md
+     S5.1's rung table rather than transcribing it, refusing on anything but six
+     rows - and S5.1 ALREADY carries rung 4 as FIRED - so C18's real file
+     republishes the cut from the frozen artefact automatically. My file is the
+     interim, not the mechanism, and it says so in its own first box.
+  4. README.md ALREADY LINKED TO RESULTS.md IN FOUR PLACES and every link was
+     dead.
+
+ SAFETY CHECKED BEFORE WRITING, NOT AFTER: `grep -rn 'RESULTS.md' tests/ src/
+ Makefile` finds NOTHING that READS a repo-root RESULTS.md. The only path that
+ touches it is tasks.py:202, which WRITES it. So creating it cannot turn a test
+ green for the wrong reason and cannot turn one red.
+
+ WHAT THE FILE SAYS ABOUT ITSELF, on its first line: "PARTIAL. NO RESULT IS
+ PUBLISHED HERE, BECAUSE NO RUN HAS PRODUCED ONE." S5 then NAMES every item of
+ C18's card that is absent and says C18 owes it.
+
+================================================================================
+3. GATE 2 - EVERY README FACT, AND WHERE I VERIFIED IT FIRST-HAND
+================================================================================
+
+ Every row below was measured by me or by a read-only agent whose command and
+ output I have, then re-measured a second way by an independent adversarial
+ agent instructed to REFUTE it. Where the two disagreed I measured a third time
+ myself. NOTHING here is copied from the prompt.
+
+ (1) THE PILOT RAN, IS SPENT, IS THE RECORD UNDER S6b.        CONFIRMED
+     20 attempted . 0 completed . 11 truncated . 9 never started . 20==0+11+9
+     WHERE: evals/episodes/ holds 11 ledgers, evals/checkpoints/ holds 11
+     checkpoints, ALL with "truncated": true, max turns_run 8 of a 20 budget ->
+     completed 0. The 9 absent are gemma-26b seeds 2102-2110. The triple
+     reconciles FROM THE FILES ALONE, without reading any prose.
+     Also: driver report at docs/sessions/arch-pilot-run-5.txt S6; INC-142;
+     declaration 733c4fe (declared 03:26:24Z, commit 03:26:25Z, run start
+     03:26:31Z - pushed BEFORE the run); output committed d5b660e.
+     ! ONE HONEST LIMIT I PUBLISH RATHER THAN SMOOTH: "ran to completion, exit
+     0" appears only in PROSE. No artefact under evals/ records a process exit
+     status. What IS file-verifiable is the count triple and its reconciliation,
+     and S6b's rule turns on the word "completion" - so the distinction is
+     named here rather than assumed away.
+
+ (2) IT SELECTED NO N.                                        PARTIAL -> CORRECTED
+     config/protocol.yaml:389 selected_branch: TODO_C14_PILOT, :390
+     measured_tokens_per_episode: TODO_C14_PILOT - identical at HEAD and in the
+     worktree, YAML-PARSED rather than grepped.
+     ! BUT "select_n REFUSED" IS THE WRONG ATTRIBUTION AND I DID NOT PUBLISH IT.
+     MEASURED: the refusal is driver/pilot.py's decide_n, at its
+     `if not measurement.is_usable_for_n` guard, which raises PilotError BEFORE
+     line 333 calls n_rule.select_n. select_n has NO refusal of its own: given
+     the pilot's one existing figure - 3903, the DISCLOSURE average over a
+     denominator with ZERO completions - it returns N = 50, branch A. THE LARGER
+     N, off a figure that reads LOW because a truncated episode cost less than a
+     whole one and divides as if it were whole.
+     Verified twice, by two methods: once by calling select_n(3903) directly,
+     once by HAND-COMPUTING the projection without running the code
+     (46,046,650 / 1,920,000 = 23.98 h <= 32 h, and 3903 <= 60000 -> branch A).
+     ! SO CREDITING select_n CREDITS THE COMPONENT THAT WOULD HAVE CHOSEN THE
+     BIGGER SAMPLE. The README says decide_n and prints the 3903 and the 50.
+     The unhedged form is in INCIDENTS.md:11040 and QUESTIONS.md:14860, both
+     outside this fence - QUESTIONS OWED, item 1.
+
+ (3) THE CALIBRATION HAS NOT RUN.                             CONFIRMED
+     config/protocol.yaml:335 void_threshold_breach_rate: TODO_C14_CALIBRATION.
+     evals/cal/ DOES NOT EXIST and `git log -- evals/cal` is EMPTY - it has
+     never existed on any ref. No calibration RUN_DECLARED.md was ever written;
+     the only one is evals/pilot/RUN_DECLARED.md. All 11 episode files carry the
+     `pilot` prefix and every checkpoint's `block` is "PILOT".
+     Executed, read-only: void.void_threshold() RAISES UndeterminedThreshold;
+     void.verdict(breach_rate(5,10)) RAISES. tests/test_c10_probe.py's
+     `test_the_void_threshold_is_a_SENTINEL_and_NO_VOID_VERDICT_IS_COMPUTABLE_TODAY`
+     asserts both raises and PASSES.
+     ! I PUBLISHED THE SCOPED FORM, NOT THE LOOSE ONE. is_void(rate, threshold)
+     is PURE ARITHMETIC and computes if a caller hand-supplies a threshold - I
+     called it and got True. What does not exist is a CALIBRATED verdict: every
+     path reaching config/ raises, and no entry point supplies a threshold from
+     anywhere else. The repository's own wording, at void.py and Q-106, is "no
+     VOID verdict is computable FROM config/ today, on any input", and that is
+     the form the README now carries, with the reason for the qualifier.
+
+ (4) prereg-v1 DOES NOT EXIST AND THERE IS NO WITNESS GIST.   CONFIRMED
+     `git for-each-ref refs/tags` -> exactly SEVEN, all annotated:
+       c0-pass 86d16bac . c1-pass 4cc4677c . c2-pass ef71f6a9 . c3-pass 2b49fe23
+       c4-pass 99f2a55f . c13-pass 815bd43d . probe-v1 170bd3ff (-> 4ce8f566)
+     `git rev-parse prereg-v1` EXITS 128, "unknown revision".
+     No prereg-v1.sha256, no PREREG_FINGERPRINT.txt, no *.ots anywhere in the
+     worktree, and `git log --all` shows none ever existed on any ref. Exactly
+     one "gist.github" string in tracked files - PROCESS.md:723, the procedure
+     itself - and ZERO gist ids; the only one is the unfilled placeholder in
+     S12.1's curl command.
+     ! README.md:56-58's SENTENCE AGAINST ITSELF IS BYTE-IDENTICAL. I did not
+     touch it, did not weaken it, did not "improve" it. It is the most
+     creditable line in the file and it is the one line of the STATUS area I
+     deliberately left alone.
+     ! ONE LIMIT: this is a LOCAL measurement. No network call was made, so I
+     cannot rule out first-hand a tag or gist existing only on the remote. But
+     S6a.2 requires the fingerprint files COMMITTED and the gist coordinates
+     written into INCIDENTS.md and the README, and neither happened - so a
+     remote-only artefact would itself be a procedure violation.
+
+ (5) THE SWEEP HAS NOT RUN.                                   CONFIRMED
+     The distinct set of `block` values across all 11 checkpoints is ['PILOT'].
+     Zero episodes for M-ADV, T-NEG, T-FP, M-BEN or AD-CMP. `git log --all
+     --diff-filter=A --name-only -- evals/` returns 26 paths EVER ADDED across
+     all refs and every one is pilot__*, RUN_DECLARED.md or a usage log. A
+     case-insensitive filesystem search for every sweep block slug returns ZERO.
+     No evals/results/ - which is why `make eval` refuses.
+     Seeds 2101-2110 are protocol.yaml's pilot_first/pilot_last and are disjoint
+     from the scored 2001-2050.
+
+ (6) THE SUITE IS RED.                    CONFIRMED - AND MY FIRST FORM WAS WRONG
+     `make test` LIVE at HEAD 3f07907: 7 failed, 1447 passed, 2 skipped,
+     2 deselected, exit 1. See S5 - this is the one I got wrong and corrected.
+
+ (7) ledger.genesis_hash - THE ROW WAS STALE AND I CORRECTED IT.
+     README said PRE-FREEZE with a note that a concurrent session held an
+     uncommitted edit. THAT EDIT HAS LANDED: config/protocol.yaml:363 reads
+     170bd3ff4abfdd8f87f64055972a60c82cc54efc at HEAD, = probe-v1's tag object
+     id. ! AND I VERIFIED THE CONSEQUENCE RATHER THAN INFERRING IT: I opened
+     evals/episodes/pilot__1__2101__gemma-26b.json and it carries
+     "genesis_hash": "170bd3ff4abfdd8f87f64055972a60c82cc54efc". All eleven do.
+     THEY CHAIN FROM probe-v1, NOT FROM prereg-v1, WHICH DOES NOT EXIST - so
+     S12.3's binding is now EXERCISED rather than anticipated, and one grep
+     checks it. Q-153's own premise ("available ONLY BECAUSE NO EPISODE HAS
+     RUN") no longer holds, which the README now says.
+
+ (8) evals/ - 26 files, not one. All the pilot's.
+
+================================================================================
+4. ! CONFIRMATION: ZERO PLACEHOLDERS FILLED, ZERO NUMBERS INVENTED
+================================================================================
+
+ MEASURED BEFORE AND AFTER, AND THE COUNT IS BYTE-IDENTICAL TO 3f07907:
+
+   grep -c 'PENDING-RUN' README.md     ->  39 occurrences over 9 LINES
+   named form <<PENDING-RUN: ...>>     ->  38
+   bare form  <<PENDING-RUN>>          ->   1
+   ALL <<...>> tokens of any spelling  ->  39   (so no variant was missed)
+
+ NOT ONE WAS FILLED. NOT ONE WAS REMOVED. NOT ONE WAS ADDED.
+
+ ! AND ONE NEAR-MISS I MADE MYSELF, RECORDED BECAUSE IT IS THE EXACT CLASS THIS
+ FILE EXISTS TO REFUSE. My first draft of the STATUS box and of S18.1 wrote the
+ literal token twice in PROSE - once naming the GIST_ID placeholder, once saying
+ "it filled ZERO <<PENDING-RUN:...>> placeholders". That took the grep from 39
+ to 41 AND QUIETLY FALSIFIED OF-250, which pins the count at 39 as a MEASURED
+ finding. I caught it by re-running the count rather than by re-reading the
+ prose. Both were rewritten to name the placeholder without spelling it, BEFORE
+ any commit. A count that a document's own prose inflates is a count nobody can
+ check, and OF-250 is the row that would have been made false.
+
+ NO NUMBER IN ANYTHING I WROTE WAS INVENTED, ESTIMATED, ROUNDED, HEDGED OR
+ ILLUSTRATED. There is no "roughly", no "we expect", no "on the order of", and
+ no cross-arm comparison, escape rate or "blocked N%" anywhere. Every integer I
+ published traces to a command whose output I have or to a file:line I read.
+ The one place I DECLINED to compute a number is named in the file: S11's rung-4
+ row prints 05:27 UTC rather than an IST time this repository never recorded.
+
+================================================================================
+5. ! THE ONE I GOT WRONG, IN MY OWN COMMIT, 40 MINUTES OLD
+================================================================================
+
+ COMMIT 4ae054a's STATUS box printed:
+   "| the test suite | `make test`, and the dated counts in docs/sessions/ |
+    RED, AND RED FOR DAYS: 5 failed, 1451 passed, 2 skipped |"
+
+ TWO DEFECTS, BOTH FOUND BY RUNNING THE SUITE INSTEAD OF CITING IT.
+
+ (a) 5/1451 IS NOT A `make test` NUMBER AND CANNOT BE ONE.
+     `make test` -> Makefile:23 -> tasks.py:80 -> pytest -q -m "not
+     operator_gate", which DESELECTS 2 tests. 5 + 1451 + 2 skipped = 1458 = THE
+     FULL COLLECTION, nothing deselected -> it is a BARE pytest run.
+     Confirmed from the other side: one of those five failures is
+     tests/test_lanes_operator_placeholders.py::test_the_camel_branch_is_decided_before_any_camel_run,
+     in a file carrying `pytestmark = pytest.mark.operator_gate` at :56 - which
+     `make test` CANNOT report. The tell in any reported count is the word
+     "deselected", and arch-pilot-run-4.txt S5 prints both instruments SIDE BY
+     SIDE. I read past the distinction and published the wrong attribution.
+
+ (b) "RED FOR DAYS" IS INSTRUMENT-DEPENDENT AND THE PLURAL OVERSTATES ONE.
+     bare pytest : red since AT LEAST 2026-08-31 (c2-review-1.txt:325,
+                   "2 failed, 230 passed, 1 skipped") - ~4 days, and
+                   STRUCTURALLY GUARANTEED, because a bare run always includes
+                   the deliberately-red operator_gate file.
+     make test   : last recorded GREEN 2026-09-03 (PROGRESS.md, "801 passed,
+                   0 failed, 1 skipped, 2 deselected"); first red after at
+                   c8-build-1.txt:556 the same morning; continuously red since
+                   -> ABOUT A DAY AND A HALF. "DAYS" plural overstates it.
+
+ THE LIVE RUN, WHICH IS NOW THE README'S HEADLINE FIGURE:
+     make test at HEAD 3f07907:
+        7 failed, 1447 passed, 2 skipped, 2 deselected in 1305.42s   EXIT 1
+
+ ! AND 3 OF THE 7 ARE THE SHARED WORKING TREE, NOT THE CODE:
+     test_c14_prereg::test_the_working_tree_agrees_with_the_object_store_for_config
+        -> "config/ has uncommitted changes ... M config/protocol.yaml"
+     test_c3_tau2_enumeration::test_the_spec_still_says_first_40_stratified_20_and_20
+        -> "assert 20 == 40" - a concurrent session MID-WAY THROUGH EXECUTING
+           RUNG 4, so the tripwire is red against a config that moved and a HEAD
+           that did not
+     test_repo_invariants::test_the_object_store_and_the_working_tree_agree
+        -> its offender list NAMED THIS SESSION'S OWN UNCOMMITTED README.md AND
+           docs/reviews/OPEN_FINDINGS.md
+   The other 4 are pre-existing and are the ones arch-lanes-1 S10 attributes.
+
+ ! THIS IS OF-214 DEMONSTRATED RATHER THAN CITED. A suite count taken in a
+ multi-session tree measures the sessions as much as the code. S13.7 now says
+ that, with this run as its evidence, and still ends where it did: run it
+ yourself.
+
+ 4ae054a IS NOT AMENDED. a9f4150 corrects it as a separate commit, and the
+ wrong sentence is replaced in the file and NAMED in it. History is not
+ rewritten here - INC-139's and INC-146's treatment, applied to me by me.
+
+================================================================================
+6. MY INDEPENDENT RE-MEASUREMENT OF THE REVIEW TRAIL
+================================================================================
+
+ Measured twice by two agents using disjoint methods (directory listing +
+ verdict regex vs git add/delete history + tag-cut disposition + session
+ reports), then reconciled by me.
+
+ THE REVIEW-FILE HALF: CONFIRMED TO THE INTEGER.
+   20 REVIEW_*.md files . FAIL 14 . PASS 6 . other verdict values 0.
+   ARCHITECT_CHECK_0/1.md, OPEN_FINDINGS.md, README.md and the independent/ and
+   mutants/ subdirectories are NOT counted - an architect check is a different
+   artefact and folding it in inflates in the flattering direction.
+   Every file was resolved from header AND body AND tail. NO FILE DISAGREES
+   WITH ITSELF.
+
+ THE THREE HEADER-LESS FAILS: CONFIRMED, WITH THEIR LINES.
+   REVIEW_7_1.md  FAIL at BODY L762  (header L8 defers to S15)
+   REVIEW_7_2.md  FAIL at BODY L637  (header L9 defers to S15)
+   REVIEW_8_1.md  FAIL at BODY L210  ("# !! FAIL - FOUR BLOCKERS ...")
+                  - and its header carries NO verdict AND NO defer-pointer.
+
+ ! AND HERE THE PROMPT'S NUMBER, AND THE README'S, ARE BOTH WRONG - IN OPPOSITE
+   DIRECTIONS - BECAUSE THE FIGURE DEPENDS ON THE SCAN.
+     VERDICT-anchored, first 20 lines : 11 FAIL / 6 PASS / 3 no verdict
+     the same, first 10 lines         :  7 FAIL
+     the same, first  5 lines         :  3 FAIL
+     bare-token, first 20 lines       : 13 FAIL / 5 PASS  - AND IT MISREADS
+       REVIEW_C0_2, A PASS, AS A FAIL, because its line 7 names its
+       predecessor "(attempt 1, token 52f5307b, **FAIL**)"
+   The prompt said 11 (right for one variant). README.md said "FAIL 10" (right
+   for none). I published NEITHER as the answer: the README now carries the
+   table above and the conclusion that generalises - NO HEADER-ONLY SCAN REACHES
+   14, AND ONE OF THEM TURNS A PASS INTO A FAIL.
+
+ THE CHUNK HALF: THE PROMPT'S "14 unreviewed / 13 pending / 1 CUT" IS RIGHT
+ UNDER THE README'S OWN DEFINITION AND WRONG UNDER PROCESS.md S12's. Both
+ agents flagged it as REFUTED; I measured a third time and the disagreement is
+ DEFINITIONAL, not factual:
+   README S10's table has 23 ROWS = S12's 22 chunks PLUS C12-DRIVER, which Q-149
+   rules a distinct deliverable. Under that: 6 tagged + 3 residue (C6,C7,C8) +
+   14 unreviewed = 23. PARTITIONS EXACTLY.
+   Against S12's 22 rows (no C12-DRIVER, and C8 counted as reviewed): 6 tagged,
+   9 with a review file, 13 without (12 pending + C16 cut), 16 untagged.
+   BOTH ARE TRUE. THEY ARE DIFFERENT QUESTIONS. The README now STATES THE
+   DEFINITION its box is counted under, and names the two facts invariant under
+   either: six cN-pass tags exist, and C16 is the only chunk not awaiting a
+   review because it was CUT.
+   ! And four chunks resist bucketing at all: C6 and C7 are DISPOSED rather than
+   pending (Q-089), and C15's and C20's reviews are FOLDED into C18's and C21's
+   by rung 1, so they will never produce a review file of their own. That is now
+   in the README too, because it is how the 14 arose.
+
+ TAGS: 6 cN-pass - c0, c1, c2, c3, c4, c13. Cross-checked against STATUS.md's
+ 22 rows: every tag claim matches git exactly; no chunk claims a tag that does
+ not exist; no tag exists STATUS.md does not account for.
+ ONE MINOR DISAGREEMENT FOUND AND REPORTED RATHER THAN FIXED: STATUS.md cites a
+ file "REVIEW_C0_1" once; no such file exists or ever has (the C0 review is
+ REVIEW_C0.md, added in 9c5481b, and STATUS.md cites the correct name three
+ times elsewhere). A citation typo, not a missing review. STATUS.md's live rows
+ are not mine to edit - QUESTIONS OWED, item 4.
+
+ I DID NOT CLAIM ANY REVIEW PASSED THAT DID NOT. No verdict was changed, no
+ chunk was moved between buckets, and no tag was cut.
+
+================================================================================
+7. GATE 3 - THE OPEN_FINDINGS ROWS ADDED
+================================================================================
+
+ APPEND ONLY. 29 insertions, 0 DELETIONS - proved by `git diff --numstat` and by
+ a deletion count of zero on the diff. 265 rows -> 268. Highest id 253 -> 256,
+ RE-MEASURED IMMEDIATELY BEFORE THE WRITE and 254/255/256 confirmed unused. No
+ row renumbered, no row edited, NO OTHER SESSION'S ROW CLOSED.
+ ! The write was done by a script opening the file in APPEND MODE ONLY. It never
+ reads and never rewrites the existing 544 KB, so sweeping another session's row
+ is impossible BY CONSTRUCTION rather than by care.
+
+ PROVENANCE IS STATED, NOT BORROWED - the treatment this file's own note on
+ OF-01 already gives. These were raised by ARCH LANES 1, a FIX session, which
+ said in its S12: "WRITE docs/reviews/OPEN_FINDINGS.md. Outside the fence, and
+ CLAUDE.md S6.5 makes it a REVIEW session's duty. INC-147 says so rather than
+ claiming the finding is filed there." They are filed by another non-review
+ session because the alternative is a known gap in a safety guard living only in
+ a session report. FILING IS NOT CLOSING AND IT IS NOT CERTIFYING.
+
+ OF-254  HIGH  C11, runner/redaction.py - SAFETY GUARD
+   The secret scan is PREFIX-ANCHORED, so a credential INSIDE a longer string is
+   WRITTEN. ! THE GAP IS STATED AS POSITION, NOT SHAPE, and the row explains why
+   that framing is the finding: the module's docstring DISCLOSES A LIMIT AND IT
+   IS THE WRONG LIMIT - "not of a known prefix shape ... passes" READS AS THOUGH
+   A KEY OF A KNOWN PREFIX SHAPE IS COVERED. Verified at source by me:
+   _looks_like_a_key at :67 tests value.startswith(prefix) at :72 against
+   _KEY_PREFIXES at :49, and the environment test at :82 is `value ==
+   env_value`. BOTH ARE WHOLE-STRING TESTS. The docstring names "a provider
+   error message quoting the credential it rejected" as reason two the module
+   exists - and a message quoting a credential is BY CONSTRUCTION a credential
+   inside a longer string. THE GUARD DOES NOT COVER ITS OWN HEADLINE SCENARIO.
+   ! THE ARCHITECT'S NOTE IS RECORDED VERBATIM IN THE ROW, because "it deserved
+   a review" is exactly the sentence a session writes when it is out of time:
+   the file was INSIDE arch-lanes-1's fence and was still not changed, because
+   startswith -> containment makes the project's central guard - which REFUSES
+   rather than masks, so a false positive ABORTS AN EPISODE - fire on "AIza"
+   anywhere in the 498-entry attacker corpus (measured: 498 across 5 pinned
+   sources). That trade needs a MEASURED false-positive rate, not a judgement.
+
+ OF-255  HIGH  C11/C14, driver/clients.py - PRE-SPEND READINESS
+   Whether Groq accepts the SHIPPED User-Agent is UNMEASURED. The 403->200 proof
+   used "Mozilla/5.0"; clients.py:428 ships "whetstone-gate/1.0 (+research
+   harness; Razorpay Track 01)", sent at :940 and :951 - deliberately naming the
+   project rather than impersonating a browser, which is the right call and is
+   EXACTLY why the fix is unproven: the header measured is not the header that
+   runs. Severity argued rather than assumed: this failure HAS ALREADY SPENT ONE
+   SINGLE-SHOT ARTEFACT, and driver/run.py:liveness_refusal - the named
+   mitigation - is implemented, tested, AND NOT WIRED INTO preflight.
+   ! CHECKED AT HEAD BEFORE FILING, as the prompt required: Q-190 carries NO
+   Status field at all, no architect ruling for it exists anywhere in the repo,
+   and its residual sentence is byte-identical at HEAD and in the worktree. IT
+   IS NOT CLOSED, so the FINDING was filed and not a closure.
+
+ OF-256  MEDIUM (RULED, NOT YET IMPLEMENTED)  C11, runner/buckets.py
+   The bucket models TPM as continuous refill; the provider's limiter is
+   stricter. On the pilot's eight-call trace the bucket NEVER EMPTIES (min 6,170
+   of 16,000) while a sliding window is exceeded twice, peaking at 22,069
+   (1.38x). The convenient claim is explicitly NOT made: INC-143's settle-side
+   top-up would NOT have prevented the 429, and call 9 is still sent immediately
+   either way. What the evidence does NOT support is carried too - nine points
+   cannot separate the limiter shapes, and no retry-after/header/body was
+   recorded for the 429.
+   ! IT WAS Q-191, NOT Q-190, THAT MOVED UNDER ME - AND I FOLDED IT IN. The
+   prompt warned that the live session might close Q-190 at its Gate 2b. Q-190
+   is untouched; but the SAME session had an UNCOMMITTED QUESTIONS.md block
+   titled "FIVE RULINGS RECORDED VERBATIM - Q-189(a)(b)(c)(d) AND Q-191" in
+   which the architect RULES THE OPPOSITE of arch-lanes-1's "It is NOT proposed
+   here": "Model TPM as a 60-SECOND SLIDING WINDOW ... Class B". I quote that
+   ruling verbatim in the row AND state its status exactly - UNCOMMITTED, held
+   by 8f3c72e1 at the moment of filing.
+   ! THE ROW STAYS OPEN, AND THE REASON IS MEASURED: `git diff --
+   src/whetstone_gate/runner/buckets.py` was EMPTY at filing, the module still
+   documenting itself as "refilled continuously" at :59 and :61. A RULING IS NOT
+   AN IMPLEMENTATION, AND A FINDING CLOSED BY A RULING THAT HAS NOT LANDED IS
+   CLOSED BY ASSERTION. Close it with the SHA that lands the code.
+   (After filing, that session began editing buckets.py. The row's wording is
+   scoped to the filing moment and names the close condition, so it does not go
+   stale - but the fact is reported here.)
+
+ ! THE COUNT OF OPEN FINDINGS WENT UP BY THREE AND NOTHING WAS CLOSED. The block
+ ends by saying so, because filing a finding is not progress on it.
+
+ ! WHY THE README DOES NOT RESTATE A NEW OPEN-FINDINGS TOTAL. I measured the
+ file and it carries 265 rows over only 239 DISTINCT IDS - 26 ids appear on more
+ than one row, a row restated by a later session BESIDE its original rather than
+ overwriting it. My naive parse gives 200 OPEN where the README's box says 193,
+ and an adversarial re-parse gives 176 OPEN / 46 CLOSED / 24 HYBRID over 246
+ canonical rows. THE TOTAL IS METHOD-DEPENDENT. So I did NOT publish a new
+ number: the README keeps C19's 193 as C19's dated measurement, and states that
+ three rows were appended and none closed, with `git log` named as the
+ authority. Publishing a fresh single total would have looked more settled than
+ the file is.
+
+================================================================================
+8. GIT - EVERY `Swept:` LINE, AND THE GUARD THAT NEVER REFUSED
+================================================================================
+
+ FIVE COMMITS. EACH ONE FILE. `git show --numstat` on every one confirms the
+ single declared path and nothing else.
+
+   97fe84b  RESULTS.md                       195 /  0   (new file)
+   0287e80  docs/reviews/OPEN_FINDINGS.md     29 /  0   (append only)
+   4ae054a  README.md                        295 / 37
+   a9f4150  README.md                         38 / 13   (correction of 4ae054a)
+   <this>   docs/sessions/arch-publish-1.txt, STATUS.md, PROGRESS.md
+
+ THE RECIPE, ON ALL FIVE, PROCESS.md S7b WITH INC-139's CORRECTION:
+   export GIT_INDEX_FILE="$(mktemp -d)/index"     # fresh OS temp, never the repo
+   git read-tree HEAD                             # ALWAYS LIVE HEAD, never a pin
+   git add -- <declared paths>
+   test "$(git diff --cached --name-only|sort)" = "$(printf '%s\n' <declared>|sort)" \
+     || { echo "STOP: snapshot does not match declared path list"; exit 1; }
+   git diff --cached --stat && git commit -F <msg>
+   env -u GIT_INDEX_FILE git reset -- <the same paths>      # env -u, NEVER VAR=
+   env -u GIT_INDEX_FILE git diff --cached --quiet          # exit 0 required
+
+ ! DID THE NAME-ONLY COMPARISON EVER REFUSE?  NO. NOT ONCE, ON ANY OF THE FIVE.
+ `git diff --cached --name-only` matched the pre-declared single-path list
+ exactly every time, and `git diff --cached --stat` listed that one path and no
+ others. HEAD was RE-READ IMMEDIATELY BEFORE EVERY COMMIT and the parent of each
+ commit is the previous one, in order, with no gap. The shared-index check
+ returned EXIT 0 after every reset. Had it refused I would have stopped: that
+ refusal is the guard that was missing when a FINAL OUTPUT was deleted.
+
+ `git diff --cached` WAS THIS SESSION'S FIRST GIT COMMAND, BEFORE THE READ ORDER
+ (OF-213): the shared index was EMPTY and clean.
+
+ THE `Swept:` LINES, ONE PER COMMIT, VERBATIM FROM THE MESSAGES:
+  97fe84b: "Swept: NOTHING. One path - RESULTS.md, a NEW file - staged from a
+    private index seeded from LIVE HEAD ... config/, src/, tests/,
+    tests/goldens/, PROTOCOL.md, QUESTIONS.md, INCIDENTS.md, CONTEXT.md,
+    PROCESS.md, HOLES.md, evals/ and corpora/ are ALL outside this session's
+    fence and NONE was written; a concurrent session 8f3c72e1 holds uncommitted
+    edits to QUESTIONS.md and config/protocol.yaml and neither was touched,
+    staged or reverted here."
+  0287e80: "Swept: NOTHING. One path - docs/reviews/OPEN_FINDINGS.md ... The
+    write was performed by a script opening the file in APPEND mode only: it
+    never reads and never rewrites the existing 544KB, so a sweep of another
+    session's row is impossible by construction rather than by care."
+  4ae054a: "Swept: NOTHING. One path - README.md ... the concurrent session
+    8f3c72e1 held uncommitted edits to eight of those paths throughout and not
+    one was staged, reverted or touched."
+  a9f4150: "Swept: NOTHING. One path - README.md ... Nothing outside the fence
+    was staged; the concurrent session 8f3c72e1's eight uncommitted paths were
+    not touched."
+  <this>:  "Swept: NOTHING. Three paths ... PROGRESS.md is newest-on-top so this
+    PREPENDS, and the prepend is proved additions-only AND proved that the
+    entire previous file is intact byte-for-byte as a SUFFIX. STATUS.md is an
+    APPEND, proved as a PREFIX, merged into no live row.
+    docs/sessions/arch-publish-1.txt is new."
+
+ LF ONLY: every file I wrote was byte-checked - 0 CR bytes, and each ends with
+ exactly one newline.
+
+ ! THE CONCURRENT SESSION, NAMED. 8f3c72e1 (ARCH CAL BUILD 1) was live in this
+ tree throughout, holding uncommitted QUESTIONS.md, config/protocol.yaml,
+ src/whetstone_gate/benign/blindness.py, executor.py, manifest.py,
+ runner/buckets.py, tests/test_c12_benign.py and tests/test_c3_tau2_enumeration.py.
+ NOT ONE WAS STAGED, REVERTED OR TOUCHED BY ME. I did not `git stash`, `checkout
+ --`, `restore`, `clean` or `reset --hard` at any point.
+
+================================================================================
+9. QUESTIONS OWED
+================================================================================
+
+ Each is a file I may not write, or a ruling only the architect can give.
+
+ 1. ! "select_n REFUSED" IS RECORDED UNHEDGED IN TWO FILES AND IT IS THE WRONG
+    ATTRIBUTION. INCIDENTS.md:11040 (inside INC-144) and QUESTIONS.md:14860
+    both say select_n returned the refusal. MEASURED: driver/pilot.py's decide_n
+    raises at its is_usable_for_n guard BEFORE select_n is called, and select_n
+    given the pilot's only figure (3903) returns N = 50 - THE LARGER N.
+    arch-pilot-run-5.txt:327 hedges it correctly as "select_n / decide_n". Both
+    files are outside my fence. THE README NOW SAYS decide_n; the two source
+    entries do not. RULING NEEDED on whether they are corrected beside
+    themselves (INC-139's treatment) or left as the record with this noted.
+
+ 2. ! PROCESS.md S14's RUNG-4 ROW STILL READS "NOT FIRED. RESERVED UNTIL C14".
+    PROCESS.md:1406. It is stale against INC-144, PROTOCOL.md S5.1, STATUS.md
+    and now README.md and RESULTS.md. PROCESS.md is outside every recent
+    session's fence, including mine. RULING NEEDED: who amends S14's own table,
+    and does it get INC-139's correct-beside-itself treatment?
+
+ 3. ! OF-256's RULING IS UNCOMMITTED AND ITS IMPLEMENTATION IS NOT MINE TO
+    JUDGE. Q-191 is ruled to a 60-second sliding window in a QUESTIONS.md block
+    held uncommitted by 8f3c72e1. I filed the row WITH the ruling quoted and its
+    status stated. If that block lands unchanged the row is right as written; if
+    it changes, the row quotes a ruling that was never committed. FLAGGED so the
+    next session checks rather than inherits.
+
+ 4. STATUS.md CITES A REVIEW FILE THAT DOES NOT EXIST. "REVIEW_C0_1" appears
+    once; the file is REVIEW_C0.md (added 9c5481b) and STATUS.md names it
+    correctly three times elsewhere. A citation typo, not a missing review. The
+    live rows are not mine to edit.
+
+ 5. ! THE SYSTEMIC GUARDRAIL INC-144 PROPOSED IS STILL NOT INSTALLED: a test
+    asserting that EVERY pre-declared degradation rung HAS A SEAM - that the
+    value it changes is reachable through config/ or a flag, not only as the
+    length of a frozen list. It needs config/ and PROCESS.md S14 together, and
+    both are outside my fence. Carried forward so it is not lost.
+
+ 6. RESULTS.md's STRUCTURE IS MINE, NOT C18's, AND C18 MAY WANT NONE OF IT. I
+    created the minimum S14 demands and said so at the top; `make eval`
+    overwrites it wholesale. If the architect would rather it not exist until
+    C18 runs, deleting it is one command and this report is the record of why it
+    was created.
+
+================================================================================
+10. WHAT I COULD NOT DO
+================================================================================
+
+ 1. EXECUTE RUNG 4. config/ is outside my fence. Published as DECLARED with its
+    execution named as owed - and, as it happens, being executed by 8f3c72e1
+    while I wrote, which the files say against a named commit rather than
+    against "today".
+ 2. WRITE THE REAL RESULTS.md. It is C18's, it comes out of stored ledgers, and
+    there are none. What exists is a stub that carries the cuts and no number.
+ 3. FILL ANY PLACEHOLDER. There is nothing to fill one with. All 39 remain.
+ 4. CORRECT INCIDENTS.md's AND QUESTIONS.md's select_n ATTRIBUTION. Outside the
+    fence. QUESTIONS OWED item 1.
+ 5. AMEND PROCESS.md S14's STALE RUNG-4 ROW. Outside the fence. Item 2.
+ 6. CLOSE ANY FINDING. I appended three and closed none.
+ 7. MEASURE WHETHER GROQ ACCEPTS THE SHIPPED User-Agent. It is the single
+    cheapest way to de-risk the next run and it costs ONE CALL - but I held NO
+    TOKEN SANCTION and PROCESS.md S8 makes a session without one refuse rather
+    than judge. OF-255 carries it as operator-owed.
+ 8. RUN THE PILOT, THE CALIBRATION OR THE SWEEP, or cut any tag, or flip the
+    repository public. None was attempted.
+ 9. REVIEW MY OWN WORK. Three of the things this session found wrong were
+    published claims of OTHER sessions; ONE WAS MY OWN, in my own commit, found
+    only by running a command instead of trusting a document. That is the
+    argument for the review that follows, not a substitute for it.
+
+================================================================================
+11. WHAT THE OPERATOR MUST DO NEXT - SHORTEST FIRST
+================================================================================
+
+ 1. ONE SANCTIONED CALL on the qwen-27b lane carrying the SHIPPED _USER_AGENT
+    verbatim. It settles OF-255's half for the cost of one request, and OF-255
+    is the finding most likely to spend the next single-shot artefact.
+ 2. RULE ON WIRING liveness_refusal INTO preflight. It converts BOTH of the
+    pilot's failures from "discovered by spending the artefact" to "refused
+    before it", at one call per lane per run.
+ 3. RULE ON QUESTIONS OWED 1 and 2 - the select_n attribution, and who amends
+    PROCESS.md S14's stale rung-4 row.
+ 4. FINISH RUNG 4's EXECUTION IN config/ BEFORE prereg-v1, as ONE ATOMIC ACT
+    with the three test sites that pin 40, and RE-MEASURE PROTOCOL.md S1.1's
+    manifest digest rather than copying it. 8f3c72e1 appeared to be doing this
+    while I wrote; verify it landed complete.
+ 5. RULE ON INC-147 / OF-254 - accept the prefix-anchored scan as a stated
+    limitation with a docstring that names POSITION rather than shape, or
+    schedule the containment change with a review that measures the
+    false-positive rate against the 498-entry corpus first.
+ 6. A FRESH ADVERSARIAL REVIEW OF THIS SESSION. Nothing here is self-certified,
+    no tag was cut, and the correction in S5 was found by ME - after I had
+    already committed the claim it corrects.
+
+================================================================================
