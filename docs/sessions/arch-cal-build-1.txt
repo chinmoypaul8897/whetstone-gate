@@ -1,0 +1,607 @@
+================================================================================
+ ARCH CAL BUILD 1     SESSION-TOKEN 8f3c72e1     ROLE: FIX          2026-09-04
+================================================================================
+
+ PUSHED SHA: 5960120   (and c5a83fd beneath it; this file is committed on top,
+             and THAT commit's SHA is the first line of the chat report)
+
+ The full record is committed VERBATIM at docs/sessions/arch-cal-build-1.txt
+ BEFORE this was printed. CLAUDE.md S6.1: the FILE is the record; this is the
+ convenience copy, and a paraphrase on the way is detectable against it.
+
+================================================================================
+0. THE HEADLINE
+================================================================================
+
+ ALL FOUR GATES EXECUTED. THE CALIBRATION PATH EXISTS AND IS INVOCABLE.
+
+ ! git rev-parse prereg-v1 EXITS 128 - verified as this session's FIRST act,
+ before the read order - so every config/ edit below was legal.
+
+ GATE 0  five rulings recorded VERBATIM before anything else was touched
+ GATE 1  degradation rung 4 EXECUTED in config/; the twenty ids RE-DERIVED
+ GATE 2  Q-191's sliding window shipped; GROQ ACCEPTS THE SHIPPED User-Agent
+ GATE 3  driver/cal.py + `--block cal`: Q-189 BLOCKER 1 IS CLOSED
+
+ SPEND: 1 call, 21 tokens, qwen-27b, against 2 calls / 5,000 tokens. No 429.
+ Nothing retried. No lane substituted.
+
+ ! THE CALIBRATION WAS NOT RUN. evals/cal/RUN_DECLARED.md WAS NOT WRITTEN.
+ ! NO TAG WAS CUT OR MOVED. NOT SELF-CERTIFIED.
+
+ ! AND THIS SESSION FOUND FOUR THINGS WRONG, THREE OF THEM ITS OWN:
+   INC-149  a SECOND EXECUTOR SESSION entered this tree six minutes after this
+            session's concurrency check passed, and moved HEAD five commits
+   INC-150  the prompt named THREE test sites; SEVEN broke, plus a PRINTED
+            REPORT IN SHIPPED SOURCE that no test could have caught
+   INC-151  this session wrote a throwaway file INTO THE REPOSITORY ROOT
+   INC-152  this session's main commit carries NO `Swept:` line, breaking a
+            convention its previous ELEVEN commits all observe
+
+================================================================================
+1. THE CONCURRENCY TEST - PASSED, THEN STALE FOUR MINUTES LATER (INC-149)
+================================================================================
+
+ The prompt's test, and the only one that binds: "STOP ONLY IF ANOTHER LIVE
+ SESSION HOLDS 8f3c72e1 OR IS WRITING TO evals/, config/, src/ OR tests/."
+
+ RUN FIRST, by INC-140's four-step recipe:
+   PID 14232 -> ca0152c1 -> C:\Users\chinm\role playoff hackathon  DIFFERENT REPO
+   PID  2260 -> 99119ca6 -> c:\Users\chinm\whetstone-gate          THE CONSOLE
+   PID 22720 -> (fresh)  -> a775827b                               THIS SESSION
+
+ THE CONSOLE'S READ-ONLY CLAIM WAS RE-MEASURED, NOT TAKEN ON THE PROMPT'S WORD:
+   140 Bash   21 Read   4 Grep   1 ToolSearch   1 WebFetch   1 AskUserQuestion
+     0 Write   0 Edit   0 NotebookEdit          over 2,344 records
+   0 `git tag` WITH AN ARGUMENT (all 26 hits are listings)
+   its one rm -rf / clone / checkout runs entirely inside its OWN scratchpad on
+   a throwaway clone, and `oldclone` is absent from this tree
+   8f3c72e1 appears EXACTLY TWICE, both inside the prompt it authored for me
+
+ TEST NOT MET -> PROCEEDED.
+
+ ! AND THEN PID 20620 STARTED AT 13:22:26, SIX MINUTES LATER. It is ARCH
+ PUBLISH 1 (2e5b8a47), and between 13:47 and 14:02 it landed FIVE commits,
+ moving HEAD 3f07907 -> dc9b842 while this session held eleven files of
+ uncommitted work. It was found only because check-roles E1 went red.
+
+ RE-MEASURED, EVERY QUESTION ANSWERED BY MEASUREMENT:
+   does it hold 8f3c72e1?   NO. Its own first message reads "SESSION-TOKEN:
+     2e5b8a47 ... ANOTHER SESSION IS LIVE IN THIS TREE RIGHT NOW (`8f3c72e1`)
+     AND HEAD WILL MOVE UNDER YOU. IT HOLDS config/, src/, tests/, PROTOCOL.md,
+     QUESTIONS.md, INCIDENTS.md."
+   did it touch this fence?  NO. git diff --name-only 3f07907..dc9b842 filtered
+     to ^(evals|config|src|tests)/ is EMPTY.
+   was anything swept?       NO. git diff HEAD -- QUESTIONS.md was +150/-0.
+
+ ! THE ARCHITECT RAN TWO FENCED SESSIONS IN PARALLEL ON PURPOSE AND TOLD EACH
+ ABOUT THE OTHER. This is NOT INC-136's two-instances-one-token. The stop test
+ was not met and this session proceeded - correctly, and for a measured reason.
+
+================================================================================
+2. GATE 0 - FIVE RULINGS, AND THE ONE THAT CHECKED ITSELF
+================================================================================
+
+ Q-189(a) CAL seed block, (b) ceilings, (c) breach numerator, (d) Wilson bound,
+ and Q-191 the bucket model - all recorded VERBATIM in QUESTIONS.md before a
+ line of anything else was touched (hard rule 5).
+
+ ! Q-189(d) CARRIED ITS OWN WITHDRAWAL CONDITION AND THE CHECK WAS RUN BEFORE
+ IMPLEMENTING ANYTHING. THE RULING SURVIVES.
+
+   grep for one-sided|two-sided|1.645|1.959|z= over the FROZEN set
+     HOLES.md, INVARIANTS.md, PROVENANCE.md, RAZORPAY_SEMANTICS.md, config/
+                                                      -> NO HIT, ANY FILE
+     PROTOCOL.md:643  "McNemar exact, two-sided"      -> a DIFFERENT test
+     PROTOCOL.md:655  "exact one-sided Clopper-Pearson"-> a DIFFERENT bound
+
+   HOLES.md S3.5 rule 2 and CONTEXT.md S10.3 rule 2 are the SAME sentence:
+   "the LOWER BOUND of the 95% Wilson interval ... ROUNDED DOWN to 5 pp".
+   NEITHER STATES A SIDEDNESS. NEITHER STATES A z.
+   ! The project's frozen vocabulary contains BOTH words elsewhere, so the
+     silence is not a vocabulary gap. The withdrawal condition is NOT met.
+
+ THE ARITHMETIC CLAIM RE-COMPUTED RATHER THAN ACCEPTED, at n_cal = 30:
+
+   obs     rate  | LB two-sided  thr | LB one-sided  thr
+   30/30 100.0%  |     88.65%    85% |     91.73%    90%
+   27/30  90.0%  |     74.38%    70% |     77.45%    75%
+   24/30  80.0%  |     62.69%    60% |     65.75%    65%
+   21/30  70.0%  |     52.12%    50% |     55.06%    55%
+   19/30  63.3%  |     45.51%    45% |     48.33%    45%
+   15/30  50.0%  |     33.15%    30% |     35.62%    35%
+   12/30  40.0%  |     24.59%    20% |     26.71%    25%
+    9/30  30.0%  |     16.66%    15% |     18.37%    15%
+
+ One-sided is HIGHER in every case; HOLES.md S3.5 says "Below the calibrated
+ threshold -> VOID", so a higher threshold makes a VOID MORE likely. z = 1.645
+ is the SELF-CRITICAL direction. THE RULING'S CLAIM IS TRUE.
+
+ ! TWO RESIDUALS RECORDED BESIDE IT, BECAUSE NEITHER IS IN THE RULING:
+
+ (1) "the 95% Wilson INTERVAL" names an INTERVAL, and an interval has two ends.
+     The ruling's test is "in terms", and in terms the frozen text says neither
+     - so this session did not treat the phrase as a two-sided specification.
+     BUT A LATER READER MUST NOT FIND THIS RECORDED AS THOUGH THE FROZEN
+     ARTEFACT SETTLED IT. It did not; the architect chose, and chose the
+     stricter of the two available readings.
+
+ (2) ! ONE z FEEDS TWO DIFFERENT PUBLISHED NUMBERS, AND THE RULING DOES NOT
+     SAY SO. Measured in the module graph:
+        probe/statistics.py:143  wilson_lower_bound -> wilson_interval(...).lower
+        probe/statistics.py:135  wilson_interval    -> z = two_sided_z(level)
+        results/figures.py:142   wilson_interval    -> S12.4's PUBLISHED ceiling,
+                          whose docstring says "the two-sided Wilson score interval"
+     So BOTH obvious implementations are wrong: changing statistics.confidence_level
+     moves S12.4's published table AND edits a pre-registration artefact; changing
+     wilson_interval's z moves S12.4's published ceiling, which C10's own done-when
+     pins to that table BY COMPUTATION.
+     ! THE ONLY CORRECT IMPLEMENTATION IS A SEPARATE ONE-SIDED QUANTILE USED BY
+     wilson_lower_bound ALONE. THIS SESSION DID NOT IMPLEMENT IT - it is not one
+     of the four gates, it changes how a REPORTED NUMBER is computed (Class A),
+     and nothing is mis-computed meanwhile: void_threshold_breach_rate is still
+     TODO_C14_CALIBRATION and the loader RAISES on it. Operator item 3.
+
+ Q-189(c) re-verified against the frozen text and it is a CONFIRMATION, not a
+ ruling: HOLES.md S3.1 already says episodes-over-episodes-attempted, with hard
+ rule 11 restated inside the freeze. Nobody re-decides it.
+
+================================================================================
+3. GATE 1 - RUNG 4 EXECUTED, AND THE IDS RE-DERIVED RATHER THAN PASTED
+================================================================================
+
+ config/protocol.yaml, ONE ATOMIC COMMIT:
+   :421  tfp_task_count        40 -> 20
+   :422  tfp_stratification    {airline:20,retail:20} -> {airline:10,retail:10}
+   :461  tfp_task_ids          -> the first ten per domain
+
+ ! THE DERIVATION IS INDEPENDENT AND IMPORTS NOTHING FROM whetstone_gate AND
+ READS NOTHING FROM config/. It parses tau2/domains/{airline,retail}/tools.py
+ with ast for @is_tool(ToolType.WRITE), reads each task's own reference
+ trajectory from the vendored tasks.json, takes the complement of the
+ must-not-write set, and sorts BYTEWISE ASCENDING AS STRINGS within each domain
+ (PROTOCOL.md S3.2's ruled sort). MEASURED:
+
+   airline  WRITE tools (6)   50 tasks  26 write  24 must-not-write
+   retail   WRITE tools (7)  114 tasks 104 write  10 must-not-write
+   TOTAL                              130 write   <- CONTEXT.md S13.4 says 130
+
+   must-not-write ids reproduce config's tau2_must_not_write_task_ids EXACTLY,
+   both domains, byte for byte - a list this session never read into the deriver.
+
+   airline first 20 == config's pre-registered twenty   IDENTICAL
+   retail  first 20 == config's pre-registered twenty   IDENTICAL
+
+   THE TWENTY THAT RUN, derived independently:
+     airline (10):  11 12 14 15 16 17 18 19 20 21
+     retail  (10):  0 1 100 101 102 103 104 105 106 107
+   THE TWENTY DROPPED, NAMED:
+     airline (10):  22 23 24 25 29 30 32 33 35 37
+     retail  (10):  108 109 11 110 111 112 113 13 14 15
+
+   EXACT PREFIX OF THE FORTY: CONFIRMED, both domains, by set comparison.
+   NOTHING ENTERS THE SAMPLE THAT WAS NOT ALREADY IN IT.
+
+ ! tau2-BENCH IS NOT CUT. Only this ONE BLOCK'S BREADTH is staged, which
+ CONTEXT.md S21.4 permits in terms. T-NEG keeps all 34 must-not-write tasks and
+ the externally-authored-answer-key claim is INTACT. Said in the commit message,
+ in config/'s own comments, and in benign/manifest.py's docstring.
+
+ ! THE PROMPT NAMED THREE TEST SITES. SEVEN BROKE (INC-150), AND THE EIGHTH WAS
+ NOT A TEST AT ALL:
+
+   test_c12_benign  ..._reads_FORTY_ids_...          40/40/{20,20}/200   NAMED
+   test_c3_tau2     ..._still_says_first_40...       config vs CONTEXT   NAMED
+   test_c12_benign  ..._episode_keys_qualify...      len(keys)==200      NOT named
+   test_c12_benign  ..._block_REFUSES...             "200 episodes"      NOT named
+   test_c11_runner  test_Q107_RULED_...              40.05 hours         NOT named
+   test_c11_runner  ..._published_table_...          4 rows              NOT named
+   test_c11_runner  ..._REGARDLESS_clause_...        31,908 break-even   NOT named
+   src/.../benign/manifest.py                        PROSE + A PRINTED REPORT
+
+ ! manifest.py ASSERTED IN CAPITALS "FORTY, NOT TWENTY. RUNG 4 WAS NOT FIRED"
+ AND PRINTED IT AT RUNTIME. No test pins prose, so nothing would have gone red
+ on it. It would have shipped as a measurably false statement in source - which
+ is INC-146's exact class, in the file INC-146 is about.
+
+ ! AND THE CUT MOVED Q-107's PUBLISHED PROJECTIONS - RAISED AS Q-193, CLASS A.
+ n_rule.py:441 reads selections.tfp_task_count, so select_n now projects a
+ smaller run. MEASURED at every vector Q-107 publishes:
+
+   measured   ruled N before   ruled N NOW   hours before -> now
+    24,310         50              50           29.83 -> 24.72
+    60,000         30              30           40.05 -> 34.95
+    60,001         30              30           40.05 -> 34.95
+   105,290         30              30           53.03 -> 47.92
+
+ ! EVERY RULED N IS UNCHANGED and Q-121's "regardless" clause still holds - the
+ break-even moved 31,908 -> 49,726, still BELOW the 60,000 registered target.
+ What IS open: S13.4's third branch can no longer fire, because its input has
+ been overwritten by its own output. Nobody ruled that. Q-193, operator item 4.
+ ! Golden 8 fixture F is UNAFFECTED - it pins the FIRST conjunct only, which is
+ `measured <= target` and does not read T-FP. Its own text says so:
+ "THE_SECOND_CONJUNCT_THIS_FIXTURE_DOES_NOT_PIN". tests/goldens/ untouched.
+
+ ! HOW THE PUBLISHED FIGURES WERE KEPT WITHOUT RE-VALUING THEM TO WHATEVER THE
+ CODE NOW RETURNS (hard rule 3): Q-107's totals and hours are asserted AT THE
+ T-FP 40 THEY WERE PUBLISHED AT, through project_total_tokens' explicit
+ tfp_tasks argument; the RULED N and the golden's own reading are asserted
+ against today's config, because those are what the ruling is about. Each test
+ refuses loudly, naming the flip as Class A, if a later change moves an N.
+
+ PROTOCOL.md S1.1's config/protocol.yaml row RE-MEASURED FROM THE GIT BLOB:
+   $ BLOB=$(git hash-object -w config/protocol.yaml)
+   $ git cat-file blob $BLOB | sha256sum
+   2480da6a1a885ce1bf5a30777cb224c0048e1c2038e0100deb1bd8f8ecc8f496
+   $ git cat-file blob $BLOB | wc -c
+   33479
+ ! RE-VERIFIED AFTER THE COMMIT against HEAD:config/protocol.yaml - the row
+ matches the COMMITTED blob and the blob id (bae20f6f...) matches too, so it is
+ not stale. INC-139 is the entry about this row standing stale for two days.
+ ! .gitattributes carries `* text=auto eol=lf`, which OVERRIDES this machine's
+ core.autocrlf=true - checked rather than assumed; the blob holds 0 CR bytes.
+ ! make check-prereg recomputes NOTHING before the tag (Q-181) and reports
+ "NOT-YET-FROZEN", so it could not have caught a stale row. Confirmed by running it.
+
+================================================================================
+4. GATE 2 - THE SLIDING WINDOW, AND THE SHIPPED User-Agent
+================================================================================
+
+ 2a. Q-191 IMPLEMENTED. runner/buckets.py gains SlidingWindow; Buckets.tpm is
+ now one. RPM, RPD and TPD stay continuously-refilling Buckets, because Q-191
+ measured requests as "not remotely implicated" (max 3 in any 60s against 30).
+
+ ! NO NEW CONSTANT (hard rule 9): the capacity is the lane's existing `tpm` key
+ and the window is the module's existing _SECONDS_PER_MINUTE - the SAME TWO
+ ARGUMENTS the TPM Bucket already took. The "M" in TPM is the window. A test
+ asserts _SECONDS_PER_MINUTE is defined exactly once.
+
+ REPLAYED ON THE PILOT'S EIGHT REAL CALLS, READ FROM THE COMMITTED USAGE LOG
+ (evals/usage/gemma-26b-2026-09-04.jsonl), never from a hand-written fixture:
+
+   call  t(s)  tokens | trailing 60s | SLIDING | CONTINUOUS
+     1      0     790 |          790 |  ADMIT  |   ADMIT
+     2     32   3,203 |        3,993 |  ADMIT  |   ADMIT
+     3     55   4,002 |        7,995 |  ADMIT  |   ADMIT
+     4    107   6,201 |       10,203 |  ADMIT  |   ADMIT
+     5    145   6,665 |       12,866 |  ADMIT  |   ADMIT
+     6    171   7,439 |       14,104 |  ADMIT  |   ADMIT
+     7    201   7,782 |       21,886 | REFUSE  |   ADMIT   <-- THE DIFFERENCE
+     8    219   6,848 |       22,069 |  ADMIT  |   ADMIT
+
+   trailing-60s column reproduces Q-191's table EXACTLY, and exceeds 16,000 at
+   calls 7 AND 8 - the two immediately before the 429, at 1.38x.
+   continuous bucket's final level: 6,170 of 16,000 - EXACTLY the "min 6,170"
+   INC-143 and ARCH LANES 1 both measured, re-derived here rather than quoted.
+
+ ! WHY CALL 8 READS "ADMIT" AND WHY THAT IS NOT A CONTRADICTION: Q-191's table
+ computes over a trace where EVERY call was sent. Here call 7 is REFUSED, so it
+ is never recorded and the window at call 8 is lighter. The ruling describes
+ what the PROVIDER saw; the test describes what OUR limiter would have done.
+ Both are pinned, separately, by two different tests.
+
+ ! PROVED RED AGAINST HEAD, AND THE RED IS BEHAVIOURAL, NOT STRUCTURAL. HEAD's
+ buckets.py was put back in place by a plain file write (the git index never
+ touched) and the discriminating test alone was run:
+     assert shipped_refused[:1] == [7]
+     E  assert [] == [7]
+ The CONTROL half passed in the same run (continuous_refused == []), so the
+ comparison is meaningful. buckets.py was then restored and PROVED restored -
+ git hash-object identical to the new implementation.
+ The other four reds in that file ARE structural (no attribute 'SlidingWindow')
+ and are NAMED as such rather than counted as evidence. Three tests passed at
+ HEAD and are named too: the precondition on the committed log, Q-191's pure
+ arithmetic table, and the no-new-constant guard.
+
+ 2b. ! GROQ ACCEPTS THE SHIPPED User-Agent. THE RESIDUAL RISK IS CLOSED.
+
+ HARD RULE 12'S READ, BEFORE THE FIRST CALL:
+   gemma-26b-2026-09-04.jsonl        9 records, 42,930 tokens
+   qwen-27b-2026-09-04.jsonl        10 records,      0 tokens, 10x ERROR
+   liveness-6d1a94f3-2026-09-04.jsonl 4 records,     89 tokens
+
+   lane        UA sent                                            result
+   qwen-27b    whetstone-gate/1.0 (+research harness; Razorpay Track 01)
+                                                                  HTTP 200
+                                              body parses as JSON, 21 tokens
+
+ ACTUAL SPEND BY MODEL: qwen-27b 1 call, 21 tokens. Nothing else was called.
+ AGAINST: 2 calls, 5,000 tokens. ONE CALL LEFT UNSPENT.
+ ! NO 429. NOTHING RETRIED. NO LANE SUBSTITUTED.
+ ! THE STRING WAS READ OUT OF driver/clients.py:428 AND NOT RETYPED, and it went
+ through the SHIPPED builder and the SHIPPED transport - so a body-shape
+ rejection would have reproduced what the pilot provoked.
+ ! NO BROWSER STRING WAS SENT AND NONE WAS NEEDED. The prompt's instruction not
+ to substitute one required no exercise.
+ ! NO KEY VALUE WAS READ, PRINTED OR RECORDED. Only NAMES. The 403 body handling
+ from ARCH LANES 1 was preserved: no body is ever printed.
+ ! The spend went to evals/usage/liveness-8f3c72e1-2026-09-04.jsonl, a SEPARATE
+ file, following ARCH LANES 1's precedent - and inheriting its disclosed cost:
+ a preflight reading <model>-<date>.jsonl will not see these 21 tokens. The
+ three pre-existing usage logs are BYTE-IDENTICAL to HEAD, verified.
+
+================================================================================
+5. GATE 3 - THE CALIBRATION PATH. Q-189 BLOCKER 1 IS CLOSED.
+================================================================================
+
+ src/whetstone_gate/driver/cal.py (NEW, 244 lines) + `--block cal`.
+
+ THE CAL MATRIX, EVERY VALUE WITH ITS SOURCE:
+
+   value              setting             SOURCE
+   block label        "CAL"               PROTOCOL.md S3.1's row label (a LABEL,
+                                          not a spec VALUE - like PILOT_BLOCK)
+   arm                "1"                 CONTEXT.md S10.3 rule 1 "Arm 1 only"
+                                          AND FROZEN HOLES.md S3.5 rule 1
+   cells              ONE                 S10.3 "No other arm or configuration
+                                          runs inside this calibration block"
+   lane               gemma-26b           config/lanes.yaml's role string, which
+                                          LITERALLY CONTAINS "CAL"; architect
+                                          confirmed the single cell 2026-09-04
+   seeds              2201..2230 (30)     config seeds.cal_first / cal_last
+                                          (Q-189(a), Class A, NEW)
+   episodes           30                  DERIVED: 1 cell x 30 seeds; CROSS-
+                                          CHECKED against probe.n_cal, REFUSING
+                                          if they ever disagree
+   turn budget        20                  config attacker.turn_budget
+   judge lane         gemma-26b           config/lanes.yaml - the SAME lane; its
+                                          role carries "gate judge for arms
+                                          2/2S/3" too. ZERO judge calls (arm 1
+                                          has no gate), but run.py's preflight
+                                          checks it, so it is NAMED and TRUE
+
+ ! NOTHING WAS INVENTED. Every value above is read or derived; the one thing
+ that could have been invented - a judge lane for a block that makes no judge
+ calls - turned out to be the SAME lane, so no false claim was needed and
+ Q-189(b)'s ONE-LANE sanction covers the block.
+
+ ! THE BLOCK LABEL REACHES EVERY LEDGER AND EVERY CHECKPOINT KEY, MEASURED:
+   30 keys; ALL slugs begin `cal__`; first cal__1__2201__gemma-26b,
+   last cal__1__2230__gemma-26b; slugs injective; ZERO collision with any pilot
+   slug; ZERO seed collision with scored_n50, scored_n30, ladder or pilot.
+ ! THAT IS THE PROPERTY Q-189 CORRECTION 2 FOUND THE PILOT PATH COULD NOT OFFER:
+ forcing a calibration through load_pilot would have dispatched NINE live
+ episodes stamped block=PILOT at pilot__1__<seed>__gemma-26b, byte-
+ indistinguishable from the pilot's own, into an append-only directory.
+
+ load_cal() TAKES NO ARGUMENT, deliberately, where load_pilot REQUIRES its arm.
+ The pilot's arm is genuinely undetermined (Q-144: S13.4 and PROTOCOL.md S3.1
+ both say "1 ref arm" and neither says which). The calibration's is fixed by two
+ artefacts, one FROZEN, both in terms - so an argument would be an invitation to
+ vary a pre-registered parameter on the one run that is single-shot.
+
+ ! `--block {pilot,cal}` DEFAULTS TO pilot, AND THAT DEFAULT IS NOT CONVENIENCE.
+ evals/pilot/RUN_DECLARED.md S1 carries THE EXACT COMMAND, was pushed before the
+ pilot ran, and PROCESS.md S6b makes it the declaration of a run ALREADY SPENT.
+ IT CARRIES NO --block. A required flag would make that committed pre-
+ registration EXIT 2. A test READS THE COMMAND OUT OF THE ARTEFACT and asserts
+ it still parses to block=pilot.
+ ! Under --block cal, --arm stays REQUIRED but is CHECKED rather than obeyed: a
+ mismatch REFUSES with exit 2. Driven at arms 2, 2S, 3 and 4; each returns 2.
+
+ ! THE CALIBRATION WAS NOT RUN. evals/cal/RUN_DECLARED.md WAS NOT WRITTEN.
+ Building the path and spending the single-shot run are different acts and this
+ session did only the first.
+
+================================================================================
+6. TESTS - EVERY NEW ONE PROVED RED FIRST, AND THE REDS ARE CLASSIFIED
+================================================================================
+
+ AST-EXACT DIFF, session-start HEAD (3f07907) vs the final tree. ast.Assert
+ nodes, NOT `grep -c assert`:
+
+   file                            def test_*     ast.Assert   names
+   tests/test_c12_benign.py         61 -> 61      174 -> 175   +1 / -1 RENAME
+   tests/test_c3_tau2_enumeration.py 34 -> 34      68 ->  71   +1 / -1 RENAME
+   tests/test_c11_runner.py         62 -> 62      222 -> 226   +1 / -1 RENAME
+   tests/test_arch_lanes.py         27 -> 27       63 ->  67   +1 / -1 RENAME
+   tests/test_arch_cal_build.py      0 -> 17        0 ->  53   NEW FILE
+
+ ! NOT ONE ASSERTION WAS DELETED FROM ANY FILE. NOT ONE TEST WAS REMOVED. Every
+ "-1" is the OLD NAME of a RENAMED test, paired with its "+1"; the assert count
+ rose in all four existing files.
+
+ THE FOUR RENAMES, AND WHY EACH NAME HAD TO MOVE:
+   ..._reads_FORTY_ids_... -> ..._reads_TWENTY_ids_...
+     THE NAME WAS AN ASSERTION and it became false. Same reason
+     test_c18_results' rung-tuple test was renamed rather than re-valued.
+   ..._still_says_first_40... -> ..._and_config_carries_RUNG_4s_EXACT_HALF
+     the spec STILL says 40, so that half of the name stayed TRUE; the test now
+     asserts BOTH halves and is STRICTLY STRONGER than the equality it replaces.
+   ..._published_table_... -> ..._AT_ITS_OWN_T_FP_40_BASIS
+     the basis is now explicit, which is the whole content of the change.
+   ..._negative_bucket_STILL_REFILLS... -> ..._clears_its_debt_BY_EXPIRY...
+     the OLD name states the property Q-191 REVERSED. A sliding window does not
+     refill; it expires. Leaving the name would be a false claim wearing a
+     passing test's clothes.
+
+ ! THE ONE EXISTING TEST WHOSE ASSERTIONS FLIPPED, AND THE FLIP IS PROVABLY
+ MEANINGFUL (hard rule 6): test_a_negative_bucket_STILL_REFILLS asserted
+ wait_seconds(0, now=30.0) == 0.0 and available == 0.0 - true of a continuous
+ bucket at the half-minute. The replacement asserts the OPPOSITE at t=30 (still
+ blocked, still -8,000) AND pins the exact expiry instant at t=60. EVERY new
+ assertion FAILS on the old code, and the test now pins the clearing INSTANT
+ where before it pinned one midpoint.
+
+ ! THREE TESTS IN test_arch_lanes.py BROKE ON A SCAFFOLD, NOT AN ASSERTION, AND
+ THE SCAFFOLD WAS THE THING THAT WAS WRONG. They drove the pacer with
+ `clock=lambda: next(moments)` and `sleep=lambda _s: None` - one clock reading
+ per call and a sleep that does not move time, which was faithful only because
+ the CONTINUOUS bucket never made the pacer wait on this trace ("calls delayed
+ by the pacer, either way: 0"). The sliding window refuses call 7, so _pace's
+ `while True` loop sleeps and reads the clock again -> StopIteration. A sleep
+ that does not advance a clock models a runner that CAN NEVER WAIT. Replaced
+ with a clock that advances by exactly what is slept, and RECORDS the sleeps.
+
+================================================================================
+7. THE FULL SUITE
+================================================================================
+
+ MEASURED ON THE FINAL COMMITTED TREE, not predicted:
+
+     7 failed, 1466 passed, 2 skipped in 537.50s (0:08:57)     EXIT 1
+
+ ! IT IS NOT GREEN, AND IT WAS NOT GREEN BEFORE THIS SESSION EITHER. The suite
+ has been red for days: arch-lanes-1.txt records "5 failed, 1451 passed, 2
+ skipped", arch-pilot-run-4.txt "5 failed, 1421 passed", arch-night-1.txt
+ "5 failed, 1419 passed". This session did not make it green and does not claim to.
+
+ ! A CLEAN "BEFORE" ON THIS TREE WAS NOT OBTAINABLE AND THAT IS STATED RATHER
+ THAN PAPERED OVER. This session started a baseline run at 13:22; HEAD MOVED
+ UNDER IT (INC-149) and its own edits landed while it ran, so it returned 16
+ failures over a tree that never existed as a commit. IT IS NOT CITED AS A
+ BASELINE. The figures above are the only clean measurement, and attribution
+ below is done per-test rather than by subtracting two totals.
+
+ THE SEVEN, EACH ATTRIBUTED - NONE OF THEM IS THIS SESSION'S:
+
+  THE FIVE STANDING REDS, the same five arch-lanes-1 named, unchanged:
+   tests/test_c12_benign.py::test_the_benign_package_imports_no_model_client_WAY_ONE_the_transitive_ast_walk
+   tests/test_c7_ledger.py::test_Q069_nothing_in_this_repository_imports_the_ledger_yet
+   tests/test_c8_scorer.py::test_golden2_coverage_block_reproduces
+   tests/test_c8_scorer.py::test_null_is_not_empty_a_scorer_returning_empty_for_absent_subjects_passes_seven_of_eight
+   tests/test_lanes_operator_placeholders.py::test_the_camel_branch_is_decided_before_any_camel_run
+
+  AND TWO MORE, WHICH ARE ONE FAULT COUNTED TWICE AND IT IS NOT THIS SESSION'S:
+   tests/test_repo_invariants.py::test_no_commit_carries_a_forged_or_reused_session_token
+   tests/test_repo_invariants.py::test_check_roles_exits_zero
+
+  ! MEASURED, NOT ASSUMED - both fail on the SAME line, and it names the token:
+      FORGED/UNISSUED: {'2e5b8a47': ['3ced8ab','d84d630','dc9b842','a9f4150',
+                        '4ae054a','0287e80','97fe84b']}
+                        - not present in QUESTIONS.md ## Session tokens
+  ! `8f3c72e1` APPEARS NOWHERE IN THAT LIST. The second test fails only because
+  check_roles.run() returns 1, and E1 is the reason it returns 1. See INC-149,
+  Q-194 and operator item 1. The list has GROWN from five commits to seven while
+  this session was writing its report - ARCH PUBLISH 1 is still committing.
+
+ ! SO THIS SESSION'S CHANGES ADDED ZERO REDS, and that is a per-test claim
+ rather than an arithmetic one.
+
+ ! A THIRD repo_invariants FAILURE SEEN MID-SESSION IS GONE AND ITS ABSENCE IS
+ EXPLAINED: test_the_object_store_and_the_working_tree_agree failed on the
+ contaminated run because the tree was DIRTY at the time. It passes on the
+ committed tree, which is the correct behaviour and the reason that run was
+ discarded rather than reported.
+
+ make check-roles: 20 passed, 1 failed, 3 n/a.
+ ! A3 AND A4 BOTH PASS - "471 text file(s) carry no CRLF" and "git's filter
+ chain is a no-op on all 473 tracked file(s)". arch-lanes-1 turned those red by
+ writing a file through a helper that converted 1,135 line endings; every file
+ this session wrote was CR-audited before staging and every one held 0 CR bytes.
+ make check-prereg: NOT-YET-FROZEN, exit 0 - reported as it actually answers.
+
+================================================================================
+8. WHAT WAS NOT TOUCHED - VERIFIED, NOT ASSERTED
+================================================================================
+
+ MEASURED as the exact file list of THIS SESSION'S TWO COMMITS (c5a83fd,
+ 5960120) - not as a diff across a range that also spans another session's work:
+
+   CONTEXT.md, PROCESS.md, HOLES.md          NOT touched by me
+   config/lanes.yaml                         NOT touched by me
+   README.md, RESULTS.md                     NOT touched by me
+   INVARIANTS.md, PROVENANCE.md,             NOT touched by me
+   RAZORPAY_SEMANTICS.md
+   corpora/, docs/submission/                NOT touched by me
+   tests/goldens/                            NOT touched by me; every golden
+                                             byte-identical to 3f07907
+   evals/episodes/, evals/checkpoints/       NEVER WRITTEN
+   the three pilot usage logs                byte-identical to HEAD
+   tags                                      none cut, none moved:
+                                             c0..c4-pass, c13-pass, probe-v1
+   prereg-v1                                 STILL DOES NOT RESOLVE
+   .env                                      NEVER READ, PRINTED, ECHOED OR
+                                             COMMITTED. Only NAMES.
+
+ SWEPT LINES:
+   c5a83fd  ! CARRIES NO `Swept:` LINE - INC-152. The comparison it should have
+            reported, run after the fact: 15 paths declared, 15 landed, the sets
+            IDENTICAL, NOTHING swept. The commit is NOT amended (PROCESS.md S7
+            forbids the rewrite; INC-146's precedent is exact).
+   5960120  Swept: NOTHING. Three paths - driver/__main__.py,
+            tests/test_arch_cal_build.py, INCIDENTS.md - private index seeded
+            from LIVE HEAD (PROCESS.md S7b with INC-139's `env -u`), name-only
+            compared against a pre-declared three-path list. VERIFIED IDENTICAL.
+
+ ! BOTH COMMITS WERE MADE WHILE ANOTHER SESSION WAS EDITING README.md,
+ RESULTS.md AND docs/reviews/OPEN_FINDINGS.md IN THE SAME TREE. The private
+ index is why the staged snapshot listed only my paths both times.
+
+================================================================================
+9. WHAT I COULD NOT DO
+================================================================================
+
+ 1. IMPLEMENT Q-189(d)'s WILSON CHANGE. Not one of the four gates; Class A; and
+    the shared-z coupling above means the two obvious implementations corrupt
+    S12.4's published table. Owed to a session whose card names it.
+ 2. RESOLVE Q-193. S13.4's third branch is now unreachable. CONTEXT.md is
+    outside this fence and is the artefact that would have to move.
+ 3. REGISTER 2e5b8a47 IN THE TOKEN TABLE. check-roles E1 is RED because of it.
+    NOT this session's token to register, ARCH PUBLISH 1 was still live and may
+    register it, and two sessions appending one row to one file is INC-136's
+    hazard. Reported, not worked around.
+ 4. WRITE evals/cal/RUN_DECLARED.md OR RUN THE CALIBRATION. Forbidden by the
+    prompt, and S6b arms the declaration on push.
+ 5. WIRE liveness_refusal INTO PREFLIGHT. Owed a ruling; the prompt forbids it.
+ 6. TOUCH redaction.py (INC-147). The prompt sends it to review.
+ 7. FILE ANYTHING IN docs/reviews/OPEN_FINDINGS.md. Outside this fence, and
+    CLAUDE.md S6.5 makes it a REVIEW session's duty.
+
+================================================================================
+10. WHAT THE OPERATOR MUST DO NEXT
+================================================================================
+
+ 1. ADD THE MISSING TOKEN ROW so check-roles goes green:
+      | `2e5b8a47` | ARCH | FIX | 2026-09-04 |
+    in QUESTIONS.md's ## Session tokens table. Q-194. Confirm with ARCH PUBLISH 1
+    first - it may already have added it.
+
+ 2. RULE ON Q-193 (Class A). S13.4's decision rule's third branch - "T-FP is cut
+    from 40 to 20" - can no longer fire, because rung 4 fired it early by
+    schedule. THREE OPTIONS ARE WRITTEN OUT IN Q-193 with what each costs; this
+    session's recommendation is (c), record the branch as SPENT in PROTOCOL.md.
+    ! NOT URGENT: every ruled N is unchanged and the rule is dormant.
+
+ 3. SCHEDULE THE WILSON IMPLEMENTATION as its own chunk, with the shared-z
+    finding in its card. It must NOT change statistics.confidence_level and must
+    NOT change wilson_interval's z - both move S12.4's published table. The only
+    correct shape is a separate one-sided quantile used by wilson_lower_bound
+    alone. C10's done-when is the test that a careless change turns red.
+
+ 4. SANCTION THE CALIBRATION, OR DECLINE TO. The path now exists and the command
+    is:
+      python -m whetstone_gate.tasks drive -- --spend-real-tokens \
+        --block cal --arm 1 \
+        --s3-binding authorization-is-the-payment \
+        --call-ceiling 600 --token-ceiling 4800000 \
+        --sanction-lane gemma-26b
+    ! Q-189(b)'s ceilings are a PROMPT sanction, not a config value, so a
+    session cannot self-sanction it. ! AND THE DISCLOSURE THE RULING REQUIRES
+    MUST SHIP: 4,800,000 derives from EIGHT calls in ONE episode, and the
+    measurement meant to inform it is the one the pilot refused to produce.
+    ! evals/cal/RUN_DECLARED.md must be committed and PUSHED BEFORE it starts.
+
+ 5. RULE ON WIRING liveness_refusal INTO PREFLIGHT. Still item 4 of ARCH LANES
+    1's list and still owed. Gate 2b has now shown the shipped User-Agent works,
+    which removes one reason a preflight would have fired - not the need for it.
+
+ 6. CONSIDER A TRIPWIRE for INC-150's class: no tracked file's prose may claim a
+    degradation rung is "NOT FIRED" while PROTOCOL.md S5.1 records it as fired.
+    manifest.py would have shipped exactly that.
+
+ 7. CONSIDER check-roles E6 (INC-152's class): every commit carrying a
+    Session-Token trailer must also carry a `Swept:` line, with the same one-off
+    exception list E5 already keeps. NOT written here - adding an invariant that
+    retroactively fails existing commits is a Class A decision.
+
+ 8. RE-ATTEST config/lanes.yaml's gemma-26b limits. Still ARCH LANES 1's item 6,
+    still owed, now SIX days stale. ! This session's evidence does not contradict
+    the declared 16,000 - Q-191 says it is CONSISTENT with the observed 429.
+
+ 9. A FRESH ADVERSARIAL REVIEW OF THIS SESSION. Nothing here is self-certified
+    and no tag was cut. ! THREE of the four things this session found wrong were
+    ITS OWN, and two of those were found only by accident - INC-150's eighth site
+    by a grep run out of habit, and INC-152 by looking at what OTHER sessions had
+    done. NEITHER was caught by this session reading its own work. THAT IS THE
+    ARGUMENT FOR THE REVIEW, NOT A SUBSTITUTE FOR IT.
