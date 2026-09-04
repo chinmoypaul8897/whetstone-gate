@@ -1,3 +1,47 @@
+*⚠️⚠️ **UPDATE, ARCH PILOT RUN 4 (`c7b41f6a`), 2026-09-04 — GATE 0 AND GATE 1 LANDED; `Q-179`(1),
+`Q-179`(2)/`Q-174` AND `Q-179`(3) ARE RULED, FIXED AND PUSHED, EACH WITH A TEST PROVED RED AGAINST
+THE OLD CODE. `Q-183` IS **STOPPED BY ITS OWN RULING** — `CONTEXT.md` STATES NO JUDGE TEMPERATURE, SO
+`config/` IS UNTOUCHED. GATE 2a PREFLIGHT **RETURNED WITH NO REFUSAL** — THE KEY BLOCKER THAT STOPPED
+LAST NIGHT IS GONE — AND GATE 2b REHEARSED 20 OF 20, EXIT 0, WITH THE PACER ON THE PATH FOR THE FIRST
+TIME. ⚠️ **GATE 2c AND 2d WERE NOT EXECUTED AND ARE REFERRED TO THE OPERATOR**: A SECOND SESSION IS
+LIVE IN THIS TREE (`INC-140`) AND `PROCESS.md` §6b MAKES THE FIRST COMPLETED EXECUTION *THE* RUN.
+ZERO TOKENS. NO TAG. `prereg-v1` DOES NOT EXIST. REPOSITORY NOT FLIPPED PUBLIC. NOT SELF-CERTIFIED.***
+
+**GATE 0 — LANDED (`7a14feb`).** Four architect rulings recorded **verbatim**, dated 2026-09-04,
+attributed, **before a line of code was touched** (hard rule 5), and **appended rather than merged**
+because a second session is live (`INC-136`'s own remedy). Token rows written for `c7b41f6a` and for
+`8c47b1e0`, which had been absent since it authored `f45721d`'s code and died.
+⚠️ **`make check-roles` E1 FAILED on `5d7e2b91` last night. It is GREEN: 21 passed, 0 failed, 3 n/a.**
+
+**GATE 1 — THREE RULINGS LANDED, ONE STOPPED.** `git rev-parse prereg-v1` **exits 128**, verified
+before anything else, so the `Q-183` edit **would have been** legal.
+- **`a2e9655` `Q-179`(1)** — `_pace` reads the clock **ONCE**. No epsilon, no tolerance, no grace
+  constant (the ruling forbids each by name; hard rule 9 forbids the class). RED first, measured:
+  *"the bucket was ASKED about [1.0] and CHARGED against [2.0]"*.
+- **`f649521` `Q-179`(2), which CLOSES `Q-174`** — `PACER_REFUSED` is now a declared cause, booked
+  at the site that books `RateLimited` and `ProviderFailed`, and **printed as a number including at
+  zero**. RED first: the `BucketError` walked out of `episode.py:372` uncaught.
+- **`e9dbf5c` `Q-179`(3)** — `--dry-run` **builds the pacer**, on an injected clock that advances
+  only when slept on. RED first: *"a dry run … requested ZERO sleeps"*, `assert 0 > 0`.
+- ⚠️ **`Q-183` STOPPED — see `Q-188`.** All six `temperature` occurrences in `CONTEXT.md` measured:
+  §8.6's row is scoped *"attacker, benign solver"*; the judge's own row is a **token** target (1,500);
+  `config/lanes.yaml` contains the string `temp` **nowhere**. **There is no judge temperature in the
+  law to write**, so `config/` is untouched and the `0.0` literal stays — deleting it alone would
+  change what the Google endpoint is *sent*, which is the deviation the ruling exists to prevent.
+
+**GATE 2 — 2a AND 2b PASSED; 2c AND 2d WITHHELD FOR THE OPERATOR.**
+`preflight` on the real two-lane matrix **RETURNED**: `probe-v1 resolves: True`; `API key NAMES
+present: ['google','groq']` (values never read); both lanes `0 tokens, 0 calls` today;
+`498 pinned corpus entries, hashes verified`. ⚠️ **`arch-night-1b.txt` diagnosed this as a stale
+process environment and `arch-night-1.txt` diagnosed it as an absence; B was right.** The rehearsal
+ran 20 of 20, exit 0, to a fresh OS temp dir outside the repository — 42 files there, **zero** under
+`evals/` — and its report now prints `PACER_REFUSED : 0`, which is `Q-179`(2) proven on the shipped
+path rather than only in a test. ⚠️ **`RUN_DECLARED.md` §8 IS BLANK FOR THE FIFTH SESSION, AND FOR
+THE FIRST TIME THAT IS A DECISION AND NOT A BLOCKER:** a declared start time written by a session
+that then does not run is a false pre-registration, and §6b makes the retry the operator's call.
+
+---
+
 *⚠️⚠️ **UPDATE, ARCH NIGHT 1 (`5d7e2b91`), 2026-09-04 — GATES 3 AND 4 LANDED; GATES 1 AND 2 SKIPPED
 ON PRECONDITIONS AND THE PILOT'S SINGLE-SHOT WINDOW IS STILL UNSPENT. `INC-126`'s NINE RED GENESIS
 ASSERTIONS WERE TEN AND ALL TEN ARE CLOSED, EACH FLIP PROVED FAILING ON THE OLD CODE. `PROTOCOL.md`'s

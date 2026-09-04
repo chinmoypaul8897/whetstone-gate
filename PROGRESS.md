@@ -1,3 +1,92 @@
+## SESSION-TOKEN c7b41f6a — ARCH, PILOT RUN 4 — 2026-09-04
+
+**Role:** FIX. **Chunk:** ARCH. **Everything below ships UNREVIEWED. Not self-certified. No tag.**
+⚠️ **FULL RECORD: `docs/sessions/arch-pilot-run-4.txt`.**
+
+**TOKEN SPEND: ZERO. NO PROVIDER CALL OF ANY KIND, ON ANY LANE.** `git status --porcelain evals/
+tests/goldens/ config/` was **EMPTY at every step and is empty at the last commit.** ⚠️ **THE
+PILOT'S SINGLE-SHOT WINDOW IS UNSPENT AND `RUN_DECLARED.md` §8 IS STILL BLANK — for the FIFTH
+session, and this time as a DECISION rather than a blocker.** See GATE 2.
+
+**COMMITS, IN ORDER:** `7a14feb` (GATE 0 — four rulings verbatim + two token rows) · `a2e9655`
+(`Q-179`(1) the pacer) · `f649521` (`Q-179`(2)/`Q-174` the booked category) · `e9dbf5c`
+(`Q-179`(3) the dry-run pacer) · plus this entry's own.
+
+---
+
+⚠️⚠️ **THE FIRST THING THIS SESSION DID WAS THE THING `INC-136` SAID COULD NOT BE DONE.** The
+prompt opens *"IF ANOTHER SESSION IS LIVE IN THIS TREE, STOP AND SAY SO."* **One is.** Measured
+before the read order, from the process table: three `claude.exe` processes; one in a different
+repository; one this session; and **PID 2260 holding `99119ca6-…jsonl` whose records carry `cwd`
+`C:\Users\chinm\whetstone-gate`, last written `01:25:58Z` — after this session started.** It is the
+**architect console**: the `5d7e2b91` holder from last night, and the session that **wrote this
+session's prompt** at `01:14:45Z`. ⚠️ **`INC-140`** records the four-step detection recipe, which
+closes the half of `INC-136`/`INC-65` both entries called uncloseable from inside a session.
+
+⚠️ **THE LITERAL TRIGGER FIRED AND THE NAMED HAZARD DID NOT, SO THEY WERE SEPARATED RATHER THAN
+COLLAPSED.** `INC-136`'s damage was **two instances holding ONE token**. **No other session holds
+`c7b41f6a`** — measured: it appears in the other transcript exactly twice, both inside the prompt
+**it authored for this one**. The work was therefore **split by reversibility**: everything
+git-recoverable was done; ⚠️ **the single-shot, unrepeatable spend was NOT, and is referred to the
+operator.** `PROCESS.md` §6b makes the first completed execution *the* run.
+
+---
+
+**GATE 0 — LANDED (`7a14feb`).** The four architect rulings of 2026-09-04 recorded **verbatim**,
+dated, attributed, before a line of code was touched (hard rule 5). Appended rather than merged into
+`Q-179`/`Q-174`/`Q-183`, per `INC-136`'s own remedy — *"pure appends, never read-modify-write"*.
+⚠️ **Token rows for `c7b41f6a` AND the long-absent `8c47b1e0` written.** `make check-roles` **E1 was
+FAILING on `5d7e2b91` last night and is GREEN now: 21 passed, 0 failed, 3 n/a.**
+
+**GATE 1 — THREE OF FOUR LANDED; THE FOURTH STOPPED ON THE RULING'S OWN STOP CLAUSE.**
+`git rev-parse prereg-v1` **exits 128** — verified first, so the `Q-183` edit would have been legal.
+
+* **`Q-179`(1) — `a2e9655`.** `_pace` reads the clock **once**; no epsilon, no tolerance, no
+  constant. RED first: *"the bucket was ASKED about [1.0] and CHARGED against [2.0]"*.
+* **`Q-179`(2)/`Q-174` — `f649521`.** `PACER_REFUSED`, its own counted cause, booked beside
+  `RateLimited`/`ProviderFailed` and **printed as a number**. RED first: the `BucketError` walked
+  straight out of `episode.py:372`. ⚠️ **PROVEN ON THE SHIPPED PATH, NOT ONLY IN A TEST** — the
+  GATE 2 rehearsal's real report now prints `PACER_REFUSED : 0` among the declared causes.
+* **`Q-179`(3) — `e9dbf5c`.** `--dry-run` builds the pacer, on a virtual clock that advances only
+  when slept on. RED first: *"a dry run of the declared matrix requested ZERO sleeps"*, `assert
+  0 > 0`. ⚠️ **This is why last night's "20 of 20, exit 0" rehearsal proved less than it looked:
+  it ran over a code path the pilot does not take.**
+* ⚠️ **`Q-183` — STOPPED, and the ruling ordered the stop.** *"if CONTEXT.md states none, STOP, say
+  so, and leave config/ untouched."* **CONTEXT.md states no judge temperature anywhere** — all six
+  `temperature` occurrences measured; §8.6's row is scoped *"attacker, benign solver"*; the section
+  governing the judge gives a **token** target, 1,500. `config/` untouched, the `0.0` literal left
+  standing, **and the reason the three acts cannot be separated is written into `Q-188`**: deleting
+  the literal alone changes what the Google endpoint is *sent*, by a session told to choose no value.
+
+⚠️ **AND `Q-183`'s PREMISE IS OFF BY ONE STEP — REPORTED, NOT QUIETLY CORRECTED (`Q-188`).** The
+`complete_judge` docstring does **not** assert the opposite; every clause of it is **true**, and it
+already cites `Q-164` asking for this key. The defect is one step down: the judge passes `None`, the
+judge lane is `provider: google`, and `clients.py:782` turns `None` into **`0.0`** — so *"NO
+TEMPERATURE IS SENT"* is false **exactly where it is load-bearing**, and true on the Groq branch.
+
+**GATE 2 — 2a AND 2b RUN AND PASSED. 2c AND 2d NOT EXECUTED, DELIBERATELY.**
+* **2a `preflight` on the real two-lane matrix: RETURNED, no refusal** — `probe-v1 resolves: True`;
+  `lanes sanctioned: ['gemma-26b','qwen-27b']`; `API key NAMES present: ['google','groq']`; both
+  lanes `0 tokens, 0 calls` today; `498 pinned corpus entries, hashes verified`. ⚠️ **Last night this
+  REFUSED for want of keys. The VS Code restart fixed it, which is exactly what `arch-night-1b.txt`
+  diagnosed and `arch-night-1.txt` did not.** Nothing was written under `evals/`.
+* **2b rehearsal: 20 of 20, exit 0**, out-root a fresh OS temp dir outside the repository, 42 files
+  written there and **none** under `evals/`. Denominator reconciles `20 == 20 + 0 + 0`.
+* ⚠️ **2c/2d WITHHELD.** Writing a declared start time and then not running would be a false
+  declaration; spending an unrepeatable run while a live-session hazard is unresolved is the one
+  call a session should not make alone. **Both are the operator's.**
+
+**SUITE.** Before (`7a14feb`): **5 failed, 1421 passed, 2 skipped in 638.90s.** After: see
+`docs/sessions/arch-pilot-run-4.txt` §9. ⚠️ **Every test file touched was diffed by AST — `def
+test_*` names and `ast.Assert` node counts, before and after — and NOTHING was removed from either
+file.** `grep -c "assert "` was rejected as the instrument because it counts the word inside
+comments; it mis-reported `test_c11_runner.py` as gaining an assertion when the AST count was
+unchanged at 222.
+
+**RAISED:** `Q-188` (`Q-183` stopped; the `None`→`0.0` coercion). **`INC-140`.**
+
+---
+
 ## SESSION-TOKEN 5d7e2b91 — ARCH, NIGHT 1 — **SECOND INSTANCE** — 2026-09-04
 
 **Role:** FIX. **Chunk:** ARCH. **Everything below ships UNREVIEWED. Not self-certified. No tag.**

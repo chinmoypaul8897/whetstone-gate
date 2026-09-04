@@ -10621,3 +10621,94 @@ guardrail remains the operator's and is one line: do not run two sessions in one
 This is the **sixth** incident in this family — `INC-88`, `INC-123`, `INC-125`, `INC-136`, `INC-137`,
 and now this — and ⚠️ **the first in which the harm landed on a COMPLETED, COMMITTED artefact rather
 than on a draft.**
+
+
+## INC-140 — a second live session was in this working tree again, and this time the session found it BEFORE writing a line, by a mechanism `INC-136` had declared uncloseable from inside a session
+
+**Date:** 2026-09-04 (ARCH PILOT RUN 4, `c7b41f6a`). Fix SHA under **Fix**.
+
+**Event:** the `c7b41f6a` prompt opens *"⚠️⚠️ RUN EXACTLY ONE SESSION ON THIS TOKEN … ⚠️ IF ANOTHER
+SESSION IS LIVE IN THIS TREE, STOP AND SAY SO."* Before the read order, this session enumerated the
+live processes and resolved each to the working tree it holds. **Three `claude.exe` processes were
+running.** One (PID 14232) resumed a transcript under
+`…\projects\c--Users-chinm-role-playoff-hackathon` — a different repository. One (PID 3848) was this
+session. ⚠️ **The third, PID 2260, resumed `99119ca6-e452-4c89-9b29-843c95128397.jsonl` under
+`…\projects\c--Users-chinm-whetstone-gate`, whose own records carry `cwd`
+`C:\Users\chinm\whetstone-gate` — THIS TREE — and whose last record is timestamped
+`2026-09-04T01:25:58Z`, two minutes after this session started at `01:23:01Z`.** It is **the
+architect console**: the session that held `5d7e2b91` last night, and the session that **wrote this
+session's own prompt**, at `2026-09-04T01:14:45Z`. ⚠️ **And at `01:25:58Z` it drafted a THIRD prompt,
+`9e2c81d4` (CHUNK C21, ROLE BUILD), whose header states: *"⚠️⚠️ ANOTHER SESSION IS LIVE IN THIS
+WORKING TREE RIGHT NOW (`c7b41f6a`) AND IT IS SPENDING THE PROJECT'S SINGLE-SHOT, UNREPEATABLE
+PILOT."*** The operator's message to it 89 seconds earlier reads *"anything u want me to run
+alongside in paralele"*.
+
+**Action:** the literal trigger of the stop rule fired and the hazard it names did **not**, so the
+two were separated rather than collapsed. ⚠️ **NO OTHER SESSION HOLDS `c7b41f6a`** — measured, not
+assumed: the token appears in the other transcript exactly twice, both times inside the prompt **it
+authored for this session**. `INC-136`'s damage was *two instances holding ONE token*; that is not
+what is happening. The session therefore **split the work by reversibility**: GATE 0 (rulings) and
+GATE 1 (three ruled fixes, each with its own test) are git-recoverable and were executed;
+⚠️ **GATE 2c and 2d — writing the declared start time and SPENDING THE SINGLE-SHOT PILOT — were NOT
+executed and were referred to the operator**, because `PROCESS.md` §6b makes the first completed
+execution *the* run and no session should spend it while a documented concurrency hazard is live and
+unresolved. Every write followed `INC-136`'s own remedy: pure appends, no read-modify-write on a
+shared document, `PROCESS.md` §7b's private index with `INC-139`'s `env -u` correction, a name-only
+comparison against a pre-declared path list that refuses on a mismatch, and a FINAL OUTPUT at a
+filename (`docs/sessions/arch-pilot-run-4.txt`) no other session can be writing.
+
+**Expectation:** `CLAUDE.md` §5 says a token is *"never reused"* and `make check-roles` is described
+as failing *"if a token is reused across roles"*. It has nothing to fire on here either — this is not
+a reuse at all, it is **one executor and one console in one tree**, a shape §7a's table has no column
+for. `INC-136`'s `Q-187` already recorded that gap; this entry does not re-raise it.
+
+**Missing:** ⚠️ **NOTHING, AND THAT IS THIS ENTRY'S POINT — the thing `INC-136` recorded as missing
+was found.** Its `Missing` field reads, in full: *"**any mechanism by which a session can learn that
+another session holds its token.** `PROCESS.md` §7a mechanises identity 'as far as it can be, and
+names it as an honour system where it cannot', and this is squarely in the second half. A token is
+issued in a prompt and recorded in `QUESTIONS.md`; nothing observes how many live processes are
+holding one."* ⚠️ **A mechanism exists and it is four steps of read-only observation**, recorded here
+so it does not have to be rediscovered:
+
+    1. enumerate live processes            -> Win32_Process WHERE Name='claude.exe'
+    2. read each command line's --resume    -> the session UUID it holds
+    3. resolve that UUID to a transcript    -> ~/.claude/projects/<slug>/<uuid>.jsonl
+    4. read that transcript's `cwd` field   -> the WORKING TREE it is in
+
+Step 4 is the one that matters: the project-directory **slug** is derived from the path, and the
+`cwd` recorded on the transcript's own records is the tree itself. A session with **no** `--resume`
+is a fresh one, and its UUID is the scratchpad path its own harness was given — which is how this
+session identified **itself** among the three rather than guessing.
+
+**Missed:** ⚠️ **NOTHING WAS MISSED THIS TIME, AND THE REASON IS WORTH MORE THAN THE RESULT: the
+check ran FIRST, before the read order, because the prompt put it first.** `INC-136`'s `Missed`
+field records that its evidence *"was in this session's own first tool call and was read as a stale
+snapshot"* — `git status` had changed underneath it and the timestamps said so. ⚠️ **The difference
+between that session and this one is not diligence, it is ORDERING**: `INC-136` looked at
+`git status`, an artefact that reports *what changed*, and had to infer *who*; this session looked at
+the process table, which reports *who* directly. **A detector that names the other party does not
+need to be believed twice.** ⚠️ **The signal that WOULD have been missed had the check not run:
+`git status --porcelain` reported two files modified while `git diff` was EMPTY, and the blobs of
+both were identical to `HEAD`** — a stale index stat cache, indistinguishable at a glance from
+another session's uncommitted work, and `OF-213`'s exact species.
+
+**Diagnosis:** two Claude Code sessions were open on one working tree because the operator drives the
+architect console and the executing session in two VS Code windows on one folder; nothing in the
+harness, the token mechanism or `git` makes either observable to the other, so the only detector is
+one a session runs deliberately on the process table — which `INC-136` had concluded did not exist.
+
+**Fix:** ⚠️ **NO CODE CHANGE, AND NONE IS OWED** — nothing was damaged, no record was overwritten and
+no path was swept. What this entry lands is the **detection recipe** above and the **split by
+reversibility**; the commit that carries it is named in this session's `PROGRESS.md` entry and in
+`docs/sessions/arch-pilot-run-4.txt`.
+
+**Systemic guardrail:** ⚠️ **THE PREVENTION HALF IS STILL THE OPERATOR'S AND IS STILL ONE LINE** — a
+prompt is not started twice — **but the DETECTION half, which `INC-136` and `INC-65` both called
+uncloseable from inside a session, is now closed and is cheap enough to be mandatory.** It is
+proposed, not installed, because `PROCESS.md` is outside this session's fence: **every build, review
+and fix prompt should open with the four-step process check above, ahead of the read order**, and
+`make check-roles` could carry it as a `E6 no second live session in this tree` row that reads the
+process table rather than the git log — the first check in this project able to fire **before** the
+damage rather than after it. ⚠️ **Its limit, stated so it is not oversold: it sees only sessions on
+THIS machine.** A session on another machine against a clone is invisible to it, and that residue is
+`INC-65`'s uncloseable half, genuinely uncloseable.

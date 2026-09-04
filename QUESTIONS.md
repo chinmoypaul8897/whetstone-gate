@@ -14453,3 +14453,87 @@ ruling is legal only while the tag does not resolve:
 
 **`prereg-v1` DOES NOT RESOLVE. `config/` IS NOT YET FROZEN, AND THE `Q-183` EDIT IS LEGAL.**
 `probe-v1` **does** resolve, at `170bd3ff4abfdd8f87f64055972a60c82cc54efc`.
+
+
+---
+
+### Q-188 — `Q-183`'s OWN STOP CLAUSE FIRES: `CONTEXT.md` states NO judge temperature, so `config/` is left untouched and the `0.0` literal STAYS
+
+**Raised** 2026-09-04 by ARCH PILOT RUN 4 (`c7b41f6a`), under the `Q-183` ruling recorded verbatim
+above. **Class A. STOPPED, not deviated from.**
+
+⚠️ **THE RULING'S LAST SENTENCE IS AN INSTRUCTION TO STOP, AND IT IS THE ONE THAT APPLIES:**
+
+> *"⚠️ CHOOSE NO VALUE YOURSELF — write the key with the value the CONTEXT.md section governing the
+> judge states; **if CONTEXT.md states none, STOP, say so, and leave config/ untouched**, because
+> inventing a spec value is the deviation this ruling exists to prevent."*
+
+**MEASURED, EXHAUSTIVELY, BEFORE STOPPING.** Every occurrence of the string `temperature` in
+`CONTEXT.md` is on line **791, 1609, 2038, 2072, 2151** or **2343**, and not one of them states a
+judge temperature:
+
+| line | what it says | is it a judge temperature? |
+|---|---|---|
+| **791** | §8.6 constants table: **attacker temperature \| 0.7 \| attacker, benign solver** | **NO** — its own *Used by* column names the attacker and the benign solver, and **not** the judge |
+| 1609 | §12's *"Same task, same seed, same solver, same temperature"* | no — a comparability clause |
+| 2038, 2072, 2151 | *"the temperature"* among the things pre-registration must publish | no — a manifest of what to publish |
+| 2343 | *"temperature 0.7 against a hosted provider and cannot be bit-reproducible"* | no — hard rule 10's scope, and it is the **attacker's** 0.7 |
+
+And the section that **does** govern the judge states a token target, never a temperature:
+`CONTEXT.md` line **798**, *"gate-judge tokens/call target [ADDED 31 Aug] \| 1,500"*; §13.3.2 (line
+1774) names the judge's **models**. ⚠️ **`config/` agrees:** `config/protocol.yaml:37` carries
+`temperature: 0.7` under the **attacker**, and `grep -i temp config/lanes.yaml` returns **nothing at
+all**. **There is no judge temperature to write, anywhere in the law.**
+
+**SO THE THREE ACTS THE RULING ORDERS ARE ALL WITHHELD, TOGETHER, AND ON PURPOSE:**
+1. **`config/lanes.yaml` is NOT edited.** No key is added and no value is chosen.
+2. **The `0.0` literal at `driver/clients.py:782` STAYS.** ⚠️ **Removing it alone would be worse than
+   leaving it**, and this is the reason the three acts cannot be separated: the ruling removes the
+   literal *and* threads a configured value in its place, in one motion. With no value to thread,
+   deleting the literal changes what the Google endpoint is **sent** — from an explicit `0.0` to no
+   `generationConfig.temperature` at all — which is a **behaviour change to the shipped path made by
+   a session that was told to choose no value.** That is the deviation the ruling exists to prevent,
+   arriving by subtraction instead of by addition.
+3. **The docstring is NOT rewritten** — see the finding below, which is why.
+
+---
+
+⚠️⚠️ **AND THE RULING'S PREMISE IS OFF BY ONE STEP, WHICH IS REPORTED RATHER THAN QUIETLY
+CORRECTED — THE DOCSTRING DOES NOT ASSERT THE OPPOSITE; IT ASSERTS THE TRUTH, AND THE CODE
+FALSIFIES IT ON THE ONE PROVIDER THE JUDGE ACTUALLY RUNS ON.**
+
+The ruling says *"the docstring that asserts the opposite is CORRECTED"*. `clients.py:731-738`, the
+`complete_judge` docstring, verbatim:
+
+> ⚠️ **NO TEMPERATURE IS SENT, BECAUSE `config/` CARRIES NONE FOR THE JUDGE.**
+> ``gate_judge`` has no temperature key and hard rule 9 forbids inventing one here, so
+> the provider's own default applies and `QUESTIONS.md` **Q-164** asks for the key.
+
+**Every clause of that is TRUE, and it already cites `Q-164` asking for the very key `Q-183` rules.**
+It is not the opposite of the measurement; it **is** the measurement. **The defect is one step
+further down, and it is real:**
+
+    clients.py:743      complete_judge passes `None` as the temperature — deliberately.
+    config/lanes.yaml:55-56   the judge lane `gemma-26b` has `provider: google`.
+    clients.py:782      body = _google_body(messages, temperature if temperature is not None else 0.0)
+
+⚠️ **SO `None` BECOMES `0.0` ON THE GOOGLE BRANCH, AND A TEMPERATURE IS SENT AFTER ALL.** The
+docstring's *"NO TEMPERATURE IS SENT"* and *"the provider's own default applies"* are **both false
+for the judge**, because the judge is a Google lane. On the **Groq** branch the same docstring is
+**true** — `_groq_body` at `clients.py:584-585` omits the key when the value is `None` — so the
+sentence is not wrong in general, it is wrong **exactly where it is load-bearing**.
+
+**THAT MAKES THE `0.0` A HARDCODED SPEC VALUE ON THE SHIPPED PATH — hard rule 9's own species** — and
+by `Q-048`'s test (*"does this value change what the experiment sees?"*) a judge temperature plainly
+does. ⚠️ **It does not touch the pilot** (`Q-144`: arm 1 has no gate, so `complete_judge` makes zero
+calls, which the docstring itself already says), **and it does touch every judged arm of the sweep.**
+
+⚠️ **WHY THE DOCSTRING IS LEFT STANDING RATHER THAN CORRECTED IN PASSING.** Correcting it means
+writing *"a temperature of 0.0 IS sent, on the provider the judge runs on, and nothing declared it"*
+— which is a session **publishing a spec value as settled** in the one file a reader trusts, while
+the ruling that governs it is stopped. The false sentence is therefore **left exactly as it is and
+named here**, which is the same trade `INC-139` made with three stale `INC-137` citations.
+
+**WHAT THE ARCHITECT IS ASKED FOR, IN ONE LINE:** the judge temperature as a **number**, for §8.6's
+constants table and `config/`, ⚠️ **while `prereg-v1` still does not resolve** — after that tag,
+hard rule 4 freezes `config/` and this is published as a limitation instead of fixed.
