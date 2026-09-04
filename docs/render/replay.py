@@ -55,6 +55,19 @@ from whetstone_gate.world.harm import COMPONENTS
 #: ``pilot__<arm>__<seed>__<model>.json`` — the stored filename convention.
 _NAME_PARTS = 4
 
+#: ⚠️ **WHICH MCP TOOLS MOVE MONEY. A READ/WRITE SPLIT, NOT A SPEC CONSTANT.**
+#:
+#: `CONTEXT.md` §2's tool surface: ``fetch_payments`` and ``fetch_payment`` are reads and
+#: move nothing; a refund, a capture and an instant settlement each move money -- to a
+#: customer, from a customer, and between the merchant's own accounts respectively
+#: (§12.2). It carries **no threshold, no amount and no author-chosen number**, so it is
+#: not a hard-rule-9 value and §8.6's constants table owes it nothing. It exists so
+#: :attr:`EpisodeReplay.executed_money_moves` can answer *"did money move?"* separately
+#: from *"was harm booked?"*, which is `B-2`'s whole subject.
+MONEY_MOVING_TOOLS = frozenset(
+    {"create_refund", "capture_payment", "create_instant_settlement"}
+)
+
 
 class EpisodeLoadError(RuntimeError):
     """A stored episode could not be read as one. Refused, never guessed at."""
@@ -89,6 +102,15 @@ COMPLETE = "COMPLETE"
 TRUNCATED = "TRUNCATED"
 EMPTY = "EMPTY"
 ABSENT = "ABSENT"
+
+#: ⚠️ **THE FIFTH STATE, ADDED BY C17 FIX 1 (`1b9e4c73`) FOR REVIEW 1's `B-3`.**
+#: A ledger can reach the end of the budget and still be missing most of what is beneath
+#: it. Completeness was decided from ``max(turn_index)`` alone, so three entries at turn
+#: indices 0, 1 and 19 against a 20-turn budget rendered *"COMPLETE. All 20 turns of the
+#: budget are accounted for"* -- **seventeen turns absent, twenty declared accounted
+#: for.** A high water mark is not a record of the turns beneath it, and hard rule 11's
+#: subject is exactly a denominator statement that is not true.
+GAPPED = "GAPPED"
 
 
 @dataclass(frozen=True)
@@ -132,6 +154,42 @@ class EpisodeReplay:
             return None
         return max(int(e["turn_index"]) for e in self.entries)
 
+    @property
+    def turn_indices(self) -> tuple[int, ...]:
+        """Every turn index this ledger actually carries, sorted, de-duplicated."""
+        return tuple(sorted({int(e["turn_index"]) for e in self.entries}))
+
+    @property
+    def missing_turn_indices(self) -> tuple[int, ...]:
+        """⚠️ **The turns with NO entry, beneath the highest one that has one.**
+
+        `B-3`. This is the difference between *"the ledger reaches turn 20"* and *"all 20
+        turns are accounted for"*, and a renderer may print the second only when this is
+        empty. The range stops at the last entry rather than at the budget so a
+        **TRUNCATED** ledger is not accused of gaps it never claimed to fill -- the turns
+        after the last entry are truncation, which is a different fact with its own label.
+        """
+        last = self.last_turn_index
+        if last is None:
+            return ()
+        present = set(self.turn_indices)
+        return tuple(index for index in range(last + 1) if index not in present)
+
+    @property
+    def entries_beyond_budget(self) -> tuple[Mapping[str, Any], ...]:
+        """⚠️ **Entries at a turn index at or beyond the budget.**
+
+        `H-3`. :func:`race.render` draws exactly ``budget`` frames, so no frame can ever
+        show one of these -- while :func:`audit.summary` counts them. **Two deliverables,
+        one episode, two different answers**, with nothing anywhere saying a row had been
+        dropped. They stay in every money figure (hard rule 11: *"every dropped episode is
+        counted"*, and a row is not dropped merely because a frame cannot draw it); what
+        changed is that **both** artefacts now name them.
+        """
+        return tuple(
+            e for e in self.entries if int(e["turn_index"]) >= self.budget
+        )
+
     def component_total(self, component: str) -> int:
         """One harm component, summed **within itself** across the episode's entries.
 
@@ -153,6 +211,37 @@ class EpisodeReplay:
 
     def entries_at(self, turn_index: int) -> tuple[Mapping[str, Any], ...]:
         return tuple(e for e in self.entries if int(e["turn_index"]) == turn_index)
+
+    @property
+    def executed_money_moves(self) -> tuple[Mapping[str, Any], ...]:
+        """⚠️ **The calls that ACTUALLY MOVED MONEY, which is a different question
+        from harm.**
+
+        `B-2`'s third falsehood. `CONTEXT.md` §12.2 reporting rule 4 renames the money
+        metric *"money that moved into a state Razorpay's own API documents as an
+        error"* -- a **much narrower** claim than all money movement, and a rendered log
+        that says *"nothing moved"* over four zero harm components is not making the
+        narrow claim, it is making the wide one. **MEASURED on the one stored non-empty
+        episode: the world executed two refunds worth 20,118,586 paise while the log said
+        "nothing moved" four times.**
+
+        ⚠️ **Nothing here is adjudicated.** :data:`MONEY_MOVING_TOOLS` is the same
+        read/write split `audit.py`'s own tool glosses already carry -- a ``fetch_*`` is
+        *"a read; moves no money"* -- and the amount is the entry's stored
+        ``amount_paise``, not a figure this module computed.
+        """
+        return tuple(
+            e for e in self.entries
+            if e.get("executed")
+            and e.get("tool") in MONEY_MOVING_TOOLS
+            and e.get("amount_paise") is not None
+        )
+
+    @property
+    def executed_money_paise(self) -> int:
+        """The paise those calls moved. ⚠️ **NOT a harm figure and never reported as
+        one** -- it is deliberately named for what it is so the two cannot be confused."""
+        return sum(int(e["amount_paise"]) for e in self.executed_money_moves)
 
     # -- the three outcomes the fifteen-field schema can tell apart --------------------
 
@@ -242,6 +331,30 @@ def load_episode(path: Path, budget: int | None = None) -> EpisodeReplay:
         )
     entries = tuple(ledger)
 
+    # ⚠️ `L-1` / `OF-260`. ENTRY SHAPE IS VALIDATED HERE, because
+    # :class:`EpisodeLoadError`'s docstring promises *"refused, never guessed at"* and an
+    # entry missing ``turn_index`` used to reach the completeness arithmetic below and
+    # raise a raw ``KeyError: 'turn_index'`` instead. A caller that catches the module's
+    # own error type would have seen the file crash straight through it.
+    for position, entry in enumerate(entries):
+        if not isinstance(entry, Mapping):
+            raise EpisodeLoadError(
+                f"{path.name}: ledger row {position} is {type(entry).__name__}, not an "
+                f"object. Refused rather than rendered as a turn."
+            )
+        try:
+            int(entry["turn_index"])
+        except KeyError as exc:
+            raise EpisodeLoadError(
+                f"{path.name}: ledger row {position} has no 'turn_index'. An entry that "
+                f"cannot be placed on a turn is refused, never guessed at."
+            ) from exc
+        except (TypeError, ValueError) as exc:
+            raise EpisodeLoadError(
+                f"{path.name}: ledger row {position} has a non-integer 'turn_index' "
+                f"({entry.get('turn_index')!r}). Refused, never guessed at."
+            ) from exc
+
     genesis = raw.get("genesis_hash")
     algorithm = raw.get("hash_algorithm")
     if not isinstance(genesis, str) or not isinstance(algorithm, str):
@@ -258,11 +371,25 @@ def load_episode(path: Path, budget: int | None = None) -> EpisodeReplay:
     seed = raw.get("seed", named[1] if named else None)
     model = named[2] if named else None
 
+    # ⚠️ `B-3`. COMPLETENESS IS CHECKED, NOT INFERRED FROM A HIGH WATER MARK.
+    # The rule that stood here was ``COMPLETE if last >= budget - 1 else TRUNCATED``,
+    # which asks only how far the ledger REACHES and never whether anything is missing
+    # beneath. COMPLETE now additionally requires that every turn index from 0 to the
+    # last one carries an entry -- so a ledger at turns 0, 1 and 19 of 20 is **GAPPED**,
+    # and the log says which seventeen turns have no entry instead of declaring all
+    # twenty accounted for.
     if not entries:
         completeness = EMPTY
     else:
-        last = max(int(e["turn_index"]) for e in entries)
-        completeness = COMPLETE if last >= budget - 1 else TRUNCATED
+        indices = {int(e["turn_index"]) for e in entries}
+        last = max(indices)
+        gapped = any(index not in indices for index in range(last + 1))
+        if last < budget - 1:
+            completeness = TRUNCATED
+        elif gapped:
+            completeness = GAPPED
+        else:
+            completeness = COMPLETE
 
     return EpisodeReplay(
         path=path,
@@ -301,9 +428,41 @@ def discover(root: Path | None = None) -> list[Path]:
     return sorted(directory.glob("*.json"))
 
 
-def load_all(root: Path | None = None, budget: int | None = None) -> list[EpisodeReplay]:
+def load_all_reporting(
+    root: Path | None = None, budget: int | None = None
+) -> tuple[list[EpisodeReplay], tuple[tuple[Path, str], ...]]:
+    """Every readable stored episode, **and every file that could not be read**.
+
+    ⚠️ `M-4` / `OF-264`. ``load_all`` caught nothing, so one stray file --
+    a partially-written episode from an interrupted run, an editor backup -- raised
+    ``EpisodeLoadError`` out through :func:`race.main`, :func:`audit.main` and
+    :func:`list_episodes` alike, and **every good episode beside it became
+    unreachable.** The module already held the right instinct one level up:
+    :func:`parse_episode_name` returns ``None`` rather than raising, because an
+    unrecognised filename is *"something to report, not something to crash the render
+    on"*, and the malformed-**content** path did not follow it.
+
+    ⚠️ **NOTHING IS SWALLOWED.** The refusals come back as data so every entry point
+    can print them as a counted, categorised line -- hard rule 11's own shape. A caller
+    that wants the strict behaviour still has :func:`load_episode`, which refuses one
+    file loudly and is what `tests/test_c17_render.py` fires malformed shapes at.
+    """
     budget = turn_budget() if budget is None else budget
-    return [load_episode(path, budget) for path in discover(root)]
+    replays: list[EpisodeReplay] = []
+    refused: list[tuple[Path, str]] = []
+    for path in discover(root):
+        try:
+            replays.append(load_episode(path, budget))
+        except EpisodeLoadError as exc:
+            refused.append((path, str(exc)))
+    return replays, tuple(refused)
+
+
+def load_all(root: Path | None = None, budget: int | None = None) -> list[EpisodeReplay]:
+    """The readable episodes. ⚠️ **Use :func:`load_all_reporting` if you will render**
+    -- the refusals it returns are owed a counted line, and dropping them on the floor
+    here would be the silent shrinkage hard rule 11 forbids."""
+    return load_all_reporting(root, budget)[0]
 
 
 def seeds_available(replays: Iterable[EpisodeReplay]) -> list[int]:
@@ -329,12 +488,28 @@ def by_arm(
     return grouped
 
 
+def off_arm(replays: Iterable[EpisodeReplay], seed: int) -> list[EpisodeReplay]:
+    """Episodes at this seed whose ``arm`` is **not one of the five**.
+
+    ⚠️ `M-2` / `OF-258`. :func:`by_arm` filters on ``replay.arm in grouped``, so such
+    an episode is discovered, loaded and chain-verified -- and then belongs to no bucket
+    and **vanishes with no count and no line of rendered output**. Hard rule 11: *"Every
+    dropped episode is counted, categorised and printed as a number."* This returns them
+    so the renderers can do exactly that. **Latent on today's data**, where all eleven
+    stored episodes are arm ``1``; it is the shape that is the defect, not a live
+    miscount.
+    """
+    return [r for r in replays if r.seed == seed and r.arm not in ARMS]
+
+
 __all__ = [
     "ABSENT",
     "ARMS",
     "COMPLETE",
     "COMPONENTS",
     "EMPTY",
+    "GAPPED",
+    "MONEY_MOVING_TOOLS",
     "TRUNCATED",
     "EpisodeLoadError",
     "EpisodeReplay",
@@ -344,7 +519,9 @@ __all__ = [
     "episodes_dir",
     "genesis_matches_config",
     "load_all",
+    "load_all_reporting",
     "load_episode",
+    "off_arm",
     "parse_episode_name",
     "repo_root",
     "seeds_available",

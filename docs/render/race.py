@@ -72,6 +72,20 @@ FILLED = "#"
 EMPTY_CELL = "."
 NOT_RUN_MARK = "  -- NOT RUN --  no episode file for this arm at this seed"
 
+#: The warning glyph, named once so the lines carrying it stay inside 100 columns.
+W = "⚠️"
+
+#: ⚠️ **`H-1`. A CHAIN-FAILED ARM GETS NO BAR, FOR THE SAME REASON A NOT-RUN ONE
+#: DOES NOT.** The race used to draw a full-length money bar from tampered content --
+#: measured: ``arm 1  [############################]  88,888,888 paise`` from a ledger
+#: whose chain had failed. §18 puts this frame in the video, **where the bar is the image
+#: and the footer is small type**, so a footer note is not a cure. A bar is a claim about
+#: money, and a file that fails its own digests supports no such claim.
+CHAIN_FAILED_MARK = (
+    "  !! CHAIN FAILED -- NO BAR DRAWN. This file does not match its own digests, "
+    "so its contents are not a record of what happened"
+)
+
 #: ⚠️ **N DOES NOT EXIST.** The pilot completed 0 of 20 episodes, ``select_n`` returned
 #: ``USABLE TO SELECT N: False``, and ``config/protocol.yaml``'s
 #: ``n_decision.selected_branch`` is still ``TODO_C14_PILOT``. `RESULTS.md` §3.2,
@@ -104,7 +118,12 @@ def bar(value: int, scale: int) -> str:
     """One money bar. ``scale`` is the largest value in this track across the arms."""
     if scale <= 0:
         return EMPTY_CELL * BAR_CELLS
-    filled = min(BAR_CELLS, (value * BAR_CELLS) // scale)
+    # ⚠️ `L-5` / `OF-266`: CLAMPED AT BOTH ENDS. ``min`` alone went NEGATIVE for a
+    # negative value, so ``FILLED * filled`` was empty and ``EMPTY_CELL * (BAR_CELLS -
+    # filled)`` OVERSHOT -- measured, ``bar(-5, 100)`` returned a 30-character track
+    # against ``BAR_CELLS = 28``, breaking the frame's alignment. No stored component is
+    # negative today; a track whose width depends on its value is a defect regardless.
+    filled = max(0, min(BAR_CELLS, (value * BAR_CELLS) // scale))
     return FILLED * filled + EMPTY_CELL * (BAR_CELLS - filled)
 
 
@@ -165,8 +184,19 @@ def frame(
     turn_index: int,
     seed: int,
     budget: int,
+    *,
+    off_arm: "tuple[rp.EpisodeReplay, ...] | list[rp.EpisodeReplay]" = (),
+    unreadable: "tuple[tuple[Path, str], ...] | list[tuple[Path, str]]" = (),
 ) -> str:
-    """One turn of the race, as text. **Pure** — takes data, returns a string."""
+    """One turn of the race, as text. **Pure** — takes data, returns a string.
+
+    ⚠️ ``off_arm`` and ``unreadable`` are keyword-only with empty defaults, so every
+    existing caller is unchanged — but :func:`render` and :func:`list_episodes` now pass
+    them, because hard rule 11 says *"every dropped episode is counted, categorised and
+    printed as a number"* and a file on disk that reaches no track is dropped. `M-2` /
+    `OF-258` is the episode whose arm is not one of the five; `M-4` / `OF-264` is the file
+    that could not be read at all.
+    """
     lines: list[str] = []
     lines.append("=" * 78)
     lines.append(f"  THE RACE  --  turn {turn_index + 1} of {budget}")
@@ -176,11 +206,14 @@ def frame(
     chosen = {arm: episodes[0] for arm, episodes in grouped.items()}
 
     for component in rp.COMPONENTS:
+        # ⚠️ `H-1`: A CHAIN-FAILED EPISODE SETS NO SCALE. If it did, fabricated
+        # content would silently shrink every honest bar beside it to nothing -- the
+        # tampered file would be deciding what the truthful arms look like.
         scale = max(
             (
                 episode.component_total_through(component, turn_index)
                 for episode in chosen.values()
-                if episode.present
+                if episode.present and episode.chain_ok
             ),
             default=0,
         )
@@ -192,8 +225,25 @@ def frame(
             if not episode.present:
                 lines.append(f"{label}{NOT_RUN_MARK}")
                 continue
+            if not episode.chain_ok:
+                # ⚠️ `H-1`. No bracket, no bar, no figure from a tampered file.
+                lines.append(f"{label}{CHAIN_FAILED_MARK}")
+                continue
             value = episode.component_total_through(component, turn_index)
-            measured = "MEASURED ZERO" if value == 0 else paise(value)
+            last = episode.last_turn_index
+            # ⚠️ `B-2` / `O-7` IN THE ARTEFACT §18 PUTS ON SCREEN. "MEASURED ZERO"
+            # used to be printed for ANY zero, including an EMPTY ledger -- so a bar
+            # labelled MEASURED ZERO sat beside a bracket reading "[EMPTY LEDGER -- this
+            # episode recorded no turn at all]", one line contradicting itself. It fires
+            # on the real stored seeds 2102-2110, whose one arm-1 episode is EMPTY.
+            if episode.completeness == rp.EMPTY:
+                measured = "NO RECORD -- nothing was measured, and that is not a zero"
+            elif value == 0 and last is not None and turn_index > last:
+                measured = f"MEASURED ZERO THROUGH TURN {last + 1}"
+            elif value == 0:
+                measured = "MEASURED ZERO"
+            else:
+                measured = paise(value)
             lines.append(f"{label}[{bar(value, scale)}]  {measured}{past_end(episode, turn_index)}")
 
     lines.append("")
@@ -213,11 +263,32 @@ def frame(
                 f"  ⚠️ arm {arm}: {len(grouped[arm])} stored episodes at this seed. "
                 f"Shown: {chosen[arm].model}. ALSO ON DISK, NOT SHOWN: {names}."
             )
+    # ⚠️ `H-4`. "NO DATA" USED TO MEAN "NO FILE". The footer computed
+    # ``not_run = [arm for arm in ARMS if not chosen[arm].present]`` and printed it under
+    # the heading ARMS WITH NO DATA -- but an EMPTY episode IS present, so on the real
+    # stored seeds 2102-2110 it read "4 of 5 arms have never run" while **five of five had
+    # no usable data**, crediting the one arm whose summary also said "nothing moved".
+    # Three different facts, three lines: never ran / ran and recorded nothing / neither.
     not_run = [arm for arm in rp.ARMS if not chosen[arm].present]
+    recorded_nothing = [
+        arm for arm in rp.ARMS
+        if chosen[arm].present and chosen[arm].completeness == rp.EMPTY
+    ]
+    unusable = len(not_run) + len(recorded_nothing)
     lines.append("")
     lines.append(
-        f"  ARMS WITH NO DATA: {', '.join(not_run) if not_run else 'none'}"
+        f"  ARMS WITH NO DATA -- NEVER RAN (no episode file): "
+        f"{', '.join(not_run) if not_run else 'none'}"
         f"   ({len(not_run)} of {len(rp.ARMS)} arms have never run)"
+    )
+    lines.append(
+        f"  ARMS THAT RAN AND RECORDED NOTHING (EMPTY ledger): "
+        f"{', '.join(recorded_nothing) if recorded_nothing else 'none'}"
+        f"   ({len(recorded_nothing)} of {len(rp.ARMS)})"
+    )
+    lines.append(
+        f"  {W} ARMS WITH NO USABLE DATA AT ALL: {unusable} of {len(rp.ARMS)}"
+        f"   -- never ran, PLUS ran and recorded nothing. An EMPTY ledger is NOT data."
     )
     lines.append(
         "  A NOT-RUN ARM IS DRAWN WITH NO BAR AT ALL, NEVER AS A ZERO BAR:"
@@ -225,6 +296,72 @@ def frame(
     lines.append(
         "  a zero bar and a not-run bar look identical and mean opposite things."
     )
+
+    # ⚠️ `H-3`. THE TWO DELIVERABLES MUST NOT DISAGREE ABOUT ONE EPISODE. This
+    # renderer builds exactly ``budget`` frames, so an entry at a turn index at or beyond
+    # the budget can appear in NONE of them -- while the audit log counts it. Measured: an
+    # entry at turn index 25 booking 777,777 paise was in the audit summary and in none of
+    # the twenty frames, with nothing anywhere saying a row had been dropped.
+    # ⚠️ `chain_ok` IS PART OF THIS FILTER FOR `H-1`'s REASON, NOT `H-3`'s: the line
+    # below prints PAISE FIGURES out of the entries, and a file that fails its own digests
+    # supports no money claim anywhere in this frame. A chain-failed arm already carries
+    # CHAIN_FAILED_MARK on every track and `!! CHAIN ... at ledger_seq N` in the footer,
+    # so it is disclosed -- just never quantified.
+    beyond = [
+        (arm, entry)
+        for arm in rp.ARMS
+        if chosen[arm].chain_ok
+        for entry in chosen[arm].entries_beyond_budget
+    ]
+    if beyond:
+        lines.append("")
+        lines.append(
+            f"  {W} {len(beyond)} LEDGER ENTRY/ENTRIES LIE AT A TURN INDEX"
+        )
+        lines.append(
+            f"  AT OR BEYOND THE TURN BUDGET (the budget is {budget})"
+        )
+        lines.append(
+            "  AND ARE IN NO FRAME OF THIS RACE, WHICH DRAWS ONE FRAME PER BUDGETED TURN:"
+        )
+        for arm, entry in beyond:
+            booked = ", ".join(
+                f"{int(entry.get(component, 0) or 0):,} paise in {component}"
+                for component in rp.COMPONENTS
+                if int(entry.get(component, 0) or 0)
+            )
+            lines.append(
+                f"       arm {arm:<3} turn index {int(entry['turn_index'])}   "
+                f"{booked or 'no money booked'}"
+            )
+        lines.append(
+            "  THE AUDIT LOG COUNTS THEM AND SO DOES THIS LINE. The race cannot DRAW them,"
+        )
+        lines.append(
+            "  and says so rather than losing the money between two deliverables."
+        )
+
+    # ⚠️ `M-2` / `OF-258` and `M-4` / `OF-264`: hard rule 11 -- a file on disk that
+    # reaches no track above is counted and categorised, never dropped in silence.
+    if off_arm:
+        lines.append("")
+        lines.append(
+            f"  {W} {len(off_arm)} STORED EPISODE(S) AT THIS SEED CARRY AN ARM THAT IS"
+            " NOT ONE OF THE FIVE"
+        )
+        lines.append("  AND ARE IN NO TRACK ABOVE. Counted here rather than dropped:")
+        for episode in off_arm:
+            name = episode.path.name if episode.path else "(no file)"
+            lines.append(f"       arm {episode.arm:<6} {name}")
+    if unreadable:
+        lines.append("")
+        lines.append(
+            f"  {W} {len(unreadable)} FILE(S) UNDER evals/episodes/ COULD NOT BE READ AS A"
+            " STORED EPISODE"
+        )
+        lines.append("  AND ARE IN NO TRACK ABOVE. Counted here rather than dropped:")
+        for path, reason in unreadable:
+            lines.append(f"       {path.name}  -  {reason}")
     return "\n".join(lines)
 
 
@@ -237,9 +374,13 @@ def render(
 ) -> list[str]:
     """Every frame of the race for one seed. Returns them; prints them as it goes."""
     budget = rp.turn_budget()
-    replays = rp.load_all(root, budget)
+    replays, unreadable = rp.load_all_reporting(root, budget)
     grouped = rp.by_arm(replays, seed, budget)
-    frames = [frame(grouped, turn, seed, budget) for turn in range(budget)]
+    stray = rp.off_arm(replays, seed)
+    frames = [
+        frame(grouped, turn, seed, budget, off_arm=stray, unreadable=unreadable)
+        for turn in range(budget)
+    ]
     for index, text in enumerate(frames):
         say(text)
         if animate and index < len(frames) - 1:
@@ -251,16 +392,26 @@ def list_episodes(root: Path | None = None) -> None:
     """⚠️ **What is ACTUALLY on disk**, so the caption can never outrun the data."""
     budget = rp.turn_budget()
     paths = rp.discover(root)
+    replays, unreadable = rp.load_all_reporting(root, budget)
     say(f"  {len(paths)} stored episode(s) under evals/episodes/  (turn budget {budget})")
     say("")
-    for path in paths:
-        episode = rp.load_episode(path, budget)
+    for episode in replays:
+        name = episode.path.name if episode.path else "(no file)"
         say(
-            f"  {path.name:<34} arm {episode.arm:<3} seed {episode.seed}  "
+            f"  {name:<34} arm {episode.arm:<3} seed {episode.seed}  "
             f"{episode.completeness:<10} {chain_note(episode)}"
         )
+    if unreadable:
+        # ⚠️ `M-4` / `OF-264`: counted and categorised, never a silence.
+        say("")
+        say(
+            f"  {W} {len(unreadable)} FILE(S) COULD NOT BE READ AS A STORED EPISODE and are"
+            " in nothing above:"
+        )
+        for path, reason in unreadable:
+            say(f"       {path.name}  -  {reason}")
     if not paths:
-        say("  ⚠️ NONE. evals/episodes/ is absent or empty; there is nothing to replay.")
+        say(f"  {W} NONE. evals/episodes/ is absent or empty; there is nothing to replay.")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -276,6 +427,8 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     available = rp.seeds_available(rp.load_all())
+    # ⚠️ `M-4`: a stray unreadable file no longer takes this command down with it;
+    # ``load_all`` collects the refusals and ``render`` prints them into every frame.
     if not available:
         say("  ⚠️ NO STORED EPISODE EXISTS. There is nothing to replay, and this renderer")
         say("     will not invent one. Run the pilot or the calibration first.")
