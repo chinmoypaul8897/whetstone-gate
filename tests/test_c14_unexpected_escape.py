@@ -400,6 +400,36 @@ def test_the_booked_record_carries_THE_TYPE_NAME_AND_NEVER_THE_MESSAGE():
     assert "AIzaSy" not in flat
 
 
+def test_the_floor_NEVER_RELABELS_AN_ALREADY_BOOKED_LaneStopped():
+    """⚠️⚠️ **CAUSE-LAUNDERING IS THE ONE WAY A FLOOR CAN MAKE THE RECORD WORSE THAN NO FLOOR.**
+
+    :class:`~whetstone_gate.driver.episode.LaneStopped` is an ``Exception``, so a floor spelled
+    ``except Exception`` would catch one raised inside ``call()`` and **relabel it**
+    ``UNEXPECTED_ERROR`` — publishing a 429, a token ceiling or a pacer refusal as an
+    unexplained fault, with its accounting already settled by the meter that raised it.
+
+    ⚠️ **NO PATH REACHES THIS TODAY**, and the guard is written and asserted anyway: the
+    ruling's words are *"keep the existing branches and **their distinct causes**"*, and a
+    nesting introduced later would dissolve exactly those. This test is what stops the guard
+    being deleted as dead code by someone who checks only that nothing currently calls it.
+    """
+    metered = _metered(lambda *_a, **_k: None)
+
+    def already_booked():
+        raise driver_episode.LaneStopped(ep_module.RATE_LIMIT_429)
+
+    with pytest.raises(driver_episode.LaneStopped) as stopped:
+        metered.run(already_booked)
+
+    assert stopped.value.cause == ep_module.RATE_LIMIT_429, (
+        "a 429 was relabelled as an unexplained fault. The floor must never re-book a cause "
+        "that is already booked"
+    )
+    assert stopped.value.cause != ep_module.UNEXPECTED_ERROR
+    # ⚠️ AND IT IS NOT DOUBLE-COUNTED: the meter that raised it did its own accounting.
+    assert metered.calls_settled == 0
+
+
 def test_the_floor_DOES_NOT_RETRY_AND_DOES_NOT_STOP_THE_LANE():
     """⚠️ **`Q-200`'s two negatives, both asserted.**
 

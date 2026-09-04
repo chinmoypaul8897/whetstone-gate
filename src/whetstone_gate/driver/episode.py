@@ -450,6 +450,22 @@ class _MeteredCall:
                 error_type=BucketError.__name__,
             )
             raise LaneStopped(runner_episodes.PACER_REFUSED) from None
+        except LaneStopped:
+            # ⚠️ **A CAUSE THAT IS ALREADY BOOKED IS NEVER RE-BOOKED.** `LaneStopped` is an
+            # `Exception`, so without this line the floor below would catch one raised inside
+            # `call()` and **relabel it `UNEXPECTED_ERROR`** — publishing a 429 or a ceiling
+            # stop as an unexplained fault, with its accounting already settled by the meter
+            # that raised it. That is cause-laundering, and it is the one way a floor can make
+            # the record *worse* than no floor.
+            #
+            # ⚠️ **NO PATH REACHES THIS TODAY AND IT IS STILL WRITTEN.** `_MeteredCall.run` is
+            # the only place `LaneStopped` is raised, and the attacker's `call()` reaches the
+            # provider directly — the judge's meter is driven by the executor *between*
+            # attacker calls, not inside one, so the two are sequential and never nested. The
+            # guard exists because the ruling's own words are *"keep the existing branches and
+            # **their distinct causes**"*, and a nesting introduced later would silently
+            # dissolve exactly those. It costs one re-raise and it is asserted by a test.
+            raise
         except Exception as escaped:
             # ⚠️⚠️ **THE FLOOR. `QUESTIONS.md` `Q-200`, RULED 2026-09-04, VERBATIM:** *"ANY
             # exception escaping the model call is BOOKED AS A COUNTED, NAMED OUTCOME AND THE
