@@ -84,7 +84,39 @@ bytes, and it is also the same hand that then changed them.
 | Path | SHA-256 of the git blob | Bytes | Git blob id |
 |---|---|---|---|
 | `config/lanes.yaml` | `23b8db927cf66d0b0876a9a393c523b3e5287f2bb392b8efdb3d9f52accea0bd` | 13,622 | `ab6f0f266fa010c8b4b7be08b713dc4fa836264a` |
-| `config/protocol.yaml` | `a4a9a02ddd556d599807e2b2ded8f7d35d8ca8c7707deebfa7a9397ff4c3886e` | 30,960 | `8688b87cf8ce0ac440234b9aed9fac5bb419cb53` |
+| `config/protocol.yaml` | `2480da6a1a885ce1bf5a30777cb224c0048e1c2038e0100deb1bd8f8ecc8f496` | 33,479 | `bae20f6fa87afbfaef9dbef2481a2b7ca577d295` |
+
+⚠️⚠️ **`config/protocol.yaml`'s ROW WAS RE-MEASURED AGAIN ON 2026-09-04 BY ARCH CAL BUILD 1
+(`8f3c72e1`), BECAUSE THAT SESSION'S OWN COMMIT CHANGED THE FILE — TWICE.** Both edits are
+architect-ruled and both are legal only because `git rev-parse prereg-v1` **does not resolve**,
+verified as that session's first act:
+
+| | what moved the bytes | authority |
+|---|---|---|
+| **1** | **DEGRADATION RUNG 4 EXECUTED** — `selections.tfp_task_count` 40 → **20**, `tfp_stratification` `{20,20}` → **`{10,10}`**, and `tfp_task_ids` cut to the **first ten per domain** | the operator's ruling of 2026-09-04; `PROCESS.md` §14; `INCIDENTS.md` **INC-144**; §3.2 below |
+| **2** | **THE CAL SEED BLOCK ADDED** — `seeds.cal_first: 2201`, `seeds.cal_last: 2230` | `QUESTIONS.md` **`Q-189`(a)**, RULED 2026-09-04, **Class A** |
+
+⚠️ **RE-MEASURED, NEVER COPIED — THIS FILE'S OWN RULE, AND `INC-139` IS THE ENTRY ABOUT THIS
+EXACT ROW STANDING STALE FOR TWO DAYS.** The measurement, run against the **git blob** and not
+against the working file (they are the same here, and that was checked rather than assumed —
+`.gitattributes` carries `* text=auto eol=lf`, which overrides this machine's
+`core.autocrlf=true`, and the blob holds **0 CR bytes**):
+
+```
+$ BLOB=$(git hash-object -w config/protocol.yaml)   # object store only; no index, no HEAD
+$ git cat-file blob $BLOB | sha256sum
+2480da6a1a885ce1bf5a30777cb224c0048e1c2038e0100deb1bd8f8ecc8f496
+$ git cat-file blob $BLOB | wc -c
+33479
+```
+
+⚠️ **AND `make check-prereg` WOULD NOT HAVE CAUGHT A STALE ROW HERE — `QUESTIONS.md` `Q-181`:
+it recomputes nothing before the tag.** So this row is owed to a session that re-measures it
+deliberately, which is why the command above is printed rather than described. The previous row
+read `a4a9a02ddd556d599807e2b2ded8f7d35d8ca8c7707deebfa7a9397ff4c3886e`, **30,960 bytes**, blob
+`8688b87cf8ce0ac440234b9aed9fac5bb419cb53`, and it was **correct for the bytes it was taken
+from** — `ARCH CAL BUILD 1` verified it against `HEAD` **before** editing the file, so the
+difference below is this session's own two edits and nothing else.
 
 ⚠️ **`config/protocol.yaml`'s ROW WAS RE-MEASURED ON 2026-09-03 BY ARCH NIGHT 1 (`5d7e2b91`),
 BECAUSE `Q-153`'s RULING MOVED THE BYTES AND THE ROW DID NOT MOVE WITH THEM.** The previous row

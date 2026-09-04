@@ -33,6 +33,7 @@ from pathlib import Path
 import pytest
 
 from whetstone_gate import config as cfg
+from whetstone_gate.runner import n_rule
 from whetstone_gate.tau2 import enumerate as tau2_enum
 
 # ======================================================================================
@@ -265,18 +266,61 @@ def test_a_source_with_no_decorated_tools_is_a_refusal():
 # ======================================================================================
 
 
-def test_the_spec_still_says_first_40_stratified_20_and_20(spec_13_4):
-    """The pre-registration in `config/` is checked against §13.4's own sentence."""
+def test_the_spec_STILL_says_first_40_stratified_20_and_20_and_config_carries_RUNG_4s_EXACT_HALF(
+    spec_13_4,
+):
+    """⚠️ **THIS ASSERTION FLIPPED BECAUSE A RULING CHANGED THE BEHAVIOUR, NOT TO GET GREEN.**
+
+    Before rung 4 this test read §13.4's sentence and asserted ``config/`` **equalled** it.
+    The operator fired **rung 4** on 2026-09-04 at 05:27 UTC (`PROCESS.md` §14;
+    `INCIDENTS.md` **INC-144**; `PROTOCOL.md` §3.2), cutting T-FP from 40 to 20, and
+    ``config/`` now carries the reduced sample while `CONTEXT.md` — **outside the fence of
+    every session that has touched this, and rightly so** — still carries the
+    pre-registration.
+
+    ⚠️ **SO THE TEST ASSERTS BOTH HALVES RATHER THAN RELAXING EITHER, AND IT IS STRICTLY
+    STRONGER THAN THE ONE IT REPLACES:**
+
+      1. `CONTEXT.md` §13.4 **still** says first **40**, stratified **20 / 20** — the
+         pre-registration is **not erased by a cut**, it is *recorded against*
+         (`PROCESS.md` §14: *"a cut item is never silently lost"*);
+      2. ``config/`` carries the **exact half** of each of those three figures — not merely
+         "some smaller number", which is what a weakened assertion would have accepted;
+      3. the cut total equals :data:`whetstone_gate.runner.n_rule.TFP_REDUCED`, the figure
+         the codebase already named for this one pre-declared reduction;
+      4. the stratification still **sums** to the count (`PROCESS.md` §9).
+
+    **It fails on the old `config/`** — where the count was 40 and 40 != 20 — and it fails
+    on any future edit that moves `CONTEXT.md`'s pre-registration to match `config/`, which
+    is the failure mode a plain equality check would have hidden.
+    """
     count, airline, retail = _one(
         r"takes the \*\*first (\d+) write-task ids after sorting, stratified (\d+) airline / "
         r"(\d+) retail\.\*\*",
         spec_13_4,
         "T-FP rule",
     )
+    # 1. The PRE-REGISTRATION, untouched.
+    assert (int(count), int(airline), int(retail)) == (40, 20, 20), (
+        "CONTEXT.md S13.4's pre-registered T-FP sentence has MOVED. A cut is recorded "
+        "against the pre-registration; it never rewrites it"
+    )
+
+    # 2-4. The FIRED CUT, in config/.
     protocol = cfg.load("protocol")
-    assert protocol.require("selections.tfp_task_count") == int(count)
-    assert protocol.require("selections.tfp_stratification.airline") == int(airline)
-    assert protocol.require("selections.tfp_stratification.retail") == int(retail)
+    cut_count = protocol.require("selections.tfp_task_count")
+    cut_airline = protocol.require("selections.tfp_stratification.airline")
+    cut_retail = protocol.require("selections.tfp_stratification.retail")
+
+    assert cut_count == int(count) // 2 == 20, (
+        f"config/ says tfp_task_count={cut_count}. Rung 4 halves S13.4's {count} to 20"
+    )
+    assert cut_airline == int(airline) // 2 == 10
+    assert cut_retail == int(retail) // 2 == 10
+    assert cut_count == n_rule.TFP_REDUCED, (
+        "the codebase already names the reduced figure; the cut must equal it"
+    )
+    assert cut_airline + cut_retail == cut_count, "PROCESS.md S9: every partition sums"
 
 
 def test_the_tfp_selection_is_the_first_n_of_the_bytewise_string_sort(enumeration):

@@ -804,18 +804,22 @@ def test_every_work_request_carries_a_razorpay_url_and_says_what_is_authored():
 
 
 # --------------------------------------------------------------------------------------
-# 7. THE T-FP BLOCK — forty ids READ from config, and the refusal.
+# 7. THE T-FP BLOCK — twenty ids READ from config, and the refusal.
+# ⚠️ RUNG 4 FIRED 2026-09-04 (PROCESS.md §14; INCIDENTS.md INC-144; PROTOCOL.md §3.2).
+# The names and the literals below MOVED WITH IT, because a name that says FORTY on a
+# block that holds twenty is a false assertion wearing a passing test's clothes — the
+# same reason test_c18_results' rung-tuple test was renamed rather than quietly re-valued.
 # --------------------------------------------------------------------------------------
 
 
-def test_the_TFP_manifest_reads_FORTY_ids_from_config_stratified_twenty_and_twenty():
+def test_the_TFP_manifest_reads_TWENTY_ids_from_config_stratified_ten_and_ten():
     manifest = manifest_module.load_manifest()
-    assert manifest.task_count == 40, (
-        f"T-FP holds {manifest.task_count} ids. PROCESS.md S14's rung 4 (40 -> 20) is NOT "
+    assert manifest.task_count == 20, (
+        f"T-FP holds {manifest.task_count} ids. PROCESS.md S14's rung 4 (40 -> 20) IS "
         f"FIRED and config/'s selections.tfp_task_count is the authority"
     )
-    assert manifest.declared_count == 40
-    assert manifest.quota_by_domain == {"airline": 20, "retail": 20}
+    assert manifest.declared_count == 20
+    assert manifest.quota_by_domain == {"airline": 10, "retail": 10}
     assert set(manifest.task_ids_by_domain) == {"airline", "retail"}
     # ⚠️ Read, not transcribed: the ids must equal config/'s own list byte for byte.
     from whetstone_gate.tau2 import enumerate as tau2_enum
@@ -823,16 +827,33 @@ def test_the_TFP_manifest_reads_FORTY_ids_from_config_stratified_twenty_and_twen
     assert manifest.task_ids_by_domain == {
         domain: tuple(ids) for domain, ids in tau2_enum.committed_tfp_ids().items()
     }
-    assert manifest.episode_count == 200, "5 configurations x 40 tasks"
+    assert manifest.episode_count == 100, "5 configurations x 20 tasks (rung 4)"
 
 
 def test_the_TFP_episode_keys_qualify_the_task_id_by_its_DOMAIN():
     manifest = manifest_module.load_manifest()
     keys = manifest.keys()
-    assert len(keys) == 200
-    assert len({key.slug for key in keys}) == 200, (
-        "two T-FP episodes share a checkpoint slug. Ids '11', '14' and '15' appear in BOTH "
-        "domains, so a flat id loses information and one episode overwrites the other"
+    assert len(keys) == 100
+    assert len({key.slug for key in keys}) == 100, (
+        "two T-FP episodes share a checkpoint slug. A flat id would lose the domain, and "
+        "one episode would overwrite the other"
+    )
+    # ⚠️⚠️ RUNG 4 REMOVED THIS TEST'S OWN DEMONSTRATION, AND THAT IS RECORDED HERE RATHER
+    # THAN LEFT FOR A READER TO ASSUME OTHERWISE. Before the cut this test's message read
+    # *"Ids '11', '14' and '15' appear in BOTH domains"* — true of the pre-registered FORTY,
+    # where retail's twenty included "11", "13", "14" and "15". The surviving TEN per domain
+    # are airline 11..21 and retail 0,1,100..107, which are DISJOINT. So on the reduced
+    # sample a flat id would NOT collide, and this assertion no longer proves that
+    # qualifying by domain is NECESSARY — only that the keys are in fact unique.
+    # The property is still REQUIRED (the forty remain pre-registered and the block may be
+    # restored), and it is still demonstrated elsewhere: the T-NEG must-not-write lists DO
+    # overlap across domains on id "10". Measured, not asserted, so that a later reader is
+    # told the truth in whichever direction it holds:
+    airline_ids = set(manifest.task_ids_by_domain["airline"])
+    retail_ids = set(manifest.task_ids_by_domain["retail"])
+    assert not (airline_ids & retail_ids), (
+        "the surviving T-FP ids now OVERLAP across domains again. That restores this "
+        "test's original demonstration and this comment must be corrected back"
     )
     assert all(key.block == manifest_module.TFP_BLOCK for key in keys)
     assert {key.arm for key in keys} == set(ARMS)
@@ -843,7 +864,7 @@ def test_the_TFP_block_REFUSES_and_the_refusal_names_both_questions():
     refusal = str(manifest_module.refuse_tfp(manifest))
     assert "Q-154" in refusal and "Q-155" in refusal
     assert "C5" in refusal
-    assert "200 episodes" in refusal
+    assert "100 episodes" in refusal, "5 configurations x 20 tasks, after rung 4"
     for fact in manifest_module.C5_EVIDENCE + manifest_module.SURFACE_EVIDENCE:
         assert fact in refusal
 

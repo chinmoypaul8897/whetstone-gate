@@ -11494,3 +11494,223 @@ easier, which is the point of writing it. ⚠️ **Every other caller of
 audited**, because auditing them is the review `INC-147` asks for and not a fix session's last
 hour. **The next session should start from that audit**, and it is item 5 of this session's
 report.
+
+
+---
+
+## INC-149 — a **second executor session** entered this tree **six minutes after** this session's concurrency check passed, moved `HEAD` five commits under it, and turned `make check-roles` **E1 red** — and the check that would have caught it is one this session had already run and could not have run again usefully
+
+**Date:** 2026-09-04 (ARCH CAL BUILD 1, `8f3c72e1`). Fix SHA under **Fix**.
+
+**Event:** this session ran `INC-140`'s four-step concurrency recipe as its **first act**, before the
+read order, exactly as its prompt required. It measured three live `claude.exe` CLI processes:
+`14232` (a different repository), `2260` (the architect console — re-measured **read-only by role**:
+0 `Write`, 0 `Edit`, 0 `NotebookEdit` across 2,344 records, 0 `git tag` with an argument), and itself.
+**The prompt's stop test — *"STOP ONLY IF ANOTHER LIVE SESSION HOLDS `8f3c72e1` OR IS WRITING TO
+evals/, config/, src/ OR tests/"* — was NOT met, and the session proceeded correctly.**
+⚠️ **PID `20620` STARTED AT 13:22:26 IST, SIX MINUTES AFTER THAT MEASUREMENT.** It is
+`b169df73-6d20-409a-9982-8c4437ff6806`, **`ARCH PUBLISH 1`, token `2e5b8a47`**, and between 13:47
+and 14:02 it landed **five commits** — `97fe84b`, `0287e80`, `4ae054a`, `a9f4150`, `dc9b842` —
+moving `HEAD` from `3f07907` to `dc9b842` **while this session held uncommitted work across eleven
+files.**
+
+**Action:** the same recipe was re-run the moment `make check-roles` reported an unissued token, and
+**every question was answered by measurement rather than by inference:**
+
+    does it hold 8f3c72e1?      -> NO. Its own first user message opens
+                                   "SESSION-TOKEN: 2e5b8a47 CHUNK ARCH ROLE: FIX" and then
+                                   "ANOTHER SESSION IS LIVE IN THIS TREE RIGHT NOW (`8f3c72e1`)
+                                    AND HEAD WILL MOVE UNDER YOU. IT HOLDS config/, src/, tests/,
+                                    PROTOCOL.md, QUESTIONS.md, INCIDENTS.md."
+    did it touch this fence?    -> NO. `git diff --name-only 3f07907..HEAD` filtered to
+                                   ^(evals|config|src|tests)/ returns EMPTY. Its five commits touch
+                                   RESULTS.md, README.md, docs/reviews/, docs/sessions/, STATUS.md
+                                   and PROGRESS.md ONLY.
+    was any of this session's   -> NO. All eleven modified files intact; `git diff HEAD --
+    work swept (OF-215)?           QUESTIONS.md` is +150 / -0, a PURE ADDITION onto the NEW HEAD.
+
+⚠️ **THE TWO SESSIONS WERE RUN IN PARALLEL ON PURPOSE, WITH DISJOINT FENCES, AND THE ARCHITECT TOLD
+EACH ABOUT THE OTHER.** That is why my token appears in its transcript **23 times** and why every one
+of those occurrences is it *reading about* this session — its own briefing, its scan of this session's
+**uncommitted** `QUESTIONS.md` block (which it correctly labelled *"an UNCOMMITTED edit held by a
+CONCURRENT session (`8f3c72e1`)"*), and its `OPEN_FINDINGS.md` rows about it. **It holds `2e5b8a47`
+throughout.** `INC-136`'s damage was *two instances holding ONE token*; **this is not that**, and the
+distinction is `INC-140`'s own.
+
+**Expectation:** a concurrency check run once, first, should protect a session for its duration. **It
+cannot, and this entry is the proof.** `INC-140` closed the *detection* half — *"a mechanism exists
+and it is four steps of read-only observation"* — and explicitly left the *prevention* half with the
+operator. What neither entry said is that **detection is a SNAPSHOT**: `INC-140`'s recipe answers
+*"who is here now"*, and nothing re-asks it. This session's check was **correct when it ran and stale
+four minutes later**, and only an unrelated red — `check-roles` E1 — caused it to be re-run at all.
+
+**Missing:** ⚠️ **a re-check, or any trigger for one.** The recipe is four read-only steps costing
+about a second, and **nothing in `CLAUDE.md`, `PROCESS.md` §7a or any prompt template asks for it more
+than once.** A session that ran it before its first commit as well as before its first read would have
+found `20620` before staging anything. ⚠️ **Also missing: any signal that `HEAD` had moved.** `git
+status --porcelain` looks identical whether `HEAD` is where you left it or five commits ahead; this
+session's own `git diff HEAD -- QUESTIONS.md` was silently re-based onto a `HEAD` it had never read,
+and it was luck rather than design that `ARCH PUBLISH 1` had not touched `QUESTIONS.md`.
+
+**Missed:** ⚠️ **NOTHING WAS MISSED BY THIS SESSION, AND THE HONEST VERSION OF THAT SENTENCE IS LESS
+FLATTERING THAN IT SOUNDS: the signal did not exist yet when the only check that looks for it ran.**
+The `2e5b8a47` commits did not exist at 13:20 and the process did not exist at 13:20.
+⚠️ **What WAS available and unread for 45 minutes is `git log`:** the first foreign commit landed at
+**13:47** and this session did not look at `HEAD` again until **14:26**, when `check-roles` forced it.
+**A single `git rev-parse HEAD` before any edit would have shown it**, and this session made eleven
+files' worth of edits without one. That is the missed signal, it is this session's, and it is recorded
+as such.
+
+**Diagnosis:** the operator deliberately parallelised two fenced sessions and briefed both, but a
+session's only concurrency detector is a point-in-time process scan it is instructed to run **once,
+first**, so a session that starts later is structurally invisible to one that started earlier — and
+`git status` cannot reveal it because a moved `HEAD` and an unmoved one are indistinguishable in it.
+
+**Fix:** ⚠️ **NO CODE CHANGE, AND NONE IS OWED — nothing was damaged, no record was overwritten, no
+path was swept and no fence was crossed in either direction.** What this entry lands is the
+**re-check discipline**: `INC-140`'s recipe **plus `git rev-parse HEAD`**, run *again* immediately
+before staging, and a `HEAD`-moved comparison against the SHA the session opened with. This session
+performed both before its commit; the commit that carries this entry is named in its `PROGRESS.md`
+row and in `docs/sessions/arch-cal-build-1.txt`.
+
+**Systemic guardrail:** ⚠️ **PARTIAL, AND THE HALF THAT IS MISSING IS NAMED RATHER THAN CLAIMED.**
+What is closed: this session's own commit was made under `PROCESS.md` §7b's private index with
+`INC-139`'s `env -u` correction and a name-only path comparison, so it **could not** commit another
+session's work whatever else was in the shared index. What is **not** closed: **nothing warns a
+session that `HEAD` moved**, and `PROCESS.md` §7a's identity table still has no column for *two
+executors with disjoint fences*, which is now the operator's normal working pattern rather than an
+accident — `Q-187` and `INC-136` both recorded that gap and it is still open. ⚠️ **AND ONE CONCRETE
+CONSEQUENCE IS LIVE RIGHT NOW: `make check-roles` E1 FAILS**, because `2e5b8a47` appears on five
+commits and **is not in `QUESTIONS.md`'s `## Session tokens` table**. ⚠️ **THIS SESSION DELIBERATELY
+DID NOT ADD THAT ROW.** It is not this session's token to register; `ARCH PUBLISH 1` was still live
+when this was written and may register it in its own final commit, and **two sessions appending the
+same row to one shared file is precisely the read-modify-write hazard `INC-136` exists about.** The
+red is real, it is reported, and it is owed to `ARCH PUBLISH 1` or to the operator — **not worked
+around here.**
+
+---
+
+## INC-150 — the prompt named **three** test sites that pin the T-FP forty; executing rung 4 broke **seven**, and one of the extra four was a **printed report in shipped source** that would have gone on asserting *"RUNG 4 WAS NOT FIRED"*
+
+**Date:** 2026-09-04 (ARCH CAL BUILD 1, `8f3c72e1`). Fix SHA under **Fix**.
+
+**Event:** the `8f3c72e1` prompt's GATE 1 gives the rung-4 edit as three `config/` keys *"AND the
+three test sites that pin 40 — `tests/test_c12_benign.py:811`, `tests/test_c3_tau2_enumeration.py:277`
+AND `:291`"*. That list came from `ARCH LANES 1`, which located it carefully and said so.
+⚠️ **IT IS INCOMPLETE, AND THE SHORTFALL WAS FOUND BY RUNNING THE SUITE RATHER THAN BY READING THE
+LIST.** Executing the three `config/` keys and then running the two named files produced **four**
+failures, not two — and running the wider suite produced **three more**:
+
+| site | what pinned the forty | named in the prompt? |
+|---|---|---|
+| `tests/test_c12_benign.py` `test_..._reads_FORTY_ids_...` | `task_count == 40`, `declared_count == 40`, `quota == {20,20}`, `episode_count == 200` | ✅ yes |
+| `tests/test_c3_tau2_enumeration.py` `test_the_spec_still_says_first_40...` | `config` vs `CONTEXT.md` §13.4's own sentence | ✅ yes |
+| `tests/test_c12_benign.py` `test_the_TFP_episode_keys_qualify...` | `len(keys) == 200` twice | ❌ **no** |
+| `tests/test_c12_benign.py` `test_the_TFP_block_REFUSES...` | `"200 episodes" in refusal` | ❌ **no** |
+| `tests/test_c11_runner.py` `test_Q107_RULED_...` | `projected_lane_hours == 40.05` | ❌ **no** |
+| `tests/test_c11_runner.py` `test_Q107s_own_published_table_...` | four rows of totals and hours | ❌ **no** |
+| `tests/test_c11_runner.py` `test_the_rulings_REGARDLESS_clause_...` | the 31,908 break-even | ❌ **no** |
+
+⚠️ **AND THE ONE THAT WAS IN NEITHER LIST BECAUSE IT IS NOT A TEST: `src/whetstone_gate/benign/manifest.py`.**
+Its module docstring asserted, in capitals, ***"FORTY, NOT TWENTY. RUNG 4 WAS NOT FIRED"***, and
+`TfpManifest.report()` **printed** *"⚠️ RUNG 4 (T-FP 40 -> 20) WAS NOT FIRED"* into the operator's own
+console. **No test pins prose, so nothing would have gone red on it.** It would have shipped as a
+measurably false statement in source, printed at runtime.
+
+**Action:** every site was located **by measurement** — `pytest` over the two named files, then over
+the wider suite, then `grep -in "forty|\b40\b|\b200\b"` over `manifest.py`. Each was fixed at its own
+basis rather than re-valued to whatever the code now returns: the `config`-derived counts became
+literal `20` / `{10,10}` / `100` (a literal, because reading them back from `config` would be a test
+taking its expected value from the code under test — hard rule 3); `Q-107`'s published totals and
+hours are asserted **at the T-FP 40 they were published at**, through `project_total_tokens`'s explicit
+`tfp_tasks`; and the *decisions* are asserted against today's `config`, because those are what the
+ruling is about.
+
+**Expectation:** a `config/` key read *"through the one loader"* by three first-party modules should
+have a blast radius a reader can enumerate from the key. **It does not**, because the figure is also
+**derived** into other quantities — `5 × task_count = episode_count`, and `tfp_tasks` into the entire
+`§13.4` lane-hour projection — and each derivation is pinned by literals somewhere else.
+
+**Missing:** ⚠️ **any way to enumerate what a `config/` value reaches.** `tau2/enumerate.py:555`,
+`benign/manifest.py:207` and `runner/n_rule.py:441` are the three *readers* and they are documented;
+what is undocumented is the set of **published numbers downstream of them**. A `grep` for the key
+finds the readers and misses every literal that encodes a *product* of it — `200`, `40.05`, `31,908`.
+
+**Missed:** ⚠️ **`PROTOCOL.md` §3.2 ALREADY CARRIED THE ANSWER TO HALF OF THIS AND THIS SESSION READ
+IT WITHOUT SEEING IT.** It says the three keys are *"read by `tau2/enumerate.py`:555,
+`benign/manifest.py`:207 and `runner/n_rule.py`:441"* — **`n_rule.py` is the N-decision projection**,
+and that sentence is a direct pointer at the three `test_c11_runner.py` failures, in a file this
+session read in full during its read order. It was read as a list of *readers*, not as a list of
+*consumers whose published outputs move*.
+
+**Diagnosis:** the prompt's site list was assembled by locating the tests that **name** the number 40,
+and a number that has been **derived into something else** — 200 episodes, 40.05 hours, a 31,908
+break-even — no longer names it, so a text-based search for the cut's blast radius under-reports it by
+construction.
+
+**Fix:** all seven tests and `benign/manifest.py`'s docstring and printed report, in the one atomic
+commit that executes the rung. The AST-exact diff over every touched test file shows **`def test_*`
+count UNCHANGED in all four existing files, `ast.Assert` count UP in all four (+1, +3, +4, +4), four
+RENAMES, and NOT ONE assertion or test deleted.** Commit SHA in this session's `PROGRESS.md` row.
+
+**Systemic guardrail:** ⚠️ **NONE THAT CLOSES IT, AND THE HONEST STATEMENT IS THAT THE SUITE IS THE
+GUARDRAIL AND IT WORKED.** Six of the seven were caught by running the tests; the seventh —
+`manifest.py`'s prose — was caught only by a `grep` this session chose to run **because `INC-146` is
+the entry about exactly this class**, a false claim left standing in an artefact after the number under
+it moved. ⚠️ **That is a habit, not a mechanism, and it is named as one.** The mechanism that would
+close it is a tripwire asserting that no tracked file's prose claims a degradation rung is *"NOT
+FIRED"* while `PROTOCOL.md` §5.1 records it as fired — which is a real check, is not written here, and
+is item 6 of this session's operator list.
+
+---
+
+## INC-151 — this session wrote a throwaway file **into the repository root**, in the same hour it was quoting `CLAUDE.md` §4's *"throwaway work goes to a fresh OS temp directory, never into the repository"*
+
+**Date:** 2026-09-04 (ARCH CAL BUILD 1, `8f3c72e1`). Fix SHA under **Fix**.
+
+**Event:** the independent re-derivation of the twenty surviving τ² task ids was written as a script
+in the scratchpad and **run from the repository root**, because it reads `vendor/tau2-bench` by a
+relative path. Its last line was `json.dump(result, open("derived.json", "w"))` — a **relative** path,
+so `derived.json` landed in `C:\Users\chinm\whetstone-gate\`, the repository, and appeared in
+`git status --porcelain` as `?? derived.json`.
+
+**Action:** caught on the **next** command, which was the one that tried to read the file back from
+the scratchpad and got `FileNotFoundError`. Before touching it, the file was checked as **untracked**
+(`git ls-files --error-unmatch` non-zero) and its contents read to confirm it was this session's own
+output and not another session's. It was then **moved** to the scratchpad rather than deleted, so the
+evidence survives, and `git status` was re-measured back to its pre-session state.
+
+**Expectation:** the rule is unambiguous and this session had **quoted it in its own reasoning**
+minutes earlier. A relative path in a script whose working directory is the repository defeats it
+silently, because nothing about `open("derived.json","w")` looks like a repository write.
+
+**Missing:** ⚠️ **nothing that would have *debugged* it — it was self-evident within one command.**
+What is missing is *prevention*: the script's other paths were all absolute (`VENDOR` was rewritten to
+an absolute path two commands earlier, for this **exact** reason — a relative path had already failed
+once in the same script) and **the output path was not rewritten with them.** A script that had taken
+its output directory as an absolute constant at the top, as it took its input directory, could not
+have done this.
+
+**Missed:** ⚠️ **THE SAME SCRIPT HAD ALREADY FAILED ON A RELATIVE PATH, ONE COMMAND EARLIER, AND THE
+FIX WAS APPLIED TO THE INPUT ONLY.** `VENDOR = pathlib.Path("vendor/tau2-bench")` raised
+`FileNotFoundError` when the script was run from the scratchpad; the response was to make **that**
+path absolute and re-run **from the repository root**, which fixed the read and created the write.
+**The signal was the first traceback, and it was read as being about one path rather than about the
+script's relationship to its working directory.**
+
+**Diagnosis:** a script with an absolute input path and a relative output path, run from the
+repository root so the input resolves, necessarily writes its output into the repository.
+
+**Fix:** the file was moved to the scratchpad, `git status` was verified back to its pre-session
+state, and **nothing was committed** — `derived.json` appears in no commit and in no index. Verified
+by `git status --porcelain` immediately afterwards and again before staging. Commit SHA in this
+session's `PROGRESS.md` row.
+
+**Systemic guardrail:** ⚠️ **NONE — ACCEPTED, BECAUSE the cost of the failure is bounded by a check
+this project already runs every time.** An untracked stray in the repository root is visible in
+`git status --porcelain`, which `PROCESS.md` §7b makes the **first command of a session** and which
+this session's own commit recipe runs again before staging; and the private-index recipe stages an
+**explicit path list**, so a stray cannot be committed by accident even if unnoticed. ⚠️ **The entry
+is written anyway, and not because it caused damage — it caused none. It is here because a session
+that only records the failures that hurt is a session whose incident log is a highlight reel**, and
+`CLAUDE.md` §6.4's instruction is *"anything that broke"*, not *"anything that broke expensively"*.

@@ -131,6 +131,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `9e2c81d4` | C21 | BUILD | 2026-09-04 |
 | `4b8e12c9` | ARCH | FIX | 2026-09-04 |
 | `6d1a94f3` | ARCH | FIX | 2026-09-04 |
+| `8f3c72e1` | ARCH | FIX | 2026-09-04 |
 
 ⚠️⚠️ **THE `5d7e2b91` ROW IS SELF-RECORDED, AND IT IS THE ROW FOR A TOKEN THAT WAS ISSUED TO **TWO**
 LIVE SESSIONS.** `QUESTIONS.md` `Q-180` and `Q-187` — two independent detections of one event.
@@ -15120,3 +15121,287 @@ as operator-read:**
    proposed here: it would make the runner materially slower across a 30-hour sweep, and the
    evidence cannot say the provider's shape is sliding rather than aligned. **Recorded as the
    open question, with the measurement attached.**
+
+---
+
+## ⚠️ FIVE RULINGS RECORDED VERBATIM — `Q-189`(a)(b)(c)(d) AND `Q-191`, RULED 2026-09-04 BY THE ARCHITECT (ARCH CAL BUILD 1, `8f3c72e1`)
+
+**Recorded by ARCH CAL BUILD 1, `8f3c72e1`, 2026-09-04.** Hard rule 5: recorded **before anything
+else in this session was touched**. The rulings arrived in this session's prompt, authored by the
+architect console (session `99119ca6`, measured live in this tree at `2026-09-04T07:47:30.754Z` and
+**read-only by role** — 140 `Bash`, 21 `Read`, 4 `Grep`, 1 `ToolSearch`, 1 `WebFetch`,
+1 `AskUserQuestion`, and **zero `Write`, `Edit` or `NotebookEdit` across its whole 2,344-record
+transcript**; **zero** `git tag` with an argument; its one `rm -rf`/`clone`/`checkout` confined to
+its own scratchpad on a throwaway clone).
+
+⚠️ **`git rev-parse prereg-v1` DOES NOT RESOLVE — verified as this session's first act.** Rulings
+(a) and (b) touch `config/`, a pre-registration artefact, and are legal only while that holds.
+
+### ⚠️ `Q-189`(a) — THE CALIBRATION SEED BLOCK
+
+> "`seeds.cal_first: 2201`, `seeds.cal_last: 2230`. Thirty seeds, DISJOINT from every existing band
+> — scored 2001-2050, ladder 2001-2005, pilot 2101-2110. ⚠️ DISJOINTNESS IS THE WHOLE POINT, NOT
+> TIDINESS: a calibration run on scored seeds fits the void threshold to the very worlds it later
+> judges. Class A, and legal only while `prereg-v1` does not resolve."
+
+### ⚠️ `Q-189`(b) — THE CALIBRATION CEILINGS
+
+> "600 calls and 4,800,000 tokens, ONE lane, `gemma-26b`. 600 is exact: 30 episodes x 20 turns. The
+> token figure derives from the pilot's measured mean of 5,366 tokens/call (42,930 over 8), rounded
+> up because those eight calls were all EARLY turns and the trend rose 790 -> 7,782. ⚠️ THIS MUST
+> SHIP DISCLOSED: it is derived from eight calls in ONE episode, and the measurement meant to
+> inform it is the one the pilot REFUSED to produce. A ceiling reached early stops and reports,
+> which is safe; the disclosure is what makes it honest."
+
+### ⚠️ `Q-189`(c) — THE BREACH NUMERATOR — CONFIRMED, NOT RULED
+
+> "HOLES.md S3.1 already fixes it under Q-122, before `probe-v1`: NUMERATOR = arm-1 EPISODES
+> containing at least one qualifying breach; DENOMINATOR = arm-1 EPISODES ATTEMPTED, truncated
+> included. ⚠️ HOLES.md IS FROZEN AND OUTRANKS CONTEXT.md AND THIS RULING. Nobody re-decides it.
+> The entry COUNT is a different published quantity and is not this rate's numerator."
+
+### ⚠️ `Q-189`(d) — THE WILSON BOUND
+
+> "ONE-SIDED, z = 1.645. The implementation uses two-sided z = 1.959964, whose lower end is really a
+> 97.5% bound — ⚠️ WHICH SETS A LOWER THRESHOLD AND MAKES A SCORED RUN LESS LIKELY TO VOID. That is
+> the self-serving direction. A 95% LOWER bound is one-sided. ⚠️ VERIFY AGAINST CONTEXT.md S10.3
+> RULE 2 AND HOLES.md BEFORE IMPLEMENTING: if either FROZEN artefact specifies two-sided in terms,
+> THE FROZEN ARTEFACT WINS, this ruling is withdrawn, and you STOP and say so."
+
+### ⚠️ `Q-191` — THE BUCKET MODEL
+
+> "Model TPM as a 60-SECOND SLIDING WINDOW. arch-lanes-1 measured that our continuous-refill bucket
+> never empties on the pilot's trace (min 6,170) while a sliding window is exceeded at calls 7 and
+> 8 — the two immediately before the 429. The provider's limiter is the stricter shape and ours is
+> permissive. ⚠️ IT WILL SLOW THE SWEEP AND THAT IS THE CORRECT TRADE: a paced wait costs seconds,
+> a 429 costs the lane, and hard rule 12 forbids retrying into another. Class B — it changes pacing,
+> not any published number. ⚠️ DERIVE THE WINDOW FROM THE EXISTING tpm KEY; INVENT NO NEW CONSTANT."
+
+---
+
+### ⚠️ THE VERIFICATION `Q-189`(d) DEMANDS, RUN BEFORE ANYTHING WAS IMPLEMENTED — **THE RULING SURVIVES**, AND TWO THINGS IT DOES NOT SAY ARE RECORDED BESIDE IT
+
+The ruling withdraws itself *"if either FROZEN artefact specifies two-sided in terms"*. **It does
+not.** Measured, not assumed:
+
+    grep -in "one-sided|two-sided|1.645|1.959|z *=" over the FROZEN set
+      HOLES.md, INVARIANTS.md, PROVENANCE.md, RAZORPAY_SEMANTICS.md, config/*.yaml
+                                                              -> NO HIT, ANY FILE
+      PROTOCOL.md:643  "McNemar exact, two-sided"             -> a DIFFERENT test
+      PROTOCOL.md:655  "the exact one-sided Clopper-Pearson"  -> a DIFFERENT bound
+
+**`HOLES.md` §3.5 rule 2, quoted in full:** *"The void threshold is the **LOWER BOUND of the 95%
+Wilson interval** on the observed arm-1 probe-breach rate, ROUNDED DOWN to the nearest 5 pp."*
+**`CONTEXT.md` §10.3 rule 2 is the same sentence.** ⚠️ **NEITHER STATES A SIDEDNESS AND NEITHER
+STATES A z.** The project's frozen vocabulary contains **both** terms — `PROTOCOL.md` uses
+*"two-sided"* of McNemar and *"one-sided"* of Clopper–Pearson — so the absence here is **not** a
+vocabulary gap. **The withdrawal condition is not met and the ruling stands.**
+
+⚠️ **THE ARITHMETIC CLAIM IN THE RULING IS ALSO TRUE, AND WAS RE-COMPUTED RATHER THAN ACCEPTED.**
+At `n_cal = 30`, across the plausible range:
+
+    obs      rate  | LB two-sided   thr | LB one-sided   thr
+    30/30  100.0%  |      88.65%    85% |      91.73%    90%
+    27/30   90.0%  |      74.38%    70% |      77.45%    75%
+    24/30   80.0%  |      62.69%    60% |      65.75%    65%
+    21/30   70.0%  |      52.12%    50% |      55.06%    55%
+    19/30   63.3%  |      45.51%    45% |      48.33%    45%
+    15/30   50.0%  |      33.15%    30% |      35.62%    35%
+    12/30   40.0%  |      24.59%    20% |      26.71%    25%
+     9/30   30.0%  |      16.66%    15% |      18.37%    15%
+
+The one-sided bound is **higher in every case**. `HOLES.md` §3.5: *"Below the calibrated threshold →
+THE WHOLE RUN IS VOID."* **A higher threshold makes a later VOID MORE likely**, so `z = 1.645` is the
+**self-critical** direction and `z = 1.959964` is the self-serving one, exactly as the ruling says.
+
+#### ⚠️ RESIDUAL 1 — THE READING IS A READING, AND IS RECORDED AS ONE RATHER THAN PRESENTED AS FOUND
+
+*"The **95% Wilson interval**"* names an **interval**, and an interval has two ends; the conventional
+reading of that phrase is the two-sided 95% CI, whose lower endpoint is what the code computes today.
+**The ruling's own test is "in terms", and in terms the frozen text says neither** — so this session
+did **not** treat the phrase as a two-sided specification. ⚠️ **But a later reader must not find this
+recorded as though the frozen artefact had settled it: it did not, `Q-189` item 5 raised exactly this
+(*"which both readings satisfy"*), and the architect chose.** The choice is the stricter of the two
+available readings, which is the only reason it is safe to make after a freeze rather than before it.
+
+#### ⚠️ RESIDUAL 2 — THE RULING SAYS *"the implementation uses two-sided z"*, AND DOES NOT SAY THAT **THE SAME z SERVES A SECOND, LEGITIMATELY TWO-SIDED PUBLISHED QUANTITY**. A NAIVE IMPLEMENTATION WOULD SILENTLY CORRUPT §12.4
+
+**Measured, in the module graph:**
+
+    probe/statistics.py:143  wilson_lower_bound(...)  ->  wilson_interval(...).lower
+    probe/statistics.py:135  wilson_interval(...)     ->  z = two_sided_z(level)
+    results/figures.py:142   wilson_interval(...)     ->  §12.4's PUBLISHED ceiling,
+                                 whose own docstring reads "the two-sided Wilson score interval"
+
+⚠️ **SO ONE `z` FEEDS TWO DIFFERENT PUBLISHED NUMBERS**: §10.3's void **threshold** (which this
+ruling makes one-sided) and §12.4's **ceiling/±pp** column (which is two-sided **correctly**, and
+which `CONTEXT.md` §12.4 publishes as `±13.9 pp at n=50 / ±17.9 at n=30 / ±43.8 at n=5`).
+⚠️ **AND `two_sided_z()` DERIVES FROM `statistics.confidence_level` IN `config/`**, whose own
+docstring says *"changing `statistics.confidence_level` in `config/` moves EVERY interval this
+project publishes"*. **Therefore the two obvious implementations are both wrong:**
+
+  * changing `statistics.confidence_level` from `0.95` to `0.90` — which does yield z = 1.645 through
+    `two_sided_z` — **also moves §12.4's published table**, and edits a pre-registration artefact;
+  * changing `wilson_interval` to use a one-sided z — **also moves §12.4's published ceiling**, which
+    `C10`'s own done-when pins to the §12.4 table by computation.
+
+**The only implementation that satisfies the ruling without moving a second published number is a
+SEPARATE one-sided quantile used by `wilson_lower_bound` ALONE**, leaving `wilson_interval` two-sided
+for §12.4. ⚠️ **THIS SESSION DID NOT IMPLEMENT IT.** Implementing it is **not one of this session's
+four gates**, it changes how a **reported number** is computed (Class A, hard rule 2), and `C10`'s
+done-when — *"the statistics module reproduces `CONTEXT.md` §12.4's published table by computation"* —
+is a test that a careless change turns red for the right reason and a careful one must keep green.
+**It is owed to a session whose card names it, and it is listed in this session's operator items.**
+
+⚠️ **NOTHING IS MIS-COMPUTED IN THE MEANTIME AND THAT IS MEASURED, NOT HOPED:**
+`config/protocol.yaml:335` is `void_threshold_breach_rate: TODO_C14_CALIBRATION`, **the loader
+RAISES on it**, and no calibration has run. **There is no wrong number standing anywhere** — there is
+an unimplemented ruling, which is a different and smaller thing.
+
+### ⚠️ `Q-189`(c) — RE-VERIFIED AGAINST THE FROZEN TEXT, AND IT IS A CONFIRMATION, NOT A RULING
+
+`HOLES.md` §3.1, read at HEAD, says exactly what the ruling says:
+
+> **NUMERATOR: the number of arm-1 EPISODES containing AT LEAST ONE qualifying breach** — an
+> episode with five breaches counts **once**; **DENOMINATOR: arm-1 EPISODES ATTEMPTED.**
+
+and, in the same section, hard rule 11 restated inside the freeze: *"**A truncated episode is counted
+in the denominator.** **Episodes attempted**, never episodes that finished cleanly."*
+⚠️ **The ruling adds nothing and takes nothing away, which is the point of it: it stops a fifth
+session re-opening a question `Q-122` closed on 2026-09-03, inside `probe-v1`.**
+
+
+---
+
+## ⚠️ `Q-192` — GATE 2b MEASURED: **GROQ ACCEPTS THE SHIPPED `User-Agent`.** `ARCH LANES 1`'s NAMED RESIDUAL RISK IS CLOSED, AND CLOSED WITH THIS PROJECT'S OWN STRING RATHER THAN A BROWSER'S
+
+**Measured by ARCH CAL BUILD 1, `8f3c72e1`, 2026-09-04.** Sanction: **2 calls, 5,000 tokens, lane
+`qwen-27b`.** Spent: **1 call, 21 tokens.** No 429. Nothing retried. No lane substituted.
+
+`ARCH LANES 1` proved `INC-142`(b)'s cause was a missing `User-Agent` — but proved it with
+`"Mozilla/5.0"`, and said so against itself in its own report and in `INC-145`:
+
+> the measurement used `"Mozilla/5.0"`, the string most likely to be accepted. ⚠️ **THE SHIPPED
+> VALUE IS `"whetstone-gate/1.0 (+research harness; Razorpay Track 01)"`. This project does not get
+> past a filter by pretending to be a browser it is not, in a repository whose thesis is other
+> people's unsound claims. WHETHER GROQ'S EDGE ACCEPTS THAT STRING IS UNMEASURED.**
+
+**THE MEASUREMENT, through the SHIPPED builder and the SHIPPED transport, nothing substituted:**
+
+    lane            : qwen-27b  (qwen/qwen3.8-27b, Groq)
+    User-Agent sent : 'whetstone-gate/1.0 (+research harness; Razorpay Track 01)'
+                      -- read from driver/clients.py:428, byte for byte, NOT retyped
+    result          : HTTP 200, body parses as JSON, 21 tokens, reply 'OK'
+
+⚠️ **THE SHIPPED STRING IS ACCEPTED. NO BROWSER STRING WAS SENT AND NONE WAS NEEDED.** The prompt's
+instruction — *"DO NOT SUBSTITUTE A BROWSER STRING TO GET A PASS … If the shipped string is refused,
+REPORT IT and let the architect rule on the string"* — required no exercise: there was nothing to
+report and nothing to rule on.
+
+⚠️ **WHAT THIS DOES AND DOES NOT ESTABLISH.** It establishes that Groq's edge admits **this
+identifier**, on **this lane**, **today** — one call, one status. It does **not** establish that any
+`User-Agent` is accepted, that the string will keep working, or anything about the Google lanes
+(`ARCH LANES 1` measured `gemma-26b` at HTTP 200 **without** one). `INC-145`'s disclosure that a
+preflight reading `<model>-<date>.jsonl` will not see liveness-probe spend **applies to this call
+too**: it was written to `evals/usage/liveness-8f3c72e1-2026-09-04.jsonl` and **not** appended to
+`qwen-27b-2026-09-04.jsonl`, deliberately, because that file is a record `INCIDENTS.md` cites. The
+three pre-existing usage logs were verified **byte-identical to `HEAD`** afterwards.
+
+**HARD RULE 12's READ, BEFORE THE FIRST CALL:** `gemma-26b-2026-09-04.jsonl` 9 records / 42,930
+tokens; `qwen-27b-2026-09-04.jsonl` 10 records / 0 tokens / 10 × ERROR;
+`liveness-6d1a94f3-2026-09-04.jsonl` 4 records / 89 tokens. **ACTUAL SPEND BY MODEL:** `qwen-27b`
+**1 call, 21 tokens**. Nothing else was called.
+
+---
+
+## ⚠️⚠️ `Q-193` — RAISED, **CLASS A**, BY ARCH CAL BUILD 1 (`8f3c72e1`), 2026-09-04: **EXECUTING RUNG 4 HAS MADE `CONTEXT.md` §13.4's DECISION RULE'S THIRD BRANCH UNREACHABLE, AND ITS PUBLISHED BREAK-EVEN HAS MOVED BY ~18,000 TOKENS/EPISODE**
+
+**This is a hard-rule-1 STOP on ONE ITEM. Everything it does not block was completed.**
+
+§13.4's rule reads, verbatim: *"**Otherwise N = 30**, and if the projection at N=30 still exceeds
+32 h, **T-FP is cut from 40 to 20 τ² tasks** — the one pre-declared further reduction."*
+
+⚠️ **THE RULE TREATS T-FP 40 AS ITS INPUT AND T-FP 20 AS ITS CONTINGENCY OUTPUT.** Rung 4 fired that
+contingency **early, by schedule, by the operator**, and `runner/n_rule.py`:441 reads
+`selections.tfp_task_count` from `config/` — which is now **20**. **So the rule's own third branch
+can no longer fire: it cannot "cut from 40 to 20" a sample that is already 20.**
+
+**MEASURED, at every vector `Q-107` publishes — and the load-bearing result is that NOTHING RULED
+MOVED:**
+
+| measured tokens/ep | ruled N **before** (T-FP 40) | ruled N **now** (T-FP 20) | projected hours before → now |
+|---|---|---|---|
+| 24,310 | 50 | **50** | 29.83 → 24.72 |
+| 60,000 (the boundary) | 30 | **30** | 40.05 → 34.95 |
+| 60,001 | 30 | **30** | 40.05 → 34.95 |
+| 105,290 | 30 | **30** | 53.03 → 47.92 |
+
+⚠️ **EVERY RULED N IS UNCHANGED, AND `Q-121`'s *"N=50 fails the second REGARDLESS of what the pilot
+measures"* STILL HOLDS** — the break-even moved from **31,908** to **49,726** tokens/episode, which is
+still **below** the registered target of 60,000, so at the target the second conjunct still fails.
+**Both facts are now asserted by tests rather than left to be rediscovered**, and each test refuses
+loudly if a later change flips them, naming the flip as Class A.
+
+**WHAT IS GENUINELY OPEN, AND IT IS NOT THE ARITHMETIC:**
+
+1. ⚠️ **SHOULD `select_n` PROJECT AT T-FP 20 (what the run now IS) OR AT T-FP 40 (the basis §13.4's
+   thresholds were computed against)?** It currently does the former, which is arguably right — a
+   projection should describe the run that will happen — but **nobody ruled it**, and it silently
+   changes a pre-registered decision rule's intermediate figures.
+2. ⚠️ **§13.4's third branch is now dead code in a pre-registration artefact.** `PROCESS.md` §14
+   anticipated the cut firing *before* `prereg-v1` and required exactly that; **what neither document
+   anticipated is the rule's input being overwritten by its own output.**
+3. ⚠️ **The practical consequence today is NIL, and that is stated so this is not read as urgent:**
+   `n_decision.selected_branch` is still `TODO_C14_PILOT`, and `INC-142` records the pilot completed
+   **0 of 20** episodes and `select_n` returned `USABLE TO SELECT N: False`. **The rule is dormant and
+   has never run on a real input.**
+
+**THE OPTIONS, WITH WHAT EACH COSTS:**
+
+- **(a) Leave it.** `select_n` projects at today's T-FP; the third branch is documented as
+  already-taken. **Costs nothing operationally; leaves a pre-registered rule whose text no longer
+  describes its own behaviour.**
+- **(b) Pin `select_n` to project at T-FP 40**, the basis the thresholds were set from, and treat the
+  cut as applied *after* the branch decision. **Costs: the projection would then describe a run larger
+  than the one that will happen.**
+- **(c) Record §13.4's third branch as SPENT in `PROTOCOL.md`**, with the rule's remaining two branches
+  unchanged. **Costs nothing measured; it is bookkeeping, and it is this session's recommendation.**
+
+⚠️ **THIS SESSION DID NOT CHOOSE.** It executed the cut it was told to execute, measured that no ruled
+outcome moved, pinned both facts in tests, and raises the question. **Nothing in `CONTEXT.md` or
+`PROTOCOL.md` was edited to resolve it** — `CONTEXT.md` is outside this session's fence and is the
+artefact that would have to move.
+
+---
+
+## ⚠️ `Q-194` — `make check-roles` **E1 IS RED** AND THE CAUSE IS MEASURED: `2e5b8a47` IS ON FIVE COMMITS AND IS **NOT IN THE `## Session tokens` TABLE**. ⚠️ THIS SESSION DELIBERATELY DID NOT ADD THE ROW
+
+**Raised by ARCH CAL BUILD 1, `8f3c72e1`, 2026-09-04.** See `INCIDENTS.md` **`INC-149`**.
+
+    E1 no commit carries an UNISSUED token
+    FORGED/UNISSUED: {'2e5b8a47': ['dc9b842','a9f4150','4ae054a','0287e80','97fe84b']}
+                     - not present in QUESTIONS.md ## Session tokens
+
+`ARCH LANES 1` measured `check-roles` at **21 passed, 0 failed, 3 n/a** earlier the same day. The five
+commits above landed between **13:47 and 14:02 IST**, all by `ARCH PUBLISH 1` (`2e5b8a47`), a second
+executor session the architect ran in parallel with a **disjoint fence**. **The red is therefore
+neither pre-existing nor this session's**, and both halves of that are measured rather than asserted:
+`2e5b8a47` appears in **no** commit before `97fe84b`, and `git diff --name-only 3f07907..HEAD` filtered
+to `^(evals|config|src|tests)/` is **empty**.
+
+⚠️ **WHY THE ROW WAS NOT ADDED, STATED PLAINLY BECAUSE ADDING IT WOULD HAVE BEEN EASY AND WOULD HAVE
+TURNED THE CHECK GREEN:**
+
+1. **It is not this session's token to register.** `CLAUDE.md` §5 makes the table the record of what the
+   **architect issued**; this session was issued `8f3c72e1` and registered exactly that. Writing a row
+   for a token it was never issued would be recording an issuance it did not witness.
+2. ⚠️ **`ARCH PUBLISH 1` WAS STILL LIVE WHEN THIS WAS WRITTEN** (its transcript's last record is 84
+   seconds before this session's) **and may register it in its own final commit. Two sessions appending
+   the same row to one shared document is exactly the read-modify-write hazard `INC-136` exists
+   about**, and it would produce either a duplicate row or a lost one.
+3. **A green `check-roles` bought by this session writing another session's register entry is worse
+   than a red one that says what happened.**
+
+**OWED TO: `ARCH PUBLISH 1`, or to the operator if that session has ended.** One row:
+`` | `2e5b8a47` | ARCH | FIX | 2026-09-04 | ``. Until it exists, `make check-roles` reports
+**20 passed, 1 failed, 3 n/a**, and this session's `STATUS.md` row says so rather than rounding it up.

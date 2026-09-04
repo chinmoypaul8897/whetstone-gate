@@ -537,6 +537,50 @@ class _ReplayClient:
         raise AssertionError("this replay drives the attacker path only")
 
 
+class _ReplayWallClock:
+    """A monotonic clock for replaying the pilot's real call times that **advances when the
+    pacer sleeps**.
+
+    ⚠️⚠️ **THIS SCAFFOLD REPLACED ONE THAT COULD NOT MODEL A WAIT, AND `Q-191` IS WHY.**
+    The three pacer replays below were written as::
+
+        moments = iter([t for t, _n in calls])
+        clock=lambda: next(moments),
+        sleep=lambda _seconds: None,
+
+    — **exactly one clock reading per call, and a sleep that does not move time.** That was
+    faithful only because the **continuous-refill** TPM bucket never made the pacer wait on
+    this trace: `Q-191` measured *"calls delayed by the pacer, either way: 0"*.
+
+    ⚠️ **`Q-191` (RULED 2026-09-04) MADE TPM A 60-SECOND SLIDING WINDOW, WHICH REFUSES CALL 7
+    OF THIS VERY TRACE.** :meth:`whetstone_gate.driver.run._PacedClient._pace` is a
+    ``while True`` loop — it sleeps and **reads the clock again** — so the old scaffold raised
+    ``StopIteration`` on its exhausted iterator.
+
+    ⚠️ **THE SCAFFOLD WAS WRONG, NOT THE PACER, AND THE DISTINCTION MATTERS: a `sleep` that
+    does not advance a clock models a runner that can never wait**, which is precisely the
+    behaviour the ruling introduced. This clock does what a real one does — each call arrives
+    at its recorded wall time, and time moves forward by exactly what is slept. It also
+    **records the sleeps**, so the ruling's own predicted cost ("it will slow the sweep") is
+    measurable rather than asserted.
+    """
+
+    def __init__(self) -> None:
+        self.now = 0.0
+        self.slept: list[float] = []
+
+    def arrive(self, at: float) -> None:
+        """The episode reaches this call at its recorded wall time — or later, if it waited."""
+        self.now = max(self.now, at)
+
+    def clock(self) -> float:
+        return self.now
+
+    def sleep(self, seconds: float) -> None:
+        self.slept.append(seconds)
+        self.now += seconds
+
+
 def test_the_PACER_CHARGES_THE_BUCKET_AT_LEAST_WHAT_THE_CALL_ACTUALLY_COST(repo_root):
     """⚠️⚠️ **`INC-143`, AS AN ASSERTION. THIS IS THE TEST THAT WAS MISSING.**
 
@@ -568,17 +612,18 @@ def test_the_PACER_CHARGES_THE_BUCKET_AT_LEAST_WHAT_THE_CALL_ACTUALLY_COST(repo_
             name="gemma-26b", rpm=30, tpm=16_000, rpd=14_400, tpd=None
         )
     )
-    moments = iter([t for t, _n in calls])
+    wall = _ReplayWallClock()
     paced = driver_run._PacedClient(
         inner=_ReplayClient([n for _t, n in calls]),
         attacker_buckets=buckets,
         judge_buckets=buckets,
         attacker_reservation=reservation,
         judge_reservation=reservation,
-        clock=lambda: next(moments),
-        sleep=lambda _seconds: None,
+        clock=wall.clock,
+        sleep=wall.sleep,
     )
-    for _ in calls:
+    for _at, _n in calls:
+        wall.arrive(_at)
         paced.complete_attacker(messages=_MESSAGES, temperature=0.7, lane="gemma-26b")
 
     charged = sum(buckets.taken) + sum(buckets.settled)
@@ -601,17 +646,18 @@ def test_the_pacer_charges_AT_LEAST_the_actual_cost_ON_EVERY_SINGLE_CALL(repo_ro
             name="gemma-26b", rpm=30, tpm=16_000, rpd=14_400, tpd=None
         )
     )
-    moments = iter([t for t, _n in calls])
+    wall = _ReplayWallClock()
     paced = driver_run._PacedClient(
         inner=_ReplayClient([n for _t, n in calls]),
         attacker_buckets=buckets,
         judge_buckets=buckets,
         attacker_reservation=reservation,
         judge_reservation=reservation,
-        clock=lambda: next(moments),
-        sleep=lambda _seconds: None,
+        clock=wall.clock,
+        sleep=wall.sleep,
     )
-    for _ in calls:
+    for _at, _n in calls:
+        wall.arrive(_at)
         paced.complete_attacker(messages=_MESSAGES, temperature=0.7, lane="gemma-26b")
 
     per_call = [t + s for t, s in zip(buckets.taken, buckets.settled)]
@@ -633,17 +679,18 @@ def test_the_top_up_introduces_NO_NEW_SPEC_VALUE(repo_root):
             name="gemma-26b", rpm=30, tpm=16_000, rpd=14_400, tpd=None
         )
     )
-    moments = iter([t for t, _n in calls])
+    wall = _ReplayWallClock()
     paced = driver_run._PacedClient(
         inner=_ReplayClient([n for _t, n in calls]),
         attacker_buckets=buckets,
         judge_buckets=buckets,
         attacker_reservation=reservation,
         judge_reservation=reservation,
-        clock=lambda: next(moments),
-        sleep=lambda _seconds: None,
+        clock=wall.clock,
+        sleep=wall.sleep,
     )
-    for _ in calls:
+    for _at, _n in calls:
+        wall.arrive(_at)
         paced.complete_attacker(messages=_MESSAGES, temperature=0.7, lane="gemma-26b")
 
     assert set(buckets.taken) == {reservation}
@@ -684,16 +731,57 @@ def test_a_settle_TOP_UP_MAY_DRIVE_A_BUCKET_NEGATIVE_because_the_tokens_ARE_ALRE
     )
 
 
-def test_a_negative_bucket_STILL_REFILLS_and_the_debt_is_PAID_OFF_BY_TIME():
-    """The debt is not permanent damage: it is a delay, and it clears at the published rate."""
+def test_a_negative_TPM_WINDOW_clears_its_debt_BY_EXPIRY_and_NOT_by_a_linear_refill():
+    """⚠️⚠️ **THIS ASSERTION FLIPPED BECAUSE `Q-191` CHANGED THE BEHAVIOUR IT PINS — NOT TO
+    GET GREEN. RULED 2026-09-04, Class B: it changes PACING, not any published number.**
+
+    **What it said before, verbatim, and it was true of the code at the time:**
+
+        The debt is not permanent damage: it is a delay, and it clears at the published rate.
+            buckets.take(tokens=16_000, now=0.0)
+            buckets.settle(extra_tokens=8_000, now=0.0)
+            assert buckets.tpm.available == pytest.approx(-8_000.0)
+            assert buckets.wait_seconds(tokens=0, now=30.0) == 0.0     # <-- HALF A MINUTE
+            assert buckets.tpm.available == pytest.approx(0.0)         # <-- 8,000 REFILLED
+
+    A **continuously-refilling** :class:`~whetstone_gate.runner.buckets.Bucket` pays a debt
+    down smoothly, so at ``t=30`` — half of a 60 s window — exactly half of a 16,000 capacity
+    had been credited back and the 8,000 debt was cleared.
+
+    ⚠️ **A 60-SECOND SLIDING WINDOW DOES NOT REFILL AT ALL. IT EXPIRES.** The 24,000 units
+    recorded at ``t=0`` are still wholly inside the window at ``t=30`` — they leave it, all at
+    once, at ``t=60``. **The debt clears in a STEP, not on a ramp**, and the wait is longer
+    everywhere in between. That is the entire behavioural difference, and it is the reason the
+    ruling says in capitals *"IT WILL SLOW THE SWEEP AND THAT IS THE CORRECT TRADE."*
+
+    ⚠️ **THE FLIP IS PROVABLY MEANINGFUL (hard rule 6): every assertion below FAILS on the
+    continuous bucket** — ``t=30`` is asserted to still be blocked where the old code
+    admitted, and ``t=60`` to be clear. **Nothing was loosened: the test now pins the debt's
+    clearing INSTANT exactly, where before it pinned a single midpoint.**
+    """
     buckets = runner_buckets.Buckets.for_lane(
         name="gemma-26b", rpm=30, tpm=16_000, rpd=14_400, tpd=None
     )
     buckets.take(tokens=16_000, now=0.0)
     buckets.settle(extra_tokens=8_000, now=0.0)
-    assert buckets.tpm.available == pytest.approx(-8_000.0)
-    assert buckets.wait_seconds(tokens=0, now=30.0) == 0.0
-    assert buckets.tpm.available == pytest.approx(0.0)
+    assert buckets.tpm.available == pytest.approx(-8_000.0), "the debt is recorded, as before"
+
+    # ⚠️ HALFWAY THROUGH THE WINDOW NOTHING HAS EXPIRED. The old bucket was clear here.
+    assert buckets.wait_seconds(tokens=0, now=30.0) > 0.0, (
+        "a sliding window does not refill; the t=0 events are still inside it at t=30"
+    )
+    assert buckets.tpm.available == pytest.approx(-8_000.0), "still -8,000, not 0"
+    assert buckets.wait_seconds(tokens=0, now=30.0) == pytest.approx(30.0), (
+        "the wait is until the events EXPIRE at t=60, i.e. 30 more seconds"
+    )
+
+    # ⚠️ AND AT THE WINDOW'S EDGE THE WHOLE DEBT CLEARS AT ONCE.
+    assert buckets.wait_seconds(tokens=0, now=60.0) == 0.0
+    assert buckets.tpm.available == pytest.approx(16_000.0), (
+        "at t=60 every t=0 event has left the window, so the FULL capacity is back — not "
+        "the 0.0 a linear refill from -8,000 would have reached"
+    )
+    assert buckets.wait_seconds(tokens=16_000, now=60.0) == 0.0, "a full call fits again"
 
 
 def test_the_PACERS_DOCSTRING_NO_LONGER_MAKES_THE_CLAIM_THAT_WAS_MEASURED_FALSE():

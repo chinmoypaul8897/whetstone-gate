@@ -289,6 +289,23 @@ seeds:
   ladder_last: 2005
   pilot_first: 2101
   pilot_last: 2110
+  # ── THE ARM-1 CALIBRATION BLOCK (CONTEXT.md §10.3, HOLES.md §3.5) ────────────
+  # ⚠️ RULED BY THE ARCHITECT 2026-09-04 — QUESTIONS.md Q-189(a), Class A, and legal
+  # only while `prereg-v1` does not resolve. Raised by ARCH PILOT RUN 5 as BLOCKER 2:
+  # "there is no cal_first, no cal_last, and `grep -i cal` over the seeds block returns
+  # nothing", while PROCESS.md §6b requires the run declaration to NAME the seed block.
+  #
+  # ⚠️ THIRTY SEEDS, DISJOINT FROM EVERY EXISTING BAND — scored 2001-2050, ladder
+  # 2001-2005, pilot 2101-2110. DISJOINTNESS IS THE WHOLE POINT, NOT TIDINESS: a
+  # calibration run on scored seeds fits the void threshold to the very worlds it later
+  # judges, which is the shape PROTOCOL.md §2.2 already forbids for the pilot in its own
+  # words. The threshold decides whether the scored run is PUBLISHABLE AT ALL, so the
+  # objection applies here with more force than it does to the pilot.
+  #
+  # The count is 30 and it MUST equal probe.n_cal (CONTEXT.md §10.3 rule 1, HOLES.md
+  # §3.5 rule 1). driver/cal.py refuses if the two ever disagree rather than trusting it.
+  cal_first: 2201
+  cal_last: 2230
 
 # ── The defender-integrity probe ──────────────────────────────────────────────
 probe:
@@ -417,9 +434,16 @@ selections:
   # NAMED in PROTOCOL.md — no silent truncation.
   agentdojo_injection_task: InjectionTask6
   agentdojo_user_task_count: 16
-  # T-FP: the first 40 write-task ids after sorting, stratified 20 airline / 20 retail.
-  tfp_task_count: 40
-  tfp_stratification: { airline: 20, retail: 20 }
+  # T-FP: the first 40 write-task ids after sorting, stratified 20 airline / 20 retail
+  # (CONTEXT.md §13.4). ⚠️ DEGRADATION RUNG 4 FIRED 2026-09-04 05:27 UTC by the OPERATOR,
+  # on SCHEDULE — PROCESS.md §14, INCIDENTS.md INC-144, PROTOCOL.md §3.2 — and the sample
+  # below is the SAME RULE AT K=20: the first 10 per domain under the same bytewise sort,
+  # an EXACT PREFIX of the pre-registered 40, which remain printed in PROTOCOL.md §3.2
+  # because a pre-registration is not erased by a cut, it is recorded against.
+  # ⚠️ NOT fired by CONTEXT.md §13.4's decision rule — that rule reads the pilot's measured
+  # tokens/episode and INC-142 records the pilot completed 0 of 20 and refused to select N.
+  tfp_task_count: 20
+  tfp_stratification: { airline: 10, retail: 10 }
   tau2_must_not_write_task_count: 34
   tau2_write_task_count: 130
 
@@ -457,9 +481,18 @@ selections:
 
   # T-FP: the first 40 write-task ids after sorting, stratified 20 airline /
   # 20 retail (CONTEXT.md §13.4). The complement of the set above is 130 write
-  # tasks — 26 airline, 104 retail — and these are its first 20 of each.
+  # tasks — 26 airline, 104 retail — and these were its first 20 of each.
+  # ⚠️ RUNG 4 (2026-09-04): CUT TO THE FIRST 10 PER DOMAIN. Same rule, same
+  # bytewise-ascending string sort, smaller K. Each list below is an EXACT PREFIX
+  # of its domain's pre-registered twenty, so NOTHING ENTERS THE SAMPLE THAT WAS
+  # NOT ALREADY IN IT — a reduction, not a re-registration.
+  # THE TWENTY DROPPED, NAMED (PROCESS.md §14: "a cut item is never silently lost"):
+  #   airline NOT RUN: 22 23 24 25 29 30 32 33 35 37
+  #   retail  NOT RUN: 108 109 11 110 111 112 113 13 14 15
+  # ⚠️ τ²-BENCH ITSELF IS NOT CUT — it is on the never-cut list (PROCESS.md §14,
+  # CONTEXT.md §21.4 "It is never dropped"). ONLY THE BREADTH OF THIS ONE BLOCK is
+  # staged, which §21.4 permits in terms ("its scope is staged"). T-NEG keeps all 34
+  # must-not-write tasks and the externally-authored-answer-key claim is INTACT.
   tfp_task_ids:
-    airline: ["11", "12", "14", "15", "16", "17", "18", "19", "20", "21",
-              "22", "23", "24", "25", "29", "30", "32", "33", "35", "37"]
-    retail: ["0", "1", "100", "101", "102", "103", "104", "105", "106", "107",
-             "108", "109", "11", "110", "111", "112", "113", "13", "14", "15"]
+    airline: ["11", "12", "14", "15", "16", "17", "18", "19", "20", "21"]
+    retail: ["0", "1", "100", "101", "102", "103", "104", "105", "106", "107"]

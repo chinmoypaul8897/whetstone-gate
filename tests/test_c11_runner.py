@@ -534,8 +534,35 @@ def test_Q107_RULED_both_conjuncts_are_implemented_and_the_rule_yields_N_30_at_t
     assert at_boundary.first_conjunct_holds is True
     assert at_boundary.second_conjunct_holds is False
     assert at_boundary.bound_by == nr.BOUND_BY_LANE_TIME, "record which one bound"
-    assert at_boundary.projected_lane_hours == Decimal("40.05")
     assert at_boundary.lane_hour_budget == Decimal("32")
+
+    # ⚠️ THE PUBLISHED 40.05 h IS A FIGURE AT T-FP **40**, AND RUNG 4 CUT T-FP TO **20** ON
+    # 2026-09-04. `select_n` reads `selections.tfp_task_count` from `config/`, so its
+    # projection now describes the run that will ACTUALLY happen, which is a smaller one.
+    # ⚠️ THE PUBLISHED NUMBER IS NOT RE-VALUED TO WHATEVER THE CODE NOW RETURNS — that would
+    # be a test taking its expected value from the code under test (hard rule 3). It is
+    # asserted AT ITS OWN BASIS, which still reproduces exactly:
+    published_at_tfp_40 = nr.project_total_tokens(
+        n=int(cfg.load("protocol").require("n_decision.branch_a_n")),
+        tfp_tasks=40,
+        measured_tokens_per_episode=60000,
+    )
+    assert published_at_tfp_40.lane_hours(nr.gemma_tokens_per_lane_hour()) == Decimal("40.05"), (
+        "Q-107's published 40.05 h must still reproduce at the T-FP 40 it was computed at"
+    )
+
+    # ⚠️ AND THE PROPERTY THAT ACTUALLY CARRIES THE RULING IS ASSERTED SEPARATELY, BECAUSE IT
+    # IS THE ONE A SMALLER T-FP COULD HAVE BROKEN: the projection must still EXCEED the
+    # budget, or the boundary would select N=50 and Q-107's ruling would have been silently
+    # overturned by a schedule cut. Measured: 34.95 h against a 32 h budget. It still binds.
+    assert at_boundary.projected_lane_hours > at_boundary.lane_hour_budget, (
+        "rung 4's T-FP cut brought the boundary projection UNDER the 32 h budget, which "
+        "flips Q-107's ruled N at 60,000 from 30 to 50. That is a Class A change to a "
+        "RULED decision and must stop the session, not be re-valued here"
+    )
+    assert at_boundary.projected_lane_hours < Decimal("40.05"), (
+        "the cut must LOWER the projection; if it did not, config/ did not take effect"
+    )
 
 
 def test_the_projection_reproduces_S13_4s_OWN_THREE_PUBLISHED_BRANCH_TOTALS():
@@ -567,43 +594,100 @@ def test_the_projection_reproduces_S13_4s_OWN_THREE_PUBLISHED_BRANCH_TOTALS():
         assert p.lane_hours(rate) == Decimal(hours)
 
 
-def test_Q107s_own_published_table_reproduces_row_for_row():
-    """`Q-107`'s table of both readings, reproduced — projection, hours and N, all four rows."""
+def test_Q107s_own_published_table_reproduces_row_for_row_AT_ITS_OWN_T_FP_40_BASIS():
+    """`Q-107`'s table of both readings, reproduced — projection, hours and N, all four rows.
+
+    ⚠️ **RUNG 4 (T-FP 40 → 20, fired 2026-09-04) SPLIT THIS TEST IN TWO, AND NEITHER HALF IS
+    WEAKER THAN THE ONE ASSERTION IT REPLACES.**
+
+    `Q-107`'s published table was computed at the pre-registered **T-FP 40**. `select_n` reads
+    ``selections.tfp_task_count`` from ``config/``, which is now **20**, so its *projections*
+    are smaller — while its *decisions* are what the ruling is about.
+
+      * the **published totals and hours** are asserted at **T-FP 40**, the basis they were
+        published at, through :func:`project_total_tokens`'s explicit ``tfp_tasks``. They
+        still reproduce exactly. **They are not re-valued to whatever the code now returns**,
+        which would make the expected value a product of the code under test (hard rule 3);
+      * the **ruled N and the golden's own first-conjunct reading** are asserted against
+        today's ``config/``, because *those* must survive the cut — and they do, on all four
+        vectors. Had any N moved, a schedule cut would have overturned a ruling.
+    """
     rows = [
         (24310, 50, 50, "57270500", "29.83"),
         (60000, 50, 30, "76900000", "40.05"),
         (60001, 30, 30, "76900550", "40.05"),
         (105290, 30, 30, "101809500", "53.03"),
     ]
+    rate = nr.gemma_tokens_per_lane_hour()
+    branch_a = int(cfg.load("protocol").require("n_decision.branch_a_n"))
     for measured, golden_n, ruled_n, total, hours in rows:
+        # THE PUBLISHED TABLE, at the T-FP it was published at.
+        # ⚠️ AT **BRANCH A**, not at the ruled N: the second conjunct asks what N=50 would
+        # COST, and Q-107's published totals are that projection. Getting this wrong reads
+        # 69.10M (the N=30 row) where the table says 76.90M.
+        published = nr.project_total_tokens(
+            n=branch_a, tfp_tasks=40, measured_tokens_per_episode=measured
+        )
+        assert published.total_tokens == int(total), f"Q-107's published total for {measured}"
+        assert published.lane_hours(rate) == Decimal(hours), f"Q-107's published hours for {measured}"
+
+        # THE RULING, against today's config/ — the half that had to survive the cut.
         decision = nr.select_n(measured)
-        assert nr.select_n_first_conjunct_only(measured) == golden_n
-        assert decision.n == ruled_n
-        assert decision.projection.total_tokens == int(total)
-        assert decision.projected_lane_hours == Decimal(hours)
+        assert nr.select_n_first_conjunct_only(measured) == golden_n, (
+            "the golden's own first-conjunct reading is `measured <= target` and does not "
+            "depend on T-FP at all, so rung 4 must not have moved it"
+        )
+        assert decision.n == ruled_n, (
+            f"rung 4's T-FP cut moved Q-107's RULED N at {measured} from {ruled_n} to "
+            f"{decision.n}. A schedule cut has overturned a ruling; that is Class A and "
+            f"stops the session"
+        )
 
 
 def test_the_rulings_REGARDLESS_clause_is_MEASURED_and_holds_under_only_one_reading():
     """⚠️ **`Q-121`.** The ruling says N=50 *"fails the second regardless of what the pilot
     measures"*. **Measured:** that is true of the AT-THE-REGISTERED-TARGET reading and false of
-    the RECOMPUTED one, which holds up to 31,908 tokens/episode — and golden 8 fixture F's own
-    first vector, 24,310, is below that break-even.
+    the RECOMPUTED one, which holds up to **31,908 tokens/episode at the pre-registered
+    T-FP 40** — and golden 8 fixture F's own first vector, 24,310, is below that break-even.
 
-    **Both are computed and neither is adjusted.** This test pins the break-even so that a
-    later change to any component moves a number a reader can see.
+    ⚠️ **THE BREAK-EVEN IS A FUNCTION OF T-FP, AND RUNG 4 MOVED T-FP** (40 → 20, 2026-09-04).
+    A smaller run fits more tokens per episode inside the same 32 h, so the break-even rose.
+    **The published 31,908 is therefore pinned AT ITS OWN BASIS, and the ruling's REGARDLESS
+    clause is re-checked at today's T-FP as a PROPERTY** — the break-even is still below the
+    registered target, so at the target the second conjunct still fails and N=50 still loses.
+    Pinning today's break-even as a constant would mean reading it back out of the code this
+    test exists to check (hard rule 3).
+
+    **Both readings are computed and neither is adjusted.**
     """
     rate = nr.gemma_tokens_per_lane_hour()
     budget_hours = nr.lane_hour_budget()
     branch_a = int(cfg.load("protocol").require("n_decision.branch_a_n"))
+    target = int(cfg.load("protocol").require("attacker.target_tokens_per_episode"))
     tfp = int(cfg.load("protocol").require("selections.tfp_task_count"))
 
-    def hours_at(measured: int) -> Decimal:
+    def hours_at(measured: int, tfp_tasks: int) -> Decimal:
         return nr.project_total_tokens(
-            n=branch_a, tfp_tasks=tfp, measured_tokens_per_episode=measured
+            n=branch_a, tfp_tasks=tfp_tasks, measured_tokens_per_episode=measured
         ).lane_hours(rate)
 
-    assert hours_at(31908) == Decimal("32.00") <= budget_hours
-    assert hours_at(31909) == Decimal("32.01") > budget_hours
+    # ⚠️ THE PUBLISHED BREAK-EVEN, 31,908, IS A FIGURE AT T-FP **40** and is asserted at that
+    # basis. Rung 4 cut T-FP to 20 on 2026-09-04, which MOVES the break-even upward — a
+    # smaller run fits more tokens per episode inside the same 32 h.
+    assert hours_at(31908, 40) == Decimal("32.00") <= budget_hours
+    assert hours_at(31909, 40) == Decimal("32.01") > budget_hours
+
+    # ⚠️ AND THE RULING'S "REGARDLESS" CLAUSE IS RE-CHECKED AT TODAY'S T-FP RATHER THAN
+    # ASSUMED TO SURVIVE — it is the clause a smaller run could have broken. It holds because
+    # the break-even, wherever the cut moved it, is still BELOW the registered target: at the
+    # target the second conjunct still fails, so N=50 still loses. Asserted as the PROPERTY,
+    # not pinned to a constant this test would have had to read back out of the code.
+    assert hours_at(target, tfp) > budget_hours, (
+        "at the REGISTERED TARGET the projection now fits the 32 h budget, so N=50 no longer "
+        "'fails the second regardless of what the pilot measures'. Rung 4 would have "
+        "overturned Q-121's ruling; that is Class A and stops the session"
+    )
+    assert hours_at(target, 40) > budget_hours, "and it failed at the published basis too"
 
     at_24310 = nr.select_n(24310)
     assert at_24310.second_conjunct_holds is True, "RECOMPUTED: 29.83 h fits"

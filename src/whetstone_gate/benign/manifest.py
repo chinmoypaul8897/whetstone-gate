@@ -1,17 +1,34 @@
-"""**THE T-FP BLOCK — its forty pre-registered τ² tasks, and why it cannot run today.**
+"""**THE T-FP BLOCK — its TWENTY selected τ² tasks, and why it cannot run today.**
 
 `CONTEXT.md` §13.4 pre-registers the block: **T-FP** is *"5 configs × 40 of 130
 (pre-registered sample)"*, and the sample is *"the **first 40 write-task ids after sorting,
-stratified 20 airline / 20 retail**"*. ``config/protocol.yaml`` carries the forty ids at
+stratified 20 airline / 20 retail**"*. ``config/protocol.yaml`` carries the ids at
 ``selections.tfp_task_ids``, and this module **reads them** through
 :func:`whetstone_gate.tau2.enumerate.committed_tfp_ids` rather than transcribing them.
 
-⚠️ **FORTY, NOT TWENTY. RUNG 4 WAS NOT FIRED.** `PROCESS.md` §14's ladder table gives rung 4
-as *"T-FP 40 → 20 τ² tasks"* with the status **NOT FIRED. RESERVED UNTIL C14**, and
-``config/protocol.yaml``'s ``selections.tfp_task_count`` is **40**.
-:data:`whetstone_gate.runner.n_rule.TFP_REDUCED` is the *reduced* figure and is **not** what
-this block runs at. The count is read and then **checked against the stratification**, which
-is what :func:`whetstone_gate.tau2.enumerate.tfp_quota` already refuses on.
+⚠️ **TWENTY, NOT FORTY — RUNG 4 *WAS* FIRED, 2026-09-04 05:27 UTC, BY THE OPERATOR, ON
+SCHEDULE.** `PROCESS.md` §14's rung 4 is *"T-FP 40 → 20 τ² tasks"*; `INCIDENTS.md` **INC-144**
+records the cut at the moment it was made and `PROTOCOL.md` §3.2 names the twenty that run and
+the twenty that do not. ``config/protocol.yaml``'s ``selections.tfp_task_count`` is now **20**
+and its stratification ``{airline: 10, retail: 10}``. The surviving ids are the **same rule at
+a smaller K** — the first ten per domain under the same bytewise-ascending string sort — so
+each list is an **exact prefix** of its pre-registered twenty: **a reduction, not a
+re-registration.**
+
+⚠️ **THIS DOCSTRING PREVIOUSLY SAID, IN CAPITALS, "FORTY, NOT TWENTY. RUNG 4 WAS NOT FIRED."
+It was true when written and the cut made it false**, which is why it is corrected here rather
+than left to read as a fact about today. `INCIDENTS.md` **INC-146** is this repository's entry
+about a false claim standing in an artefact, and the lesson it draws is the reason for this
+paragraph: **a number that moves has prose attached to it, and the prose is part of the edit.**
+
+⚠️ **τ²-BENCH ITSELF IS NOT CUT.** It is on `PROCESS.md` §14's never-cut list and
+`CONTEXT.md` §21.4 says *"It is never dropped"* — **only the breadth of this one block is
+staged**, which §21.4 permits in terms (*"its scope is staged"*). T-NEG keeps all 34
+must-not-write tasks and the externally-authored-answer-key claim is **intact**.
+
+:data:`whetstone_gate.runner.n_rule.TFP_REDUCED` is that same reduced figure. The count is read
+and then **checked against the stratification**, which is what
+:func:`whetstone_gate.tau2.enumerate.tfp_quota` already refuses on.
 
 --------------------------------------------------------------------------------------
 ⚠️⚠️ THE BLOCK CANNOT RUN, AND THIS IS A HARD-RULE-1 STOP WITH A MEASURED CAUSE — `Q-154`
@@ -139,18 +156,31 @@ class TfpManifest:
 
     @property
     def episode_count(self) -> int:
-        """§13.4's own figure for this block: ``5 configs × 40`` = **200**, computed."""
+        """§13.4's figure for this block, **computed, never written down**: ``5 configs ×
+        task_count``. At §13.4's pre-registered 40 that was **200**; after rung 4's cut to
+        20 it is **100**. It moves with ``config/`` because it is derived from it."""
         return len(self.configurations) * self.task_count
 
     def keys(self) -> tuple[EpisodeKey, ...]:
         """Every episode of the block, as C11's ``(block, arm, seed_or_task, model)`` key.
 
-        ⚠️ **THE TASK ID IS QUALIFIED BY ITS DOMAIN, AND IT HAS TO BE.** ``"11"``, ``"14"``
-        and ``"15"`` each appear in **both** the airline and the retail list, so a flat set
-        of forty ids loses information and two different episodes would collide on one
-        checkpoint path — which :class:`~whetstone_gate.runner.episodes.EpisodeKey`'s own
-        ``__post_init__`` calls *"a silently lost episode"*. The separator is ``-`` because
-        the key refuses ``/``, ``\\`` and ``..``.
+        ⚠️ **THE TASK ID IS QUALIFIED BY ITS DOMAIN, AND IT HAS TO BE.** At §13.4's
+        pre-registered **forty**, ``"11"``, ``"13"``, ``"14"`` and ``"15"`` each appeared in
+        **both** the airline and the retail list, so a flat set of ids lost information and
+        two different episodes collided on one checkpoint path — which
+        :class:`~whetstone_gate.runner.episodes.EpisodeKey`'s own ``__post_init__`` calls
+        *"a silently lost episode"*. The separator is ``-`` because the key refuses ``/``,
+        ``\\`` and ``..``.
+
+        ⚠️ **AFTER RUNG 4 THE SURVIVING TWENTY NO LONGER COLLIDE, AND THAT IS SAID HERE
+        RATHER THAN LEFT TO IMPLY THE GUARD IS STILL EARNING ITS KEEP ON THIS SAMPLE.**
+        The reduced lists are airline ``11..21`` and retail ``0``, ``1``, ``100..107``, which
+        are **disjoint**, so on today's selection a flat id would happen not to collide. The
+        qualification is kept because it is **correct**, because the forty remain
+        pre-registered and the block may be restored, and because T-NEG's must-not-write
+        lists **do** still overlap across domains (on id ``"10"``). **A guard that is right
+        for a reason that has lapsed is still right; describing it as still demonstrated
+        would not be.**
         """
         built: list[EpisodeKey] = []
         for arm in self.configurations:
@@ -182,8 +212,17 @@ class TfpManifest:
                    f"{len(self.configurations)} — {', '.join(self.configurations)}")
         out.append(f"  episodes the block pre-registers               : {self.episode_count}")
         out.append(
-            "  ⚠️ RUNG 4 (T-FP 40 -> 20) WAS NOT FIRED — PROCESS.md S14's table says "
-            "'NOT FIRED. RESERVED UNTIL C14'"
+            "  ⚠️ RUNG 4 (T-FP 40 -> 20) WAS FIRED 2026-09-04 05:27 UTC by the OPERATOR, on "
+            "SCHEDULE — PROCESS.md S14; INCIDENTS.md INC-144; PROTOCOL.md S3.2 names the "
+            "twenty that RUN and the twenty that DO NOT"
+        )
+        out.append(
+            "     NOT fired by CONTEXT.md S13.4's decision rule — that rule reads the pilot's "
+            "measured tokens/episode, and INC-142 records the pilot completed 0 of 20"
+        )
+        out.append(
+            "     tau2-bench itself is NOT cut (never-cut list); only THIS BLOCK'S BREADTH is "
+            "staged. T-NEG keeps all 34 must-not-write tasks"
         )
         return out
 
@@ -201,8 +240,9 @@ def load_manifest() -> TfpManifest:
     # ⚠️ `tfp_quota` ALREADY refuses a stratification that does not sum to
     # `selections.tfp_task_count`, and that check is not repeated here. The count is read
     # again, separately and through the same one loader, for a different purpose: the report
-    # prints **config/'s own number** beside the ids it actually read, so a reader sees 40
-    # asserted and 40 read rather than 40 read and has to trust it was the target.
+    # prints **config/'s own number** beside the ids it actually read, so a reader sees the
+    # count asserted and the same count read, rather than a count read that must be trusted
+    # to have been the target.
     stratified = tau2_enum.tfp_quota()
     declared = int(cfg.load("protocol").require("selections.tfp_task_count"))
 
@@ -266,7 +306,7 @@ def refuse_tfp(manifest: TfpManifest) -> BlockRefused:
     """Build the refusal, with the manifest it refuses to run **and both questions named**.
 
     Returned rather than raised so a caller can print it beside the manifest — the block's
-    forty ids are a real, checkable deliverable, and the refusal is a fact about the *run*,
+    selected ids are a real, checkable deliverable, and the refusal is a fact about the *run*,
     not about the enumeration. `PROCESS.md` §9: *"zero-occurrence branches are printed as
     zeros, never omitted. A reader must distinguish 'did not happen' from 'was not
     checked.'"* This block **was checked** and **did not happen**.
@@ -289,9 +329,11 @@ def refuse_tfp(manifest: TfpManifest) -> BlockRefused:
     lines.extend(
         [
             "",
-            "This is a hard-rule-1 STOP and the refusal is the outcome. The forty ids ARE "
-            "read and printed above, so the block's pre-registered denominator is visible "
-            "and a later session does not have to re-derive it.",
+            "This is a hard-rule-1 STOP and the refusal is the outcome. The SELECTED ids "
+            "ARE read and printed above, so the block's denominator is visible and a later "
+            "session does not have to re-derive it. The denominator printed is the "
+            "POST-RUNG-4 one; PROTOCOL.md S3.2 carries the pre-registered forty and names "
+            "the twenty that were cut, because a cut item is never silently lost.",
         ]
     )
     return BlockRefused("\n".join(lines))

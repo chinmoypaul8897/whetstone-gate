@@ -1,3 +1,69 @@
+## SESSION-TOKEN 8f3c72e1 — ARCH, CAL BUILD 1 — 2026-09-04
+
+**Role:** FIX. **Chunk:** ARCH. **Everything below ships UNREVIEWED. Not self-certified. No tag.**
+⚠️ **FULL RECORD: `docs/sessions/arch-cal-build-1.txt`.**
+⚠️ **SPEND: 1 call, 21 tokens, `qwen-27b`, against a sanction of 2 calls / 5,000 tokens.** No 429.
+Nothing retried. No lane substituted. `evals/episodes/` and `evals/checkpoints/` never touched.
+⚠️ **`git rev-parse prereg-v1` EXITS 128 — verified as this session's FIRST act, before the read
+order — so every `config/` edit below was legal. NO TAG WAS CUT OR MOVED.**
+
+**FOUR GATES, ALL EXECUTED.**
+
+**GATE 0.** Five architect rulings recorded **verbatim** before anything else was touched (hard
+rule 5): `Q-189`(a) the CAL seed block, (b) the ceilings, (c) the breach numerator, (d) the Wilson
+bound, and `Q-191` the bucket model. ⚠️ **`Q-189`(d) carried its own withdrawal condition and the
+verification it demands was run BEFORE implementing anything. THE RULING SURVIVES:** no frozen
+artefact states the Wilson bound's sidedness *in terms* — and the project's frozen vocabulary uses
+**both** words elsewhere, so the silence is not a vocabulary gap. The ruling's arithmetic claim was
+**re-computed rather than accepted**: one-sided is higher at every rate, and a higher threshold makes
+a VOID **more** likely, which is the self-critical direction. ⚠️ **Two residuals recorded beside it:**
+*"the 95% Wilson interval"* names an **interval**, so the reading is recorded **as a reading**; and
+`wilson_lower_bound` shares its `z` with `results/figures.py`'s **§12.4 published ceiling**, so the
+two obvious implementations both corrupt a second published number. **The Wilson change was therefore
+NOT implemented** — not a gate, Class A, and nothing is mis-computed meanwhile because the threshold
+is still `TODO_C14_CALIBRATION` and the loader raises on it.
+
+**GATE 1 — RUNG 4 EXECUTED IN `config/`, ONE ATOMIC COMMIT.** ⚠️ **The twenty ids were RE-DERIVED
+INDEPENDENTLY from the vendored checkout** — an AST walk for `@is_tool(ToolType.WRITE)`, then each
+task's reference trajectory, then `PROTOCOL.md` §3.2's bytewise string sort — reproducing **130 write
+tasks**, the **24/10 must-not-write split byte-identically**, and both pre-registered twenties
+**exactly**. The surviving ten per domain are an **EXACT PREFIX**. ⚠️ **The prompt named THREE test
+sites; SEVEN broke, plus a printed report in shipped source (`INC-150`)** — `benign/manifest.py`
+asserted *"FORTY, NOT TWENTY. RUNG 4 WAS NOT FIRED"* in capitals and **printed** it, and no test pins
+prose. `PROTOCOL.md` §1.1's row **re-measured from the git blob**, never copied.
+
+**GATE 2.** `Q-191`'s **60-second sliding window** implemented for TPM only, **no new constant**, and
+**replayed on the pilot's eight real calls read from the committed usage log**: the sliding model
+refuses **call 7**, the continuous bucket refuses nothing and ends at **6,170 of 16,000** — the figure
+`INC-143` measured. ⚠️ **Proved RED against `HEAD`, and the red is BEHAVIOURAL:** `assert [] == [7]`.
+⚠️ **GATE 2b: GROQ ACCEPTS THE SHIPPED `User-Agent`** — HTTP 200, 21 tokens, the project's own string,
+no browser string sent. `ARCH LANES 1`'s named residual risk is **closed**.
+
+**GATE 3 — `Q-189` BLOCKER 1 CLOSED.** `driver/cal.py` builds the arm-1 calibration: one cell, thirty
+seeds **2201–2230**, cross-checked against `probe.n_cal` and **refusing** if they disagree. ⚠️ **Every
+slug begins `cal__`; none collides with a pilot slug; no CAL seed collides with any band.** ⚠️ **THE
+CALIBRATION WAS NOT RUN** — building the path and spending the single-shot run are different acts.
+
+⚠️⚠️ **A SECOND EXECUTOR SESSION ENTERED THIS TREE SIX MINUTES AFTER THIS SESSION'S CONCURRENCY CHECK
+PASSED (`INC-149`)** — `ARCH PUBLISH 1` (`2e5b8a47`), which moved `HEAD` five commits. **Measured: it
+does not hold this token, and none of its commits touched `evals/`, `config/`, `src/` or `tests/`.**
+The stop test was **not met**. ⚠️ **But `make check-roles` E1 is RED on its unregistered token, and
+this session DID NOT write that row** — not its token, that session was still live, and two sessions
+appending one row to one file is `INC-136`'s hazard (`Q-194`).
+
+**RAISED:** `Q-193`, **Class A** — rung 4 has made `CONTEXT.md` §13.4's third branch unreachable and
+moved its published break-even, **though every ruled N is unchanged** and `Q-121` still holds.
+**`Q-192`** records Gate 2b. **`INC-149`, `INC-150`, `INC-151`** written, the last against this session
+itself. **AST-exact test diff: `def test_*` unchanged in all four existing files, `ast.Assert` UP in
+all four, four RENAMES, NOT ONE assertion or test deleted.**
+
+**`tests/goldens/` UNTOUCHED at every step. `CONTEXT.md`, `PROCESS.md`, `HOLES.md`, `config/lanes.yaml`,
+`corpora/`, `README.md`, `RESULTS.md` not opened for writing. `.env` never read, printed, echoed or
+committed — only key NAMES.** A fresh adversarial review follows; nothing here is self-certified.
+
+
+---
+
 ## SESSION-TOKEN 2e5b8a47 — ARCH, PUBLISH 1 — 2026-09-04
 
 **Role:** FIX. **Chunk:** ARCH. **Everything below ships UNREVIEWED. Not self-certified. No tag.**
