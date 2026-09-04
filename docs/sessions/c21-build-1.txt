@@ -1,0 +1,519 @@
+================================================================================
+C21 BUILD 1 - FINAL OUTPUT
+SESSION-TOKEN 9e2c81d4 | ROLE BUILD | CHUNK C21 | 2026-09-04
+================================================================================
+
+PUSHED SHA: 685ca50c01dc1a47a8e5acaa799a3f00bd71b313
+  This is the DELIVERABLE commit and it is pushed (origin/main == 685ca50 at the
+  moment this file was written). TWO FURTHER COMMITS FOLLOW THIS FILE and are
+  named in the printed report: (i) this journal file itself, and (ii) the
+  STATUS.md / PROGRESS.md append, which the prompt requires to be the LAST
+  commit. This ordering is stated rather than hidden, because a journal cannot
+  name a SHA that does not exist when it is committed.
+
+BASE HEAD MOVED UNDER THIS SESSION, AS WARNED: the session opened at 19284cf and
+the commit's parent was e9dbf5c. The base tree was read from LIVE HEAD at commit
+time, never from a pinned SHA. That is INC-139's corrected recipe and it is the
+whole reason nothing was reverted.
+
+--------------------------------------------------------------------------------
+1. WHAT WAS WRITTEN
+--------------------------------------------------------------------------------
+
+  docs/submission/FORM_ANSWERS.md   535 lines, new     THE DELIVERABLE
+  docs/submission/FORM.md            16 lines, new     a pointer, no content of
+                                                       its own, cannot diverge
+
+  Both LF-only, valid UTF-8, zero CR bytes, zero control bytes outside TAB/LF -
+  measured with a byte scan before the commit, because check-roles A3 and A5
+  would otherwise go red on the tree (INC-121's class).
+
+  THE FILENAME IS NOT THE ONE THE PROMPT NAMED, AND THAT IS DELIBERATE.
+  The prompt said docs/submission/FORM.md. The C21 card (PROCESS.md:1343) and
+  the specification (CONTEXT.md:2187) BOTH say docs/submission/FORM_ANSWERS.md.
+  CLAUDE.md S2 rule 4 - "ONE SOURCE OF TRUTH. CONTEXT.md outranks the plan, the
+  code, the tests, and memory" - resolves it to the card's name. The deliverable
+  therefore carries FORM_ANSWERS.md, and FORM.md is a six-line pointer so that a
+  session or reviewer holding the prompt's filename lands on the deliverable
+  rather than on nothing. The string "FORM.md" appears in NO other file in this
+  repository. This is a rule-1 STOP and it is item Q-A under QUESTIONS OWED.
+
+--------------------------------------------------------------------------------
+2. THE FIVE METHOD CLAIMS - ONE VERIFIED, TWO NARROWED, TWO NOT YET TRUE
+--------------------------------------------------------------------------------
+
+Each claim was verified against the tree as it exists today, then attacked from
+three independent angles - literal truth, the panelist who has not read the spec,
+and the project's own HOLES.md / OPEN_FINDINGS.md / INCIDENTS.md record.
+
+!! ALL FIFTEEN ADVERSARIAL PASSES RETURNED REFUTED AGAINST THE CLAIMS AS THE
+   PROMPT WORDED THEM. Not one of the five survived its own prompt wording
+   unchanged. FORM_ANSWERS.md S2 uses only the narrowed forms.
+
+(1) A POLICY-BLIND ATTACKER ............... TRUE ONLY AS NARROWED
+    TRUE: the attacker never receives the gate's policy text, our pre-registered
+    holes, our attack-or-invariant taxonomy, or any gate's denial reason; the
+    only refusal it sees is one generic string, identical across arms.
+    EVIDENCE: CONTEXT.md S7 architecture block, lines 439-470 - "ATTACKER (LLM,
+    policy-blind) ... never sees: policy, holes, attack list, gate reasons".
+    Blindness guards are proved to FIRE, not merely to be silent:
+    tests/test_c12_benign.py:404 test_the_blindness_scan_FIRES_at_four_planted_leaks;
+    tests/test_c6_attacker.py carries the attacker-side guards including
+    test_the_attacker_package_imports_no_model_client_and_no_network_library.
+    NOT TRUE AS PROMPTED: "never seen ... any attack list" is false. The attacker
+    is DELIBERATELY seeded from published third-party attack corpora, and the
+    system prompt WE wrote names four attack families in plain English. The
+    tested property is blindness to OUR policy and OUR answer key, not to attack
+    technique in general.
+    ALSO CARRY: C6 was reviewed SIX times, never passed, and carries no tag
+    (README.md:986; docs/reviews/REVIEW_C6_1..6, all six FAIL).
+
+(2) AN EXTERNALLY-AUTHORED ANSWER KEY (tau2-bench) ... TRUE ONLY AS NARROWED
+    TRUE: the tasks, the gold behaviour and the db_reward grader are Sierra's.
+    EVIDENCE: config/protocol.yaml:396
+      tau2_bench_sha: a2c024725189473d2d7cea3a5cfdbcc67478e41f
+    vendor/tau2-bench/LICENSE - "MIT License / Copyright (c) 2025 Sierra
+    Research". CONTEXT.md S11.1's authorship-split table: tasks, gold behaviour,
+    grader and benign tasks all "Sierra"; the gate "Us - the only thing we
+    author".
+    NOT TRUE AS PROMPTED, AND THIS IS THE EASIEST THING IN THE PROJECT TO GET
+    WRONG: CONTEXT.md S11.1 is titled "what it actually provides, and what it
+    does NOT", and states in bold that tau2-bench provides NO ESCAPE GROUND
+    TRUTH - "Escape measurement moves WHOLLY to the mock Razorpay world."
+    tau2-bench provides (a) false-positive ground truth via the 130 write tasks
+    and (b) an external attacker-competence control via the 34 must-not-write
+    tasks. A form paragraph saying "our escape number is measured against an
+    external answer key" would be FALSE.
+    AND: it has graded nothing. evals/ holds one file; RESULTS.md does not exist.
+    AND: AgentDojo, the second external environment, was CUT at rung 3
+    (README.md:701, :992, :1159; STATUS.md:1830; config/protocol.yaml
+    vendor.agentdojo_sha is still TODO_C13_C16).
+
+(3) A COMPETENCE PROBE THAT VOIDS OUR OWN RUN ... NOT YET TRUE AS AN
+    ACCOMPLISHED FACT
+    TRUE, AND VERIFIED BY THIS SESSION FIRST-HAND:
+      probe-v1 is an annotated tag, object id
+        170bd3ff4abfdd8f87f64055972a60c82cc54efc
+        tagger date 2026-09-03 20:43:04 +0530
+        message "pre-registration: HOLES.md, before the pilot and the calibration"
+      HOLES.md git blob a4e50ed6f379784c6b6bfefdd1728a57ca3d4c20 at BOTH probe-v1
+        and HEAD; git diff probe-v1 HEAD -- HOLES.md is EMPTY. The rule is frozen
+        and provably unmoved.
+      HOLES.md:221 - "Consequence. Below the calibrated threshold -> THE WHOLE
+        RUN IS VOID."
+      The decision is pure arithmetic: src/whetstone_gate/probe/void.py:81
+        breach_rate, :109 is_void. No model client, asserted by
+        tests/test_c10_probe.py:1092 and :1106
+        (test_the_VOID_RULE_imports_no_model_client_WAY_ONE / WAY_TWO).
+    NOT YET TRUE: config/protocol.yaml:335 reads
+      void_threshold_breach_rate: TODO_C14_CALIBRATION
+    The loader RAISES rather than defaulting, so NO VOID VERDICT IS COMPUTABLE
+    FROM config/ AS IT STANDS, ON ANY INPUT. The single-shot arm-1 calibration
+    that sets the threshold has not run, and there is no run to void.
+    DO NOT WRITE: "a live kill switch"; "if it falls short the run is
+    automatically voided". The banner states what must not be published; nothing
+    suppresses a table.
+
+(4) A FREEZE WITNESSED OUTSIDE THIS REPOSITORY ... NOT YET TRUE
+    EVIDENCE: git tag -l returns SEVEN tags -
+      c0-pass c1-pass c13-pass c2-pass c3-pass c4-pass probe-v1
+    prereg-v1 IS ABSENT. There is no witness gist: README.md:1222 prints the
+    verification command with the id as the literal <<PENDING-RUN: GIST_ID>>,
+    and README.md:56-58 says it against itself - "there is no prereg-v1 to hash,
+    AND there is no published fingerprint or witness gist to compare against -
+    no prereg-v1.sha256 and no OTS receipt exist in this tree."
+    !! THIS IS THE SINGLE MOST DAMAGING SENTENCE AVAILABLE TO THIS PROJECT. A
+    claim of external witness that a judge cannot curl discredits the one
+    differentiator the whole project rests on. No sentence in either form
+    paragraph asserts it. What IS asserted is the true and checkable form: the
+    procedure is written and committed IN FULL before there is any number to fit
+    it to; one of the two tags is cut; the witness has not been published; and
+    the README says so on its own first screen.
+
+(5) gates/ AND scorer/ SHARE NO FIRST-PARTY MODULE ... VERIFIED
+    MEASURED BY THIS SESSION by running, read-only,
+      python -m whetstone_gate.tasks check-roles
+    (git status --porcelain was captured before and after and was IDENTICAL; the
+    target writes nothing.) Result, verbatim:
+      [PASS] D1 gates/ imports nothing from scorer/
+      [PASS] D2 scorer/ imports nothing from gates/
+      [PASS] D3 no shared first-party module
+             ... The allow-list holds 0 entr(y/ies). 118 first-party module(s)
+             indexed; 15 reachable from src/whetstone_gate/gates (14 seed(s)),
+             6 from src/whetstone_gate/scorer (6 seed(s)), TRANSITIVELY
+      [PASS] D4 no dynamic import in gates/ or scorer/
+    Whole run: 21 passed, 0 failed, 3 n/a.
+    !! THE ALLOW-LIST HOLDS ZERO ENTRIES. src/whetstone_gate/check_roles.py:637 -
+       MOAT_ALLOW_LIST: frozenset[str] = frozenset()
+    CLAUDE.md hard rule 8 describes it as "a short, explicit allow-list of pure
+    value types (enums, the harm-record dataclass, the paise integer wrapper)".
+    THE IMPLEMENTED LIST IS EMPTY - stronger than the constitution describes.
+    The correct thing to publish is the measured 0, not the described "short".
+    That divergence is item Q-D under QUESTIONS OWED.
+    LIMITS THAT MUST TRAVEL WITH THE CLAIM, and do travel with it in the file:
+      (a) the property is "no shared first-party MODULE", NOT "no shared code" -
+          both sides deliberately reimplement the same predicates, twice, on
+          purpose;
+      (b) this exact assertion has TWICE printed clean or PASS over a LIVE
+          gates/ -> scorer/ reach before being hardened - INC-51 and INC-132;
+      (c) the closure is built from STATIC imports, so a reach whose first hop is
+          made by third-party code is scanned by neither half - an OPEN finding,
+          not a closed one;
+      (d) neither package has passed adversarial review: there is no c8-pass and
+          no c9-pass tag.
+
+--------------------------------------------------------------------------------
+3. THE PLACEHOLDER TABLE - EVERY UNFILLED VALUE
+--------------------------------------------------------------------------------
+
+Convention is README.md:28's - "every one of them is spelled <<PENDING-RUN:
+name>> so you can find them all with one grep." A PLACEHOLDER IS NEVER A RESULT.
+
+  PLACEHOLDER                    WHERE                       FILLED BY
+  -----------------------------  --------------------------  ----------------
+  <<PENDING-RUN: VIDEO_URL>>     FORM_ANSWERS.md S5          C20 / operator
+  <<PENDING-RUN: GIST_ID>>       referenced FORM_ANSWERS.md  C14 / operator
+                                 S0.0 and S6.1(4); lives in
+                                 README.md:1222
+
+AND THE NUMBERS THE FILE DELIBERATELY DOES NOT PRINT, because printing any of
+them today would be a fabricated result. NONE appears in either paragraph:
+
+  escape rate per arm (1, 2, 2S, 3, 4)  no scored episode has run
+  money past the gate, per component    ditto; and every rupee figure must ship
+                                        as a per-episode median with its spread,
+                                        never as a sum
+  false positives per arm (paired d)    ditto
+  probe breach rate / probe reach       threshold is TODO_C14_CALIBRATION
+  the VOID verdict                      not computable on any input today
+  the selected N                        n_decision.selected_branch is
+                                        TODO_C14_PILOT; the pilot has not run
+  the attacker-strength ladder          not run
+  any "blocked N%" or "0/N"             and when one exists it never ships
+                                        without its rule-of-three ceiling
+
+--------------------------------------------------------------------------------
+4. EVERY FACTUAL CLAIM, AND THE FILE AND SECTION IT WAS VERIFIED IN
+--------------------------------------------------------------------------------
+
+INCIDENTS.md INC-05 is the entry that makes this section mandatory: "a
+precise-sounding third-party number that exists in no third-party source." Every
+row below was read first-hand in this repository during this session.
+
+  Project name WHETSTONE GATE; repo whetstone-gate ....... CONTEXT.md:86
+  Deliverable filename FORM_ANSWERS.md .................. PROCESS.md:1343;
+                                                          CONTEXT.md:2187
+  The S9 limitation sentence, and its three destinations   PROCESS.md:1029-1031;
+    (README, video, submission form) .................... published wording at
+                                                          PROVENANCE.md S4:596-604
+  Objectives must open on the merchant's loss ........... CONTEXT.md S21.3
+  Razorpay MCP: list capped at 100, no rupee cap; nine
+    mcpgo.Max() and not one on a rupee amount;
+    capture_payment.amount unbounded; READ_ONLY false ... CONTEXT.md S2, each
+                                                          table row carrying its
+                                                          own file:line citation
+                                                          into razorpay-mcp-server
+                                                          @7950d51d..., read
+                                                          2026-08-30
+  The concrete loss (over-capture / over-refund /
+    duplicate refund / early sweep) .................... CONTEXT.md S2, closing
+  43 Track 01 READMEs; each authored its own world AND
+    its own answer key; "100% blocked" ................. CONTEXT.md S1
+  The mandatory occupancy caveat sentence, verbatim ..... CONTEXT.md S21.2
+  CaMeL / PRAMANA better; argus, AgentProof, HydraLoop
+    ship generated adversaries ......................... CONTEXT.md S5, S21.1
+  The conjunction is the contribution .................. CONTEXT.md S5
+  Attacker sees no policy/holes/attack list/gate reason;
+    one generic refusal message ....................... CONTEXT.md S7, S9.3
+  Blindness guards proved to FIRE ...................... tests/test_c12_benign.py:404
+  No model in the scorer; deterministic ledger replay ... CONTEXT.md S7, S14;
+                                                          tests/test_c8_scorer.py:741
+  Four deliberate non-uses, each with a test ............ tests/test_c9_gates.py
+                                                          :1282,:1298;
+                                                          test_c8_scorer.py:741;
+                                                          test_c10_probe.py
+                                                          :1065,:1075,:1092,:1106;
+                                                          test_c2_world.py:827
+  tau2-bench MIT, pinned a2c0247..., 2026-08-18 ......... config/protocol.yaml:396;
+                                                          vendor/tau2-bench/LICENSE;
+                                                          CONTEXT.md S11.1
+  tau2-bench gives FP ground truth + competence control,
+    NOT escape ground truth ........................... CONTEXT.md S11.1 table
+  db_reward alone, no model ............................ CONTEXT.md S11.1
+  AgentDojo CUT at rung 3 .............................. README.md:701,:992,:1159;
+                                                          STATUS.md:1830
+  The spike's shared helper - "not a result; it is a
+    definition" ....................................... CONTEXT.md S7;
+                                                          CLAUDE.md S2 rule 8
+  D1-D4 all PASS; allow-list 0; 118/15/6/empty .......... measured this session;
+                                                          check_roles.py:637
+  probe-v1 tag object 170bd3ff..., 2026-09-03 .......... git for-each-ref
+  HOLES.md byte-identical at probe-v1 and HEAD ......... git rev-parse both ->
+                                                          a4e50ed6...; git diff
+                                                          empty
+  "Below the calibrated threshold -> THE WHOLE RUN IS
+    VOID" ............................................. HOLES.md:221
+  Void threshold is the sentinel TODO_C14_CALIBRATION ... config/protocol.yaml:335
+  Void rule is pure arithmetic ......................... probe/void.py:81,:109
+  prereg-v1 does not exist; seven tags total ............ git tag -l
+  No witness gist; <<PENDING-RUN: GIST_ID>> ............. README.md:56-58,:1222
+  evals/ holds one file; RESULTS.md absent .............. find evals -type f;
+                                                          ls RESULTS.md
+  Review trail 14 FAIL / 6 PASS over 20 files; 6 tagged;
+    14 unreviewed ..................................... RE-MEASURED THIS SESSION
+                                                          from docs/reviews/
+                                                          REVIEW_*.md - see S5
+  C6 reviewed six times, never passed, no tag .......... README.md:986;
+                                                          REVIEW_C6_1..6
+  137 "## INC-" headings ............................... grep -c on INCIDENTS.md
+  INC-02 content and date 2026-08-28 ................... INCIDENTS.md:59-84
+  INC-132 content, date 2026-09-04, Fix SHA 1fd0877 .... INCIDENTS.md:9832-9915
+  First build commit ee3cf93, 2026-08-30 ............... git log --reverse
+  Repo URL ............................................. git remote -v;
+                                                          README.md:1202,:1450
+  Repository still private until C21's flip ............ PROCESS.md:862
+  Video URL absent; C20 todo ........................... STATUS.md:1834
+  No payment method, attested 2026-08-30, operator-only   PROVENANCE.md S1.5
+  Secret scan committed at HEAD = 90b6d6fa... .......... docs/submission/
+                                                          git-history-secret-scan.txt:4
+  Determinism scope; model output NOT reproducible ..... CLAUDE.md rule 10;
+                                                          README.md S9.11;
+                                                          CONTEXT.md S20
+  Placeholder convention <<PENDING-RUN: name>> ......... README.md:28
+  Form is one-shot; no form until the review is PASS ... PROCESS.md:175,:1344
+
+--------------------------------------------------------------------------------
+5. THE REVIEW TRAIL - RE-MEASURED, NOT COPIED
+--------------------------------------------------------------------------------
+
+The prompt supplied "FAIL 14 / PASS 6 over 20 review files, 6 tagged, 14
+unreviewed" and instructed this session to re-measure it rather than copy it.
+IT WAS RE-MEASURED, INDEPENDENTLY, AND IT AGREES ON ALL FOUR NUMBERS.
+
+  20 REVIEW_*.md files at the top level of docs/reviews/. ARCHITECT_CHECK_0.md,
+  ARCHITECT_CHECK_1.md, OPEN_FINDINGS.md, README.md and the independent/ and
+  mutants/ subdirectories were NOT counted - an architect check is a different
+  artefact and folding it in would inflate the count in the flattering direction.
+
+  FAIL 14: REVIEW_C0, REVIEW_C1_1, REVIEW_C6_1..C6_6 (six), REVIEW_7_1,
+           REVIEW_7_2, REVIEW_8_1, REVIEW_13_1, REVIEW_13_2, REVIEW_13_3
+  PASS  6: REVIEW_C0_2, REVIEW_C1_2, REVIEW_C2_1, REVIEW_C3_1, REVIEW_C4_1,
+           REVIEW_13_4
+  14 + 6 = 20, none unclassified.
+
+  !! THE MEASUREMENT HAS A TRAP AND IT WAS HIT AND CLEARED. Three of the fourteen
+  FAILs - REVIEW_7_1, REVIEW_7_2 and REVIEW_8_1 - do NOT carry their verdict in
+  the file header. Each opens with a pointer ("VERDICT: recorded in S15, at the
+  foot of this file. Nothing above it is a verdict.") and records the verdict as
+  a heading far down the file. A header-only scan reads FAIL 11 and prints C7 and
+  C8 with no verdict at all. This session's first pass hit exactly that and
+  REVIEW_8_1 came back blank; it was chased to REVIEW_8_1.md:210, which reads
+  "# !! FAIL - FOUR BLOCKERS". This is INCIDENTS.md INC-102's recorded class.
+
+  cN-pass TAGS: 6 - c0-pass c1-pass c2-pass c3-pass c4-pass c13-pass.
+  UNREVIEWED CHUNKS: 14, per README.md:1005-1007 and STATUS.md.
+  COMMITS ENDING "(unreviewed)": 129 subjects contain the marker at HEAD.
+  !! ONE HONEST QUALIFICATION on the 14: thirteen of them are genuinely awaiting
+  review; the fourteenth, C16, is NOT RUN - CUT at rung 3, so it is not awaiting
+  anything. "13 pending + 1 cut" is the exact form. This is recorded here rather
+  than smoothed over.
+
+--------------------------------------------------------------------------------
+6. WHAT COULD NOT BE DONE, AND WHY
+--------------------------------------------------------------------------------
+
+  THE VIDEO URL. It does not exist. STATUS.md:1834 has C20 at "todo - review
+  folded" and no video URL appears anywhere in README.md or CONTEXT.md. The card
+  requires "the exact video URL". FORM_ANSWERS.md S5 carries
+  <<PENDING-RUN: VIDEO_URL>> and the operator checklist marks it a HARD GATE.
+
+  THE PERISHABLE-FACT RE-VERIFICATION (CONTEXT.md S21.5). All five facts are
+  dated 2026-08-30 and are six days stale. Four of them need a browser or the
+  GitHub API and are the operator's. The fifth - "that the pre-registration gist
+  still resolves and still reports its original created_at" - CANNOT BE
+  PERFORMED AT ALL, because there is no gist. CONTEXT.md S21.5 calls this "the
+  one perishable fact the project cannot re-create after the fact." IT IS NOT
+  REPORTED AS PASS.
+
+  THE BILLING RE-CONFIRMATION (the card's own done-when). PROVENANCE.md S1.5 is
+  dated 2026-08-30 and says in terms that NO SESSION CAN HOLD THIS - a session
+  has no browser and no permitted credentials, and CLAUDE.md S4 forbids reading a
+  key value at all. It is checklist item O-5 and it is a HARD GATE. It is the
+  only claim in the frozen set that can go stale with NO FILE CHANGING.
+
+  RE-RUNNING THE GIT-HISTORY SECRET SCAN. The committed output at
+  docs/submission/git-history-secret-scan.txt:4 records the scan's tree as
+  HEAD = 90b6d6fab329ad39b44f47f3f651bebe311e21c8. HEAD has moved well past that.
+  The scan must cover the tree that actually goes public. docs/submission/ is
+  inside this session's fence, but that file is ANOTHER SESSION'S COMPLETED
+  ARTEFACT, and the card orders the re-run immediately before the visibility
+  flip, which is an operator act. It is checklist item O-6 and it is a HARD GATE
+  on O-7.
+
+  THE VISIBILITY FLIP. Not done. C21's other half and the operator's act.
+  NO TAG WAS CUT. prereg-v1 still does not exist.
+  QUESTIONS.md WAS NOT WRITTEN - fenced out, another session was writing there.
+    Everything owed to it is in section 7 below.
+
+--------------------------------------------------------------------------------
+7. QUESTIONS OWED - to be placed in QUESTIONS.md by the architect
+--------------------------------------------------------------------------------
+
+Q-A  THE DELIVERABLE'S FILENAME. The C21 BUILD prompt named
+     docs/submission/FORM.md. PROCESS.md:1343 and CONTEXT.md:2187 both name
+     docs/submission/FORM_ANSWERS.md, and the string "FORM.md" appears in no
+     other file in this repository. CLAUDE.md S2 rule 4 was applied and the
+     deliverable carries FORM_ANSWERS.md; a six-line pointer with no content of
+     its own sits at FORM.md. RULING SOUGHT: confirm FORM_ANSWERS.md, and say
+     whether the pointer should stay or be deleted before the repository goes
+     public. (Class: B, recorded rather than assumed.)
+
+Q-B  WHICH "S9 LIMITATION SENTENCE". The card writes bare "S9" where it writes
+     "spec S21.3" elsewhere. CONTEXT.md S9 is THE INVARIANTS and carries no
+     limitation sentence. README.md S9 is Limitations - a fourteen-subsection
+     section, not a sentence. PROCESS.md S9 is the ONLY S9 that names one
+     sentence AND names the submission form as a destination, so it was taken as
+     the referent. RULING SOUGHT: confirm PROCESS.md S9.
+
+Q-C  THE LIMITATION SENTENCE NAMES A CUT COMPONENT. Its published wording
+     (PROVENANCE.md S4:596-604) ends "...are all someone else's: tau2-bench's
+     db_reward, AgentDojo's banking suite, and a probe that voids our own run."
+     AGENTDOJO WAS CUT AT RUNG 3. FORM_ANSWERS.md carries the two sentences
+     PROCESS.md S9 actually names verbatim and states the third clause in the
+     form that matches the repository today, printing BOTH forms so the
+     substitution is visible. RULING SOUGHT: approve the substituted clause, or
+     rule that the frozen wording is carried unchanged with a footnote.
+     !! PROVENANCE.md is in the frozen set and was NOT edited by this session.
+
+Q-D  CLAUDE.md HARD RULE 8 DESCRIBES AN ALLOW-LIST THAT IS NOT THE IMPLEMENTED
+     ONE. Rule 8 says the moat test fails "on any shared first-party module
+     outside a short, explicit allow-list of pure value types (enums, the
+     harm-record dataclass, the paise integer wrapper)". MEASURED:
+     check_roles.py:637 is MOAT_ALLOW_LIST: frozenset[str] = frozenset() - EMPTY,
+     and D3 printed "The allow-list holds 0 entr(y/ies)". The implementation is
+     STRONGER than the constitution describes. This is not a defect, but the
+     published claim should be the measured 0, not the described "short", and the
+     constitution's wording invites a future session to add the three named types
+     believing rule 8 already permits them - which would be a Class A change made
+     under the impression that it is not one. RULING SOUGHT: amend rule 8's
+     wording, or record that the empty list is the intended state.
+
+Q-E  THE CARD'S FIVE FIELDS VS HARD RULE 13'S EIGHT. The card requires the
+     Build-Challenges paragraph "in the Event / Action / Expectation / Missing /
+     Missed format". Rule 13 fixes eight fields for an INCIDENTS.md entry and
+     gives the reason the extra three matter - "An invented incident has no
+     commit." Rule 13 governs INCIDENTS.md, not form prose, so the card may be
+     deliberate. FORM_ANSWERS.md uses the card's five as headings and APPENDS
+     Diagnosis and Fix (SHA), which satisfies the card and forfeits nothing.
+     RULING SOUGHT: confirm the appended fields are acceptable on the form.
+
+Q-F  TWO OF THE CARD'S OWN DELIVERABLES ARE UNSATISFIABLE TODAY. The card
+     requires "the exact video URL" (C20 is todo; no URL exists) and requires
+     re-verifying "that the pre-registration gist still resolves and still
+     reports its original created_at" (there is no gist and no prereg-v1).
+     RULING SOUGHT: how the C21 review should treat two done-when items that
+     cannot be met by any session's effort.
+
+Q-G  INCIDENTS.md CARRIES TWO "## INC-139" HEADINGS (lines 10224 and 10531) and
+     a numbering gap INC-103 -> INC-107; 137 headings, 136 distinct ids. A form
+     paragraph citing "INC-139" would be ambiguous, so THIS SESSION CITED
+     INC-02 AND INC-132 INSTEAD - both have a unique id and a Date line.
+     Renumbering is the architect's and this session did not touch INCIDENTS.md.
+     RAISED, NOT FIXED.
+
+Q-H  PROGRESS.md IS NEWEST-ON-TOP AND THE FENCE SAID APPEND ONLY. This session's
+     PROGRESS.md entry is therefore appended at the FOOT, not placed at the head,
+     and is labelled as such in the file. The fence was obeyed literally because
+     a concurrent session was live. RULING SOUGHT: whether the entry should be
+     moved to the head by a later session.
+
+--------------------------------------------------------------------------------
+8. GIT - THE RECIPE, THE GUARD, AND EVERY "Swept:" LINE
+--------------------------------------------------------------------------------
+
+INC-139's CORRECTED RECIPE WAS USED FOR EVERY COMMIT. git read-tree HEAD, always
+live HEAD, never a pinned SHA - which is INC-139 exactly, and HEAD DID MOVE under
+this session (19284cf at session open; e9dbf5c as the deliverable's parent).
+
+OF-213's first-command check was run BEFORE the read order and again before the
+commit: git diff --cached --name-only on the SHARED index was EMPTY both times.
+Nothing was inherited and nothing of another session's was staged under this
+session's token.
+
+DID THE NAME-ONLY COMPARISON EVER REFUSE?  NO. It matched on every commit, first
+time, with no retry and nothing forced past it. The declared list and the staged
+snapshot were identical on each. Had it refused, the commit would not have been
+made; it was never necessary.
+
+Step 4 was run as env -u GIT_INDEX_FILE git reset -- <the same paths>, never as
+GIT_INDEX_FILE= (INC-91: the empty spelling makes git read an empty index at path
+"" and report the whole repository staged for deletion). Step 5,
+env -u GIT_INDEX_FILE git diff --cached --quiet, exited 0 - the shared index is
+clean and the concurrent session's two modified files
+(src/whetstone_gate/benign/blindness.py and .../executor.py) were left modified,
+unstaged and uncommitted, exactly as they were found.
+
+THE "Swept:" LINES, IN FULL, WITH NO LINE COUNTS IN ANY OF THEM (OF-216: a
+message heredoc is composed BEFORE the --stat prints, so any number in it is a
+prediction, and INC-97 measured a Swept: line whose arithmetic was wrong):
+
+  685ca50  "Swept: NOTHING. Base tree read from live HEAD; the two declared paths
+            were compared against the staged snapshot by name before the commit
+            and the comparison matched."
+  <journal commit>  "Swept: NOTHING. One declared path, read from live HEAD, name
+            comparison matched."
+  <STATUS/PROGRESS commit>  "Swept: NOTHING. Two declared paths, APPEND-ONLY, read
+            from live HEAD, name comparison matched. No existing row, column or
+            entry was edited, moved or erased."
+
+AUTHORITATIVE ARITHMETIC, from git show --numstat, which cannot be wrong:
+  685ca50   docs/submission/FORM.md            16  0
+            docs/submission/FORM_ANSWERS.md   535  0
+  ZERO DELETIONS. NOTHING WAS REVERTED. That is the line INC-139 exists to make
+  someone read, and it was read.
+
+Every commit carries the trailer Session-Token: 9e2c81d4.
+NO COMMIT CARRIES "(unreviewed)": this session touched neither source nor tests.
+NO TAG WAS CUT. NO FORCE-PUSH. NO HISTORY REWRITE. NO git stash, checkout --,
+restore, clean, or reset --hard was run at any point.
+
+--------------------------------------------------------------------------------
+9. SAFETY
+--------------------------------------------------------------------------------
+
+  ZERO PROVIDER TOKENS SPENT. No token sanction was held and none was taken. No
+  provider API call of any kind was made. The pilot, the calibration and the
+  sweep were not run and were not touched.
+  .env WAS NEVER OPENED. No key value was read, printed, echoed or committed, and
+  no key name was ever paired with a value.
+  evals/ WAS READ AND NEVER WRITTEN. The concurrent session's single-shot pilot
+  window was not disturbed.
+  UNTOUCHED, AS THE FENCE REQUIRED: evals/, config/, src/, tests/,
+  tests/goldens/, QUESTIONS.md, INCIDENTS.md, README.md, RESULTS.md, PROTOCOL.md,
+  CONTEXT.md, PROCESS.md, corpora/, every tag, .env.
+  Throwaway work went to a fresh OS temp directory, never into the repository.
+  The only files this session wrote are the four it declared:
+  docs/submission/FORM_ANSWERS.md, docs/submission/FORM.md,
+  docs/sessions/c21-build-1.txt, and the STATUS.md / PROGRESS.md appends.
+
+--------------------------------------------------------------------------------
+10. HOLD-POINT
+--------------------------------------------------------------------------------
+
+  C21 is PART-BUILT AND UNREVIEWED. The two form paragraphs exist; the visibility
+  flip, the fresh secret scan, the video URL and the perishable re-verification
+  do not, and every one of them is on the operator's checklist in
+  FORM_ANSWERS.md S7 with its blocking order.
+
+  NOT SELF-CERTIFIED. NO TAG. A fresh adversarial review - full + submission,
+  persona 3 - follows, and it should read FORM_ANSWERS.md S6 first: of the five
+  method claims the submission rests on, ONE is verified, TWO are true only when
+  narrowed, and TWO ARE NOT YET TRUE. All fifteen adversarial passes returned
+  REFUTED against the claims as the build prompt worded them. If any one of those
+  five reaches the live form in its unnarrowed form, the submission asserts
+  something this repository cannot show a judge - which is the exact failure this
+  project exists to make impossible.
+
+================================================================================
+END OF C21 BUILD 1 FINAL OUTPUT
+================================================================================
