@@ -15537,3 +15537,144 @@ day's spend by them. **Disclosed, not fixed by contaminating the record.**
    is dead"* from *"the lane was paced too fast"*; it does not predict the second.** `Q-191`'s
    sliding window is the change aimed at that, and it is a different one.
 3. It does **not** close `OF-240`, `Q-143` or `Q-145`.
+
+
+---
+
+## ⚠️⚠️ `Q-195` — **IMPLEMENTING `Q-189`(d) MAKES THE FROZEN RECORD SELF-INCONSISTENT: `HOLES.md` §3.5 RULE 2 REQUIRES C14 TO PUBLISH "THE INTERVAL" BESIDE THE THRESHOLD, AND AFTER THIS CHANGE THE INTERVAL'S LOWER END IS NO LONGER WHERE THE THRESHOLD COMES FROM**
+
+**Status: OPEN. BLOCKING: nothing today — it blocks C14's write-up, not this session's code.**
+**Class A** (it decides a **published number's presentation** in a **frozen** artefact).
+**Raised by: ARCH WILSON 1 (`5c9e08f4`), 2026-09-04, AFTER implementing `Q-189`(d).**
+⚠️ **The implementation is COMPLETE and CORRECT to the ruling as written. This is not a defect in
+it. It is a consequence of the ruling that the ruling does not address, and it lands in a FROZEN
+artefact, which is why it is the architect's and not this session's.**
+
+### THE TEXT, QUOTED IN FULL FROM BOTH ARTEFACTS
+
+`HOLES.md` §3.5 rule 2 — ⚠️ **FROZEN, and under `probe-v1`, which resolves**
+(`170bd3ff4abfdd8f87f64055972a60c82cc54efc`):
+
+> **The void threshold is the LOWER BOUND of the 95% Wilson interval on the observed arm-1
+> probe-breach rate, ROUNDED DOWN to the nearest 5 pp.** The observed rate, **the interval** and
+> the resulting threshold are written into `PROTOCOL.md` and into this file, committed and tagged.
+
+`CONTEXT.md` §10.3 rule 2, lines 1289–1291 — the **same sentence**, and the artefact `Q-189`(d)
+names **first** in its own withdrawal condition:
+
+> The void threshold is set to the **lower bound of the 95% Wilson interval** on the observed arm-1
+> probe-breach rate, **rounded down to the nearest 5 pp**. The observed rate, **the interval** and
+> the resulting threshold are written into `PROTOCOL.md` and `HOLES.md`, committed and
+> **git-tagged**.
+
+### ⚠️ THE PROBLEM, STATED AS ARITHMETIC RATHER THAN AS A WORRY
+
+Both artefacts require C14 to write **THREE** things: the observed rate, **the interval**, and the
+threshold. Before `Q-189`(d) those three were one object — the threshold *was* the interval's lower
+end rounded down, so publishing all three was publishing one computation. **After `Q-189`(d) they
+are two different computations**, and the only `Interval` the code produces is the **two-sided**
+one, because that is what §12.4's published ceiling needs and what the ruling deliberately left
+alone. `wilson_lower_bound` now returns a **bare float** and no interval at all.
+
+**So C14 is obliged to publish an interval whose lower end and the threshold beside it disagree.**
+Measured at an illustrative 3/30 — ⚠️ **an illustration of the RULE, not an observed rate; the
+observed rate is `TODO_C14_CALIBRATION` and no calibration has run:**
+
+| what §3.5 rule 2 says to publish | value | source |
+|---|---|---|
+| the observed rate | *(hypothetical 3/30)* | the calibration |
+| **the interval** | **3.46% – 25.62%** | `wilson_interval`, TWO-SIDED |
+| **the threshold's source** | **4.07%** | `wilson_lower_bound`, ONE-SIDED (`Q-189`(d)) |
+
+A reader of `HOLES.md` will see an interval, then a threshold, and **the second cannot be derived
+from the first**. ⚠️ **That is precisely the shape of defect this project exists to criticise in
+other people's numbers** — a published figure whose stated derivation does not reproduce it — and
+it would be introduced by us, into a frozen artefact, in the write-up of the single number that
+decides whether we may publish at all.
+
+### THE OPTIONS SEEN, AND WHAT EACH COSTS
+
+1. **C14 publishes the ONE-SIDED bound as "the interval", written as a half-line `[4.07%, 1.0]`.**
+   Faithful to the threshold. ⚠️ But a one-sided bound is **not** the object §12.4 calls an
+   interval, and `HOLES.md` says *"the interval"* in a sentence whose other half is the two-sided
+   §12.4 vocabulary.
+2. **C14 publishes BOTH, labelled**: the two-sided interval (as §3.5's *"the interval"*) **and**
+   the one-sided lower bound (as the threshold's stated source), with one sentence saying why they
+   differ and citing `Q-189`(d). ⚠️ **This session's recommendation**, and the only option that
+   makes both frozen sentences true at once. It publishes one number more than the frozen text
+   asks for, which `CLAUDE.md` §4's *"the finding is published as a limitation"* already
+   contemplates.
+3. **C14 publishes only the one-sided bound and calls it "the interval".** Cheapest, and it makes
+   the frozen sentence read as satisfied when it is not. **Rejected here as exactly the silent
+   move this project's rules exist to prevent** — recorded as an option because the ruling belongs
+   to the architect, not because it is defensible.
+4. **Withdraw `Q-189`(d).** ⚠️ Available on the merits, and the arithmetic in `Q-189`(d) says what
+   it costs: the two-sided reading sets a **lower** threshold and makes a scored run **less** likely
+   to VOID. **That is the self-serving direction**, which is why the architect ruled the other way.
+
+**⚠️ NOTHING IS MIS-COMPUTED IN THE MEANTIME AND THAT IS MEASURED, NOT HOPED.**
+`config/protocol.yaml:352` is still `void_threshold_breach_rate: TODO_C14_CALIBRATION` and the
+loader RAISES on it. `RESULTS.md` was read in full: **ZERO occurrences** of *"Wilson"*, *"% CI"*,
+*"upper bound"*, `13.9`, `17.9` or `43.8` — **no interval of any kind is standing in the published
+report**, and that is the fact that makes this change safe to land today rather than after C14.
+There is no wrong number anywhere; there is an unanswered presentation question, which is a
+different and smaller thing — and it must be answered **before** C14 writes `HOLES.md`.
+
+---
+
+## ⚠️ `Q-196` — **`prereg-v1` DOES NOT EXIST YET, SO A `config/` KEY FOR THE SIDEDNESS IS STILL LANDABLE TODAY AND NEVER WILL BE AFTER THAT TAG. THIS IS A NOW-OR-NEVER CLASS A DECISION AND IT IS NOT THIS SESSION'S**
+
+**Status: OPEN. Raised by: ARCH WILSON 1 (`5c9e08f4`), 2026-09-04.** **Class A.**
+**Blocking: nothing. Expiring: at `git tag prereg-v1`.**
+
+**Measured, as this session's own check:** `git tag` → `c0-pass c1-pass c13-pass c2-pass c3-pass
+c4-pass probe-v1`. `git rev-parse probe-v1` → `170bd3ff…`. `git rev-parse prereg-v1` → **`fatal:
+ambiguous argument 'prereg-v1': unknown revision`.** So `PROTOCOL.md`, `PROVENANCE.md` and
+`config/` are **not yet under a freeze tag**; `HOLES.md` is (under `probe-v1`).
+
+⚠️ **THE POINT.** Hard rule 9 says *"every spec-specified value lives in `config/`"*. The sidedness
+of the void threshold's bound is now **a spec-specified choice** — the architect ruled it, and it
+changes a reported number — and it currently lives **nowhere in `config/`**. It is expressed only
+as the identity of the function `wilson_lower_bound` calls. This project has three precedents for
+exactly this shape: `statistics.quartile_method`, `statistics.rule_of_three_min_n` and
+`money.rounding` are all **named in `config/` precisely because an unnamed method is an
+unreproducible number**.
+
+**A key such as `statistics.void_bound_sidedness: one_sided` would make the ruling reproducible
+from `config/` alone rather than inferable only from a function name.** ⚠️ **This session did NOT
+add it**, and the reason is not timidity: `config/` is **explicitly outside this session's fence**,
+it is a pre-registration artefact whose blob SHAs are listed in `PROTOCOL.md` and verified by
+`make check-prereg` inside both `make eval` and `make test`, and adding a key is Class A. **But it
+is landable today and it is not landable after `prereg-v1`**, so recording it *now* is the only
+thing that keeps it a decision rather than a missed window.
+
+**What is true without it:** the sidedness is pinned by three tests
+(`tests/test_arch_wilson.py`'s AST guard, its numeric guard, and the frozen-artefact scan), the
+quantile is still **derived** from `statistics.confidence_level` and no z is typed anywhere in
+`src/`, so hard rule 9's *literal* prohibition is satisfied. What is missing is its *positive*
+half — the value being **stated** in `config/` rather than implied by code.
+
+---
+
+## ⚠️ `Q-197` — **§12.4's "±44 pp" LADDER CAPTION IS A PUBLISHED NUMBER THAT NO CODE GENERATES AND NO TEST READS, IN FOUR PLACES**
+
+**Status: OPEN, LOW. Raised by: ARCH WILSON 1 (`5c9e08f4`), 2026-09-04.**
+⚠️ **RECORDED HERE RATHER THAN IN `docs/reviews/OPEN_FINDINGS.md` BECAUSE `docs/reviews/` IS
+OUTSIDE THIS SESSION'S FENCE.** It belongs there and should be moved by a session that owns it;
+`INC-141`'s principle — say so rather than reach outside the fence — is why it is not moved here.
+
+`CONTEXT.md` §12.4.2 requires the ladder cell's interval to be *"printed on the figure, not in a
+footnote"*, and the figure is quoted as **±44 pp** at `CONTEXT.md`:1643, :1816, :2292 and :2405. It
+is a rounding of the ±43.8 pp Wald half-width that `published_table()` computes and that
+`tests/test_c10_probe.py` and now `tests/test_arch_wilson.py` both pin.
+
+⚠️ **But the four prose occurrences are pinned by nothing.** They are transcriptions. A change to
+`statistics.confidence_level` moves the computed value to ≈±36.8 pp while all four captions keep
+saying ±44, and **every test stays green** — the computed pins would move together with the config
+and agree with each other. It is the same species of defect as `INC-155`: a published number whose
+only guard is that nobody edited it.
+
+Not fixed here: `CONTEXT.md` is outside this session's fence, and the remedy (a test that parses
+the four captions and diffs them against `published_table()`, in the shape of
+`tests/test_c3_tau2_enumeration.py`, which already parses `CONTEXT.md` §11.1's counts back out of
+the prose) is a chunk's work rather than a line.

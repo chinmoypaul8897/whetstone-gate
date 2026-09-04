@@ -11912,3 +11912,141 @@ improvement worth naming is not a test but a habit: a prompt should carry the ba
 just its counts** — `arch-cal-build-1` had already recorded that a clean "before" was unobtainable on
 a moving tree (`INC-149`), and a count with no SHA cannot be re-measured by the session it is given
 to.
+
+
+---
+
+## INC-155 — one `z` fed two different published numbers, and the only test over the second one asserted a **hardcoded label** and an inequality true of every interval estimator ever written, so the naive fix would have moved a published ceiling with a **green suite**
+
+**Date:** 2026-09-04 (ARCH WILSON 1, `5c9e08f4`). Fix SHA under **Fix**.
+
+**Event:** architect ruling `Q-189`(d) required the void threshold's Wilson bound to become
+**one-sided**. `probe/statistics.py:143` computed it as `wilson_interval(successes, n, level).lower`,
+and `wilson_interval` took `z = two_sided_z(level)` at `:135`. The obvious implementation — change
+that `z` — satisfies the ruling in one line. ⚠️ **But `results/figures.py:142` calls the same
+`wilson_interval` to build the `WILSON_SCORE` ceiling that `CONTEXT.md` §12.4.4 attaches to every
+published non-zero rate, and publishes BOTH its ends.** So one `z` fed two different published
+numbers: §10.3's void threshold, which the ruling makes one-sided, and §12.4's ceiling, which is
+two-sided **correctly**. The second obvious implementation — moving
+`statistics.confidence_level` from `0.95` to `0.90`, which also yields z = 1.645 — moves §12.4's
+**six published half-widths and three zero-ceilings** as well, and edits a pre-registration artefact.
+
+**Action:** the coupling was verified at all three line numbers **before** anything was implemented,
+and a caller census established that `wilson_interval` has exactly **two** call sites in `src/`. The
+implemented shape shares the **algebra** through a private `_wilson_bounds(successes, n, z)` and
+shares **no quantile**: `wilson_interval` keeps `two_sided_z`, `wilson_lower_bound` takes a new
+`one_sided_z`. It was then proved by measurement rather than argued: **2,693 `(k, n)` pairs of
+`wilson_interval` compared against the pre-ruling module bit-for-bit with `==` — 0 mismatches — and
+1,991 published ceilings recomputed through `figures.ceiling_for` against the OLD module's own
+arithmetic — 0 moved.**
+
+**Expectation:** that a change to the `z` behind a **published** number would turn a test red. The
+suite is 1,199 tests and 3,706 assertions, `CONTEXT.md` §12.4's table is pinned in two separate
+files, and `PROCESS.md` §12's C10 done-when names that table explicitly. ⚠️ **It would not have.**
+
+**Missing:** any numeric pin on `results/figures.py`'s `successes > 0` branch. `published_table()`
+regenerates §12.4's grid, but that grid is **Wald half-widths and Clopper–Pearson zero-ceilings** —
+it never calls `wilson_interval` at all. `tests/test_c18_results.py:133` pins the ceiling column, but
+only for `successes == 0`, which `figures.py:130` guards **away** from `wilson_interval` entirely.
+⚠️ **Two apparently redundant pins both missed the one branch that actually publishes a Wilson
+number**, and the strings `"25.6"`, `"3.5"` and `"% CI"` appeared in **no test file in the
+repository**.
+
+**Missed:** ⚠️ **`tests/test_c18_results.py:161`, `test_a_nonzero_figure_gets_a_TWO_SIDED_Wilson_
+interval`, whose NAME contains the word `TWO_SIDED` and which therefore reads, at a glance, exactly
+like the guard that was absent.** Its two assertions are `"Wilson" in ceiling.method` — a hardcoded
+string constant at `figures.py:51` that no arithmetic touches — and `lower_pct < upper_pct`, which is
+true of every interval estimator ever written. **Both survive any `z`, any confidence level, and a
+wholesale swap to Agresti–Coull or Jeffreys.** The test was read by more than one session while this
+coupling was being discussed and its name was taken for its content.
+⚠️ **And the signal was in writing before the code was:** `Q-189`(d) RESIDUAL 2, committed on
+2026-09-04, states the coupling exactly and ends *"THIS SESSION DID NOT IMPLEMENT IT."* The hazard
+was published, correctly, by the session that found it; **what nobody wrote was that the suite could
+not detect it**, and that is the half that would have made the next session careful.
+
+**Diagnosis:** a test named for the property it *should* check, asserting only a hardcoded label and
+a universally-true inequality, is indistinguishable from a real guard at review time and provides
+none of its protection. The shared `z` then made a single-line edit sufficient to move a published
+number that nothing was watching.
+
+**Fix:** `23ba66c` — the quantile split (`one_sided_z`, `_wilson_bounds`, `_refuse_unless_a_
+proportion`) plus `tests/test_arch_wilson.py`, whose
+`test_S12_4s_PUBLISHED_CEILING_is_PINNED_to_its_exact_values` pins ten `(k, n)` cells to exact
+`Decimal` pairs **and** to `Ceiling.phrase()`. `phrase()` is asserted as well as the fields because
+it carries the confidence **label** (`"95.0% CI …"`), so it also catches the `config/` route — which
+`results/loader.py` reads on a path that never passes through
+`probe.statistics.confidence_level()` at all. Proved red against a tree with `wilson_interval`
+switched to one-sided (**4 red**) and against a tree with `config/`'s level moved to 0.90 (**7
+red**), both in throwaway OS temp directories.
+
+**Systemic guardrail:** ⚠️ **partial, and named as partial rather than claimed.** What is closed:
+this ceiling is now pinned to exact values, and the two quantities are asserted — numerically **and**
+on the AST — never to share a quantile again, so re-coupling them turns two tests red. What is
+**not** closed is the general class: *a published number whose only test asserts a constant string
+and a tautology*. `Q-197` records a second live instance found while writing this entry — §12.4's
+**±44 pp** ladder caption, quoted in four places in `CONTEXT.md`, generated by no code and read by no
+test. **The class needs a sweep, not a test**, and the sweep is not this session's.
+
+---
+
+## INC-156 — this session's prompt opened *"THE SINGLE-SHOT CALIBRATION IS RUNNING IN THE OPERATOR'S TERMINAL RIGHT NOW"* and it was **not running, and had never started**
+
+**Date:** 2026-09-04 (ARCH WILSON 1, `5c9e08f4`). Fix SHA under **Fix**.
+
+**Event:** the prompt's first two lines are a live-hazard warning: *"⚠️⚠️ THE SINGLE-SHOT CALIBRATION
+IS RUNNING IN THE OPERATOR'S TERMINAL RIGHT NOW. It writes to `evals/` and imports
+`src/whetstone_gate/driver/`. ⚠️ YOU MUST NOT WRITE EITHER. A crash-and-resume mid-run would
+re-import `driver/`, so an edit there is a live hazard, not a stylistic concern."* This session ran
+`INC-140`'s concurrency recipe before the read order and, in doing so, measured the machine.
+**There was no calibration process of any kind.**
+
+**Action:** four independent measurements, all read-only, before any conclusion was drawn:
+**(1)** a full `Win32_Process` inventory — **zero** `python.exe` or `python3.exe` processes on the
+machine, in a listing that names 88 `svchost.exe`, 42 `Code.exe` and 19 `claude.exe`;
+**(2)** `evals/` holds **28 files**, byte-for-byte the count `ARCH CAL PREP 1` recorded as its
+before-and-after, and **nothing under it has been written since 15:02:12Z**, which is
+`evals/cal/RUN_DECLARED.md` itself; **(3)** `find evals -name '*cal__*'` returns **zero** — not one
+calibration episode, checkpoint or ledger exists; **(4)** `evals/cal/RUN_DECLARED.md` §8, the
+operator-filled UTC start time, is **still blank**, exactly as `CAL PREP 1` left it and as
+`PROCESS.md` §6b requires until the moment of starting. The session then proceeded with its own
+gates, **touching nothing in `evals/`, `driver/` or `runner/` regardless**, because the fence
+forbids them whether or not a run is live.
+
+**Expectation:** that a prompt's stated live hazard describes the machine it is issued about. ⚠️ **It
+is the strongest instruction in the prompt** — it is the reason `driver/` and `runner/` are fenced
+off — and a session that takes it at face value inherits a false picture of what is safe.
+
+**Missing:** any machine-readable assertion of run state. There is no `evals/cal/RUN_STARTED` marker,
+no PID file, no lock. `RUN_DECLARED.md` §8's blank start time is the closest thing the repository has
+to one, and reading it is not part of any documented concurrency recipe — `INC-140`'s four steps
+enumerate **sessions**, not **runs**.
+
+**Missed:** ⚠️ **the repository was already saying so, in a file this session read for a different
+reason.** `STATUS.md`'s own top block, written by `CAL PREP 1` and unchanged since, reads *"THE
+CALIBRATION IS PREPARED, DECLARED AND HANDED OVER. ⚠️ IT WAS NOT RUN"* and *"GATE 4 — HANDED OVER,
+NOT RUN."* The prompt was drafted against the intention to start it and states the intention as a
+fact. **The two documents contradicted each other at the moment the prompt was written**, and
+`CLAUDE.md` §1 has a rule for exactly that shape — *"if the card, the spec and the logs disagree →
+STOP and write `QUESTIONS.md`"* — which is aimed at specifications and was not applied to a prompt's
+factual preamble.
+
+**Diagnosis:** the prompt described the operator's next action as though it were the current state,
+and nothing in the repository could contradict it fast enough to matter, because run-liveness is
+recorded only in prose that a session reads *after* the concurrency check. The error is
+**self-correcting in the safe direction** — it over-states a hazard and so buys extra caution — which
+is precisely why it could persist unnoticed.
+
+**Fix:** no code change; this entry and the report are the fix, and the finding is published rather
+than silently absorbed. ⚠️ **No SHA is claimed for a fix that does not exist** — an invented
+incident has no commit, and so does an invented remedy. The entry lands in the journal commit that
+follows `23ba66c`.
+
+**Systemic guardrail:** ⚠️ **none — accepted, because** the cheap remedy is worse than the disease.
+A liveness marker under `evals/` would be a **write to `evals/`**, which is append-only to every
+session and operator-only to delete, and a stale marker after a crash would assert a run that had
+stopped — turning a conservative error into a permissive one. The honest remedy is procedural and is
+recorded rather than built: **a prompt should state run-liveness as a measurement with its evidence
+(`§8`'s start time, the `cal__` artefact count) rather than as a fact**, which is the same shape as
+`INC-154`'s closing note that *"a prompt should carry the baseline's SHA, not just its counts."* Two
+consecutive sessions have now found the same class of defect in their own prompts, and that is the
+part worth keeping.
