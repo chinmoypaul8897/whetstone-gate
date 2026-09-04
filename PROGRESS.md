@@ -1,3 +1,84 @@
+## SESSION-TOKEN 7a1e3b52 — C17, BUILD 1 — 2026-09-04
+
+**Role:** BUILD. **Chunk:** C17. **Two jobs, because the card names two:** the §18 RACE beat **and**
+the audit log a non-author can read and follow. ⚠️ **FULL RECORD: `docs/sessions/c17-build-1.txt`.**
+⚠️ **SPEND: ZERO. No provider call in any mode**, and this session held no token sanction.
+⚠️ **`evals/` READ-ONLY AND NEVER WRITTEN**; `tests/goldens/` READ and never written; no tag cut or
+moved; **not self-certified** — C17 is `code`-reviewed and that review may raise BLOCKERs.
+
+**SHIPPED — `b332853`, 5 files, 1933 insertions, 0 deletions.**
+
+    docs/render/replay.py   the shared core: loads a stored episode and VERIFIES its chain
+    docs/render/race.py     DELIVERABLE A - the §18 RACE beat, five arms, one seed, 1400 ms/turn
+    docs/render/audit.py    DELIVERABLE B - one episode end to end, in plain English
+    docs/render/README.md   how to run both, and what each refuses to do
+    tests/test_c17_render.py  36 tests, all green
+
+**B WAS BUILT AS ITS OWN OUTPUT, NOT AS A BY-PRODUCT OF A.** The race answers *how fast*; the audit
+log answers *what happened, to whose money, and how do I know this file was not edited*. They share
+only the loader.
+
+**THE CHAIN IS RECOMPUTED, NOT TRUSTED — AND THE VERIFIER IS PROVED ABLE TO FAIL.** Hard rule 3 was
+run in its intended order: a standalone script **importing nothing from `whetstone_gate`** implemented
+the rule transcribed from `golden5b_ledger_writer.json`'s own `hash_rule`, was **CONTROLLED FIRST**
+against that fixture's three pinned digests — all three reproduced — and only then pointed at the real
+stored ledger. Golden 5's cases C and D are fired at the renderer, and **the defective stored-field
+verifier is written out in the test beside the real one and required to DISAGREE** (`VALID` vs
+`DETECTED at 3`). Without that discrimination, *"it verifies"* is unfalsifiable.
+
+**NO NETWORK, NO MODEL — FOUR WAYS, PROVED ABLE TO FAIL.** Transitive AST walk (closure **pinned at
+five modules**), raw source-text scan, `sys.modules` in a subprocess that actually renders, and a
+**socket guard** that proves the *capability* absent rather than merely unnamed. A real
+`import socket` / `import urllib.request` planted in `replay.py` turned **all four RED**; reverted and
+re-run green. ⚠️ **One real finding, recorded because it changed the test:** the runtime check first
+went red on `urllib` — **measured**, what is imported is **`urllib.parse` only**, a string parser
+pulled in by PyYAML, which hard rule 9 *requires* the renderer to reach `config/` through, with
+`urllib.request`, `socket`, `ssl` and `http.client` all **absent**. The check was made **precise** and
+the socket guard **added**: a refinement plus a strictly stronger check, never a relaxation.
+
+⚠️ **NO N WAS INVENTED. NO NOT-RUN ARM RENDERS AS A ZERO.** `n_decision.selected_branch` is
+`TODO_C14_PILOT` and the pilot returned `USABLE TO SELECT N: False`, so the caption renders the
+literal `<<PENDING-RUN: N>>`, and a test asserts no rendered `N = 50`/`N = 30` in any spelling appears
+in either renderer's output *or* source. Arm 1 ran and moved nothing → **MEASURED ZERO** with its bar
+track drawn; arms 2/2S/3/4 → **no bar track at all**. ⚠️ **All four harm components are zero in every
+stored episode**, so today literally every bar is empty and this labelling is the *only* thing
+separating *"the gate held"* from *"nothing ran"*.
+
+⚠️ **TRUNCATED, EMPTY AND ABSENT ARE THE DATA HERE, NOT EDGE CASES.** The gemma ledger stops at **turn
+8 of a 20-turn budget** and *every frame past it* prints `[NO DATA -- ledger ended at turn 8; not a
+measured zero]` — a bar that stops growing looks exactly like an attacker that tried and failed. The
+ten qwen ledgers are `"ledger": []` and verify **VALID BUT VACUOUS**: *"a chain over nothing proves
+nothing"*, never printed bare, because a bare `VALID` over an empty file is the most flattering true
+sentence available. A malformed episode is **refused**, not rendered as one in which nothing happened.
+
+**THE SUITE, WITH EVERY RED ATTRIBUTED.** `tests/test_c17_render.py` **36 passed**; suite excluding
+`test_repo_invariants` **5 failed, 1504 passed, 2 skipped**; `test_repo_invariants` **2 failed, 21
+passed**; tripwire **10 passed** (it scans `docs/render/`, and nothing there hardcodes a spec value).
+⚠️ **The five are PRE-EXISTING AND THAT WAS PROVED, NOT ASSERTED**: the five new files were moved
+aside to a temp directory and those five tests re-run — all five failed **identically** without my
+code present, then restored.
+
+⚠️ **THE OTHER TWO REDS ARE THIS SESSION'S COMMIT AND ARE `INC-141`'s TRAP EXACTLY.** `check-roles`
+went **21/0 → 20/1**: `[FAIL] E1 FORGED/UNISSUED: {'7a1e3b52': ['b332853']}`. `7a1e3b52` has **no
+issued row** — `grep -c` → **1**, and that one occurrence is another session's *prose* naming this
+session as live. `QUESTIONS.md` is **outside this session's fence**, and `INC-141` records that
+writing your own row *"WOULD BE THE EXACT SHAPE OF THE DEFECT E1 EXISTS TO CATCH"*. **I did not write
+it, and the next session must not either.** Both reds are one fault and clear together on one line:
+`| `7a1e3b52` | C17 | BUILD | 2026-09-04 |`.
+
+**SEVEN QUESTIONS OWED**, in `docs/sessions/c17-build-1.txt` §9 — including §18's *"five money bars"*
+against §12.2's *"never summed"* (I built **four component tracks with five bars each**, because a
+stacked bar puts the forbidden sum back on screen as a **length**; raised rather than settled), §18's
+**1400 ms/turn having no home in a frozen `config/`**, and ⚠️ **`INC-140`'s recipe being only
+PARTIALLY EXECUTABLE from inside a session on this machine** — steps 3–4 were refused by the harness's
+auto-mode classifier, so four fresh `claude.exe` processes could not be resolved to working trees at
+all. The prompt's actual stop condition was answered by other means and is recorded in §1.
+
+⚠️ **ONE DONE-WHEN CLAUSE THIS SESSION CANNOT DISCHARGE, STATED PLAINLY:** *"handed to a **non-author**
+who can follow one episode end to end"* requires a non-author. I am the author. The log is made
+followable and **prints its own gaps**; whether a non-author can actually follow it is the review's to
+measure.
+
 ## SESSION-TOKEN 3d7f21ac — C14, ABORT 1 — 2026-09-04
 
 **Role:** FIX. **Chunk:** C14. **One job:** write the single-shot calibration's aborted attempt 1 to

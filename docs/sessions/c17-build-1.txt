@@ -1,0 +1,435 @@
+================================================================================
+C17 BUILD 1   SESSION-TOKEN 7a1e3b52   ROLE: BUILD   2026-09-04
+docs/render/ - THE REPLAY RENDERER. TWO DELIVERABLES, ONE BUILD.
+================================================================================
+
+PUSHED SHA: b332853  (code + tests)  and the journal commit that carries this file.
+            Both stated again at the end of S12, after the push.
+
+SPEND: ZERO, IN EVERY MODE. No provider call was made. This session held no token
+sanction and none was taken. No tag was cut or moved. Nothing under evals/ was
+written, read-only throughout. tests/goldens/ was READ and NEVER written.
+NOT SELF-CERTIFIED - C17 is `code`-reviewed and that review may raise BLOCKERs.
+
+--------------------------------------------------------------------------------
+1. THE CONCURRENCY CHECK, RUN FIRST, BEFORE THE READ ORDER (INC-140's recipe)
+--------------------------------------------------------------------------------
+
+The prompt's stop condition is narrow: STOP ONLY IF another live session HOLDS
+`7a1e3b52` OR IS WRITING TO docs/render/. NEITHER FIRED. Measured, not assumed:
+
+  step 1  Win32_Process WHERE Name='claude.exe'  -> 6 CLI processes
+  step 2  --resume= per command line             -> 2 resumed, 4 fresh
+  step 3  UUID -> project slug (existence probe only)
+            ca0152c1  -> c--Users-chinm-role-playoff-hackathon   A DIFFERENT REPO
+            99119ca6  -> c--Users-chinm-whetstone-gate           THIS TREE
+            511a8849  -> c--Users-chinm-whetstone-gate           THIS SESSION (me)
+  step 4  cwd from the transcript                -> BLOCKED, see below
+
+! STEP 4 COULD NOT BE COMPLETED AND THAT IS REPORTED, NOT PAPERED OVER. Reading
+  any other session's transcript was refused by the harness's auto-mode classifier,
+  twice, on two different tools. So the four FRESH processes could not be resolved
+  to working trees at all. INC-140's recipe is therefore only PARTIALLY executable
+  from inside this session on this machine, which is a NEW limit on it, and it is
+  the first thing S11 owes.
+
+  99119ca6 IS THE ARCHITECT CONSOLE - INC-140 identifies that exact UUID as such,
+  and the prompt states four sessions have independently measured it READ-ONLY BY
+  ROLE. Not re-litigated here.
+
+WHAT WAS MEASURED INSTEAD, AND IT ANSWERS THE ACTUAL STOP CONDITION:
+
+  (a) NO OTHER SESSION HOLDS `7a1e3b52`. Zero commits carry it as a Session-Token
+      trailer. Its only appearances anywhere are THREE mentions BY OTHER SESSIONS
+      NAMING ME so they would not race me:
+        QUESTIONS.md:978  "A second session holds this file - `7a1e3b52` (C17
+                           BUILD), live, with QUESTIONS.md outside its fence"
+        30e87bc, 77d5be4  the same statement in two commit messages
+      That is the OPPOSITE of a co-holder: it is other sessions observing me.
+  (b) NOBODY IS WRITING docs/render/. THE DIRECTORY DID NOT EXIST. I created it.
+  (c) No .git/index.lock or HEAD.lock present.
+  (d) The SHARED index was CLEAN at session start (`git diff --cached` exit 0) -
+      PROCESS.md S7b's own first-command-of-a-session check, OF-213.
+
+OF-213 CONFIRMED AND NOT "CLEANED". benign/blindness.py and benign/executor.py
+carry an index `M` while `git diff HEAD` on them is EMPTY and their worktree blobs
+are BYTE-IDENTICAL to HEAD:
+  blindness.py  worktree 3658539894766611abef3d80475b212d28f4b009 == HEAD
+  executor.py   worktree 13f0e7aaf40414ff55ac008d505a2b09a74a0476 == HEAD
+A stale stat cache. Untouched, exactly as instructed.
+
+--------------------------------------------------------------------------------
+2. THE TWO DELIVERABLES, AND WHERE EACH LIVES
+--------------------------------------------------------------------------------
+
+  A. THE S18 RACE BEAT ............ docs/render/race.py
+     Five arms, one seed, one frame per turn, 1400 ms/turn, caption stating the
+     seed and N. `--list`, `--seed`, `--no-animate`, `--ms-per-turn`.
+
+  B. THE AUDIT LOG ................ docs/render/audit.py
+     One episode end to end in plain English: what the agent called, on what, for
+     how much, what the gate said, what Razorpay said, whether it EXECUTED, what
+     was booked, and the chain link for that row. `--episode`, `--all`.
+
+     SHARED CORE .................. docs/render/replay.py   (loads + VERIFIES)
+     HOW TO RUN IT ................ docs/render/README.md
+     THE TESTS .................... tests/test_c17_render.py   (36, all green)
+
+B IS NOT A BY-PRODUCT OF A AND WAS NOT BUILT AS ONE. The race answers "how fast".
+The audit log answers "what happened, to whose money, and how do I know this file
+was not edited". They share only the loader.
+
+! CONTEXT.md's OWN TREE (line 2183) PUTS render/ UNDER docs/, so the card, the
+  fence and the spec agree and there was no rule-4 conflict to stop on. Checked
+  before a line was written, because a disagreement there would have been a STOP.
+
+--------------------------------------------------------------------------------
+3. HOW IT BEHAVES ON A TRUNCATED, AN EMPTY AND AN ABSENT LEDGER
+   - MEASURED AGAINST THE REAL PILOT FILES, NOT AN IMAGINED ONE
+--------------------------------------------------------------------------------
+
+The eleven stored episodes are ALL ARM 1 and they are the pilot's. What they are:
+
+  TRUNCATED   pilot__1__2101__gemma-26b.json   8 entries, turn_index 0..7,
+              against a turn budget of 20 read from config.
+              RENDERS AS: "TRUNCATED - stopped after turn 8 of a 20-turn budget;
+              the remaining 12 turns were never attempted", plus - and this is the
+              part that matters - EVERY RACE FRAME FROM TURN 9 ON prints
+              "[NO DATA -- ledger ended at turn 8; not a measured zero]" beside the
+              bar. A bar that stops growing at turn 8 looks EXACTLY like an
+              attacker that tried and achieved nothing. It is marked per FRAME, not
+              once in a footer.
+
+  EMPTY       the ten qwen-27b episodes, seeds 2101-2110, literally "ledger": []
+              RENDERS AS: "VALID -- BUT VACUOUSLY SO. This ledger has ZERO entries.
+              A chain over nothing verifies trivially. It is NOT evidence that the
+              episode ran correctly; it is the absence of any evidence at all."
+              ! An empty ledger DOES verify VALID. Printing that bare would be the
+              most flattering true sentence available, so it is never printed bare.
+
+  ABSENT      arms 2, 2S, 3 and 4 - no file at any seed
+              RENDERS AS: "-- NOT RUN --  no episode file for this arm at this
+              seed", WITH NO BAR TRACK DRAWN AT ALL, and a per-frame footer
+              "ARMS WITH NO DATA: 2, 2S, 3, 4  (4 of 5 arms have never run)".
+              Tested three ways: an empty evals/episodes/, a missing evals/ entirely,
+              and by_arm() over an empty list. None crashes; none fabricates.
+
+  MALFORMED   a file with no `ledger` array, or no declared genesis/algorithm, is
+              REFUSED with a typed EpisodeLoadError rather than rendered as "an
+              episode in which nothing happened".
+
+--------------------------------------------------------------------------------
+4. THE CHAIN IS VERIFIED, NOT TRUSTED - AND THE VERIFIER IS PROVED ABLE TO FAIL
+--------------------------------------------------------------------------------
+
+HAND-COMPUTED BEFORE THE CODE (hard rule 3). A standalone script IMPORTING NOTHING
+FROM whetstone_gate implements the rule transcribed from golden5b_ledger_writer
+.json's own `hash_rule` field. CONTROL FIRST, and a failing control would have been
+a STOP - it was required to reproduce golden 5b's THREE PINNED digests before it
+was allowed to derive anything:
+
+    seq 1  186a2118ba239d24936e48a485c33b099d97bb0daa848cece504fc6db1aedf5d  OK
+    seq 2  26019af38ccd8c0f7fedbbb5d4f893bd3d6f10aeca6cf9b953d6650d13ecbc2c  OK
+    seq 3  5433c3f43df511d5f834972112a102936bf6569d0359f844d290f667524edf86  OK
+
+Only then was it pointed at the real stored ledger. HAND-DERIVED, then confirmed to
+agree with the shipped chain.verify on all five cases:
+
+    gemma untouched        VALID,    first_bad None    head 95bddf223040cc0c...
+    qwen empty             VALID,    first_bad None    (VACUOUS)
+    seq-3 CONTENT edited   DETECTED, first_bad 3
+    seq-4 link zeroed      DETECTED, first_bad 4
+    middle entry deleted   DETECTED, first_bad 6
+
+THE DISCRIMINATION IS ASSERTED, WHICH IS THE POINT. On the content edit - every
+stored prev_hash and hash left INTACT, golden 5's cases C and D - the DEFECTIVE
+stored-field verifier is written out in the test beside the real one and required
+to DISAGREE:
+    stored-field verifier -> VALID     (walks past it)
+    the renderer          -> DETECTED at 3
+Without that, a renderer that always returned DETECTED and one that genuinely
+recomputes would both pass every other test in the file.
+
+AND THE RENDERER REFUSES TO ANIMATE A TAMPERED LEDGER: the audit log prints
+"THIS FILE DOES NOT MATCH ITS OWN DIGESTS" and does not present the entries as a
+record of what happened. The tampered copy was written to a TEMP directory;
+evals/ was never written.
+
+GENESIS PROVENANCE, REPORTED AS A SEPARATE LINE RATHER THAN FOLDED INTO THE VERDICT:
+the episodes declare genesis 170bd3ff4abfdd8f87f64055972a60c82cc54efc, which is the
+`probe-v1` TAG OBJECT ID (`git cat-file -t` -> tag), and it agrees with
+config/protocol.yaml. An episode written under a root that has since moved is
+INTERNALLY sound and EXTERNALLY out of date, and a reader needs both facts, not
+their conjunction. `prereg-v1` does not exist yet, so these are cryptographically
+distinguishable from scored episodes - which is the free proof PROTOCOL.md's genesis
+binding buys.
+
+--------------------------------------------------------------------------------
+5. THE IMPORT TEST, PROVED ABLE TO FAIL
+--------------------------------------------------------------------------------
+
+FOUR WAYS, because INC-51 is the entry about an AST walk printing CLEAN over a live
+reach - a call expression is not an ast.Import node, BY CONSTRUCTION.
+
+  WAY ONE   transitive AST walk over the first-party closure, seeded at every file
+            in docs/render/. The closure is PINNED at 5 modules so the assertion
+            cannot quietly become a claim about somebody else's package:
+              whetstone_gate._console, .config, .ledger.chain, .ledger.entry,
+              .world.harm
+            Plus: the renderer reaches NEITHER attacker, runner, gates, scorer,
+            benign, driver NOR tau2. A renderer that could reach the attacker could
+            re-run it. It cannot reach it.
+  WAY TWO   raw source-text scan for client import lines and for every dynamic
+            form INC-51 measured (importlib, __import__, sys.modules, exec, eval,
+            runpy, pkgutil).
+  WAY THREE sys.modules in a SUBPROCESS THAT ACTUALLY RENDERS a race frame and an
+            audit log - the shape INC-51's planted reach would have failed.
+  WAY FOUR  A SOCKET GUARD. socket.socket, create_connection and getaddrinfo are
+            replaced with functions that RAISE, before the renderer is imported,
+            and then all 20 frames and all 11 audit logs are rendered. This proves
+            the CAPABILITY is absent rather than merely unnamed, and it survives a
+            rename of every module in the refused list.
+
+PROVED ABLE TO FAIL, BY PLANTING A REAL LEAK IN THE REAL RENDERER:
+  `import socket` + `import urllib.request` added to docs/render/replay.py ->
+     FAILED WAY ONE   (transitive import walk)
+     FAILED WAY TWO   (raw source text scan)
+     FAILED WAY THREE (sys.modules in the rendering subprocess)
+     FAILED WAY FOUR  (socket guard: the process died in ssl.py)
+  The plant was REVERTED and the suite re-run green. Each way ALSO ships its own
+  planted-input test inside the file, so the proof does not depend on my having
+  done it once by hand.
+
+! ONE REAL FINDING FROM WAY THREE, RECORDED BECAUSE IT CHANGED THE TEST. The first
+  version intersected on the TOP-LEVEL module name and went RED on `urllib`.
+  MEASURED rather than assumed: what is actually imported is `urllib.parse` ONLY -
+  urllib.request, socket, ssl and http.client are ALL ABSENT - and urllib.parse is
+  a STRING PARSER pulled in by PyYAML, which hard rule 9 REQUIRES the renderer to
+  reach config through. The check was made PRECISE (exact dotted names) and WAY
+  FOUR was ADDED. That is a refinement plus a strictly stronger check, NOT a
+  relaxation; excluding urllib.parse by name alone would have been an amnesty, and
+  the capability proof is what makes the narrowing safe.
+
+--------------------------------------------------------------------------------
+6. NO N WAS INVENTED. NO NOT-RUN ARM RENDERS AS A ZERO. CONFIRMED.
+--------------------------------------------------------------------------------
+
+! NO N WAS INVENTED, GUESSED OR DEFAULTED, ANYWHERE.
+  config/protocol.yaml n_decision.selected_branch is TODO_C14_PILOT and the pilot
+  returned USABLE TO SELECT N: False (RESULTS.md S3.2, INC-142). The caption renders
+  the literal string `<<PENDING-RUN: N>>`, README.md:28's convention. A test asserts
+  the placeholder is present AND that no rendered "N = 50" / "N = 30" in any spelling
+  appears in either renderer's output or source. Neither branch value (50, 30) is
+  written anywhere in docs/render/.
+
+! NO NOT-RUN ARM RENDERS AS A ZERO, AND THE DISTINCTION SURVIVES INTO THE TEXT.
+  Arm 1 ran and moved nothing            -> "MEASURED ZERO", bar track DRAWN, empty
+  Arms 2, 2S, 3, 4 have no data          -> "-- NOT RUN --", NO BAR TRACK AT ALL
+  A test walks the rendered frame line by line and asserts that no line for arms
+  2/2S/3/4 contains a bar bracket at all, and that the two phrases appear a
+  DIFFERENT number of times - so a future refactor that collapsed them into one
+  string goes red.
+  This matters more here than it would anywhere else: ALL FOUR HARM COMPONENTS ARE
+  ZERO IN EVERY STORED EPISODE, so today literally every bar is empty and the ONLY
+  thing distinguishing "the gate held" from "nothing ran" is this labelling.
+
+--------------------------------------------------------------------------------
+7. THE QUESTIONS A NON-AUTHOR WOULD STILL HAVE
+   (written down, rather than asserting there are none)
+--------------------------------------------------------------------------------
+
+The card's done-when is "a non-author can follow one episode end to end WITHOUT
+ASKING A QUESTION". The honest way to meet that is to answer what the record can
+and NAME what it cannot, so the audit log PRINTS these itself:
+
+   1. N is not set, and why.
+   2. Four of the five arms have never run, so nothing here compares gates.
+   3. The ledger does not record WHAT THE ATTACKER SAID - not the prompt, not the
+      reasoning, not the refusal text. It records calls and their fate.
+   4. "The tool layer refused it" does not say WHY. The schema distinguishes that
+      outcome from a Razorpay refusal but stores no reason string for it.
+   5. A VALID chain proves the file is internally consistent WITH ITS OWN ROOT. It
+      does not prove the root is the right one, and cannot.
+
+AND THESE, WHICH THE LOG DOES NOT PRINT AND WHICH I OWE THE ARCHITECT:
+
+   6. Why did the gemma episode stop at turn 8? The ledger records that it did, not
+      why. A reader will ask, and nothing in evals/episodes/ answers it.
+   7. Why are ten qwen ledgers empty? Same shape of gap.
+   8. Two of the eleven stored episodes are seed 2101 arm 1 (gemma AND qwen). The
+      race must pick one. It shows gemma and DISCLOSES the other on screen - "ALSO
+      ON DISK, NOT SHOWN: qwen-27b" - rather than picking silently, but WHICH ONE
+      THE VIDEO SHOULD USE IS NOT MINE TO DECIDE. See S9(6).
+   9. ! THE DONE-WHEN ITSELF IS NOT DISCHARGED BY ME AND I WILL NOT CLAIM IT IS.
+      "handed to a NON-AUTHOR who can follow one episode end to end" requires a
+      non-author. I am the author. I have made it followable and printed its own
+      gaps; whether a non-author can actually follow it is the review's to measure,
+      and it is the one done-when clause this session cannot self-certify.
+
+ONE MISREADING WAS FOUND AND FIXED WHILE WRITING IT: the log first printed "the gate
+let the call through" on arm 1 - which CREDITS A GATE THAT DOES NOT EXIST, arm 1
+being the no-gate baseline. It now reads "ALLOWED - BY CONSTRUCTION, NOT BY
+JUDGEMENT: arm 1 is the NO-GATE baseline. Nothing was consulted and nothing could
+have blocked this." A test pins it.
+
+--------------------------------------------------------------------------------
+8. THE FULL SUITE, AND EVERY RED ATTRIBUTED
+--------------------------------------------------------------------------------
+
+  tests/test_c17_render.py                     36 passed        (mine, all green)
+  whole suite excluding test_repo_invariants   5 failed, 1504 passed, 2 skipped
+  tests/test_repo_invariants.py                2 failed, 21 passed
+  tests/test_tripwire_registry.py              10 passed        (scans docs/render/)
+
+FIVE PRE-EXISTING REDS, AND I PROVED THEY ARE NOT MINE RATHER THAN ASSERTING IT.
+My five files were MOVED ASIDE to a temp directory and the five tests re-run: all
+five fail IDENTICALLY without my code present. Restored immediately after.
+
+  1. test_c12_benign.py::test_the_benign_package_imports_no_model_client_WAY_ONE_
+     the_transitive_ast_walk
+  2. test_c7_ledger.py::test_Q069_nothing_in_this_repository_imports_the_ledger_yet
+  3. test_c8_scorer.py::test_golden2_coverage_block_reproduces
+  4. test_c8_scorer.py::test_null_is_not_empty_a_scorer_returning_empty_for_absent_
+     subjects_passes_seven_of_eight
+  5. test_lanes_operator_placeholders.py::test_the_camel_branch_is_decided_before_
+     any_camel_run
+
+  (The prompt said EIGHT reds were attributed by the previous session; FIVE remain,
+  so three cleared between that session and this one. Not my doing and not claimed.)
+
+TWO FURTHER REDS ARE CAUSED BY THIS SESSION'S COMMIT AND ARE INC-141's TRAP EXACTLY:
+
+  6. test_repo_invariants.py::test_no_commit_carries_a_forged_or_reused_session_token
+  7. test_repo_invariants.py::test_check_roles_exits_zero
+
+  MEASURED BEFORE AND AFTER, against the same tree:
+    BEFORE my commit:  check-roles  21 passed, 0 failed, 3 n/a   E1 PASS
+    AFTER  my commit:  check-roles  20 passed, 1 failed, 3 n/a
+                       [FAIL] E1  FORGED/UNISSUED: {'7a1e3b52': ['b332853']}
+                              - not present in QUESTIONS.md ## Session tokens
+    Independently: grep -c "7a1e3b52" QUESTIONS.md -> 1, and that ONE occurrence is
+    another session's PROSE naming me, not an issued row. The token table's last
+    rows are 8f3c72e1, 9a4d63b2, 2e5b8a47, 5c9e08f4 - no 7a1e3b52.
+
+  ! I DID NOT WRITE MY OWN ROW, FOR TWO REASONS, AND THE NEXT SESSION MUST NOT
+    EITHER. (i) QUESTIONS.md is OUTSIDE THIS SESSION'S FENCE. (ii) INC-141 records
+    that turning E1 green by writing your own issued-token row "WOULD BE THE EXACT
+    SHAPE OF THE DEFECT E1 EXISTS TO CATCH - a session vouching for its own
+    identity". Both reds are ONE fault and clear together on one row.
+
+  THE REMEDY, FOR THE ARCHITECT TO PASTE INTO QUESTIONS.md's token table:
+        | `7a1e3b52` | C17 | BUILD | 2026-09-04 |
+
+--------------------------------------------------------------------------------
+9. QUESTIONS OWED
+--------------------------------------------------------------------------------
+
+  1. ! S18 SAYS "FIVE MONEY BARS"; S12.2 SAYS THE FOUR HARM COMPONENTS ARE NEVER
+     SUMMED. THESE PULL APART AND I HAD TO CHOOSE.
+     A stacked five-bar chart would put the forbidden sum back on screen as a
+     LENGTH, in the one artefact a judge watches - the same claim in a costume.
+     I BUILT FOUR COMPONENT TRACKS WITH FIVE BARS EACH: five money bars racing,
+     four times over, nothing added to anything. It is labelled on screen and in
+     docs/render/README.md. THIS IS A PRESENTATION DECISION WITH A CLASS-A FLAVOUR
+     AND I AM RAISING IT RATHER THAN LETTING IT STAND UNREMARKED. If the architect
+     prefers a single bar per arm, the shape of the fix is small and local to
+     race.frame() - but it should be a ruling, not my default.
+
+  2. ! S18's "1400 ms/turn" HAS NO HOME IN config/, AND config/ IS FROZEN.
+     Hard rule 9 says every spec-specified value lives in config/. 1400 is
+     spec-specified (S18) and is in NEITHER config/ NOR S8.6's constants table, and
+     config/ is a pre-registration artefact this session may not edit. I declared it
+     as a NAMED module constant `MS_PER_TURN`, documented as presentation-only,
+     overridable with --ms-per-turn, entering no published figure. NOT smuggled in
+     as a bare literal. A ruling is owed on whether it should become a config key
+     before the video, or stay declared where it is.
+
+  3. THE PLACEHOLDER IS SPELLED `<<PENDING-RUN: N>>` BECAUSE THE PROMPT SAID SO, IN
+     TERMS. README.md already carries `<<PENDING-RUN: N-branch>>` for what looks
+     like the same quantity. I followed the prompt exactly rather than harmonising
+     on my own judgement. If they are the same quantity, one of the two should move,
+     and that is a ruling, not a build decision.
+
+  4. Q-069's TEST DOES NOT SCAN docs/render/, AND docs/render/ NOW IMPORTS THE
+     LEDGER. test_Q069_nothing_in_this_repository_imports_the_ledger_yet globs
+     `src/**/*.py` and `tests/**/*.py` only, so my renderer's legitimate
+     `from whetstone_gate.ledger.chain import verify` produces NO offender and I did
+     NOT widen that red. I am flagging it rather than enjoying it: the renderer is a
+     REPLAY READER, the same side of the moat as scorer/, and Q-069's ruling allows
+     that side. When someone narrows that test to the gate side, docs/render/ should
+     be in its scan set on purpose rather than out of it by accident.
+
+  5. THE `7a1e3b52` ISSUED ROW IS MISSING. S8(6-7) above. One line, architect's.
+
+  6. TWO STORED EPISODES EXIST FOR SEED 2101 ARM 1 (gemma-26b AND qwen-27b). The
+     race renders gemma and states on screen that qwen is also on disk and not
+     shown. WHICH ONE THE VIDEO'S RACE BEAT SHOULD USE IS NOT A BUILD DECISION.
+
+  7. ! INC-140's RECIPE IS ONLY PARTIALLY EXECUTABLE FROM INSIDE A SESSION ON THIS
+     MACHINE. Steps 3 and 4 - resolving a session UUID to its transcript and reading
+     its `cwd` - were REFUSED by the harness's auto-mode classifier, on two
+     different tools. Steps 1 and 2 (the process table and the --resume UUID) ran
+     fine, and an existence-only probe resolved the two RESUMED sessions to project
+     slugs. But FOUR FRESH sessions could not be resolved at all. INC-140 calls the
+     detection half "closed and cheap enough to be mandatory"; on this machine, in
+     this permission mode, IT IS NOT FULLY AVAILABLE, and a future prompt that
+     mandates it should say what a session does when step 4 is refused. I answered
+     the prompt's actual stop condition by other means (S1) rather than treating the
+     refusal as a pass.
+
+--------------------------------------------------------------------------------
+10. WHAT I COULD NOT DO
+--------------------------------------------------------------------------------
+
+  - I could not complete INC-140's steps 3-4 for the four fresh sessions. S9(7).
+  - I could not discharge "handed to a NON-AUTHOR". I am the author. S7(9).
+  - I could not write the `7a1e3b52` issued row - fenced out, and INC-141 forbids a
+    session vouching for itself. So I leave check-roles RED and say so loudly.
+  - I could not add 1400 ms/turn to config/ - frozen artefact. S9(2).
+  - I did not touch: evals/ (read-only; the calibration's directory), any existing
+    test file, src/whetstone_gate/ anywhere, tests/goldens/, config/, CONTEXT.md,
+    PROCESS.md, HOLES.md, PROTOCOL.md, QUESTIONS.md, INCIDENTS.md, corpora/,
+    docs/submission/, README.md, RESULTS.md, any tag, .env.
+  - NO INCIDENTS.md ENTRY WAS WRITTEN, because INCIDENTS.md is outside this
+    session's fence. Nothing broke that would owe one: no review FAIL, no aborted
+    run, no damaged record. The one thing worth an entry - INC-140's recipe being
+    only partially executable - is raised as S9(7) for the architect to place.
+
+--------------------------------------------------------------------------------
+11. NOTE ON THE PROMPT'S OPENING CLAIM
+--------------------------------------------------------------------------------
+
+The prompt states "THE SINGLE-SHOT CALIBRATION IS RUNNING IN THE OPERATOR'S TERMINAL
+AND IS WRITING TO evals/". At session start there were ZERO python processes on this
+machine and only two files under evals/ modified after 12:00. I therefore cannot
+confirm it was running, and INC-156 records the same prompt line being false for an
+earlier session. THIS CHANGED NOTHING I DID: evals/ is read-only to me either way and
+was never written. Recorded because a prompt and a tree that disagree is exactly what
+rule 1 says to write down, and because INC-157 (C14 ABORT 1) landed during this
+session recording an aborted attempt - so the true state is "declared, attempted,
+aborted", not "running".
+
+--------------------------------------------------------------------------------
+12. THE COMMITS
+--------------------------------------------------------------------------------
+
+  b332853  feat(render): C17 - docs/render/, the replay renderer ... (unreviewed)
+           docs/render/{README.md,audit.py,race.py,replay.py} + tests/
+           test_c17_render.py.  5 files, 1933 insertions, 0 deletions.
+
+  The journal commit carrying THIS FILE, STATUS.md and PROGRESS.md follows it, and
+  its SHA is stated as the first line of the printed report.
+
+  Both were staged through a PRIVATE INDEX seeded from LIVE HEAD (df4cd5d, re-read
+  immediately before read-tree - HEAD had moved from f0de10a during this session),
+  name-only compared against a pre-declared path list that REFUSES on mismatch, and
+  released with `env -u GIT_INDEX_FILE git reset --` and NEVER `VAR=`. The shared
+  index was verified CLEAN after each. Swept: NOTHING.
+
+  All five source paths are LF-ONLY - verified at the BYTE level (CRLF=0, bare CR=0)
+  after conversion, because a `grep -c $'\r'` audit MISREPORTED them as still CRLF
+  and would have been believed. There is a grep.exe.stackdump in this repo root.
+
+================================================================================
+END - C17 BUILD 1 - 7a1e3b52
+================================================================================
