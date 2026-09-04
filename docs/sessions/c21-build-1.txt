@@ -517,3 +517,73 @@ restore, clean, or reset --hard was run at any point.
 ================================================================================
 END OF C21 BUILD 1 FINAL OUTPUT
 ================================================================================
+
+================================================================================
+ADDENDUM, WRITTEN AFTER THE THREE COMMITS AND BEFORE THIS FILE WAS PRINTED
+C21 BUILD 1 - `9e2c81d4` - 2026-09-04
+================================================================================
+
+!! `make check-roles` IS RED AT HEAD, THIS SESSION'S COMMITS ARE THE CAUSE, AND
+   THE REMEDY IS ONE ROW THIS SESSION IS FENCED OUT OF WRITING.
+
+MEASURED. Before this session's first commit, run against the same tree:
+
+    21 passed, 0 failed, 3 n/a
+    [PASS] E1 no commit carries an UNISSUED token
+           clean - 78 issued row(s) covering 78 token(s) parsed from
+           QUESTIONS.md; 75 token(s) appear in the log
+
+Run again after the three commits:
+
+    20 passed, 1 failed, 3 n/a
+    [FAIL] E1 no commit carries an UNISSUED token
+           FORGED/UNISSUED: {'9e2c81d4': ['183d063', '22293d2', '685ca50']}
+           - not present in QUESTIONS.md ## Session tokens
+
+CONFIRMED INDEPENDENTLY: `grep -c "9e2c81d4" QUESTIONS.md` returns **0**. The
+token is in no row of that file.
+
+THIS IS NOT A FORGED TOKEN AND IT IS NOT A FABRICATED ONE. `9e2c81d4` was issued
+by the architect and opened this session's prompt. What is missing is its ROW.
+`PROCESS.md` §7a requires every issued token to be recorded in `QUESTIONS.md`
+under `## Session tokens`, and `QUESTIONS.md` is EXPLICITLY OUTSIDE THIS
+SESSION'S FENCE - the prompt names it in the may-not-write list because a
+concurrent session was writing to it, and directs every question here instead.
+So the check is correct, the token is legitimate, and the two facts are only
+reconcilable by an architect edit.
+
+`CLAUDE.md` §5's instruction was followed to the letter: "Never invent one and
+never reuse one." No token was fabricated, and no row was written into a file
+this session may not touch in order to turn a red green. TURNING E1 GREEN BY
+WRITING MY OWN ISSUED-TOKEN ROW WOULD BE THE EXACT SHAPE OF THE DEFECT E1
+EXISTS TO CATCH - a session vouching for its own identity - and it was not done.
+
+THE FIX, EXACT AND ONE LINE, for the architect to paste into `QUESTIONS.md`
+under `## Session tokens`, in the format the last rows of that table already use
+(`QUESTIONS.md`:125-130):
+
+    | `9e2c81d4` | C21 | BUILD | 2026-09-04 |
+
+E1 goes green the moment that row exists. E2 and E3 already pass at 80 issued
+rows, so no other token is affected and nothing else in the run is disturbed.
+
+RAISED AS Q-I UNDER QUESTIONS OWED, alongside Q-A..Q-H in §7 above.
+
+!! AND THE SECOND-ORDER POINT, WHICH IS WORTH MORE THAN THE ROW. A build session
+   whose prompt fences it out of `QUESTIONS.md` CANNOT COMMIT WITHOUT TURNING E1
+   RED. The fence and `PROCESS.md` §7a are, for such a session, mutually
+   unsatisfiable - one requires the row, the other forbids the file. Every future
+   fenced session hits this on its first commit. That is a process defect, not
+   this session's, and it belongs in `INCIDENTS.md` - which is also outside this
+   fence. It is stated here so the next session that sees `FORGED/UNISSUED` does
+   not spend its window diagnosing a scare, and does not "fix" it by writing its
+   own row.
+
+NOTHING ELSE CHANGED. The other 20 checks pass, including A3 (no CRLF), A5 (no
+control byte) and D1-D4 (the moat, allow-list still 0). This session's five files
+carry zero CR bytes and zero control bytes, measured by byte scan before each
+commit.
+
+================================================================================
+END OF ADDENDUM
+================================================================================

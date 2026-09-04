@@ -12091,3 +12091,39 @@ done, and stated as such: the video URL (**does not exist**); the §21.5 perisha
 session can hold it**); the **stale** secret scan (its output records `HEAD = 90b6d6fa…`); and the
 visibility flip. **Zero provider tokens. `.env` never opened. No tag cut. Not self-certified — a
 fresh adversarial review follows.**
+
+### ⚠️ C21 BUILD 1 (`9e2c81d4`) — ADDENDUM: `make check-roles` E1 IS RED AT `HEAD`, AND THIS SESSION IS THE CAUSE
+
+**Measured before this session's first commit: `21 passed, 0 failed, 3 n/a`. Measured after its
+three commits: `20 passed, 1 failed, 3 n/a`** —
+`[FAIL] E1 no commit carries an UNISSUED token · FORGED/UNISSUED: {'9e2c81d4': ['183d063',
+'22293d2', '685ca50']} - not present in QUESTIONS.md ## Session tokens`. Confirmed independently:
+`grep -c "9e2c81d4" QUESTIONS.md` → **0**.
+
+⚠️ **THE TOKEN IS NOT FORGED.** It was issued by the architect and opened this session's prompt.
+What is missing is its **row**. `PROCESS.md` §7a requires every issued token to be recorded in
+`QUESTIONS.md` under `## Session tokens`, and **`QUESTIONS.md` is explicitly outside this session's
+fence** — the prompt names it in the may-not-write list because a concurrent session was writing
+there. The check is right, the token is legitimate, and only an architect edit reconciles them.
+
+**THE FIX IS ONE LINE**, in the format `QUESTIONS.md`:125-130 already uses:
+
+```
+| `9e2c81d4` | C21 | BUILD | 2026-09-04 |
+```
+
+⚠️ **IT WAS NOT WRITTEN BY THIS SESSION, DELIBERATELY.** Writing one's own issued-token row to turn
+E1 green is the exact shape of the defect E1 exists to catch — a session vouching for its own
+identity. E2 and E3 still pass at 80 issued rows, so no other token is affected.
+
+⚠️ **AND THE SECOND-ORDER POINT, WORTH MORE THAN THE ROW: a build session fenced out of
+`QUESTIONS.md` CANNOT COMMIT WITHOUT TURNING E1 RED.** The fence and `PROCESS.md` §7a are, for such
+a session, mutually unsatisfiable — one requires the row, the other forbids the file. Every future
+fenced session hits this on its first commit. **That is a process defect, not this session's**, and
+it belongs in `INCIDENTS.md`, which is also outside this fence. It is recorded here so the next
+session that sees `FORGED/UNISSUED` does not burn its window on a scare — or "fix" it by writing its
+own row. Full detail, with both measured runs, is in `docs/sessions/c21-build-1.txt`'s ADDENDUM;
+raised as **`Q-I`**.
+
+**The other 20 checks pass**, including A3 (no CRLF), A5 (no control byte) and D1–D4 (the moat;
+allow-list still **0**).
