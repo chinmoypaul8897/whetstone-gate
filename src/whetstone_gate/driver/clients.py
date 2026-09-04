@@ -438,6 +438,12 @@ _ERROR_TYPE_MAX_CHARS = 64
 #: quote it. These four are enum-shaped machine fields.
 _ERROR_TYPE_KEYS = ("type", "code", "status", "reason")
 
+#: What a carried error type becomes when the provider put something credential-shaped in one
+#: of those fields. ⚠️ **WITHHELD, NOT MASKED** — it carries no byte of the value, and it is
+#: distinguishable from ``None``, which means *"the provider reported no type at all."*
+#: **Absent and refused are different facts and the record says which.** `INC-147`.
+_ERROR_TYPE_WITHHELD = "WITHHELD-SECRET-SHAPED"
+
 #: The providers this client speaks. Keyed by `config/lanes.yaml`'s own ``provider`` string.
 _PROVIDERS = ("google", "groq")
 
@@ -565,14 +571,35 @@ def _short_error_type(body: bytes) -> str | None:
         value = error.get(key)
         if isinstance(value, bool) or not isinstance(value, (str, int)):
             continue
-        text = str(value).strip()
-        if text and text not in parts:
-            parts.append(text)
+        text = str(value).strip()[:_ERROR_TYPE_MAX_CHARS]
+        if not text or text in parts:
+            continue
+        # ⚠️⚠️ **EACH PART IS SCANNED ON ITS OWN, AND JOINING BEFORE SCANNING WAS A REAL
+        # LEAK IN THIS FUNCTION — caught by `tests/test_arch_lanes.py` on the first run
+        # after the planted value was shortened.** `runner/redaction.py`'s scan is
+        # **prefix-anchored** (`INCIDENTS.md` **INC-147**): it asks whether a string
+        # *begins* with `gsk_`/`AIza`, not whether it *contains* one. So a provider that
+        # put a credential in `code` while `type` held an ordinary enum produced
+        # `"invalid_api_key/gsk_…"`, which **starts with neither prefix and sailed
+        # straight through** — the whole secret, in the record, past the guard.
+        #
+        # Scanning each part **before** it is joined restores the anchor: a credential in
+        # any single field now *is* the start of the string being tested.
+        try:
+            refuse_if_secret_bearing(text, where=f"$.error.{key}")
+        except Exception:
+            # ⚠️ **WITHHELD, NOT MASKED, AND NOT SILENTLY DROPPED.** `redaction.py`'s rule
+            # is *"it refuses; it does not mask"* — a `***` written into the record is a
+            # secret written down and then partly crossed out. But an outright raise here
+            # would replace a booked `PROVIDER_ERROR` with an exception on the one path
+            # `INC-142` exists to keep diagnosable, so the field reports **that it was
+            # withheld and why**, carrying zero bytes of the value. Reporting it as `None`
+            # would be worse: absent and refused are different facts.
+            return _ERROR_TYPE_WITHHELD
+        parts.append(text)
     if not parts:
         return None
-    joined = "/".join(parts)[:_ERROR_TYPE_MAX_CHARS]
-    refuse_if_secret_bearing(joined, where="$.error[type|code|status|reason]")
-    return joined
+    return "/".join(parts)[:_ERROR_TYPE_MAX_CHARS]
 
 
 def _decode(response: HttpResponse, *, lane: str) -> Mapping[str, Any]:

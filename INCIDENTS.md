@@ -11402,3 +11402,95 @@ the next session inherits a decision rather than a rediscovery:
 **`runner/redaction.py`:72, `value.startswith(prefix)` → `prefix in value`** — which also
 makes `AIza`, four characters that occur in ordinary text, a run-aborting refusal anywhere in
 the attacker corpus. **That trade is the review's to make, not a fix session's.**
+
+
+---
+
+## INC-148 — `INC-147`'s PREFIX-ANCHORED SCAN LET A WHOLE CREDENTIAL THROUGH **THE CODE THIS SAME SESSION HAD JUST WRITTEN TO CARRY PROVIDER ERRORS**, and the first version of the test that catches it passed **only by an accident of string length**
+
+**Date:** 2026-09-04 (ARCH LANES 1, `6d1a94f3`), found in this session's own uncommitted work by
+this session's own new test. Fix SHA under **Fix**.
+⚠️ **THIS IS `INC-147` ARRIVING IN PRACTICE INSIDE THE HOUR IT WAS WRITTEN**, in the one place
+this session had just built to carry provider error data — which is the strongest argument
+available that `INC-147` is a live defect and not a theoretical one.
+
+**Event:** `driver/clients.py:_short_error_type` reads the provider's short enum-shaped error
+fields and joins them. As first written it **joined, then scanned the join**:
+
+    joined = "/".join(parts)[:_ERROR_TYPE_MAX_CHARS]
+    refuse_if_secret_bearing(joined, where="$.error[type|code|status|reason]")
+
+`runner/redaction.py:72` tests `value.startswith(prefix)`. **MEASURED against a provider body
+carrying an ordinary enum in `type` and a credential-shaped value in `code`:**
+
+    OLD (join-then-scan) -> 'invalid_api_key/' + <the planted 40-char key shape, VERBATIM>
+       contains the planted credential : True    <-- the WHOLE value, in the record
+    NEW (scan-each-part) -> 'WITHHELD-SECRET-SHAPED'
+       contains the planted credential : False
+
+⚠️ **THE SHAPE IS ELIDED IN THE LINE ABOVE, AND `check_roles` C1 IS WHY — IT CAUGHT THIS ENTRY
+TOO.** The first draft of this paragraph quoted the leaked string verbatim, and the repository's
+own scan refused it: `[FAIL] C1 no secret-shaped string in any tracked file — HITS:
+INCIDENTS.md:11426 — Groq API key`. **That is the second time in one hour C1 refused this
+session over the same planted shape** — first in `tests/test_arch_lanes.py`, now in the incident
+entry *about* the first refusal. It is the only check in this repository that fired on this
+class unprompted, twice, and it was right both times.
+
+**The joined string begins with neither `gsk_` nor `AIza`, so the guard did not fire.**
+
+**Action:** each candidate field is now scanned **before** it is joined, which restores the
+anchor — a credential in any single field is then the *start* of the string being tested. A
+refused field yields `_ERROR_TYPE_WITHHELD = "WITHHELD-SECRET-SHAPED"`. ⚠️ **WITHHELD, NOT
+MASKED, AND NOT REPORTED AS ABSENT.** `redaction.py`'s doctrine is *"it refuses; it does not
+mask"*, and a `***` in the record is a secret written down and partly crossed out. An outright
+raise was rejected too: it would replace a booked `PROVIDER_ERROR` with an exception on the one
+path `INC-142` exists to keep diagnosable. **And `None` was rejected because absent and refused
+are different facts** — `None` would tell the operator the provider sent no type when in truth
+it sent one this client would not repeat. Three tests pin all three distinctions.
+
+**Expectation:** the scan is called *"the second half of the same guarantee"* by its own module
+docstring and is wired across every reply, every checkpoint and every usage row. A session
+adding a **new** field to a usage row, calling that scan on it explicitly, and holding
+`INC-147` open in its own working tree at that moment, should not have been able to ship a leak
+through it.
+
+**Missing:** ⚠️ **NOTHING NEW — `INC-147` IS THE MISSING THING, AND IT WAS ALREADY WRITTEN.**
+This entry adds no fresh gap; it demonstrates the one already recorded. That is why it exists
+separately rather than as a line inside `INC-147`: a defect that has *occurred* is different
+evidence from a defect that *could* occur, and the review needs to weigh the second one
+knowing the first happened.
+
+**Missed:** ⚠️⚠️ **THE FIRST VERSION OF THE TEST PASSED, AND IT PASSED FOR A REASON THAT HAD
+NOTHING TO DO WITH SAFETY.** The planted value was originally 52 characters; joined with
+`"invalid_api_key/"` it exceeded `_ERROR_TYPE_MAX_CHARS = 64`, so **the tail was truncated off
+and the assertion held by an accident of length.** The leak was already there, already shipped
+into the working tree, and **a green test was reporting otherwise.** It surfaced only because
+the repository's own `check_roles` C1 scan refused the key-shaped *literal* in the tracked test
+file — an unrelated invariant, firing for an unrelated reason — which forced the constant to be
+rebuilt at runtime **twelve characters shorter**, and the test went red on the next run.
+⚠️ **A cap that silently truncates is a cap that can make a leak test pass**, and nothing in the
+first draft would ever have said so.
+
+**Diagnosis:** the secret scan is prefix-anchored, so scanning a *concatenation* tests only
+whichever field happened to be first; joining before scanning therefore moved every field except
+the first out of the guard's reach, and a length cap applied after the join could hide the
+remainder from the test that was supposed to catch it.
+
+**Fix:** `driver/clients.py` — per-part scan before the join, `_ERROR_TYPE_WITHHELD`, and the
+cap applied per part as well as to the join. `tests/test_arch_lanes.py` gains
+`test_a_credential_in_ONE_field_beside_an_ORDINARY_enum_in_ANOTHER_is_STILL_WITHHELD`,
+`test_a_WITHHELD_error_type_is_DISTINGUISHABLE_from_NO_error_type_at_all` and
+`test_the_WITHHELD_marker_itself_carries_no_secret_and_is_not_key_shaped`. The first is proved
+RED against the join-then-scan version by driving both implementations over the same body, side
+by side, rather than by re-running the fixed one. The commit SHA is the one carried by this
+session's `PROGRESS.md` row and by `docs/sessions/arch-lanes-1.txt`.
+
+**Systemic guardrail:** ⚠️ **PARTIAL, AND THE HONEST SCOPE IS STATED.** What is installed closes
+this *site*: every value that reaches the new field is scanned while it is still the whole
+string, and three tests pin the withheld/absent/marker distinctions. **What is NOT installed is
+the fix to the scan itself** — `INC-147` — and this entry makes that decision harder rather than
+easier, which is the point of writing it. ⚠️ **Every other caller of
+`refuse_if_secret_bearing` that scans a COMPOSED value has this same defect and none was
+audited**, because auditing them is the review `INC-147` asks for and not a fix session's last
+hour. **The next session should start from that audit**, and it is item 5 of this session's
+report.
