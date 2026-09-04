@@ -32,6 +32,7 @@ from whetstone_gate import config
 from whetstone_gate.driver import cal
 from whetstone_gate.driver import pilot
 from whetstone_gate.driver import run as driver_run
+from whetstone_gate.driver import __main__ as driver_main
 from whetstone_gate.runner import buckets as runner_buckets
 from whetstone_gate.runner import lanes as runner_lanes
 
@@ -411,3 +412,59 @@ def test_the_CAL_LANE_IS_THE_ONE_WHOSE_ROLE_NAMES_CAL_read_from_lanes_yaml():
     )
     assert lane.name == "gemma-26b"
     assert matrix.reference.attacker_model == lane.name
+
+
+def test_the_BLOCK_FLAG_DEFAULTS_TO_PILOT_because_a_PUSHED_PREREGISTRATION_CARRIES_NO_BLOCK(repo_root):
+    """⚠️⚠️ **THE DEFAULT IS NOT CONVENIENCE. A REQUIRED `--block` WOULD MAKE A COMMITTED,
+    PUSHED PRE-REGISTRATION OF AN ALREADY-SPENT SINGLE-SHOT RUN EXIT 2.**
+
+    `evals/pilot/RUN_DECLARED.md` §1 carries **the exact command**, and `PROCESS.md` §6b makes
+    that file the declaration from the moment it is pushed. **It has no `--block`.** The pilot
+    has already run against it (`INC-142`), so the command is not a plan — it is the record of
+    what was executed. A parser change that stopped it parsing would retroactively invalidate
+    a pre-registration, which is the one thing a freeze exists to prevent.
+
+    **The declared command is READ OUT OF THE ARTEFACT, not retyped here.**
+    """
+    declared = (repo_root / "evals" / "pilot" / "RUN_DECLARED.md").read_text(encoding="utf-8")
+    block = re.search(r"```sh\n(.*?)```", declared, re.S)
+    assert block, "RUN_DECLARED.md S1's fenced command block has moved"
+    command = block.group(1)
+    assert "--block" not in command, (
+        "the committed pilot command now carries --block; this test's premise has changed"
+    )
+
+    # Everything after the program name, as the shell would split it.
+    argv = [tok for tok in command.replace("\\\n", " ").split() if tok not in ("python", "-m", "--")]
+    argv = argv[argv.index("drive") + 1:] if "drive" in argv else argv
+    argv = [tok for tok in argv if tok != "whetstone_gate.tasks"]
+
+    parsed = driver_main.build_parser().parse_args(argv)
+    assert parsed.block == "pilot", (
+        "the DECLARED pilot command must still select the pilot block. If --block ever "
+        "becomes required, evals/pilot/RUN_DECLARED.md S1 exits 2 and a pushed "
+        "pre-registration stops describing a runnable command (PROCESS.md S6b)"
+    )
+    assert parsed.arm == "1"
+
+
+def test_BLOCK_CAL_BUILDS_THE_CALIBRATION_and_a_MISMATCHED_ARM_REFUSES_rather_than_running():
+    """⚠️ **`--arm` IS CHECKED, NOT OBEYED, UNDER `--block cal`.**
+
+    `CONTEXT.md` §10.3 rule 1 and **frozen** `HOLES.md` §3.5 rule 1 both say *"arm 1 only"*, so
+    the arm is not the operator's to choose here. **The calibration is SINGLE-SHOT** — the first
+    execution that runs to completion **is** the run — so an arm typed wrongly would spend the
+    one attempt on a block the specification does not describe. It refuses with **exit 2**.
+    """
+    base = [
+        "--dry-run", "--block", "cal", "--s3-binding", "authorization-is-the-payment",
+        "--call-ceiling", "600", "--token-ceiling", "4800000",
+    ]
+    parsed = driver_main.build_parser().parse_args(base + ["--arm", "1"])
+    assert parsed.block == "cal"
+
+    for wrong in ("2", "2S", "3", "4"):
+        assert driver_main.main(base + ["--arm", wrong]) == 2, (
+            f"--block cal with --arm {wrong} must REFUSE with exit 2, not run a calibration "
+            f"on an arm CONTEXT.md S10.3 and frozen HOLES.md S3.5 both exclude"
+        )

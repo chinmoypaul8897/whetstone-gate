@@ -11714,3 +11714,67 @@ this session's own commit recipe runs again before staging; and the private-inde
 is written anyway, and not because it caused damage — it caused none. It is here because a session
 that only records the failures that hurt is a session whose incident log is a highlight reel**, and
 `CLAUDE.md` §6.4's instruction is *"anything that broke"*, not *"anything that broke expensively"*.
+
+
+---
+
+## INC-152 — this session's main commit carries **no `Swept:` line**, breaking a house convention every one of the previous **eleven** commits observes — and the omission was found only *after* the commit, by looking at what other sessions had done
+
+**Date:** 2026-09-04 (ARCH CAL BUILD 1, `8f3c72e1`). Fix SHA under **Fix**.
+
+**Event:** `PROCESS.md` §7b requires *"COMPOSE THE `Swept:` LINE FROM THE STAGED SNAPSHOT ALONE, AND
+PUT NO LINE COUNTS IN IT"*, and `OF-215` makes the name-only comparison the detector for a session's
+work being swept by a concurrent one. **Measured across the last twelve commits: eleven carry a
+`Swept:` line and exactly one does not — `c5a83fd`, this session's.**
+
+**Action:** the comparison the line reports was **run after the fact and is recorded here**, so the
+fact is available even though the line is not:
+
+    paths DECLARED and staged                : 15
+    paths that LANDED in c5a83fd             : 15
+    in the commit but NOT declared (a SWEEP) : NONE
+    declared but ABSENT from the commit      : NONE
+    -> Swept: NOTHING. The sets are IDENTICAL.
+
+⚠️ **THE COMMIT IS NOT AMENDED AND WILL NOT BE.** `PROCESS.md` §7 and `CLAUDE.md` §5 forbid the
+rewrite outright — *"No force-push. No tag moves. No amending a tagged commit. No history rewrite,
+ever"* — and `INC-146`'s precedent is exact on this point: *"The commit message cannot be corrected at
+all."* The line is therefore carried **here** and in the journal commit, and `c5a83fd` stands with the
+defect visible.
+
+**Expectation:** the recipe in `PROCESS.md` §7b is written as five numbered shell steps, and this
+session executed **all five correctly** — private index in a fresh temp dir, `git read-tree HEAD`,
+stage-snapshot-commit in one command, `env -u GIT_INDEX_FILE git reset`, and the clean-index proof.
+**The `Swept:` line is not one of the five steps.** It appears in §7b's *prose*, three paragraphs
+below the code block, and a session working from the code block alone executes the mechanism perfectly
+and omits the report of it.
+
+**Missing:** ⚠️ **any check that fires on a missing `Swept:` line.** `make check-roles` has five
+trailer and identity checks — E1 through E5 — and every one of them is about `Session-Token`. **A
+commit with no `Swept:` line is structurally indistinguishable, to every automated check in this
+repository, from one that swept nothing.** The information the line carries is exactly the
+information nothing else records.
+
+**Missed:** ⚠️ **ELEVEN CONSECUTIVE EXAMPLES, IN OUTPUT THIS SESSION HAD ALREADY READ.** This session
+read `docs/sessions/arch-lanes-1.txt` **in full** during its read order, and read `PROCESS.md` §7b in
+full, including the paragraph that requires the line. It also ran `git log` repeatedly while
+diagnosing `INC-149` — **the five `2e5b8a47` commits it examined for their touched paths each carry a
+`Swept:` line**, and it read their subjects without reading their bodies. The convention was in front
+of it at least three times.
+
+**Diagnosis:** the session treated `PROCESS.md` §7b as a shell recipe to execute rather than a section
+to satisfy, so the four requirements expressed as **code** were met and the one expressed as **prose
+about the commit message** was not.
+
+**Fix:** the `Swept:` statement for `c5a83fd` is recorded above and carried in this session's journal
+commit and in `docs/sessions/arch-cal-build-1.txt`; the journal commit itself carries a properly
+formed `Swept:` line. Commit SHA: the journal commit named in this session's `PROGRESS.md` row.
+
+**Systemic guardrail:** ⚠️ **NONE WRITTEN, AND THE ONE THAT WOULD CLOSE IT IS NAMED RATHER THAN
+GESTURED AT:** a `check-roles` **E6** asserting that every commit carrying a `Session-Token` trailer
+also carries a `Swept:` line, with the same one-off exception list `E5` already maintains for the four
+`CTX-13.4` commits. It is a real check, it is roughly the size of `E5`, **it is not written here**
+because `src/whetstone_gate/check_roles.py` is inside this session's fence but adding an invariant that
+would retroactively fail commits is a change to what the project asserts about its own history — and
+that is a Class A decision, not a fix session's tidy-up. **It is item 7 of this session's operator
+list.**

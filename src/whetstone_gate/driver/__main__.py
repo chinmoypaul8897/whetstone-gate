@@ -20,6 +20,7 @@ from pathlib import Path
 
 from whetstone_gate import config as cfg
 from whetstone_gate._console import say
+from whetstone_gate.driver import cal as cal_module
 from whetstone_gate.driver import episode as driver_episode
 from whetstone_gate.driver import pilot as pilot_module
 from whetstone_gate.driver import rehearsal
@@ -55,11 +56,27 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument(
+        "--block",
+        choices=("pilot", "cal"),
+        default="pilot",
+        help=(
+            "which pre-registered block to run. 'cal' is CONTEXT.md S10.3's ARM-1 "
+            "CALIBRATION (one cell, probe.n_cal episodes on seeds.cal_*, every ledger and "
+            "checkpoint stamped CAL). ⚠️ DEFAULTS TO 'pilot' AND MUST: "
+            "evals/pilot/RUN_DECLARED.md S1's committed command carries no --block, and a "
+            "required flag here would make a PUSHED pre-registration of an ALREADY-SPENT "
+            "single-shot run exit 2 (PROCESS.md S6b)"
+        ),
+    )
+    parser.add_argument(
         "--arm",
         required=True,
         help=(
             "the arm the pilot runs. NOT in config/ and NOT defaulted: CONTEXT.md S13.4 and "
-            "PROTOCOL.md S3.1 both say '1 ref arm' and neither says which (QUESTIONS.md Q-144)"
+            "PROTOCOL.md S3.1 both say '1 ref arm' and neither says which (QUESTIONS.md Q-144). "
+            "⚠️ With --block cal it is still REQUIRED but is CHECKED rather than obeyed: "
+            "CONTEXT.md S10.3 and FROZEN HOLES.md S3.5 both say 'arm 1 only', so a "
+            "disagreement is a refusal and not a choice"
         ),
     )
     parser.add_argument(
@@ -149,7 +166,25 @@ def _transcript_client(
 
 def main(argv: list[str] | None = None) -> int:
     arguments = build_parser().parse_args(argv)
-    matrix = pilot_module.load_pilot(arm=arguments.arm)
+    if arguments.block == "cal":
+        # ⚠️ CONTEXT.md S10.3 rule 1 and FROZEN HOLES.md S3.5 rule 1 both say "arm 1 only",
+        # so `load_cal()` takes nothing and `--arm` is CHECKED against it rather than
+        # obeyed. A mismatch is a refusal: the calibration is SINGLE-SHOT (PROCESS.md S6b)
+        # and the first completed execution IS the run, so an arm typed wrongly on the
+        # command line would spend the one attempt on a block the spec does not describe.
+        matrix = cal_module.load_cal()
+        if arguments.arm != matrix.arm:
+            say(
+                f"REFUSED: --block cal runs CONTEXT.md S10.3's ARM-1 calibration, and "
+                f"--arm was given as {arguments.arm!r}. S10.3 rule 1 says 'Arm 1 only' and "
+                f"FROZEN HOLES.md S3.5 rule 1 says 'arm 1 only'; neither is a default this "
+                f"session may override. The calibration is SINGLE-SHOT (PROCESS.md S6b): "
+                f"the first execution that runs to completion IS the run, so this refuses "
+                f"rather than running the wrong block."
+            )
+            return 2
+    else:
+        matrix = pilot_module.load_pilot(arm=arguments.arm)
 
     out_root = arguments.out_root
     if out_root is None:
