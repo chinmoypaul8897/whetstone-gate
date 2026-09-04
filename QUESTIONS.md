@@ -138,6 +138,8 @@ appears that was never issued**, or if a token is reused across roles.
 | `3d7f21ac` | C14 | FIX | 2026-09-04 |
 | `7a1e3b52` | C17 | BUILD | 2026-09-04 |
 | `4e8b91d3` | C17 | REVIEW | 2026-09-04 |
+| `6f2d47ba` | C21 | BUILD | 2026-09-04 |
+| `8c2f5e91` | C14 | FIX | 2026-09-04 |
 
 ⚠️⚠️ **THE `5d7e2b91` ROW IS SELF-RECORDED, AND IT IS THE ROW FOR A TOKEN THAT WAS ISSUED TO **TWO**
 LIVE SESSIONS.** `QUESTIONS.md` `Q-180` and `Q-187` — two independent detections of one event.
