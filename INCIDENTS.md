@@ -12283,10 +12283,11 @@ tampered, gapped, past-budget, or EMPTY-beside-ABSENT.**
 — *"writes the `INCIDENTS.md` entry **first**, then fixes only the findings named"* — **so no SHA
 exists at the moment of writing and none is invented.** The fix lands in this same session, in
 `docs/render/{replay,audit,race}.py`, `docs/render/README.md` and `tests/test_c17_render.py`, and
-**its commit SHA is `<<PENDING-COMMIT: SHA>>`, filled in on this line by this session's own later
-commit.** ⚠️ **If this line still reads `<<PENDING-COMMIT: SHA>>` in a committed tree, the fix did not
-land and this entry is the record of a FAIL that was never repaired** — `README.md:28`'s convention,
-under which a placeholder is never a result. Shape of the change, stated now so the later SHA can be
+**its commit SHA is `9d7cc48` (unreviewed)**, written onto this line by this session's own later
+commit, because a commit cannot name its own SHA. ⚠️ **Until that commit existed this line
+carried a `README.md:28`-style pending placeholder rather than a number**, on the rule that a
+placeholder is never a result; `git show 9d7cc48 --stat` lists exactly the five files named
+below and nothing else. Shape of the change, stated now so the later SHA can be
 checked against it rather than taken on trust: a detected-tampered ledger renders **no** entries, **no**
 money summary and **no** per-entry verification stamp, and draws **no** race bar and enters **no**
 bar scale; `MEASURED ZERO`, `EMPTY`, `ABSENT` and `MONEY THE WORLD EXECUTED` become four different

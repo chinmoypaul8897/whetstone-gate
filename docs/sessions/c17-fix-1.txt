@@ -1,0 +1,542 @@
+================================================================================
+C17 FIX 1   SESSION-TOKEN 1b9e4c73   ROLE: FIX   2026-09-04/05
+docs/render/ - THE REPLAY RENDERER, after REVIEW 1's FAIL.
+NO TAG.  `c17-pass` DOES NOT EXIST AFTER THIS SESSION.  NOT SELF-CERTIFIED.
+================================================================================
+
+PUSHED SHA: ! THE COMMIT THAT CARRIES THIS FILE IS THE FINAL ONE, AND A COMMIT
+            CANNOT NAME ITS OWN SHA.  It is `git rev-parse origin/main` after the
+            push, and it is the first line of the report printed to the architect.
+            The two commits before it CAN be named and are:
+
+  e9b843e   GATE 0 - INC-158 + the issued token row, BEFORE a line of code
+  9d7cc48   THE FIX - docs/render/ + tests/test_c17_render.py   (unreviewed)
+  <this>    the records: INCIDENTS SHA fill, QUESTIONS Q-203..205, STATUS,
+            PROGRESS, and this file
+
+SPEND: ZERO, IN EVERY MODE.  No provider call was made in any mode.  This session
+held NO token sanction and took none.  No lane was touched.  `.env` was never read,
+printed or committed.  No tag was cut or moved.  `evals/` was READ-ONLY and
+`evals/episodes/` is byte-identical to HEAD; every tampered, gapped, past-budget,
+off-arm and unreadable fixture was written to an OS TEMP DIRECTORY.
+`tests/goldens/`, `config/`, `src/`, `docs/reviews/`, `CONTEXT.md`, `PROCESS.md`,
+`HOLES.md`, `PROTOCOL.md`, `README.md`, `RESULTS.md`, `docs/submission/`,
+`corpora/` were NOT WRITTEN.
+
+! NOT SELF-CERTIFIED, AND THE ONE CLAUSE THAT CANNOT BE: C17's done-when says the
+  audit log is handed to a NON-AUTHOR who can follow one episode end to end
+  without asking a question.  THIS SESSION IS NOT THAT PERSON.  See S6.
+
+--------------------------------------------------------------------------------
+0. GATE 0 - THE INCIDENT ENTRY, WRITTEN BEFORE A LINE OF CODE CHANGED
+--------------------------------------------------------------------------------
+
+INCIDENTS.md INC-158, committed at e9b843e together with the issued token row
+
+    | `1b9e4c73` | C17 | FIX | 2026-09-04 |
+
+inserted BENEATH `8c2f5e91`'s, which the concurrent session had committed at
+7ae1f83 while this session was reading.  All eight of hard rule 13's fields are
+filled, plus the house `Date:` field.
+
+! THE `Diagnosis` IS THE CLASS, NOT FIVE COINCIDENCES, because that is what the
+  review found and what the prompt required:
+
+      Every one of B-1, B-2, B-3, H-3 and H-4 is the renderer ASSERTING A
+      PROPERTY OF THE RECORD FROM A PROXY FOR THAT PROPERTY RATHER THAN FROM
+      THE RECORD - verification inferred from "an entry exists", a measured
+      zero from "the sum is 0", completeness from max(turn_index) alone, a
+      frame's money from "turn < budget", and "has data" from "a file exists".
+
+! THE `Missed` IS THE GREEN TEST, AND IT IS THE WORST FACT IN THE ENTRY.
+  `test_the_renderer_would_REFUSE_TO_ANIMATE_a_tampered_ledger` was PASSING, with
+  36 of 36 green in that file.  Its deciding line was
+
+      assert "WHAT HAPPENED, TURN BY TURN" not in rendered.split("DOES NOT MATCH")[0]
+
+  and RE-MEASURED BY THIS SESSION on the tampered render: the slice BEFORE the
+  warning is 2,437 characters and the slice AFTER is 9,904, carrying the
+  turn-by-turn block and all eight `RECOMPUTED, MATCHED` stamps.  The header is
+  emitted after the chain section BY CONSTRUCTION, so split()[0] can never
+  contain it - the assertion is satisfied by DOCUMENT ORDER ALONE and would pass
+  whether the renderer printed 0 entries or 8.  A TEST NAMED FOR A PROPERTY IT
+  DOES NOT TEST IS WORSE THAN NO TEST: it converts an open question into a
+  settled one, and the build session read its own green suite and wrote a claim
+  that was false in its second half.
+
+! THE `Systemic guardrail` IS PARTIAL AND SAYS SO.  What is installed: negative
+  assertions (tests that fail when the renderer PRINTS something) for all five
+  instances, plus fixtures for the four shapes evals/episodes/ does not contain.
+  WHAT IS NOT INSTALLED, AND WOULD ACTUALLY CLOSE THE CLASS: nothing in this
+  repository REQUIRES a test to be shown RED before it is trusted.  INC-14's
+  convention is a habit sessions honour by hand, and C17's suite honoured it for
+  the three import proofs and NOT for the tampered-ledger proof - precisely where
+  it was needed.  That guardrail is the architect's to install; PROCESS.md and
+  the review protocol are both outside this fence.  Recorded as OWED, not claimed.
+
+! M-3/OF-259 IS NOT IN THAT ENTRY.  The six suite reds the live calibration causes
+  are not C17's, the review says so in terms, and sweeping them into a C17 incident
+  would be the dramatisation hard rule 13 exists to price.
+
+--------------------------------------------------------------------------------
+1. EVERY FINDING RE-MEASURED FIRST-HAND BEFORE ANYTHING WAS WRITTEN
+--------------------------------------------------------------------------------
+
+The review's report is a CLAIM, not evidence, and a FIX session that fixes what a
+report says rather than what the code does is fixing a description.  All eleven
+findings were reproduced against the PRE-FIX renderer, in an OS temp directory,
+before Gate 0.  ALL ELEVEN REPRODUCED:
+
+  B-1  DETECTED at ledger_seq 3, and 8 occurrences of "RECOMPUTED, MATCHED",
+       and '88,888,888' present under MONEY PAST THE GATE, BY COMPONENT
+  O-3  slice before the warning 2,437 chars / after 9,904 chars; the header is
+       in the second and never in the first - document order alone
+  H-1  arm 1  [############################]  88,888,888 paise
+  B-2  EMPTY (real file):  "MEASURED ZERO (the episode ran; nothing moved)" x4
+       ABSENT:             the same four measurements after "Nothing below is a
+                           measurement."
+       GEMMA:              world EXECUTED 20,118,586 paise; log said "nothing
+                           moved" x4 and stated the executed figure NOWHERE
+  B-3  turn indices [0, 1, 19] -> completeness COMPLETE ->
+       "COMPLETE. All 20 turns of the budget are accounted for."
+  H-3  entry at turn index 25, 777,777 paise: in ANY of the 20 race frames False;
+       audit component_total 777777
+  H-4  real seed 2105: "ARMS WITH NO DATA: 2, 2S, 3, 4  (4 of 5 arms have never
+       run)" with arm 1 EMPTY and present
+  M-2  discovered 2 ['1','9'], placed 1, arm '9' in any group False
+  M-4  load_all RAISED EpisodeLoadError; the good episode became unreachable
+  L-1  RAISED UNTYPED: KeyError 'turn_index'
+  L-5  race.bar(-5, 100) length 30 against BAR_CELLS 28
+
+--------------------------------------------------------------------------------
+2. THE FIX, FINDING BY FINDING, WITH THE TEST THAT WAS RED FIRST
+--------------------------------------------------------------------------------
+
+! THE ORDER WAS: incident -> tests -> PROVE RED against the untouched pre-fix
+  docs/render/ -> fix -> GREEN.  The RED run is the evidence and it is quoted.
+
+  MEASURED, against the PRE-FIX renderer:   28 failed, 41 passed
+  MEASURED, after the fix:                  69 passed
+
+B-1  BLOCKER.  audit.render() returns a WITHHELD block for a present episode whose
+     chain failed: no entries, no money summary, no per-entry stamp.  entry_block
+     takes `verified` as a REQUIRED KEYWORD WITH NO DEFAULT, so a caller must
+     decide rather than inherit a flattering one.  The refusal STATES WHAT IT
+     WITHHOLDS (8 entries, four components) and that the episode is still counted,
+     categorised as one whose ledger FAILED VERIFICATION - hard rule 11 cuts both
+     ways and refusing is not licence to say nothing.
+     RED FIRST:  test_a_TAMPERED_LEDGER_gets_NO_PER_ENTRY_VERIFICATION_STAMP
+                 test_a_TAMPERED_LEDGERS_ENTRIES_AND_MONEY_SUMMARY_ARE_WITHHELD
+                 test_a_WITHHELD_TAMPERED_LEDGER_IS_COUNTED_AND_NOT_QUIETLY_DROPPED
+     AND THE EXISTING TEST'S DECIDING LINE WAS REPLACED, NOT DELETED: the slice
+     form gives way to the same claim over the WHOLE document, which is strictly
+     stronger (x not in whole implies x not in any slice of whole), plus two more.
+     THE VACUITY IS PINNED SO IT CANNOT RETURN:
+                 test_the_OLD_VACUOUS_ASSERTION_SHAPE_is_FIRED_at_a_document_it_would_pass
+     fires BOTH forms at a synthetic document of the pre-fix shape; the old form
+     passes on it and the new form fails on it.
+     AND THE CONTROL, because a renderer that withheld everything always would
+     pass every assertion above:
+                 test_a_VALID_ledger_STILL_gets_its_entries_its_stamp_and_its_money
+     requires the real stored ledger to render in full, with all 8 stamps.
+
+B-2  BLOCKER.  component_note() gives FOUR FACTS FOUR SENTENCES:
+       ABSENT          "NOT RUN. No episode file exists, so NOTHING WAS MEASURED.
+                        Not a zero."
+       EMPTY           "NO RECORD. The ledger holds no entry at all, so NOTHING
+                        WAS MEASURED here. Not a zero."
+       measured zero   "MEASURED ZERO across N recorded turn(s)"
+       money moved     its own block, MONEY THE WORLD EXECUTED
+     ! AND THE THIRD FALSEHOOD IS ANSWERED WITH A FIGURE, NOT A HEDGE.  The log
+       now prints the 20,118,586 paise (Rs. 201,185.86) the world actually moved,
+       row by row, beside S12.2 reporting rule 4's much narrower metric - "money
+       that moved into a state Razorpay's own API documents as an error" - and
+       says in terms that a zero there does NOT mean nothing moved.
+     RED FIRST:  test_MEASURED_ZERO_IS_NEVER_PRINTED_OVER_AN_EMPTY_LEDGER
+                 test_MEASURED_ZERO_IS_NEVER_PRINTED_OVER_AN_ABSENT_ARM
+                 test_the_log_STATES_THE_MONEY_THE_WORLD_EXECUTED_and_NEVER_SAYS_NOTHING_MOVED
+                 test_the_FOUR_FACTS_READ_AS_FOUR_DIFFERENT_SENTENCES
+                 test_the_RACE_does_not_call_an_EMPTY_ARM_a_MEASURED_ZERO_either
+     ! THE EXPECTED VALUE WAS HAND-DERIVED, NOT TAKEN FROM THE RENDERER.
+       13,417,275 + 6,701,311 = 20,118,586, and
+       test_the_EXECUTED_MONEY_EXPECTATION_is_DERIVED_FROM_THE_RAW_LEDGER_not_the_renderer
+       re-derives it from the stored JSON with no renderer call at all.
+
+B-3  HIGH.  Completeness is CHECKED, not inferred from a high water mark.  A fifth
+     state, GAPPED, and a new `missing_turn_indices` property.  COMPLETE now
+     requires an entry for every turn index from 0 to the last, and the log says
+     the coverage was "checked one by one rather than inferred from the highest
+     one".
+     RED FIRST:  test_a_GAPPED_ledger_is_NEVER_CALLED_COMPLETE
+     AND THE CONTROL, because "never say COMPLETE" would pass that test:
+                 test_a_CONTIGUOUS_FULL_ledger_IS_still_called_COMPLETE
+     builds a 20-entry contiguous ledger and requires COMPLETE.
+
+H-1  HIGH.  A chain-failed arm gets CHAIN_FAILED_MARK and NO bracket, and - the
+     half that is not obvious - IT SETS NO SCALE for the arms beside it, so
+     fabricated content cannot silently shrink every honest bar to nothing.
+     RED FIRST:  test_the_RACE_DRAWS_NO_BAR_AT_ALL_from_a_ledger_whose_chain_FAILED
+                 test_a_CHAIN_FAILED_ARM_SETS_NO_SCALE_for_the_arms_beside_it
+     ! AND NO PAISE FIGURE FROM A TAMPERED FILE APPEARS ANYWHERE IN THE FRAME,
+       including inside H-3's own beyond-the-budget disclosure - a disclosure is
+       not an exemption from H-1.  Caught by this session, not by the review.
+
+H-2  HIGH.  See S6 - it is the clause this session may not certify.
+
+H-3  HIGH.  entries_beyond_budget, named in BOTH deliverables under ONE anchor
+     phrase, "AT OR BEYOND THE TURN BUDGET", because the finding is that the two
+     must not disagree - including about what to call it.  The money stays in
+     every figure: a row is not dropped because a frame cannot draw it.
+     RED FIRST:  test_an_entry_PAST_THE_TURN_BUDGET_is_NAMED_IN_THE_AUDIT_LOG
+                 test_an_entry_PAST_THE_TURN_BUDGET_is_NAMED_IN_EVERY_RACE_FRAME
+     AND THE CONTROL:  test_a_normal_episode_carries_NO_BEYOND_BUDGET_NOTICE, so
+     the notice is a disclosure and not wallpaper.
+
+H-4  HIGH.  Three lines where there was one: NEVER RAN (no episode file) / RAN AND
+     RECORDED NOTHING (EMPTY ledger) / ARMS WITH NO USABLE DATA AT ALL.
+     MEASURED on the real stored data:
+        seed 2105  ->  ARMS WITH NO USABLE DATA AT ALL: 5 of 5
+        seed 2101  ->  ARMS WITH NO USABLE DATA AT ALL: 4 of 5
+     RED FIRST:  test_an_EMPTY_ARM_IS_NOT_COUNTED_AS_AN_ARM_THAT_HAS_DATA
+     AND THE CONTROL:  test_an_arm_THAT_REALLY_HAS_DATA_is_not_counted_as_having_none
+
+--------------------------------------------------------------------------------
+3. THE MEDIUM/LOW TAKEN, AND THE THREE LEFT - WITH THE REASON FOR EACH
+--------------------------------------------------------------------------------
+
+TAKEN:
+  OF-257  M-1  the README no longer says the socket guard "proves the capability
+               is absent".  It states what each way ACTUALLY establishes, in a
+               table, AND NAMES THE RESIDUAL: ways 3-5 execute only race.frame()
+               and audit.render(), so a reach in main(), race.render(),
+               list_episodes() or audit.main() is invisible to them, a subprocess
+               child evades all three, and native FFI other than ctypes is
+               unenumerated.  "Five ways is five ways - it is not a proof that the
+               capability is absent, and this file no longer says it is."
+               ! NO PROOF WAS WEAKENED.  Ways 1-4 are untouched and a FIFTH is
+                 ADDED - a ctypes guard replacing CDLL/WinDLL/cdll/windll with
+                 functions that raise, fired at a process that really calls
+                 ctypes.WinDLL("ws2_32.dll") and required to die.
+               RED FIRST: test_the_README_does_NOT_CLAIM_the_socket_guard_PROVES_THE_CAPABILITY_ABSENT
+  OF-258  M-2  off_arm() collects episodes whose arm is not one of the five; the
+               frame counts and NAMES them.  RED FIRST:
+               test_an_episode_whose_ARM_IS_NOT_ONE_OF_THE_FIVE_IS_COUNTED_AND_PRINTED
+  OF-264  M-4  load_all_reporting() returns the readable episodes AND the refusals;
+               one unreadable file no longer takes down every entry point, and the
+               refusals are printed as a counted, categorised line in the frame,
+               in --list and in audit.main().  RED FIRST:
+               test_ONE_UNREADABLE_FILE_DOES_NOT_TAKE_DOWN_THE_RENDER_AND_IS_COUNTED
+  OF-260  L-1  entry shape is validated in load_episode(); a missing or
+               non-integer turn_index, and a row that is not an object at all,
+               raise the TYPED EpisodeLoadError the class docstring promises.
+               RED FIRST: test_a_MALFORMED_ENTRY_raises_the_TYPED_error_the_module_PROMISES
+  OF-261  L-2  the `or True` assertion is REPLACED, not deleted, by the assertion
+               it was reaching for - over the RENDERED text, where a fabricated N
+               would actually be a defect.
+  OF-263  L-4  A5 is named in the summary AND in WHAT IS MISSING as a fifth
+               published figure this file cannot show, with the reason (assigned
+               at replay by scorer/, hangs on no ledger_seq, hard rule 8 keeps the
+               two sharing no code).  RED FIRST:
+               test_A5_IS_NAMED_AS_A_FIGURE_THIS_LOG_CANNOT_SHOW
+  OF-266  L-5  bar() clamps at zero.  RED FIRST:
+               test_bar_CLAMPS_A_NEGATIVE_VALUE_and_never_widens_the_track
+
+LEFT, AND WHY:
+  OF-259  M-3  ! NOT C17's.  The six suite reds are the live single-shot
+               calibration appending to a tracked usage file, and the remedy is in
+               tests/test_arch_lanes.py and tests/test_arch_cal_build.py - both
+               outside this fence.  The review says in terms it "must not be swept
+               into that entry", and it is not in INC-158.
+  OF-262  L-3  ! OUTSIDE THIS FENCE.  The remedy is to widen
+               tests/test_c7_ledger.py's scan set, which is not this session's
+               file.  RE-MEASURED rather than accepted: that red's offenders are
+               benign/{executor,shell}.py, driver/{episode,run}.py and four test
+               files - ZERO from docs/render/ - so C17 has still not widened it.
+  OF-265  M-5  ! A RULING IS OWED AND A FIX SESSION MAY NOT TAKE IT.  The review
+               says "a ruling on whether the scale should be a fixed per-track
+               denominator is owed before the video, not after", and it is Class A
+               because it changes what the video shows.  Raised as Q-203 with
+               three options and none chosen.  ! NOTHING ABOUT THE SCALE WAS
+               CHANGED: bar()'s only change is L-5's clamp, and H-1's exclusion of
+               a chain-failed episode from the max is a tamper guard, not a scale
+               decision.
+
+! THE OF ROWS THEMSELVES ARE STILL MARKED OPEN, and deliberately: docs/reviews/ is
+  outside this session's fence and the prompt says in terms that the review's
+  findings are not mine to edit or close.  A review session closes them.
+
+--------------------------------------------------------------------------------
+4. THE AST-EXACT TEST DIFF.  NOT `grep -c assert`.
+--------------------------------------------------------------------------------
+
+Measured with ast.parse over HEAD's blob and the working tree, counting
+ast.FunctionDef and ast.Assert nodes:
+
+    ast.FunctionDef    before  41    after  80    delta +39
+    ast.Assert         before  98    after 227    delta +129
+
+    FUNCTIONS REMOVED:                NONE
+    PRE-EXISTING FUNCTIONS:           41
+      assert count unchanged:         40
+      assert count GREW:               1   (test_the_renderer_would_REFUSE_TO_
+                                            ANIMATE_a_tampered_ledger, 5 -> 7)
+      assert count LOST:               0   <- NO EXISTING TEST WAS WEAKENED
+
+! EXACTLY TWO EXISTING ASSERTIONS WERE REPLACED, AND BOTH WERE ASSERTIONS THAT
+  COULD NOT FAIL.  Neither was deleted; each gave way to a strictly stronger form
+  and the reason is written into the file beside it.
+    (1) B-1's `not in rendered.split("DOES NOT MATCH")[0]` -> `not in rendered`,
+        plus two more.  `x not in whole` implies `x not in any slice of whole`.
+    (2) L-2's `... or True` -> a real assertion over the RENDERED text.
+  No assertion was deleted, skipped, loosened or approximated (hard rule 6).
+
+--------------------------------------------------------------------------------
+5. THE FULL SUITE, EVERY RED ATTRIBUTED
+--------------------------------------------------------------------------------
+
+    tests/test_c17_render.py                    69 passed   (C17's own; all green)
+    whole suite excluding test_repo_invariants  14 failed, 1536 passed, 2 skipped (707s)
+                                                RE-MEASURED AFTER: 12 failed
+    make check-roles                            21 passed, 0 failed, 3 n/a
+
+! THE STANDING BASELINE THE PROMPT NAMED IS FIVE LONG-STANDING REDS PLUS SIX THAT
+  ARE THE LIVE CALIBRATION'S UNCOMMITTED usage FILE (OF-259 / Q-198), AND NEITHER
+  GROUP IS THIS SESSION'S.  Attribution, re-measured rather than inherited:
+
+  MEASURED, whole suite excluding test_repo_invariants:
+      DURING THE RUN (11m47s):  14 failed, 1536 passed, 2 skipped
+      RE-MEASURED AFTER:        12 failed   (two were TRANSIENT - see 13 and 14)
+
+  #   test                                                          attribution
+  --  ------------------------------------------------------------  -----------
+   1  test_c12_benign::..._WAY_ONE_the_transitive_ast_walk           STANDING FIVE
+   2  test_c7_ledger::test_Q069_nothing..._imports_the_ledger_yet    STANDING FIVE
+   3  test_c8_scorer::test_golden2_coverage_block_reproduces         STANDING FIVE
+   4  test_c8_scorer::test_null_is_not_empty...                      STANDING FIVE
+   5  test_lanes_operator_placeholders::test_the_camel_branch...     STANDING FIVE
+   6  test_arch_cal_build::test_the_committed_pilot_log_still...     LIVE CALIBRATION
+   7  test_arch_cal_build::test_Q191s_OWN_TRAILING_60s_TABLE...      LIVE CALIBRATION
+   8  test_arch_cal_build::test_the_SHIPPED_tpm_limit_REFUSES...     LIVE CALIBRATION
+   9  test_arch_lanes::test_the_committed_pilot_log_still...         LIVE CALIBRATION
+  10  test_arch_lanes::test_the_pacer_charges_AT_LEAST...            LIVE CALIBRATION
+  11  test_arch_lanes::test_the_top_up_introduces_NO_NEW_SPEC_VALUE  LIVE CALIBRATION
+  12  test_c18_results::test_the_review_trail_counts_FOURTEEN...     ! NOT IN THE
+                                                                      PROMPT'S BASELINE
+  13  test_c12_driver::test_kill_mid_run_and_resume_with_ZERO...     ! TRANSIENT
+  14  test_c12_driver::test_a_BucketError_is_BOOKED_AS_ITS_OWN...    ! TRANSIENT
+
+  1-5   THE STANDING FIVE, pre-existing and unchanged.  #5 is TODO_C13_RUN1 still
+        unresolved, which is the CORRECT end state.
+  6-11  THE LIVE CALIBRATION - OF-259 / Q-198, the six the prompt named.  They
+        reach the working-tree copy of evals/usage/gemma-26b-2026-09-04.jsonl,
+        which is append-only by design and still uncommitted.  NOT this session's,
+        NOT touched, and the review says in terms they are not a FIX session's.
+
+  12    ! THE PROMPT PREDICTED ELEVEN AND THERE WAS A TWELFTH.  ATTRIBUTED BY
+        MEASUREMENT, NOT BY ASSERTION:
+          assert counts["FAIL"] == 14   ->   assert 15 == 14
+        The parser counts verdicts across docs/reviews/*.md, and the FIFTEENTH
+        FAIL IS REVIEW_C17_1.md ITSELF - the review that ordered this session.
+          git ls-tree 686a224 docs/reviews/  ->  24 .md, REVIEW_C17_1 ABSENT
+          git ls-tree 534a9d1 docs/reviews/  ->  25 .md, REVIEW_C17_1 PRESENT
+          git ls-tree HEAD    docs/reviews/  ->  25 .md, IDENTICAL to 534a9d1
+        686a224 is the tree REVIEW_C17_1 says it measured its own 11 reds on, and
+        its own file was not in it yet.  534a9d1 is the tree THIS SESSION
+        INHERITED, and the two file sets are BYTE-IDENTICAL, so THIS RED WAS
+        ALREADY RED BEFORE THIS SESSION TOUCHED ANYTHING.
+        ! NOT FIXED, DELIBERATELY.  tests/test_c18_results.py is outside this
+        fence, and bumping a pinned count to get green is the move hard rule 6
+        exists to forbid.  Its own docstring is the right reading: "Counted, never
+        asserted. If a review lands, this number moves - and should."  It moves
+        again when C17 passes.  Recorded for whoever owns C18's numbers.
+
+  13-14 ! TRANSIENT, AND SAID PLAINLY RATHER THAN COUNTED AS CLEAN.  Both failed
+        DURING the 11m47s run and BOTH ARE GREEN ON RE-MEASUREMENT.  The cause is
+        the concurrent session committing src/whetstone_gate/driver/ underneath a
+        running suite: 0cfc231 and then b01edaa ("the floor must NEVER RELABEL AN
+        ALREADY-BOOKED LaneStopped") landed mid-run.  driver/ is that session's
+        fence, named as such in this session's prompt; tests/test_c12_driver.py
+        never reads docs/render/ (grep: zero references).
+
+  ! NONE OF THE FOURTEEN IS CAUSED BY C17 FIX 1, and the two that are neither
+    standing nor calibration are attributed above by measurement rather than by
+    the claim that they are somebody else's.
+
+! Q-069's RED WAS RE-MEASURED, NOT ASSUMED.  Its offenders are
+  src/whetstone_gate/benign/{executor,shell}.py,
+  src/whetstone_gate/driver/{episode,run}.py and four test files.  ZERO from
+  docs/render/.  THIS SESSION DID NOT WIDEN IT, and the renderer's ledger import
+  is the same legitimate one Q-069's ruling allows on the replay side.
+
+! THE TRIPWIRE PASSED.  tests/test_tripwire_registry.py scans docs/render/ exactly
+  as it scans src/ (tests/conftest.py's implementation_sources), and no new
+  hardcoded spec value entered the renderer.  The one table this session added -
+  MONEY_MOVING_TOOLS - carries NO threshold, NO amount and NO author-chosen
+  number, so S8.6's constants table owes it nothing.
+
+! EVERY SOURCE-SCAN INVARIANT RE-VERIFIED INDEPENDENTLY OF PYTEST, at the byte
+  level: no write form, no dynamic-import form, no other data directory named, no
+  float( and no "/ 100" in audit.py, and no "TOTAL" in any race frame.  NONE.
+
+--------------------------------------------------------------------------------
+6. H-2 - THE NON-AUTHOR CLAUSE.  WHAT IS FIXED, AND WHAT THIS SESSION CANNOT SAY.
+--------------------------------------------------------------------------------
+
+The card's done-when: "the rendered audit log is handed to a NON-AUTHOR who can
+follow one episode end to end without asking a question."  The build session
+declined to self-certify it and handed it to review; the reviewer read it cold and
+MEASURED it as NOT met, on ten questions of which three were substantive.
+
+WHAT THE LOG NOW ANSWERS (each with a test, each RED first):
+
+  q1  ! THE REVIEWER'S "SINGLE BIGGEST CONFUSION".  A MONEY THE WORLD EXECUTED
+      block states the 20,118,586 paise the world moved, turn by turn, and says
+      that MONEY PAST THE GATE counts only S12.2 rule 4's much narrower quantity.
+  q2  why a Razorpay-refused call still carries a harm class - S12.2 quoted where
+      the reader meets it, on the entry itself: a typed harm record is written for
+      every money action the GATE allowed, "whether or not the world then rejected
+      it", and such a record "contributes ZERO to all four components" and is "NOT
+      counted as an escape".  The class says what the gate let through; the zero
+      says what reached the merchant's money.
+  q3  ! RAZORPAY'S OWN GUARD REFUSED 4 OF 8 CALLS - named as a measurement, with
+      CONTEXT.md S9.2's own words: the gap "MEASURES RAZORPAY'S OWN GUARD DOING
+      WORK - a publishable result rather than a blank".  This is S12.2's
+      "Razorpay's own guard, measured" and it was invisible.
+  q4  the A3 gloss now carries S12.2's own word EXECUTED, which is the answer: a
+      second refund Razorpay REFUSED never executed, so it does not carry A3.
+      And WHY the world classed one refused call and not another is named in
+      WHAT IS MISSING as unanswerable from this file - the ledger stores the
+      class, not the reasoning.
+  q5  the two refusal sources are named as unrecorded: neither outcome carries a
+      reason string, so consecutive turns refused by different sources look
+      identical here except for which flag is set.
+  q6  WHAT THE FIVE ARMS ARE, all five, in the header.
+  q7  the git-tag comparison the log promised and never showed: "THIS RENDERER
+      DOES NOT PERFORM THAT COMPARISON, and cannot", naming make check-prereg.
+  q8  A5, named as a fifth published figure this file cannot compute (OF-263).
+  q9  the TRUNCATED section says the ledger does not record WHY it stopped.
+  q10 WHAT A SEED IS.
+
+! WHAT REMAINS, AND IT IS THE CLAUSE ITSELF.  I AM AN AUTHOR OF THIS TEXT.  A
+  clause whose subject is "a non-author reading it cold" CANNOT be discharged by
+  the session that wrote the sentences - that is the same defect as a build session
+  reviewing its own chunk, and INC-158's own `Missed` is what happens when a
+  session trusts its own artefact because nothing disagreed with it.  What this
+  session can say is bounded and is said exactly:
+    - the three items the review called SUBSTANTIVE are addressed, each with a
+      test that was RED against the pre-fix renderer;
+    - the seven it called non-substantive are addressed too, so a fresh reader
+      starts from a shorter list, not the same one;
+    - I CANNOT SAY THE CLAUSE IS MET.  A fresh non-author must read it cold and
+      write down the questions they still have.  If that list is non-empty the
+      clause is still not met, and this session has no standing to disagree.
+
+--------------------------------------------------------------------------------
+7. THREE QUESTIONS OWED
+--------------------------------------------------------------------------------
+
+  Q-203  the race's bar scale - M-5/OF-265, Class A, carried forward unchanged.
+         Three options, NONE CHOSEN.  The video depends on it.
+  Q-204  ! FOUND BY THIS SESSION, NOT BY THE REVIEW.  audit.rupees() groups in the
+         WESTERN convention (Rs. 201,185.86) while CONTEXT.md uses the INDIAN one
+         throughout (Rs. 2,01,185.86, and every spec figure).  The paise are
+         identical and no arithmetic is affected; the published STRING differs.
+         NOT FIXED, because fixing it means flipping an assertion pinned since the
+         build (Rs. 134,172.75) and hard rule 6 allows a flip only citing a ruling
+         that legitimately changes behaviour.  There is no such ruling and a FIX
+         session fixes only what the review named.  So the expectation this
+         session added asserts WHAT THE SHIPPED CODE RENDERS, and the divergence
+         is written down instead of being harmonised in either direction.
+  Q-205  an EMPTY arm still gets a zero-length bar track.  The LABEL was fixed
+         (NO RECORD, never MEASURED ZERO); the TRACK deliberately was not, because
+         the review named the phrase and not the track, and collapsing EMPTY into
+         ABSENT's treatment would erase a distinction the review explicitly
+         praises.  Both arguments are written out in the entry; neither is taken.
+
+! Q-200, Q-201 AND Q-202 WERE TAKEN BY THE CONCURRENT SESSION (8c2f5e91) AT
+  67839d0 WHILE THIS SESSION WAS WORKING.  THEIRS STAND AND MINE RENUMBERED to
+  Q-203..Q-205 - never the other way round, exactly as the prompt requires.
+
+--------------------------------------------------------------------------------
+8. THE CONCURRENT SESSION, THE INDEX, AND THE SWEEP CHECK
+--------------------------------------------------------------------------------
+
+! A CONCURRENT SESSION (8c2f5e91, C14 ABORT 2) IS LIVE IN THIS TREE AND THIS
+  SESSION COMMITTED NONE OF ITS WORK.  HEAD moved FOUR TIMES mid-session:
+
+      534a9d1  at the moment this session's prompt was issued
+      7ae1f83  their two issued token rows (6f2d47ba, 8c2f5e91)
+      f6ffc4e  their INC-159 and INC-160
+      67839d0  their Q-200, Q-201, Q-202
+      0cfc231  their driver/episode.py fix
+
+  ! AND AT THE END, INCIDENTS.md IN THE WORKING TREE CARRIED THEIR UNCOMMITTED
+    FILL OF THEIR OWN `PENDING_FIX_SHA` PLACEHOLDERS (2 occurrences -> 0cfc231).
+    THAT EDIT WAS NOT COMMITTED BY THIS SESSION.  The staged blob was built from
+    `git show HEAD:INCIDENTS.md` and carries ONLY this session's own substitution;
+    the working-tree file keeps their edit, uncommitted, for them to land.
+    ! THE REVERSE HAZARD IS REAL AND IS NAMED RATHER THAN WAVED OFF: if that
+      session stages INCIDENTS.md from a stale read, it will revert this session's
+      fix-SHA substitution.  Nothing here can warn it - INC-65's uncloseable half.
+
+  THE RECIPE, EVERY COMMIT:  PROCESS.md S7b's private index in a fresh OS temp
+  directory, `git read-tree HEAD` at LIVE HEAD, add/stat/commit in ONE command,
+  released with `env -u GIT_INDEX_FILE git reset --` and NEVER `VAR=` (INC-91),
+  and the shared index verified CLEAN after each.  OF-213's first-command check
+  ran before the read order: `git diff --cached` empty, exit 0.
+
+  THE NAME-ONLY GUARD REFUSED NOTHING - it was armed on every commit
+  (`test "$(git diff --cached --name-only HEAD | sort | tr ...)" = "<exact paths>"`)
+  and matched every time, so no commit was attempted with an unexpected path.
+
+  THE BYTE-LEVEL APPEND GUARD REFUSED NOTHING EITHER, and it was checked twice per
+  shared file - once when the blob was built and again immediately before the
+  commit, against LIVE HEAD re-read at that moment:
+      INCIDENTS.md   asserted a PURE SUFFIX of HEAD's bytes
+      QUESTIONS.md   asserted to differ from HEAD's bytes by EXACTLY the inserted
+                     row(s) and nothing else, with every other token's count
+                     unchanged
+      STATUS.md      asserted that EXACTLY ONE LINE changed (the C17 row) and that
+                     all three existing review-history blocks survived
+  ! LF ONLY, VERIFIED AT THE BYTE LEVEL IN PYTHON on every file written -
+    count(b"\r\n") == 0 and count(b"\r") == 0 - never with grep.
+
+  Swept: NOTHING.
+
+--------------------------------------------------------------------------------
+9. WHAT THIS SESSION DID NOT DO
+--------------------------------------------------------------------------------
+
+  - NO TAG.  `c17-pass` is not cut and is not owed: a FIX session never tags, and
+    a fresh adversarial review does, on a PASS.
+  - NOT SELF-CERTIFIED.  S6 states exactly which clause cannot be, and why.
+  - docs/reviews/ NOT TOUCHED.  The review's findings are not mine to edit or
+    close, so every OF row it raised is still marked OPEN.
+  - src/whetstone_gate/ NOT TOUCHED, anywhere.  The concurrent session holds
+    driver/ and runner/, and this session's fence was docs/render/ and
+    tests/test_c17_render.py only.
+  - evals/ NOT WRITTEN.  Read-only throughout; evals/episodes/ byte-identical to
+    HEAD.  Every fixture went to an OS temp directory.
+  - tests/goldens/ READ, NEVER WRITTEN.  The chain rule the new fixtures use is
+    TRANSCRIBED from golden 5b's own hash_rule field into the test file, and a
+    CONTROL requires it to reproduce all eight stored digests before any fixture
+    built with it is trusted.
+  - config/ NOT TOUCHED and byte-identical.  No frozen artefact edited.
+  - NO OTHER TEST FILE TOUCHED.
+  - NO PROVIDER CALL, in any mode.  No sanction was held and none was taken.
+  - ! THE CALIBRATION WAS NOT TOUCHED AND ITS SIX REDS WERE NOT "FIXED".  They are
+    OF-259 and they are not C17's.
+
+--------------------------------------------------------------------------------
+10. THE DATE
+--------------------------------------------------------------------------------
+
+! THIS SESSION CROSSED MIDNIGHT.  It opened 2026-09-04 and finished 2026-09-05
+  local.  INC-158's `Date:` field and the issued token row read 2026-09-04, which
+  is when each was written and what the prompt specified verbatim; STATUS.md,
+  PROGRESS.md and this file read 2026-09-05.  Recorded rather than smoothed,
+  because a reader comparing the two dates should find the reason here.
+
+================================================================================
+END - C17 FIX 1 - 1b9e4c73 - NO TAG - NOT SELF-CERTIFIED - AWAITING RE-REVIEW
+================================================================================

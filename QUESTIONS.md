@@ -15949,3 +15949,106 @@ call is honest; booking a failed world is a lie with a category attached.**
 real ambiguity has succeeded."* Hard rule 2 makes option 3 Class A — it changes which failures end a
 run. **The floor the ruling ordered is built and tested; this is the part the ruling did not order,
 and this session did not take it.**
+
+---
+
+## ⚠️ `Q-203` — **THE RACE'S BAR SCALE. `M-5`/`OF-265`'s RULING IS OWED BEFORE THE VIDEO, AND A FIX SESSION MAY NOT TAKE IT**
+
+**Raised by:** C17 FIX 1 (`1b9e4c73`) · **Date:** 2026-09-04/05 · **Status:** ⚠️ **OPEN — carried
+forward unchanged from `REVIEW_C17_1.md` §2.6's `M-5`, which says in terms that *"a ruling on
+whether the scale should be a fixed per-track denominator is owed before the video, not after"*.**
+**Blocking:** the §18 RACE beat's visual promise, and therefore C20.
+**Deviation class:** ⚠️ **A** — it changes what the video shows. **Which is exactly why this session
+did not decide it.**
+
+**The finding, re-measured first-hand rather than inherited.** `race.frame()` scales each component
+track by `max(...)` **across the arms present at that turn**, so the denominator is recomputed every
+frame. With exactly one arm carrying data — today's state, and the state the video would be shot in
+— that arm **is always its own maximum**, so its bar is 100% full from its first non-zero turn
+onward: the number beside it grows and the bar does not. Today it degenerates the other way instead,
+because every stored harm component is zero, `scale == 0`, and **every bar is empty in every frame**.
+
+**§18's promise is *"five money bars FILLING at different speeds"*. Neither state is that.**
+
+**Options seen, none of them this session's to choose:**
+  1. **Leave the scale as relative-to-leader.** It is the right scale for *comparing five arms*,
+     which is the race §18 actually describes, and no renderer can invent arms that never ran.
+     ⚠️ Costs §18's specific beat until more than one arm has data.
+  2. **A fixed per-track denominator** — an episode cap, or arm 1's final figure. Bars then fill.
+     ⚠️ Loses the head-to-head comparison the current scale buys, and **an episode cap is a
+     `config/` value**, which is a frozen pre-registration artefact.
+  3. **Shoot the beat on a seed with more than one arm**, once the arms have run. ⚠️ Depends on a
+     run that has not happened, and the calibration is currently aborted.
+
+⚠️ **THIS SESSION CHANGED NOTHING ABOUT THE SCALE.** `bar()`'s only change is `L-5`'s clamp at zero
+(`OF-266`), which fixes a track that was **wider than every other** for a negative value and touches
+no denominator. `H-1` additionally excludes a **chain-failed** episode from the `max`, so fabricated
+content cannot decide what the honest arms look like — that is a tamper guard, not a scale decision.
+
+---
+
+## ⚠️ `Q-204` — **THE AUDIT LOG PRINTS RUPEES IN THE WESTERN GROUPING WHILE `CONTEXT.md` USES THE INDIAN ONE THROUGHOUT. THE FIGURE IS THE SAME; THE PUBLISHED STRING IS NOT**
+
+**Raised by:** C17 FIX 1 (`1b9e4c73`) · **Date:** 2026-09-04/05 · **Status:** ⚠️ **OPEN — NOT raised
+by `REVIEW_C17_1.md`. Found by this session while writing `B-2`'s expected value, and recorded
+rather than fixed, because fixing it would require flipping an assertion that has been pinned since
+the build.**
+**Blocking:** nothing. **Deviation class:** ⚠️ **A if changed** — it moves a published string in a
+submission-facing artefact.
+
+**Measured.** `docs/render/audit.py`'s `rupees()` formats with Python's `,` grouping:
+
+```
+  audit.rupees(20118586)  ->  'Rs. 201,185.86'      the renderer, today
+  CONTEXT.md / the review ->  'Rs. 2,01,185.86'     the Indian grouping, used throughout the spec
+```
+
+⚠️ **The paise are identical and no arithmetic is affected** — money is integer paise end to end and
+`rupees()` never touches a float. What differs is the rendered string a judge reads, in a project
+whose merchant, thresholds and every spec figure (**₹2,00,000**, **₹3,00,000**, **₹5,30 L**,
+**₹2.36 cr**) are written the Indian way.
+
+⚠️ **WHY IT WAS NOT SIMPLY FIXED.** `tests/test_c17_render.py::test_money_is_rendered_from_INTEGER_
+PAISE_and_never_through_a_float` pins `audit.rupees(13417275) == "Rs. 134,172.75"`, committed before
+the build prompt's review. Changing the grouping means **flipping that assertion**, and hard rule 6
+allows a flip only *"citing the ruling"* that legitimately changes behaviour. **There is no such
+ruling, and a FIX session fixes only what the review named.** So the expectation this session added
+for `B-2` asserts what the shipped code actually renders (`Rs. 201,185.86`), and the divergence is
+written down here instead of being quietly harmonised in either direction.
+
+**Options:** (1) leave it — one convention inside the renderer, another in the prose, both
+unambiguous; (2) move `rupees()` to Indian grouping and flip the pinned assertion citing the ruling;
+(3) print paise only in the log and let `RESULTS.md` do the rupee prose. **None chosen here.**
+
+---
+
+## ⚠️ `Q-205` — **AN `EMPTY` ARM STILL GETS A (ZERO-LENGTH) BAR TRACK IN THE RACE. THIS SESSION FIXED ITS LABEL AND DELIBERATELY DID NOT REMOVE ITS TRACK**
+
+**Raised by:** C17 FIX 1 (`1b9e4c73`) · **Date:** 2026-09-04/05 · **Status:** ⚠️ **OPEN**
+**Blocking:** nothing. **Deviation class:** **B** as built — a scope decision inside `B-2`'s remedy,
+recorded with its rationale as hard rule 2 requires.
+
+**What the review named.** `O-7`: an `EMPTY` episode has `present == True`, so it *"does get a drawn
+bar track labelled `MEASURED ZERO`"*, and the review calls the **phrase** *"the same conflation as
+`O-5`, in the artefact §18 puts on screen."* **`B-2`'s instruction is about the sentence**:
+*"MEASURED ZERO, EMPTY, ABSENT and MONEY MOVED are four different facts and must read as four
+different sentences."*
+
+**What this session did.** The label is now `NO RECORD -- nothing was measured, and that is not a
+zero`, beside the existing `[EMPTY LEDGER -- this episode recorded no turn at all]`. **The track is
+still drawn**, empty, so the three states are visually distinct: a bar with data, an empty bracket
+that says NO RECORD, and — for `ABSENT` — **no bracket at all**.
+
+⚠️ **THE ARGUMENT FOR GOING FURTHER, STATED BECAUSE IT IS NOT WEAK.** `race.py`'s own docstring says
+*"an empty bar and an absent bar look identical on screen and mean opposite things"*. An `EMPTY`
+ledger recorded nothing, so a zero-length track for it invites the very reading — *"the gate held"* —
+that the whole distinction exists to prevent. **Removing the track for `EMPTY` too would be the
+tighter reading.**
+
+⚠️ **THE ARGUMENT FOR STOPPING WHERE THE REVIEW STOPPED.** A FIX session fixes only the findings
+named; the review named the phrase, not the track; and collapsing `EMPTY` into `ABSENT`'s treatment
+would **erase a distinction the review explicitly praises** — *"an `ABSENT` arm takes the `continue`
+branch and gets no bar bracket at all … That is the right design and it works."* **A ruling, not a
+fix session's default.**
+
+---

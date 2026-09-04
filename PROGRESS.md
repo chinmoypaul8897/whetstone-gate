@@ -1,3 +1,73 @@
+## SESSION-TOKEN 1b9e4c73 — C17, FIX 1 — 2026-09-05
+
+**Role:** FIX, after `REVIEW_C17_1.md`'s ⛔ **FAIL** (2 BLOCKER, 5 HIGH, 5 MEDIUM, 5 LOW). **Chunk:**
+C17. **Built by `7a1e3b52`, reviewed by `4e8b91d3` — this session is neither.**
+⚠️ **FULL RECORD: `docs/sessions/c17-fix-1.txt`. INCIDENT: `INCIDENTS.md` INC-158.**
+⚠️ **SPEND: ZERO. No provider call in any mode**; this session held no sanction and took none.
+⚠️ **`evals/` READ-ONLY AND NEVER WRITTEN** — `evals/episodes/` is byte-identical to `HEAD`; every
+tampered, gapped, past-budget and off-arm fixture was written to an **OS temp directory**.
+⚠️ **NO TAG. `c17-pass` is NOT cut and is NOT owed — a FIX session never tags, and this work is
+NOT SELF-CERTIFIED.** A fresh adversarial review follows.
+
+**GATE 0.** `INC-158` was committed at **`e9b843e`** *before a line of code changed*, with the issued
+token row `1b9e4c73`. Its `Diagnosis` is the **class** the review found rather than five
+coincidences: **the renderer asserted a property of the record from a PROXY for that property rather
+than from the record** — verification from *"an entry exists"*, a measured zero from *"the sum is
+0"*, completeness from `max(turn_index)` alone, a frame's money from *"turn < budget"*, and *"has
+data"* from *"a file exists"*. Its `Missed` is the green test: the deciding line of
+`test_the_renderer_would_REFUSE_TO_ANIMATE_a_tampered_ledger` split the render at the warning and
+inspected only the slice **before** it, so it was satisfied by **document order alone** — 2,437 chars
+before, 9,904 after carrying the block and all eight false stamps — and would have passed whether the
+renderer printed zero entries or eight.
+
+**THE FIX, `9d7cc48`.** ⚠️ **Every finding was RE-MEASURED FIRST-HAND before anything was written**;
+none was taken from the review's report. **`B-1`** a DETECTED-tampered ledger now renders no entries,
+no money summary and no per-entry stamp, and states what it withholds; `verified` is a **required**
+keyword with no default. **`B-2`** MEASURED ZERO / EMPTY / ABSENT / MONEY MOVED are four different
+sentences, and a `MONEY THE WORLD EXECUTED` block states the **20,118,586 paise** the world actually
+moved beside §12.2 rule 4's much narrower metric. **`B-3`** COMPLETE now requires **contiguous**
+coverage; a ledger at turns 0, 1, 19 of 20 is the new fifth state `GAPPED` and names its seventeen
+missing turns. **`H-1`** a chain-failed arm gets **no bar and sets no scale**. **`H-2`** the log
+answers the review's three substantive cold-read questions — including **RAZORPAY'S OWN GUARD REFUSED
+4 OF 8**, §12.2's own *"Razorpay's own guard, measured"*, which was invisible. **`H-3`** entries past
+the budget are named in **both** deliverables under one anchor phrase. **`H-4`** the footer separates
+*never ran* from *ran and recorded nothing* — on the real stored seeds 2102–2110 it said *"4 of 5"*
+where five of five had no usable data.
+
+⚠️ **EVERY FIX SHIPPED WITH THE INPUT THAT MADE IT FAIL.** 28 of the new assertions were run against
+the **pre-fix** renderer and were RED; the 6 that passed are controls (the hand-written chain writer,
+the money derivation, the valid-ledger control, the vacuity meta-test, and the two new `ctypes`
+proofs). **AST-exact diff: `ast.FunctionDef` 41 → 80, `ast.Assert` 98 → 227, ZERO functions removed,
+and NO pre-existing test lost an assertion** (40 unchanged, 1 grew 5 → 7). The only two assertions
+replaced were the two that **could not fail**: `B-1`'s document-order line and `L-2`'s `or True`.
+
+**TAKEN beyond the BLOCKERs and HIGHs:** `OF-257` (the README no longer claims the socket guard
+*"proves the capability is absent"* — `ctypes` defeated all four proofs; **a fifth way is ADDED, no
+proof weakened**, and the residual is stated), `OF-258`, `OF-260`, `OF-261`, `OF-263`, `OF-264`,
+`OF-266`. **LEFT, and named:** `OF-259` (⚠️ **NOT C17's** — the live calibration), `OF-262` (outside
+this fence), `OF-265` (**a ruling is owed** — `Q-203`).
+
+**THREE QUESTIONS OWED:** `Q-203` the race's bar scale (`M-5`/`OF-265`, Class A, the video depends on
+it); `Q-204` the audit log prints rupees in the **Western** grouping while `CONTEXT.md` uses the
+Indian one throughout — found by this session, not by the review, and **not fixed**, because fixing
+it means flipping an assertion pinned since the build; `Q-205` an `EMPTY` arm still gets a
+zero-length bar track — the label was fixed, the track deliberately was not.
+⚠️ **Q-200, Q-201 and Q-202 were taken by the concurrent session (`8c2f5e91`) at `67839d0` while this
+session was working. THEIRS STAND AND MINE RENUMBERED, never the other way round.**
+
+⚠️ **A CONCURRENT SESSION IS LIVE IN THIS TREE AND ITS WORK WAS NOT COMMITTED BY THIS ONE.** `HEAD`
+moved **three times** mid-session (`7ae1f83` → `f6ffc4e` → `67839d0` → `0cfc231`), and at the end
+`INCIDENTS.md` in the **working tree** carried that session's **uncommitted** fill of its own
+`PENDING_FIX_SHA` placeholders. Every blob this session staged was rebuilt from **live HEAD** at the
+moment of staging and asserted at the **byte level** — `INCIDENTS.md` a pure suffix, `QUESTIONS.md`
+differing by exactly the inserted rows. **Swept: NOTHING.**
+
+**SUITE.** `tests/test_c17_render.py` **69 passed**, all green. Whole-suite result and every red
+attributed in `docs/sessions/c17-fix-1.txt`. ⚠️ **`test_c7_ledger::test_Q069_...` was re-measured:
+its offenders are `benign/{executor,shell}.py`, `driver/{episode,run}.py` and four test files —
+ZERO from `docs/render/`, so this session did not widen it.** `make check-roles` **21 passed, 0
+failed, 3 n/a**.
+
 ## SESSION-TOKEN 4e8b91d3 — C17, REVIEW 1 — 2026-09-04 — ⛔ **FAIL**
 
 **Role:** REVIEW (`code`, downgraded from `full` by rung 5, `INC-63`). **Chunk:** C17. **Built by
