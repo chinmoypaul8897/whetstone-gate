@@ -2846,3 +2846,91 @@ of the ten findings it missed are still not carried.
 `tests/`, `docs/reviews/`, `QUESTIONS.md`, `INCIDENTS.md`, `README.md`, `RESULTS.md`, `PROTOCOL.md`,
 `HOLES.md`, `CONTEXT.md`, `PROCESS.md`, `corpora/`, every tag and `.env` were **untouched**.
 **No placeholder was filled and no calibration result was anticipated.**
+
+---
+
+⚠️⚠️ **UPDATE, C14 ABORT 2 (`8c2f5e91`), 2026-09-04 — THE ARM-1 CALIBRATION'S ATTEMPT 2 ABORTED,
+IS ON THE RECORD AS `INC-159`, AND THE DEFECT THAT ABORTED IT IS FIXED AS A CLASS RATHER THAN AS AN
+INSTANCE. ⚠️ THE CALIBRATION IS NEITHER SPENT NOR VOID AND ATTEMPT 3 IS HANDED OVER, NOT RUN.**
+⚠️ **SPEND: ZERO. No provider call in any mode; this session held no token sanction and took none.
+`evals/` READ-ONLY and never written; `config/` untouched and not opened; `tests/goldens/` not read
+and not written; no tag cut or moved; `RUN_DECLARED.md` §8 NOT re-filled. NOT SELF-CERTIFIED.**
+
+⚠️ **THIS SESSION'S ROW IS APPENDED RATHER THAN EDITED INTO THE C14 CARD'S ROW, AND THAT IS
+DELIBERATE.** A second session — **C17 FIX 1 (`1b9e4c73`)** — is live in this same working tree and
+moved `HEAD` twice under this one. `Q-180`'s finding is that two processes rewriting a 512 KB file
+from separate in-memory reads is a lost-update race `git` cannot see, so every change here is a
+**pure append**. `CLAUDE.md` §6.2's *"append to the review-history column"* is honoured in substance;
+the row edit is **owed to a session that does not share the tree**, and is named here rather than
+attempted.
+
+**THE STATE OF THE CALIBRATION, IN ONE PLACE.** `PROCESS.md` §6b: *"the first execution that runs to
+**completion** IS the run."*
+
+| attempt | started | ended | how it ended | episodes | tokens |
+|---|---|---|---|---|---|
+| 1 (`INC-157`) | `13:29:25Z` | `13:29:34Z` | `ModuleNotFoundError` — bare `python` | 0 of 30 dispatched | **0** |
+| 2 (`INC-159`) | `14:33:17Z` | `14:41:51Z` | ⚠️ uncaught `TimeoutError`, SSL read | 1 dispatched, **0 recorded**, 29 never dispatched | **57,087** |
+| 3 | — | — | **handed over, not run** | — | — |
+
+⚠️ **NEITHER ATTEMPT COMPLETED, SO NEITHER IS THE RUN, AND NOTHING HERE MAY BE READ AS SAYING THE
+CALIBRATION IS SPENT OR VOID.** `evals/cal/` holds the declaration and **both** aborted logs; no name
+anywhere under `evals/` contains `cal__`; `evals/episodes/` and `evals/checkpoints/` hold 11 files
+each and **all** are `pilot__*`.
+
+⚠️ **THE PROMPT'S PARTIAL-EPISODE FIGURE IS CORRECTED, NOT COPIED.** It said *"0 completed, 0
+truncated, 30 never started"*. Measured: **0 completed, 0 truncated, 29 never dispatched — and ONE
+episode dispatched that left no record**, seed 2201, **13 provider calls, 56,855 tokens, every row
+`outcome: OK`**, plus **232** liveness tokens. *"30 never started"* would have published 56,855 spent
+tokens as an episode that never happened. ⚠️ **And not one of those numbers is the driver's**: it
+printed no report at all, so all five were reconstructed from `evals/` by this session. **The
+denominator did not shrink silently — it was never computed.**
+
+**CAUSE, PROVED BY ARITHMETIC RATHER THAN BY THE WORD "timeout".** The 13th call's usage row is
+stamped `14:38:50Z`; the log's final byte was written at `14:41:51.149Z`. **181.1 s**, against
+`driver/clients.py:475`'s `_TIMEOUT_SECONDS = 180`. `TimeoutError` is an `OSError` and **not** a
+`urllib.error.URLError`, so `_http_post`'s `URLError` branch — the one written to turn transport
+faults into `PROVIDER_ERROR` — never saw it.
+
+⚠️⚠️ **THE FIX IS A FLOOR, NOT A FOURTH NAME, AND THAT DISTINCTION IS THE WHOLE POINT.** `Q-200`,
+RULED and transcribed verbatim at `67839d0` **before a line of code changed**, closes `Q-174` and
+generalises `Q-179`(2). **Three named types escaped `_MeteredCall.run` in three days and both earlier
+fixes added one more name to a catch list.** `0cfc231` adds one `except Exception` clause **beneath**
+the three named branches, booking `UNEXPECTED_ERROR` — a ninth `UNFINISHED_CAUSES` member that prints
+with its count including its zero. **No retry. No lane stop. No new spec value; `config/` was not
+opened. Only `type(exc).__name__` is stored** (`INC-147`: the redaction scan is prefix-anchored, so a
+message is not safe to store). `KeyboardInterrupt` and `SystemExit` pass through, **asserted**.
+
+⚠️ **AND A FOURTH INSTANCE OF THE CLASS WAS FOUND INSIDE THE FIX FOR THE SECOND.** `INC-160`: the
+`except BucketError` branch `Q-179`(2) **ruled into existence to stop an uncaught escape** passed
+`episodes.PACER_REFUSED` to `usage.append`, whose outcomes are exactly `("OK","RATE_LIMITED","ERROR")`
+— so it raised `UsageError` **from inside an `except` handler**, which no sibling clause can catch.
+Proved twice first-hand in a fresh OS temp directory before it was written down. Fixed in the same
+commit, because the floor could not stand above it.
+
+**GATE 2 — RED FIRST, AND THE RIGHT RED.** `tests/test_c14_unexpected_escape.py`, 7 tests, **5 red on
+the pre-floor code**; the two headline tests fail **by the exception escaping `driver_run.execute`**,
+on an escape path **frame-for-frame identical to the calibration's** with only the transport
+substituted. ⚠️ **The second raises a bare `RuntimeError` — a type named in no client, no cause table
+and no ruling** — because a file testing only `TimeoutError` would close the instance, which is the
+mistake made twice already. **AST-EXACT DIFF, qualified names, never `grep -c assert`: ZERO functions
+removed and ZERO functions that lost an assertion, in all three touched test files.** Two existing
+tests turned red and both were **strengthened** — one had been pinning a usage row the program could
+not write (7 → 14 assertions), the other now dies on a real `KeyboardInterrupt` and its
+`pytest.raises(Exception)` became `pytest.raises(KeyboardInterrupt)`.
+
+**THREE QUESTIONS OWED.** ⚠️ **`Q-202` is the one that matters and this session STOPPED on it rather
+than deciding it:** the ruling's floor covers **the model call**, and world build, gate build, ledger
+write and `_publish` are outside it and still kill a run with no denominator. **That is not
+hypothetical — `INC-160` is exactly such a site, one line from the floor, inside the fix for this very
+class.** Widening it is Class A, because a floor that booked a world-construction failure as an
+episode outcome would publish a measurement taken against an instrument that failed to build.
+`Q-200`(a) names the one place this session **chose against a possible reading** (the escaped call is
+counted with zero tokens) with its reasoning written out so a review can overturn it. `Q-201`'s
+cause→outcome join table is **proposed, not installed**.
+
+**NOT DONE, SAID PLAINLY.** The calibration, the pilot and the sweep were **not run**. C17's FAIL is
+another live session's and was not touched. `tests/test_c18_results.py`'s `14 → 15` review-FAIL count
+is red for C17 REVIEW 1's verdict and is not this session's to move. The uncommitted
+`evals/usage/gemma-26b-2026-09-04.jsonl` keeps `test_the_object_store_and_the_working_tree_agree` and
+`OF-259`'s six reds standing, and **only the operator may commit that file.**

@@ -1,3 +1,90 @@
+## SESSION-TOKEN 8c2f5e91 — C14, ABORT 2 (FIX) — 2026-09-04 — ✅ **GATES 0–3 DONE, CALIBRATION NOT RUN**
+
+**Role:** FIX. **Chunk:** C14. **Gate 0 — the abort — was written before a line of code changed**
+(`PROCESS.md` §6b, hard rule 13), and the architect's ruling was transcribed verbatim before that.
+⚠️ **FULL RECORD: `docs/sessions/c14-abort-2.txt`.**
+⚠️ **SPEND: ZERO. No provider call in any mode; this session held no token sanction and took none.**
+⚠️ **`evals/` READ-ONLY AND NEVER WRITTEN** — it holds the evidence of two aborts and nothing under
+it was deleted, rewritten or truncated. `config/` untouched and not opened. `tests/goldens/` not
+read and not written. No tag cut or moved. `RUN_DECLARED.md` §8 **not re-filled**.
+
+> ### ⚠️⚠️ THE CALIBRATION IS **NEITHER SPENT NOR VOID.** `PROCESS.md` §6b's record is *"the first
+> execution that runs to **completion**"* and **no execution has completed.** Attempt 1 died on
+> `ModuleNotFoundError` (`INC-157`); attempt 2 died on an uncaught `TimeoutError` (`INC-159`).
+> **Attempt 3 is a numbered attempt in the same directory and the handover block is printed.**
+
+**GATE 0 — THE ABORT, ON THE RECORD.** `INC-159`, eight fields, `Diagnosis` and `Missed` both
+filled. ⚠️ **EVERY FIGURE RE-MEASURED IN THIS TREE RATHER THAN COPIED FROM THE PROMPT**, and one of
+them is **corrected**: the prompt said *"0 completed, 0 truncated, 30 never started"*, and the third
+is wrong in substance. Measured — **0 completed, 0 truncated, 29 never dispatched, and ONE episode
+dispatched that left no record**: seed 2201, **13 provider calls, 56,855 tokens, all `outcome: OK`**,
+plus **232** liveness tokens. *"30 never started"* would have published 56,855 spent tokens as an
+episode that never happened. ⚠️ **And not one of those numbers is the driver's** — it printed no
+report at all, which is hard rule 11's loss in its purest form: the denominator did not shrink
+silently, **it was never computed.** Cause proved by arithmetic rather than by the word *timeout*:
+the 13th usage row is `14:38:50Z`, the log's final byte `14:41:51.149Z`, **181.1 s** against
+`clients.py:475 _TIMEOUT_SECONDS = 180`.
+
+**GATE 0b — A FOURTH INSTANCE OF THE SAME CLASS, FOUND AND PROVED WHILE FIXING THE THIRD.**
+`INC-160`. The `except BucketError` branch that `Q-179`(2) **RULED into existence to stop an uncaught
+escape** passes `episodes.PACER_REFUSED` to `usage.append`, whose outcomes are exactly
+`("OK","RATE_LIMITED","ERROR")` — so it raises `UsageError` **from inside an `except` handler** and
+escapes `run`, `run_one_episode` and `execute` in precisely the way it was written to prevent.
+**The fix for instance #2 of the class was instance #4 of it.** Proved twice first-hand in a fresh
+OS temp directory, against the shipped code, with no provider call, **before a word of the entry was
+written**.
+
+**GATE 1 — THE RULING, THEN THE FLOOR.** `Q-200` transcribes the ruling verbatim; `Q-201` discloses
+`INC-160`'s Class B; `Q-202` **STOPS** on the Class A part the ruling did not order. The floor is one
+`except Exception` clause beneath the three named branches in `driver/episode.py:_MeteredCall.run`,
+booking `runner/episodes.py:UNEXPECTED_ERROR` — a **ninth** member of `UNFINISHED_CAUSES`, so
+`Denominator.by_cause()` prints it including its zero. **No retry. No lane stop. No new spec value.
+`config/` not opened. Only `type(exc).__name__` is stored** (`INC-147`: the redaction scan is
+prefix-anchored, so a message is not safe to store). `KeyboardInterrupt` and `SystemExit` are
+`BaseException` and pass through — **asserted, not assumed.**
+
+**GATE 2 — BOTH TESTS PROVED RED FIRST, AND THE RED IS THE RIGHT RED.**
+`tests/test_c14_unexpected_escape.py`, 7 tests, **5 red on the pre-floor code**. The two headline
+tests fail **by the exception escaping `driver_run.execute`** — and the escape path is
+**frame-for-frame identical to the calibration's**: `run.py:894 → episode.py:722 → loop.py:273 →
+episode.py:454 → episode.py:373 → episode.py:455 → run.py:506 → clients.py:896 → clients.py:1043`,
+with only the last frame (the transport) substituted. ⚠️ **The second test raises a bare
+`RuntimeError` — a type named in no client, no cause table and no ruling** — because a file testing
+only `TimeoutError` would close the instance, which is the mistake `Q-174` and `Q-179`(2) each made.
+**AST-EXACT DIFF** (`ast.FunctionDef` / `ast.Assert`, never `grep -c assert`): `test_c11_runner.py`
+**0 functions removed, 0 assertions lost**, `+2` asserts on the one flipped function (`8 → 9`, red on
+the pre-ruling code); the new file `+22 functions, +26 ast.Assert, +4 pytest.raises`.
+**NOTHING WAS WEAKENED, DELETED OR SKIPPED.**
+
+**GATE 3 — THE HANDOVER, AND ITS PRECONDITIONS WERE EXECUTED RATHER THAN ASSERTED.** `INC-157`'s
+guardrail — *"in any chain whose steps differ in reversibility, every free check runs before the
+first irreversible one"* — is the block's shape: venv activation, then the free
+`python -c "import whetstone_gate"`, then `INC-159` present in **HEAD's committed blob**, then HEAD
+pushed, then §8 unchanged, and only then the declared command **verbatim** under `nohup`.
+⚠️ **The precondition half was run for real, with the driver launch cut out of the script**, and it
+correctly **REFUSED** while HEAD was unpushed. **The calibration was NOT run by this session.**
+
+**⚠️ A CONCURRENT SESSION IS LIVE IN THIS WORKING TREE AND IT IS DISCLOSED, NOT TIDIED AWAY.**
+C17 FIX 1 (`1b9e4c73`) moved `HEAD` under this session and **took `INC-158`** between this session's
+first commit and its Gate 0 append. Both of this session's entries were **drafted as `INC-158`/`159`
+and renumbered to `159`/`160` before commit**; a tail-byte assertion in the append script caught it
+and refused rather than overwriting 122 lines of that session's work. `INC-136`, `INC-140`,
+`INC-149`; `Q-180`, `Q-187`. **`tests/test_c17_render.py` is that session's and was never staged.**
+⚠️ **Observed and NOT touched:** `INC-139` appears **twice** in `INCIDENTS.md` (lines 10224, 10531) —
+an earlier collision of the same class, not this session's, and history is not rewritten here.
+
+**THREE QUESTIONS OWED:** `Q-202` (Class A — widen the floor past the model call?) is the one that
+matters and this session **stopped** on it rather than deciding it. `Q-200`(a)'s call-counting choice
+is named as **the one place this session chose against a possible reading**, with its reasoning
+written out so a review can overturn it. `Q-201`'s cause→outcome join table is **proposed, not
+installed**.
+
+**NOT DONE, AND SAID PLAINLY:** the calibration, the pilot and the sweep were not run and no
+provider call was made. C17's FAIL was not fixed — it is another session's, and that session is live.
+`tests/test_c18_results.py`'s `14 → 15` review-FAIL count is red for C17 REVIEW 1's verdict and is
+**not this session's to move**. The uncommitted `evals/usage/gemma-26b-2026-09-04.jsonl` keeps
+`test_the_object_store_and_the_working_tree_agree` red and **only the operator may commit it**.
+
 ## SESSION-TOKEN 1b9e4c73 — C17, FIX 1 — 2026-09-05
 
 **Role:** FIX, after `REVIEW_C17_1.md`'s ⛔ **FAIL** (2 BLOCKER, 5 HIGH, 5 MEDIUM, 5 LOW). **Chunk:**

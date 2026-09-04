@@ -12445,7 +12445,7 @@ socket raises `TimeoutError`, a subclass of `OSError` and **not** of `urllib.err
 `_http_post`'s `URLError` branch — the one written to turn transport faults into `PROVIDER_ERROR` —
 never saw it.
 
-**Fix:** `PENDING_FIX_SHA` (unreviewed) — the architect's ruling of 2026-09-04, transcribed verbatim
+**Fix:** `0cfc231` + `b01edaa` (both unreviewed) — the architect's ruling of 2026-09-04, transcribed verbatim
 at `QUESTIONS.md` **`Q-200`**: a **catch-all floor** beneath the three named branches in
 `driver/episode.py:_MeteredCall.run`, booking whatever escapes under the new counted cause
 `runner/episodes.py:UNEXPECTED_ERROR` and letting the run continue to the next episode. **It does not
@@ -12454,7 +12454,15 @@ retry** (a timed-out call may already have been billed and may already have muta
 (no retry count, no backoff, no threshold — hard rule 9), and **stores the exception's TYPE NAME and
 never its message** (`INC-147`: `runner/redaction.py`'s key scan is prefix-anchored, so a credential
 inside a longer string passes it, and a provider message is therefore not safe to store).
-`KeyboardInterrupt` and `SystemExit` are `BaseException` and pass through untouched. ⚠️ **AND THE FIX
+`KeyboardInterrupt` and `SystemExit` are `BaseException` and pass through untouched.
+⚠️ **`b01edaa` ADDS THE ONE GUARD A CATCH-ALL NEEDS AGAINST ITSELF:** a `LaneStopped` is an
+`Exception`, so without an explicit pass-through the floor would have caught one raised inside
+`call()` and **relabelled a 429 or a ceiling stop as an unexplained fault** — cause-laundering,
+the one way a floor can make the record *worse* than no floor. No path reaches it today and it
+is written and tested anyway. ⚠️ **The first attempt at that guard was itself broken** — the
+edit consumed the `except Exception` line and made the whole floor unreachable — **and the
+suite caught it in seconds**, the same four tests going red by the exception escaping.
+⚠️ **AND THE FIX
 FOUND A FOURTH INSTANCE OF THE SAME CLASS WHILE IT WAS BEING WRITTEN** — `INC-160`, immediately
 below: the `BucketError` branch that `Q-179`(2)'s own fix installed **could not book its outcome at
 all**, because it hands `"PACER_REFUSED"` to a usage log that declares three outcomes and refuses a
@@ -12544,7 +12552,7 @@ refusal is raised from inside an `except` handler in `_MeteredCall.run`, it esca
 `run_one_episode` and `execute` exactly as the `BucketError` it was installed to contain. The defect
 survived review because every test of that branch injects a sink that accepts any string.
 
-**Fix:** `PENDING_FIX_SHA` (unreviewed) — the branch now passes `usage.OUTCOME_ERROR` with
+**Fix:** `0cfc231` (unreviewed) — the branch now passes `usage.OUTCOME_ERROR` with
 `error_type="BucketError"`, which is a **declared** outcome and preserves the diagnosis in the field
 `INC-142` built for it. ⚠️ **THE `LaneStopped` CAUSE IS UNCHANGED AND STAYS `PACER_REFUSED`**: the
 episode is still booked, counted and printed under its own name, so `Q-179`(2)'s ruling is now

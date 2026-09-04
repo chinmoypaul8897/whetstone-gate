@@ -1,0 +1,398 @@
+C14 ABORT 2  --  SESSION-TOKEN 8c2f5e91  --  ROLE: FIX  --  2026-09-04 UTC
+PUSHED SHA: the commit carrying THIS FILE. A file cannot contain its own commit
+            SHA, so the printed report gives the value and this line names the
+            offset: ONE commit, the journal commit, and nothing else.
+
+=====================================================================
+0. THE ONE THING TO READ FIRST
+=====================================================================
+THE CALIBRATION IS NEITHER SPENT NOR VOID. PROCESS.md S6b's record is "the first
+execution that runs to COMPLETION", and NO EXECUTION HAS COMPLETED. Attempt 1 died on
+ModuleNotFoundError (INC-157). Attempt 2 died on an uncaught TimeoutError (INC-159).
+Attempt 3 is HANDED OVER in section 7 and WAS NOT RUN by this session.
+
+ZERO PROVIDER TOKENS SPENT. This session held no sanction and took none. `evals/` was
+READ ONLY -- nothing under it was deleted, rewritten or truncated. `config/` was not
+opened. `tests/goldens/` was not read and not written. No tag was cut or moved.
+`evals/cal/RUN_DECLARED.md` S8 was NOT re-filled.
+
+=====================================================================
+1. COMMITS. ALL SIX CARRY `Session-Token: 8c2f5e91`.
+=====================================================================
+  7ae1f83  chore(record)   The two ISSUED token rows `6f2d47ba` (C21 BUILD) and
+                           `8c2f5e91` (C14 FIX). A PRECONDITION, not work: without
+                           `8c2f5e91`'s row this session's own next commit would turn
+                           check-roles E1 red (INC-141's trap). It ALSO CLEARED the two
+                           standing test_repo_invariants reds that `6f2d47ba`'s missing
+                           row had been causing since C21 BUILD 2 correctly refused to
+                           write its own.
+  f6ffc4e  chore(incident) GATE 0. INC-159 and INC-160. Written BEFORE any retry (S6b)
+                           and BEFORE a line of code changed (hard rule 13) -- that
+                           commit contains INCIDENTS.md and nothing else.
+  67839d0  chore(ruling)   GATE 1 opening. The ruling VERBATIM as Q-200, plus Q-201 and
+                           Q-202. Still no source line changed at that commit.
+  0cfc231  fix(driver)     GATE 1 + GATE 2. The floor, INC-160's fix, and the tests.
+  b01edaa  fix(driver)     The cause-laundering guard (section 5b).
+  <this one>   chore(journal)  STATUS.md, PROGRESS.md, this file, and the Fix-SHA fills.
+
+=====================================================================
+2. GATE 0 -- INC-159. EIGHT FIELDS. EVERY FIGURE RE-MEASURED, NOT COPIED.
+=====================================================================
+WHAT HAPPENED. Attempt 2 ran S1's declared command under the venv at 14:33:17Z. All
+eight of RUN_DECLARED.md S7's preconditions passed, INCLUDING Q-193's liveness probe --
+`evals/usage/liveness-CAL-2026-09-04.jsonl` holds exactly one row, 232 tokens, status
+200, at 14:33:18Z. INC-142's guardrail worked, and INC-159 records that it worked.
+Thirteen consecutive attacker calls then succeeded, every one `outcome: OK`:
+
+  call  1  14:33:30Z    512     call  8  14:35:31Z   3,994
+  call  2  14:33:55Z  2,882     call  9  14:36:06Z   3,780
+  call  3  14:34:07Z  3,333     call 10  14:37:05Z   4,874
+  call  4  14:34:23Z  3,918     call 11  14:37:35Z   5,305
+  call  5  14:34:44Z  4,251     call 12  14:38:24Z   6,819
+  call  6  14:35:03Z  4,831     call 13  14:38:50Z   7,181
+  call  7  14:35:19Z  5,175              TOTAL      56,855
+
+The fourteenth did not return. `TimeoutError: The read operation timed out`, raised by
+`ssl.py:1104 read` beneath `clients.py:542 urlopen`.
+
+CAUSE, PROVED BY ARITHMETIC AND NOT BY THE WORD "timeout". `clients.py:475` is
+`_TIMEOUT_SECONDS = 180`. The 13th call's usage row is stamped 14:38:50Z; the log's final
+byte was written at 14:41:51.149Z. 181.1 SECONDS, against a 180-second socket timeout --
+leaving ~1.1 s for the pacer's wait, the request write and the traceback. The 14th call
+spent essentially its whole life blocked in one socket read.
+
+PARTIAL EPISODE COUNT (S6b requires it). ⚠️ THE PROMPT'S THIRD FIGURE IS CORRECTED.
+It said "0 completed, 0 truncated, 30 never started".
+
+  declared                        30    RUN_DECLARED.md S6, seeds 2201..2230
+  completed                        0    evals/episodes/ holds 11 files, ALL pilot__*;
+                                        NO name anywhere under evals/ contains `cal__`
+  truncated                        0    a truncation is a BOOKED LaneStopped outcome and
+                                        the escape produced none
+  DISPATCHED, LEFT NO RECORD       1    seed 2201: 13 calls, 56,855 tokens
+  never dispatched                29    30 - 1
+
+⚠️ "30 NEVER STARTED" WOULD HAVE PUBLISHED 56,855 SPENT TOKENS AS AN EPISODE THAT NEVER
+HAPPENED. Episode 2201 started and ran 13 of its 20 turns; it is invisible under `evals/`
+only because publish-on-complete writes the ledger at the end and the end never came.
+⚠️ AND NOT ONE OF THOSE FIVE NUMBERS IS THE DRIVER'S -- it printed no report at all, so
+every one was reconstructed from `evals/` by this session. That is hard rule 11's loss in
+its purest form: the denominator did not shrink silently, IT WAS NEVER COMPUTED.
+
+TOKENS BY MODEL (CLAUDE.md S4). gemma-26b 56,855 over 13 calls (mean 4,373, max 7,181),
+plus 232 liveness = 57,087, against declared ceilings of 600 calls / 4,800,000 tokens:
+1.19% of the token ceiling, 2.33% of the call ceiling. No other lane was touched --
+`evals/usage/qwen-27b-2026-09-04.jsonl` is unchanged since 03:33:07Z, ten hours earlier.
+
+MISSED -- THE FIELD THAT MATTERS. THIS IS THE THIRD ESCAPE OF ONE CLASS IN THREE DAYS AND
+BOTH EARLIER FIXES CLOSED THE INSTANCE INSTEAD OF THE CLASS:
+  1  DriverClientError  Q-174     "propagates straight out of execute ... no report, no
+                                   denominator"          -> question raised, not closed
+  2  BucketError        Q-179(2)  RULED: "book it as its own named counted category"
+                                                         -> ONE MORE NAME on a catch list
+  3  TimeoutError       INC-159   -> killed a single-shot run
+Q-174 STATED THE GENERAL FORM AND IT WAS READ AS A PARTICULAR: its reasoning -- "so that a
+single-shot run which dies at episode 1 still publishes what it attempted" -- contains
+nothing about DriverClientError. A catch list is a list of the failures somebody
+predicted, and the whole lesson of INC-142 and INC-157 is that the failure which spends an
+unrepeatable artefact is the one nobody predicted.
+
+MISSING. Nothing about the diagnosis, and that is itself the finding -- this abort was
+fully diagnosable in about four minutes. What is missing is the 29 episodes that would
+have run. Smaller: `_http_post` converts `urllib.error.URLError` into ProviderFailed, and
+TimeoutError is an OSError and NOT a URLError subclass, so the one function whose job is
+turning transport faults into counted outcomes had a hole invisible from reading it alone.
+
+=====================================================================
+3. GATE 0b -- INC-160. A FOURTH INSTANCE, FOUND INSIDE THE FIX FOR THE SECOND.
+=====================================================================
+The `except BucketError` branch that Q-179(2) RULED INTO EXISTENCE TO STOP AN UNCAUGHT
+ESCAPE could not book its own outcome. It passed `episodes.PACER_REFUSED` to
+`usage.append`, whose OUTCOMES are exactly ("OK","RATE_LIMITED","ERROR"), so it raised
+UsageError -- FROM INSIDE AN EXCEPT HANDLER, which no sibling `except` can catch -- and
+escaped `run`, `run_one_episode` and `execute` exactly as the BucketError it was installed
+to contain.
+
+PROVED TWICE FIRST-HAND, IN A FRESH OS TEMP DIRECTORY, AGAINST THE SHIPPED CODE, NO
+PROVIDER CALL, BEFORE A WORD OF THE ENTRY WAS WRITTEN:
+  (1) UsageLog.append(outcome=PACER_REFUSED) -> "UsageError: 'PACER_REFUSED' is not a
+      declared outcome; declared: ['OK','RATE_LIMITED','ERROR']". Control: the same call
+      with outcome=ERROR, error_type="BucketError" wrote its row without complaint.
+  (2) Through the REAL _MeteredCall.run with the REAL _usage_sink:
+      EXPECTED LaneStopped('PACER_REFUSED');  ACTUAL UsageError escaped,
+      isinstance(exc, LaneStopped) == False, isinstance(exc, RuntimeError) == True.
+
+MISSED: `runner/episodes.py`'s own module docstring warns about drift between the cause
+and the SCORER's vocabularies -- but there are THREE vocabularies in this program (causes,
+usage OUTCOMES, scorer categories) and the one pair nobody wrote the warning for is the
+pair that is crossed here. `driver/episode.py` even writes out CAUSE_FOR_STOP by hand for
+another pair, "because a mapping table is where a reviewer can see the join". The
+cause->outcome join was never written. Second signal, in the same three lines: the two
+neighbouring branches pass STRING LITERALS and only this one passed a module constant --
+the odd one out was the broken one, and it looked like the tidy one.
+
+MISSING: any test driving that branch through a REAL UsageLog. Every existing test used a
+stub sink that accepts any string, so "the pacer refusal is booked" was true of the double
+and false of the program.
+
+=====================================================================
+4. GATE 1 -- THE RULING, TRANSCRIBED VERBATIM AS Q-200 BEFORE ANY CODE
+=====================================================================
+Hard rule 5. `67839d0` contains QUESTIONS.md and nothing else, and `src/` and `tests/`
+were byte-identical to HEAD at it. Q-200 carries the ruling word for word, unreordered,
+together with the two constraints the same prompt attached (keep the three named branches
+as a floor beneath, not a replacement; never swallow KeyboardInterrupt or SystemExit; pass
+the exception's TYPE NAME and never its message, per INC-147). IT CLOSES Q-174, which had
+been OPEN asking this exact question and declining to answer it because choosing a
+category was Class A -- the architect has now chosen it and declared the change Class B.
+
+Q-200(a) NAMES THE THREE CLASS B CHOICES RATHER THAN BURYING THEM:
+  (1) the cause is UNEXPECTED_ERROR, a NINTH member of UNFINISHED_CAUSES, deliberately
+      NOT PROVIDER_ERROR -- that category means the provider ANSWERED, and a socket
+      timeout, our own UsageError and our own arithmetic are not the provider's answers.
+      Filing our faults under the provider's name is what PACER_REFUSED exists to refuse.
+  (2) ⚠️ THE ONE PLACE THIS SESSION CHOSE AGAINST A POSSIBLE READING, AND SAYS SO: the
+      escaped call IS counted, with zero tokens. For ProviderFailed we KNOW a request was
+      made; for an arbitrary escape we do not. The ruling's own "may already have been
+      billed" settles the direction, and hard rule 12 is a ceiling, so counting a call
+      that may not have been sent makes the ceiling bind EARLIER -- the safe side. THE
+      REASONING IS WRITTEN DOWN SO A REVIEW CAN OVERTURN IT.
+  (3) only `type(exc).__name__` is stored, in the `error_type` field INC-142 built.
+
+Q-201 -- Class B, disclosed: INC-160's fix. `usage.OUTCOME_ERROR` with
+error_type="BucketError". THE LaneStopped CAUSE IS UNCHANGED AND STAYS PACER_REFUSED.
+Adding PACER_REFUSED to `usage.OUTCOMES` was the other available fix and is REJECTED with
+its reason: that tuple is the on-disk vocabulary of an APPEND-ONLY record, `spent_today`
+branches on it, and `tests/test_arch_lanes.py` pins the committed rows' shape. Widening a
+published file format to fix a call site is the wrong direction. No published number
+moves, because the row this writes is a row the program could not previously write at all.
+
+Q-202 -- ⚠️ CLASS A, OPEN, AND STOPPED ON DELIBERATELY. See section 8.
+
+=====================================================================
+5. GATE 1 -- THE FIX. `0cfc231`. THREE FILES, NOTHING ELSE.
+=====================================================================
+  runner/episodes.py   UNEXPECTED_ERROR, a NINTH member of UNFINISHED_CAUSES, so
+                       Denominator.by_cause() prints it with its count INCLUDING its zero.
+  driver/episode.py    ONE `except Exception` clause BENEATH the three named branches,
+                       which keep their distinct causes and their distinct accounting.
+                       Plus INC-160's one-line correction to the BucketError branch.
+  tests/               see section 6.
+
+NO RETRY -- asserted: the callable is invoked exactly once.
+NO LANE STOP -- asserted: `budget.stopped` stays False and `rate_limited` stays 0.
+NO NEW SPEC VALUE -- no retry count, no backoff, no threshold. `config/` was not opened.
+KeyboardInterrupt AND SystemExit PASS THROUGH -- they are BaseException, so `except
+  Exception` cannot see them; ASSERTED rather than left to whoever next edits the line,
+  because a floor that booked an operator's Ctrl-C would make a 32-hour sweep unstoppable.
+ONLY THE TYPE NAME IS STORED -- INC-147 measured redaction.py's key scan as
+  PREFIX-ANCHORED, so a credential inside a longer string passes it, and INC-148 measured
+  a whole credential getting through it. A test raises an exception whose message is
+  deliberately key-shaped and asserts not one byte of it is booked.
+
+5b. `b01edaa` -- THE GUARD A CATCH-ALL NEEDS AGAINST ITSELF.
+LaneStopped is an Exception, so the floor would have caught one raised inside `call()` and
+RELABELLED a 429 or a ceiling stop as an unexplained fault, with its accounting already
+settled. That is cause-laundering, and it is the one way a floor can make the record WORSE
+than no floor. NO PATH REACHES IT TODAY -- the judge's meter is driven by the executor
+BETWEEN attacker calls, never inside one -- and the guard is written and tested anyway,
+because Q-200's own words are "keep the existing branches AND THEIR DISTINCT CAUSES".
+⚠️ THE FIRST ATTEMPT AT THIS GUARD WAS BROKEN AND IS RECORDED RATHER THAN SMOOTHED OUT:
+the edit consumed the `except Exception as escaped:` line, so the whole floor body became
+unreachable code inside the LaneStopped handler. THE SUITE CAUGHT IT IN SECONDS -- the
+same four tests went red again, by the exception escaping. Verified after the correction
+by an `ast` walk of the handler chain rather than by reading it:
+  try at line 376 -> RateLimited, ProviderFailed, BucketError, LaneStopped, Exception.
+
+=====================================================================
+6. GATE 2 -- PROVED RED FIRST, AND RED IN THE RIGHT WAY
+=====================================================================
+`tests/test_c14_unexpected_escape.py` -- 8 tests, 5 RED against the pre-floor code:
+  FAILED test_a_TimeoutError_FROM_THE_TRANSPORT_IS_BOOKED_AND_THE_RUN_CONTINUES
+  FAILED test_a_BARE_RuntimeError_NOBODY_NAMED_IS_BOOKED_THE_SAME_WAY
+  FAILED test_the_booked_record_carries_THE_TYPE_NAME_AND_NEVER_THE_MESSAGE
+  FAILED test_the_floor_DOES_NOT_RETRY_AND_DOES_NOT_STOP_THE_LANE
+  FAILED test_INC160_the_BucketError_branch_BOOKS_THROUGH_A_REAL_UsageLog
+
+⚠️ THE TWO HEADLINE TESTS FAIL BY THE EXCEPTION ESCAPING `driver_run.execute` -- which is
+exactly what happened at 14:41:51Z -- AND THE ESCAPE PATH IS FRAME-FOR-FRAME THE
+CALIBRATION'S, with only the last frame (the transport) substituted:
+  run.py:894 -> episode.py:722 -> loop.py:273 -> episode.py:454 -> episode.py:373 ->
+  episode.py:455 -> run.py:506 -> clients.py:896 -> clients.py:1043 -> [transport]
+The real log's chain is identical and ends `clients.py:542 urlopen`.
+
+⚠️ THE SECOND TEST RAISES A BARE RuntimeError -- a type named in no client, no cause table
+and no ruling. A file testing only TimeoutError would close the INSTANCE, which is the
+mistake Q-174 and Q-179(2) each made. If a later session narrows the floor back into a
+list, the TimeoutError test may well stay green while that one goes red. THE ASYMMETRY IS
+THE GUARDRAIL.
+
+Two of the eight passed pre-fix and are honest regression guards rather than flips: the
+KeyboardInterrupt/SystemExit pass-through (trivially true when there is no catch at all,
+and false the moment someone widens the clause to BaseException) and the
+cause/outcome disjointness check.
+
+⚠️ TWO EXISTING TESTS TURNED RED AND BOTH WERE STRENGTHENED. INC-154's species -- only
+running them found them. NEITHER WAS WEAKENED, DELETED OR SKIPPED.
+  test_a_BucketError_is_BOOKED...  its stub sink was `lambda lane, tokens, outcome` and it
+    asserted `booked == [(..., PACER_REFUSED)]` -- IT PINNED A ROW THE PROGRAM COULD NOT
+    WRITE. That IS INC-160's Missing field. 7 assertions -> 14; none removed.
+  test_kill_mid_run_and_resume...  pass 1 used to die on an exhausted transcript raising
+    DriverClientError, which the floor now BOOKS -- that is Q-174 being CLOSED, not a
+    regression. Pass 1 now dies on a real KeyboardInterrupt, which is what the test's own
+    name always said, and `pytest.raises(Exception)` became
+    `pytest.raises(KeyboardInterrupt)` -- STRICTLY STRONGER. It now exercises both halves
+    of the ruling at once.
+
+AST-EXACT TEST DIFF -- `ast.FunctionDef` / `ast.Assert`, QUALIFIED names (Class.method), so
+two functions sharing a name are two entries. NEVER `grep -c assert`:
+  tests/test_c11_runner.py             functions  68 ->  68   REMOVED 0
+                                       ast.Assert 226 -> 228  (+2)   pytest.raises 24 -> 24
+                                       CHANGED test_every_declared_cause_prints_even_at_zero
+                                               asserts 2 -> 4
+  tests/test_c12_driver.py             functions 135 -> 138   REMOVED 0
+                                       ast.Assert 246 -> 253  (+7)   pytest.raises 40 -> 40
+                                       ADDED _KilledAfter.{complete_attacker,complete_judge,
+                                             attacker_calls}
+                                       CHANGED test_a_BucketError_is_BOOKED...
+                                               asserts 7 -> 14
+  tests/test_c14_unexpected_escape.py  NEW FILE   25 functions, 26 ast.Assert,
+                                       4 pytest.raises
+  ⚠️ FUNCTIONS REMOVED: ZERO in all three.
+  ⚠️ FUNCTIONS THAT LOST AN ASSERTION OR A pytest.raises: ZERO in all three.
+
+`tests/test_c11_runner.py`'s `len(UNFINISHED_CAUSES) == 8` flips to `== 9` citing Q-200.
+THE FLIP IS PROVABLY MEANINGFUL: `== 9` fails on the pre-ruling code. Two assertions are
+ADDED beside it -- that the new member is really in the tuple, and that the tuple has no
+duplicate -- which a bare count cannot state.
+
+=====================================================================
+6b. THE FULL SUITE, ATTRIBUTED PER TEST BY comm(1), NEVER BY SUBTRACTING TOTALS
+=====================================================================
+INSTRUMENT: bare pytest from the venv, `-q -p no:cacheprovider`, the whole suite, run
+TWICE against COMMITTED trees. NOT `make test`, which is a different instrument.
+  BEFORE  at `534a9d1` (this session's parent):     15 failed, 1517 passed, 2 skipped
+  AFTER   at `b01edaa` (this session's final tree): 13 failed, 1561 passed, 2 skipped
+
+⚠️ ATTRIBUTED PER TEST BY comm(1) ON SORTED NODE-ID LISTS. NEVER BY SUBTRACTING TOTALS --
+which would have been actively misleading here: passed went 1517 -> 1561, +44, and only
+8 of those are this session's. The other 36 are the CONCURRENT C17 FIX 1 session's, which
+landed two commits in this tree while this suite work was going on.
+
+  comm -13  REDS INTRODUCED BY THIS SESSION ........................ 0   ⚠️ EMPTY
+  comm -23  REDS CLEARED BY THIS SESSION ........................... 2
+              tests/test_repo_invariants.py::test_check_roles_exits_zero
+              tests/test_repo_invariants.py::test_no_commit_carries_a_forged_or_reused_session_token
+              (both are ONE fault -- `6f2d47ba`'s missing issued row, INC-141's trap,
+               cleared by `7ae1f83`)
+  comm -12  UNCHANGED REDS ........................................ 13
+
+THE THIRTEEN, EVERY ONE ATTRIBUTED. 6 + 5 + 1 + 1 = 13:
+
+  SIX -- OF-259 / Q-198, THE LIVE CALIBRATION'S UNCOMMITTED USAGE FILE. NOT MINE. Two
+  helpers whose docstrings say "READ FROM THE COMMITTED ARTEFACT" read the WORKING TREE
+  copy of `evals/usage/gemma-26b-2026-09-04.jsonl`, which attempt 2 appended 13 rows to.
+    test_arch_cal_build.py::test_the_committed_pilot_log_still_holds_the_EIGHT_NUMBERS_this_file_replays
+    test_arch_cal_build.py::test_Q191s_OWN_TRAILING_60s_TABLE_REPRODUCES_from_the_committed_log
+    test_arch_cal_build.py::test_the_SHIPPED_tpm_limit_REFUSES_call_7_WHICH_THE_CONTINUOUS_BUCKET_ADMITTED
+    test_arch_lanes.py::test_the_committed_pilot_log_still_holds_the_EIGHT_numbers_INC_143_MEASURED
+    test_arch_lanes.py::test_the_pacer_charges_AT_LEAST_the_actual_cost_ON_EVERY_SINGLE_CALL
+    test_arch_lanes.py::test_the_top_up_introduces_NO_NEW_SPEC_VALUE
+
+  FIVE -- THE LONG-STANDING FIVE, exactly as STATUS.md:115 records them. NOT MINE.
+    test_c12_benign.py::test_the_benign_package_imports_no_model_client_WAY_ONE_the_transitive_ast_walk
+    test_c7_ledger.py::test_Q069_nothing_in_this_repository_imports_the_ledger_yet
+    test_c8_scorer.py::test_golden2_coverage_block_reproduces
+    test_c8_scorer.py::test_null_is_not_empty_a_scorer_returning_empty_for_absent_subjects_passes_seven_of_eight
+    test_lanes_operator_placeholders.py::test_the_camel_branch_is_decided_before_any_camel_run
+
+  ⚠️ ONE MORE THAN THE PROMPT PREDICTED, AND IT IS NAMED RATHER THAN FOLDED IN. The prompt
+  said "FIVE long-standing plus SIX from the usage file". There are TWO others, both
+  pre-existing at `534a9d1` and NEITHER this session's:
+    test_c18_results.py::test_the_review_trail_counts_FOURTEEN_FAILS_AND_SIX_PASSES_FROM_THE_FILES
+        measured directly: `assert 15 == 14`. C17 REVIEW 1 landed a FAIL and the count
+        moved. It is C17/C18's to move, not a C14 FIX session's.
+    test_repo_invariants.py::test_the_object_store_and_the_working_tree_agree
+        the dirty-tree artefact. At `534a9d1` it named `evals/usage/gemma-26b-2026-09-04.jsonl`
+        alone; it will keep naming it until THE OPERATOR commits that file, which is the
+        only person who may -- `evals/` is outside every session's fence.
+
+THE THREE TOUCHED TEST FILES, RUN TOGETHER AFTER THE FINAL CODE CHANGE:
+  tests/test_c11_runner.py + tests/test_c12_driver.py + tests/test_c14_unexpected_escape.py
+  --> 150 passed, 2 skipped, 0 failed.
+
+=====================================================================
+7. GATE 3 -- ATTEMPT 3. HANDED OVER. NOT RUN.
+=====================================================================
+PROCESS.md S1: a run over two hours executes in the OPERATOR'S terminal. The block is in
+the report. Its SHAPE is INC-157's systemic guardrail: "in any chain whose steps differ in
+reversibility, every free check runs before the first irreversible one." Venv activation,
+then the FREE `python -c "import whetstone_gate"`, then INC-159 present in HEAD's
+COMMITTED blob, then HEAD pushed, then S8 unchanged -- and only then the declared command.
+
+⚠️ THE PRECONDITION HALF WAS EXECUTED FOR REAL, WITH THE DRIVER LAUNCH CUT OUT OF THE
+SCRIPT, WHICH IS THE THING NOBODY DID FOR ATTEMPT 1. Measured:
+    OK  interpreter : C:\Users\chinm\whetstone-gate\.venv\Scripts\python.exe
+    OK  INC-159     : on the record at 67839d0
+    REFUSED: HEAD 67839d0... is not pushed (origin/main = 534a9d1...)
+It refused, correctly, BEFORE anything irreversible. Re-run after the push it passes.
+
+⚠️ RUN_DECLARED.md S8 IS NOT RE-FILLED AND `fill_cal_start.py` IS NOT RE-RUN. S8 was
+filled at 13:29:25Z and pushed as `63c70ec`. Attempt 3 is a NUMBERED ATTEMPT IN THE SAME
+DIRECTORY (S6b); both aborted logs remain. The declared-versus-actual gap is DISCLOSED in
+INC-159 and printed by RESULTS.md -- never closed by editing the artefact.
+
+=====================================================================
+8. QUESTIONS OWED -- THREE, AND ONE OF THEM IS A STOP
+=====================================================================
+Q-202  ⚠️ CLASS A, OPEN, STOPPED ON. The ruling's floor covers THE MODEL CALL. World
+       build, gate build, ledger write and `_publish` are outside it and still kill a run
+       with no denominator. ⚠️ NOT HYPOTHETICAL: INC-160 is exactly such a site, one line
+       from the floor, INSIDE THE FIX FOR THIS VERY CLASS. Widening it is Class A because
+       a floor that booked a world-construction failure as an episode outcome would
+       publish a measurement taken against an instrument that failed to build -- booking a
+       failed model call is honest; booking a failed world is a lie with a category
+       attached. Three options are written out in QUESTIONS.md; NONE WAS TAKEN.
+Q-200(a) the call-counting choice above. Named as the one place this session chose against
+       a possible reading, with the reasoning written out so a review can overturn it.
+Q-201  the cause->outcome join table (or an enum per vocabulary). PROPOSED, NOT INSTALLED.
+
+A MEASURED CONSEQUENCE OF THE FIX, STATED BECAUSE A REVIEW SHOULD JUDGE IT: a booked
+episode is checkpointed, so a RESUME WILL NOT RE-RUN IT. That is not new behaviour
+invented here -- `_publish` has always checkpointed truncated episodes, and a
+RATE_LIMIT_429 episode has always behaved this way. The floor is CONSISTENT WITH ALL THREE
+OF ITS SIBLINGS, which is the argument for it; it is written down rather than left to be
+discovered.
+
+=====================================================================
+9. THE CONCURRENT SESSION -- DISCLOSED, NOT TIDIED AWAY
+=====================================================================
+A C17 FIX 1 session (token `1b9e4c73`) is LIVE in this same working tree and moved HEAD
+under this session at least three times. IT TOOK INC-158 at 23:53:54+0530, between this
+session's `7ae1f83` and its Gate 0 append. Both of this session's entries were DRAFTED AS
+INC-158/INC-159 and RENUMBERED to INC-159/INC-160 before commit. A tail-byte assertion in
+the append script -- refuse unless the working tree still equals HEAD's blob -- caught it
+and REFUSED rather than overwriting 122 lines of that session's work. INC-136, INC-140,
+INC-149; Q-180, Q-187.
+  `tests/test_c17_render.py` and `docs/render/` are that session's and were NEVER STAGED.
+  Every commit used PROCESS.md S7b's private-index recipe with `git read-tree HEAD` re-run
+  against LIVE HEAD each time (INC-139's correction), explicit paths, `env -u
+  GIT_INDEX_FILE git reset`, and a verified-clean shared index after each.
+
+⚠️ OBSERVED AND NOT TOUCHED: `INC-139` appears TWICE in INCIDENTS.md, at lines 10224 and
+10531 -- an earlier collision of this same class. It is not this session's, history is
+never rewritten here, and no attempt was made to renumber it.
+
+=====================================================================
+10. WHAT WAS NOT DONE
+=====================================================================
+- The calibration, the pilot and the sweep were NOT RUN. No provider call was made in any
+  mode. No token sanction was held.
+- No tag cut or moved. No N and no void threshold written. `config/` not opened.
+- C17's FAIL was NOT fixed -- it is another session's, and that session is live.
+- `tests/test_c18_results.py`'s 14 -> 15 review-FAIL count is red for C17 REVIEW 1's own
+  verdict and is NOT this session's to move.
+- `evals/usage/gemma-26b-2026-09-04.jsonl` is still uncommitted, which keeps
+  `test_the_object_store_and_the_working_tree_agree` and OF-259's six reds standing.
+  ⚠️ ONLY THE OPERATOR MAY COMMIT THAT FILE -- `evals/` is outside this session's fence.
+- NOT SELF-CERTIFIED. A fresh adversarial review follows.
