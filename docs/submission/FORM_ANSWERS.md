@@ -83,6 +83,12 @@ as wrong.
   `14:33:30Z` and `14:38:50Z`, every one on episode `cal__1__2201__gemma-26b` — plus a 232-token
   preflight liveness call at `14:33:18Z` (`evals/usage/liveness-CAL-2026-09-04.jsonl`), **57,087
   tokens on the lane in total.** Its log is `evals/cal/run-attempt2-20260904T143317Z.log`.
+  ⚠️⚠️ **THAT IS SPEND ON ONE INCOMPLETE EPISODE. IT IS NOT A TOKENS-PER-EPISODE FIGURE, AND NO N
+  AND NO THRESHOLD MAY BE DERIVED FROM IT.** `CONTEXT.md`:1832's decision rule keys on *measured*
+  tokens/episode over **completed** episodes; `config/protocol.yaml`:407
+  `measured_tokens_per_episode` is still `TODO_C14_PILOT`; and `INC-142` records what happens when a
+  partial episode is divided as if it were whole — the figure reads **low** and selects the **larger**
+  N. **The two numbers above are a record of spend, and nothing else.**
 - ⚠️ **`find evals -name '*cal__*'` returns 0. There is no calibration episode ledger and no
   calibration checkpoint.** `evals/` is publish-on-complete, so **no calibration episode has
   completed.**
@@ -107,16 +113,28 @@ and `evals/` are both outside this session's fence, so this session wrote neithe
 verdict about attempt 2's outcome beyond the two facts that no calibration episode completed and no
 threshold exists** — both of which are true whatever happens next.
 
-### 0.3 ⚠️ RUNG 4 FIRED — AND WHAT DID *NOT* CHOOSE IT
+### 0.3 ⚠️ RUNG 4 FIRED — AND WHAT DID *NOT* CHOOSE IT (`tau2-bench` / τ²-bench: **NOT CUT**)
 
-`INCIDENTS.md` `INC-144`, and the same words in `README.md` §9.3 (:810) and `RESULTS.md` §1:
+> ⚠️ **An ASCII `tau2` grep and a Unicode `τ²` grep do not return the same lines of this file** —
+> the prose uses `τ²`, the config keys and filenames use `tau2`. Both spellings are deliberately
+> present in this heading so a reader who greps either one lands here.
+
+`INCIDENTS.md` `INC-144`, and the same words in `README.md` §9.3 (:810) and `RESULTS.md` §1.
+⚠️ **Read `INC-144` with `INC-146` (`INCIDENTS.md`:11250) beside it**: `INC-146` is the entry that
+corrects `INC-144`, recording three measurably false statements in it — one of which reached a
+pre-registration artefact — and that `INC-144`'s own `Diagnosis` is built on one of them. **The cut
+itself, its time, its rung and its derivation are not among the corrections**, and those are what
+this section relies on; the pairing is named here so nobody cites `INC-144` bare.
 
 - **What was cut:** the **breadth of one block**. T-FP, the τ² false-positive sample, from **40 write
   tasks to 20, stratified 10 airline / 10 retail.** The paired FP delta is therefore reported on
   **n=20 per configuration**, and every table caption must state that cell size.
 - **Which 20 survive was derived, not chosen:** the same rule at K=20 — *first K/2 per domain,
-  bytewise-ascending string sort, within each domain separately* (`CONTEXT.md` §13.4;
-  `PROTOCOL.md` §3.2). Each surviving list is an **exact prefix** of its domain's pre-registered 20.
+  bytewise-ascending string sort, within each domain separately*. ⚠️ **The authority is
+  `CONTEXT.md`:1859, the SELECTION rule** (*"T-FP takes the first 40 write-task ids after sorting,
+  stratified 20 airline / 20 retail"*), **not `CONTEXT.md`:1832, the schedule-conditioned DECISION
+  rule that did NOT fire** — §13.4 contains both, and citing the section bare would name one place as
+  the derivation authority and the rule that did not fire at once. Sort fixed by `PROTOCOL.md` §3.2. Each surviving list is an **exact prefix** of its domain's pre-registered 20.
   **A prefix cut is not a re-registration**, and it was made **before** `prereg-v1`, which is what
   `PROCESS.md` §14's rung-4 row says to do *"if at all possible"*.
 - ⚠️ **τ²-BENCH IS NOT CUT.** It is the **first** entry on `PROCESS.md` §14's *"NEVER CUT, at any
@@ -341,8 +359,8 @@ whole moat' printed **PASS on all four checks** over a live `gates/` → `scorer
 **155 recorded incident headings** (154 distinct ids; one, `INC-139`, is duplicated and that is
 itself recorded), a review trail of **15 FAIL and 6 PASS across 21 adversarial reviews**, and an
 open-findings register that is published, not drained. Of 23 tracked deliverables, **6 carry a
-`cN-pass` tag, 3 ship with named residue and no tag, and 14 have never been adversarially reviewed at
-all** — including the freeze itself and the README. The build session and the review session are
+`cN-pass` tag, 3 ship with named residue and no tag, 1 was reviewed today and FAILED, and 13 have
+never been adversarially reviewed at all** — including the freeze itself and the README. The build session and the review session are
 never the same session, and one chunk — the attacker loop — was reviewed **six times, never passed,
 and ships with its residue named and untagged** rather than quietly re-scoped. Both failures above
 have the same shape — **a check that reported success over a live defect** — which is precisely the
@@ -472,7 +490,12 @@ carry no per-episode blindness field, so no *run* attests it — the *tests* do.
 (b) **the scan is known to be leaky and the leaks are published, not closed:**
 `docs/reviews/OPEN_FINDINGS.md` **OF-127** (:1458) records that two of `OF-104`'s own three measured
 exhibits **still escape both copies of the guard**, and **OF-133** (:1464) that **46 of 118 needles
-escape** when carried in `LAST_REFUSAL_LABEL`. Both are **OPEN**.
+escape** when carried in `LAST_REFUSAL_LABEL`. Both are **OPEN**. ⚠️ **And the positive-control claim
+above is true of COPY 1 only:** `OF-175` (:2205) records copy 2's probe/hole vocabulary scan is
+*"FIRED AT NOTHING"*, `OF-176` (:2206) the same for its claim 3, `OF-177` (:2207) that an
+attacker-supplied idempotency key trips claim 1's scan, and `OF-178` (:2208) that catcher classes
+present in copy 1 are absent from copy 2 — **all OPEN.** So *"checked by tests carrying planted-leak
+positive controls"* must not be written of both copies without naming which.
 (c) the attacker chunk **C6 was reviewed six times, never passed, and carries no tag** — and it is
 formally **disposed as shipped-with-residue**, not pending: `Q-089` rules that *"neither is tagged
 and neither gets another review cycle"* (`README.md`:1216, :1263-1264; `docs/reviews/REVIEW_C6_1..6`,
@@ -483,9 +506,20 @@ all six FAIL).
 competence control are Sierra's, not ours — τ²-bench, MIT, pinned — and the false-positive block
 ships at half its pre-registered breadth, by a scheduled cut, with its cell size stated."
 *Evidence:* `config/protocol.yaml`:413 `tau2_bench_sha: a2c024725189473d2d7cea3a5cfdbcc67478e41f`;
-`vendor/tau2-bench/LICENSE` → *"MIT License / Copyright (c) 2025 Sierra Research"*; `CONTEXT.md`
-§11.1's authorship-split table — tasks, gold behaviour, grader and benign tasks all **Sierra**, the
-gate **"Us — the only thing we author"**.
+`vendor/MANIFEST.md` (the pin, its reason, and the fetch recipe); `CONTEXT.md` §11.1's
+authorship-split table — tasks, gold behaviour, grader and benign tasks all **Sierra**, the gate
+**"Us — the only thing we author"**.
+⚠️ **DO NOT CITE `vendor/tau2-bench/LICENSE` AS EVIDENCE — A CLONE DOES NOT CONTAIN IT.** Measured
+by this session: `git ls-files vendor/` returns exactly one path, `vendor/MANIFEST.md`;
+`git check-ignore -v vendor/tau2-bench/LICENSE` → `.gitignore:54:vendor/*/`; and
+`git log --all -- vendor/tau2-bench` returns nothing **on any ref**. `vendor/MANIFEST.md` says so
+itself: *"The source trees themselves are NOT committed to this repository."* **A panelist who
+clones receives the pin and the fetch command, not the licence file.** This is recorded and **OPEN**
+— `docs/reviews/OPEN_FINDINGS.md` **OF-08** (:55) and **OF-163** (:2101), the latter measuring that a
+fresh clone cannot run the full suite and that **20 of its failures land in
+`tests/test_c3_tau2_enumeration.py`** — the very file this section cites as rung 4's proof. **An
+earlier draft of this file made exactly that citation twice; it is corrected here rather than
+left.**
 *Do not write:* any present-tense claim that our numbers were scored by it. `CONTEXT.md` §11.1 is
 explicit that τ²-bench does **not** provide escape ground truth, and that *"Escape measurement moves
 WHOLLY to the mock Razorpay world."* **The external key has graded nothing** — `RESULTS.md` publishes
@@ -506,7 +540,13 @@ BLOCK — THE ONLY BLOCK WHOSE TASKS, GOLD BEHAVIOUR AND GRADER ARE NOT OURS —
 **Status: OPEN**, blocking 200 pre-registered episodes), and **`Q-155`** (:12355, **Class A, OPEN** —
 the six-name tool surface and τ²'s tool set are disjoint, *"AND BUILDING C5 DOES NOT CLOSE IT"*).
 ⚠️ **These are a CAPABILITY gap, not a scope decision, and §9.4 says so explicitly: *"Halving a
-block that cannot run does not make it run."*** The right form of claim 2 today is therefore:
+block that cannot run does not make it run."***
+⚠️ **AND §9.4's OWN HEADLINE IS THAT *BOTH* HALVES ARE SHORT, SO BOTH BELONG HERE.** The
+counter-metric's **mock-world** half is short too: `README.md`:930-948 records that of the **30**
+benign scenarios the plan requires, the benign solver ships **3** — *"THREE, NOT THIRTY, AND THE
+SHORTFALL IS A DECLARED STOP RATHER THAN A ROUNDING"* (`QUESTIONS.md` **Q-158**, :12470). An earlier
+draft of this file carried the τ² half and not this one.
+The right form of claim 2 today is therefore:
 **τ²-bench is vendored, pinned, licensed and authored by Sierra — and the block that would use it as
 a false-positive key has not run and cannot yet run.** Anything stronger overstates it.
 
@@ -553,8 +593,12 @@ witness that a judge cannot `curl` discredits the one differentiator the project
 *Stronger evidence than BUILD 1 had, and it strengthens the admission rather than softening it:*
 `README.md`:42 asserts that **neither the fingerprint nor the receipt has ever existed on any ref** —
 a claim checkable with `git log --all --name-only`, not merely a statement about the working tree.
-*Two further limits, from the README's own first screen:* `check-prereg` **fails open** and returns
-`0` when `prereg-v1` does not resolve, so a PASS from it today is worth less than it looks — and
+*Two further limits, and the first is worse than the README's first screen states:* `check-prereg`
+**fails open** — and not only on the missing-tag branch. `docs/reviews/OPEN_FINDINGS.md` **OF-185**
+(:2278, MEDIUM, **OPEN**) measured it from source: *"`make check-prereg` RETURNS A REAL VERDICT ON NO
+BRANCH, AND RETURNS `0` ON ALL THREE … the tag resolves → it prints 'the manifest comparison lands
+with C14' and returns 0 **without comparing anything**."* ⚠️ **So cutting `prereg-v1` does not by
+itself make that check meaningful, and nothing here should be read as saying it would.** Second:
 nothing in code stops a scored run from starting without the tag; the driver's gate checks only
 `probe-v1`. **The rule is a rule, not an interlock, and the README says so.**
 ⚠️ *And the consequence persona 3 will hit directly:* **the pre-registration cannot today be verified
@@ -618,7 +662,7 @@ items that are now done, one that was mis-scoped, and it predates the calibratio
 |---|---|---|---|
 | **O-0** | ⚠️ **THE CALIBRATION IS FIRST, BEFORE ANYTHING ELSE, AND IT BLOCKS A RETRY.** Attempt 2 has **not** produced a completed calibration episode (`find evals -name '*cal__*'` → 0), and this session measured no running interpreter and a log ending in `TimeoutError`. `PROCESS.md` §6b: *"If an attempt aborts before completion, the abort, its cause and its partial episode count are written to `INCIDENTS.md` **before** any retry."* ⚠️ **So: (i) decide whether attempt 2 is dead; (ii) if it is, write its `INCIDENTS.md` entry — with the partial episode count as a number, and the tokens actually spent, both of which are measurable — BEFORE starting attempt 3; (iii) do not edit `evals/cal/RUN_DECLARED.md`'s declared start time to match.** `INC-157` is the template and its `Fix` block carries the working launch recipe (activate the venv; run the free `import whetstone_gate` check first). | terminal, then `INCIDENTS.md` | ⚠️ **HARD GATE ON EVERYTHING** |
 | **O-1** | ⚠️ **Do NOT open the submission form until the C21 review returns PASS.** `PROCESS.md`:175 and :1344 — the form is one-shot, *"no further changes or edits can be made after submitting"*, and the one irreversible step must not be the unreviewed one. **No C21 review file exists in `docs/reviews/` and `STATUS.md`:2200 has C21 at `todo`.** | — | ⚠️ **HARD GATE** |
-| **O-2** | ⚠️ **Add the missing `## Session tokens` rows to `QUESTIONS.md`.** `make check-roles` E1 was **green (21/0/3)** at `686a224` before this session committed; it goes **red** on this session's commits because `6f2d47ba` has no row (`grep -c "6f2d47ba" QUESTIONS.md` → **0**). **This is `INC-141`'s recorded trap, not a defect in the work, and this session did not write its own row** — a session vouching for its own identity is exactly the shape E1 exists to catch. The one-line fix, in the format the table's last rows already use: `\| `6f2d47ba` \| C21 \| BUILD \| 2026-09-04 \|`. ⚠️ **The C17 rows are already half-done and UNCOMMITTED:** `git diff -- QUESTIONS.md` shows a concurrent session has added `7a1e3b52` (C17 BUILD) and `4e8b91d3` (C17 REVIEW) in the working tree. **Commit those and add this session's, and E1 goes green; leave them and committed `HEAD` stays red.** | `QUESTIONS.md` | before the review reads a red tree |
+| **O-2** | ⚠️ **Add the missing `## Session tokens` rows to `QUESTIONS.md`.** `make check-roles` E1 was **green (21/0/3)** at `686a224` before this session committed; it goes **red** on this session's commits because `6f2d47ba` has no row (`grep -c "6f2d47ba" QUESTIONS.md` → **0**). ⚠️ **AND THE PRECISE FORM, BECAUSE AN EARLIER DRAFT OF THIS ROW GOT IT WRONG: E1 WAS ALREADY RED AT COMMITTED `686a224`, FOR A DIFFERENT TOKEN.** `docs/reviews/REVIEW_C17_1.md` §0 measured that same tree at **20 passed, 1 failed, 3 n/a**, `FORGED/UNISSUED: {'7a1e3b52': ['686a224', 'b332853']}`. This session's own read showed 21/0/3 only because the working tree already carried that session's two uncommitted rows. **Those are now committed at `259ca6b`; `6f2d47ba` is the one still missing.** **This is `INC-141`'s recorded trap, not a defect in the work, and this session did not write its own row** — a session vouching for its own identity is exactly the shape E1 exists to catch. The one-line fix, in the format the table's last rows already use: `\| `6f2d47ba` \| C21 \| BUILD \| 2026-09-04 \|`. ⚠️ **The C17 rows are already half-done and UNCOMMITTED:** `git diff -- QUESTIONS.md` shows a concurrent session has added `7a1e3b52` (C17 BUILD) and `4e8b91d3` (C17 REVIEW) in the working tree. **Commit those and add this session's, and E1 goes green; leave them and committed `HEAD` stays red.** | `QUESTIONS.md` | before the review reads a red tree |
 | **O-3** | Fill every `<<PENDING-RUN: …>>` in §8 **that this form carries**, or strike the sentence that carries it. **A placeholder pasted into the live form is the worst outcome available.** ⚠️ **And note `OF-250`** (`docs/reviews/OPEN_FINDINGS.md`:2642): `README.md` ships with **39** named placeholders and **nothing in the repository fails if one survives publication** — the discipline is a convention, not a check. | this file, then `README.md` | ⚠️ **HARD GATE** |
 | **O-4** | Re-verify the perishable facts of `CONTEXT.md` §21 item 5 — see §7.1. | browser | ⚠️ **HARD GATE** |
 | **O-4b** | ⚠️ **A C17 FIX SESSION, BEFORE THE RACE BEAT IS SHOT.** `docs/reviews/REVIEW_C17_1.md` returned **FAIL** with two BLOCKERs on 2026-09-04 (`4e8b91d3`), and both are **printed sentences in the artefacts the video shows** — `B-1`, a false `RECOMPUTED, MATCHED` stamp on a ledger the renderer has itself detected as tampered; `B-2`, *"MEASURED ZERO (the episode ran; nothing moved)"* printed unguarded on 10 of 11 stored episodes and on an episode where 20,118,586 paise moved. `H-1` puts the tampered-content money bar **in the §18 frame**. **A FIX session writes the `INCIDENTS.md` entry first, then fixes only `B-1`, `B-2`, `H-1`, `H-2` and whichever LOWs it takes — and `M-3` is NOT C17's** (the review says so in terms). | a FIX session | ⚠️ **HARD GATE on O-5** |
@@ -745,7 +789,7 @@ third-party number that exists in no third-party source."*
 | Attacker never sees policy, holes, attack list or gate reasons; one generic refusal message | `CONTEXT.md` §7 architecture block; §9.3 |
 | Blindness guard is proved to FIRE | `tests/test_c12_benign.py`:404; `tests/test_c6_attacker.py`:1137 |
 | The four deliberate non-uses each have a test | `tests/test_c9_gates.py`:1282, :1298; `tests/test_c8_scorer.py`:741; `tests/test_c10_probe.py`:1100, :1110, :1127, :1141; `tests/test_c2_world.py`:827 |
-| τ²-bench MIT, pinned `a2c0247…`, 2026-08-18; Sierra authored tasks/gold/grader | `config/protocol.yaml`:413; `vendor/tau2-bench/LICENSE`; `CONTEXT.md` §11.1 |
+| τ²-bench MIT, pinned `a2c0247…`, 2026-08-18; Sierra authored tasks/gold/grader | `config/protocol.yaml`:413; **`vendor/MANIFEST.md`** — ⚠️ **NOT `vendor/tau2-bench/LICENSE`, which is git-ignored (`.gitignore`:54) and has never been tracked on any ref**; `CONTEXT.md` §11.1 |
 | τ²-bench provides FP ground truth + competence control, **not** escape ground truth | `CONTEXT.md` §11.1 |
 | `db_reward` alone, no model | `CONTEXT.md` §11.1 |
 | **Rung 4 fired 2026-09-04 05:27 UTC, by the operator on schedule, NOT by §13.4** | `INCIDENTS.md` `INC-144`; `README.md` §9.3 (:810); `RESULTS.md` §1; `QUESTIONS.md` `Q-099` |

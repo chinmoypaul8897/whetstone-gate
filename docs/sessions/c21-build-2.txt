@@ -816,3 +816,123 @@ Q-M  LINE-NUMBER CITATIONS IN THIS REPOSITORY ROT WITHIN HOURS, AND NOTHING
 ================================================================================
 END OF C21 BUILD 2 FINAL OUTPUT
 ================================================================================
+
+================================================================================
+ADDENDUM, WRITTEN AFTER THE FIRST TWO COMMITS AND BEFORE THIS FILE WAS PRINTED
+C21 BUILD 2 - `6f2d47ba` - 2026-09-04
+================================================================================
+
+A COMPLETENESS PASS OVER THE DELIVERABLE FOUND EIGHT DEFECTS IN THIS SESSION'S
+OWN WORK. All eight are corrected in a third commit. They are recorded here
+rather than quietly fixed, because a session that finds its own errors and does
+not name them has published the same file with a better story.
+
+  1. !! THE WORST ONE: THE FORM CITED A FILE NO CLONE CONTAINS, TWICE.
+     S6.1(2) and S9 both cited `vendor/tau2-bench/LICENSE` as the proof that
+     tau2-bench is Sierra's and MIT. MEASURED: `git ls-files vendor/` returns
+     EXACTLY ONE path, `vendor/MANIFEST.md`;
+     `git check-ignore -v vendor/tau2-bench/LICENSE` -> `.gitignore:54:vendor/*/`;
+     `git log --all -- vendor/tau2-bench` returns NOTHING ON ANY REF. The tree
+     exists on this disk and is git-ignored. A PANELIST WHO CLONES RECEIVES THE
+     PIN AND THE FETCH COMMAND, NOT THE LICENCE FILE THE FORM TELLS THEM TO
+     READ - which is precisely the class of unverifiable citation persona 3 is
+     written to distrust, in the one paragraph that claims an EXTERNAL authority.
+     It is a recorded OPEN finding the form never mentioned: OF-08
+     (OPEN_FINDINGS.md:55) and OF-163 (:2101), the latter measuring that a fresh
+     clone cannot run the full suite and that 20 of its failures land in
+     tests/test_c3_tau2_enumeration.py - THE VERY FILE THE FORM CITES AS RUNG 4's
+     PROOF. CORRECTED: the citation is now `vendor/MANIFEST.md`, which is tracked
+     and which says of itself "The source trees themselves are NOT committed to
+     this repository", with the measurement and both finding ids beside it.
+
+  2. O-2 WAS FALSE, AND THE FILE CONTRADICTED ITSELF FIFTEEN LINES APART. O-2
+     said "E1 was green (21/0/3) at 686a224 before this session committed".
+     REVIEW_C17_1.md S0 measured THE SAME TREE at "20 passed, 1 failed, 3 n/a",
+     `FORGED/UNISSUED: {'7a1e3b52': ['686a224', 'b332853']}`. This session's own
+     21/0/3 was true only of the WORKING TREE, which already carried that
+     session's two uncommitted rows - which S6.1(5) said correctly while O-2 said
+     otherwise. CORRECTED, with the review's numbers quoted.
+
+  3. A COUNT INSIDE THE VERBATIM-PASTE BLOCK WENT FALSE BY ONE WHILE THE FILE WAS
+     BEING WRITTEN. S3 said "14 have never been adversarially reviewed at all".
+     C17 was one of those 14 and has now BEEN reviewed - and FAILED. The
+     partition 6+3+14=23 no longer holds; a fourth state exists. CORRECTED to
+     "6 tagged, 3 with residue, 1 reviewed today and FAILED, 13 never reviewed".
+     This session had updated the FAIL count and left the partition behind - a
+     half-applied correction, which is worse than none.
+
+  4. !! ONE PASSAGE LEFT ROOM TO INFER A TOKENS-PER-EPISODE FIGURE. S0.2 reported
+     "13 calls ... 56,855 tokens ... every one on episode cal__1__2201" - a
+     numerator and a denominator for a quantity CONTEXT.md:1832's frozen decision
+     rule is keyed to. That is not a threshold, but it is the same class of
+     mistake one layer out. CORRECTED with an explicit refusal: it is spend on
+     ONE INCOMPLETE episode, it is NOT a tokens-per-episode figure, no N and no
+     threshold may be derived from it - and INC-142 records what happens when a
+     partial episode is divided as if whole: the figure reads LOW and selects the
+     LARGER N.
+
+  5. S0.3 CITED "CONTEXT.md S13.4" FOR THE SELECTION RULE while ten lines below
+     it cited the same section as "the DECISION rule that did NOT fire". S13.4
+     contains BOTH. A panelist greping S13.4 would find one section named as the
+     derivation authority and as the rule that did not fire. CORRECTED to cite
+     CONTEXT.md:1859 (the selection rule) explicitly against :1832 (the decision
+     rule).
+
+  6. check-prereg FAILS OPEN ON ALL THREE BRANCHES, NOT ONE. The file stated only
+     the missing-tag branch. OF-185 (:2278, MEDIUM, OPEN) measured it from
+     source: "RETURNS A REAL VERDICT ON NO BRANCH, AND RETURNS 0 ON ALL THREE ...
+     the tag resolves -> it prints 'the manifest comparison lands with C14' and
+     returns 0 WITHOUT COMPARING ANYTHING." As written, the file let a reader
+     infer that cutting prereg-v1 would make the check meaningful. IT WOULD NOT.
+     CORRECTED.
+
+  7. THE COUNTER-METRIC'S OTHER HALF WAS MISSING. README.md S9.4's own headline
+     is "BOTH of its halves are short"; the file carried the tau2 half (Q-154,
+     Q-155) and not the mock-world half - README.md:930-948, "of the 30 benign
+     scenarios the plan requires, the benign solver ships 3 ... THREE, NOT
+     THIRTY, AND THE SHORTFALL IS A DECLARED STOP RATHER THAN A ROUNDING"
+     (Q-158, QUESTIONS.md:12470). CORRECTED.
+
+  8. INC-144 - THE FILE'S MOST-CITED SOURCE - HAS ITS OWN CORRECTION ENTRY, AND
+     THE FILE CITED IT SIX TIMES AND INC-146 ZERO. INCIDENTS.md:11250 (INC-146)
+     records three measurably false statements in INC-144, one of which reached a
+     pre-registration artefact, and that INC-144's Diagnosis is built on one of
+     them. The cut's time, rung and derivation are NOT among the corrections and
+     are what this file relies on - but citing INC-144 bare invites a reviewer to
+     find INC-146 first. CORRECTED: the pairing is named.
+
+  ALSO ADDED, not a defect: an ASCII `tau2-bench` anchor in S0.3's heading.
+  MEASURED: `grep -c "tau2"` returned 8 lines against `grep -c` on the Unicode
+  form 21 - the prose uses the Unicode spelling and the config keys use ASCII, so
+  a reader greping `tau2` was missing most of the disclosure. Both spellings now
+  sit in the heading. This directly serves the prompt's instruction to say it
+  "where a reader who greps `tau2` lands". After the change: 14 and 21.
+
+WHAT THE COMPLETENESS PASS CONFIRMED, and it is worth as much as the defects:
+  - NO NUMBER, VERDICT OR RESULT IS ASSERTED THAT NO COMPLETED RUN PRODUCED.
+    Every rupee figure in the pasted text is explicitly withdrawn; S8 enumerates
+    every absent number with its reason; S10 states the refusal.
+  - NO THRESHOLD, NO BREACH RATE AND NO VOID VERDICT APPEARS ANYWHERE.
+  - THE FILE DOES NOT IMPLY THE S13.4 MEASUREMENT CHOSE THE T-FP CUT. It denies
+    it in the strongest terms available, in three separate places, and the word
+    "scheduled" carries it inside the pasted paragraph itself.
+  - README.md's prereg-v1 admission IS NOT SOFTENED; S6.1(4) strengthens it with
+    README.md:42's "never existed on any ref", which is checkable with
+    `git log --all --name-only`.
+  - EVERY PLACE A READER LANDS ON tau2 TELLS THEM THE TRUTH ABOUT RUNG 4.
+
+THE ONE THING THIS ADDENDUM CANNOT FIX. Items 1, 6, 7 and 8 are all the same
+shape: the deliverable relied on this repository's own OPEN findings register and
+read it SELECTIVELY. It named OF-64, OF-127, OF-133, OF-250 and OF-253 and missed
+OF-08, OF-26, OF-153, OF-163, OF-175, OF-176, OF-177, OF-178, OF-185 and OF-212.
+Four of those ten are now carried. THE OTHER SIX ARE NOT, AND THAT IS STATED
+RATHER THAN CLOSED: OF-26 (a surviving mutant M11 on the parser that derives the
+34-task competence control), OF-153, and OF-212 (D4's run-time-reach refusal list
+is applied to gates/ and scorer/ ONLY, so the probe, the void rule, the world and
+the runner are scanned by nothing) each qualify a claim this file makes. A
+reviewer should read OPEN_FINDINGS.md against S6 rather than trusting S6's
+selection of it. RAISED AS Q-N.
+
+================================================================================
+END OF ADDENDUM
+================================================================================
