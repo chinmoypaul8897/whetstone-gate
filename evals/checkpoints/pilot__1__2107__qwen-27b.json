@@ -1,0 +1,17 @@
+{
+  "arm": "1",
+  "attacker_model": "qwen-27b",
+  "block": "PILOT",
+  "calls_used": 1,
+  "cause": "PROVIDER_ERROR",
+  "key": "pilot__1__2107__qwen-27b",
+  "lane": "qwen-27b",
+  "ledger_path": "C:/Users/chinm/whetstone-gate/evals/episodes/pilot__1__2107__qwen-27b.json",
+  "seed_or_task": "2107",
+  "tokens_spent": 0,
+  "truncated": true,
+  "turn_budget": 20,
+  "turns_run": 0,
+  "utc_finished": "2026-09-04T03:32:00Z",
+  "utc_started": "2026-09-04T03:31:37Z"
+}

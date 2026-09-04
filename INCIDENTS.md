@@ -10813,3 +10813,202 @@ wording:** split its verdict into `UNISSUED (no row, no prompt)` — a genuine f
 *"mechanised as far as it can be, and named as an honour system where it cannot"* — a row asserts
 that a token was issued, and nothing can verify that claim against the architect's intent. That
 residue is genuine and is not what this entry is about.
+
+
+## INC-142 — the SINGLE-SHOT pilot ran to completion and is therefore THE pilot, and it measured NOTHING: 0 of 20 episodes completed, one lane stopped by a 429 at turn 8 of episode 1 and the other returned a provider error on 100% of its calls
+
+**Date:** 2026-09-04 (ARCH PILOT RUN 5, `4b8e12c9`). Fix SHA under **Fix**.
+⚠️ **THIS IS NOT AN ABORT AND IT MUST NOT BE READ AS ONE.** The driver exited **0**, all 20 episodes
+were attempted, and the denominator reconciles. `PROCESS.md` §6b: *"The first execution that runs to
+completion IS the run, and its output directory is the record whatever number it contains."*
+**It ran to completion. It is the record. There is no retry clause to reach for.**
+
+**Event:** the declaration was committed (`733c4fe`) and pushed, and §1's exact command was then run
+with `--spend-real-tokens`. Declared start `2026-09-04T03:26:24Z`; actual start `2026-09-04T03:26:31Z`;
+end `2026-09-04T03:33:07Z`. **Six minutes and thirty-six seconds.** The report, verbatim in the parts
+that matter:
+
+    gemma-26b     8/200 calls    42,930/600,000 tokens    stopped by: 429
+    qwen-27b     10/200 calls          0/600,000 tokens    stopped by: -
+    episodes attempted : 20      completed : 0      TRUNCATED : 11      never started : 9
+      RATE_LIMIT_429 : 10     PROVIDER_ERROR : 10     PACER_REFUSED : 0
+    DENOMINATOR (completed+trunc) : 11        reconciles : 20 == 0 + 11 + 9
+    USABLE TO SELECT N : False
+    N DECISION: REFUSED, and the refusal is the result
+
+**Two independent failures, and neither was predicted by the rehearsal.**
+**(a) `gemma-26b` took an HTTP 429 on its 9th call**, at turn 8 of the first episode, after 8
+successful calls costing `[790, 3203, 4002, 6201, 6665, 7439, 7782, 6848]` tokens — 42,930 in 219
+seconds, a mean of **11,762 tokens/minute against a published TPM of 16,000**. The lane stopped and
+did not retry, which is correct behaviour. **(b) `qwen-27b` returned a `ProviderFailed` on every one
+of its 10 calls**, one per episode, 0 tokens each, instantly, leaving 10 empty ledgers
+(`"ledger": []`). Every qwen episode failed on its very first call.
+
+**Action:** ⚠️ **NOTHING WAS RETRIED, NOTHING WAS MOVED TO ANOTHER LANE, AND NOTHING UNDER `evals/`
+WAS TOUCHED AFTER THE FACT.** `CLAUDE.md` §4 and hard rule 12. The output directory is the record and
+is append-only. ⚠️ **AND GATE 2 — THE SINGLE-SHOT ARM-1 CALIBRATION — WAS NOT SPENT**, although this
+session's prompt authorises it and its precondition (*"ONLY IF GATE 1 COMPLETED"*) is literally met.
+The calibration sets `void_threshold_breach_rate`, which `PROCESS.md` §6b calls *"the single number
+that decides whether the whole run is publishable"*, and it is equally unrepeatable. **Spending a
+second unrepeatable artefact into an instrument measured broken twenty minutes earlier would be the
+same mistake twice inside one hour.** The reversible half of Gate 2 was done instead —
+`evals/cal/RUN_DECLARED.md` written, which §6b requires to exist *before* any calibration, and its
+dry-run rehearsal — and the spend was referred to the operator.
+
+**Expectation:** the rehearsal is the artefact that is supposed to tell an operator whether the
+shipped path works before the single-shot clock starts. **It ran 20 of 20, exit 0, through the pacer
+(`Q-179`(3)), forty minutes earlier, and it predicted none of this.** `RUN_DECLARED.md` §7.3 lists
+seven preconditions *"each a refusal and not a warning"*, and **preflight passed all seven** —
+including §7.3 #5, *"Every provider key NAME set"*, and #7, the provider client. ⚠️ **What no
+precondition tests is whether either lane ANSWERS.** Preflight reads a key's **name**, never makes a
+call, and the dry run dispatches to a `TranscriptClient`. **So the entire ladder of checks between
+the operator and a single-shot run can pass while one of the two lanes is incapable of returning a
+single usable reply**, which is exactly what happened.
+
+**Missing:** ⚠️ **THE CAUSE OF (b) IS NOT RECOVERABLE FROM THE RECORD, AND THAT IS THIS ENTRY'S
+MOST EXPENSIVE LINE.** `driver/episode.py`:381-388 catches `ProviderFailed` and re-raises as
+`raise LaneStopped(runner_episodes.PROVIDER_ERROR) from None` — **`from None`, and the message is
+never logged**. `driver/clients.py` can raise `ProviderFailed` from seven distinct sites on this
+path, of which two are reachable for a Groq lane: :599 *"answered with no usage block carrying
+'total_tokens'"* and :813 *"answered HTTP {status}"*. **The record cannot distinguish an HTTP 401
+from a 404 from a 200 with a malformed body.** The categorical outcome `PROVIDER_ERROR` is booked and
+counted — hard rule 11 is satisfied — but the *diagnosis* is gone, so the operator cannot tell
+whether the qwen lane needs a credential, a corrected `api_model_id`, or a parser change. ⚠️ **The
+suppression is deliberate and its stated reason is sound** — :813 says *"The body is NOT reproduced:
+a provider error can quote the credential it rejected"* — **but the HTTP STATUS CODE is not the body,
+it cannot quote a credential, and it is discarded with it.** Also missing: the 429 carries no record
+of *which* limit it hit, because the same suppression drops it. Also missing, and smaller: no
+precondition makes **one** real call per lane before the single-shot clock starts.
+
+**Missed:** ⚠️ **THE SIGNAL WAS IN THE PREDECESSOR SESSION'S OWN FINAL OUTPUT, IN CAPITALS, AND IT
+WAS READ AS AN ARITHMETIC NOTE RATHER THAN AS A WARNING.** `docs/sessions/arch-pilot-run-4.txt` §9:
+*"THE CEILINGS IN YOUR GATE 2d LINE ARE `--call-ceiling 200` WITH TWO LANES, AND THE MATRIX IS 10
+EPISODES x 20 TURNS = EXACTLY 200 CALLS PER LANE. THE REHEARSAL SATURATES THEM PRECISELY: 200/200 and
+unused: 0. **THERE IS ZERO CALL HEADROOM.** … it means any single extra call on a lane stops that
+lane."* **The same rehearsal that proved there was no headroom also proved the token ceiling was
+sized at exactly 3,000 tokens per call**, and 7 of the 8 real calls cost more than that (`INC-143`).
+⚠️ **AND A SECOND SIGNAL WAS MISSED, OLDER AND LOUDER:** `config/lanes.yaml`'s rate limits are
+**operator-attested from dashboards on 2026-08-30** (`PROVENANCE.md` §1) and were **five days stale**
+when the single-shot run was spent against them. `CONTEXT.md` §21.5 already names re-verifying
+perishable facts as a duty, and `docs/sessions/c21-build-1.txt` §6 had reported **that same day** that
+all five perishable facts were stale and unverified. **Nothing connected "the lane limits are stale"
+to "the next thing we do is spend an unrepeatable run against those limits."**
+
+**Diagnosis:** the pilot was spent against two lanes whose ability to answer had never been tested by
+anything — preflight reads key **names** and the rehearsal dispatches to a transcript fixture — so a
+100%-failing Groq lane and a Google lane that rate-limited after eight calls were both first
+discovered by the single-shot run itself. Because `PROCESS.md` §6b makes the first completed execution
+**the** run, the discovery and the expenditure were the same event, and there is no second attempt in
+which to apply what was learned.
+
+**Fix:** ⚠️ **NO CODE FIX IS POSSIBLE FROM THIS SESSION AND NONE IS ATTEMPTED** — `src/`,
+`config/` and `tests/` are all outside its fence, and the pilot itself is spent and cannot be
+un-spent by any change. What this entry lands is the **record**, committed at the SHA carried by this
+session's `PROGRESS.md` row and `docs/sessions/arch-pilot-run-5.txt`. ⚠️ **AND THE ONE THING A FIX
+MUST NOT DO: re-run the pilot.** §6b: *"Two completed calibration runs existing is a process violation
+and is published as one,"* and `CONTEXT.md` §15.4 binds the pilot identically. **The N branch is now
+selected by the rule against a refusal, or by an architect ruling that says so in `QUESTIONS.md` and
+publishes this run as the limitation it is.** `config/protocol.yaml`'s `n_decision.selected_branch`
+and `n_decision.measured_tokens_per_episode` remain `TODO_C14_PILOT`; ⚠️ **this session did not write
+either, and no session should write a measurement this run did not produce.**
+
+**Systemic guardrail:** ⚠️ **ONE LINE, AND IT IS CHEAP: A LIVENESS CALL PER LANE, IN PREFLIGHT,
+BEFORE THE SINGLE-SHOT CLOCK STARTS.** One real minimal request to each sanctioned lane, its tokens
+counted against the ceiling like any other, refusing the run if any lane cannot return a usable
+reply. It costs two calls out of 400 and it converts both of this run's failures from *"discovered by
+spending the artefact"* into *"refused in preflight"*. ⚠️ **A SECOND, EVEN CHEAPER: STOP THROWING THE
+STATUS CODE AWAY.** `raise LaneStopped(PROVIDER_ERROR) from None` should carry the `ProviderFailed`
+message's **status code and site**, which quote no credential, into the checkpoint — the record would
+then say *which* failure it was. ⚠️ **A THIRD, WHICH IS PROCESS AND NOT CODE:** `config/lanes.yaml`'s
+rate limits are operator-attested and dated; a single-shot run should refuse against attestations
+older than some stated age, or the operator should re-attest immediately before. **Proposed, not
+installed** — all three live in files this session may not write, and `config/` is a pre-registration
+artefact. ⚠️ **What none of them closes, and is accepted:** §6b's single-shot rule is deliberately
+unforgiving, and it *should* be. The residue is not the rule; it is that everything upstream of the
+rule was allowed to pass without ever asking a provider a question.
+
+---
+
+## INC-143 — the pacer's per-call token "reservation" is documented as an UPPER BOUND that "can only make the runner slower … never faster, which is the direction that does not earn a 429", and it is a MEAN: 7 of the 8 real calls cost MORE than it, the largest 2.59x more, on the run that earned a 429
+
+**Date:** 2026-09-04 (ARCH PILOT RUN 5, `4b8e12c9`), measured from the pilot's own usage log. Fix SHA
+under **Fix**.
+
+**Event:** `driver/run.py`'s `_PacedClient` class docstring states, in its own emphasis:
+*"⚠️ **THE BUCKETS ARE TAKEN AT THE RESERVATION, NOT AT THE SETTLED COST** … **A reservation is an
+upper bound, so this paces conservatively — it can only make the runner slower than the provider's
+published limit, never faster, which is the direction that does not earn a 429.**"*
+`driver/episode.py`:305 computes that reservation as
+`attacker.target_tokens_per_episode // attacker.turn_budget` = **60,000 // 20 = 3,000**, and its own
+docstring repeats the claim: *"A reservation is an **upper bound** … so it can only make a lane stop
+**earlier**, never later."*
+
+**MEASURED, from `evals/usage/gemma-26b-2026-09-04.jsonl`, the pilot's own record:**
+
+    reservation charged to the bucket, every call : 3,000
+    ACTUAL total_tokens, in order                : 790, 3203, 4002, 6201, 6665, 7439, 7782, 6848
+    calls whose ACTUAL cost EXCEEDED it          : 7 of 8
+    largest                                      : 7,782  =  2.59x the reservation
+
+**The ninth call was an HTTP 429.**
+
+**Action:** measured and recorded, not fixed — `src/` is outside this session's fence and the
+reservation's inputs live in `config/`, a pre-registration artefact. ⚠️ **The contribution of this
+defect to the 429 is NOT asserted, because it is not established.** A token bucket of capacity 16,000
+refilling at 16,000/minute, simulated against the eight measured calls and their real timestamps,
+**does not empty** — so the operative limit may have been a daily cap, a burst window, or a limit not
+in `config/lanes.yaml` at all, and `INC-142` records that the record cannot say which. **What is
+established, independently of the 429, is that a documented safety property is false.**
+
+**Expectation:** the docstring makes a specific, checkable promise: the runner cannot be paced
+*faster* than the provider's published limit. If the reservation were an upper bound the promise would
+hold. **It is not an upper bound; it is the per-episode target divided by the turn budget, which is by
+construction the MEAN.** A multi-turn conversation's per-call cost rises monotonically with context
+(`attacker.context_window_turns_verbatim` = 6 verbatim turns plus a summary), so the actual cost is
+**below** the mean early and **above** it for the rest of the episode — and the pacer under-charges the
+bucket for every one of those calls. On this run it under-charged by up to 4,782 tokens per call.
+
+**Missing:** any test that compares the reservation to a **real** provider `usage.total_tokens`. The
+reservation is exercised throughout `tests/test_c12_driver.py`, but a dry run's `TranscriptClient`
+returns the token counts the fixture was built with, so **the fixture and the reservation can agree
+forever while the provider disagrees with both**. Also missing: any assertion anywhere that the
+docstring's *"never faster"* claim holds — it is prose, and prose is not checked. This is the same
+species as `INC-138` (*"the work this session landed had DELETED the only test of hard rule 9 on the
+shipped path"*): a property everyone believes because a comment says so.
+
+**Missed:** ⚠️ **THE ARITHMETIC WAS PRINTED IN FRONT OF THE PREVIOUS SESSION AND READ AS A
+CEILING NOTE INSTEAD OF A PACING NOTE.** `docs/sessions/arch-pilot-run-4.txt` §9 flagged that
+`--token-ceiling 600000` over 200 calls is **exactly 3,000 tokens per call** and that there is *"ZERO
+CALL HEADROOM"*. **The same 3,000 is the pacer's reservation** — one number doing two different jobs,
+a ceiling and a rate — and the session that noticed it was too small for the ceiling did not ask
+whether it was also too small for the bucket. ⚠️ **AND `RUN_DECLARED.md` §3 says the quiet part
+out loud and was read past:** *"`attacker.target_tokens_per_episode` IS A TARGET THE PILOT EXISTS TO
+CHECK, NOT A MEASUREMENT."* **A value the declaration itself calls an unverified target is the value
+the pacer treats as an upper bound.**
+
+**Diagnosis:** `target_tokens_per_episode // turn_budget` is an average, and it was used where an
+upper bound was required, so the bucket was charged less than the call actually cost on 7 of 8 calls
+and the lane ran faster than its published limit — the exact direction the docstring says is
+impossible. The error is invisible to every existing test because the only client that reports token
+counts in the test suite is the fixture the expectations were written from.
+
+**Fix:** ⚠️ **NONE IN THIS SESSION, AND THE FILES ARE NAMED SO THE NEXT ONE DOES NOT HAVE TO LOOK:**
+`src/whetstone_gate/driver/run.py`'s `_PacedClient` docstring, `src/whetstone_gate/driver/episode.py`:305
+where the reservation is computed, and whichever `config/protocol.yaml` key a corrected bound would
+read. **`config/` is a pre-registration artefact** and ⚠️ **`prereg-v1` does not resolve at the time
+of writing**, so a corrected value is still legal today and will not be after that tag — which is a
+reason to rule on it **now** rather than publish it as a limitation. The record this entry lands is
+committed at the SHA carried by this session's `PROGRESS.md` row and
+`docs/sessions/arch-pilot-run-5.txt`.
+
+**Systemic guardrail:** ⚠️ **THE HONEST FIX IS NOT A BIGGER CONSTANT — IT IS TO CHARGE THE BUCKET
+THE DIFFERENCE ONCE THE REAL COST IS KNOWN.** The provider returns `usage.total_tokens` on every
+successful call and the run already books it; a `settle`-side top-up of
+`max(0, actual - reservation)` against the same bucket makes the pacing self-correcting and needs no
+new spec value at all, which is what hard rule 9 wants. ⚠️ **A SECOND, WHICH IS THE TEST THAT WAS
+MISSING:** assert the documented property directly — replay a recorded real usage series through the
+buckets and fail if the charged total is ever less than the actual total. It would have failed against
+this run's own eight numbers. ⚠️ **AND THE CHEAPEST OF ALL, IF NEITHER IS DONE: DELETE THE CLAIM.**
+A docstring that promises *"can only make the runner slower … never faster"* is worse than silence
+once it is known to be false, because the next session budgets against it. **Proposed, not installed**
+— every one of them is in a file this session may not write.
