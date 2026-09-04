@@ -21,25 +21,60 @@ spends most of its effort trying to prove that its own "blocked" number means no
 
 ## STATUS ⚠️ read this before any number in this document
 
-**No scored episode has run. There is no sweep, no calibration and no pilot.** This box is the first
-thing in the README because every table below either carries a number **this session measured from
-files in this repository**, or carries a **named placeholder** that [`RESULTS.md`](RESULTS.md)
-fills when a run exists. **A placeholder is never a result**, and every one of them is spelled
-`<<PENDING-RUN: name>>` so you can find them all with one grep.
+**No scored episode has run. There is no sweep and no calibration. ⚠️ THE PILOT HAS RUN, IT IS SPENT,
+AND IT MEASURED NOTHING.** This box is the first thing in the README because every table below either
+carries a number **measured from files in this repository**, or carries a **named placeholder** that
+[`RESULTS.md`](RESULTS.md) fills when a run exists. **A placeholder is never a result**, and every one
+of them is spelled `<<PENDING-RUN: name>>` so you can find them all with one grep. **All 39 are still
+placeholders; not one has been filled.**
 
-Measured 2026-09-03 by the C19 build session, on the tree described in
-[§13.7](#137--a-suite-count-here-is-not-reproducible):
+⚠️ **THIS BOX WAS RE-MEASURED ON 2026-09-04 AT `HEAD` = `3f07907` BY A LATER SESSION (`2e5b8a47`),
+BECAUSE FOUR OF ITS ROWS HAD GONE STALE — the pilot ran, `ledger.genesis_hash` moved, `evals/` filled,
+and degradation rung 4 fired.** The C19 build session's original measurement was taken on 2026-09-03
+at `a691d13`; where a value has moved since, **both are shown**, because a status box that quietly
+overwrites yesterday's measurement teaches a reader nothing about how fast this tree moves. Nothing
+below is estimated and no placeholder was filled to produce it.
 
-| Fact | How it was measured | State |
+| Fact | How it was measured | State at `3f07907`, 2026-09-04 |
 |---|---|---|
-| `git tag -l` | `git for-each-ref refs/tags` | `c0-pass c1-pass c2-pass c3-pass c4-pass c13-pass` **and `probe-v1`** |
-| **`prereg-v1`** | the same command | ⚠️ **DOES NOT EXIST** |
-| `probe.void_threshold_breach_rate` | [`config/protocol.yaml`](config/protocol.yaml) line 335 | **`TODO_C14_CALIBRATION`** — an explicit sentinel. The loader **raises** on it; it is never defaulted |
-| `ledger.genesis_hash` | `config/protocol.yaml` line 363 | **`PRE-FREEZE`** at `a691d13` — so **no ledger committed to this repository is a scored one**, cryptographically. ⚠️ **Changing as this was written:** a concurrent session holds an uncommitted edit setting it to `probe-v1`'s tag object id `170bd3ff…`, under `Q-153`. [§12.3](#123-the-genesis-binding--one-free-proof) |
-| `n_decision.selected_branch` | `config/protocol.yaml` line 389 | **`TODO_C14_PILOT`** — N is not selected; neither the N=50 nor the N=30 branch is chosen |
+| `git tag -l` | `git for-each-ref refs/tags` | **seven tags**: `c0-pass c1-pass c2-pass c3-pass c4-pass c13-pass` **and `probe-v1`** (tag object `170bd3ff…` → commit `4ce8f56`) |
+| **`prereg-v1`** | `git rev-parse prereg-v1` | ⚠️ **DOES NOT EXIST** — exits `128`, *"unknown revision"*. **Unchanged since 2026-09-03** |
+| **the external witness** | `find . -name '*.sha256' -o -name '*.ots'`; `grep -rn 'gist.github'` | ⚠️ **DOES NOT EXIST.** No `prereg-v1.sha256`, no OTS receipt, and no gist id anywhere — the only gist id anywhere in this repository is the unfilled `GIST_ID` placeholder inside [§12.1](#121-the-reviewer-procedure--run-this)'s `curl` command. **Neither the fingerprint nor the receipt has ever existed on any ref** |
+| **the pilot** | `evals/` on disk, and the driver's own report (`INC-142`) | ⚠️ **RAN. SPENT. IT IS THE RECORD.** Output committed at `d5b660e`; declaration `evals/pilot/RUN_DECLARED.md` pushed **before** the run at `733c4fe`. **20 attempted · 0 completed · 11 truncated · 9 never started · 20 == 0 + 11 + 9.** `PROCESS.md` §6b: the first execution that runs to completion **is** the run — **there is no retry clause and none was reached for** |
+| **the N decision** | the pilot's report; `config/protocol.yaml` lines 389–390 | ⚠️ **REFUSED. NO N IS SELECTED.** `selected_branch` and `measured_tokens_per_episode` both still **`TODO_C14_PILOT`**; neither the N=50 nor the N=30 branch is chosen. See the precision note below — **the component that refused is not the one usually named** |
+| **the calibration** | `find evals -type d`; `git log -- evals/cal` | ⚠️ **HAS NOT RUN, AND NEVER STARTED.** `evals/cal/` does not exist and never has on any ref; **no calibration `RUN_DECLARED.md` was written**, because `PROCESS.md` §6b arms one on push and `Q-189` records that no code path in this repository runs a calibration at all |
+| `probe.void_threshold_breach_rate` | [`config/protocol.yaml`](config/protocol.yaml) line 335 | **`TODO_C14_CALIBRATION`** — an explicit sentinel. The loader **raises** on it; it is never defaulted. ⚠️ **So no calibrated VOID verdict is computable today** — see below |
+| `ledger.genesis_hash` | `config/protocol.yaml` line 363 | ⚠️ **CHANGED SINCE THE C19 MEASUREMENT.** It read **`PRE-FREEZE`** at `a691d13`; it now reads **`170bd3ff4abfdd8f87f64055972a60c82cc54efc`** — `probe-v1`'s tag object id (`Q-153`). **Measured in the pilot's own ledgers: all 11 carry that genesis.** They chain from `probe-v1`, **not** from `prereg-v1`, which does not exist — so **no ledger in this repository is a scored one, cryptographically**, and the binding still holds. [§12.3](#123-the-genesis-binding--one-free-proof) |
 | `vendor.agentdojo_sha` | `config/protocol.yaml` line 403 | **`TODO_C13_C16`** — the sentinel **stays**, and the loader **keeps raising**. That is the visible consequence of a published cut, not a defect (see [§11](#11-the-degradation-ladder--every-cut-named)) |
-| `evals/` | `find evals -type f` | **one file**: `evals/pilot/RUN_DECLARED.md`. **No run directory exists** |
-| the pilot | the commit message at `4788184` | **declared and NOT RUN.** Its UTC start time is a deliberate blank, because a declaration carrying a start time earlier than the run is a pre-registration written afterwards |
+| `selections.tfp_task_count` | `config/protocol.yaml` line 421 | ⚠️ **`40` at this commit — and degradation rung 4 has FIRED, cutting it to 20.** The cut is declared and recorded (`INC-144`); its execution in `config/` was still owed. [§9.3](#93-rung-4-fired--t-fp-the-false-positive-block-40-write-tasks-cut-to-20) |
+| `evals/` | `find evals -type f \| wc -l` | ⚠️ **26 files** (it was **one** on 2026-09-03): 11 episode ledgers, 11 checkpoints, 3 usage logs, 1 declaration. **All 26 are the pilot's. There is no sweep run directory and no `evals/results/`** |
+| **the sweep** | every checkpoint's `block` field; `git log --all -- evals/` | ⚠️ **HAS NOT RUN.** The distinct set of `block` values across all 11 checkpoints is **`['PILOT']`** — zero episodes for M-ADV, T-NEG, T-FP, M-BEN or AD-CMP, and none has ever existed on any ref |
+| **the test suite** | `make test`, and the dated counts in `docs/sessions/` | ⚠️ **RED, AND RED FOR DAYS: `5 failed, 1451 passed, 2 skipped`** at `arch-lanes-1`'s final tree. Also `5 failed, 1421 passed, 2 skipped` (`arch-pilot-run-4.txt`:304) and `5 failed, 1419 passed, 2 skipped, 2 deselected` (`arch-night-1.txt`:537). **See below — the number is dated on purpose** |
+
+⚠️ **THREE PRECISION NOTES, BECAUSE THE SHORT FORM OF EACH IS THE ONE THIS PROJECT WOULD BE CAUGHT ON.**
+
+1. ⚠️ **"`select_n` refused" IS THE WRONG ATTRIBUTION, AND THE RIGHT ONE IS LESS FLATTERING.** The
+   refusal is raised by `driver/pilot.py`'s `decide_n`, at its `if not measurement.is_usable_for_n`
+   guard — **which fires BEFORE `n_rule.select_n` is ever called.** `select_n` has no such refusal of
+   its own: given the pilot's one existing figure, the **disclosure** average of **3,903**
+   tokens/episode over a denominator in which **zero episodes completed**, `select_n` returns
+   **N = 50, branch A** — **the LARGER N, off a figure that reads LOW because a truncated episode
+   cost less than a whole one and divides as if it were whole.** So the safety property belongs to
+   `decide_n`'s guard, and crediting `select_n` with it would credit the component that would have
+   selected the larger sample. **This README says `decide_n`.** (`INCIDENTS.md` `INC-103`'s shape.)
+2. ⚠️ **"NO VOID VERDICT IS COMPUTABLE" IS TRUE OF EVERY PATH THAT READS `config/`, AND THAT IS THE
+   CLAIM.** `probe/void.py`'s `is_void(rate, threshold)` is **pure arithmetic** and computes fine if a
+   caller hand-supplies a threshold. What does not exist is a **calibrated** verdict: every path that
+   reaches `config/` for the threshold **raises**, no entry point supplies one from anywhere else, and
+   the calibration that would set it has not run. **The precise form — the repository's own, at
+   `void.py` and `Q-106` — is *"no VOID verdict is computable FROM `config/` today, on any input."***
+3. ⚠️ **A SUITE COUNT IN A DOCUMENT IS STALE THE MOMENT ANOTHER SESSION LANDS A TEST**
+   (`OF-214`), which is why [§13.7](#137--a-suite-count-here-is-not-reproducible) refuses to print a
+   bare total and tells you to run `make test` yourself. **That instruction stands.** The three counts
+   above are printed **with their commits and their dates** for one purpose only: to establish that
+   the suite has been red **across days and across sessions**, which no single number can show. **The
+   five surviving failures are named and attributed in `docs/sessions/arch-lanes-1.txt` §10**, and
+   none is new.
 
 **What follows from that, stated rather than implied:**
 
@@ -62,11 +97,33 @@ Measured 2026-09-03 by the C19 build session, on the tree described in
   run before `prereg-v1` exists"* is stated in `PROTOCOL.md` §6 and the plan — but the driver's own
   gate checks **only `probe-v1`**, which now resolves. **The rule is a rule, not an interlock, and
   saying so is cheaper than being caught by it.**
+- ⚠️⚠️ **AND THE PILOT IS THE EVIDENCE FOR THAT, NOT A HYPOTHETICAL — IT RAN, IT WAS SINGLE-SHOT, AND
+  IT RETURNED NOTHING.** Both lanes failed for reasons **nothing in this repository had ever asked a
+  provider about**: `gemma-26b` took an HTTP **429** at turn 8 of the first episode after 8 good calls,
+  and `qwen-27b` returned a provider error on **100% of its 10 calls, 0 tokens, ten empty ledgers** —
+  since diagnosed as **one missing `User-Agent` header** refused by the provider's edge before the
+  request reached a model (`INC-145`, `Q-190`). **Preflight passed. The 20-episode rehearsal passed
+  20/20.** Neither predicted either failure, **because nothing between the operator and a single-shot
+  run ever asks a provider a question** (`INC-142`). The guardrail that would — `driver/run.py`'s
+  `liveness_refusal` — **exists, is tested, and is not wired into preflight.** ⚠️ **And whether the
+  `User-Agent` this repository actually ships is accepted is still UNMEASURED**: the fix was proved
+  with `Mozilla/5.0`, and the shipped string names this project rather than impersonating a browser
+  (`docs/reviews/OPEN_FINDINGS.md` **OF-255**).
+- **The counts are printed either way, and that is the rule rather than a courtesy.** A truncated
+  episode is **counted in the denominator**; the pilot's 11 truncated and 9 never-started episodes are
+  categorised by cause and printed, and the denominator reconciles to the 20 that were attempted. **A
+  run that measured nothing still publishes its denominator** ([§3.4](#34-no-silent-denominator-shrinkage)).
 
-**This is not a VOID.** A VOID is a determination made *about a run* by the rule in
-[`HOLES.md`](HOLES.md) §3. There is no run to void. If a run happens and voids, a **VOID banner with
-its date** replaces this box, at the top of both this file and `RESULTS.md`, and `HOLES.md` §4 fixes
-exactly what is published in that case — written before the run so it cannot be negotiated
+**This is not a VOID, and the reason is sharper than "there is no run".** A VOID is a determination
+made *about a scored run* by the rule in [`HOLES.md`](HOLES.md) §3, against a threshold set by the
+arm-1 calibration. ⚠️ **Two separate things stop one being declared today, and both are stated because
+either alone would be enough:** **(a)** there is **no scored run** — the pilot's seeds are the
+pre-registered pilot block, disjoint from the scored set, and its ledgers chain from `probe-v1` rather
+than from a `prereg-v1` that does not exist; and **(b)** there is **no calibrated threshold** —
+`probe.void_threshold_breach_rate` is an unresolved sentinel and the loader raises, so **the rule could
+not be evaluated even if a scored run existed.** If a run happens and voids, a **VOID banner with its
+date** replaces this box, at the top of both this file and [`RESULTS.md`](RESULTS.md), and `HOLES.md`
+§4 fixes exactly what is published in that case — written before the run so it cannot be negotiated
 afterwards.
 
 ---
@@ -238,6 +295,12 @@ the published figures overstate the ceiling by 0.2 and 0.5 pp. The 45.1% at n=5 
 `<<PENDING-RUN: N-branch>>`**: the N
 branch is selected by the pilot's measured tokens/episode under `CONTEXT.md` §13.4's decision rule,
 and `config/protocol.yaml` still holds `TODO_C14_PILOT`.
+⚠️ **AND IT IS NO LONGER PENDING FOR THE REASON IT WAS WHEN THIS SENTENCE WAS WRITTEN.** The pilot has
+since **run, and refused to select** — **0 of 20 episodes completed**, so there is no tokens/episode
+figure to feed the rule, and `driver/pilot.py`'s `decide_n` raised rather than averaging over zero
+completions. **The branch is undecided because the measurement refused, not because the measurement is
+outstanding**, and the two are different states that a placeholder cannot distinguish. See the
+[STATUS box](#status--read-this-before-any-number-in-this-document).
 
 **Real cell sizes are far below N.** Every reported comparison is per-arm × per-environment ×
 per-attacker-strength, **and every figure caption states its own cell size**. The
@@ -715,14 +778,93 @@ this project we did not author.
 keeps raising.** `config/` is a pre-registration artefact; editing it to tidy this away would be
 amending a frozen artefact.
 
-### 9.3 RUNGS 1 and 5 also fired; rungs 2, 4 and 6 did not
+### 9.3 RUNG 4 FIRED — T-FP, the false-positive block, 40 write tasks cut to 20
 
-See [§11](#11-the-degradation-ladder--every-cut-named) for the full ladder with every rung's state.
+⚠️⚠️ **AND THE FIRST THING TO SAY ABOUT IT IS WHAT IT IS NOT: τ²-BENCH IS NOT CUT.** Only the breadth
+of **one block** is staged. A reader who skims this heading and stops has read a dropped comparator;
+there is none, and the paragraphs below are the proof rather than the reassurance.
+
+**Fired 2026-09-04 05:27 UTC.** `INCIDENTS.md` **INC-144**, `PROTOCOL.md` §5.1, §3.2. ⚠️ **The record
+carries UTC only, so this section does too** — rungs 1, 3 and 5 are stamped in IST because that is how
+`e31f6b3` recorded them, and converting one of the two into the other's format would be a time this
+repository never wrote down.
+
+**What is reduced:** the **breadth of one block**. T-FP — the τ² false-positive sample — goes from
+**40 write tasks to 20, stratified 10 airline / 10 retail.** The false-positive sample is halved, so
+the paired FP delta is reported on **n=20 per configuration, 100 episodes**, and every table caption
+states that cell size.
+
+⚠️ **What is intact, and both halves belong in the same sentence: τ²-bench is NOT cut.** It is the
+**first** entry on the never-cut list, and `CONTEXT.md` §21.4 says of it *"It is never dropped"* —
+adding, in the same sentence, that its **scope** is staged. **Only the breadth of this one block is
+staged. The comparator, the external answer key, and the T-NEG must-not-write control — all 34 tasks,
+untouched — remain, and the externally-authored-answer-key claim is intact.** **A staged breadth is
+not a dropped comparator**, and that distinction is this project's thesis rather than a detail.
+
+⚠️ **What fired it — and what did NOT. The measurement did not choose this cut.** Two instruments can
+order this same reduction and **only one of them fired.** `CONTEXT.md` §13.4's decision rule fires on
+the pilot's **measured** attacker tokens/episode — and **its input does not exist**: the pilot
+completed **0 of 20** episodes, the N decision **REFUSED**, and `n_decision.selected_branch` is still
+`TODO_C14_PILOT` (`INC-142`; see the [STATUS box](#status--read-this-before-any-number-in-this-document)).
+**`PROCESS.md` §14 rung 4 fires on SCHEDULE, at the operator's decision, and that is the one that
+fired.** ⚠️ **Nothing in this repository says the pilot selected this cut**, and the reason that
+sentence is written so flatly is `QUESTIONS.md` **Q-099**: an earlier session's prompt asserted rung 4
+had already fired when it had not, and that session **stopped rather than transcribe it into a frozen
+artefact.**
+
+**Which 20 survive was derived, not chosen.** `CONTEXT.md` §13.4's rule — *"the first 40 write-task
+ids after sorting, stratified 20 airline / 20 retail"* — under `PROTOCOL.md` §3.2's **bytewise-ascending
+string sort within each domain separately**, evaluated at K=20 instead of K=40. Same rule, same sort,
+smaller K:
+
+```
+airline (10) : 11 12 14 15 16 17 18 19 20 21
+retail  (10) : 0 1 100 101 102 103 104 105 106 107
+```
+
+**Each list is an EXACT PREFIX of its domain's pre-registered 20**, so nothing entered the sample that
+was not already in it. **A prefix cut is not a re-registration** — which is the hazard §14 names for a
+cut made *after* the freeze, and this one was made **before** it, with `prereg-v1` still not existing.
+
+⚠️ **The visible consequence, named so a reader who greps `tfp_task_count` finds the cut and not a
+contradiction:** the cut is **declared and recorded**, and at the commit that carries this section
+`config/protocol.yaml` **still read 40** — `config/` is a pre-registration artefact and the session
+that fired the rung was fenced out of it. Its execution is **operator-owed, before `prereg-v1`, as one
+atomic act** including the three test sites that pin 40, because the tests re-derive from the config.
+⚠️ **And it was being executed as this was written:** a concurrent session held an uncommitted
+`config/protocol.yaml` setting `tfp_task_count: 20` and the ten ids per domain above. `git log -1 --
+config/protocol.yaml` settles which state you are looking at. **After `prereg-v1` none of it is legal**,
+and §14 then requires the block to be published as **incomplete with its denominator**, never as a
+re-registration.
+
+**Rungs 1 and 5 also fired; rungs 2 and 6 did not.** See
+[§11](#11-the-degradation-ladder--every-cut-named) for the full ladder with every rung's state, and
+[`RESULTS.md`](RESULTS.md) for the same cuts in the words `PROCESS.md` §14 requires them to be
+published in.
 
 ### 9.4 T-FP, the counter-metric, is not runnable as specified — and BOTH of its halves are short
 
 **Stated plainly first, because it is the sentence this project would most like to omit: the
 counter-metric is on the NEVER-CUT list, and it is NOT COMPLETE.**
+
+⚠️ **AND TWO DIFFERENT THINGS ARE TRUE OF T-FP AT ONCE. THEY ARE NOT THE SAME FACT AND COLLAPSING
+THEM WOULD HIDE BOTH.** **(1)** T-FP was **cut in half by degradation rung 4** on 2026-09-04 —
+**40 τ² write tasks → 20** — which is a **scope** decision made by the operator on schedule
+([§9.3](#93-rung-4-fired--t-fp-the-false-positive-block-40-write-tasks-cut-to-20), `INC-144`).
+**(2)** T-FP is **not runnable at any size**, for the two reasons this section then gives — and that
+is a **capability** gap, unaffected by the cut. **Halving a block that cannot run does not make it
+run, and fixing the reasons it cannot run would not restore the other twenty tasks.**
+
+**The two τ² blocks, named, because a reader who greps `T-FP` needs the pair and this README used
+only one of the labels:**
+
+| block | what it is | tasks | touched by rung 4? |
+|---|---|---|---|
+| **T-FP** | the τ² **false-positive** block — write tasks a correct gate must ALLOW | ~~40~~ → **20**, stratified 10 airline / 10 retail | ⚠️ **YES — halved** |
+| **T-NEG** | the τ² **must-not-write control** — the external attacker-competence control | **34**, all of them | **NO — untouched** |
+
+⚠️ **τ²-bench itself is NOT cut**, is first on the never-cut list, and the
+externally-authored-answer-key claim is intact. **Only T-FP's breadth is staged.**
 
 **The τ² half cannot run, for two separate reasons, and the second is not fixed by fixing the first.**
 
@@ -912,7 +1054,20 @@ architect wrote both, and the build session **was right to refuse rather than gu
 `170bd3ff4abfdd8f87f64055972a60c82cc54efc` **before the first episode** — *"available only because no
 episode has run."* A concurrent session holds `config/protocol.yaml` and that change may have landed
 after this document was committed. **`RESULTS.md` prints the binding actually in force**; this README
-prints what it measured and names when.
+prints what it measured and names when. **(It landed. Both are now measured — see
+[§12.3](#123-the-genesis-binding--one-free-proof).)**
+
+⚠️⚠️ **AND THE RULING'S OWN PHRASE — *"better than no run at all"* — HAS SINCE BEEN TESTED, WHICH IS
+WORTH MORE THAN THE DISCLOSURE IT REPLACES.** The unreviewed client **has now carried the pilot**, and
+**both of its lanes failed**, for two causes that had never been exercised: an HTTP **429** after 8
+calls, and a **403 on 100% of one lane's 10 calls** because the client sent **no `User-Agent`** and the
+provider's edge refused it before a model saw it (`INC-142`, `INC-145`). **Neither is a subtle defect.
+Either would have been found by one reviewer or by one call.** The 403 is fixed; ⚠️ **whether the
+header it now sends is accepted is UNMEASURED** (`Q-190`, `OF-255`), and `driver/run.py`'s
+`liveness_refusal` — the guard that turns this class from *discovered by spending the artefact* into
+*refused before it* — **exists, is tested, and is still not wired into preflight.** **So the ruling's
+trade is no longer hypothetical: shipping an unreviewed client cost a single-shot artefact, and that
+is the sentence this section owes.**
 
 ### 9.14 What the process still cannot close
 
@@ -967,8 +1122,25 @@ toward the prompt.** The verdict parser had to learn **two** verdict shapes to g
 reviews — `REVIEW_7_1`, `REVIEW_7_2` and `REVIEW_8_1`, **every one of them a FAIL** — record their
 verdict as a *heading* at the foot of the file, because their own opening line says *"VERDICT:
 recorded in §15, at the foot of this file. Nothing above it is a verdict."* A parser seeing only the
-inline shape would have published **FAIL 10** where the repository holds **14**, and would have
-printed C7 and C8 with no verdict at all (`INCIDENTS.md` **INC-102**).
+inline shape would have printed C7 and C8 with **no verdict at all** (`INCIDENTS.md` **INC-102**).
+
+⚠️ **RE-MEASURED 2026-09-04 at `3f07907` by session `2e5b8a47`, and one number in the paragraph above
+was WRONG — replaced here rather than quietly corrected.** An earlier draft said a header-only parser
+*"would have published FAIL 10"*. **It would not, and worse, there is no single right answer, because
+the figure depends on the scan you write:**
+
+| header-only scan | result |
+|---|---|
+| `VERDICT`-anchored, first 20 lines | **11 FAIL / 6 PASS / 3 with no verdict** — the three are exactly `REVIEW_7_1`, `REVIEW_7_2`, `REVIEW_8_1` |
+| the same, first 10 lines | **7 FAIL** |
+| the same, first 5 lines | **3 FAIL** |
+| bare-token (any `FAIL`/`PASS` in the first 20 lines) — the more natural naive scan | **13 FAIL / 5 PASS**, and it ⚠️ **MISREADS `REVIEW_C0_2`, a PASS, as a FAIL**, because its line 7 names its predecessor *"(attempt 1, token `52f5307b`, **FAIL**)"* |
+
+**The conclusion is stronger than the number it replaces, and it is the one that generalises: no
+header-only scan reaches 14, and one of them turns a PASS into a FAIL.** The repository holds **14
+FAIL / 6 PASS over 20 files, verdicts resolved from header *and* body *and* tail, with no
+disagreement in any file.** **A count is only as good as the definition it was taken under, which is
+the next box's subject too.**
 
 | chunk | what it is | review type | times adversarially reviewed | FAIL | PASS | verdict |
 |---|---|---|---|---|---|---|
@@ -1003,6 +1175,27 @@ CHUNKS SHIPPING UNREVIEWED, NO TAG    : C5, C9, C10, C11, C12, C12-DRIVER, C14,
                                         C15, C16, C17, C18, C19, C20, C21            (14)
 OPEN FINDINGS (docs/reviews/OPEN_FINDINGS.md) : 193   [HIGH 11, MEDIUM 106, LOW 76]
 ```
+
+⚠️ **THE DEFINITION THAT BOX IS COUNTED UNDER, STATED, BECAUSE THE SAME REPOSITORY YIELDS A DIFFERENT
+NUMBER UNDER A DIFFERENT ONE — AND A COUNT WHOSE RULE IS UNSTATED IS THE DEFECT THIS PROJECT IS ABOUT.**
+The universe above is **the 23 rows of the table**: `PROCESS.md` §12's 22 planned chunks **plus
+`C12-DRIVER`**, which `Q-149` rules is a distinct deliverable from C12 the benign solver. Under that
+definition **6 + 3 + 14 = 23 partitions exactly.** ⚠️ **Counted against `PROCESS.md` §12's 22 rows
+instead — no `C12-DRIVER` — the same tree gives 6 tagged, 9 chunks with at least one review file, and
+13 with none (12 pending + C16 cut), with 16 untagged.** **Both are true; they are different questions.**
+Two facts are invariant under either: **six `cN-pass` tags exist**, and **C16 is the only chunk that
+is not awaiting a review because it was CUT** ([§11](#11-the-degradation-ladder--every-cut-named)).
+**And four chunks resist bucketing at all** — C6 and C7 are *disposed* rather than pending (`Q-089`:
+*"neither is tagged and neither gets another review cycle"*), and C15's and C20's reviews are **folded
+into C18's and C21's** by rung 1, so they will never produce a review file of their own.
+
+⚠️ **THE `193` IS THE C19 SESSION'S MEASUREMENT AT `a691d13` AND IS NOT RE-MEASURED HERE.** On
+2026-09-04 session `2e5b8a47` **appended three rows — `OF-254`, `OF-255`, `OF-256` — and closed none**,
+so the open count went **up by three**. It is deliberately not restated as a new total: the file
+carries **26 finding ids that appear on more than one row** (a row restated by a later session beside
+its original, never overwritten), so *"how many open findings"* is method-dependent in the same way the
+box above is, and a fresh single number would look more settled than it is. **`git log -- docs/reviews/OPEN_FINDINGS.md`
+is the authority on what has been appended since.**
 
 ⚠️ **THE UNREVIEWED CHUNKS ARE IN THE TABLE, IN THEIR OWN COLUMN, NOT IN A FOOTNOTE.** **C6 shipped
 with residue after SIX reviews and C7 after TWO — both untagged.** **Fourteen chunks — including C14,
@@ -1157,12 +1350,18 @@ with why.**
 | **1** | Collapse a `code`-review chunk into its neighbour's review — C15's ladder harness reviews inside C18; C20's video reviews inside C21 | ⚠️ **FIRED 2026-09-02 08:10 IST** — `INC-61`, `Q-083`. Two reviews **FOLDED**. Neither chunk publishes a number |
 | **2** | The L2 extended cell stays at n=5 instead of 20 | **NOT FIRED** |
 | **3** | **C16 / AD-CMP, the AgentDojo comparator — 80 episodes** | ⚠️ **FIRED 2026-09-02 08:10 IST — C16 IS NOT RUN.** `INC-62`, `Q-083`. See [§9.2](#92-rung-3-fired--c16--the-agentdojo-comparator-80-episodes-was-not-run) |
-| **4** | T-FP 40 → 20 τ² tasks | **NOT FIRED** |
+| **4** | **T-FP 40 → 20 τ² tasks** | ⚠️ **FIRED 2026-09-04 05:27 UTC — T-FP IS REDUCED TO 20, stratified 10 airline / 10 retail.** `INC-144`. ⚠️ **τ²-bench is NOT cut** — only this one block's breadth is staged. Fired by the **operator, on schedule**, and **not** by the §13.4 decision rule, whose input the pilot never produced. ⚠️ **DECLARED; its execution in `config/` was still owed at this commit.** See [§9.3](#93-rung-4-fired--t-fp-the-false-positive-block-40-write-tasks-cut-to-20) |
 | **5** | **Downgrade C17's and C19's reviews from `full` to `code`** | ⚠️ **FIRED 2026-09-02 08:10 IST** — `INC-63`, `Q-083`. Two reviews **DOWNGRADED**. ⚠️ **This README is one of them.** Neither chunk publishes a computed number |
 | **6** | C13 / CaMeL live run → Branch B citation | **NOT FIRED** — C13 PASSED on 2026-09-02, so the branch is the operator run's to decide, not the ladder's |
 
-**Two rungs fired that fold or downgrade a review; one fired that removes a measurement. Rungs 2, 4
-and 6 did not fire.**
+**Four rungs have fired: 1, 3, 4 and 5. Two rungs fired that fold or downgrade a review (1 and 5);
+two fired that reduce what is measured — rung 3 removed the AgentDojo comparator outright, and rung 4
+halved the breadth of one τ² block without removing the comparator. Rungs 2 and 6 did not fire.**
+
+⚠️ **AND THE ONE SENTENCE THAT MUST TRAVEL WITH RUNG 4 WHEREVER IT IS READ: τ²-bench is on the
+never-cut list below and it is NOT cut.** Rung 4 stages the **breadth of one block** — T-FP, from 40
+write tasks to 20. **T-NEG, the must-not-write control, keeps all 34 tasks, and the
+externally-authored-answer-key claim is intact.**
 
 ⚠️ **N IS NOT A RUNG.** If the sweep cannot finish the pre-registered N, the episodes that did not
 run are reported as an **incomplete denominator — counted, categorised and printed** — and the number
@@ -1262,6 +1461,19 @@ notes the binding *"is available ONLY BECAUSE NO EPISODE HAS RUN."* **Whichever 
 you read this, `RESULTS.md` prints the one the episodes actually chained from; this README prints what
 it measured and names when it measured it.**
 
+⚠️⚠️ **RE-MEASURED 2026-09-04 at `3f07907`, AND THE BINDING HAS SINCE BEEN EXERCISED FOR REAL — WHICH
+IS BETTER EVIDENCE THAN THE PARAGRAPH ABOVE COULD OFFER.** Three things are now measured rather than
+anticipated: **(1)** the uncommitted edit **landed** — `config/protocol.yaml:363` reads
+`170bd3ff4abfdd8f87f64055972a60c82cc54efc`; **(2)** episodes **have** since run — the pilot's — and
+`Q-153`'s premise (*"available ONLY BECAUSE NO EPISODE HAS RUN"*) therefore no longer holds, so the
+value can no longer be moved backwards without contradicting a committed ledger; **(3)** ⚠️ **all
+eleven pilot ledgers carry that genesis, read from the files themselves** —
+`evals/episodes/pilot__1__2101__gemma-26b.json` opens `"genesis_hash":
+"170bd3ff4abfdd8f87f64055972a60c82cc54efc"`. **They chain from `probe-v1`. They do not chain from
+`prereg-v1`, because `prereg-v1` does not exist.** So the binding does exactly what this section
+claims for it: **the eleven episodes in this repository are cryptographically distinguishable from
+scored ones, and it takes one `grep` to check.**
+
 ---
 
 ## 13. How to check us
@@ -1351,13 +1563,31 @@ it was corrected.
 
 `docs/reviews/OPEN_FINDINGS.md` **OF-214** records that a test-suite count printed in a document goes
 stale the moment another session lands a test — and this repository has had **multiple concurrent
-sessions writing all day.** So this README prints **no suite total**, and instead names what a reader
-should do: **run `make test` yourself and read the number it prints.**
+sessions writing all day.** So this README prints **no suite total as a current fact**, and instead
+names what a reader should do: **run `make test` yourself and read the number it prints.**
 
-Every measurement in this README was taken on the tree at commit `a691d13` with a clean shared
-index. **Two other sessions were live in the same working tree while it was written** — tokens
-`7c05e3b9` and `2e94c7b5` — and `probe-v1` was cut by `7c05e3b9` during this session's run, at
-`4ce8f56`. That is named rather than smoothed over.
+⚠️ **AND THE STATUS BOX NOW PRINTS THREE SUITE COUNTS, WHICH IS NOT A REVERSAL OF THAT RULE — SO THE
+DISTINCTION IS WRITTEN OUT RATHER THAN LEFT TO BE SPOTTED.** OF-214's defect is an **undated** count
+presented as the tree's present state. What the STATUS box carries is **three counts, each pinned to a
+session, a file and a line**, whose only job is to establish a property no single number can: **the
+suite has been red across days and across sessions.** ⚠️ **Do not read any of the three as the count
+you will get.** Run the target.
+
+Every measurement in the C19 build session's version of this README was taken on the tree at commit
+`a691d13` with a clean shared index. **Two other sessions were live in the same working tree while it
+was written** — tokens `7c05e3b9` and `2e94c7b5` — and `probe-v1` was cut by `7c05e3b9` during that
+session's run, at `4ce8f56`. That is named rather than smoothed over.
+
+⚠️ **AND SO IS THE SECOND PASS. The STATUS box, [§3.2](#32--every-number-carries-its-ceiling-a-bare-count-is-the-defect-this-project-is-criticising),
+[§9.3](#93-rung-4-fired--t-fp-the-false-positive-block-40-write-tasks-cut-to-20), §9.4,
+[§10](#10-the-review-trail--itself-a-published-result), [§11](#11-the-degradation-ladder--every-cut-named),
+§12.3, this section, §18 and §19 were re-measured and rewritten on 2026-09-04 at `HEAD` = `3f07907` by
+session `2e5b8a47`** — a FIX session, not a review — **and ONE MORE SESSION WAS LIVE IN THIS SAME
+WORKING TREE THROUGHOUT**, token `8f3c72e1`, holding uncommitted edits to `QUESTIONS.md` and
+`config/protocol.yaml` at the moment these words were written. **Neither session reviewed the other and
+neither is certified by the other.** Every value that a concurrent edit was moving is reported **as of
+`3f07907`, with the concurrent state named beside it**, which is the only honest form available in a
+shared tree.
 
 ---
 
@@ -1536,6 +1766,33 @@ about.**
    [§9.14](#914-what-the-process-still-cannot-close).
 6. **No tag was cut.** Tagging is a review session's act, and **this document has not been reviewed.**
 
+### 18.1 ⚠️ AND WHAT THE 2026-09-04 PUBLISHING PASS DID NOT DO — a second session, a second list
+
+**The list above is the C19 build session's, at `a691d13`, and it is left standing unedited.** A later
+session (`2e5b8a47`, role FIX, 2026-09-04, at `3f07907`) published degradation rung 4, created
+[`RESULTS.md`](RESULTS.md) and re-measured the STATUS box. **Its own list is separate, because merging
+the two would let one session's completions cover another's gaps:**
+
+1. ⚠️ **It filled ZERO placeholders. All 39 remain, and the grep still returns 39.** There is nothing to fill
+   them with, and a placeholder replaced by anything other than a measured number is the single
+   failure this repository exists to prevent.
+2. ⚠️ **It ran nothing and spent nothing.** No pilot, no calibration, no sweep, **no provider call of
+   any kind** — it held no token sanction, and `PROCESS.md` §8 makes a session without one refuse
+   rather than judge.
+3. ⚠️ **It did not execute rung 4 in `config/`, and could not.** `config/` is a pre-registration
+   artefact and outside its fence; the cut is published as **declared, with its execution named as
+   owed** ([§9.3](#93-rung-4-fired--t-fp-the-false-positive-block-40-write-tasks-cut-to-20)).
+4. ⚠️ **It did not write the real `RESULTS.md`.** What it created is a **partial file carrying the
+   published cuts and no number at all**, which `make eval` overwrites the first time it succeeds.
+   **C18 owns the results document and C18 has not run.**
+5. ⚠️ **It closed no finding.** It **appended three** — `OF-254`, `OF-255`, `OF-256` — which
+   `ARCH LANES 1` had raised and, being fenced out of `docs/reviews/`, had said in its own report it
+   could not file. **The open count went up.**
+6. ⚠️ **It cut no tag and certified nothing — including its own corrections.** It found and replaced a
+   wrong number in [§10](#10-the-review-trail--itself-a-published-result) and a wrong attribution in
+   the STATUS box. **Both replacements are themselves unreviewed**, and a fresh adversarial review is
+   owed on this pass exactly as on the one before it.
+
 ---
 
 ## 19. Repository map
@@ -1550,6 +1807,7 @@ about.**
 | [`PROTOCOL.md`](PROTOCOL.md) | 🔒 **FROZEN** — the pre-registration: `config/` blob digests, vendor pins, the ladder record |
 | [`PROVENANCE.md`](PROVENANCE.md) | 🔒 **FROZEN** — every claim's source, every constant tagged Razorpay-defined or author-chosen |
 | [`RAZORPAY_SEMANTICS.md`](RAZORPAY_SEMANTICS.md) | 🔒 **FROZEN** — 71 rows, each a verbatim quote + URL + fetch date. The oracle for the spend-free self-test |
+| [`RESULTS.md`](RESULTS.md) | ⚠️ **PARTIAL, and it says so on its first line.** It carries the four fired degradation cuts in the words `PROCESS.md` §14 requires, **and not one measured number** — no run has produced one. `make eval` **overwrites it from the stored ledgers** when a run exists; **C18 owns it and C18 has not run** |
 | [`INCIDENTS.md`](INCIDENTS.md) | Every failure, in a fixed eight-field format including `Missing`, `Missed` and `Fix`-with-SHA |
 | [`QUESTIONS.md`](QUESTIONS.md) | Every ambiguity and every ruling, verbatim. **A ruling that exists only in a chat does not exist** |
 | [`STATUS.md`](STATUS.md) / [`PROGRESS.md`](PROGRESS.md) | Where the project is; what every session did |
