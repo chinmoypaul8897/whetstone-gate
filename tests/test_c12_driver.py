@@ -2128,6 +2128,13 @@ def test_the_PACED_CLIENT_forwards_the_lane_and_REFUSES_a_lane_its_BUCKETS_disag
         def take(self, *, tokens, now):
             return None
 
+        def settle(self, *, extra_tokens, now):
+            # ⚠️ ADDED by ARCH LANES 1 (`6d1a94f3`) when `INC-143`'s settle-side top-up
+            # widened the bucket protocol. **A double implementing a new method, NOT an
+            # assertion changing:** this class carries none, and every `def test_` name and
+            # every `assert` in this file is unchanged by that session.
+            return None
+
     paced = driver_run._PacedClient(
         inner=_Recorder(),
         attacker_buckets=_Buckets("qwen-27b"),
@@ -2181,6 +2188,13 @@ def test_the_FULL_ADAPTER_CHAIN_routes_TWO_LANES_to_TWO_PROVIDERS(
             return 0.0
 
         def take(self, *, tokens, now):
+            return None
+
+        def settle(self, *, extra_tokens, now):
+            # ⚠️ ADDED by ARCH LANES 1 (`6d1a94f3`) when `INC-143`'s settle-side top-up
+            # widened the bucket protocol. **A double implementing a new method, NOT an
+            # assertion changing:** this class carries none, and every `def test_` name and
+            # every `assert` in this file is unchanged by that session.
             return None
 
     messages = ({"role": "system", "content": "identical on both lanes"},)
@@ -2731,6 +2745,7 @@ def test_the_pacer_reads_the_clock_ONCE_and_charges_the_bucket_AGAINST_THAT_SAME
             self.lane = lane
             self.asked: list[float] = []
             self.charged: list[float] = []
+            self.settled: list[float] = []
 
         def wait_seconds(self, *, tokens, now):
             self.asked.append(now)
@@ -2738,6 +2753,13 @@ def test_the_pacer_reads_the_clock_ONCE_and_charges_the_bucket_AGAINST_THAT_SAME
 
         def take(self, *, tokens, now):
             self.charged.append(now)
+
+        def settle(self, *, extra_tokens, now):
+            # ⚠️ ADDED by ARCH LANES 1 (`6d1a94f3`) with `INC-143`'s settle-side top-up.
+            # Recorded into its OWN list, so `asked == charged` below is untouched and the
+            # new reading is asserted SEPARATELY — this EXTENDS `Q-179`(1)'s one-clock-read
+            # property to the new code path rather than relaxing it.
+            self.settled.append(now)
 
     class _EverAdvancingClock:
         """⚠️ **EVERY READ RETURNS A LATER VALUE, WHICH IS WHAT A MONOTONIC CLOCK IS.**
@@ -2774,6 +2796,14 @@ def test_the_pacer_reads_the_clock_ONCE_and_charges_the_bucket_AGAINST_THAT_SAME
         f"_pace read the clock {clock.reads} time(s) on a call it did not have to sleep "
         f"for. The ruling is 'take `now` once'; a second read is the defect itself, not "
         f"an implementation detail"
+    )
+    # ⚠️ ADDED by ARCH LANES 1 (`6d1a94f3`): `INC-143`'s settle-side top-up runs AFTER the
+    # provider answers, so it is the obvious place for a second clock read to creep back in.
+    # `Q-179`(1)'s property is asserted over it too — the top-up is charged against the SAME
+    # reading `_pace` admitted on, and `clock.reads` above is still 1.
+    assert buckets.settled == [1.0], (
+        f"the settle-side top-up charged the bucket against {buckets.settled} rather than "
+        f"the reading _pace admitted on. Q-179(1): ONE reading decides the call"
     )
 
 

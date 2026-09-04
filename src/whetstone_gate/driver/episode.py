@@ -378,13 +378,33 @@ class _MeteredCall:
             self.budget.record_429()
             self.on_usage(self.lane, 0, "RATE_LIMITED")
             raise LaneStopped(runner_episodes.RATE_LIMIT_429) from None
-        except ProviderFailed:
+        except ProviderFailed as failure:
             # ⚠️ A NON-429 ERROR HAS NO `usage` BLOCK, SO ITS TOKEN COST IS UNKNOWN AND IS
             # RECORDED AS ZERO — an UNDER-count, published rather than estimated (golden 8:
             # "NEVER estimated"). The call itself IS counted, because the request was made.
+            #
+            # ⚠️⚠️ **`INCIDENTS.md` INC-142's MOST EXPENSIVE LINE WAS HERE.** This clause used
+            # to be a bare `except ProviderFailed:` and the `from None` below discarded the
+            # message with the traceback — so the pilot's ten qwen failures were booked,
+            # counted and reconciled (hard rule 11 satisfied) while the *diagnosis* was gone,
+            # and the operator could not tell a 401 from a 404 from a malformed 200.
+            #
+            # ⚠️ **THE `from None` STAYS, AND SO DOES THE SUPPRESSION OF THE BODY.** INC-142
+            # itself calls that suppression *"deliberate and its stated reason sound — a
+            # provider error can quote the credential it rejected."* What changed is that the
+            # STATUS and a SHORT enum-shaped TYPE now travel as FIELDS on the exception rather
+            # than as prose inside a message that is thrown away. **A status is an integer; it
+            # cannot quote a credential, and it was being discarded with the body for no
+            # reason but proximity.**
             self.budget.settle(0)
             self.calls_settled += 1
-            self.on_usage(self.lane, 0, "ERROR")
+            self.on_usage(
+                self.lane,
+                0,
+                "ERROR",
+                status=failure.status,
+                error_type=failure.error_type,
+            )
             raise LaneStopped(runner_episodes.PROVIDER_ERROR) from None
         except BucketError:
             # ⚠️⚠️ **`Q-179`(2), RULED 2026-09-04, WHICH ALSO CLOSES `Q-174`.** Before this

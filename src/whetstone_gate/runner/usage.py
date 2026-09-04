@@ -130,12 +130,29 @@ class UsageLog:
         episode: str,
         total_tokens: int,
         outcome: str,
+        status: int | None = None,
+        error_type: str | None = None,
     ) -> None:
         """Append one call's row. **Append-only; nothing is ever rewritten.**
 
         ``total_tokens`` is the provider's own ``usage.total_tokens`` — see
         :func:`.budget.usage_total_tokens`. It is **never** an estimate and never a
         reconstruction from ``prompt_tokens + completion_tokens``.
+
+        ⚠️⚠️ **``status`` AND ``error_type`` EXIST BECAUSE OF `INCIDENTS.md` INC-142**, whose
+        `Missing` field is that the pilot's ten `PROVIDER_ERROR` rows could not tell the
+        operator *"whether the qwen lane needs a credential, a corrected `api_model_id`, or a
+        parser change."* They come from :class:`whetstone_gate.driver.clients.ProviderFailed`'s
+        own fields — an integer status and a short enum-shaped type, **never a body, never a
+        header** — and they pass through the same secret scan as the rest of the row, which
+        **refuses rather than masks**.
+
+        ⚠️ **THEY ARE OMITTED FROM THE ROW WHEN THEY ARE ``None``, AND THAT IS LOAD-BEARING.**
+        `evals/` is append-only and the pilot's committed rows are the record `INC-143`'s eight
+        numbers were measured from. A schema change that added keys to a **successful** row
+        would silently re-shape that record; an `OK` row has nothing to report, so it is
+        byte-identical to the ones the pilot wrote. `tests/test_arch_lanes.py` pins that
+        exactly.
         """
         if outcome not in OUTCOMES:
             raise UsageError(f"{outcome!r} is not a declared outcome; declared: {list(OUTCOMES)}")
@@ -150,6 +167,11 @@ class UsageLog:
                 f"and never ran"
             )
 
+        if status is not None and (isinstance(status, bool) or not isinstance(status, int)):
+            raise UsageError(f"status must be an integer HTTP status or None; got {status!r}")
+        if error_type is not None and not isinstance(error_type, str):
+            raise UsageError(f"error_type must be a string or None; got {error_type!r}")
+
         row = {
             "utc": utc,
             "model": model,
@@ -158,6 +180,12 @@ class UsageLog:
             "total_tokens": total_tokens,
             "outcome": outcome,
         }
+        # ⚠️ ONLY WHEN THERE IS SOMETHING TO REPORT. See this method's docstring: an `OK` row
+        # must stay byte-identical to the ones the pilot committed.
+        if status is not None:
+            row["status"] = status
+        if error_type is not None:
+            row["error_type"] = error_type
         refuse_if_secret_bearing(row, where=f"usage[{model}-{date}]")
         path = self.path_for(model, date)
         path.parent.mkdir(parents=True, exist_ok=True)

@@ -125,6 +125,32 @@ class Bucket:
             )
         self.available -= cost
 
+    def settle(self, cost: float, now: float) -> None:
+        """Charge ``cost`` **unconditionally**, even into deficit. ⚠️ **NOT** :meth:`take`.
+
+        ⚠️⚠️ **THIS IS THE ONLY METHOD THAT MAY DRIVE A BUCKET BELOW ZERO, AND THE REASON IS
+        ARITHMETIC RATHER THAN POLICY.** :meth:`take` runs **before** a call and refuses what
+        the bucket cannot afford, because at that moment refusing is a *wait* and nothing has
+        been spent. ``settle`` runs **after** the provider has answered: **those tokens are
+        already billed.** A bucket that declined to record them would be describing a spend
+        that did not happen, and the runner would go on believing it had an allowance it had
+        already used — which is exactly `INCIDENTS.md` **INC-143**.
+
+        The deficit is not damage; it is a **delay**. :meth:`refill_to` credits it back at the
+        published rate like any other shortfall, so the next :meth:`wait_seconds` simply
+        returns a longer wait. **That is the whole self-correction**, and it introduces no
+        constant of any kind (hard rule 9): every number here is either the reservation the
+        run already used or a figure the provider itself returned.
+        """
+        if cost < 0:
+            raise BucketError(
+                f"bucket {self.name!r} was asked to settle {cost}, which is negative. A "
+                f"settle CHARGES; a refund would hand back an allowance the provider has "
+                f"already billed"
+            )
+        self.refill_to(now)
+        self.available -= cost
+
 
 @dataclass
 class Buckets:
@@ -194,3 +220,29 @@ class Buckets:
         self.rpd.take(1, now)
         if self.tpd is not None:
             self.tpd.take(tokens, now)
+
+    def settle(self, *, extra_tokens: int, now: float) -> None:
+        """Charge the **token** buckets ``extra_tokens`` more, after the provider has billed.
+
+        ⚠️ **THE TOKEN BUCKETS ONLY. NEVER THE REQUEST BUCKETS.** One call is **one** request
+        however many tokens it turned out to cost; charging RPM or RPD a second time on the
+        settle would park a lane on a limit it never came near.
+
+        ⚠️ **WHY THIS EXISTS —** `INCIDENTS.md` **INC-143**, measured on the pilot's own log.
+        A call is admitted at a *reservation*, which `driver/episode.py` computes as
+        ``attacker.target_tokens_per_episode // attacker.turn_budget``. That expression is a
+        **mean**, not an upper bound: a multi-turn conversation's per-call cost rises with
+        context, so the reservation is above the real cost early and below it for the rest of
+        the episode. On the pilot's eight real calls it was exceeded **seven** times, the
+        largest by **2.59x**, and the buckets were under-charged by **18,930 tokens** in
+        total. The ninth call was an HTTP 429.
+
+        ``extra_tokens`` is ``max(0, actual - reservation)``, computed by the caller from the
+        provider's own ``usage.total_tokens``. **A zero is normal** — it is what an
+        under-budget call settles — and it is charged rather than special-cased so the call
+        graph has one shape.
+        """
+        if extra_tokens:
+            self.tpm.settle(extra_tokens, now)
+            if self.tpd is not None:
+                self.tpd.settle(extra_tokens, now)

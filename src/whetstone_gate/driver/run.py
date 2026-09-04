@@ -84,7 +84,7 @@ from whetstone_gate.ledger.chain import Ledger, load_chain_spec
 from whetstone_gate.runner import lanes as runner_lanes
 from whetstone_gate.runner import report as runner_report
 from whetstone_gate.runner import usage as runner_usage
-from whetstone_gate.runner.budget import Ceilings, LaneBudget
+from whetstone_gate.runner.budget import Ceilings, LaneBudget, usage_total_tokens
 from whetstone_gate.runner.checkpoint import CheckpointStore, build_document
 from whetstone_gate.runner.episodes import EpisodeKey, EpisodeOutcome, RunDenominator
 from whetstone_gate.runner.keys import missing_keys
@@ -391,11 +391,37 @@ class _PacedClient:
     and this is the only place in the driver that can sleep. The clock and the sleep are both
     **injected**, so a test drives a whole day's pacing in microseconds.
 
-    ⚠️ **THE BUCKETS ARE TAKEN AT THE RESERVATION, NOT AT THE SETTLED COST**, because pacing
-    happens *before* the call and the settled cost does not exist yet. A reservation is an
-    upper bound, so this paces **conservatively** — it can only make the runner slower than
-    the provider's published limit, never faster, which is the direction that does not earn
-    a 429.
+    ⚠️ **THE BUCKETS ARE TAKEN AT THE RESERVATION AND THEN TOPPED UP AT THE SETTLED COST.**
+    Pacing happens *before* the call, when the real cost does not exist yet, so admission is
+    charged the reservation; the provider then returns ``usage.total_tokens`` and the
+    difference is charged too. See :meth:`_settle`.
+
+    ⚠️⚠️ **THE RESERVATION IS NOT AN UPPER BOUND, AND THIS DOCSTRING USED TO SAY IT WAS.**
+    `INCIDENTS.md` **INC-143**. The removed sentence read, in its own emphasis: *"A reservation
+    is an upper bound, so this paces conservatively — it can only make the runner slower than
+    the provider's published limit, **never faster**, which is the direction that does not
+    earn a 429."* **MEASURED against the pilot's own eight calls, that was false on seven of
+    them:**
+
+        reservation, every call : 3,000   (`attacker.target_tokens_per_episode // turn_budget`)
+        ACTUAL, in order        : 790 3203 4002 6201 6665 7439 7782 6848
+        exceeded it             : 7 of 8, the largest 7,782 = **2.59x**
+        buckets under-charged by: **18,930** tokens across the eight
+
+    The ninth call was an HTTP 429. ``target // turn_budget`` is **by construction the MEAN**,
+    and a multi-turn conversation's per-call cost rises with context, so the reservation is
+    above the real cost early and below it for the whole rest of an episode.
+
+    ⚠️ **THE CLAIM IS NOT RESTATED IN A WEAKER FORM; IT IS EARNED.** :meth:`_settle` charges
+    ``max(0, actual - reservation)`` once the real cost is known, so the buckets are charged
+    ``max(reservation, actual)`` per call — **never less than the provider billed**.
+    `tests/test_arch_lanes.py` asserts exactly that, replayed against the pilot's own eight
+    numbers read from the committed usage log, and it fails against the code this replaced.
+
+    ⚠️ **AND IT INTRODUCES NO NEW SPEC VALUE**, which is hard rule 9's requirement and the
+    reason the fix is not a bigger constant: every charge is either the reservation the run
+    already used or a figure the **provider** returned. There is no multiplier, no headroom
+    factor and no safety margin to put in `config/`.
     """
 
     inner: MeteredModelClient
@@ -410,15 +436,55 @@ class _PacedClient:
         self, *, messages: tuple[dict[str, str], ...], temperature: float, lane: str
     ) -> ModelReply:
         self._agree(lane, self.attacker_buckets, role="attacker")
-        self._pace(self.attacker_buckets, self.attacker_reservation)
-        return self.inner.complete_attacker(
+        admitted_at = self._pace(self.attacker_buckets, self.attacker_reservation)
+        reply = self.inner.complete_attacker(
             messages=messages, temperature=temperature, lane=lane
         )
+        self._settle(self.attacker_buckets, self.attacker_reservation, reply, admitted_at)
+        return reply
 
     def complete_judge(self, *, system: str, user: str, lane: str) -> ModelReply:
         self._agree(lane, self.judge_buckets, role="judge")
-        self._pace(self.judge_buckets, self.judge_reservation)
-        return self.inner.complete_judge(system=system, user=user, lane=lane)
+        admitted_at = self._pace(self.judge_buckets, self.judge_reservation)
+        reply = self.inner.complete_judge(system=system, user=user, lane=lane)
+        self._settle(self.judge_buckets, self.judge_reservation, reply, admitted_at)
+        return reply
+
+    def _settle(
+        self, buckets: Any, reservation: int, reply: ModelReply, admitted_at: float
+    ) -> None:
+        """Charge the buckets ``max(0, actual - reservation)`` now the real cost is known.
+
+        ⚠️ **`INCIDENTS.md` INC-143's OWN PROPOSED GUARDRAIL, VERBATIM:** *"THE HONEST FIX IS
+        NOT A BIGGER CONSTANT — IT IS TO CHARGE THE BUCKET THE DIFFERENCE ONCE THE REAL COST
+        IS KNOWN. The provider returns `usage.total_tokens` on every successful call and the
+        run already books it; a `settle`-side top-up of `max(0, actual - reservation)` against
+        the same bucket makes the pacing self-correcting and needs no new spec value at all."*
+
+        ⚠️ **ONLY ON A SUCCESSFUL CALL, AND THAT IS NOT AN OMISSION.** A `ProviderFailed` or a
+        `RateLimited` never reaches here — both raise out of ``self.inner`` — and neither has
+        a `usage` block to read. `driver/episode.py` books those at **zero** tokens, an
+        under-count *published rather than estimated* (golden 8: *"NEVER estimated"*), and
+        inventing a settle figure for them here would put an estimate exactly where hard rule
+        12 forbids one.
+
+        ⚠️ **``max(0, ...)`` AND NOT A SIGNED DIFFERENCE.** A call that came in **under** its
+        reservation — the pilot's first, 790 against 3,000 — does **not** hand the surplus
+        back. The reservation was genuinely committed at admission, and refunding it would let
+        a cheap opening turn buy headroom for an expensive later one, which is the same
+        under-charge in the other direction.
+
+        ⚠️ **THE TOP-UP IS CHARGED AT THE ADMISSION CLOCK READING, NOT A FRESH ONE, AND THAT
+        IS DELIBERATE ON BOTH COUNTS.** `Q-179`(1) already ruled that this class reads the
+        clock **once per call** — a second reading is what turned a bucket refusal into a
+        `BucketError` on this project's own platform (`INC-134`: 139 short sleeps in 300
+        samples). It is also the **conservative** direction: settling at the earlier moment
+        credits the bucket *less* refill than settling at the later one, so the lane ends up
+        slightly more paced rather than slightly less — and "less" is the direction that earns
+        a 429.
+        """
+        actual = usage_total_tokens(reply.usage)
+        buckets.settle(extra_tokens=max(0, actual - reservation), now=admitted_at)
 
     @staticmethod
     def _agree(lane: str, buckets: Any, *, role: str) -> None:
@@ -455,7 +521,7 @@ class _PacedClient:
                 f"are read (QUESTIONS.md Q-161)"
             )
 
-    def _pace(self, buckets: Any, tokens: int) -> None:
+    def _pace(self, buckets: Any, tokens: int) -> float:
         """Wait until the buckets permit ``tokens``, then charge them. **One clock read.**
 
         ⚠️⚠️ **`Q-179`(1), RULED 2026-09-04 — THE PACER USED TO READ THE CLOCK TWICE AND LET
@@ -488,13 +554,71 @@ class _PacedClient:
             wait = buckets.wait_seconds(tokens=tokens, now=now)
             if wait <= 0:
                 buckets.take(tokens=tokens, now=now)
-                return
+                # ⚠️ RETURNED so :meth:`_settle` can charge the top-up against **this** same
+                # reading rather than taking a second one. See its docstring, and `Q-179`(1).
+                return now
             self.sleep(wait)
 
 
 # --------------------------------------------------------------------------------------
 # The run
 # --------------------------------------------------------------------------------------
+
+
+def liveness_refusal(
+    lanes: Sequence[str], *, probe: Callable[[str], int]
+) -> str | None:
+    """⚠️⚠️ **ONE LIVENESS CALL PER LANE. `INCIDENTS.md` INC-142's OWN PROPOSED GUARDRAIL.**
+
+    Returns ``None`` when every lane answered, or a **refusal string naming every lane that
+    did not and the status it gave**. It is a refusal and not a warning: `PROCESS.md` §6b
+    makes the first completed execution *the* run, so a warning printed above a single-shot
+    pilot is a warning printed above a spent artefact.
+
+    ⚠️ **WHY THIS EXISTS, IN `INC-142`'s OWN WORDS.** *"`RUN_DECLARED.md` §7.3 lists seven
+    preconditions 'each a refusal and not a warning', and preflight passed all seven —
+    including §7.3 #5, 'Every provider key NAME set', and #7, the provider client. ⚠️ **What
+    no precondition tests is whether either lane ANSWERS.** Preflight reads a key's name,
+    never makes a call, and the dry run dispatches to a `TranscriptClient`. So the entire
+    ladder of checks between the operator and a single-shot run can pass while one of the two
+    lanes is incapable of returning a single usable reply, which is exactly what happened."*
+
+    **Both of the pilot's failures were of this kind, and both would have been refused here:**
+
+    - `qwen-27b` answered **HTTP 403** to every one of its ten calls — measured on 2026-09-04
+      to be an edge block on the missing `User-Agent`, since fixed (`INC-145`), and a lane
+      that answers 403 to a one-token probe answers 403 to an episode.
+    - `gemma-26b` was alive, and a probe would have said so — which matters just as much: it
+      is what separates *"the lane is dead"* from *"the lane was paced too fast"* **before**
+      six minutes of single-shot run rather than after.
+
+    ⚠️ **EVERY DEAD LANE IS NAMED, NOT JUST THE FIRST.** The pilot's two lanes were broken in
+    two *different* ways. A check that stopped at the first would have sent the operator back
+    for a second single-shot run to discover the second — **and there is no second single-shot
+    run.**
+
+    ⚠️ **A 429 IS A REFUSAL TOO.** A lane already rate-limited before the run starts cannot
+    complete it, and `CLAUDE.md` §4 forbids waiting it out by retrying.
+
+    ``probe`` is injected — it takes a lane name and returns an HTTP status — so this function
+    is pure, and so that a test drives it without a socket. ⚠️ **The status is ALL that
+    crosses this boundary: no body, no header, nothing that could carry a credential**
+    (`INC-142`, and :class:`whetstone_gate.driver.clients.ProviderFailed`).
+    """
+    dead: list[str] = []
+    for lane in lanes:
+        status = probe(lane)
+        if not 200 <= int(status) < 300:
+            dead.append(f"{lane} answered HTTP {int(status)}")
+    if not dead:
+        return None
+    return (
+        "REFUSED before spending: "
+        + "; ".join(dead)
+        + ". A lane that does not answer a one-token probe does not answer an episode, and "
+        "PROCESS.md S6b makes the first completed execution THE run. INCIDENTS.md INC-142: "
+        "the pilot spent its single, unrepeatable artefact discovering this."
+    )
 
 
 def _utc_now() -> datetime:
@@ -809,7 +933,17 @@ def _usage_sink(
     :func:`whetstone_gate.runner.redaction.refuse_if_secret_bearing` before it is serialised.
     """
 
-    def sink(lane: str, tokens: int, outcome: str) -> None:
+    def sink(
+        lane: str,
+        tokens: int,
+        outcome: str,
+        *,
+        status: int | None = None,
+        error_type: str | None = None,
+    ) -> None:
+        # ⚠️ `status` / `error_type` arrive ONLY from the `ProviderFailed` path (INC-142) and
+        # are dropped from the row when absent, so an `OK` row stays byte-identical to the
+        # ones the pilot committed. See `runner/usage.py:append`.
         usage_log.append(
             model=lane,
             date=date,
@@ -818,6 +952,8 @@ def _usage_sink(
             episode=key.slug,
             total_tokens=tokens,
             outcome=outcome,
+            status=status,
+            error_type=error_type,
         )
 
     return sink

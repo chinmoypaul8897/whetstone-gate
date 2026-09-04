@@ -14947,3 +14947,176 @@ owes one further act, and it is named in this session's report as item 1 of what
    named in both.** The exact words C18 and C19 must publish are in this session's report and in
    `INC-144`. **Until they are published, rung 4 is recorded but not yet DISCLOSED**, and that gap is
    this session's, not theirs.
+
+
+---
+
+## ⚠️ CORRECTION — THE GATE 0 RULING ABOVE CONTAINS A FALSE STATEMENT, FOUND BY THIS SESSION'S OWN ADVERSARIAL PASS AFTER IT WAS COMMITTED AT `a551a31`
+
+**ARCH LANES 1, `6d1a94f3`, 2026-09-04T05:56Z.** Full entry: `INCIDENTS.md` **`INC-146`**.
+
+The ruling above says, under *"ONE HALF OF THIS CUT CANNOT BE MADE BY THIS SESSION"*:
+*"`CLAUDE.md` hard rule 9 also makes every spec-specified value a `config/` value, so the
+**count** 20 would have to live there too, and there is no `tfp_task_count` key today."*
+
+⚠️ **THAT IS FALSE, AND IT WAS FALSE WHEN IT WAS WRITTEN.** MEASURED, in the working tree and
+in the committed blob:
+
+    config/protocol.yaml:421:  tfp_task_count: 40
+    config/protocol.yaml:422:  tfp_stratification: { airline: 20, retail: 20 }
+
+read through the one loader by **three** first-party modules — `tau2/enumerate.py`:555,
+`benign/manifest.py`:207, `runner/n_rule.py`:441 — and `runner/n_rule.py`:158 already carries
+`TFP_REDUCED = 20`, whose own comment points at the key by name.
+
+**The claim came from a `grep` for `tfp_task_ids` — a search for the ids — from which a
+universal negative about a different key was asserted.** `INC-146` carries the full entry, its
+`Missed` (the answer was forty lines above the one that was read, in the same YAML block) and
+its `Diagnosis`.
+
+**WHAT CHANGES AND WHAT DOES NOT:**
+
+| | |
+|---|---|
+| **UNCHANGED — the cut itself** | The operator's ruling, the selection rule, its citations, the three rejected readings, and **the twenty surviving ids**. They were derived from the stated rule and re-measured against `config/protocol.yaml:461-465`; each is an exact prefix. |
+| **UNCHANGED — that it is operator-owed** | `config/` is still outside this session's fence. |
+| ⚠️ **CHANGED — the reason** | Not *"the rung has no seam"*. **It has two.** The cut is a **three-key edit plus the tests that pin 40**, and it is dull rather than structural. |
+| ⚠️ **CHANGED — `INC-144`'s Diagnosis and Systemic guardrail** | Both were built on the false premise. `INC-146` supersedes them and they are **not** rewritten, which is `INC-139`'s treatment of a stale citation: *"the superseded text stays and is explained beside itself."* |
+
+---
+
+## ⚠️ `Q-190` — GATE 2: BOTH LANES DIAGNOSED. `qwen-27b`'s 100% FAILURE WAS A MISSING `User-Agent` HEADER, AND `gemma-26b` IS ALIVE. FOUR CALLS, 89 TOKENS, AGAINST A 4-CALL / 20,000-TOKEN SANCTION
+
+**Raised and answered by ARCH LANES 1, `6d1a94f3`, 2026-09-04.** Full entry: `INC-145`.
+
+**HARD RULE 12, THE READ BEFORE THE FIRST CALL:** `evals/usage/gemma-26b-2026-09-04.jsonl`
+held **42,930 tokens / 8 calls**; `evals/usage/qwen-27b-2026-09-04.jsonl` held **0 / 10**.
+
+**ACTUAL SPEND, BY MODEL:**
+
+| lane | calls | tokens | result |
+|---|---|---|---|
+| `gemma-26b` | **1** | **68** | HTTP **200** — the lane is alive, the credential works |
+| `qwen-27b` | **3** | **21** | HTTP **403**, **403**, then **200** with a `User-Agent` |
+| **TOTAL** | **4 / 4** | **89 / 20,000** | ceiling reached on calls, never on tokens |
+
+⚠️ **NO 429 WAS RECEIVED.** Nothing was retried and no lane was substituted for another.
+
+**THE DIAGNOSIS, AND IT IS A CONTROLLED COMPARISON RATHER THAN AN INFERENCE.** Calls 3 and 4
+were byte-identical requests — same credential, same `api_model_id`, same URL, same JSON
+body, same shipped builder, same shipped transport, seconds apart — differing **only** in the
+presence of a conventional `User-Agent` header. Call 3: **403**, body **17 bytes, not JSON**.
+Call 4: **200**, 21 tokens, reply `"OK"`.
+
+⚠️ **THE PROMPT'S TWO PRE-EXCLUDED HYPOTHESES ARE NOW EXCLUDED BY MEASUREMENT.** It stated
+that the credential is valid and the model id exists, *"SO THE QWEN FAILURE IS NEITHER A 401
+NOR A 404"*. Call 4's **200** proves both from inside this repository: a 401 or a 404 is not
+made to disappear by adding a header.
+
+**Why every failed pilot call cost exactly 0 tokens and returned instantly:** it never reached
+a model. Groq's edge refuses `Python-urllib/3.12` before the API sees the request.
+
+⚠️ **ONE RESIDUAL RISK, STATED BECAUSE THE SANCTION IS SPENT AND IT COULD NOT BE MEASURED.**
+The measurement used `Mozilla/5.0`, because that is the string most likely to be accepted.
+**The shipped value is `whetstone-gate/1.0 (+research harness; Razorpay Track 01)`** — this
+project does not get past a filter by pretending to be a browser it is not, in a repository
+whose thesis is other people's unsound claims. **Whether Groq's edge accepts *that* string is
+UNMEASURED.** The mitigation is not the string; it is `driver/run.py:liveness_refusal`, which
+turns a refusal into something discovered **before** a run rather than inside one.
+
+---
+
+## ⚠️ `Q-191` — GATE 4: WHAT THE PILOT'S 429 EVIDENCE DOES AND DOES NOT SUPPORT. ⚠️ `config/lanes.yaml` IS **UNTOUCHED**, AND THE OPERATOR-OWED ATTESTATION IS NAMED
+
+**Raised by ARCH LANES 1, `6d1a94f3`, 2026-09-04.** Class **A** if any number in
+`config/lanes.yaml` is ever to move. **No number was moved.**
+
+`config/lanes.yaml` declares `gemma-26b` at **rpm 30 / tpm 16000 / rpd 14400 / tpd null**,
+`limits_read_on: "2026-08-30"`, `limits_source: "operator dashboards … operator-attested, not
+session-verified"` — **five days stale**. The pilot took a 429 after 8 calls and 42,930 tokens
+in 219 s.
+
+### WHAT THE EVIDENCE **DOES** SUPPORT — measured from the committed usage log
+
+**(1) `rpm` and `rpd` are not remotely implicated.** Maximum requests in any 60-second window:
+**3**, against a declared 30. Requests that day: **9**, against 14,400.
+
+**(2) A strict 60-second SLIDING window IS exceeded, twice, by up to 1.38x.**
+
+    call  t(s)   tokens   tokens in the preceding 60s
+      1      0      790         790
+      2     32     3203       3,993
+      3     55     4002       7,995
+      4    107     6201      10,203
+      5    145     6665      12,866
+      6    171     7439      14,104
+      7    201     7782      21,886   *** EXCEEDS 16,000 ***
+      8    219     6848      22,069   *** EXCEEDS 16,000 ***
+      9    220        —      HTTP 429
+
+**(3) Wall-clock-ALIGNED minutes never exceed it — but the 429's own minute has no room for
+the 9th request.** Per aligned minute: 790 / 7,205 / 6,201 / 14,104 / **14,630**. The 429
+arrived at `03:30:22`, inside a minute already holding **14,630** of 16,000 — **1,370 of
+headroom** — and the 9th call's prompt alone would have been of the order of call 8's 6,848.
+**A limiter that counts a request's tokens at admission refuses that, under either window
+shape.**
+
+**(4) ⚠️ THE DECLARED `tpm: 16000` IS THEREFORE CONSISTENT WITH THE OBSERVED 429, AND THE
+THING THE EVIDENCE CONTRADICTS IS NOT THE NUMBER — IT IS OUR MODEL OF HOW IT IS ENFORCED.**
+`runner/buckets.py` models every limit as a **continuously-refilling** bucket. Simulated
+against these eight real calls and their real timestamps it **never empties**: the minimum
+level reached is **6,170 of 16,000**. `INC-143` reported exactly this and the architect
+re-ran it independently. **Both results are true and they are not in tension — they are two
+different limiter shapes**, and the provider's is the stricter one.
+
+**(5) ⚠️ AND THE SETTLE-SIDE TOP-UP THIS SESSION SHIPPED WOULD *NOT* HAVE PREVENTED THIS 429.
+MEASURED, NOT ASSUMED.** Replaying the eight calls through the fixed pacer:
+
+    OLD   (reservation only)      tpm after each call: 13000 every time; call 9 SENT IMMEDIATELY
+    FIXED (settle-side top-up)    tpm after each call: 13000 12797 11998 9799 9335 8561 8218 6170
+                                  call 9 STILL SENT IMMEDIATELY; 0 calls delayed either way
+
+**The fix corrects a documented property that was measurably false (`INC-143`). It does not
+explain, and would not have prevented, the pilot's 429.** Saying otherwise would be the
+convenient claim, and it is not what the simulation returns.
+
+### WHAT THE EVIDENCE **DOES NOT** SUPPORT
+
+- ⚠️ **It does not establish which enforcement Google actually uses.** Sliding window,
+  aligned window with admission-time counting, and a burst rule are all consistent with these
+  nine data points. **Nine points cannot separate them.**
+- ⚠️ **It does not establish a "true" limit to write anywhere.** No `retry-after`, no header,
+  no body and no error type was recorded for the 429 — `INC-142` again: **the record contains
+  the string `429` and nothing else.** This session's Gate 1a fix means the *next* 429 carries
+  its status and a short type, but that is prospective and cannot recover this one.
+- ⚠️ **It does not rule out an undeclared account-level or burst limit.** It also does not
+  support one: `gemma-26b` and `qwen-27b` are different providers on different credentials, so
+  no cross-lane interaction is available as an explanation.
+- ⚠️ **It says nothing about `gemma-31b` or either Flash-Lite lane**, which have never been
+  called by anything.
+
+### THE RULING SOUGHT, AND WHY `config/` WAS LEFT ALONE
+
+⚠️ **NO NUMBER IN `config/lanes.yaml` WAS CHANGED, AND THE PROMPT'S INSTRUCTION AND THE
+EVIDENCE AGREE ON THAT FOR ONCE.** *"DO NOT GUESS A NEW NUMBER AND DO NOT COPY ONE FROM A
+PROVIDER'S PUBLIC PAGE."* The evidence says the declared 16,000 is **consistent with what
+happened**; there is nothing to correct, and `INC-05` is the entry about precise-sounding
+values that came from memory. Changing it would also invalidate `PROTOCOL.md` §1.1's manifest
+row (`config/lanes.yaml` = `23b8db92…`, 13,622 bytes), a digest three sessions have now
+re-measured.
+
+**OPERATOR-OWED, and it is an ATTESTATION rather than a measurement, because `PROCESS.md` §8
+forbids a session from calling the models endpoint and `PROVENANCE.md` §1 records these limits
+as operator-read:**
+
+1. **Re-read the Google AI Studio dashboard for `Gemma 4 26B` and confirm or correct rpm/tpm/
+   rpd/tpd**, and update `limits_read_on`. `CONTEXT.md` §21.6 already names *"free-tier limits
+   can change under us mid-run"* as an open risk, and §13.7's fourth clause makes a **differing**
+   limit an `INCIDENTS.md` entry. Five days stale is the whole of the reason to look.
+2. **Rule on whether `runner/buckets.py` should model TPM as a 60-second SLIDING window rather
+   than a continuously-refilling bucket.** ⚠️ **This is the actionable half of Gate 4 and it is
+   a code question, not a `config/` one — it changes no declared number.** On this trace the
+   sliding shape would have refused calls 7 and 8 that the bucket admitted. It is **not**
+   proposed here: it would make the runner materially slower across a 30-hour sweep, and the
+   evidence cannot say the provider's shape is sliding rather than aligned. **Recorded as the
+   open question, with the measurement attached.**

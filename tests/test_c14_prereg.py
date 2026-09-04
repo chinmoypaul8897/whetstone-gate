@@ -780,7 +780,26 @@ def test_the_DEGRADATION_RECORD_in_PROTOCOL_md_matches_INCIDENTS_md(
         int(number)
         for number in re.findall(r"DEGRADATION RUNG (\d) FIRED", incidents)
     }
-    assert fired_in_incidents == {1, 3, 5}, (
+    # ⚠️⚠️ **FLIPPED {1,3,5} -> {1,3,4,5} BY ARCH LANES 1 (`6d1a94f3`), 2026-09-04, CITING THE
+    # OPERATOR'S RULING OF THAT DATE: "RUNG 4 FIRES. RUNGS 2 AND 6 DO NOT."**
+    #
+    # ⚠️ **THIS TEST ASKED TO BE FLIPPED, IN ITS OWN WORDS**, and that is why the flip is not a
+    # weakening (hard rule 6). Its message reads: *"the set of rungs INCIDENTS.md records as
+    # fired has changed. That is legitimate — a rung may be fired — but PROTOCOL.md is a FROZEN
+    # artefact and its table must be re-checked by a human, not by this assertion."* **The human
+    # re-check happened**: the ruling is recorded verbatim in `QUESTIONS.md` BEFORE any file was
+    # touched (hard rule 5), `INC-144` was written at the moment of the cut with the time and the
+    # reason, and `PROTOCOL.md` §5.1, §5.2 and §3.2 were all updated in the same commit.
+    #
+    # ⚠️ **AND THE FLIP IS PROVABLY MEANINGFUL — it FAILS on the old artefacts.** `INCIDENTS.md`
+    # at `b60e198` carries `DEGRADATION RUNG` entries for 1, 3 and 5 only; this assertion run
+    # against that file yields `{1,3,5} != {1,3,4,5}` and goes RED. It is a real flip, not a
+    # widened set that would accept anything.
+    #
+    # ⚠️ **AND `prereg-v1` DOES NOT RESOLVE**, verified as that session's first act, so
+    # `PROTOCOL.md` was not yet frozen when it was amended — which `PROCESS.md` §14 rung 4 asks
+    # for in terms: *"Fire it BEFORE `prereg-v1` if at all possible."*
+    assert fired_in_incidents == {1, 3, 4, 5}, (
         "the set of rungs INCIDENTS.md records as fired has changed. That is legitimate — a "
         "rung may be fired — but PROTOCOL.md is a FROZEN artefact and its table must be "
         f"re-checked by a human, not by this assertion. Found: {sorted(fired_in_incidents)}"

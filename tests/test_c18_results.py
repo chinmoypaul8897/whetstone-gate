@@ -461,11 +461,28 @@ def test_S2_MAY_PRINT_A_ZERO_AND_THAT_IS_A_RESULT_NOT_A_GAP():
 # ======================================================================================
 
 
-def test_the_rungs_are_READ_from_PROTOCOL_md_and_1_3_5_FIRED_while_2_4_6_DID_NOT():
-    """⚠️ **Read it, do not assume it.** `Q-099`: a prompt asserted rungs 4 and 6 had fired."""
+def test_the_rungs_are_READ_from_PROTOCOL_md_and_1_3_4_5_FIRED_while_2_6_DID_NOT():
+    """⚠️ **Read it, do not assume it.** `Q-099`: a prompt asserted rungs 4 and 6 had fired.
+
+    ⚠️⚠️ **RENAMED AND FLIPPED BY ARCH LANES 1 (`6d1a94f3`), 2026-09-04 — `(1,3,5)/(2,4,6)` ->
+    `(1,3,4,5)/(2,6)` — CITING THE OPERATOR'S RULING OF THAT DATE:** *"RUNG 4 FIRES. RUNGS 2 AND
+    6 DO NOT."* `INCIDENTS.md` **`INC-144`**, written at the moment of the cut.
+
+    ⚠️ **THE NAME MOVED BECAUSE THE NAME WAS AN ASSERTION.** `Q-099` is the entry about a prompt
+    claiming rung 4 had fired when it had not, so a test called `..._1_3_5_FIRED_while_2_4_6_DID
+    _NOT` that actually checked `(1,3,4,5)` would be the same defect in the same place, wearing a
+    passing test's clothes.
+
+    ⚠️ **THE FLIP IS PROVABLY MEANINGFUL — BOTH ASSERTIONS FAIL ON THE OLD ARTEFACT.** Against
+    `PROTOCOL.md` at `b60e198`, whose §5.1 row 4 reads `| **4** | T-FP 40 → 20 τ² tasks | **NOT
+    FIRED** | — |`, `record.fired` is `(1,3,5)` and `record.not_fired` is `(2,4,6)`, so each line
+    below goes RED. Neither was loosened: the tuples are still exact and still exhaustive, and
+    together they still account for all six rungs. **Rung 4 moved from one tuple to the other;
+    nothing was deleted from either.**
+    """
     record = degradation_record((REPO_ROOT / "PROTOCOL.md").read_text(encoding="utf-8"))
-    assert tuple(r.number for r in record.fired) == (1, 3, 5)
-    assert tuple(r.number for r in record.not_fired) == (2, 4, 6)
+    assert tuple(r.number for r in record.fired) == (1, 3, 4, 5)
+    assert tuple(r.number for r in record.not_fired) == (2, 6)
 
 
 def test_C16_AD_CMP_IS_NAMED_NOT_RUN_WITH_WHY():

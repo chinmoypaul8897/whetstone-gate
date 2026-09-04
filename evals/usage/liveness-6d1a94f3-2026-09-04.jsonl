@@ -1,0 +1,4 @@
+{"lane": "gemma-26b", "outcome": "OK", "probe": "GATE2_LIVENESS", "session": "6d1a94f3", "status": 200, "total_tokens": 68, "utc": "2026-09-04"}
+{"error": {"parse": "JSONDecodeError"}, "lane": "qwen-27b", "outcome": "ERROR", "probe": "GATE2_LIVENESS", "session": "6d1a94f3", "status": 403, "utc": "2026-09-04"}
+{"call": 3, "lane": "qwen-27b", "note": "the SHIPPED request repeated; body 17 bytes, not JSON", "outcome": "ERROR", "probe": "GATE2_LIVENESS", "session": "6d1a94f3", "status": 403, "utc": "2026-09-04"}
+{"call": 4, "lane": "qwen-27b", "note": "BYTE-IDENTICAL to call 3 plus a User-Agent header. INC-145", "outcome": "OK", "probe": "GATE2_LIVENESS", "session": "6d1a94f3", "status": 200, "total_tokens": 21, "utc": "2026-09-04"}

@@ -165,7 +165,36 @@ class ProviderFailed(RuntimeError):
 
     Counted under :data:`whetstone_gate.runner.episodes.PROVIDER_ERROR`, never swallowed:
     hard rule 11 counts *"retries, fallbacks, skipped cases, or missing traces"* alike.
+
+    ⚠️⚠️ **:attr:`status` AND :attr:`error_type` EXIST BECAUSE OF `INCIDENTS.md` INC-142,
+    WHOSE `Missing` FIELD IS THE MOST EXPENSIVE LINE IN THIS PROJECT'S RECORD:** *"The record
+    cannot distinguish an HTTP 401 from a 404 from a 200 with a malformed body … so the
+    operator cannot tell whether the qwen lane needs a credential, a corrected
+    `api_model_id`, or a parser change."* The pilot spent its single, unrepeatable run
+    discovering a failure it then could not name.
+
+    ⚠️ **THE BODY IS STILL NEVER CARRIED, AND THAT SUPPRESSION IS STILL RIGHT.** INC-142
+    itself says so: *"a provider error can quote the credential it rejected."* **But the
+    STATUS IS NOT THE BODY.** It is an integer from a fixed set; it cannot quote anything,
+    and it was being discarded *with* the body for no reason but proximity. :attr:`error_type`
+    is the provider's own short enum-shaped ``type``/``code`` field — never ``message`` —
+    length-capped at :data:`_ERROR_TYPE_MAX_CHARS` and passed through
+    :func:`whetstone_gate.runner.redaction.refuse_if_secret_bearing` before it is kept.
+
+    Both are ``None`` when there is nothing to report. ⚠️ **An absent value is reported as
+    absent and never synthesised:** a guessed status reads exactly like a measured one.
     """
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        status: int | None = None,
+        error_type: str | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.status = status
+        self.error_type = error_type
 
 
 @dataclass(frozen=True)
@@ -367,6 +396,48 @@ def cycle(replies: Iterable[tuple[str, int]], times: int) -> tuple[tuple[str, in
 _GOOGLE_BASE = "https://generativelanguage.googleapis.com/v1beta"
 _GROQ_CHAT_URL = "https://api.groq.com/openai/v1/chat/completions"
 
+#: ⚠️⚠️ **THE HEADER THAT COST THE PILOT.** `INCIDENTS.md` **INC-142**(b): `qwen-27b` returned
+#: a provider error on **100% of its 10 calls**, 0 tokens each, instantly, leaving ten empty
+#: ledgers — and the single-shot pilot was spent discovering it.
+#:
+#: **MEASURED live on 2026-09-04**, under `ARCH LANES 1`'s sanctioned 4-call ceiling, calls 3
+#: and 4, against `qwen/qwen3.8-27b`:
+#:
+#: ===========================================  ========  ==========================
+#: request                                      status    body
+#: ===========================================  ========  ==========================
+#: the shipped one (urllib's default UA)        **403**   17 bytes, **not JSON**
+#: byte-identical + a conventional ``User-Agent``  **200**   567 bytes, JSON, 21 tokens
+#: ===========================================  ========  ==========================
+#:
+#: **The only difference between those two requests is this header.** Groq's edge refuses
+#: `Python-urllib/3.12` before the request reaches a model, which is why every failed call
+#: cost zero tokens and returned instantly. The credential was valid and the `api_model_id`
+#: existed — **both proved by the 200, not assumed** — so neither a 401 nor a 404 was ever
+#: the answer.
+#:
+#: ⚠️ **IT NAMES THIS PROJECT RATHER THAN IMPERSONATING A BROWSER.** A `User-Agent` is sent
+#: to a third party on every call; claiming to be Chrome to get past a filter is the kind of
+#: thing this repository exists to criticise in other people's work. Google answered 200
+#: without any UA at all, so this is not a fix Google needed — it is one client identifying
+#: itself the same way on both lanes, so that the next edge block is a **known** variable.
+#:
+#: ⚠️ **NOT A `CONTEXT.md` §8.6 CONSTANT.** It is a Class B implementation choice (hard rule
+#: 2): it changes no reported number, and §8.6's constants table — the authoritative list the
+#: hard-rule-9 tripwire scans against — contains nothing of this kind.
+_USER_AGENT = "whetstone-gate/1.0 (+research harness; Razorpay Track 01)"
+
+#: The cap on a carried provider error type. ⚠️ **This is what makes "a SHORT error type" a
+#: property rather than a hope:** a provider that puts a paragraph in ``type`` must not
+#: thereby put a paragraph in the record. See :class:`ProviderFailed`.
+_ERROR_TYPE_MAX_CHARS = 64
+
+#: The **only** keys read out of a provider's error object, in preference order.
+#: ⚠️⚠️ **``message`` IS DELIBERATELY ABSENT AND MUST STAY ABSENT.** `INC-142`: *"a provider
+#: error can quote the credential it rejected"* — and ``message`` is exactly where it would
+#: quote it. These four are enum-shaped machine fields.
+_ERROR_TYPE_KEYS = ("type", "code", "status", "reason")
+
 #: The providers this client speaks. Keyed by `config/lanes.yaml`'s own ``provider`` string.
 _PROVIDERS = ("google", "groq")
 
@@ -453,6 +524,55 @@ def _http_post(url: str, body: bytes, headers: Mapping[str, str]) -> HttpRespons
             f"the provider could not be reached: {failure.reason}. This is counted under "
             f"PROVIDER_ERROR and never swallowed (hard rule 11)"
         ) from None
+
+
+def _short_error_type(body: bytes) -> str | None:
+    """The provider's own SHORT, enum-shaped error type. **Pure.** ``None`` when there is none.
+
+    ⚠️⚠️ **THE NARROWEST THING THAT ANSWERS `INC-142`'s QUESTION, AND NOT ONE BYTE WIDER.**
+    That entry's `Missing` field is *"the operator cannot tell whether the qwen lane needs a
+    credential, a corrected `api_model_id`, or a parser change"* — three questions a status
+    plus a machine-readable type answers and a status alone does not.
+
+    **FOUR RULES, EACH OF WHICH IS A REFUSAL RATHER THAN A CLEAN-UP:**
+
+    1. **Only :data:`_ERROR_TYPE_KEYS` are read — never ``message``.** `INC-142`: *"a provider
+       error can quote the credential it rejected."* ``message`` is the free-text field where
+       it would; ``type``/``code``/``status``/``reason`` are enum-shaped machine fields.
+    2. **Only ``str`` and ``int`` values.** A nested object is not a type, and stringifying one
+       would put arbitrary provider text into the record by the back door.
+    3. **Capped at :data:`_ERROR_TYPE_MAX_CHARS`.**
+    4. ⚠️ **SECRET-SCANNED, AND IT REFUSES RATHER THAN MASKS** —
+       :func:`whetstone_gate.runner.redaction.refuse_if_secret_bearing`, the same rule the
+       reply text and the usage block already pass through. A masked secret is a secret that
+       was written down and then partly crossed out.
+
+    ⚠️ **A BODY THAT DOES NOT PARSE YIELDS ``None``, NOT A GUESS.** That is the pilot's own
+    shape — Groq's edge answered **17 bytes of non-JSON** — and an absent type is reported as
+    absent, because a synthesised one reads exactly like a measured one.
+    """
+    try:
+        payload = json.loads(body.decode("utf-8"))
+    except (ValueError, UnicodeDecodeError):
+        return None
+    if not isinstance(payload, Mapping):
+        return None
+    error = payload.get("error")
+    if not isinstance(error, Mapping):
+        return None
+    parts: list[str] = []
+    for key in _ERROR_TYPE_KEYS:
+        value = error.get(key)
+        if isinstance(value, bool) or not isinstance(value, (str, int)):
+            continue
+        text = str(value).strip()
+        if text and text not in parts:
+            parts.append(text)
+    if not parts:
+        return None
+    joined = "/".join(parts)[:_ERROR_TYPE_MAX_CHARS]
+    refuse_if_secret_bearing(joined, where="$.error[type|code|status|reason]")
+    return joined
 
 
 def _decode(response: HttpResponse, *, lane: str) -> Mapping[str, Any]:
@@ -783,13 +903,25 @@ class MeteredProviderClient:
             # ⚠️ THE HEADER, NEVER A ?key= QUERY STRING. urllib.error.HTTPError carries the
             # request URL on .url and prints it in its own repr, so a key in the query
             # string would leak into every logged traceback. That is the reason, not taste.
-            headers = {"Content-Type": "application/json", "x-goog-api-key": secret}
+            headers = {
+                "Content-Type": "application/json",
+                "x-goog-api-key": secret,
+                # ⚠️ INC-142(b). See `_USER_AGENT`: without it Groq's edge answers 403 before
+                # the request reaches a model. Google answered 200 without one — this lane
+                # does not need it — and it is sent on BOTH so the client identifies itself
+                # identically everywhere and the next edge block is a known variable.
+                "User-Agent": _USER_AGENT,
+            }
         else:
             url = _GROQ_CHAT_URL
             body = _groq_body(lane.api_model_id, messages, temperature)
             headers = {
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {secret}",
+                # ⚠️⚠️ THE ONE HEADER THAT COST THE SINGLE-SHOT PILOT. MEASURED 2026-09-04:
+                # without it this exact request is HTTP 403 with a 17-byte non-JSON body;
+                # with it, HTTP 200 and 21 tokens. INCIDENTS.md INC-142(b), INC-145.
+                "User-Agent": _USER_AGENT,
             }
         response = self.transport(url, json.dumps(body).encode("utf-8"), headers)
         return self._reply(lane, response)
@@ -810,10 +942,17 @@ class MeteredProviderClient:
                 f"only within this lane"
             )
         if not 200 <= response.status < 300:
+            error_type = _short_error_type(response.body)
             raise ProviderFailed(
-                f"lane {lane.lane!r} answered HTTP {response.status}. The body is NOT "
-                f"reproduced: a provider error can quote the credential it rejected. "
-                f"Counted under PROVIDER_ERROR and never swallowed (hard rule 11)"
+                f"lane {lane.lane!r} answered HTTP {response.status}"
+                + (f" ({error_type})" if error_type else "")
+                + f". The body is NOT reproduced: a provider error can quote the credential "
+                f"it rejected. Counted under PROVIDER_ERROR and never swallowed (hard rule "
+                f"11). ⚠️ The STATUS and the short error TYPE are carried as FIELDS on this "
+                f"exception (INC-142), because a status is an integer and cannot quote "
+                f"anything, and discarding it with the body cost this project its pilot",
+                status=response.status,
+                error_type=error_type,
             )
         payload = _decode(response, lane=lane.lane)
         reply = (

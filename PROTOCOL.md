@@ -426,11 +426,28 @@ injection tasks get above:**
 external answer key is untouched, and the externally-authored-answer-key claim is INTACT.**
 
 ⚠️ **NOT YET EXECUTABLE, AND THAT IS DISCLOSED RATHER THAN PAPERED OVER.**
-`config/protocol.yaml:selections.tfp_task_ids` still holds all **40** — correctly, as the
-pre-registered enumeration — and `config/` was **outside the fence of the session that fired this
-rung**. There is also **no `tfp_task_count` key of any name**, so the sample size exists only as the
-*length of that list*. **Reducing it to the twenty above, before `prereg-v1`, is OPERATOR-OWED.**
-`INC-144` **Missing** and **Fix**.
+`config/protocol.yaml` still holds all **40**, correctly, as the pre-registered enumeration, and
+`config/` was **outside the fence of the session that fired this rung**. **Reducing it to the twenty
+above, before `prereg-v1`, is OPERATOR-OWED**, and it is a **three-key edit plus the tests that pin
+40**:
+
+    config/protocol.yaml:421   tfp_task_count: 40                          -> 20
+    config/protocol.yaml:422   tfp_stratification: {airline:20, retail:20} -> {airline:10, retail:10}
+    config/protocol.yaml:461   tfp_task_ids                                -> the first 10 per domain
+
+read by `tau2/enumerate.py`:555, `benign/manifest.py`:207 and `runner/n_rule.py`:441, each through the
+one loader. `runner/n_rule.py`:158 already carries `TFP_REDUCED = 20` as the named reduced figure.
+
+⚠⚠ **CORRECTION, `INCIDENTS.md` `INC-146`, BY THE SESSION THAT WROTE THE ERROR.** The text this
+paragraph replaces was landed by `ARCH LANES 1` (`6d1a94f3`) at commit `a551a31` and said, in this
+artefact: *"There is also **no `tfp_task_count` key of any name**, so the sample size exists only as
+the *length of that list*."* ⚠️ **THAT IS FALSE.** `config/protocol.yaml:421` is `tfp_task_count: 40`
+and three first-party modules read it. The claim came from a `grep` for `tfp_task_ids` — a search for
+the **ids** — from which a universal negative about a **different key** was asserted. `INC-144`'s
+**Missing** and **Diagnosis** are wrong for the same reason and are **not** rewritten: `INC-146` and
+an appended `QUESTIONS.md` correction stand beside them, which is the treatment `INC-139` gave a
+stale citation. **The cut itself, and the twenty surviving ids above, are unaffected** — they were
+derived from the stated selection rule and re-measured against `config/protocol.yaml:461-465`.
 
 **T-NEG — the 34 of 164 must-not-write tasks**: reference trajectories containing **no** tool carrying
 τ²'s own `@is_tool(ToolType.WRITE)` decorator — **24 of 50 airline** (7 empty action list, 17
