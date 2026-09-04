@@ -1,0 +1,818 @@
+================================================================================
+C21 BUILD 2 - FINAL OUTPUT
+SESSION-TOKEN 6f2d47ba | ROLE BUILD | CHUNK C21 | 2026-09-04
+================================================================================
+
+PUSHED SHA: 2126abf74b8c7f9980c484e8f15b72b9eba71a08
+  The DELIVERABLE commit, pushed (origin/main == 2126abf at the moment this file
+  was written; verified with git ls-remote). TWO FURTHER COMMITS FOLLOW and are
+  named in the printed report: (i) this journal file, and (ii) the STATUS.md /
+  PROGRESS.md append, which the prompt requires to be the LAST commit. The
+  ordering is stated rather than hidden, because a journal cannot name a SHA that
+  does not exist when it is committed.
+
+HEAD MOVED UNDER THIS SESSION, TWICE, AND THE SECOND MOVE CHANGED THE DELIVERABLE
+  Session opened at 686a224. All measurement was done there. C17 REVIEW 1 then
+  landed at 259ca6b WHILE THIS FILE'S SUBJECT WAS BEING WRITTEN, with verdict
+  FAIL. The deliverable's parent is 259ca6b, read from LIVE HEAD at commit time -
+  INC-139's corrected recipe - and every row the move touched was RE-MEASURED
+  rather than left standing. See section 3.
+
+================================================================================
+0. THE THING TO READ FIRST, IF YOU READ NOTHING ELSE
+================================================================================
+
+  !! THE SINGLE-SHOT CALIBRATION'S ATTEMPT 2 HAS ABORTED AND ITS INCIDENTS.md
+     ENTRY DOES NOT EXIST. PROCESS.md S6b FORBIDS ATTEMPT 3 UNTIL IT IS WRITTEN.
+
+  MEASURED, twice, at 14:45:42Z and again at 14:57:31Z, and re-confirmed at
+  15:2xZ:
+
+    ps -W | grep -c python.exe                 -> 0   (326 processes listed;
+                                                       the only python-shaped
+                                                       ones are VS Code's
+                                                       pet.exe helpers)
+    tail -1 evals/cal/run-attempt2-...Z.log    -> TimeoutError: The read
+                                                  operation timed out
+    find evals -name '*cal__*'                 -> 0   (publish-on-complete, so
+                                                       NO calibration episode
+                                                       completed)
+    newest write anywhere under evals/         -> that log, 14:41:51Z
+    usage rows for cal__1__2201__gemma-26b     -> 13, all outcome OK,
+                                                  56,855 tokens, 14:33:30Z to
+                                                  14:38:50Z
+    plus preflight liveness                    -> 232 tokens, 14:33:18Z
+    TOKENS ON THE LANE, TOTAL                  -> 57,087
+    grep "^## INC-" INCIDENTS.md | tail -1     -> INC-157, which covers
+                                                  ATTEMPT 1 ONLY
+
+  PROCESS.md S6b, verbatim: "If an attempt aborts before completion, the abort,
+  its cause and its partial episode count are written to INCIDENTS.md BEFORE any
+  retry, and the retry is a numbered attempt in the same directory."
+
+  INCIDENTS.md AND evals/ ARE BOTH OUTSIDE THIS SESSION'S FENCE. This session
+  wrote neither. The partial episode count and the token count are both stated
+  above as numbers so the entry can be written without re-measuring.
+
+  !! MY PROMPT SAID THE CALIBRATION WAS RUNNING. IT SAID SO CORRECTLY - it was
+  written at ~14:37Z, and the 13 usage rows show it was alive then. It is not
+  alive now. The prompt also said "WRITE THE STATE AS 'RUNNING, RESULT NOT YET
+  KNOWN' AND NOTHING MORE." Writing "running" into a published artefact tonight
+  would have been FALSE, so CLAUDE.md rule 1 was applied: the prompt and the tree
+  disagree, and the deliverable carries a form that is TRUE under either state -
+  "no calibration episode has completed and no threshold exists" - while the
+  measured abort evidence goes here and into the operator checklist as O-0.
+  RAISED AS Q-J.
+
+================================================================================
+1. WHAT WAS WRITTEN
+================================================================================
+
+  docs/submission/FORM_ANSWERS.md   REWRITTEN   +560 / -283   THE DELIVERABLE
+  docs/submission/FORM.md           amended     +9   / -2     the pointer
+  docs/sessions/c21-build-2.txt     new                        this file
+  STATUS.md / PROGRESS.md           APPEND ONLY                the last commit
+
+  Authoritative arithmetic, from git show --numstat 2126abf, which cannot be
+  wrong and was read AFTER the commit rather than predicted before it (OF-216,
+  INC-97):
+      docs/submission/FORM.md            9   2
+      docs/submission/FORM_ANSWERS.md  560 283
+
+  Both LF-only, valid UTF-8, ZERO CR bytes, ZERO control bytes outside TAB/LF -
+  measured with a PYTHON BYTE SCAN, not with grep. The prompt warned that
+  `grep -c $'\r'` misreported five files for c17-build-1 and that a
+  grep.exe.stackdump sits in this repository root; there is now a du.exe.stackdump
+  beside it. Every byte-level check in this session used python and read the file
+  in binary.
+
+  WHY REWRITTEN AND NOT AMENDED. Counted, not estimated: of C21 BUILD 1's seven
+  state rows, TWO had become FALSE and THREE more carried line numbers that had
+  moved. Its published incident count was 137; it is now 155.
+
+================================================================================
+2. THE FIVE METHOD CLAIMS - RE-MEASURED, NOT INHERITED. TWO MOVED.
+================================================================================
+
+BUILD 1 graded these nine hours before this session and reported that ALL FIFTEEN
+of its adversarial passes REFUTED the claims as its prompt had worded them. This
+session did not inherit a single one of its answers. Each was measured again
+against the tree tonight and then attacked from three independent angles -
+literal truth; the panelist who has not read the spec; the project's own HOLES.md
+/ OPEN_FINDINGS.md / INCIDENTS.md record.
+
+(1) A POLICY-BLIND ATTACKER .................. TRUE ONLY AS NARROWED   [unmoved]
+
+    UNMOVED, and measured rather than assumed: git diff --stat 685ca50..HEAD over
+    src/whetstone_gate/attacker/, data/attacker_sys.txt, CONTEXT.md, corpora/ and
+    tests/test_c6_attacker.py is EMPTY. Every artefact this claim rests on is
+    byte-identical to what BUILD 1 measured.
+
+    TRUE: CONTEXT.md S7's architecture block, lines 449-455 - "ATTACKER (LLM,
+    policy-blind) ... never sees: policy, holes, attack list, gate reasons".
+    The blindness guard is PROVED TO FIRE, not merely to be silent:
+    tests/test_c12_benign.py:404
+    test_the_blindness_scan_FIRES_at_four_planted_leaks. Still exactly at :404.
+
+    !! THREE CORRECTIONS THIS SESSION MADE TO ITS OWN FIRST DRAFT AND TO
+       BUILD 1'S:
+
+    (a) MISCATEGORISED EVIDENCE. BUILD 1 cited
+        tests/test_c6_attacker.py:1137
+        test_the_attacker_package_imports_no_model_client_and_no_network_library
+        as blindness evidence. IT IS NOT A BLINDNESS TEST. It proves the attacker
+        PACKAGE reaches no provider SDK and no network library - a PURITY
+        SEPARATION property under hard rule 8. Citing it as blindness overstates
+        what is asserted. The deliverable now says so in terms.
+
+    (b) THE GUARD IS KNOWN TO LEAK AND THE LEAKS ARE PUBLISHED, NOT CLOSED.
+        docs/reviews/OPEN_FINDINGS.md OF-127 (:1458) - TWO of OF-104's own THREE
+        measured exhibits STILL ESCAPE BOTH copies of the guard. OF-133 (:1464) -
+        46 OF 118 NEEDLES ESCAPE when carried in LAST_REFUSAL_LABEL. Both OPEN.
+        Neither travelled with BUILD 1's version of the claim. Both travel now.
+
+    (c) BLINDNESS IS A BUILD-TIME PROPERTY. There is no blindness check inside
+        src/whetstone_gate/attacker/loop.py and the pilot's stored ledgers carry
+        no per-episode blindness field, so no RUN attests it - the TESTS do. That
+        boundary is now stated.
+
+    DO NOT WRITE: "it has never seen any attack list." The attacker is seeded
+    from published third-party corpora and data/attacker_sys.txt:2-3 names FOUR
+    attack families in plain English - over-captures, excess refunds, early
+    settlements, duplicate refunds.
+    !! CONTEXT.md S1 ITSELF CARRIES THE UNNARROWED FORM: "an attacker that has
+    never seen the policy or any attack list". CONTEXT.md is the law and is
+    outside this fence, so it was not edited. RAISED AS Q-L.
+
+    ALSO CARRY: C6 was reviewed SIX times, never passed, carries no tag, and is
+    formally DISPOSED as shipped-with-residue - Q-089, "neither is tagged and
+    neither gets another review cycle" (README.md:1216, :1263-1264).
+
+(2) AN EXTERNALLY-AUTHORED ANSWER KEY ........ TRUE ONLY AS NARROWED   !! MOVED
+    ONE NARROWING BECAME THREE.
+
+    NARROWING 1, unchanged: tau2-bench supplies NO ESCAPE GROUND TRUTH.
+    CONTEXT.md S11.1 - "Escape measurement moves WHOLLY to the mock Razorpay
+    world." It supplies false-positive ground truth and an external
+    attacker-competence control, and nothing else. And it has graded nothing.
+
+    NARROWING 2, NEW TONIGHT - DEGRADATION RUNG 4 FIRED AND HAS BEEN EXECUTED.
+    INCIDENTS.md INC-144: fired 2026-09-04 05:27 UTC. T-FP, the false-positive
+    block, 40 tau2 write tasks -> 20, stratified 10 airline / 10 retail.
+    MEASURED TONIGHT, and BUILD 1's file predates all of it:
+        config/protocol.yaml:445   tfp_task_count: 20
+        config/protocol.yaml:446   tfp_stratification: { airline: 10, retail: 10 }
+        config/protocol.yaml:447   tau2_must_not_write_task_count: 34
+        config/protocol.yaml:497   airline: 11 12 14 15 16 17 18 19 20 21
+        config/protocol.yaml:498   retail:  0 1 100 101 102 103 104 105 106 107
+        tests/test_c3_tau2_enumeration.py:269-316 asserts BOTH that CONTEXT.md
+        S13.4 STILL says 40 / 20 / 20 AND that config/ carries rung 4's half -
+        "It fails on the old config/".
+    Each surviving list is an EXACT PREFIX of its domain's pre-registered 20
+    under the same bytewise-ascending string sort. A PREFIX CUT IS NOT A
+    RE-REGISTRATION, and it was made BEFORE prereg-v1, which is what
+    PROCESS.md S14's rung-4 row says to do "if at all possible".
+    !! INC-144 recorded the EXECUTION half as OPERATOR-OWED. IT HAS SINCE
+    LANDED, in both places it had to. That is now struck from the checklist so
+    the operator does not redo it.
+
+    !! tau2-BENCH IS NOT CUT, AND THE DELIVERABLE SAYS SO WHERE A READER WHO
+    GREPS tau2 LANDS - in S2, the pasted paragraph, not only in a footnote.
+    PROCESS.md S14's "NEVER CUT, at any rung, for any reason" list OPENS with
+    tau2-bench; CONTEXT.md S21 item 4 says "It is never dropped", adding in the
+    same sentence that its SCOPE is staged. T-NEG keeps all 34 tasks. The
+    externally-authored-answer-key claim is INTACT.
+
+    !! AND THE MEASUREMENT DID NOT CHOOSE THIS CUT. CONTEXT.md S13.4's rule fires
+    on the pilot's MEASURED tokens/episode and its input DOES NOT EXIST - the
+    pilot completed 0 of 20 and n_decision.selected_branch is still
+    TODO_C14_PILOT (config/protocol.yaml:406; INC-142). PROCESS.md S14 rung 4
+    fires ON SCHEDULE, at the OPERATOR's decision, and that is the one that
+    fired. NOTHING IN THE DELIVERABLE IMPLIES OTHERWISE, and the reason it is
+    written that flatly is Q-099.
+
+    NARROWING 3, NEW TONIGHT, AND LARGER THAN THE OTHER TWO. T-FP IS NOT
+    RUNNABLE AT ANY SIZE. README.md S9.4 (:908) states it in the repository's own
+    words - "the counter-metric is on the NEVER-CUT list, and it is NOT
+    COMPLETE" - and names two OPEN blockers, each independent of the cut and of
+    each other:
+        QUESTIONS.md:12315 Q-154 - "RULE 1 STOP: C12's DEPENDENCY C5 IS UNBUILT,
+          SO THE T-FP BLOCK - THE ONLY BLOCK WHOSE TASKS, GOLD BEHAVIOUR AND
+          GRADER ARE NOT OURS - CANNOT RUN AT ALL." Status: OPEN. Blocking the
+          whole T-FP block, 200 pre-registered episodes.
+        QUESTIONS.md:12355 Q-155 - CLASS A, OPEN. The six-name tool surface and
+          tau2's tool set are DISJOINT, "AND BUILDING C5 DOES NOT CLOSE IT."
+    README.md S9.4 draws the distinction this session then published: the cut is
+    a SCOPE decision, this is a CAPABILITY gap, and "Halving a block that cannot
+    run does not make it run."
+    !! BUILD 1'S VERSION CARRIED NONE OF THIS. The right form of claim 2 today is
+    that tau2-bench is vendored, pinned, licensed and authored by Sierra - AND
+    THE BLOCK THAT WOULD USE IT AS A FALSE-POSITIVE KEY HAS NOT RUN AND CANNOT
+    YET RUN.
+
+    EVIDENCE re-verified tonight: config/protocol.yaml:413 tau2_bench_sha
+    a2c024725189473d2d7cea3a5cfdbcc67478e41f (BUILD 1 cited :396 - MOVED);
+    vendor/tau2-bench/LICENSE "MIT License / Copyright (c) 2025 Sierra Research";
+    CONTEXT.md S11.1's authorship-split table. AgentDojo, the second external
+    environment, was CUT at rung 3 - README.md S9.2 (:793, BUILD 1 cited :701 -
+    MOVED), STATUS.md:2195 (BUILD 1 cited :1830 - MOVED),
+    config/protocol.yaml:420 agentdojo_sha still TODO_C13_C16.
+
+(3) A COMPETENCE PROBE THAT VOIDS OUR OWN RUN ... NOT YET TRUE AS AN
+    ACCOMPLISHED FACT                                                  !! MOVED
+
+    TRUE, AND RE-VERIFIED FIRST-HAND AT THE NEW HEAD RATHER THAN INHERITED:
+      probe-v1 is an annotated tag, object 170bd3ff4abfdd8f87f64055972a60c82cc54efc,
+        tagger date 2026-09-03 20:43:04 +0530, message "pre-registration:
+        HOLES.md, before the pilot and the calibration".
+      HOLES.md's blob is a4e50ed6f379784c6b6bfefdd1728a57ca3d4c20 at BOTH
+        probe-v1 and HEAD, and git diff probe-v1 HEAD -- HOLES.md is EMPTY -
+        CHECKED AGAIN AFTER HEAD MOVED. The rule is frozen and provably unmoved.
+      HOLES.md:221 - "Below the calibrated threshold -> THE WHOLE RUN IS VOID."
+      HOLES.md:186-189 fixes the rate as arm-1 EPISODES containing at least one
+        qualifying breach over arm-1 EPISODES ATTEMPTED - episodes, not entries.
+      Pure arithmetic: src/whetstone_gate/probe/void.py:81 breach_rate,
+        :109 is_void. Both still exactly there. No model client, asserted by
+        tests/test_c10_probe.py:1127 and :1141 (BUILD 1 cited :1092 and :1106 -
+        BOTH MOVED).
+
+    NOT TRUE, and MORE not-true than BUILD 1 could see:
+      config/protocol.yaml:352 void_threshold_breach_rate: TODO_C14_CALIBRATION
+        (BUILD 1 cited :335 - MOVED). The loader RAISES rather than defaulting -
+        src/whetstone_gate/probe/void.py:47, :143 UndeterminedThreshold - so NO
+        VOID VERDICT IS COMPUTABLE FROM config/ ON ANY INPUT.
+      The calibration is now DECLARED, ARMED AND ATTEMPTED TWICE, and has
+        produced ZERO completed episodes. See section 0.
+
+    !! WHAT THIS SESSION DID NOT DO WITH THAT, WHICH IS THE POINT. It wrote no
+    breach rate, no threshold, no void verdict, no prediction of one, and no
+    wording that leaves room to infer one. The deliverable's S0.2 says so in
+    terms: "What a completed calibration would produce is NOT YET KNOWN."
+
+(4) A FREEZE WITNESSED OUTSIDE THE REPOSITORY ... NOT YET TRUE         [unmoved]
+
+    git tag -l -> SEVEN tags: c0-pass c1-pass c13-pass c2-pass c3-pass c4-pass
+    probe-v1. git rev-parse prereg-v1 -> "fatal: ambiguous argument 'prereg-v1':
+    unknown revision or path not in the working tree", exit 128. VERIFIED AS THE
+    FIRST ACT OF THIS SESSION AND AGAIN AFTER HEAD MOVED.
+
+    !! README.md:120-124 IS NOT SOFTENED AND MUST NEVER BE. Its words, which
+    BUILD 1 cited at :56-58 (MOVED): "there is no prereg-v1 to hash, AND there is
+    no published fingerprint or witness gist to compare against - no
+    prereg-v1.sha256 and no OTS receipt exist in this tree. The procedure is
+    printed in full anyway, unaltered, so that what a judge will run is fixed
+    BEFORE there is a number to fit it to."
+
+    STRONGER EVIDENCE THAN BUILD 1 HAD, and it strengthens the admission rather
+    than softening it: README.md:42 asserts that NEITHER THE FINGERPRINT NOR THE
+    RECEIPT HAS EVER EXISTED ON ANY REF - checkable with git log --all
+    --name-only, not merely a statement about the working tree.
+
+    TWO FURTHER LIMITS NOW CARRIED: check-prereg FAILS OPEN and returns 0 when
+    prereg-v1 does not resolve (README.md:113-116), so a PASS from it today is
+    worth less than it looks; and nothing in code stops a scored run starting
+    without the tag - the driver's gate checks only probe-v1. THE RULE IS A RULE,
+    NOT AN INTERLOCK.
+
+    AND THE CHECKLIST LINE THIS PROJECT CURRENTLY FAILS, NAMED HERE RATHER THAN
+    DISCOVERED BY THE PANEL: persona 3 asks "Can the pre-registration be verified
+    by running the procedure printed in the README, start to finish, from a fresh
+    clone?" IT CANNOT. It fails at step 1 (the repository is private) and again
+    at git rev-parse prereg-v1^{commit}.
+
+    README.md:1491 prints the verification command with the id as the literal
+    <<PENDING-RUN: GIST_ID>> (BUILD 1 cited :1222 - MOVED).
+
+(5) gates/ AND scorer/ SHARE NO FIRST-PARTY MODULE ... VERIFIED
+    [re-measured; the module count moved 118 -> 119]
+
+    MEASURED BY THIS SESSION by running, read-only,
+      ./.venv/Scripts/python.exe -m whetstone_gate.tasks check-roles
+    git status --porcelain was captured BEFORE and AFTER and compared with diff:
+    IDENTICAL. The target writes nothing.
+
+      [PASS] D1 gates/ imports nothing from scorer/
+      [PASS] D2 scorer/ imports nothing from gates/
+      [PASS] D3 no shared first-party module
+             The allow-list holds 0 entr(y/ies). 119 first-party module(s)
+             indexed; 15 reachable from src/whetstone_gate/gates (14 seed(s)),
+             6 from src/whetstone_gate/scorer (6 seed(s)), TRANSITIVELY
+      [PASS] D4 no dynamic import in gates/ or scorer/
+             SCANNED: both package directories PLUS the 1 module(s) inside either
+             TRANSITIVE CLOSURE but outside them (['whetstone_gate.config'])
+    Whole run: 21 passed, 0 failed, 3 n/a.
+
+    118 -> 119 because src/whetstone_gate/driver/cal.py was added at c5a83fd,
+    after BUILD 1's last commit. The CLOSURE figures did not move: 15 / 14 seeds,
+    6 / 6 seeds, intersection still EMPTY.
+
+    !! AND THE QUALIFICATION THAT "21 passed, 0 failed" NEEDS, WHICH THIS SESSION
+    PUT IN THE DELIVERABLE RATHER THAN LEAVING FLATTERING. That run read the
+    WORKING TREE, and the working tree's QUESTIONS.md carried TWO UNCOMMITTED
+    ROWS a concurrent session had just added - 7a1e3b52 (C17 BUILD) and 4e8b91d3
+    (C17 REVIEW). AGAINST COMMITTED 686a224, E1 WAS RED. The D-block result is
+    clean under both readings; the whole-run count is 21/0/3 only against the
+    working tree, and the difference is entirely INC-141's token-row trap, not
+    the moat. Those two rows are now committed at 259ca6b.
+
+    THE ALLOW-LIST HOLDS ZERO ENTRIES. src/whetstone_gate/check_roles.py:637 -
+    MOAT_ALLOW_LIST: frozenset[str] = frozenset(). CLAUDE.md hard rule 8
+    describes "a short, explicit allow-list of pure value types (enums, the
+    harm-record dataclass, the paise integer wrapper)". THE IMPLEMENTED LIST IS
+    EMPTY - stronger than the constitution describes. The published claim is the
+    measured 0. BUILD 1's Q-D, still open.
+
+    LIMITS THAT TRAVEL WITH IT, and (c) now names its finding ids, which BUILD
+    1's did not:
+      (a) the property is "no shared first-party MODULE", NOT "no shared code" -
+          both sides deliberately reimplement the same predicates, twice, on
+          purpose;
+      (b) this exact assertion has TWICE printed clean or PASS over a LIVE
+          gates/ -> scorer/ reach before being hardened - INCIDENTS.md:3728
+          INC-51 and :9832 INC-132;
+      (c) the closure is built from STATIC imports, so a reach whose first hop is
+          third-party is scanned by neither half - OF-253 (:2645), OPEN, and the
+          HIGH finding that owns this assertion, OF-64 (:577), ALSO OPEN;
+      (d) neither package has passed adversarial review - no c8-pass, no c9-pass.
+
+SUMMARY OF MOVEMENT: claim 2 moved a great deal (one narrowing became three, and
+the third - that T-FP cannot run at all - is the largest single correction of the
+night). Claim 3 moved (the calibration is now declared and twice attempted, and
+STILL has no threshold). Claim 5's module count moved by one and its whole-run
+figure gained a qualification. Claims 1 and 4 did not move on substance, and that
+was MEASURED rather than assumed.
+
+================================================================================
+3. WHAT MOVED WHILE THIS SESSION WAS WRITING - C17 REVIEW 1 RETURNED FAIL
+================================================================================
+
+At 259ca6b, committed WHILE the deliverable was being drafted:
+  docs/reviews/REVIEW_C17_1.md      +713   NEW
+  docs/sessions/c17-review-1.txt    +414   NEW
+  QUESTIONS.md +83, PROGRESS.md +85, OPEN_FINDINGS.md +43, STATUS.md +1/-1
+
+VERDICT, REVIEW_C17_1.md S2.3: "FAIL - two BLOCKERs (B-1, B-2), five HIGH, five
+MEDIUM, five LOW." STATUS.md:2196 now reads "REVIEW 1 FAILED 2026-09-04
+(4e8b91d3) - TWO BLOCKERs. AWAITING FIX."
+
+!! THIS SESSION HAD ALREADY WRITTEN A PARAGRAPH ABOUT THE RENDERER, SOURCED FROM
+   THE BUILD SESSION'S OWN docs/render/README.md:36-47, SAYING IT "says on screen
+   that it is a replay of a stored hash-chained ledger" AND "verifies the chain
+   rather than trusting it". THE REVIEW MEASURED BOTH FALSE IN THE SHIPPED CODE,
+   AND THE PARAGRAPH WAS REWRITTEN TO SAY WHAT THE REVIEW MEASURED.
+
+  B-1: docs/render/audit.py:240-243 appends RECOMPUTED, MATCHED
+       UNCONDITIONALLY, and :348-361 renders every entry and the money summary
+       REGARDLESS OF episode.chain_ok. Measured by the reviewer on a tampered
+       temp copy: verdict "DETECTED at ledger_seq 3", and 8 OF 8 ENTRIES STAMPED
+       RECOMPUTED, MATCHED - INCLUDING SEQ 3 ITSELF - with a fabricated
+       88,888,888 paise under "MONEY PAST THE GATE, BY COMPONENT". The review:
+       "the card's done-when is the standard ... B-1 defeats the 'and says so'".
+       And the test carrying that exact name is VACUOUS, so no regression would
+       catch it.
+  B-2: docs/render/audit.py:268 prints "MEASURED ZERO (the episode ran; nothing
+       moved)" WITH NO GUARD - false on 10 of the 11 real stored episodes, false
+       on an ABSENT arm, and false on the one episode where the world EXECUTED
+       20,118,586 paise of refunds. NO CRAFTED INPUT IS NEEDED; the default
+       command does it.
+  MET, per the review: the caption states the seed and the pre-registered N
+       (cleanly, as <<PENDING-RUN: N>>), and the renderer makes no network call
+       and runs no model (in substance).
+  NOT MET: H-2, "a non-author can follow one episode end to end without asking a
+       question", measured with ten written-down questions.
+  H-1: the race draws a FULL-LENGTH MONEY BAR FROM TAMPERED LEDGER CONTENT, and
+       the review notes "S18 puts this frame in the video, where the bar is the
+       image and the footer is small type."
+
+CONSEQUENCE, AND IT IS NOW CHECKLIST ITEM O-4b: A C17 FIX SESSION MUST LAND
+BEFORE THE S18 RACE BEAT IS SHOT. No c17-pass tag exists and none is owed.
+
+THE REVIEW TRAIL THEREFORE MOVED UNDER THIS SESSION TOO: 20 files / 14 FAIL /
+6 PASS became 21 / 15 / 6. Both figures appear in the deliverable, the second as
+the live one and the first labelled as of 686a224.
+
+!! THE LESSON THIS SESSION IS RECORDING AGAINST ITSELF: it repeated a build
+session's own claims about that build session's artefact, from that artefact's
+README, and a reviewer measured them false within the hour. The rule that would
+have prevented it is the one this project already has - a build session's report
+is not evidence about its own output - and it was applied to BUILD 1's numbers
+but not, at first, to C17's prose.
+
+================================================================================
+4. EVERY FACTUAL CLAIM, AND THE FILE AND SECTION IT WAS VERIFIED IN
+================================================================================
+
+INCIDENTS.md INC-05 makes this section mandatory: "a precise-sounding third-party
+number that exists in no third-party source." Measured at 686a224 unless marked.
+
+  STATE
+  git tag -l -> 7; prereg-v1 exits 128 ......... git tag -l; git rev-parse
+  evals/ holds 31 files ....................... find evals -type f | wc -l
+      11 episode ledgers + 11 checkpoints + 5 usage logs + 2 declarations
+      + 2 attempt logs = 31
+  RESULTS.md EXISTS, publishes no number ...... RESULTS.md read in full;
+                                                created by ARCH PUBLISH 1
+                                                (2e5b8a47)
+  the pilot RAN, 20 attempted / 0 completed /
+      11 truncated / 9 never started; N REFUSED  README.md STATUS box, the pilot
+                                                and N-decision rows; INC-142
+  155 ## INC- headings, 154 distinct ids ...... grep -c "^## INC-" INCIDENTS.md;
+      ## INC-139 duplicated at :10224 and :10531;
+      INC-104/105/106 reserved and never issued; highest id INC-157
+  review trail 21 files / 15 FAIL / 6 PASS .... docs/reviews/REVIEW_*.md, top
+                                                level only, each verdict READ;
+                                                REVIEW_C17_1.md S2.3
+  6 tagged / 3 with residue / 14 unreviewed
+      of 23 rows ............................. README.md:1235-1237, and the
+                                                stated definition at :1238-1246
+  test suite is RED .......................... README.md STATUS box; and
+                                                REVIEW_C17_1.md S2.4 attributes
+                                                all ELEVEN reds, none to C17
+  check-roles 21/0/3 (working tree) .......... run by this session, read-only,
+                                                status compared before/after
+
+  THE FORM PARAGRAPHS
+  Project name; repo whetstone-gate .......... CONTEXT.md:86
+  Deliverable filename FORM_ANSWERS.md ....... PROCESS.md:1343; CONTEXT.md:2187
+  Open on the merchant's loss ................ CONTEXT.md S21 item 3
+  Razorpay MCP: list capped 100, no rupee cap;
+      nine mcpgo.Max(), none on a rupee amount;
+      six pagination at 100; 40-char receipt;
+      0/1 flag; 30-char settlement description;
+      capture_payment.amount unbounded;
+      READ_ONLY defaults false ............... CONTEXT.md S2's evidence table,
+                                                rows at :172-183, against
+                                                razorpay-mcp-server@7950d51d...,
+                                                committed 2026-03-26T09:52:36Z,
+                                                read 2026-08-30
+      !! MOST rows carry a file:line. The deliverable no longer claims ALL do.
+  "At least 43 entrants in this buildathon" ... CONTEXT.md:139. !! BUILD 1 wrote
+      "43 Track 01 entrants", promoting a buildathon-wide floor into a Track 01
+      claim. CORRECTED.
+  43 Track 01 READMEs, 13-14% sample, 43 of
+      312 at a corpus of 1,723 ............... CONTEXT.md:140-142
+  the occupancy caveat, verbatim ............. CONTEXT.md S21 item 2. Now a
+      STANDALONE sentence rather than a subordinate clause.
+  CaMeL and PRAMANA both have BETTER GATES;
+      PRAMANA's audit log is stronger ........ CONTEXT.md:349-350. !! BUILD 1
+      compressed this into "CaMeL's, and PRAMANA's audit log", conceding a better
+      gate only to CaMeL. CORRECTED.
+  argus / AgentProof / HydraLoop ship
+      generated adversaries .................. CONTEXT.md S5, S21 item 1
+  tau2-bench MIT, pinned a2c0247..., 2026-08-18  config/protocol.yaml:413;
+                                                vendor/tau2-bench/LICENSE;
+                                                CONTEXT.md S11.1
+  make eval's claim is "every number
+      regenerates from the stored ledgers";
+      byte-identical belongs to four named
+      things ................................. CLAUDE.md S2 rule 10. !! BUILD 1
+      attached "byte-identically" to make eval's claim - an author-side
+      strengthening of a constitutional sentence. CORRECTED.
+  temperature 0.7; models not reproducible ... CLAUDE.md rule 10;
+                                                README.md S9.11 (:1074)
+  INC-02, dated 2026-08-28 ................... INCIDENTS.md:59
+  INC-132, dated 2026-09-04, Fix 1fd0877 ..... INCIDENTS.md:9832
+  first build commit ee3cf93,
+      2026-08-30 12:20:32 +0530 .............. git log --reverse
+  repo URL ................................... git remote -v; README.md:1471,
+                                                :1757 (BUILD 1 cited :1202 and
+                                                :1450 - BOTH MOVED)
+  private until C21's flip ................... PROCESS.md:862
+  video absent; C20 todo - review folded ..... STATUS.md:2199 (BUILD 1 cited
+                                                :1834 - MOVED)
+  billing attested 2026-08-30, operator-only .  PROVENANCE.md:204 (S1.5)
+  secret scan at HEAD 90b6d6fa...;
+      57 commits behind at 686a224 ........... docs/submission/
+                                                git-history-secret-scan.txt:4;
+                                                git rev-list --count
+  placeholder convention; 39 in README ....... README.md:28;
+                                                OPEN_FINDINGS.md:2642 (OF-250)
+  form is one-shot; no form before PASS ...... PROCESS.md:175, :1344
+  single-shot rule; abort before any retry ... PROCESS.md S6b; CLAUDE.md S3
+
+  CITATIONS THAT MOVED SINCE BUILD 1 AND WERE RE-ANCHORED (not exhaustive of the
+  file; these are the load-bearing ones):
+      config/protocol.yaml   335 -> 352,  396 -> 413
+      tests/test_c10_probe   1092 -> 1127, 1106 -> 1141, 1065 -> 1100,
+                             1075 -> 1110
+      README.md              56-58 -> 120-124,  684 -> 776,  701 -> 793,
+                             955 -> 1175,  986 -> 1216,  1202 -> 1471,
+                             1222 -> 1491,  1450 -> 1757,  1005-1007 ->
+                             1235-1237
+      STATUS.md              1830 -> 2195,  1834 -> 2199
+  UNMOVED AND RE-CHECKED: CONTEXT.md:86, :2187; PROCESS.md:175, :862, :1029,
+      :1343, :1344; HOLES.md:221; void.py:81, :109; check_roles.py:637;
+      test_c12_benign.py:404; test_c9_gates.py:1282, :1298;
+      test_c8_scorer.py:741; test_c2_world.py:827; INCIDENTS.md:59, :9832;
+      git-history-secret-scan.txt:4.
+
+================================================================================
+5. THE PLACEHOLDER TABLE - EVERY UNFILLED VALUE IN THE REPOSITORY
+================================================================================
+
+!! NOT ONE WAS FILLED. Confirmed in section 7.
+
+BUILD 1's table listed this file's two. This one is the whole tree, because
+OF-250 records that a placeholder surviving into a published README is a live
+risk and nothing checks for it.
+
+  IN THE FORM ITSELF - these two block the paste:
+    <<PENDING-RUN: VIDEO_URL>>   FORM_ANSWERS.md S5        C20 / operator
+    <<PENDING-RUN: GIST_ID>>     README.md:1491, cited in  C14 / operator
+                                 FORM_ANSWERS.md S0.0, S6.1(4), S8
+
+  ELSEWHERE, MEASURED TONIGHT WITH A PYTHON REGEX COUNT, NOT A GREP:
+    README.md carries EXACTLY 39 occurrences over 9 LINES - 28, 281, 289, 290,
+    291, 292, 293, 324, 1491. Breakdown:
+        <<PENDING-RUN: arm1>> .. arm4>>   35   README.md:289-293 (5 arms x 7 cols)
+        <<PENDING-RUN>> (bare, no name)    1   README.md:281
+        <<PENDING-RUN: N-branch>>          1   README.md:324
+        <<PENDING-RUN: GIST_ID>>           1   README.md:1491
+        <<PENDING-RUN: name>> (convention) 1   README.md:28
+    That agrees exactly with the figure README.md:28 and OF-250 both publish.
+
+    <<PENDING-RUN: N>>        docs/render/README.md:46; docs/render/audit.py:44;
+                              docs/render/race.py:81; STATUS.md:20, :2196
+    <<PENDING-RUN: VIDEO_URL>>  STATUS.md:2510
+
+AND THE NUMBERS THE DELIVERABLE DELIBERATELY DOES NOT PRINT. None appears in
+S2 or S3:
+    escape rate per arm (1, 2, 2S, 3, 4) ... no scored episode has run
+    money past the gate, per component ..... ditto; and every rupee figure ships
+                                             as a per-episode median with its
+                                             spread AND its cell size, never a sum
+    false positives per arm (paired delta) . ditto; and n=20 per configuration
+                                             after rung 4
+    probe breach rate / probe reach ........ threshold is TODO_C14_CALIBRATION
+    the VOID verdict ....................... not computable on any input
+    the selected N ......................... TODO_C14_PILOT; the pilot RAN and
+                                             REFUSED
+    the attacker-strength ladder ........... not run
+    any "blocked N%" or "0/N" .............. and when one exists it never ships
+                                             without its rule-of-three ceiling
+
+================================================================================
+6. THE OPERATOR CHECKLIST, REBUILT - SEE FORM_ANSWERS.md S7 AND S7.0 IN FULL
+================================================================================
+
+TWO ITEMS BUILD 1 LISTED ARE NOW DONE and are struck so the operator does not
+redo them: rung 4's EXECUTION half (config/protocol.yaml:445, :497-498 and
+tests/test_c3_tau2_enumeration.py:269-316 - INC-144 recorded it as owed and it
+has landed), and RESULTS.md's existence.
+
+  THE SUBMISSION PATH, in blocking order:
+    O-0   !! THE CALIBRATION ABORT'S INCIDENTS.md ENTRY. Section 0 above. S6b
+          forbids attempt 3 until it exists.        HARD GATE ON EVERYTHING
+    O-1   No form until the C21 review returns PASS. No C21 review file exists;
+          STATUS.md:2200 has C21 at todo.                        HARD GATE
+    O-2   Add the missing ## Session tokens rows. 6f2d47ba has none. The two C17
+          rows were uncommitted at 686a224 and are now committed at 259ca6b.
+    O-3   Fill or strike every <<PENDING-RUN>> the form carries; and see OF-250
+          for README.md's 39.                                    HARD GATE
+    O-4   Re-verify CONTEXT.md S21 item 5's five perishable facts. All dated
+          2026-08-30, FIVE days stale.                           HARD GATE
+    O-4b  !! A C17 FIX SESSION, BEFORE THE RACE BEAT IS SHOT. Section 3.
+                                                                 HARD GATE ON O-5
+    O-5   Record the video URL.                                  HARD GATE
+    O-6   !! Re-confirm NO PAYMENT METHOD, on 4 September, into PROVENANCE.md
+          S1.5. Operator only - no session has a browser or permitted
+          credentials.                                           HARD GATE
+    O-7   Re-run the git-history secret scan. The committed one is at
+          HEAD 90b6d6fa..., 57 commits behind. History is NOT rewritten.
+                                                                 HARD GATE ON O-8
+    O-8   Flip to public. Only after O-7 is committed.
+    O-9   Logged-out browser: repo URL, then the video.
+    O-10  Paste S1-S5 VERBATIM, no re-drafting in the form box.
+    O-11  Preview + screenshot WITHOUT SUBMITTING, then submit. 18:00 IST.
+
+  THE MEASUREMENT PATH, WHICH BUILD 1'S CHECKLIST HAD NO ROW FOR AND WHICH IS
+  SEPARATE (FORM_ANSWERS.md S7.0): M-1 the abort entry; M-2 a calibration that
+  COMPLETES; M-3 derive and write the threshold; M-4 cut prereg-v1 - AFTER WHICH
+  config/ MAY NOT BE AMENDED AT ALL, so every owed config/ change lands first;
+  M-5 publish the witness gist; M-6 point ledger.genesis_hash
+  (config/protocol.yaml:380, currently probe-v1's tag object) at the scored
+  freeze; M-7 the sweep, then C18's make eval, which OVERWRITES today's
+  RESULTS.md stub in place.
+
+  THE HONEST SUMMARY, WHICH THE DELIVERABLE ALSO CARRIES: the submission can be
+  completed without M-1..M-7, and it would then be a submission of a measurement
+  apparatus and a published failure record with no measurements in it. THAT IS
+  WHAT S2 SAYS IT IS.
+
+================================================================================
+7. THE TWO CONFIRMATIONS THE PROMPT ASKED FOR, EXPLICITLY
+================================================================================
+
+  (1) NO PLACEHOLDER WAS FILLED. Every <<PENDING-RUN: ...>> that was unfilled
+      when this session opened is unfilled now. The deliverable ADDED
+      placeholders to its own inventory table (section 5) and FILLED NONE.
+      Verified: grep for PENDING-RUN over the tree before and after shows the
+      same set of VALUES; only the count of REFERENCES to them changed.
+
+  (2) NO CALIBRATION RESULT WAS ANTICIPATED. The deliverable contains no breach
+      rate, no threshold, no void verdict, no estimate of one, no range, no
+      "roughly", no "we expect", no "on the order of", and no sentence that
+      leaves room to infer one. probe.void_threshold_breach_rate is reported as
+      the literal sentinel TODO_C14_CALIBRATION and nothing else. S0.2 states in
+      terms: "What a completed calibration would produce is NOT YET KNOWN."
+      The only calibration NUMBERS anywhere in this session's output are
+      MEASURED FACTS ABOUT SPEND AND COUNTS - 13 calls, 56,855 tokens, 232
+      liveness tokens, 0 completed episodes, 0 episode ledgers - none of which
+      is a result and none of which bears on the threshold.
+
+================================================================================
+8. GIT - THE RECIPE, THE GUARD, AND EVERY "Swept:" LINE
+================================================================================
+
+INC-139's CORRECTED RECIPE WAS USED FOR EVERY COMMIT: a private index in a fresh
+OS temp directory, git read-tree HEAD from ALWAYS-LIVE HEAD, never a pinned SHA.
+HEAD MOVED TWICE under this session (686a224 at open; 259ca6b as the
+deliverable's parent).
+
+OF-213's first-command check was run BEFORE the read order and again before each
+commit: git diff --cached --name-only on the SHARED index was EMPTY every time.
+Nothing was inherited and nothing of another session's was staged under this
+session's token.
+
+DID THE NAME-ONLY GUARD REFUSE?  NO. It MATCHED on every commit, first time, with
+no retry and nothing forced past it. The declared list and the staged snapshot
+were compared with diff and were identical each time.
+
+Step 4 was run as `env -u GIT_INDEX_FILE git reset -- <the same paths>`, NEVER as
+`GIT_INDEX_FILE=` (INC-91: the empty spelling makes git read an empty index at
+path "" and report the whole repository staged for deletion). Step 5,
+`env -u GIT_INDEX_FILE git diff --cached --quiet`, exited 0 - the shared index is
+clean, and the concurrent sessions' untracked and modified files
+(evals/usage/gemma-26b-2026-09-04.jsonl, evals/cal/*.log,
+evals/usage/liveness-CAL-*.jsonl, rev/, verify.py, du.exe.stackdump,
+grep.exe.stackdump) were left exactly as found.
+
+THE "Swept:" LINES, IN FULL, WITH NO LINE COUNTS IN ANY OF THEM (OF-216: the
+message heredoc is composed BEFORE the --stat prints, so any number in it is a
+prediction; INC-97 measured a Swept: line whose arithmetic was wrong):
+
+  2126abf  "Swept: NOTHING. Two declared paths, base tree read from live HEAD,
+            and the declared list was compared against the staged snapshot by
+            name before the commit."
+  <this journal>  "Swept: NOTHING. One declared path, read from live HEAD, name
+            comparison matched."
+  <STATUS/PROGRESS>  "Swept: NOTHING. Two declared paths, APPEND-ONLY, read from
+            live HEAD, name comparison matched. No existing row, column or entry
+            was edited, moved or erased."
+
+AUTHORITATIVE ARITHMETIC, from git show --numstat, read AFTER the commit:
+  2126abf   docs/submission/FORM.md            9    2
+            docs/submission/FORM_ANSWERS.md  560  283
+  The 283 deletions are the SUPERSEDED text of a file this session rewrote by
+  design, named in the commit subject. NOTHING OF ANOTHER SESSION'S WAS DELETED.
+
+Every commit carries the trailer Session-Token: 6f2d47ba.
+NO TAG WAS CUT. NO FORCE-PUSH. NO HISTORY REWRITE. NO git stash, checkout --,
+restore, clean, or reset --hard was run at any point.
+
+ONE CLASS C DEVIATION, RECORDED (hard rule 2). The deliverable commit's subject
+ends "(unreviewed)". CLAUDE.md S5 mandates that marker for commits touching
+SOURCE OR TESTS, and this commit touches neither; BUILD 1 read the same rule and
+omitted it. The marker was included because the artefact genuinely is unreviewed
+and the marker is permanent and cannot mislead in that direction. Cosmetic, one
+line, judged at review.
+
+!! E1 WILL BE RED AT HEAD ON THIS SESSION'S COMMITS, AND THAT IS INC-141, NOT A
+DEFECT. `grep -c "6f2d47ba" QUESTIONS.md` returns 0 and QUESTIONS.md is named in
+this session's may-not-write list. INC-141 records the exact trap - "a session
+whose prompt fences it out of QUESTIONS.md CANNOT COMMIT WITHOUT TURNING
+make check-roles E1 RED, because the fence and PROCESS.md S7a are, for such a
+session, mutually unsatisfiable" - and records that the correct behaviour is what
+C21 BUILD 1 and C17 BUILD 1 both did: measure it, publish the one-line remedy,
+and DO NOT WRITE YOUR OWN ROW. This session did not write its own row. The fix,
+for the architect, in the format the table's last rows already use:
+
+    | `6f2d47ba` | C21 | BUILD | 2026-09-04 |
+
+================================================================================
+9. SAFETY
+================================================================================
+
+  ZERO PROVIDER TOKENS SPENT. No token sanction was held and none was taken. No
+  provider API call of any kind was made, in any mode, by this session or by any
+  subagent it ran. The subagents were instructed, in their prompts, that any
+  command spending provider tokens was forbidden and that --spend-real-tokens
+  and `tasks drive` must never be run.
+  .env WAS NEVER OPENED. No key value was read, printed, echoed or committed, and
+  no key name was ever paired with a value.
+  evals/ WAS READ AND NEVER WRITTEN. The single-shot calibration record was not
+  disturbed; no file under evals/ was created, edited, deleted or truncated.
+  UNTOUCHED, AS THE FENCE REQUIRED: evals/, config/, src/, tests/,
+  tests/goldens/, docs/reviews/, QUESTIONS.md, INCIDENTS.md, CONTEXT.md,
+  PROCESS.md, HOLES.md, PROTOCOL.md, README.md, RESULTS.md, corpora/, every tag,
+  .env.
+  Throwaway work went to a fresh OS temp directory, never into the repository.
+  The only files this session wrote are the four it declared:
+  docs/submission/FORM_ANSWERS.md, docs/submission/FORM.md,
+  docs/sessions/c21-build-2.txt, and the STATUS.md / PROGRESS.md appends.
+
+================================================================================
+10. QUESTIONS OWED - to be placed in QUESTIONS.md by the architect
+================================================================================
+
+BUILD 1's Q-A..Q-I stand and NONE has been answered. They are recorded verbatim
+in docs/sessions/c21-build-1.txt S7 and its addendum: the deliverable's filename;
+which "S9 limitation sentence" is meant; that the canonical limitation sentence
+names AgentDojo, which was CUT; the card's five incident fields against hard rule
+13's eight; two card done-whens that no session can satisfy; INCIDENTS.md's
+duplicate INC-139; PROGRESS.md's newest-on-top convention against an APPEND-ONLY
+fence; and the empty allow-list the constitution describes as "short".
+
+THIS SESSION ADDS FOUR.
+
+Q-J  THE CALIBRATION ABORT HAS NO INCIDENTS.md ENTRY AND S6b FORBIDS A RETRY
+     UNTIL IT DOES. Measured in section 0: zero python processes, a log ending in
+     TimeoutError, zero calibration episode ledgers, 13 usage rows and 56,855
+     tokens on cal__1__2201__gemma-26b. INCIDENTS.md's last entry is INC-157,
+     which covers attempt 1. INCIDENTS.md and evals/ are outside this fence, so
+     this session wrote neither and stated the numbers here instead.
+     RULING SOUGHT: none needed on the rule - S6b is explicit. This is raised so
+     that the entry is not skipped and attempt 3 does not start without it.
+
+Q-K  THE PROMPT'S COUNT OF BUILD 1'S QUESTIONS DOES NOT MATCH THE FILE. The
+     prompt described docs/sessions/c21-build-1.txt S7 as carrying "TEN
+     QUESTIONS". Measured: `grep -c "^Q-[A-Z] "` returns 8 (Q-A..Q-H) in S7, plus
+     Q-I raised in that file's addendum - NINE. Recorded rather than reconciled,
+     because a session that quietly matches a count to its prompt is the failure
+     Q-099 records.
+     RULING SOUGHT: confirm nine, or name the tenth.
+
+Q-L  CONTEXT.md S1 CARRIES THE UNNARROWED FORM OF METHOD CLAIM 1. CONTEXT.md:139
+     reads "an attacker that has never seen the policy or any attack list". S6.1(1)
+     of the deliverable establishes the second clause is FALSE - the attacker is
+     seeded from published third-party corpora and data/attacker_sys.txt:2-3 names
+     four attack families. CONTEXT.md is the law and outside this fence, so it was
+     not edited, and no form paragraph carries the unnarrowed form.
+     RULING SOUGHT: amend CONTEXT.md S1, or record that the narrowed form governs
+     everything published.
+
+Q-M  LINE-NUMBER CITATIONS IN THIS REPOSITORY ROT WITHIN HOURS, AND NOTHING
+     CHECKS THEM. Measured: of BUILD 1's volatile citations, a majority had moved
+     within nine hours, by between 17 and 365 lines. The deliverable now carries
+     a heading alongside each line number and states the HEAD it was taken at,
+     but the same rot is live in README.md and STATUS.md, which this session may
+     not edit.
+     RULING SOUGHT: whether a cheap invariant test - "every `FILE:NNN` citation in
+     docs/submission/ resolves to a line containing its quoted anchor" - is worth
+     the tests/ change, or whether heading-plus-line is enough.
+
+================================================================================
+11. WHAT COULD NOT BE DONE, AND WHY
+================================================================================
+
+  THE VIDEO URL. It does not exist. STATUS.md:2199 has C20 at "todo - review
+  folded". S5 carries <<PENDING-RUN: VIDEO_URL>> and O-5 marks it a HARD GATE.
+  AND IT IS NOW BLOCKED FURTHER BACK than BUILD 1 could see: C17's renderer, which
+  drives the S18 RACE beat, FAILED its review tonight with two blockers in the
+  printed prose the video shows. O-4b.
+
+  THE PERISHABLE-FACT RE-VERIFICATION (CONTEXT.md S21 item 5). All five dated
+  2026-08-30, five days stale. Four need a browser or the GitHub API and are the
+  operator's. The fifth - that the pre-registration gist still resolves with its
+  original created_at - CANNOT BE PERFORMED, because there is no gist. It is NOT
+  reported as PASS. The deliverable now words it "cannot be performed UNTIL the
+  gist is published (M-5)", so the row does not read as though the item were dead.
+
+  THE BILLING RE-CONFIRMATION. PROVENANCE.md:204 is dated 2026-08-30 and says in
+  terms that NO SESSION CAN HOLD IT. O-6, a HARD GATE. !! And PROVENANCE.md:204's
+  own note that this "IS NOT CURRENTLY A C21 DONE-WHEN" is itself STALE:
+  PROCESS.md:1343's C21 done-when names it explicitly. PROVENANCE.md is frozen and
+  was not edited.
+
+  RE-RUNNING THE GIT-HISTORY SECRET SCAN. docs/submission/git-history-secret-scan.txt:4
+  records HEAD = 90b6d6fa..., 57 commits behind. The scan must cover the tree that
+  actually goes public, immediately before the flip. O-7.
+
+  THE VISIBILITY FLIP. Not done. C21's other half and the operator's act.
+  NO TAG WAS CUT. prereg-v1 still does not resolve.
+  QUESTIONS.md WAS NOT WRITTEN - fenced out. Everything owed is in section 10.
+  INCIDENTS.md WAS NOT WRITTEN - fenced out, including the entry S6b owes.
+
+================================================================================
+12. HOLD-POINT
+================================================================================
+
+  C21 IS PART-BUILT AND UNREVIEWED. The submission pack exists and is current to
+  the tree at 259ca6b; the visibility flip, the fresh secret scan, the video, the
+  C17 fix and the perishable re-verification do not, and every one is on the
+  operator's checklist with its blocking order.
+
+  NOT SELF-CERTIFIED. NO TAG. A fresh adversarial review - full + submission,
+  persona 3 - follows, and it should read FORM_ANSWERS.md S0.2 and S6 first.
+
+  Of the five method claims the submission rests on: ONE is verified, TWO are
+  true only when narrowed, and TWO ARE NOT YET TRUE. Claim 2's narrowing tripled
+  tonight, and the new part - that the T-FP block cannot run at all - is the
+  single largest correction this session made. If any of the five reaches the
+  live form in its unnarrowed form, the submission asserts something this
+  repository cannot show a judge, which is the exact failure this project exists
+  to make impossible.
+
+================================================================================
+END OF C21 BUILD 2 FINAL OUTPUT
+================================================================================
