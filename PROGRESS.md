@@ -1,3 +1,106 @@
+## SESSION-TOKEN 7d4e2fa9 — C14, ABORT 3 (FIX) — 2026-09-05 — ✅ **GATES 0–3 DONE, CALIBRATION NOT RUN**
+
+**Role:** FIX. **Chunk:** C14. ⚠️ **FULL RECORD: `docs/sessions/c14-abort-3.txt`.**
+⚠️ **SPEND: ZERO. No provider call in any mode; this session held no token sanction and took none.**
+⚠️ **`evals/` READ-ONLY AND NEVER WRITTEN** — attempt 3's log, its 12 usage rows, its episode ledger
+and its checkpoint all stand untouched. `config/` untouched and not opened. `tests/goldens/` not read
+and not written. `docs/reviews/` not touched — a **C14 REVIEW** session (`2f7a6d18`) holds it. No tag
+cut or moved. `RUN_DECLARED.md` §8 **not re-filled**. **Not self-certified.**
+
+> ### ⚠️⚠️ ATTEMPT 3 **DID NOT CRASH.** It ran to its end, printed the whole report and reconciled
+> **`30 == 0 + 1 + 29`**. That is why it needed a ruling and the two earlier aborts did not:
+> `INC-157` died on `ModuleNotFoundError` and `INC-159` on an uncaught `TimeoutError`, and **neither
+> printed a report or computed a denominator**, so §6b's *"aborts before completion"* fitted them
+> without strain. ⚠️ **On the literal reading attempt 3's process COMPLETED, the calibration is
+> SPENT, and its published threshold would rest on a denominator of ONE — an episode that itself ran
+> 11 of its 20 turns.** The operator ruled it an **abort**. **Both readings are in `INC-161`, the
+> rejected one in its strongest form and with its cost.**
+
+**GATE 0 — THE RULING, VERBATIM, FIRST (hard rule 5).** Transcribed word for word into `INC-161`,
+including the sentence that names its own conflict of interest: *"the ruled answer and the answer the
+operator would prefer are the SAME answer, the architect declined to make the call for exactly that
+reason … A reader who thinks the ambiguity was resolved in our favour is reading it correctly."*
+⚠️ **AND WHAT IS OFFERED AGAINST THAT IS CHECKABLE RATHER THAN ASSERTED:** attempt 3's output is not
+deleted and not moved, attempt 4 is a numbered attempt in the same directory, **seed 2201 is skipped
+rather than re-rolled**, and `RESULTS.md` prints declared-versus-actual start times. **Every artefact
+a reader would need to overturn the ruling is preserved by it.**
+
+**GATE 1 — `INC-161`, EIGHT FIELDS, EVERY FIGURE RE-MEASURED IN THIS TREE.** ⚠️ **AND TWO OF THE
+PROMPT'S ARE CORRECTED.** *"34 calls, 155,672 tokens **across attempts 2 and 3**, 2 RATE_LIMITED"* —
+the three figures are the **whole day's** and the day includes the pilot; **attempts 2+3 alone are 25
+rows / 24 calls / 112,742 tokens / 1 RATE_LIMITED**. ⚠️ **And `34` and `32` are both right of
+different things: 34 is ROWS, 32 is CALLS** — `spent_today` charges a call only on `outcome == "OK"`,
+which is golden 8 fixture D's *"ZERO tokens, ZERO calls"*, and is why the driver printed `32/600`.
+`99,785 + 55,887 = 155,672` exactly. The liveness probe's **232** tokens are in neither, by design.
+⚠️ **A THIRD CORRECTION THE PROMPT DID NOT CONTAIN: the breach was not a one-off.** Attempt 3
+exceeded `tpm` at **four of eleven** calls, peaking at **22,841 (1.43×)** — *higher* than the 17,458
+the 429 followed — and **attempt 2 breached three times and was not refused.** So the provider's
+limiter shape remains unknown (`Q-191`), and the entry claims only the narrower, sufficient thing.
+**Diagnosis and Missed are both filled, and `Missed` is the self-incriminating one:** `Q-191`(5)
+already said in terms that the settle fix *"does not explain, and would not have prevented, the
+pilot's 429"* — **a written statement that the 429 had an unfixed cause, read as modesty.**
+
+**GATE 2 — THE ADMISSION, FIXED BY SEPARATING TWO NUMBERS THAT WERE ONE.** An **admission** is
+prospective and can only use an estimate; an **accounting entry** is retrospective and must use the
+truth. `runner/buckets.py` gains `ObservedCost` — pure, monotone, clock-free, *the largest
+`usage.total_tokens` this **role** has actually been billed*, **floored** by the figure `config/`
+already produces; `_pace` takes `admit_tokens` and `take_tokens`; `_settle` teaches the estimate.
+⚠️ **NO NEW SPEC VALUE (hard rule 9) — every number is the existing formula or one the provider
+returned. `config/` NOT OPENED.** ⚠️ **THE FLOOR IS A FLOOR AND NOT A SEED**, disclosed as Class B at
+`Q-206`(a): the literal *"fall back until there is data"* would drop the reservation to **512** after
+one cheap opening turn and pace the runner **faster** than the code that earned the 429.
+
+⚠️⚠️ **`INC-143`'s NO-REFUND RULE WAS RE-EXAMINED AND KEPT — AND THE PROMPT'S WARNING WAS CONFIRMED
+BY MEASUREMENT, NOT ARGUED AWAY.** On the real 32-call trace: **before 18,175** (over `tpm` by
+2,175, 43 s sleep); **adaptive charge with no refund 16,203 — still over — 633 s and 234,736 charged
+for 155,672 of real spend (+51 %)**; **signed refund 15,221, 313 s**; ⚠️ **shipped design 15,221,
+339 s, charge byte-for-byte `INC-143`'s.** Inheriting the rule onto an adaptive **charge** is both
+slower and still unsafe. The refund works and was rejected on its merits — 26 seconds, against
+opening a negative-charge path through `settle`, which is the line that makes *"never told less than
+the provider billed"* checkable. **The rule stands because the adaptive number never reaches the
+charge.**
+
+⚠️ **A SECOND DEFECT WAS FOUND IN THIS SESSION'S OWN FIX BEFORE IT SHIPPED.** `_PacedClient` is
+rebuilt **inside** `execute`'s episode loop while the buckets are built **once per lane**, so an
+estimate held on the client would have reset at every one of the 30 episodes — **`INC-161` happening
+thirty times instead of once — and it would have passed every other test in the new file.** Built
+once per `(lane, role)` in `execute` and injected; two tests pin the **lifetime**, one of them
+structural because no property of a single episode can see it.
+
+**GATE 2 — RED FIRST, AND THE RIGHT RED.** `tests/test_c14_pacer_admission.py`, **21 tests / 59
+asserts, ONE NEW FILE** (`INC-138`'s reason, as `test_arch_lanes.py` and `test_arch_cal_build.py`
+each give it). **12 red against the pre-fix source**, which was restored **byte-identical**
+afterwards. The two headline reds are the run's own numbers — **18,175** for the worst trailing-60 s
+window and **17,458** for the pair that earned the 429. ⚠️ **AST-EXACT TEST DIFF, docstrings
+stripped: 40 existing test files IDENTICAL, 0 CHANGED, 0 REMOVED.** ⚠️ **AND THE RESIDUAL IS
+PUBLISHED IN ITS OWN TEST:** a **cold** lane can still put **16,333** into a minute — 2.1 % over —
+and **no estimate can fix that**, because no measurement of past calls bounds a future one; the only
+estimate that could is `tpm` itself, which admits one call a minute and is not a runner.
+
+**GATE 3 — ATTEMPT 4, HANDED OVER, NOT RUN.** One Git Bash block: venv, then the **free**
+`import whetstone_gate` first (`INC-157`'s guardrail — every free check before the first
+irreversible step), then `INC-161` in **HEAD's committed blob**, then `HEAD` pushed, then §8
+unchanged, then no run already in flight — and only then the declared command **verbatim**, under
+`nohup`, tee'd to `evals/cal/run-attempt4-<utc>.log`. ⚠️ **`RUN_DECLARED.md` §8 IS NOT RE-FILLED**:
+it stands at `13:29:25Z` (`63c70ec`) and the gap is disclosed, never closed.
+
+⚠️⚠️ **TWO THINGS THE OPERATOR MUST DECIDE BEFORE STARTING, BOTH FOUND HERE AND NEITHER DECIDED
+HERE. (1) `Q-206`(d), CLASS A, STOPPED ON:** `cal__1__2201__gemma-26b` is **checkpointed, not
+complete** — `truncated: true`, `turns_run: 11` of 20 — so it is **skipped** and **stays in the
+denominator**, and **nothing in frozen `HOLES.md` §3.5 says whether a truncated episode may carry a
+void-threshold observation.** Counting it biases the rate **down**, which lowers the threshold and
+makes a later VOID **less** likely — the self-serving direction. Four options written out; **none
+taken**. **(2) THE CALL CEILING:** the budget is seeded once from the **start date's** usage file, so
+starting before `2026-09-05T00:00:00Z` seeds **32 calls spent** and leaves **568** against the
+**580** that 29 × 20 needs — **short by 12, binding after 28 of 29 episodes.** After midnight UTC it
+is a fresh file and 580 fits with 20 spare. **Projected wall clock: 5.2–8.1 h, central 7.4 h.**
+
+**SUITE.** **13 failed / 1,561 passed / 2 skipped before**, and the thirteen reconcile exactly to the
+prompt's declared baseline — **5 long-standing + 2 + 6 that are the calibration's uncommitted usage
+file**. Attributed **per test with `comm(1)`**, never by subtracting totals.
+
+---
+
 ## SESSION-TOKEN 8c2f5e91 — C14, ABORT 2 (FIX) — 2026-09-04 — ✅ **GATES 0–3 DONE, CALIBRATION NOT RUN**
 
 **Role:** FIX. **Chunk:** C14. **Gate 0 — the abort — was written before a line of code changed**

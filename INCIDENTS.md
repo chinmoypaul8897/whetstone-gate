@@ -12573,3 +12573,226 @@ type-level fix is an `enum` per vocabulary, or a `CAUSE_FOR_OUTCOME` join writte
 `CAUSE_FOR_STOP`; the join is the cheaper of the two and is proposed at `Q-201`, **proposed, not
 installed**, because inventing a third mapping table inside a FIX session whose fence names two
 findings would be exactly the scope creep `CLAUDE.md` §6 forbids.
+
+
+---
+
+## INC-161 — ⚠️⚠️ **THE SINGLE-SHOT CALIBRATION'S ATTEMPT 3 STOPPED ON AN HTTP 429 WITH `0 COMPLETED, 1 TRUNCATED, 29 NEVER STARTED`. IT DID NOT CRASH — IT EXITED CLEANLY AND RECONCILED — AND THAT IS WHY IT NEEDED A RULING TO CALL IT AN ABORT.** ⚠️ **THE PACER RESERVED 3,000 TOKENS FOR CALLS THAT COST 8,421 AND 9,037 TWENTY-SIX SECONDS APART: 17,458 AGAINST A DECLARED `tpm` OF 16,000. THE MEASUREMENT THAT PREDICTED THIS WAS TAKEN IN `INC-143`, WRITTEN DOWN, AND READ AS BEING ABOUT ACCOUNTING RATHER THAN ADMISSION**
+
+**Date:** 2026-09-05 (C14 ABORT 3, `7d4e2fa9`). Fix SHA under **Fix**.
+
+⚠️ **THE OPERATOR'S RULING, RECORDED VERBATIM AND FIRST — `CLAUDE.md` HARD RULE 5. BOTH READINGS
+ARE RECORDED, BECAUSE A RULING THAT NAMES ONLY THE ONE TAKEN IS AN ARGUMENT AND NOT A RECORD.**
+
+> "⚠️ ATTEMPT 3 IS AN ABORT, NOT THE RUN. PROCESS.md S6b's 'runs to completion' means THE DECLARED
+>  RUN WAS DELIVERED, not merely that the process exited cleanly. A run in which 29 of 30 declared
+>  episodes NEVER STARTED, because an external rate limit stopped the only lane, has measured
+>  nothing and is not a calibration. ⚠️ ITS OUTPUT IS NOT DELETED: it stands in the same directory
+>  as attempt 3, with its log, its usage rows and its one completed episode ledger, and attempt 4 is
+>  a NUMBERED ATTEMPT IN THAT SAME DIRECTORY.
+>  ⚠️ AND THE THING THAT MAKES THIS RULING HONEST RATHER THAN CONVENIENT IS THAT IT IS RECORDED WITH
+>  THIS SENTENCE IN IT: the ruled answer and the answer the operator would prefer are the SAME
+>  answer, the architect declined to make the call for exactly that reason, and it carries the
+>  operator's signature and not the architect's. A reader who thinks the ambiguity was resolved in
+>  our favour is reading it correctly, and the alternative — publishing a void threshold derived
+>  from n=1 — is recorded here as the reading that was rejected, with its cost."
+
+⚠️ **THE READING THAT WAS REJECTED, STATED IN ITS OWN STRONGEST FORM RATHER THAN AS A STRAW MAN.**
+`PROCESS.md` §6b says *"The first execution that runs to **completion** IS the run"*, and §6b's
+retry clause is conditioned on *"an attempt aborts **before completion**"*. **Attempt 3 did not
+abort before completion in the sense the word normally carries in this file.** `INC-157` died on
+`ModuleNotFoundError` and `INC-159` on an uncaught `TimeoutError`; **both printed no report and
+reconciled no denominator, and §6b's clause fits them without strain.** Attempt 3 is different in
+kind: `driver/run.py` ran to its end, printed the full report, and reconciled
+**`30 == 0 + 1 + 29`**. On the literal reading, *the process completed*, the calibration is
+therefore **spent**, and its published threshold would be derived from a denominator of **1** — one
+episode that itself ran **11 of 20 turns**. ⚠️ **That reading is not absurd and it is the one a
+hostile reader will reach for**, which is why it is written down here beside the other. Its cost is
+a void threshold computed from a single truncated episode, published as the number that decides
+whether the whole run is publishable. **The ruling rejects it. The record shows both.**
+
+⚠️ **AND THE CONFLICT OF INTEREST IS NAMED RATHER THAN LEFT FOR A READER TO FIND.** `PROCESS.md`
+§6b exists because *"re-running the calibration until it comes out low is rational, invisible, and
+violated no stated rule"*. **A ruling that grants a retry is exactly the shape §6b was written to
+distrust.** What is offered against that, and it is checkable rather than asserted: attempt 3's
+output is **not deleted and not moved** — its log, its 12 usage rows and its episode ledger and
+checkpoint all stand — attempt 4 is a **numbered attempt in the same directory**, seed 2201 is
+**skipped rather than re-rolled**, and `RESULTS.md` prints declared-versus-actual start times beside
+the threshold. **Every artefact a reader would need to overturn this ruling is preserved by it.**
+
+---
+
+**Event:** `evals/cal/RUN_DECLARED.md` §1's command was run under the venv at
+`2026-09-04T19:11:24Z` and every precondition passed, including `Q-193`'s one-token liveness probe
+(`evals/usage/liveness-CAL-2026-09-04.jsonl`, 1 row). Episode `cal__1__2201__gemma-26b` began
+dispatching and **eleven consecutive attacker calls succeeded**. The **twelfth** returned HTTP 429
+at `2026-09-04T19:15:58Z`, **one second** after the eleventh's usage row was written. Hard rule 12
+stopped the lane, and — unlike `INC-157` and `INC-159` — the driver then **did its job**:
+`evals/cal/run-attempt3-20260904T191123Z.log` carries the whole report, the per-lane accounting, the
+`LANES STOPPED, BY REASON` table with its zeros, and a reconciling denominator.
+
+⚠️ **THE TWO CALLS THAT DID IT, FROM `evals/usage/gemma-26b-2026-09-04.jsonl`:**
+
+| call | utc | tokens | trailing 60 s |
+|---|---|---|---|
+| 10 of the episode | `2026-09-04T19:15:31Z` | **8,421** | 8,421 |
+| 11 of the episode | `2026-09-04T19:15:57Z` | **9,037** | ⚠️ **17,458** — **1.09× the declared `tpm` of 16,000** |
+| — | `2026-09-04T19:15:58Z` | HTTP 429 | — |
+
+⚠️ **AND IT WAS NOT THE ONLY BREACH, WHICH THE PROMPT'S FIGURES DID NOT SAY AND THIS ENTRY
+CORRECTS.** Recomputing every trailing-60-second window over the artefact's own rows: **attempt 3
+exceeded `tpm` at four of its eleven calls** — calls 7, 8, 9 and 11 — peaking at **22,841 (1.43×)**
+at call 9, which is **higher than the 17,458 the 429 followed**. **Attempt 2 breached three times,
+peaking at 18,251 (1.14×), and was not refused.** The pilot breached twice, peaking at 22,069
+(1.38×), and was. ⚠️ **So the provider's limiter is not a simple trailing-60-second cap, the record
+cannot say what it is (`Q-191` says so in terms), and this entry does not claim otherwise.** What is
+established is narrower and sufficient: **we admitted calls our own declared limit could not
+afford, repeatedly, and the one time the provider refused, the lane and 29 episodes went with it.**
+
+**PARTIAL EPISODE COUNT, AS NUMBERS, PER §6b — AND EVERY ONE RE-MEASURED IN THIS TREE RATHER THAN
+COPIED FROM THE PROMPT:**
+
+| | count | how it was measured |
+|---|---|---|
+| declared | **30** | `RUN_DECLARED.md` §6: arm 1, `gemma-26b`, seeds 2201…2230 |
+| completed | **0** | the driver's own report; `evals/checkpoints/cal__1__2201__gemma-26b.json` has `truncated: true` |
+| **TRUNCATED** | **1** | seed 2201, `cause: RATE_LIMIT_429`, `turns_run: 11` of 20, `tokens_spent: 55887` |
+| never started | **29** | all booked `RATE_LIMIT_429` |
+| **reconciles** | ⚠️ **30 == 0 + 1 + 29** | printed by the driver, not reconstructed by a session |
+
+⚠️ **THIS IS THE FIRST OF THE THREE ABORTS WHOSE NUMBERS ARE THE DRIVER'S OWN.** `INC-157`'s and
+`INC-159`'s were reconstructed from the filesystem by a session, and `INC-159` says in terms that
+*"that is precisely the loss hard rule 11 forbids: the denominator did not shrink silently, it was
+never computed at all."* **`Q-200`'s floor and `INC-159`'s fix are the reason this abort could be
+counted, and they are recorded here as having worked.**
+
+⚠️ **TOKENS SPENT, BY MODEL, PER `CLAUDE.md` §4 — AND THE PROMPT'S ATTRIBUTION IS CORRECTED.** The
+C14 ABORT 3 prompt states *"34 calls, 155,672 tokens on gemma-26b **across attempts 2 and 3**, 2
+RATE_LIMITED"*. **The three figures are right and the attribution is wrong: they are the whole
+DAY's, and the day includes the pilot.** Measured by partitioning the artefact's rows on their own
+timestamps:
+
+| block | rows | of which `OK` | `RATE_LIMITED` | tokens |
+|---|---|---|---|---|
+| pilot (`03:26:42Z`–`03:30:22Z`) | 9 | 8 | 1 | 42,930 |
+| calibration attempt 2 (`14:33:30Z`–`14:38:50Z`) | 13 | 13 | 0 | 56,855 |
+| calibration attempt 3 (`19:11:35Z`–`19:15:58Z`) | 12 | 11 | 1 | **55,887** |
+| **attempts 2 + 3 only** | **25** | **24** | **1** | **112,742** |
+| ⚠️ **the whole day** | ⚠️ **34** | ⚠️ **32** | ⚠️ **2** | ⚠️ **155,672** |
+
+⚠️ **AND `34` AND `32` ARE BOTH RIGHT, OF DIFFERENT THINGS**, which is the other half of the
+correction: **34 is ROWS**, **32 is CALLS**. `runner/usage.py:spent_today` counts a call only when
+`outcome == "OK"`, so the two `RATE_LIMITED` rows are recorded but not charged — which is golden 8
+fixture D's *"ZERO tokens, ZERO calls"* — and the driver's report therefore prints
+**`gemma-26b 32/600 calls, 155,672/4,800,000 tokens`**. Preflight's *"99,785 tokens, 21 calls
+already spent today"* is the same arithmetic over the 22 rows that existed at `19:11:24Z`
+(21 `OK`), and **99,785 + 55,887 = 155,672** exactly. ⚠️ **Neither figure includes the liveness
+probe's 232 tokens**, which the log itself warns about: it is written to
+`evals/usage/liveness-CAL-2026-09-04.jsonl` and *"a later preflight reading `<lane>-<date>` will NOT
+see these calls and under-counts by them."* **Total on the sanctioned lane for the day: 155,904
+across 33 charged calls**, against ceilings of 600 calls / 4,800,000 tokens — **3.2 % of the token
+ceiling, 5.5 % of the call ceiling.** No other lane was touched.
+
+**Action:** ⚠️ **NOTHING WAS RETRIED, NOTHING WAS MOVED TO ANOTHER LANE, AND NOTHING UNDER `evals/`
+WAS EDITED, DELETED OR TRUNCATED.** This session held **zero token sanction** and made **zero
+provider calls**. `evals/cal/RUN_DECLARED.md` §8 was **not** re-filled: it stands at
+`2026-09-04T13:29:25Z` (commit `63c70ec`) while attempt 4 will start later, and **that gap is
+disclosed rather than closed**, exactly as `INC-157` recorded for attempt 2.
+
+⚠️ **THE ORDER THIS SESSION ACTUALLY WORKED IN IS RECORDED, BECAUSE IT IS NOT THE ORDER HARD RULE 13
+ASKS FOR.** Rule 13 says the FIX session writes the entry *"before it changes a line of code"*. This
+session read the artefacts, **measured** the figures above, designed and built the fix, and wrote
+this entry afterwards — so the entry is written **after** the code and is committed **after** it, to
+carry a real **Fix** SHA. ⚠️ **The reason is not a good one and is offered as an explanation rather
+than a justification:** the diagnosis below is a *measured* claim about which of two numbers the
+pacer decides on, and the measurement that establishes it is the same replay that became the test.
+**The order is disclosed here so that a reviewer reads it from the record rather than inferring it
+from the commit timestamps** — which is the only way this rule can be checked at all.
+
+**Expectation:** that a pacer whose whole purpose is *"a call is admitted only when all three
+buckets permit it"* would not admit, into a 16,000-token minute, two calls totalling 17,458 — and
+that `INC-143`, having **measured** the reservation being exceeded on 7 of 8 calls and having named
+the file and line where the estimate is computed, would have closed this. ⚠️ **More precisely, and
+this is the expectation that actually failed: that a fix which corrects a number's use in ONE of
+its two jobs would be recognised as leaving the other job unfixed.** The reservation does two things
+— it decides **whether to send** and it decides **what to charge** — and `INC-143` fixed the second.
+
+**Missing:** any test that drives the pacer over a trace whose per-call costs are what the provider
+**actually charges now**, and asserts a property of the resulting **schedule**. Every pacer test in
+the suite before this session asserted a property of the **accounting** — *"the buckets are never
+told less than the provider billed"* (`test_arch_lanes.py` §4), *"the trailing minute exceeds 16,000
+at calls 7 and 8"* (`test_arch_cal_build.py` §1) — and **both families were green while the runner
+was sending 17,458 tokens a minute.** ⚠️ **An accounting assertion cannot fail on an admission
+defect**, because the accounting was already correct: the settle charged the truth. The missing
+assertion is the one this session added, *"no trailing 60-second window may exceed `tpm`"*, and it
+is RED against the shipped code at **18,175**. ⚠️ **Also missing, and it is the smaller half:** the
+tests that *do* replay the artefact read it live, so six of them went red the moment the calibration
+appended to it — **the suite's most relevant tests were already failing for an unrelated reason,
+which is a good way for a real signal to arrive unread.**
+
+**Missed:** ⚠️⚠️ **`INC-143` MEASURED THIS EXACT DEFECT, PUBLISHED THE ARITHMETIC, AND ITS OWN FIX
+NOTE SAYS THE FIX DOES NOT ADDRESS IT — IN A SENTENCE THAT WAS READ AS MODESTY RATHER THAN AS A
+GAP.** `Q-191`(5), verbatim: *"the settle-side top-up this session shipped would **NOT** have
+prevented this 429. **MEASURED, NOT ASSUMED.** … The fix corrects a documented property that was
+measurably false (`INC-143`). **It does not explain, and would not have prevented, the pilot's
+429.**"* ⚠️ **That is a written statement that the 429 has an unfixed cause, and it was filed as a
+disclaimer.** Second signal, in the same ruling: `Q-191` names the two halves apart —
+*"it changes no declared number … it is a **code** question"* about the **limit** — and nothing in
+it claims the **estimate** was addressed. **Two sessions corrected two of the three numbers in
+`used + estimate ≤ capacity` and neither asked about the third.** Third, smaller, and in this
+session's own prompt: `RUN_DECLARED.md` §7.4 is titled *"⚠️ THE PACER CHANGED SINCE THE PILOT, AND IT
+IS UNREVIEWED"* — the declaration flagged the pacer as the unreviewed component **and the run was
+started anyway**, which was legal and is not what is being criticised; what is being recorded is
+that **the artefact named the component that then failed.**
+
+**Diagnosis:** `driver/run.py:_PacedClient._pace` asked the TPM window for room for
+`attacker.target_tokens_per_episode // turn_budget` = **3,000** — a **mean**, and one
+`RUN_DECLARED.md` §3 itself calls *"A TARGET THE PILOT EXISTS TO CHECK, NOT A MEASUREMENT"* — while
+the calls it was admitting cost 8,421 and 9,037, so `used + 3,000 ≤ 16,000` passed for a call that
+then put 17,458 into the same minute. `INC-143` corrected the **settle** and `Q-191` corrected the
+**limit**, leaving the **admission** deciding on the one number the run had already falsified.
+
+**Fix:** `291fd918564259c1284aa3bd770171f1cf99cc7b` (unreviewed) — the admission estimate is separated from the charge.
+`runner/buckets.py` gains `ObservedCost`, a pure, monotone, clock-free holder of *the largest
+`usage.total_tokens` this role has actually been billed*, floored by the reservation `config/`
+already produces; `_pace` now takes `admit_tokens` (the estimate) and `take_tokens` (the
+reservation), and `_settle` teaches the estimate what the provider charged. ⚠️ **NO NEW SPEC VALUE
+(hard rule 9): every number is either the existing formula or a figure the provider returned — no
+multiplier, no headroom factor, no safety margin, and nothing to add to `config/`.** ⚠️ **`config/`
+WAS NOT TOUCHED**; `tpm` is correct and the defect was our estimate. ⚠️ **`INC-143`'s no-refund rule
+was re-examined and KEPT, and the reasoning is in the code both ways:** it is kept **only because
+the adaptive number never reaches the charge** — `take` is still the reservation and `settle` is
+still `max(0, actual − reservation)`. Had the adaptive figure been *taken* as well as *waited for*
+with no refund, the same 32-call replay pins the window at **15,564 for twenty-one consecutive
+calls**, charges **234,736** for **155,672** of real spend (**+51 %**), sleeps **633 s** instead of
+339 s — **and still breaches `tpm` by 203.** A signed refund also works (15,221; 313 s) and was
+rejected on its merits: it buys 26 seconds and costs a new direction of travel through `settle`,
+whose refusal of a negative charge is what makes *"never told less than the provider billed"*
+checkable at all. **MEASURED on the real 32-call trace: worst trailing-60 s window 18,175 → 15,221;
+pacer sleep 43 s → 339 s.** ⚠️ **A second defect was found in this session's own fix before it
+shipped and is recorded rather than quietly corrected:** `_PacedClient` is rebuilt **inside**
+`execute`'s episode loop while the buckets are built **once per lane**, so an estimate held on the
+client would have reset at every one of the 30 episodes — **`INC-161` happening thirty times instead
+of once** — and it would have passed every other test in the new file. The estimate is now built
+once per `(lane, role)` in `execute` and injected.
+
+**Systemic guardrail:** ⚠️ **THE ASSERTION IS NOW ABOUT THE SCHEDULE AND NOT ABOUT THE
+ACCOUNTING**, which is the class this defect belongs to. `tests/test_c14_pacer_admission.py` replays
+the artefact's own 32 calls through the **real** `_PacedClient` and the **real** `Buckets` and fails
+if any trailing 60-second window exceeds `tpm`; it is RED against the pre-fix pacer at **18,175**,
+and the pair that earned the 429 fails it at **17,458**. ⚠️ **A SECOND, WHICH IS THE ONE THAT WOULD
+HAVE CAUGHT THIS SESSION'S OWN NEAR-MISS:** `test_THE_ESTIMATE_SURVIVES_THE_END_OF_AN_EPISODE` and
+`test_execute_BUILDS_THE_ESTIMATES_OUTSIDE_ITS_EPISODE_LOOP` pin the estimate's **lifetime**, which
+no property of a single episode can see. ⚠️ **AND THE RESIDUAL IS PUBLISHED RATHER THAN LEFT TO BE
+FOUND, IN ITS OWN TEST:** `test_A_COLD_LANE_CAN_STILL_OVERSHOOT_ONCE_AND_THAT_IS_PUBLISHED_NOT_HIDDEN`
+measures that a **cold** lane — one that has answered no call, so the estimate is still the `config/`
+floor — can still put **16,333** into a minute, **2.1 % over**, on the two calibration attempts
+replayed without the pilot's warming calls. ⚠️ **THIS CANNOT BE FIXED BY A BETTER ESTIMATE AND THE
+ENTRY SAYS SO:** no measurement of past calls bounds a future one, and the only estimate that could
+guarantee the window is `tpm` itself — which admits one call per minute and is not a runner. What
+the fix buys is that the overshoot is **bounded by one call's excess over the lane's own record,
+happens once per lane per run rather than once per episode, and is repaid immediately.** ⚠️ **NOT
+GUARDED, AND NAMED AS ACCEPTED:** the provider's actual limiter shape is still unknown (`Q-191`), so
+no amount of correctness against *our* model of `tpm` proves a 429 cannot recur — **accepted,
+because the alternative is to guess a number, and `INC-05` is the entry about precise-sounding
+figures that came from memory.**

@@ -2934,3 +2934,120 @@ another live session's and was not touched. `tests/test_c18_results.py`'s `14 �
 is red for C17 REVIEW 1's verdict and is not this session's to move. The uncommitted
 `evals/usage/gemma-26b-2026-09-04.jsonl` keeps `test_the_object_store_and_the_working_tree_agree` and
 `OF-259`'s six reds standing, and **only the operator may commit that file.**
+
+
+---
+
+⚠️⚠️ **UPDATE, C14 ABORT 3 (`7d4e2fa9`), 2026-09-05 — THE ARM-1 CALIBRATION'S ATTEMPT 3 **DID NOT
+CRASH**: IT RAN TO ITS END, PRINTED ITS REPORT AND RECONCILED `30 == 0 + 1 + 29`. ⚠️ **THE OPERATOR
+RULED IT AN ABORT AND BOTH READINGS ARE ON THE RECORD.** `INC-161`. THE ADMISSION DEFECT THAT CAUSED
+IT IS FIXED AND THE FIX IS PROVED RED FIRST. ATTEMPT 4 IS HANDED OVER, **NOT RUN**.**
+⚠️ **SPEND: ZERO. No provider call in any mode; this session held no token sanction and took none.
+`evals/` READ-ONLY and never written; `config/` untouched and not opened; `tests/goldens/` not read
+and not written; no tag cut or moved; `RUN_DECLARED.md` §8 NOT re-filled. NOT SELF-CERTIFIED.**
+
+⚠️ **APPENDED, NOT EDITED INTO THE C14 CARD'S ROW — the same reason `8c2f5e91` gave above.** A
+**C14 REVIEW** session (`2f7a6d18`) is live in this same working tree and holds `docs/reviews/`.
+`Q-180`'s lost-update race is why every change this session made to a shared file is a **pure
+append or a single verified line insert**, rebuilt from `git show HEAD:<file>` immediately before
+staging. `CLAUDE.md` §6.2's *"append to the review-history column"* is honoured in substance; the
+row edit is owed to a session that does not share the tree.
+
+**THE STATE OF THE CALIBRATION, IN ONE PLACE.** `PROCESS.md` §6b: *"the first execution that runs to
+**completion** IS the run."*
+
+| attempt | started | ended | how it ended | episodes | tokens |
+|---|---|---|---|---|---|
+| 1 (`INC-157`) | `13:29:25Z` | `13:29:34Z` | `ModuleNotFoundError` — bare `python` | 0 of 30 dispatched | **0** |
+| 2 (`INC-159`) | `14:33:17Z` | `14:41:51Z` | uncaught `TimeoutError`, SSL read | 1 dispatched, **0 recorded**, 29 never | **56,855** |
+| 3 (`INC-161`) | `19:11:24Z` | `19:15:58Z` | ⚠️ **HTTP 429 — CLEAN EXIT, FULL REPORT, RECONCILED** | **0 completed, 1 TRUNCATED, 29 never started** | **55,887** |
+| 4 | — | — | **handed over, not run** | — | — |
+
+⚠️ **ATTEMPT 3 IS DIFFERENT IN KIND FROM 1 AND 2, AND THAT IS WHY IT NEEDED A RULING.** Both earlier
+attempts printed no report and reconciled no denominator, so §6b's *"aborts before completion"*
+fitted them without strain. **Attempt 3's process completed.** On the literal reading the
+calibration is spent and its threshold would rest on a denominator of **1** — one episode that
+itself ran **11 of 20 turns**. ⚠️ **THE OPERATOR RULED IT AN ABORT, AND THE RULING IS RECORDED WITH
+ITS OWN CONFLICT OF INTEREST NAMED IN IT:** *"the ruled answer and the answer the operator would
+prefer are the SAME answer … A reader who thinks the ambiguity was resolved in our favour is reading
+it correctly."* **Both readings are in `INC-161`; the rejected one is written in its strongest form,
+with its cost.**
+
+⚠️ **THE PROMPT'S SPEND FIGURES ARE CORRECTED, NOT COPIED.** It said *"34 calls, 155,672 tokens …
+**across attempts 2 and 3**, 2 RATE_LIMITED"*. The three figures are the **whole day's**, and the day
+includes the pilot: attempts 2+3 alone are **25 rows / 24 calls / 112,742 tokens / 1 RATE_LIMITED**.
+⚠️ **And `34` and `32` are both right of different things — 34 is ROWS, 32 is CALLS** (`spent_today`
+charges a call only on `outcome == "OK"`), which is why the driver printed `32/600`. Preflight's
+`99,785 / 21` plus attempt 3's `55,887 / 11` is `155,672 / 32` **exactly**. The liveness probe's
+**232** tokens are in neither, by design and with the log's own warning attached.
+
+**DIAGNOSIS.** `_pace` asked the TPM window for room for `target_tokens_per_episode // turn_budget`
+= **3,000** — a **mean** — while admitting calls of **8,421** and **9,037** twenty-six seconds apart:
+**17,458 into a declared 16,000-token minute.** ⚠️ **`INC-143` corrected the SETTLE and `Q-191`
+corrected the LIMIT; nothing had corrected the ADMISSION.** ⚠️ **AND THE MEASUREMENT THAT PREDICTED
+THIS WAS TAKEN AND WRITTEN DOWN:** `Q-191`(5) says in terms that the top-up *"does not explain, and
+would not have prevented, the pilot's 429"* — **a written statement that the 429 had an unfixed
+cause, filed as a disclaimer.**
+
+⚠️ **AND THE BREACH WAS NOT A ONE-OFF, WHICH THE PROMPT DID NOT SAY.** Recomputed over the
+artefact's own rows: **attempt 3 exceeded `tpm` at four of its eleven calls**, peaking at **22,841
+(1.43×)** at call 9 — *higher* than the 17,458 the 429 followed. **Attempt 2 breached three times
+(peak 18,251) and was not refused.** So the provider's limiter shape is still unknown (`Q-191` says
+so), and `INC-161` claims only the narrower, sufficient thing: **we admitted calls our own declared
+limit could not afford, repeatedly.**
+
+**THE FIX — TWO NUMBERS SEPARATED, BECAUSE THEY ANSWER TWO QUESTIONS.** `runner/buckets.py` gains
+`ObservedCost` (pure, monotone, clock-free); `_pace` takes `admit_tokens` — the largest cost this
+**role** has actually been billed, floored by the existing `config/` figure — and `take_tokens`, the
+reservation, unchanged. ⚠️ **NO NEW SPEC VALUE (hard rule 9): every number is either the existing
+formula or one the provider returned. `config/` was not opened.**
+
+⚠️ **`INC-143`'s NO-REFUND RULE WAS RE-EXAMINED AND KEPT — AND THE PROMPT'S WARNING WAS CONFIRMED BY
+MEASUREMENT RATHER THAN ARGUED AWAY.** Replaying the real 32 calls:
+
+| design | worst trailing-60 s | sleep | charged vs actual |
+|---|---|---|---|
+| shipped **before** the fix | ⚠️ **18,175** (over by 2,175) | 43 s | 162,924 / 155,672 |
+| adaptive **charge**, no refund | ⚠️ **16,203** (still over) | **633 s** | **234,736** (+51 %) |
+| adaptive charge, signed refund | 15,221 ✔ | 313 s | 155,672 |
+| ⚠️ **SHIPPED — adaptive ADMISSION, `INC-143`'s charge** | ⚠️ **15,221 ✔** | **339 s** | 162,924 / 155,672 |
+
+**Inheriting the rule onto an adaptive charge is both slower and still unsafe.** The refund works
+and was rejected on its merits (26 s, against opening a negative-charge path through `settle`).
+**The rule is kept because the adaptive number never reaches the charge.**
+
+⚠️ **A SECOND DEFECT WAS FOUND IN THIS SESSION'S OWN FIX BEFORE IT SHIPPED, AND IT IS RECORDED
+RATHER THAN QUIETLY CORRECTED.** `_PacedClient` is rebuilt **inside** `execute`'s episode loop while
+the buckets are built **once per lane**, so an estimate held on the client would have reset at every
+one of the 30 episodes — **`INC-161` happening thirty times instead of once — and it would have
+passed every other test in the new file.** The estimate is now built once per `(lane, role)` in
+`execute` and injected, and two tests pin its **lifetime**.
+
+**GATE 2 — RED FIRST, AND THE RIGHT RED.** `tests/test_c14_pacer_admission.py`, **21 tests / 59
+asserts, ONE NEW FILE**; **12 red against the pre-fix source**, restored byte-identical afterwards.
+The two headline reds are the run's own numbers: **18,175** for the worst window and **17,458** for
+the pair that earned the 429. ⚠️ **AST-EXACT TEST DIFF: 40 existing test files IDENTICAL, 0 changed,
+0 removed.** ⚠️ **AND THE RESIDUAL IS PUBLISHED IN ITS OWN TEST rather than left to be found:** a
+**cold** lane can still put **16,333** into a minute — 2.1 % over — and *no estimate can fix that*,
+because no measurement of past calls bounds a future one.
+
+⚠️⚠️ **TWO THINGS THE OPERATOR MUST DECIDE BEFORE ATTEMPT 4 STARTS, BOTH FOUND BY THIS SESSION AND
+NEITHER DECIDED BY IT.**
+**(1) `Q-206`(d), CLASS A, STOPPED ON.** `cal__1__2201__gemma-26b` is **checkpointed** — *not
+complete* — with `truncated: true`, `cause: RATE_LIMIT_429`, `turns_run: 11` of 20. It **will be
+skipped** and **stays in the denominator**, so attempt 4 reports 29 completed + 1 truncated = 30.
+⚠️ **Nothing in frozen `HOLES.md` §3.5 or `CONTEXT.md` §10.3 says whether a truncated episode may
+carry a void-threshold observation**, and counting it biases the observed rate **down**, which sets
+a **lower** threshold and makes a later VOID **less** likely — the self-serving direction. **Four
+options are written out; none was taken.**
+**(2) THE CALL CEILING, IF ATTEMPT 4 STARTS BEFORE `2026-09-05T00:00:00Z`.** The budget is seeded
+once from the **start date's** usage file (`run.py:_lane_states`). Starting on UTC 09-04 seeds
+**32 calls already spent**, leaving **568** against the **580** that 29 × 20 turns needs — ⚠️ **short
+by 12, binding after 28 of 29 episodes.** Starting on or after `00:00:00Z` seeds a fresh file: 600,
+which fits with 20 to spare. **Projected wall clock either way: 5.2–8.1 h, central 7.4 h.**
+
+**NOT DONE, SAID PLAINLY.** The calibration, the pilot and the sweep were **not run**; no provider
+call was made in any mode. No `N` and no void threshold written. No tag cut or moved. `config/` not
+opened. `docs/reviews/` untouched — the live C14 REVIEW session holds it. The uncommitted
+`evals/usage/gemma-26b-2026-09-04.jsonl` still keeps `test_the_object_store_and_the_working_tree_agree`
+and six replay tests red, and **only the operator may commit that file.**
