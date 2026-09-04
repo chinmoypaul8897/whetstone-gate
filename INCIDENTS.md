@@ -10712,3 +10712,104 @@ process table rather than the git log — the first check in this project able t
 damage rather than after it. ⚠️ **Its limit, stated so it is not oversold: it sees only sessions on
 THIS machine.** A session on another machine against a clone is invisible to it, and that residue is
 `INC-65`'s uncloseable half, genuinely uncloseable.
+
+
+## INC-141 — a session whose prompt fences it out of `QUESTIONS.md` CANNOT COMMIT WITHOUT TURNING `make check-roles` E1 RED, because the fence and `PROCESS.md` §7a are, for such a session, mutually unsatisfiable
+
+**Date:** 2026-09-04 (ARCH PILOT RUN 5, `4b8e12c9`; the defect was raised by C21 BUILD 1, `9e2c81d4`,
+in `docs/sessions/c21-build-1.txt`). Fix SHA under **Fix**.
+
+**Event:** the C21 BUILD prompt issued `SESSION-TOKEN: 9e2c81d4` and, in the same breath, named
+`QUESTIONS.md` in its may-not-write list — because a concurrent session was writing to that file and
+`INC-136`'s measured remedy is that two sessions must not read-modify-write one 1 MB document.
+`PROCESS.md` §7a requires that **every** issued token be recorded in `QUESTIONS.md` under
+`## Session tokens`, and `make check-roles` E1 fails on any commit carrying a token with no such row.
+⚠️ **The two requirements cannot both be met by that session.** Measured by C21 itself, against
+the same tree, before and after its own commits (`docs/sessions/c21-build-1.txt`:529-541):
+
+    BEFORE:  21 passed, 0 failed, 3 n/a
+             [PASS] E1 ... clean - 78 issued row(s) covering 78 token(s) ... 75 appear in the log
+    AFTER:   20 passed, 1 failed, 3 n/a
+             [FAIL] E1 no commit carries an UNISSUED token
+                    FORGED/UNISSUED: {'9e2c81d4': ['183d063', '22293d2', '685ca50']}
+                    - not present in QUESTIONS.md ## Session tokens
+
+⚠️ **E1 was red at `HEAD` for the whole of the next session's window too** — this session
+measured it at `a7c1212` with a fourth commit added to the list, `{'9e2c81d4': ['4aec3bf', '183d063',
+'22293d2', '685ca50']}`, and two `tests/test_repo_invariants.py` tests failing with it. **The fourth
+commit is C21's own report of the red**, so the act of reporting the defect deepened it.
+
+**Action:** ⚠️ **THE FENCED SESSION DID THE RIGHT THING AND IT IS THE REASON THIS IS AN ENTRY
+RATHER THAN A SILENT GREEN.** It did not write its own row. Its addendum states why, in terms:
+*"TURNING E1 GREEN BY WRITING MY OWN ISSUED-TOKEN ROW WOULD BE THE EXACT SHAPE OF THE DEFECT E1
+EXISTS TO CATCH — a session vouching for its own identity."* It measured the red, confirmed it
+independently (`grep -c "9e2c81d4" QUESTIONS.md` → **0**), published the one-line remedy for the
+architect to paste, raised it as `Q-I`, and warned the next session not to "fix" it by writing its
+own row. The intervening session (`c7b41f6a`) then **also** declined to write the row, for a second
+and different reason it recorded: a second hand writing a **live** session's row is the duplicate
+race `INC-139` records. ⚠️ **The row was finally written by this session — a THIRD, later
+session, whose prompt names both tokens explicitly and whose fence INCLUDES `QUESTIONS.md`** — which
+is the only configuration in which the write is neither self-vouching nor racing.
+
+**Expectation:** `PROCESS.md` §7a describes the token registry as *"an honour system with an
+artefact"* and E1 as the artefact that makes it checkable. The expectation is that E1 is red **only**
+when a token's provenance is genuinely in doubt. What happened instead is that E1 was red for four
+commits and roughly two hours twenty minutes on a token that was **issued by the architect, printed
+in the session's own prompt, and never in doubt by anyone** — while the session best placed to prove
+it was the one forbidden to record it. ⚠️ **A check that is red for a reason its own remedy is
+forbidden to address trains its readers to discount it**, which is the failure mode E1 exists to
+prevent.
+
+**Missing:** ⚠️ **A WAY FOR THE ARCHITECT'S ACT OF ISSUING A TOKEN TO BE THE SAME ACT AS
+RECORDING IT.** Today issuance happens in a prompt and recording happens in a file, by a different
+hand, at a later time, and nothing binds them — so **every fence that excludes `QUESTIONS.md` opens a
+window in which E1 is red by construction**. Also missing: any way for `check_roles.py` to
+distinguish *"this token appears in no row"* from *"this token appears in no row **and** appears in
+no prompt"*. The second is a forgery; the first is bookkeeping lag. E1 prints the word
+**FORGED/UNISSUED** for both, and three consecutive sessions each had to spend part of their window
+establishing that the token was not forged. The evidence that settles it — the architect console's
+own transcript, in which the token appears only inside the prompt it authored — is machine-readable
+and is read by nothing.
+
+**Missed:** ⚠️ **THE SIGNAL WAS IN THE C21 PROMPT'S OWN TEXT, AT THE MOMENT IT WAS WRITTEN, AND
+NOBODY READ THE TWO CLAUSES AGAINST EACH OTHER.** The prompt carried `SESSION-TOKEN: 9e2c81d4` in its
+first line and `QUESTIONS.md` in its may-not-write list a few lines later. **Those two clauses are
+jointly unsatisfiable and the conflict is visible on one screen, before any session starts, without
+running anything.** It was missed by the architect who wrote it, and it was missed again in the
+`c7b41f6a` prompt, which repeated the same fence shape. ⚠️ **And a second signal was missed
+earlier and is the same shape:** `QUESTIONS.md`'s own `## Session tokens` section already carried a
+written warning that the `5d7e2b91` row was *self-recorded* and that *"the architect's §7a row was
+never written"* — i.e. the registry had **already** fallen behind issuance once, two days before, and
+that was read as a one-off about one token rather than as a defect in how rows get written at all.
+
+**Diagnosis:** `PROCESS.md` §7a puts the duty to record a token on the session that holds it, while
+`INC-136`'s concurrency remedy puts `QUESTIONS.md` outside the fence of any session running beside
+another — so for a fenced session the duty and the fence are mutually unsatisfiable and E1 must go red
+on its first commit. The red is therefore a property of the **prompt's construction**, not of the
+commit, and no act available to the session that triggers it can clear it.
+
+**Fix:** ⚠️ **`a53de08`** — the two missing rows, `| ``9e2c81d4`` | C21 | BUILD | 2026-09-04 |`
+and `| ``4b8e12c9`` | ARCH | FIX | 2026-09-04 |`, inserted into `QUESTIONS.md` `## Session tokens` at
+an anchor verified to occur exactly once before the write, additions-only (a unified diff over the
+before/after byte images proved removed==0, added==2). **Both tokens were ISSUED by the architect and
+neither was fabricated** — `CLAUDE.md` §5's distinction. Measured after: **21 passed, 0 failed, 3
+n/a**, E1 *"clean - 82 issued row(s) covering 82 token(s) parsed from QUESTIONS.md; 77 token(s)
+appear in the log"*. ⚠️ **THIS FIXES THE INSTANCE AND NOT THE CLASS.** The next fenced session
+turns E1 red again on its first commit, and this entry exists so that it is recognised in seconds
+rather than diagnosed for a third time.
+
+**Systemic guardrail:** ⚠️ **PROPOSED, NOT INSTALLED — `PROCESS.md` and `src/` are both outside
+this session's fence, and installing a guardrail into a file this session may not write is the very
+act this entry is about.** Three candidates, cheapest first. **(1) The one-line process fix, and the
+only one that closes the class: the architect writes the `## Session tokens` row AT THE MOMENT THE
+TOKEN IS GENERATED, in the same act as writing the prompt** — then no fence can ever exclude it,
+because the row already exists before the session starts. **(2) A prompt-construction check:** a
+prompt whose fence excludes `QUESTIONS.md` is malformed unless the row is already written; this is a
+one-line assertion the architect can run against its own draft. **(3) A precision fix to E1's
+wording:** split its verdict into `UNISSUED (no row, no prompt)` — a genuine forgery — and
+`UNRECORDED (no row, but present in an issuing prompt)` — bookkeeping lag; today it prints
+`FORGED/UNISSUED` for both and has now cost three sessions part of their window each.
+⚠️ **What none of them closes, and is accepted:** `PROCESS.md` §7a itself says identity is
+*"mechanised as far as it can be, and named as an honour system where it cannot"* — a row asserts
+that a token was issued, and nothing can verify that claim against the architect's intent. That
+residue is genuine and is not what this entry is about.
