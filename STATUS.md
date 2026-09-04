@@ -2126,3 +2126,48 @@ lines measured, **557** committed) · `INC-139` (its own one-commit-old guardrai
 **base tree** and **reverted the other instance's entire FINAL OUTPUT, 763 lines**; restored
 byte-for-byte at `fa73b76`). ⚠️ **`INCIDENTS.md` carries two `## INC-139` headings.** Renumbering is
 the architect's. **NOT SELF-CERTIFIED. NO TAG. `prereg-v1` NOT CUT.**
+
+---
+
+## C21 BUILD 1 — `9e2c81d4` — 2026-09-04 — **APPENDED, NOT MERGED INTO ANY LIVE ROW**
+
+⚠️ **THE C21 ROW ITSELF WAS NOT EDITED.** A concurrent session was live in this working tree
+throughout, spending the project's single-shot pilot window, and this session's fence was
+**append-only** for this file. `INC-136` / `INC-137` / `INC-139` are the family this avoids. The C21
+row at its original position still reads `todo`; **this block is its update, and the review-history
+column is extended here, never overwritten.**
+
+**C21 IS PART-BUILT AND UNREVIEWED. `C21: todo → built(1, partial)`.**
+
+| C21 deliverable | State after this session |
+|---|---|
+| The two form paragraphs + project name + repo URL | ✅ **WRITTEN** — `docs/submission/FORM_ANSWERS.md` (`685ca50`) |
+| The exact video URL | ⚠️ **NOT POSSIBLE — C20 is `todo`; no video URL exists in this repository.** Written as `<<PENDING-RUN: VIDEO_URL>>` |
+| Re-verify the §21.5 perishable facts | ⚠️ **NOT DONE — operator act.** Four need a browser; the fifth (the gist still resolving) **cannot be performed at all: there is no gist** |
+| The git-history secret scan | ⚠️ **STALE, NOT RE-RUN.** Its committed output records `HEAD = 90b6d6fa…`; `HEAD` has moved well past that. Re-running it is checklist item **O-6**, an operator act ordered immediately before the flip |
+| Flip the repository public | ⚠️ **NOT DONE.** C21's other half and the operator's act |
+| Billing re-confirmation into `PROVENANCE.md` §1.5 | ⚠️ **NOT DONE — no session can hold it.** Still dated **2026-08-30** |
+
+⚠️ **THE FINDING THAT MATTERS MOST, AND IT IS AGAINST THIS PROJECT'S OWN HEADLINE.** Each of the
+five method claims the submission rests on was verified against the tree and then attacked from
+three independent angles. **All fifteen adversarial passes returned REFUTED against the claims as
+the build prompt worded them.** Of the five: **`gates/` / `scorer/` isolation is VERIFIED** (D1–D4
+all PASS, measured here; `MOAT_ALLOW_LIST` holds **0** entries, `check_roles.py`:637 — **stronger
+than `CLAUDE.md` hard rule 8 describes**); **policy-blindness and the external answer key are TRUE
+ONLY AS NARROWED** (the attacker *is* seeded from published attack corpora; τ²-bench supplies **no
+escape ground truth** — escape is measured wholly in our own world); and **the voiding probe and the
+externally-witnessed freeze are NOT YET TRUE** (`void_threshold_breach_rate` is the sentinel
+`TODO_C14_CALIBRATION`, so **no VOID verdict is computable on any input**; `prereg-v1` does not exist
+and **no witness gist exists**). `FORM_ANSWERS.md` §6 carries, for each, the safe wording and the
+wording that would overclaim.
+
+**REVIEW HISTORY — APPENDED, NEVER OVERWRITTEN.** C21 has **0** adversarial reviews and **no tag**.
+This session **did not self-certify**. Eight questions are owed to `QUESTIONS.md` and are carried in
+`docs/sessions/c21-build-1.txt` §7 — the deliverable's **filename** (the prompt said `FORM.md`; the
+card and `CONTEXT.md`:2187 both say `FORM_ANSWERS.md`, and rule 4 resolved it); which `§9` the
+"limitation sentence" belongs to; that its published wording names **AgentDojo, which was cut at
+rung 3**; hard rule 8's allow-list wording versus the empty implemented list; the card's five fields
+versus rule 13's eight; two card deliverables unsatisfiable by any session; the **two `## INC-139`
+headings** now in `INCIDENTS.md`; and this file's append-only placement.
+**ZERO PROVIDER TOKENS. `.env` NEVER OPENED. NO TAG CUT. `prereg-v1` STILL DOES NOT EXIST.
+REPOSITORY NOT FLIPPED PUBLIC. NOT SELF-CERTIFIED.**

@@ -12033,3 +12033,61 @@ C0 is **built, unreviewed**. It has not been self-certified and must not be.
 different fresh session. C1 (`RAZORPAY_SEMANTICS.md`) and C2 (the world + the planted
 probe) are the next builds, and **C2 needs golden 7 committed before its prompt is
 issued.**
+
+---
+
+# `9e2c81d4` — C21 BUILD 1 — 2026-09-04 — the two form paragraphs
+
+⚠️ **APPENDED AT THE FOOT, NOT PLACED AT THE HEAD, AND THAT IS DELIBERATE.** This file is
+newest-on-top; this session's fence was **append-only**, because a concurrent session was live in
+the same working tree spending the single-shot pilot. Obeying the fence literally beats writing at
+the head of a file another session may be holding — `INC-139` is what the other choice costs.
+Whether a later session moves it is `Q-H` in `docs/sessions/c21-build-1.txt` §7.
+
+**Pushed:** `685ca50` (the deliverable), `22293d2` (this session's FINAL OUTPUT), and this commit.
+
+## What was built
+
+`docs/submission/FORM_ANSWERS.md` — the project name; the **Project Objectives** paragraph opening
+on the merchant's loss (`CONTEXT.md` §21.3); the **Build Challenges & Technical Obstacles**
+paragraph in the card's Event / Action / Expectation / Missing / Missed format with `Diagnosis` and
+`Fix (SHA)` appended, sourced from **INC-02** (2026-08-28) and **INC-132** (2026-09-04, *after* the
+first build commit `ee3cf93`), carrying `PROCESS.md` §9's limitation sentence; the exact public repo
+URL; the video URL as a placeholder. Plus an eleven-step operator checklist with its blocking order,
+a placeholder table, and an evidence index citing the file and section for every claim.
+`docs/submission/FORM.md` is a six-line pointer with no content of its own.
+
+**THE RUN HAS NOT HAPPENED, so no number is written.** Every unfilled value is an explicit
+`<<PENDING-RUN: name>>` in `README.md`:28's convention, and the numbers deliberately *not* printed —
+escape rate, money past the gate, false positives, probe reach, the VOID verdict, the selected N —
+are tabulated with the reason each is absent, so a later session can see what the paragraphs were
+written around.
+
+## What was found
+
+⚠️ **ALL FIFTEEN ADVERSARIAL PASSES RETURNED REFUTED AGAINST THE FIVE METHOD CLAIMS AS THE BUILD
+PROMPT WORDED THEM.** One is verified (`gates/` / `scorer/` isolation — D1–D4 PASS, measured here,
+and **`MOAT_ALLOW_LIST` is EMPTY**, which is *stronger* than `CLAUDE.md` hard rule 8's "short,
+explicit allow-list" describes). Two are true only narrowed: the attacker is blind to **our** policy,
+not to attack technique — it is deliberately seeded from published corpora; and τ²-bench supplies the
+**false-positive** ground truth and the **competence control** and **no escape ground truth at
+all**. Two are **not yet true**: the void threshold is the sentinel `TODO_C14_CALIBRATION`, so no
+VOID verdict is computable on any input; and `prereg-v1` and the witness gist do not exist, so
+**nothing is witnessed outside this repository**. ⚠️ **That last is the single most damaging sentence
+available to this project, and no form paragraph asserts it.**
+
+Verified first-hand and used: `probe-v1`'s tag object `170bd3ff…`, with `HOLES.md` byte-identical at
+the tag and at `HEAD`; `HOLES.md`:221's VOID consequence; `config/protocol.yaml`:335's sentinel;
+`vendor/tau2-bench/LICENSE` and the pin at `:396`; the four deliberate-non-use tests, all four
+present. Re-measured rather than copied: the review trail — **FAIL 14 / PASS 6 over 20 files, 6
+tagged, 14 unreviewed** — which agrees with the prompt on all four numbers; and the
+header-only-scan trap that hides three of the FAILs (`INC-102`'s class) was hit and cleared.
+
+## Owed, and not done
+
+Eight questions to `QUESTIONS.md` (fenced out; carried in `docs/sessions/c21-build-1.txt` §7). Not
+done, and stated as such: the video URL (**does not exist**); the §21.5 perishable re-verification
+(**operator — and the gist half cannot be performed at all**); the billing re-confirmation (**no
+session can hold it**); the **stale** secret scan (its output records `HEAD = 90b6d6fa…`); and the
+visibility flip. **Zero provider tokens. `.env` never opened. No tag cut. Not self-certified — a
+fresh adversarial review follows.**
