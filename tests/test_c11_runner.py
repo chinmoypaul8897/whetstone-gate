@@ -776,7 +776,16 @@ def test_every_declared_cause_prints_even_at_zero():
     text = empty.render()
     for cause in ep.UNFINISHED_CAUSES:
         assert f"{cause:<26}: 0" in text
-    assert len(ep.UNFINISHED_CAUSES) == 7
+    # ⚠️⚠️ **7 -> 8, FLIPPED UNDER HARD RULE 6 BY `Q-179`(2), RULED 2026-09-04**, which adds
+    # `PACER_REFUSED` as its own counted cause and closes `Q-174`. *"A new failure mode gets
+    # its own name."*
+    # ⚠️ **THE FLIP IS PROVABLY MEANINGFUL, WHICH HARD RULE 6 DEMANDS: `== 8` FAILS ON THE
+    # PRE-RULING CODE** (measured: `AssertionError: assert 7 == 8`), so this is a changed
+    # expected value and not a loosened assertion. ⚠️ **AND IT IS NOT WEAKENED IN ANY OTHER
+    # WAY** — the loop above is untouched, so the NEW cause must also print at zero to get
+    # here, which is the property this test exists for. Measured at the moment of the flip:
+    # that loop PASSED for all eight while this line still said 7.
+    assert len(ep.UNFINISHED_CAUSES) == 8
 
 
 def test_the_denominator_identity_can_FAIL():

@@ -50,6 +50,7 @@ from whetstone_gate.runner.budget import (
     run_offers,
     usage_total_tokens,
 )
+from whetstone_gate.runner import episodes as ep_module
 from whetstone_gate.runner.episodes import EpisodeKey
 from whetstone_gate.runner.redaction import SecretInPayload, refuse_if_secret_bearing
 from whetstone_gate.world import generator as world_generator
@@ -2773,4 +2774,105 @@ def test_the_pacer_reads_the_clock_ONCE_and_charges_the_bucket_AGAINST_THAT_SAME
         f"_pace read the clock {clock.reads} time(s) on a call it did not have to sleep "
         f"for. The ruling is 'take `now` once'; a second read is the defect itself, not "
         f"an implementation detail"
+    )
+
+
+def test_a_BucketError_is_BOOKED_AS_ITS_OWN_NAMED_CATEGORY_AND_REACHES_THE_PRINTED_REPORT():
+    """⚠️⚠️ **`Q-179`(2) / `Q-174`, RULED 2026-09-04 BY THE ARCHITECT.**
+
+        *"A ``BucketError`` escaping ``execute`` drops every remaining episode and PRINTS
+        NOTHING. That is hard rule 11's named failure exactly — silent denominator
+        shrinkage — and it is not permitted. CATCH IT AT THE SAME SITE THAT BOOKS
+        ``RateLimited`` AND ``ProviderFailed``, BOOK IT AS ITS OWN NAMED COUNTED CATEGORY,
+        AND PRINT IT AS A NUMBER LIKE EVERY OTHER. ⚠️ DO NOT make it a silent retry and DO
+        NOT fold it into an existing category — a new failure mode gets its own name."*
+
+    ⚠️⚠️ **THE THIRD CLAUSE IS THE ONE THIS TEST EXISTS FOR, AND IT IS WHY THE ASSERTIONS
+    DO NOT STOP AT ``pytest.raises``.** An outcome that is booked but never printed is the
+    same silence in a new place: hard rule 11 says *"Every dropped episode is counted,
+    categorised and **printed as a number**."* So the assertions run the whole distance —
+    caught, booked under its **own** name, counted, and **present in the rendered report
+    text with a non-zero figure beside it**.
+
+    ⚠️ **PROVED RED AGAINST THE PRE-FIX CODE, IN THREE INDEPENDENT WAYS**, any one of which
+    is sufficient:
+      1. ``ep.PACER_REFUSED`` does not exist -> ``AttributeError`` at collection of the
+         very first reference. The category is the fix.
+      2. ``_MeteredCall.run`` has no ``except BucketError`` -> the ``BucketError`` escapes
+         ``run`` unconverted, so ``pytest.raises(driver_episode.LaneStopped)`` fails with
+         the ``BucketError`` itself.
+      3. ``on_usage`` is never called, so ``booked`` is ``[]`` rather than one row.
+
+    ⚠️ **AND IT IS NOT A RETRY.** The ruling forbids a silent retry by name. ``call_count``
+    is asserted to be exactly **1**: the failing call is made once and the lane stops.
+    """
+    booked: list[tuple[str, int, str]] = []
+    budget = LaneBudget(
+        model="qwen-27b", ceilings=Ceilings(call_ceiling=10, token_ceiling=100_000)
+    )
+    metered = driver_episode._MeteredCall(
+        lane="qwen-27b",
+        budget=budget,
+        reservation_tokens=3_000,
+        on_usage=lambda lane, tokens, outcome: booked.append((lane, tokens, outcome)),
+    )
+
+    calls = {"n": 0}
+
+    def _refuses_forever():
+        calls["n"] += 1
+        raise BucketError(
+            "lane 'qwen-27b' does not permit a 3000-token call now; wait 1.20s. "
+            "A bucket refusal is a WAIT, not an abort"
+        )
+
+    # (1) IT IS CONVERTED, not left to escape.
+    with pytest.raises(driver_episode.LaneStopped) as stopped:
+        metered.run(_refuses_forever)
+
+    # (2) UNDER ITS OWN NAME - never folded into an existing category.
+    assert stopped.value.cause == ep_module.PACER_REFUSED
+    assert stopped.value.cause not in (
+        ep_module.RATE_LIMIT_429,
+        ep_module.PROVIDER_ERROR,
+    ), (
+        "the ruling says a new failure mode gets its OWN name; folding it into "
+        "RATE_LIMIT_429 or PROVIDER_ERROR would publish a lane refusal as a provider "
+        "fault and lose the distinction the category exists to make"
+    )
+
+    # (3) IT IS NOT A RETRY. Exactly one call, then the lane stops.
+    assert calls["n"] == 1, (
+        f"the failing call was made {calls['n']} times. The ruling forbids a silent "
+        f"retry by name"
+    )
+
+    # (4) IT IS COUNTED, and at ZERO tokens - the request never reached a provider, so
+    #     unlike PROVIDER_ERROR there is no call to charge for either.
+    assert booked == [("qwen-27b", 0, ep_module.PACER_REFUSED)]
+
+    # (5) ⚠️⚠️ AND IT REACHES THE PRINTED REPORT AS A NUMBER. This is the assertion the
+    #     ruling's third clause is about; (1)-(4) would all pass on a fix that booked the
+    #     outcome into a counter nobody renders.
+    denominator = ep_module.RunDenominator()
+    denominator.record(
+        ep_module.EpisodeOutcome(
+            key=ep_module.EpisodeKey("M-ADV", "1", "2101", "qwen-27b"),
+            started="2026-09-04T00:00:00Z",
+            turns_run=0,
+            turn_budget=20,
+            tokens_spent=0,
+            cause=ep_module.PACER_REFUSED,
+        )
+    )
+    assert denominator.by_cause()[ep_module.PACER_REFUSED] == 1
+
+    text = denominator.render()
+    assert ep_module.PACER_REFUSED in text, (
+        "the category was counted and NOT printed, which is hard rule 11's silence in a "
+        "new place rather than a fix for it"
+    )
+    assert f"{ep_module.PACER_REFUSED:<26}: 1" in text, (
+        f"PACER_REFUSED must print with its COUNT beside it, as every other cause does. "
+        f"Rendered:\n{text}"
     )

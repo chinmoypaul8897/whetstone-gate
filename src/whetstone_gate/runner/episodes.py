@@ -87,6 +87,21 @@ PROVIDER_ERROR = "PROVIDER_ERROR"
 #: checkpoint, so a re-run picks it up.
 INTERRUPTED = "INTERRUPTED"
 
+#: ⚠️ The lane's own rate buckets refused a call that **waiting cannot make admissible** —
+#: :class:`whetstone_gate.runner.buckets.BucketError`. `QUESTIONS.md` **Q-179**(2), which
+#: closes **Q-174**, RULED 2026-09-04: *"A `BucketError` escaping `execute` drops every
+#: remaining episode and PRINTS NOTHING. That is hard rule 11's named failure exactly —
+#: silent denominator shrinkage … BOOK IT AS ITS OWN NAMED COUNTED CATEGORY, AND PRINT IT AS
+#: A NUMBER LIKE EVERY OTHER. ⚠️ DO NOT make it a silent retry and DO NOT fold it into an
+#: existing category — a new failure mode gets its own name."*
+#:
+#: ⚠️ **IT IS NOT `PROVIDER_ERROR` AND THE DISTINCTION IS THE WHOLE POINT.** No request was
+#: made, so no provider was involved and there is nothing to charge: this is **our** pacer
+#: declining to spend, and filing it under a provider fault would publish a local refusal as
+#: a remote one. ⚠️ **NOR IS IT `RATE_LIMIT_429`**, which is a provider's *answer*; this
+#: fires **before** the wire.
+PACER_REFUSED = "PACER_REFUSED"
+
 #: Every declared cause, in print order.
 UNFINISHED_CAUSES: tuple[str, ...] = (
     TOKEN_CEILING,
@@ -95,6 +110,7 @@ UNFINISHED_CAUSES: tuple[str, ...] = (
     LANE_PARKED,
     LANE_RESERVED,
     PROVIDER_ERROR,
+    PACER_REFUSED,
     INTERRUPTED,
 )
 

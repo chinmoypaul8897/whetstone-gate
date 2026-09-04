@@ -82,6 +82,7 @@ from whetstone_gate.gates.verdict import Outcome, Verdict
 from whetstone_gate.ledger import build as ledger_build
 from whetstone_gate.ledger.chain import Ledger
 from whetstone_gate.runner import episodes as runner_episodes
+from whetstone_gate.runner.buckets import BucketError
 from whetstone_gate.runner.budget import (
     STOP_BY_429,
     STOP_BY_CALL_CEILING,
@@ -385,6 +386,27 @@ class _MeteredCall:
             self.calls_settled += 1
             self.on_usage(self.lane, 0, "ERROR")
             raise LaneStopped(runner_episodes.PROVIDER_ERROR) from None
+        except BucketError:
+            # ⚠️⚠️ **`Q-179`(2), RULED 2026-09-04, WHICH ALSO CLOSES `Q-174`.** Before this
+            # clause a `BucketError` raised inside `run._PacedClient._pace` — which runs
+            # INSIDE the `call()` above — escaped `run`, escaped `execute`, and took the
+            # whole run with it: no report, no denominator, every remaining episode gone and
+            # **nothing printed**. That is hard rule 11's named failure, *"NO SILENT
+            # DENOMINATOR SHRINKAGE"*, arriving by exception rather than by arithmetic.
+            #
+            # ⚠️ **BOOKED, NOT RETRIED.** The ruling forbids a silent retry by name. The
+            # lane stops here exactly as it does on a 429, and the episode is COUNTED under
+            # its own cause — `runner/episodes.py:PACER_REFUSED`, which is a member of
+            # `UNFINISHED_CAUSES` and therefore prints as a number in every report,
+            # including when it is zero.
+            #
+            # ⚠️ **ZERO TOKENS AND ZERO CALLS, and that is not the `ProviderFailed` case.**
+            # There, a request WAS made and is counted with an unknown cost. Here the pacer
+            # refused BEFORE the wire, so no provider saw anything: `settle` is not called
+            # and `calls_settled` does not move. Charging a call for a request that was
+            # never sent would overstate the spend hard rule 12 exists to bound.
+            self.on_usage(self.lane, 0, runner_episodes.PACER_REFUSED)
+            raise LaneStopped(runner_episodes.PACER_REFUSED) from None
         tokens = usage_total_tokens(reply.usage)
         self.budget.settle(tokens)
         self.tokens_settled += tokens
