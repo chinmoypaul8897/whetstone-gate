@@ -51,6 +51,7 @@ from whetstone_gate.runner.budget import (
     usage_total_tokens,
 )
 from whetstone_gate.runner import episodes as ep_module
+from whetstone_gate.runner import usage as runner_usage
 from whetstone_gate.runner.episodes import EpisodeKey
 from whetstone_gate.runner.redaction import SecretInPayload, refuse_if_secret_bearing
 from whetstone_gate.world import generator as world_generator
@@ -723,20 +724,71 @@ def test_the_turn_identity_reconciles_and_every_category_prints(tmp_path):
     assert result.denominator.denominator == matrix.episode_count
 
 
+@dataclasses.dataclass
+class _KilledAfter:
+    """A client that answers normally until its transcript runs out, then is **KILLED**.
+
+    ⚠️ **THE OPERATOR'S Ctrl-C, MODELLED HONESTLY.** `Q-200`'s floor books every `Exception`
+    escaping the model call, so a client that merely *errored* would no longer stop a run —
+    that is the ruling working, not a defect. A **kill** is a `BaseException`, the floor
+    cannot see it by construction, and `runner/episodes.py` already declares an `INTERRUPTED`
+    cause for exactly this. So this double raises what the thing it stands for raises.
+    """
+
+    inner: TranscriptClient
+
+    def complete_attacker(self, **kwargs):
+        try:
+            return self.inner.complete_attacker(**kwargs)
+        except driver_clients.DriverClientError:
+            raise KeyboardInterrupt("the operator stopped the run") from None
+
+    def complete_judge(self, **kwargs):
+        try:
+            return self.inner.complete_judge(**kwargs)
+        except driver_clients.DriverClientError:
+            raise KeyboardInterrupt("the operator stopped the run") from None
+
+    @property
+    def attacker_calls(self) -> int:
+        return self.inner.attacker_calls
+
+
 def test_kill_mid_run_and_resume_with_ZERO_duplicates_and_zero_re_runs(tmp_path):
     """⚠️ **Hard rule 10's whole claim, demonstrated rather than asserted.**
 
-    Pass 1 dies part-way (its transcript is exhausted). Pass 2 resumes and re-runs **only**
-    what has no checkpoint. Pass 3 re-runs **nothing at all** and makes **zero** model calls.
+    Pass 1 dies part-way. Pass 2 resumes and re-runs **only** what has no checkpoint. Pass 3
+    re-runs **nothing at all** and makes **zero** model calls.
+
+    ⚠️⚠️ **HOW PASS 1 DIES WAS CHANGED — AND THE ASSERTION WAS STRENGTHENED, NOT LOOSENED —
+    BY `QUESTIONS.md` `Q-200`, RULED 2026-09-04.** Pass 1 used to die because
+    ``TranscriptClient`` ran out of replies and raised ``DriverClientError``, and the guard was
+    the very loose ``pytest.raises(Exception)``.
+    ⚠️ **`Q-200`'s floor now BOOKS a `DriverClientError` instead of letting it escape** — which
+    is not a regression, it is `Q-174` being closed: that question asked, in terms, *"should a
+    `DriverClientError` reaching the dispatch loop be booked as a counted, categorised outcome
+    before the run ends?"* and the architect answered yes. So an exhausted transcript no longer
+    kills a run, and this test's old mechanism no longer produces a partial run at all.
+
+    ⚠️ **THE REPLACEMENT IS A REAL KILL, WHICH IS WHAT THIS TEST'S OWN NAME ALWAYS SAID.**
+    ``KeyboardInterrupt`` is a ``BaseException``; `Q-200`'s floor is spelled ``except
+    Exception`` and **deliberately cannot see it**, because a floor that booked an operator's
+    Ctrl-C as an episode outcome would make a 32-hour sweep unstoppable. So this body now
+    exercises **both** halves of the ruling at once: the floor catches what it must, and lets
+    through what it must not.
+    ⚠️ **`pytest.raises(KeyboardInterrupt)` IS STRICTLY STRONGER THAN `pytest.raises(Exception)`**
+    — it names the type instead of accepting any of them — and nothing else in this body moved.
     """
     out = tmp_path / "resume"
     matrix = pilot_module.load_pilot(arm="1")
     partial = 3
 
-    with pytest.raises(Exception):
+    with pytest.raises(KeyboardInterrupt):
         driver_run.execute(
             _request(matrix, out),
-            client=TranscriptClient(attacker_replies=rehearsal.attacker_transcript(partial)),
+            client=_KilledAfter(
+                TranscriptClient(attacker_replies=rehearsal.attacker_transcript(partial))
+            ),
             corpus_entries=(),
         )
     after_crash = sorted(p.stem for p in (out / "evals/checkpoints").glob("*.json"))
@@ -2856,7 +2908,22 @@ def test_a_BucketError_is_BOOKED_AS_ITS_OWN_NAMED_CATEGORY_AND_REACHES_THE_PRINT
     ⚠️ **AND IT IS NOT A RETRY.** The ruling forbids a silent retry by name. ``call_count``
     is asserted to be exactly **1**: the failing call is made once and the lane stops.
     """
-    booked: list[tuple[str, int, str]] = []
+    # ⚠️⚠️ **UPDATED — NOT WEAKENED — BY `INCIDENTS.md` INC-160 / `QUESTIONS.md` Q-201.**
+    # This double USED to be `lambda lane, tokens, outcome: ...`, and clause (4) below used to
+    # read `assert booked == [("qwen-27b", 0, ep_module.PACER_REFUSED)]`.
+    # ⚠️ **THAT ASSERTION PINNED A ROW THE PROGRAM COULD NOT WRITE.** The real sink is
+    # `driver/run.py:_usage_sink`, which calls `runner/usage.py:UsageLog.append`, whose
+    # `OUTCOMES` are exactly `("OK", "RATE_LIMITED", "ERROR")` — so passing `PACER_REFUSED`
+    # raised `UsageError` **from inside an `except` handler** and escaped `run`,
+    # `run_one_episode` and `execute` in exactly the way this branch was written to prevent.
+    # **The stub accepted a string the real collaborator refuses**, which is why a green test
+    # sat on top of a broken program for two days. INC-160's `Missing` field in full.
+    # ⚠️ **THE DOUBLE IS NOW SHAPED LIKE THE REAL SINK** — same keyword arguments — and clause
+    # (4) is **stronger, not looser**: it still pins the lane and the zero, and it now also
+    # requires the outcome to be one the usage log will actually accept and the diagnosis to
+    # survive. `tests/test_c14_unexpected_escape.py` asserts the same thing through a **real**
+    # `UsageLog`, which is the assertion no double can fake.
+    booked: list[dict] = []
     budget = LaneBudget(
         model="qwen-27b", ceilings=Ceilings(call_ceiling=10, token_ceiling=100_000)
     )
@@ -2864,7 +2931,9 @@ def test_a_BucketError_is_BOOKED_AS_ITS_OWN_NAMED_CATEGORY_AND_REACHES_THE_PRINT
         lane="qwen-27b",
         budget=budget,
         reservation_tokens=3_000,
-        on_usage=lambda lane, tokens, outcome: booked.append((lane, tokens, outcome)),
+        on_usage=lambda lane, tokens, outcome, **extra: booked.append(
+            {"lane": lane, "tokens": tokens, "outcome": outcome, **extra}
+        ),
     )
 
     calls = {"n": 0}
@@ -2899,7 +2968,26 @@ def test_a_BucketError_is_BOOKED_AS_ITS_OWN_NAMED_CATEGORY_AND_REACHES_THE_PRINT
 
     # (4) IT IS COUNTED, and at ZERO tokens - the request never reached a provider, so
     #     unlike PROVIDER_ERROR there is no call to charge for either.
-    assert booked == [("qwen-27b", 0, ep_module.PACER_REFUSED)]
+    assert len(booked) == 1
+    assert booked[0]["lane"] == "qwen-27b"
+    assert booked[0]["tokens"] == 0
+    assert metered.calls_settled == 0, "no request was sent, so no call is charged"
+    # ⚠️ INC-160: the usage OUTCOME must be one `runner/usage.py` DECLARES. This is the
+    #    assertion whose absence let a `UsageError` ship inside this very branch.
+    assert booked[0]["outcome"] in runner_usage.OUTCOMES, (
+        f"{booked[0]['outcome']!r} is not a declared usage outcome, so the real UsageLog "
+        f"would REFUSE this row from inside an except handler -- INC-160 exactly"
+    )
+    # ⚠️ And the DIAGNOSIS survives the change of outcome, in the field INC-142 built.
+    assert booked[0]["error_type"] == "BucketError"
+    # ⚠️ The LaneStopped CAUSE is untouched by INC-160's fix and is still this branch's own
+    #    name, which is `Q-179`(2)'s ruling and is re-asserted here beside the outcome so the
+    #    two vocabularies cannot be confused again at this call site.
+    assert stopped.value.cause == ep_module.PACER_REFUSED
+    assert ep_module.PACER_REFUSED not in runner_usage.OUTCOMES, (
+        "a cause and an outcome are different vocabularies; if they ever overlap, INC-160's "
+        "confusion would start validating by accident"
+    )
 
     # (5) ⚠️⚠️ AND IT REACHES THE PRINTED REPORT AS A NUMBER. This is the assertion the
     #     ruling's third clause is about; (1)-(4) would all pass on a fix that booked the

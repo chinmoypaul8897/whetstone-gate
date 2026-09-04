@@ -82,6 +82,10 @@ from whetstone_gate.gates.verdict import Outcome, Verdict
 from whetstone_gate.ledger import build as ledger_build
 from whetstone_gate.ledger.chain import Ledger
 from whetstone_gate.runner import episodes as runner_episodes
+# ⚠️ `Q-201` / `INC-160`: the USAGE vocabulary, imported so that this module names an
+# outcome where an outcome is required and a CAUSE where a cause is required. The two are
+# deliberately separate (`Q-119`) and passing one for the other is what INC-160 records.
+from whetstone_gate.runner import usage as runner_usage
 from whetstone_gate.runner.buckets import BucketError
 from whetstone_gate.runner.budget import (
     STOP_BY_429,
@@ -425,8 +429,91 @@ class _MeteredCall:
             # refused BEFORE the wire, so no provider saw anything: `settle` is not called
             # and `calls_settled` does not move. Charging a call for a request that was
             # never sent would overstate the spend hard rule 12 exists to bound.
-            self.on_usage(self.lane, 0, runner_episodes.PACER_REFUSED)
+            #
+            # ⚠️⚠️ **`INCIDENTS.md` INC-160: THIS LINE USED TO PASS `PACER_REFUSED` AS THE
+            # USAGE OUTCOME AND IT COULD NOT BE WRITTEN.** `runner/usage.py:OUTCOMES` is
+            # exactly `("OK", "RATE_LIMITED", "ERROR")` and `append` refuses anything else —
+            # so this branch, installed by `Q-179`(2) TO STOP AN UNCAUGHT ESCAPE, raised a
+            # `UsageError` from inside an `except` handler and escaped in exactly the way it
+            # was written to prevent. **The fix for instance #2 of the class was instance #4
+            # of it.** Proved end to end before it was changed; `Q-201` records the choice.
+            #
+            # ⚠️ **THE `LaneStopped` CAUSE BELOW IS UNCHANGED AND STAYS `PACER_REFUSED`.**
+            # Only the usage row's OUTCOME moved. The episode is still booked, counted and
+            # printed under its own name, so `Q-179`(2)'s ruling is now in force in fact and
+            # not only on paper. The two vocabularies are separate (`Q-119`), and passing a
+            # CAUSE where an OUTCOME was required is the whole of INC-160.
+            self.on_usage(
+                self.lane,
+                0,
+                runner_usage.OUTCOME_ERROR,
+                error_type=BucketError.__name__,
+            )
             raise LaneStopped(runner_episodes.PACER_REFUSED) from None
+        except Exception as escaped:
+            # ⚠️⚠️ **THE FLOOR. `QUESTIONS.md` `Q-200`, RULED 2026-09-04, VERBATIM:** *"ANY
+            # exception escaping the model call is BOOKED AS A COUNTED, NAMED OUTCOME AND THE
+            # RUN CONTINUES TO THE NEXT EPISODE. Not a longer list of caught types — a
+            # catch-all that books whatever escapes. Three named types have now escaped in
+            # three days and the third destroyed an unrepeatable run; a fourth name would be
+            # the same defect wearing a new label."*
+            #
+            # ⚠️ **IT IS A FLOOR BENEATH THE THREE BRANCHES ABOVE, NOT A REPLACEMENT FOR
+            # THEM.** `RateLimited`, `ProviderFailed` and `BucketError` keep their distinct
+            # causes and their distinct accounting; this clause is only ever reached by a
+            # type none of them names. `INCIDENTS.md` **INC-159** is the one that cost a
+            # single-shot run: a `TimeoutError` from an SSL read, which is an `OSError` and
+            # **not** a `urllib.error.URLError`, so `clients.py:_http_post`'s `URLError`
+            # branch — the one written to turn transport faults into `PROVIDER_ERROR` —
+            # never saw it. 13 calls and 56,855 tokens into episode 1 of 30; no report, no
+            # denominator, 29 episodes never attempted.
+            #
+            # ⚠️ **NO RETRY.** The ruling forbids it by name: *"A read timeout may already
+            # have been billed AND may already have mutated the world; retrying risks
+            # double-billing and double-execution, and hard rule 12's no-retry discipline is
+            # not weakened by a timeout being transient."* There is no destination argument
+            # and no loop here, so *"never retry into another lane"* stays a property of this
+            # code's shape rather than a rule to remember.
+            #
+            # ⚠️ **NO LANE STOP.** *"A 429 stops a lane because the window is genuinely spent;
+            # a transient network failure is not that, and a run that dies on one is a run
+            # that can never finish."* `record_429` is NOT called and `budget.stopped` does
+            # not move, so the dispatch loop takes the next episode.
+            #
+            # ⚠️ **NO NEW SPEC VALUE.** No retry count, no backoff, no consecutive-failure
+            # threshold, nothing added to `config/`. Hard rule 9 forbids the constant and the
+            # simple form needs none: *"If every episode fails this way, the denominator says
+            # so honestly and that IS the result."*
+            #
+            # ⚠️ **`KeyboardInterrupt` AND `SystemExit` PASS THROUGH.** They derive from
+            # `BaseException`, not `Exception`, so this clause cannot see them — and a test
+            # asserts that rather than leaving it to whoever next edits this line. A floor
+            # that booked an operator's Ctrl-C as an episode outcome would make a 32-hour
+            # sweep unstoppable.
+            #
+            # ⚠️ **ONLY THE TYPE NAME IS RECORDED. NEVER THE MESSAGE.** `INC-147` measured
+            # `runner/redaction.py`'s key scan as PREFIX-ANCHORED — a credential inside a
+            # longer string passes it — and `INC-148` measured a whole credential getting
+            # through that scan in code written the same hour to carry provider errors. **A
+            # type name is a Python identifier and cannot contain a credential.**
+            #
+            # ⚠️ **THE CALL IS COUNTED WITH ZERO TOKENS, AND THAT CHOICE IS ARGUED IN
+            # `Q-200`(a) RATHER THAN ASSUMED.** It follows `ProviderFailed` above: the cost is
+            # unknown, so it is recorded as zero — an UNDER-count, published rather than
+            # estimated — while the call itself is counted. The difference, stated because it
+            # is a real weakening: there we KNOW a request was made; here we do not. The
+            # ruling's own *"may already have been billed"* settles the direction, and hard
+            # rule 12 is a ceiling, so counting a call that may not have been sent makes the
+            # ceiling bind EARLIER, which is the safe side.
+            self.budget.settle(0)
+            self.calls_settled += 1
+            self.on_usage(
+                self.lane,
+                0,
+                runner_usage.OUTCOME_ERROR,
+                error_type=type(escaped).__name__,
+            )
+            raise LaneStopped(runner_episodes.UNEXPECTED_ERROR) from None
         tokens = usage_total_tokens(reply.usage)
         self.budget.settle(tokens)
         self.tokens_settled += tokens

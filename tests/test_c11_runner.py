@@ -869,7 +869,23 @@ def test_every_declared_cause_prints_even_at_zero():
     # WAY** — the loop above is untouched, so the NEW cause must also print at zero to get
     # here, which is the property this test exists for. Measured at the moment of the flip:
     # that loop PASSED for all eight while this line still said 7.
-    assert len(ep.UNFINISHED_CAUSES) == 8
+    #
+    # ⚠️⚠️ **8 -> 9, FLIPPED AGAIN UNDER HARD RULE 6 BY `Q-200`, RULED 2026-09-04**, which
+    # adds `UNEXPECTED_ERROR` — the floor beneath every named branch. `INCIDENTS.md`
+    # **INC-159**: a `TimeoutError` escaped the model call and killed the single-shot
+    # calibration 13 calls into episode 1 of 30, with no report and no denominator.
+    # ⚠️ **THE FLIP IS PROVABLY MEANINGFUL: `== 9` FAILS ON THE PRE-RULING CODE** (measured:
+    # `AssertionError: assert 8 == 9`), so this is a changed expected value and not a
+    # loosened one. ⚠️ **AND, AS BEFORE, THE LOOP ABOVE IS UNTOUCHED**, so `UNEXPECTED_ERROR`
+    # must also print at zero to reach this line. Measured at the moment of the flip: the
+    # loop PASSED for all nine while this line still said 8.
+    # ⚠️ **NOTHING WAS DELETED FROM THIS TEST AND NO ASSERTION WAS RELAXED.** The two lines
+    # below are ADDED, and they are the half a bare count cannot state: that the new member
+    # is really in the tuple, and that the tuple has no duplicate — a count alone would pass
+    # if a name were added twice and the real one forgotten.
+    assert len(ep.UNFINISHED_CAUSES) == 9
+    assert ep.UNEXPECTED_ERROR in ep.UNFINISHED_CAUSES
+    assert len(set(ep.UNFINISHED_CAUSES)) == len(ep.UNFINISHED_CAUSES)
 
 
 def test_the_denominator_identity_can_FAIL():

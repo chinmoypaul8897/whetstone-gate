@@ -102,6 +102,27 @@ INTERRUPTED = "INTERRUPTED"
 #: fires **before** the wire.
 PACER_REFUSED = "PACER_REFUSED"
 
+#: ⚠️⚠️ **THE FLOOR. An exception escaped the model call that no `except` clause named.**
+#: `QUESTIONS.md` **`Q-200`**, RULED 2026-09-04, verbatim: *"ANY exception escaping the model
+#: call is BOOKED AS A COUNTED, NAMED OUTCOME AND THE RUN CONTINUES TO THE NEXT EPISODE. Not a
+#: longer list of caught types — a catch-all that books whatever escapes. Three named types
+#: have now escaped in three days and the third destroyed an unrepeatable run; a fourth name
+#: would be the same defect wearing a new label."*
+#:
+#: ⚠️ **IT IS NOT `PROVIDER_ERROR`, AND THE DISTINCTION IS WHY IT IS A NINTH NAME RATHER THAN A
+#: REUSE.** `PROVIDER_ERROR` means *the provider returned an error that is not a 429* — the
+#: provider answered. This category means **nobody answered anything and we do not know why**:
+#: `INCIDENTS.md` `INC-159`'s `TimeoutError` from an SSL read, `INC-160`'s `UsageError` from our
+#: own log, an arithmetic fault in our own code. **Filing our faults under the provider's name
+#: would publish a local failure as a remote one**, which is the reason `PACER_REFUSED` exists
+#: one line above.
+#:
+#: ⚠️ **THE NAME SAYS "UNEXPECTED" ON PURPOSE.** Every other member of this tuple names a
+#: condition somebody predicted. This one names the complement of that set, and it is the only
+#: member whose population can never be enumerated in advance — which is exactly why the two
+#: earlier fixes, each of which added one predicted name, did not hold.
+UNEXPECTED_ERROR = "UNEXPECTED_ERROR"
+
 #: Every declared cause, in print order.
 UNFINISHED_CAUSES: tuple[str, ...] = (
     TOKEN_CEILING,
@@ -111,6 +132,7 @@ UNFINISHED_CAUSES: tuple[str, ...] = (
     LANE_RESERVED,
     PROVIDER_ERROR,
     PACER_REFUSED,
+    UNEXPECTED_ERROR,
     INTERRUPTED,
 )
 
