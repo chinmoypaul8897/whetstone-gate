@@ -13202,3 +13202,84 @@ raised as **`Q-I`**.
 
 **The other 20 checks pass**, including A3 (no CRLF), A5 (no control byte) and D1–D4 (the moat;
 allow-list still **0**).
+
+---
+
+### ⚠️ C21 BUILD 2 (`6f2d47ba`) — 2026-09-04 — **APPENDED AT THE FOOT, NOT PLACED AT THE HEAD**
+
+⚠️ **`PROGRESS.md` is newest-on-top and this session's fence said APPEND ONLY, so this entry sits at
+the FOOT and is labelled as such.** The fence was obeyed literally because two other sessions were
+live in this tree. **BUILD 1 hit the same collision and raised it as `Q-H`; it is still
+unanswered**, and a later session may move both entries to the head.
+
+**SESSION-TOKEN `6f2d47ba` · C21 · BUILD · attempt 2 · pushed `77854e3`.**
+
+**What it did.** Rewrote `docs/submission/FORM_ANSWERS.md` — the submission deliverable — against
+the tree as it stands tonight, rather than amending BUILD 1's nine-hour-old version. Counted rather
+than estimated: **two** of BUILD 1's seven state rows had become **false** and **three more** carried
+line numbers that had moved; its published incident count was **137** and is now **155**.
+
+**Three commits, in order:** `2126abf` the deliverable; `dbbd5c3` the journal
+(`docs/sessions/c21-build-2.txt`, committed **before** the final output was printed, per `CLAUDE.md`
+§6 duty 1); `77854e3` eight corrections this session found in its own committed work, plus the
+journal's ADDENDUM naming them.
+
+**The five method claims were RE-MEASURED, not inherited.** BUILD 1 reported all fifteen of its
+adversarial passes REFUTED. This session measured each again and attacked each from three angles.
+**Claims 1 and 4 unmoved — and "unmoved" was MEASURED**, not assumed: `git diff --stat 685ca50..HEAD`
+over `src/whetstone_gate/attacker/`, `data/attacker_sys.txt`, `CONTEXT.md`, `corpora/` and
+`tests/test_c6_attacker.py` is EMPTY. **Claim 2 moved most — one narrowing became three**, and the
+third is the largest correction of the night: **T-FP is not runnable at any size** (`Q-154` RULE 1
+STOP, `Q-155` Class A, both **OPEN**; `README.md` §9.4's *"Halving a block that cannot run does not
+make it run"*). **Claim 3 moved** — the calibration is declared, twice attempted, and still has no
+threshold. **Claim 5's** indexed-module count moved **118 → 119** (`driver/cal.py`), closure figures
+unchanged, allow-list still **0**.
+
+⚠️ **THE ITEM THE OPERATOR MUST SEE FIRST: THE CALIBRATION'S ATTEMPT 2 HAS ABORTED AND HAS NO
+`INCIDENTS.md` ENTRY, AND `PROCESS.md` §6b FORBIDS ATTEMPT 3 UNTIL IT EXISTS.** Measured twice:
+**0** `python.exe` processes; the log ends `TimeoutError: The read operation timed out`;
+`find evals -name '*cal__*'` → **0**, so **no calibration episode completed**; **13 calls / 56,855
+tokens** on `cal__1__2201__gemma-26b`, plus **232** liveness tokens. `INCIDENTS.md` and `evals/` were
+outside this fence, so the numbers are stated rather than the entry written. Checklist **O-0**.
+
+⚠️ **`HEAD` MOVED TWICE UNDER THIS SESSION** and the second move changed the deliverable. `259ca6b`
+is **C17 REVIEW 1, verdict FAIL, two BLOCKERs**. The review trail went **20 / 14 / 6 → 21 / 15 / 6**,
+and a renderer paragraph this session had written **from the build session's own `README.md`** was
+rewritten to what the **review** measured — `B-1`, a false `RECOMPUTED, MATCHED` stamp on a ledger
+the renderer itself detected as tampered; `B-2`, *"nothing moved"* printed where 20,118,586 paise
+moved. **A C17 FIX must land before the §18 RACE beat is shot** — new checklist item **O-4b**,
+because `H-1` puts the tampered-content money bar in that frame.
+
+⚠️ **EIGHT DEFECTS IN THIS SESSION'S OWN DELIVERABLE, FOUND BY ITS OWN COMPLETENESS PASS AND FIXED
+IN A THIRD COMMIT.** The worst: the form cited `vendor/tau2-bench/LICENSE` **twice** as the proof
+the answer key is Sierra's — and **a clone does not contain it**. `git ls-files vendor/` returns one
+path, `vendor/MANIFEST.md`; the tree is `.gitignore`d at :54 and has **never been tracked on any
+ref**. That is an unverifiable citation in the one paragraph claiming an external authority — the
+exact class persona 3 exists to distrust — and it was already recorded as `OF-08` and `OF-163`, both
+**OPEN**, neither previously mentioned in the form. Also fixed: a self-contradiction about E1; a
+count inside the **verbatim-paste block** that C17's review made false; a passage leaving room to
+infer a tokens-per-episode figure; a `§13.4` citation naming one section as both the derivation
+authority and the rule that did not fire; `check-prereg` failing open on **all three** branches, not
+one; the counter-metric's missing mock-world half (**3 of 30** scenarios, `Q-158`); and `INC-144`
+cited six times with `INC-146`, the entry correcting it, zero.
+
+**Git.** `INC-139`'s recipe on every commit — private index in a fresh OS temp directory,
+`git read-tree HEAD` from **always-live** HEAD, step 4 as `env -u GIT_INDEX_FILE` and never `VAR=`
+(`INC-91`), step 5 proving the shared index clean. **The name-only guard MATCHED on every commit,
+first time, and was never forced.** `OF-213`'s first-command check was empty before the read order
+and before each commit. **No tag cut, no force-push, no history rewrite, no `stash`/`checkout --`/
+`restore`/`clean`/`reset --hard`.** One Class C deviation recorded: the subjects carry
+`(unreviewed)` though they touch neither source nor tests.
+
+⚠️ **E1 WILL BE RED ON THESE COMMITS — `INC-141`, not a defect.** `grep -c "6f2d47ba" QUESTIONS.md`
+→ **0**; `QUESTIONS.md` is in this session's may-not-write list. **No row was written for this
+session's own token.** Architect's fix: `` | `6f2d47ba` | C21 | BUILD | 2026-09-04 | ``.
+
+**ZERO PROVIDER TOKENS SPENT** — no sanction held, none taken, no provider call in any mode by this
+session or by any subagent it ran. `.env` never opened. `evals/` read, never written.
+**No placeholder was filled and no calibration result was anticipated.**
+
+**Questions owed:** `Q-J`, `Q-K`, `Q-L`, `Q-M` and `Q-N`, on top of BUILD 1's `Q-A`…`Q-I`, **none of
+which has been answered**. All are in `docs/sessions/c21-build-2.txt` §10 and its ADDENDUM.
+
+**NOT SELF-CERTIFIED. NO TAG.** C21's review is `full` + `submission`, persona 3, and has not run.

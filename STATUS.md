@@ -2768,3 +2768,81 @@ was edited and none was closed — the SHA is another session's and the closure 
 ⚠️ **HEAD MOVED TWICE UNDER THIS SESSION** (`c5a83fd`, `5960120` — both `8f3c72e1`'s). The private
 index was seeded from **live HEAD** each time, which is why `INC-139` forbids a pinned SHA;
 `dc9b842` remains an ancestor of HEAD. **Nothing was swept in either direction.**
+
+---
+
+## C21 BUILD 2 — `6f2d47ba` — 2026-09-04 — **APPENDED, NOT MERGED INTO ANY LIVE ROW**
+
+⚠️ **This session's fence was `docs/submission/` and `docs/sessions/c21-build-2.txt`, with
+`STATUS.md` and `PROGRESS.md` **APPEND ONLY** as the last commit. C21's row at `STATUS.md`:2200 was
+therefore NOT edited and still reads `todo`.** That is the literal reading of the fence, taken
+deliberately while two other sessions were live in this tree. `CLAUDE.md` §6 duty 2 asks for the
+chunk's row to be updated and the review-history column appended to; the fence forbids touching an
+existing row. **BUILD 1 hit the same collision and raised it as `Q-H`; it is still unanswered.**
+
+| | |
+|---|---|
+| **Chunk / role** | C21 · BUILD · attempt 2 |
+| **Pushed** | `77854e3` (deliverable `2126abf`, journal `dbbd5c3`, corrections `77854e3`) |
+| **Deliverable** | `docs/submission/FORM_ANSWERS.md` — **REWRITTEN**, not amended |
+| **Review** | ⚠️ **NOT SELF-CERTIFIED. NO TAG.** C21's review is `full` + `submission`, persona 3, and has not run |
+
+**WHY REWRITTEN.** BUILD 1 wrote the file at 07:47 IST. Counted rather than estimated: of its seven
+state rows **two had become false** (`evals/` "one file" — now **31**; `RESULTS.md` "does not
+exist" — it does) and **three more carried line numbers that had moved**; its published incident
+count was **137** and `grep -c "^## INC-" INCIDENTS.md` now returns **155**.
+
+**THE FIVE METHOD CLAIMS WERE RE-MEASURED, NOT INHERITED, AND TWO MOVED.** Claim 1 unmoved
+(*measured*: `git diff --stat 685ca50..HEAD` over every attacker-side artefact is EMPTY). Claim 4
+unmoved. **Claim 2 moved most**: one narrowing became **three** — rung 4 fired **and has since been
+executed** in `config/protocol.yaml`:445, :497-498 and `tests/test_c3_tau2_enumeration.py`:269-316,
+and **T-FP is not runnable at any size** (`Q-154` RULE 1 STOP and `Q-155` Class A, both **OPEN**;
+`README.md` §9.4). **Claim 3 moved**: the calibration is now declared and twice attempted and still
+has no threshold. **Claim 5's** module count moved 118 → **119**.
+
+⚠️ **THE OPERATOR ITEM THAT OUTRANKS EVERY OTHER, AND IT IS NEW: THE SINGLE-SHOT CALIBRATION'S
+ATTEMPT 2 HAS ABORTED AND HAS NO `INCIDENTS.md` ENTRY.** Measured twice, at `14:45:42Z` and
+`14:57:31Z`: **zero** `python.exe` processes of 326 listed; the log ends
+`TimeoutError: The read operation timed out`; `find evals -name '*cal__*'` → **0**, so **no
+calibration episode completed**; **13 usage rows, 56,855 tokens** on `cal__1__2201__gemma-26b` plus
+**232** liveness tokens. `PROCESS.md` §6b requires the abort, its cause and its partial episode count
+in `INCIDENTS.md` **BEFORE any retry**, and `INCIDENTS.md`'s last entry is `INC-157`, which covers
+attempt 1. **`INCIDENTS.md` and `evals/` were both outside this fence, so this session wrote neither
+and stated the numbers instead.** It is checklist item **O-0**.
+
+⚠️ **`HEAD` MOVED TWICE UNDER THIS SESSION** — `259ca6b` (C17 REVIEW 1, verdict **FAIL**) and this
+session's own commits. The private index was seeded from **live HEAD** each time (`INC-139`), the
+name-only guard **matched on every commit and was never forced**, and the shared index was proved
+clean after each. **C17's review landing mid-session changed the deliverable**: the review trail went
+**20 / 14 FAIL / 6 PASS → 21 / 15 / 6**, and a renderer paragraph this session had written from
+`docs/render/README.md` — the *build* session's own words — was **rewritten to what the review
+measured**, because `B-1` and `B-2` found both of those printed claims false in the shipped code.
+
+⚠️ **AND THIS SESSION FOUND EIGHT DEFECTS IN ITS OWN COMMITTED DELIVERABLE AND FIXED THEM IN A THIRD
+COMMIT RATHER THAN LEAVING THEM.** The worst: the form cited `vendor/tau2-bench/LICENSE` **twice** as
+proof the answer key is Sierra's, and **a clone does not contain it** — `git ls-files vendor/`
+returns one path, `vendor/MANIFEST.md`; the tree is `.gitignore`d at :54 and has never been tracked
+on any ref (`OF-08`, `OF-163`, both **OPEN**, neither previously mentioned). Full list in
+`docs/sessions/c21-build-2.txt`'s **ADDENDUM**.
+
+⚠️ **`make check-roles` E1 WILL BE RED ON THIS SESSION'S COMMITS AND THAT IS `INC-141`, NOT A
+DEFECT.** `grep -c "6f2d47ba" QUESTIONS.md` → **0**, and `QUESTIONS.md` is in this session's
+may-not-write list. **No row was written for this session's own token** — a session vouching for its
+own identity is the exact shape E1 exists to catch. The architect's one-line fix:
+`` | `6f2d47ba` | C21 | BUILD | 2026-09-04 | ``.
+⚠️ **And the precise history, because this session got it wrong once and corrected it:** E1 was
+**already red at committed `686a224`** for `7a1e3b52` — `REVIEW_C17_1.md` §0 measured that tree at
+**20 passed, 1 failed, 3 n/a**. This session's own `21/0/3` was true only of the working tree, which
+already carried C17's two uncommitted rows. Those are committed at `259ca6b`; `6f2d47ba` is the one
+still missing.
+
+**FOUR QUESTIONS OWED, on top of BUILD 1's `Q-A`…`Q-I`, none of which has been answered:** `Q-J` the
+calibration abort with no entry; `Q-K` the prompt's "TEN QUESTIONS" against the **nine** that exist;
+`Q-L` `CONTEXT.md` §1 carrying the **unnarrowed** form of method claim 1; `Q-M` citation rot nothing
+checks. Plus `Q-N` in the addendum — the deliverable read `OPEN_FINDINGS.md` selectively and **six**
+of the ten findings it missed are still not carried.
+
+**ZERO PROVIDER TOKENS SPENT.** No sanction was held and none was taken. `evals/`, `config/`, `src/`,
+`tests/`, `docs/reviews/`, `QUESTIONS.md`, `INCIDENTS.md`, `README.md`, `RESULTS.md`, `PROTOCOL.md`,
+`HOLES.md`, `CONTEXT.md`, `PROCESS.md`, `corpora/`, every tag and `.env` were **untouched**.
+**No placeholder was filled and no calibration result was anticipated.**
