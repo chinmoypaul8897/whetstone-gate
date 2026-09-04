@@ -12185,3 +12185,125 @@ create and activate the venv first. ⚠️ **So the bare `python` is not a defec
 repository; the defect is a launcher that inherited the convention without carrying the activation the
 convention assumes.** Whether the frozen handover text is amended for this launcher's successors is the
 architect's call, and is recorded here rather than taken.
+
+---
+
+## INC-158 — ⚠️ **THE REPLAY RENDERER STATED A COMPLETENESS, A COUNT AND A MEASUREMENT THAT THE STORED RECORD DOES NOT CARRY — FIVE TIMES, IN FIVE PLACES, AS ONE DEFECT.** Its worst instance stamped `RECOMPUTED, MATCHED` on all eight entries of a ledger it had **itself just DETECTED as tampered**, published the fabricated `88,888,888 paise` under `MONEY PAST THE GATE` — **and the test carrying that exact behaviour's name was GREEN**
+
+**Date:** 2026-09-04 (C17 FIX 1, `1b9e4c73`). Fix SHA under **Fix**.
+
+**Event:** `docs/reviews/REVIEW_C17_1.md` (`4e8b91d3`, `code`, two sealed phases) returned **⛔ FAIL**
+on C17 with **two BLOCKERs, five HIGH, five MEDIUM, five LOW**. This session re-measured every one
+first-hand before writing a line — the renderer run over crafted and tampered episodes in an OS temp
+directory, `evals/` never written and byte-identical to `HEAD` throughout — and **every finding
+reproduced**:
+
+```
+B-1  tampered ledger: chain_verdict DETECTED at ledger_seq 3, and the SAME document then
+     printed "RECOMPUTED, MATCHED" 8 times (8 of 8 entries, the tampered one included)
+     and "88,888,888 paise" under the heading MONEY PAST THE GATE, BY COMPONENT
+B-2  EMPTY episode (10 of the 11 stored episodes, the default output of audit.py --all):
+     "there is no record that the attacker did anything" AND, 4x, "MEASURED ZERO (the
+     episode ran; nothing moved)"
+     ABSENT arm: "Nothing below is a measurement." AND, 4x, the same four measurements
+     the ONE non-empty episode: the world EXECUTED 20,118,586 paise (Rs. 2,01,185.86) of
+     refunds and the log said "nothing moved" 4x and stated the executed figure NOWHERE
+B-3  a ledger at turn indices [0, 1, 19] of a 20-turn budget -> completeness COMPLETE,
+     and the audit log printed "COMPLETE. All 20 turns of the budget are accounted for."
+     Seventeen turns absent; twenty declared accounted for
+H-1  race.frame() over the same tampered file: arm 1 [############################]
+     88,888,888 paise -- a full-length money bar, in the frame S18 puts in the video
+H-3  an entry at turn_index 25 booking 777,777 paise against a 20-turn budget:
+     "777,777" in ANY of the 20 race frames -> False;  audit component_total -> 777777.
+     Two deliverables, one episode, two different answers, and nothing said a row was dropped
+H-4  real stored seeds 2102-2110, arm 1 EMPTY and arms 2/2S/3/4 ABSENT:
+     "ARMS WITH NO DATA: 2, 2S, 3, 4   (4 of 5 arms have never run)"  -- five of five
+     have no usable data and the footer credited one of them with data
+```
+
+⚠️ **AND THE ONE THAT MADE THE OTHERS SURVIVABLE:** `tests/test_c17_render.py`'s
+`test_the_renderer_would_REFUSE_TO_ANIMATE_a_tampered_ledger` was **PASSING**, with **36 of 36 green**
+in that file at the reviewed tree.
+
+**Action:** this entry was written **before any line of code was changed**, per `CLAUDE.md` §Who-you-are
+and hard rule 13. Then, and only then: `docs/render/replay.py`, `docs/render/audit.py`,
+`docs/render/race.py`, `docs/render/README.md` and `tests/test_c17_render.py` — **the whole of this
+session's fence and nothing else**. Every fix was given a test **proved RED against the pre-fix code
+first** (a byte-copy of the pre-fix renderer was kept in an OS temp directory for exactly that
+purpose), and **no existing assertion was deleted, skipped, loosened or approximated.** `M-3`/`OF-259`
+— the six suite reds the live single-shot calibration causes by appending to a tracked usage file —
+**was not touched and is not this entry's subject**; it is not C17's, the review says so in terms, and
+sweeping it in here would be the dramatisation hard rule 13 exists to price.
+
+**Expectation:** that a renderer whose own module docstring reads *"a renderer that would happily
+animate a tampered ledger is a prop, not evidence"* would not, on detecting a tampered ledger, print
+an affirmative per-entry verification stamp and the fabricated money under `MONEY PAST THE GATE`; and
+that the four completeness states `replay.py` **correctly carries** — `COMPLETE` / `TRUNCATED` /
+`EMPTY` / `ABSENT` — would reach the two rendered artefacts, which is where a judge reads them. Both
+halves of the design were right. **The prose was not, and the prose is the deliverable.**
+
+**Missing:** any test that asserted what the renderer **does not print**. Every one of the 36 asserted
+a *presence* — `assert "DETECTED" in rendered`, `assert "VACUOUSLY" in rendered`,
+`assert "EMPTY. The episode produced NO ledger entry at all." in rendered` — and a presence assertion
+cannot see a contradiction sitting forty lines below the string it found. There was also **no fixture
+carrying a gapped ledger, an entry past the turn budget, or an EMPTY arm beside ABSENT arms**, which
+is why `B-3`, `H-3` and `H-4` had nothing to trip over: `evals/episodes/` holds one contiguous
+truncated ledger and ten empty ones, and every hand-derived expectation in the suite was taken from
+those eleven files.
+
+**Missed:** ⚠️ **THE TEST NAMED FOR `B-1`'s BEHAVIOUR WAS GREEN, AND ITS NAME WAS THE SIGNAL.**
+`test_the_renderer_would_REFUSE_TO_ANIMATE_a_tampered_ledger` ends
+
+```python
+assert "WHAT HAPPENED, TURN BY TURN" not in rendered.split("DOES NOT MATCH")[0]
+```
+
+and **this session re-measured what that line actually decides:** on the tampered render the slice
+*before* the warning is 2,437 characters and the slice *after* it is 9,904 characters containing the
+turn-by-turn block and all eight `RECOMPUTED, MATCHED` stamps. The turn-by-turn header is emitted
+**after** the chain section by construction, so `split(...)[0]` can never contain it — **the assertion
+is satisfied by DOCUMENT ORDER ALONE and would pass identically whether the renderer printed zero
+entries or eight.** ⚠️ **A test named for a property it does not test is worse than no test**, because
+it converts an open question into a settled one: the build session read its own green suite and wrote
+*"the audit log … does not present the entries as a record of what happened"*, which was false in its
+second half, and nothing in the repository disagreed. `L-2`/`OF-261` is the same shape one row down —
+an assertion in the same file ending in `or True`, unconditionally true, measured `True` against three
+different sources.
+
+**Diagnosis:** every one of `B-1`, `B-2`, `B-3`, `H-3` and `H-4` is the renderer **asserting a
+property of the record from a proxy for that property rather than from the record** — verification
+inferred from *"an entry exists"*, a measured zero from *"the sum is 0"*, completeness from
+`max(turn_index)` alone, a frame's money from *"turn < budget"*, and *"has data"* from *"a file
+exists"* — so each printed a completeness, a count or a measurement the stored record does not carry.
+**The suite could not catch any of them because it asserted only what the renderer prints, never what
+it must refuse to print, and every fixture came from the eleven stored episodes, none of which is
+tampered, gapped, past-budget, or EMPTY-beside-ABSENT.**
+
+**Fix:** ⚠️ **THIS ENTRY IS WRITTEN BEFORE THE FIX BECAUSE `CLAUDE.md` ORDERS THAT EXACT SEQUENCE**
+— *"writes the `INCIDENTS.md` entry **first**, then fixes only the findings named"* — **so no SHA
+exists at the moment of writing and none is invented.** The fix lands in this same session, in
+`docs/render/{replay,audit,race}.py`, `docs/render/README.md` and `tests/test_c17_render.py`, and
+**its commit SHA is `<<PENDING-COMMIT: SHA>>`, filled in on this line by this session's own later
+commit.** ⚠️ **If this line still reads `<<PENDING-COMMIT: SHA>>` in a committed tree, the fix did not
+land and this entry is the record of a FAIL that was never repaired** — `README.md:28`'s convention,
+under which a placeholder is never a result. Shape of the change, stated now so the later SHA can be
+checked against it rather than taken on trust: a detected-tampered ledger renders **no** entries, **no**
+money summary and **no** per-entry verification stamp, and draws **no** race bar and enters **no**
+bar scale; `MEASURED ZERO`, `EMPTY`, `ABSENT` and `MONEY THE WORLD EXECUTED` become four different
+sentences; `COMPLETE` requires contiguous coverage of the budget and not merely a high water mark;
+entries at or beyond the budget are counted and named in **both** deliverables; and the frame footer
+separates *never ran* from *ran and recorded nothing*.
+
+**Systemic guardrail:** ⚠️ **PARTIAL, AND THE PART THAT IS MISSING IS NAMED RATHER THAN CLAIMED.**
+What is installed: `tests/test_c17_render.py` gains **negative** assertions — tests that fail when the
+renderer *prints* something, not only when it omits something — for every one of the five instances,
+each proved RED against the pre-fix renderer before the fix existed, plus fixtures for the four shapes
+`evals/episodes/` does not contain (tampered, gapped, past-budget, EMPTY-beside-ABSENT). ⚠️ **What is
+NOT installed, and what would actually make this class impossible: nothing in this repository requires
+a test to be shown RED before it is trusted.** `INC-14`'s convention — *"a check ships WITH THE INPUT
+THAT MAKES IT FAIL"* — is a habit sessions honour by hand, and C17's own suite honoured it for the
+**import** proofs (three planted-leak tests) and **not** for the tampered-ledger proof, which is
+precisely where it was needed. A mutation gate over `tests/test_c17_render.py`, or a review step that
+re-runs each new assertion against the pre-fix blob, is the thing that closes it, and **it is the
+architect's to install, not this session's** — `PROCESS.md` and the review protocol are both outside
+this fence. Recorded as owed rather than asserted as done.
