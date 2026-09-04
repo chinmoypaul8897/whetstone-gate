@@ -11012,3 +11012,123 @@ this run's own eight numbers. ⚠️ **AND THE CHEAPEST OF ALL, IF NEITHER IS DO
 A docstring that promises *"can only make the runner slower … never faster"* is worse than silence
 once it is known to be false, because the next session budgets against it. **Proposed, not installed**
 — every one of them is in a file this session may not write.
+
+
+---
+
+## INC-144 — DEGRADATION RUNG 4 FIRED: T-FP 40 → 20 τ² tasks, by the operator, recorded AT THE MOMENT OF THE CUT. ⚠️ τ²-BENCH IS **NOT** CUT — ONLY ITS BREADTH IS STAGED, AND THE ENTRY SAYS SO BECAUSE A READER WHO SKIMS WILL OTHERWISE READ A DROPPED COMPARATOR
+
+**Date:** 2026-09-04, **cut made at `05:27Z`, this entry written at `05:32Z`** (ARCH LANES 1,
+`6d1a94f3`). Fix SHA under **Fix**.
+⚠️ **THIS ENTRY IS WRITTEN BECAUSE §14 REQUIRES IT AT THE MOMENT OF THE CUT AND NOT AFTERWARDS:**
+*"Record every cut in `INCIDENTS.md` **at the moment it is made**, with the time, the rung, and the
+reason. A cut item is never silently lost: it is named in `RESULTS.md` and in the README as **not
+run**, with why."* Nothing was built, tested or measured in this session before it was written.
+
+**Event:** the operator ruled, 2026-09-04, in the prompt that opened this session: **"RUNG 4 FIRES.
+RUNGS 2 AND 6 DO NOT."** `PROCESS.md` §14 rung 4 is *"**T-FP 40 → 20 τ² tasks**"*, costed there at
+*"Halves the τ² false-positive sample; −6M tokens ≈ −3 h of Gemma lane time"* and marked
+*"Pre-declared: **yes** — spec §13.4, 'the one pre-declared further reduction'"*. Until this entry,
+`PROCESS.md` §14 and `PROTOCOL.md` §5.1 both carried rung 4 as **NOT FIRED. RESERVED UNTIL C14**, and
+`PROTOCOL.md` §5.1's own paragraph recorded that a previous session's prompt had **falsely asserted**
+rung 4 was already fired and that the session **stopped rather than transcribe it** (`Q-099`).
+**This is the real firing, and it is the first.**
+
+⚠️ **THE REASON IS SCHEDULE, AND IT IS NOT THE §13.4 DECISION RULE.** Two instruments can order this
+same reduction and **only one of them fired**. `CONTEXT.md` §13.4's rule fires on the pilot's
+**measured** attacker tokens/episode; `INC-142` records that the pilot completed **0 of 20** episodes
+and that `select_n` returned **`USABLE TO SELECT N: False`**, so that rule's input **does not exist**
+and `n_decision.selected_branch` is still `TODO_C14_PILOT`. **Rung 4 is a schedule cut, fired by the
+operator, and it is published as one.** Nothing in this repository may say the pilot selected it.
+
+⚠️ **AND THE LINE THAT MATTERS MOST TO A READER WHO SKIMS: τ²-BENCH IS NOT BEING CUT.** `PROCESS.md`
+§14's *"NEVER CUT, at any rung, for any reason"* list opens with **τ²-bench — the external answer
+key**, and `CONTEXT.md` §21.4 says of it *"**It is never dropped.**"* — adding, in the same sentence,
+that its **scope** is staged (*"its **scope** is staged at 20:00 (§17)"*). §14's own never-cut row
+spells the distinction out: *"τ²-bench — the external answer key; spec §21.4 says 'never dropped',
+and **only its breadth is staged**"*. **What rung 4 reduces is the BREADTH of ONE block — T-FP, the
+false-positive block — from 40 tasks to 20. The comparator itself, the external answer key, and the
+T-NEG must-not-write control (all 34 tasks, untouched) remain.** The whole externally-authored-answer-
+key claim, which is the project's thesis, is **unaffected**.
+
+**Action:** the ruling was recorded verbatim in `QUESTIONS.md` **before any file was touched** (hard
+rule 5), together with the selection rule, its citations, and the three rejected readings. Then this
+entry. Then `PROTOCOL.md`'s rung table and T-FP rows.
+
+⚠️ **WHICH 20 SURVIVE WAS DERIVED, NOT CHOSEN.** The rule is stated and is mechanical:
+`CONTEXT.md` §13.4 — *"T-FP takes the **first 40 write-task ids after sorting, stratified 20 airline /
+20 retail**"* — and `PROTOCOL.md` §3.2, which fixes the sort and says why: *"⚠️ **The sort is BYTEWISE
+ASCENDING on the ids AS STRINGS, within each domain separately** — architect-ruled, because retail
+puts `"100".."109"` ahead of `"11"` and **a numeric sort selects a DIFFERENT sample.**"* That is one
+parameterised rule — *first K/2 per domain, bytewise ascending, within each domain separately* —
+evaluated at K=40. **Rung 4 sets K=20. Same rule, same sort, smaller K:**
+
+    airline (10) : 11 12 14 15 16 17 18 19 20 21
+    retail  (10) : 0 1 100 101 102 103 104 105 106 107
+
+**MEASURED against `config/protocol.yaml:selections.tfp_task_ids` lines 461-465: each is an EXACT
+PREFIX of that domain's pre-registered 20.** Nothing enters the sample that was not already in it;
+ten ids leave the tail of each domain. **A prefix cut is not a re-registration**, which is the precise
+hazard §14 rung 4 names for a cut made *after* the tag — and this one is made **before** it, which
+§14 says to do *"if at all possible"* for exactly this reason. `git rev-parse prereg-v1` **does not
+resolve**, verified as this session's first act.
+
+**Expectation:** §14 rung 4's row says the cut *"changes what is MEASURED"* and reserves it until
+C14; C14 is where the freeze happens, and the freeze has not happened. **So the expectation is met and
+this is not a violation** — it is the reserved rung being spent in the window reserved for it. What
+**did not** meet expectation is narrower and is stated rather than smoothed: §14 assumes a fired rung
+can be *implemented*, and **half of this one cannot be, by this session.**
+
+**Missing:** ⚠️ **A CONFIG KEY FOR THE T-FP TASK COUNT — THERE IS NONE, AND ITS ABSENCE IS WHY A
+FIRED RUNG CANNOT BE EXECUTED TODAY.** The list the **code** reads is
+`config/protocol.yaml:selections.tfp_task_ids`, and `config/` is **outside this session's fence**
+(the fence admits `config/lanes.yaml`, *"⚠️ GATE 4 ONLY"*). `CLAUDE.md` hard rule 9 requires every
+spec-specified value to live in `config/` *"with no default for a required value"*, so the number
+**20** would have to live there too — and `grep` over `config/` finds **no `tfp_task_count`, no
+`n_tfp`, and no key of any name expressing the T-FP sample size**. The count exists only as the
+*length of a list*, which means the one legal way to halve it is to halve the list, which is the file
+this session may not write. **So rung 4 is DECLARED and RECORDED and is NOT YET EXECUTABLE**, and
+that is disclosed here rather than papered over by editing outside the fence — the act `INC-05` and
+hard rule 4 exist to prevent.
+
+**Missed:** ⚠️ **`PROTOCOL.md` §5.1 ALREADY SAID, IN ITS OWN WORDS, THAT FIRING A RUNG IS AN ACT AND
+NOT A TRANSCRIPTION — AND NOBODY ASKED WHAT THE ACT WOULD CONSIST OF.** Its sentence is *"Firing a
+rung is an act with a time, a reason and an `INCIDENTS.md` entry written at the moment of the cut —
+it is not something a build session performs by transcription."* It was written on 2026-09-03 by a
+session that **stopped** because its prompt falsely claimed rung 4 was already fired. That session
+established what firing is **not**, and the obvious next question — *what would firing it actually
+touch?* — was never put, in that session or in the three that followed it. **Had it been, the missing
+`config/` key would have been found while `config/` was still freely amendable and the whole rung
+would have been executable in one session.** The same paragraph also names `Q-099`; `Q-099` is about
+the false claim, not about the mechanism.
+
+**Diagnosis:** the T-FP sample size is represented in this repository **only** as the length of a
+pre-registered id list inside a pre-registration artefact, so a cut that halves it can only be made by
+editing that artefact — and rung 4 was fired by a session fenced out of it. The pre-declaration
+covered *which tasks* and *how many*, but never *where the count lives*, so a rung the process
+reserved for exactly this moment turned out to have no seam to cut along.
+
+**Fix:** the declaration half is landed — `QUESTIONS.md`'s ruling with the derivation and the three
+rejected readings, this entry, and `PROTOCOL.md`'s rung-4 row, §5.2 T-FP row and §3.2 task list. The
+commit SHA is the one carried by this session's `PROGRESS.md` row and by
+`docs/sessions/arch-lanes-1.txt`. ⚠️ **THE EXECUTION HALF IS OPERATOR-OWED AND IS ITEM 1 OF THIS
+SESSION'S REPORT:** `config/protocol.yaml:selections.tfp_task_ids` must be reduced to the twenty ids
+above, and `tests/test_c3_tau2_enumeration.py`'s re-derivation must be moved to K=20, **before
+`prereg-v1`** — after that tag neither is legal.
+
+⚠️ **THE EXACT WORDS `RESULTS.md` AND `README.md` MUST CARRY, WRITTEN HERE BECAUSE BOTH FILES ARE
+OUTSIDE THIS SESSION'S FENCE AND §14 SAYS A CUT ITEM IS NEVER SILENTLY LOST.** Modelled on §14's own
+table for rungs 1/3/5, C18 publishes the first in `RESULTS.md` and C19 the same words in `README.md`:
+
+| what | where | the words |
+|---|---|---|
+| **T-FP, the τ² false-positive block** | `RESULTS.md` **and** `README.md` | **REDUCED — 40 τ² write tasks → 20, stratified 10 airline / 10 retail.** Degradation rung 4, fired by the operator 2026-09-04 05:27 UTC, on **schedule**, and **not** by `CONTEXT.md` §13.4's decision rule, whose input the pilot never produced (`INC-142`). The surviving 20 are the **first 10 ids per domain** under the same bytewise-ascending string sort that selected the 40, so they are an **exact prefix** of the pre-registered sample and nothing was substituted in. ⚠️ **τ²-bench is NOT cut** — `PROCESS.md` §14 and `CONTEXT.md` §21.4 both forbid dropping it, and **only the breadth of this one block is staged**; the T-NEG must-not-write control keeps all 34 tasks and **the externally-authored-answer-key claim is intact**. The false-positive sample is halved, so the paired FP delta is reported on **n=20 per configuration, 100 episodes**, and every table caption states that cell size. `INCIDENTS.md` `INC-144` |
+| **The counter-metric** | `RESULTS.md` | **NOT cut.** §14's never-cut list keeps the benign solver and the paired FP delta — *"a project that publishes only what it blocked has published half a result"*. Rung 4 **narrows** it; it does not remove it |
+
+**Systemic guardrail:** ⚠️ **NONE INSTALLED, AND THE REASON IS THE DEFECT ITSELF.** The guardrail this
+class needs is a test asserting that **every pre-declared degradation rung has a seam** — that for each
+rung, the value it changes is reachable through `config/` or a flag, and not only as the length of a
+frozen list. **That test would have to be written against `config/` and `PROCESS.md` §14 together, and
+both are outside this session's fence**; installing a guardrail into a file this session may not write
+is the same act this entry is about, and `INC-141` made exactly this call three sessions ago.
+**PROPOSED, NOT INSTALLED**, and named in this session's report so it is not lost.

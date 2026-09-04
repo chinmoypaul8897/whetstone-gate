@@ -400,6 +400,38 @@ failure, not a discovery made after the sweep.**
 - **airline (20):** `11 12 14 15 16 17 18 19 20 21 22 23 24 25 29 30 32 33 35 37`
 - **retail (20):** `0 1 100 101 102 103 104 105 106 107 108 109 11 110 111 112 113 13 14 15`
 
+⚠️ **DEGRADATION RUNG 4 FIRED 2026-09-04, 05:27 UTC — THE SAMPLE ABOVE IS CUT FROM 40 TO 20, AND
+THE FORTY REMAIN PRINTED ABOVE BECAUSE A PRE-REGISTRATION IS NOT ERASED BY A CUT; IT IS RECORDED
+AGAINST.** `PROCESS.md` §14: *"a cut item is never silently lost."* Fired by the **operator**, on
+**schedule**, and ***not*** by `CONTEXT.md` §13.4's decision rule — that rule reads the pilot's
+measured tokens/episode, and `INC-142` records the pilot completed **0 of 20** episodes and refused
+to select N. `INCIDENTS.md` **`INC-144`**; the operator's ruling is in `QUESTIONS.md`.
+
+**THE SURVIVING 20 ARE THE SAME RULE AT A SMALLER K — the first 10 ids per domain under the SAME
+bytewise-ascending string sort, so each is an EXACT PREFIX of its domain's twenty above. Nothing
+was substituted in, which is why this is a reduction and not a re-registration:**
+
+- **airline (10), RUN:** `11 12 14 15 16 17 18 19 20 21`
+- **retail (10), RUN:** `0 1 100 101 102 103 104 105 106 107`
+
+⚠️ **THE TWENTY DROPPED, NAMED — no silent truncation, the same discipline AD-CMP's eight dropped
+injection tasks get above:**
+
+- **airline (10), NOT RUN:** `22 23 24 25 29 30 32 33 35 37`
+- **retail (10), NOT RUN:** `108 109 11 110 111 112 113 13 14 15`
+
+⚠️ **τ²-BENCH ITSELF IS NOT CUT AND IS ON THE NEVER-CUT LIST (§5.3, `PROCESS.md` §14,
+`CONTEXT.md` §21.4 — *"It is never dropped"*). ONLY THE BREADTH OF THIS ONE BLOCK IS STAGED**, which
+§21.4 permits in terms (*"its **scope** is staged"*). **T-NEG keeps all 34 must-not-write tasks, the
+external answer key is untouched, and the externally-authored-answer-key claim is INTACT.**
+
+⚠️ **NOT YET EXECUTABLE, AND THAT IS DISCLOSED RATHER THAN PAPERED OVER.**
+`config/protocol.yaml:selections.tfp_task_ids` still holds all **40** — correctly, as the
+pre-registered enumeration — and `config/` was **outside the fence of the session that fired this
+rung**. There is also **no `tfp_task_count` key of any name**, so the sample size exists only as the
+*length of that list*. **Reducing it to the twenty above, before `prereg-v1`, is OPERATOR-OWED.**
+`INC-144` **Missing** and **Fix**.
+
 **T-NEG — the 34 of 164 must-not-write tasks**: reference trajectories containing **no** tool carrying
 τ²'s own `@is_tool(ToolType.WRITE)` decorator — **24 of 50 airline** (7 empty action list, 17
 read-only) and **10 of 114 retail** (2 empty, 8 read-only). Ids at
@@ -490,9 +522,19 @@ project that cuts a comparator and does not say so has done the thing it critici
 | **1** | Collapse a `code`-review chunk into its neighbour's review — C15's ladder harness into C18's, C20's video into C21's | ⚠️ **FIRED 2026-09-02, 08:10 IST = 02:40 UTC** | `INC-61`, `Q-083`, commit `e31f6b3` |
 | **2** | The L2 ladder cell stays at n=5 instead of 20 | **NOT FIRED** | — |
 | **3** | **C16 / AD-CMP, the AgentDojo comparator — 80 episodes** | ⚠️ **FIRED 2026-09-02, 08:10 IST = 02:40 UTC — C16 IS NOT RUN** | `INC-62`, `Q-083`, commit `e31f6b3` |
-| **4** | T-FP 40 → 20 τ² tasks | **NOT FIRED** | — |
+| **4** | **T-FP 40 → 20 τ² tasks** | ⚠️ **FIRED 2026-09-04, 05:27 UTC — THE SAMPLE IS 20, stratified 10 airline / 10 retail (§3.2). τ²-bench is NOT cut; only this block's breadth is staged** | `INC-144`, the operator's ruling in `QUESTIONS.md`, `ARCH LANES 1` `6d1a94f3`. ⚠️ **DECLARED, not yet EXECUTABLE** — `config/protocol.yaml` still holds 40 |
 | **5** | Downgrade C17's and C19's reviews from `full` to `code` | ⚠️ **FIRED 2026-09-02, 08:10 IST = 02:40 UTC** | `INC-63`, `Q-083`, commit `e31f6b3` |
 | **6** | C13 / CaMeL live run → Branch B citation | **NOT FIRED** | — |
+
+⚠️ **THE PARAGRAPH IMMEDIATELY BELOW IS THE STATE AS MEASURED AT `405d247` / `daf038a` ON 2026-09-03,
+AND IT IS LEFT STANDING AS THAT SESSION'S RECORD RATHER THAN REWRITTEN.** `PROCESS.md` §7 forbids a
+history rewrite and `INC-139` made the same call about a stale citation: **the superseded text stays
+and is explained beside itself.** ⚠️ **ONE THING IN IT IS NO LONGER TRUE: RUNG 4 HAS SINCE FIRED**,
+on 2026-09-04 at 05:27 UTC, by the operator, recorded in `INCIDENTS.md` `INC-144` at the moment of the
+cut. **Rungs 2 and 6 remain NOT FIRED**, and the operator's same ruling says so in terms. Everything
+else the paragraph asserts — that `e31f6b3` is the only commit that fired any rung before that date,
+and that firing a rung is an act rather than a transcription — **is unchanged and is why `INC-144`
+exists.**
 
 ⚠️ **RUNGS 2, 4 AND 6 ARE NOT FIRED, AND THIS SESSION MEASURED THAT RATHER THAN ASSUMING IT.** The
 one commit that fired any rung is `e31f6b3`, whose own subject line reads *"DEGRADATION RUNGS 1, 3
@@ -513,7 +555,7 @@ the moment of the cut — it is not something a build session performs by transc
 | **`vendor.agentdojo_sha`** | Stays at `TODO_C13_C16`; the loader keeps raising. **The visible consequence of a published cut, NOT a defect** |
 | **C15's and C20's `code` reviews** | **FOLDED** into C18's and C21's reviews — rung 1, `INC-61`. Neither publishes a number |
 | **C17's and C19's review type** | **DOWNGRADED** `full` → `code` — rung 5, `INC-63`. Neither publishes a number |
-| **T-FP** | **40 τ² tasks, stratified 20/20 — rung 4 NOT FIRED.** If it is fired **after** `prereg-v1`, the block is published as **incomplete with its denominator**, never as a re-registration |
+| **T-FP** | ⚠️ **REDUCED — 40 τ² write tasks → 20, stratified 10 airline / 10 retail.** Degradation rung 4, **FIRED by the operator 2026-09-04 05:27 UTC on SCHEDULE**, and **not** by `CONTEXT.md` §13.4's decision rule, whose input the pilot never produced (`INC-142`: 0 of 20 completed, N REFUSED). The surviving 20 are the **first 10 ids per domain** under the same bytewise-ascending string sort that chose the 40, so they are an **exact prefix** and nothing was substituted in — **a reduction, never a re-registration**, and it is made **before** `prereg-v1`, which `PROCESS.md` §14 says to do *"if at all possible"*. Both the surviving and the **dropped** ids are named in §3.2. ⚠️ **τ²-bench is NOT cut** — §5.3's never-cut list and `CONTEXT.md` §21.4 forbid it, and **only this block's breadth is staged**; T-NEG keeps all 34 tasks and **the externally-authored-answer-key claim is INTACT**. The paired FP delta is therefore reported on **n=20 per configuration, 100 episodes**, and every table caption states that cell size. `INC-144` |
 | **The CaMeL comparator** | **Branch UNDECIDED — rung 6 NOT FIRED.** RUN-1 decides it, and Branch B requires a **diagnosed** cause recorded here first (§4) |
 
 ### 5.3 What is NEVER cut, at any rung, for any reason

@@ -130,6 +130,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `c7b41f6a` | ARCH | FIX | 2026-09-04 |
 | `9e2c81d4` | C21 | BUILD | 2026-09-04 |
 | `4b8e12c9` | ARCH | FIX | 2026-09-04 |
+| `6d1a94f3` | ARCH | FIX | 2026-09-04 |
 
 ⚠️⚠️ **THE `5d7e2b91` ROW IS SELF-RECORDED, AND IT IS THE ROW FOR A TOKEN THAT WAS ISSUED TO **TWO**
 LIVE SESSIONS.** `QUESTIONS.md` `Q-180` and `Q-187` — two independent detections of one event.
@@ -14829,3 +14830,120 @@ in `config/`; there are no sanctioned ceilings for a 30-episode block.** The two
 also survives verbatim (`probe/statistics.py`:135 is exactly `z = two_sided_z(level)`, and the
 `Interval` docstring says *"A two-sided interval on a proportion"*). **And nothing here touches the
 pilot's own numbers, which are what they are.**
+
+
+---
+
+## ⚠️ RULING RECORDED VERBATIM — THE OPERATOR FIRES DEGRADATION RUNG 4, 2026-09-04. RECORDED BEFORE ANYTHING ELSE WAS TOUCHED (hard rule 5)
+
+**Recorded by ARCH LANES 1, `6d1a94f3`, 2026-09-04T05:27Z.** The ruling arrived in this session's
+prompt, which was authored by the architect console (session `99119ca6`, measured live in this tree
+at `05:06:12Z` and **read-only by role** — 120 `Bash`, 21 `Read`, 4 `Grep`, 1 `ToolSearch`,
+1 `WebFetch`, 1 `AskUserQuestion`, and **zero write tools across its whole 2,206-record transcript**).
+
+> ⚠️ **THE OPERATOR RULED, 2026-09-04: RUNG 4 FIRES. RUNGS 2 AND 6 DO NOT.**
+
+⚠️ **THE ATTRIBUTION IS THE OPERATOR'S AND THE KEYSTROKE IS THIS SESSION'S**, and that distinction is
+made here for the same reason `Q-186`'s ruling made it about line 319 of the pilot declaration: the
+row must not later be read as evidence of an act that did not occur. **The architect console put the
+question to the operator through `AskUserQuestion` at `2026-09-04T05:06:12Z`** — the last tool call in
+its transcript — and this session received the answer as an instruction, not as a transcript it read.
+
+### ⚠️ THE TRIGGER IS THE LADDER, NOT THE §13.4 DECISION RULE — AND CONFLATING THEM WOULD BE A FALSE CLAIM
+
+**Two different instruments can fire this same cut, and only one of them fired.**
+
+| | **`CONTEXT.md` §13.4's decision rule** | **`PROCESS.md` §14's rung 4** |
+|---|---|---|
+| what triggers it | the pilot's **measured** attacker tokens/episode and the projected lane-hours | **schedule slip**, at the operator's decision |
+| its words | *"Otherwise N = 30, and if the projection at N=30 still exceeds 32 h, **T-FP is cut from 40 to 20 τ² tasks** — the one pre-declared further reduction"* | *"When the schedule slips, cut in this order"* |
+| **did it fire?** | ⚠️ **NO. IT CANNOT HAVE.** `INC-142`: the pilot completed **0 of 20** episodes and `select_n` returned `USABLE TO SELECT N: False`. **The input the rule reads does not exist**, and `n_decision.selected_branch` is still `TODO_C14_PILOT` | ⚠️ **YES — fired by the operator, 2026-09-04** |
+
+⚠️ **SO NOTHING IN THIS SESSION MAY BE WRITTEN, ANYWHERE, AS "THE PILOT SELECTED THE REDUCED T-FP".**
+The pilot selected nothing. Rung 4 is a **schedule** cut and is published as one. The two instruments
+happen to name the same reduction because §14 rung 4's "Pre-declared?" column points at §13.4 for its
+*authority to exist*, not for its *trigger*.
+
+### ⚠️ THE SELECTION RULE — DERIVED, WITH CITATIONS, AND NOT CHOSEN BY TASTE
+
+The prompt's own instruction is *"WHICH 20 TASKS SURVIVE IS NOT YOURS TO PICK BY TASTE. Derive the
+selection rule from `CONTEXT.md` §13.4 and `PROTOCOL.md`, CITING SECTIONS."* **A rule is stated, it is
+mechanical, and it determines the answer uniquely.** Three clauses, each quoted at source:
+
+1. **`CONTEXT.md` §13.4**, "The pre-registered task selections":
+   > *"**T-FP** takes the **first 40 write-task ids after sorting, stratified 20 airline / 20 retail.**"*
+2. **`PROTOCOL.md` §3.2**, which fixes the sort exactly and says why:
+   > *"**T-FP — the first 40 write-task ids after sorting, stratified 20 airline / 20 retail.** ⚠️ **The
+   > sort is BYTEWISE ASCENDING on the ids AS STRINGS, within each domain separately** — architect-ruled,
+   > because retail puts `"100".."109"` ahead of `"11"` and **a numeric sort selects a DIFFERENT sample.**"*
+3. **`PROCESS.md` §14 rung 4** names the new size: **"T-FP 40 → 20 τ² tasks"**.
+
+**The rule is therefore a parameterised one — `take the first K/2 ids per domain, bytewise ascending
+on the ids as strings, within each domain separately` — and clauses 1 and 2 are that rule evaluated
+at K=40. Rung 4 sets K=20. THE SAME RULE, THE SAME SORT, A SMALLER K.**
+
+    airline (10) : 11 12 14 15 16 17 18 19 20 21
+    retail  (10) : 0 1 100 101 102 103 104 105 106 107
+
+⚠️ **AND THE PROPERTY THAT MAKES THIS NOT A RE-REGISTRATION: the surviving 20 are a strict PREFIX of
+the pre-registered 40 in each domain.** Nothing is added; ten ids are dropped from the tail of each
+domain's list and no id enters the sample that was not already in it. `PROCESS.md` §14 rung 4's own
+worst case — *"If it must fire after the tag, the block is published as **incomplete with its
+denominator**, never as a re-registration"* — is the shape a prefix cut already has, and this cut is
+firing **before** the tag, which §14 says to do *"if at all possible"* precisely because the list is
+pre-registered.
+
+**THE THREE READINGS THAT WERE CONSIDERED AND REJECTED, NAMED SO THE CHOICE IS AUDITABLE:**
+
+- **"first 20 of the combined 40-id list."** ⚠️ **REJECTED — it violates clause 1's own word
+  "stratified."** The 40 are listed airline-then-retail, so the first 20 of the concatenation are
+  **all 20 airline and zero retail**, which is not a stratified sample and would silently delete the
+  retail domain from the false-positive block.
+- **"re-derive 20 from the full 130-task pool with a fresh stratification."** ⚠️ **REJECTED as a
+  distinct option, though it is not WRONG — it yields the identical answer.** The 40 are themselves
+  the first 20 per domain of that same pool under that same sort, so the first 10 per domain of the
+  pool **are** the first 10 per domain of the 40. It is named here only so that a reader who checks
+  it finds it already checked.
+- **"every other id", "a random sample under a seed", "the ten with the most tool calls."**
+  ⚠️ **REJECTED — none is stated anywhere, and each is exactly the taste-based pick the prompt and
+  §14 forbid.** §14: *"It is the difference between honest scope reduction and cherry-picking, in a
+  submission whose entire thesis is that other people's numbers are unsound."*
+
+⚠️ **THE STRATIFICATION IS 50/50 BY DESIGN AND NOT BY ACCIDENT, WHICH IS WHY IT SURVIVES THE HALVING
+UNCHANGED.** The write-task pool is **26 airline + 104 retail = 130** (`PROTOCOL.md` §3.2's T-NEG
+paragraph: 24 of 50 airline and 10 of 114 retail are must-not-write, so 26 and 104 are the write
+remainders). An equal 20/20 split is therefore **deliberately non-proportional**, and halving it to
+10/10 preserves the design property rather than a coincidence. Both strata remain feasible (10 ≤ 26,
+10 ≤ 104).
+
+### ⚠️ ONE HALF OF THIS CUT CANNOT BE MADE BY THIS SESSION, AND IT IS NAMED RATHER THAN WORKED AROUND
+
+The surviving-20 list above is **the derivation, recorded**. It is **not** installed as the machine's
+sample, and the reason is a fence, not a doubt:
+
+- `PROTOCOL.md`'s **prose** task list is inside this session's fence (*"RUNG 4's TASK LIST ONLY"*), and
+  is amended.
+- ⚠️ **`config/protocol.yaml:selections.tfp_task_ids` is the list the CODE reads, and `config/` is
+  OUTSIDE this session's fence entirely** — the fence names `config/lanes.yaml` and adds *"⚠️ GATE 4
+  ONLY"*. `CLAUDE.md` hard rule 9 also makes every spec-specified value a `config/` value, so the
+  **count** 20 would have to live there too, and there is no `tfp_task_count` key today.
+
+**So the cut is DECLARED and RECORDED here and in `PROTOCOL.md`, and is NOT yet EXECUTABLE.** That is
+stated plainly rather than papered over: a session that edited `config/` outside its fence to make a
+declaration true would be doing the thing `INC-05` and hard rule 4 exist to prevent. ⚠️ **The operator
+owes one further act, and it is named in this session's report as item 1 of what must happen next.**
+
+### TWO TENSIONS RECORDED, NEITHER RESOLVED BY THIS SESSION
+
+1. **`CLAUDE.md` §4's LANE RESERVATION says of `qwen3.8-27b` and the Gemma lanes that "No build
+   session may spend on them," and this session's Gate 2 spends four calls on `gemma-26b` and
+   `qwen-27b`.** The rule's letter binds a **build** session and this is a **FIX** session; the spend
+   is sanctioned in the prompt in hard rule 12's full form (both lanes named, **4 calls AND 20,000
+   tokens**, window = this session), and its purpose is a liveness probe that exists to *protect* the
+   reserved sweep rather than consume it. **Proceeded on that reading, and it is recorded rather than
+   assumed.** If the architect reads §4 as binding every role, the four calls are the deviation and
+   this row is where it is disclosed.
+2. **`RESULTS.md` and `README.md` are outside this session's fence, and §14 requires the cut to be
+   named in both.** The exact words C18 and C19 must publish are in this session's report and in
+   `INC-144`. **Until they are published, rung 4 is recorded but not yet DISCLOSED**, and that gap is
+   this session's, not theirs.
