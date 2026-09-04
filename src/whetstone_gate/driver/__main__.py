@@ -16,7 +16,9 @@ from __future__ import annotations
 
 import argparse
 import json
+from datetime import datetime, timezone
 from pathlib import Path
+from typing import Callable
 
 from whetstone_gate import config as cfg
 from whetstone_gate._console import say
@@ -26,6 +28,7 @@ from whetstone_gate.driver import pilot as pilot_module
 from whetstone_gate.driver import rehearsal
 from whetstone_gate.driver import run as driver_run
 from whetstone_gate.driver.clients import MeteredProviderClient, TranscriptClient
+from whetstone_gate.runner import usage as runner_usage
 from whetstone_gate.runner.budget import Ceilings
 
 PROGRAM = "python -m whetstone_gate.driver"
@@ -219,7 +222,16 @@ def main(argv: list[str] | None = None) -> int:
             if request.dry_run
             else _provider_client(matrix)
         )
-        result = driver_run.execute(request, client=client)
+        result = driver_run.execute(
+            request,
+            client=client,
+            # ⚠️ `Q-193`. A REAL run carries INC-142's guardrail; a dry run carries None and
+            # `preflight` refuses to probe on that path rather than making the one network
+            # call a rehearsal promises not to make. A real run reaching preflight with
+            # None is a REFUSAL there, never a skip — so this ternary is the whole of the
+            # decision and there is no third state.
+            liveness_probe=None if request.dry_run else _liveness_probe(client, request),
+        )
     except driver_run.RunRefused as refused:
         say("REFUSED - and the refusal is the outcome, not an error to work around:")
         for part in str(refused).split(". "):
@@ -227,6 +239,44 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     driver_run.print_report(result)
     return 0
+
+
+def _liveness_probe(
+    client: MeteredProviderClient, request: driver_run.RunRequest
+) -> Callable[[str], int]:
+    """⚠️ **`QUESTIONS.md` `Q-193`. Bind the run's block and its out-root to the client's
+    probe, and hand `preflight` the one-argument callable it takes.**
+
+    The block label comes off the matrix's **own** keys rather than being typed here, so the
+    file this writes — ``evals/usage/liveness-<block>-<date>.jsonl`` — is stamped ``CAL`` for
+    a calibration and ``PILOT`` for a pilot by the same value that stamps every ledger and
+    every checkpoint. ⚠️ `driver/cal.py`'s reason, and it holds here too: *"A CAL episode
+    cannot be mistaken for a PILOT or a SCORED one by any reader or by any later replay."*
+
+    ⚠️ **THE DATE AND THE TIMESTAMP ARE READ AT CALL TIME, NOT HERE**, so a probe made either
+    side of a UTC midnight lands in the file its own day owns.
+    """
+    keys = request.matrix.keys()
+    if not keys:
+        raise driver_run.RunRefused(
+            "this matrix produces no episode key, so the block it would be stamped with "
+            "cannot be read. A liveness row written under a guessed block label would sit "
+            "in a file no reader could attribute (QUESTIONS.md Q-193)"
+        )
+    block = keys[0].block
+    log = runner_usage.UsageLog.under(request.out_root)
+
+    def probe(lane: str) -> int:
+        moment = datetime.now(timezone.utc)
+        return client.liveness_probe(
+            lane,
+            usage=log,
+            block=block,
+            date=moment.strftime("%Y-%m-%d"),
+            utc=moment.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        )
+
+    return probe
 
 
 def _provider_client(matrix: pilot_module.PilotMatrix) -> MeteredProviderClient:

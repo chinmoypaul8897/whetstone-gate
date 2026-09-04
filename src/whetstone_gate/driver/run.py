@@ -275,8 +275,29 @@ class Preflight:
     corpus_entries: tuple[Any, ...]
 
 
-def preflight(request: RunRequest, *, repo_root: Path, utc_date: str) -> Preflight:
-    """Every precondition, in order, as printable lines. **Raises on the first refusal.**"""
+def preflight(
+    request: RunRequest,
+    *,
+    repo_root: Path,
+    utc_date: str,
+    liveness_probe: Callable[[str], int] | None = None,
+) -> Preflight:
+    """Every precondition, in order, as printable lines. **Raises on the first refusal.**
+
+    ⚠️⚠️ **``liveness_probe`` IS `QUESTIONS.md` `Q-193`'s WIRING, AND ON A REAL RUN IT IS
+    REQUIRED.** It takes a lane name and returns an HTTP status;
+    :meth:`whetstone_gate.driver.clients.MeteredProviderClient.liveness_probe` is the one the
+    driver ships. Passing ``None`` to a ``--spend-real-tokens`` request is a **refusal**, not
+    a skip — hard rule 9's *"a missing value is a hard refusal, never a silent fallback"*
+    applied to a callable, because a default of *"then don't check"* would restore the
+    pre-`Q-193` behaviour for every caller that forgot it **while the suite stayed green.**
+
+    ⚠️ **A DRY RUN NEVER CALLS IT**, and the report says so on its own line. ``--dry-run``
+    dispatches to a :class:`~whetstone_gate.driver.clients.TranscriptClient` and promises no
+    network call; a probe there would be the only real provider call in a rehearsal. **The
+    cost of that choice is that the rehearsal still cannot tell an operator whether the lanes
+    are alive** — `INC-142`'s own `Expectation` — and this is not claimed to close it.
+    """
     lines: list[str] = ["PREFLIGHT"]
     lines.append(
         f"  mode                   : "
@@ -297,6 +318,11 @@ def preflight(request: RunRequest, *, repo_root: Path, utc_date: str) -> Preflig
         lines.append("                           in tests/test_c12_driver.py")
         lines.append("  API keys               : NOT READ - no call is made. runner/keys.py")
         lines.append("                           returns a BOOLEAN and has no path to a value")
+        # ⚠️ SAID OUT LOUD, because an UNMENTIONED skip reads exactly like a pass. Q-193.
+        lines.append("  liveness probe (Q-193) : NOT EXERCISED - a dry run makes no provider")
+        lines.append("                           call, so it CANNOT tell you whether a lane")
+        lines.append("                           is alive. That gap is INC-142's own")
+        lines.append("                           Expectation and is NOT closed by Q-193")
         entries, corpus_line = _resolve_corpus(request)
         lines.append(corpus_line)
         return Preflight(lines=lines, corpus_entries=entries)
@@ -345,7 +371,47 @@ def preflight(request: RunRequest, *, repo_root: Path, utc_date: str) -> Preflig
         )
     entries, corpus_line = _resolve_corpus(request)
     lines.append(corpus_line)
+
+    # ⚠️⚠️ LAST, AND THE ORDER IS THE POINT (`Q-193`). This is the ONLY precondition that
+    # itself SPENDS. Every check above is free — the tag, the reservations, the key NAMES,
+    # the day's usage file, the corpus — so running this before any of them would spend one
+    # call per lane to reach a refusal that cost nothing. A guardrail against wasted spend
+    # that wastes spend to run is the wrong shape.
+    lines.extend(_refuse_dead_lanes(lanes_in_play, probe=liveness_probe))
     return Preflight(lines=lines, corpus_entries=entries)
+
+
+def _refuse_dead_lanes(
+    lanes: Sequence[str], *, probe: Callable[[str], int] | None
+) -> list[str]:
+    """⚠️ **`Q-193`'s WIRING, IN ONE PLACE.** Probe every lane; refuse naming every dead one.
+
+    `INCIDENTS.md` `INC-142`, whose `Expectation` field this closes for a **real** run:
+    *"`RUN_DECLARED.md` §7.3 lists seven preconditions 'each a refusal and not a warning',
+    and preflight passed all seven … ⚠️ What no precondition tests is whether either lane
+    ANSWERS."* The pilot — single-shot, unrepeatable — was spent discovering that one lane
+    answered HTTP 403 to every call it ever made.
+    """
+    if probe is None:
+        raise RunRefused(
+            "a real run reached the liveness check with NO PROBE. QUESTIONS.md Q-193 wires "
+            "INC-142's guardrail into preflight and a real run may not skip it: a probe that "
+            "defaulted to 'then do not check' would restore the pre-Q-193 behaviour for "
+            "every caller that forgot it, WITH A GREEN SUITE. Hard rule 9's 'a missing value "
+            "is a hard refusal, never a silent fallback', applied to a callable. Pass "
+            "MeteredProviderClient.liveness_probe, which is what __main__ supplies"
+        )
+    refusal = liveness_refusal(lanes, probe=probe)
+    if refusal is not None:
+        raise RunRefused(refusal)
+    return [
+        f"  liveness (Q-193)       : {len(lanes)} lane(s) ANSWERED - {sorted(lanes)}",
+        "                           ONE call per lane, and it is SPEND: recorded in",
+        "                           evals/usage/liveness-<block>-<date>.jsonl, never in",
+        "                           the run's own lane log (INC-143's record is read from",
+        "                           that file). A later preflight reading <lane>-<date>",
+        "                           will NOT see these calls and under-counts by them",
+    ]
 
 
 def _resolve_corpus(request: RunRequest) -> tuple[tuple[Any, ...], str]:
@@ -689,6 +755,7 @@ def execute(
     clock: Callable[[], float] | None = None,
     sleep: Callable[[float], None] | None = None,
     repo_root: Path | None = None,
+    liveness_probe: Callable[[str], int] | None = None,
 ) -> RunResult:
     """Run every pending episode of ``request.matrix``, then report. **Resumable.**
 
@@ -708,7 +775,12 @@ def execute(
     root = repo_root or cfg.repo_root()
     started = now()
     result = RunResult()
-    checks = preflight(request, repo_root=root, utc_date=_date(started))
+    checks = preflight(
+        request,
+        repo_root=root,
+        utc_date=_date(started),
+        liveness_probe=liveness_probe,
+    )
     result.preflight_lines = checks.lines
 
     settings = EpisodeSettings.from_config(s3_binding=request.s3_binding)

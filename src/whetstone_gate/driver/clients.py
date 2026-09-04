@@ -139,9 +139,12 @@ import urllib.request
 from dataclasses import dataclass, field
 from typing import Any, Callable, Iterable, Mapping, Protocol, Sequence
 
+from whetstone_gate.runner import usage as usage_module
+from whetstone_gate.runner.budget import usage_total_tokens
 from whetstone_gate.runner.keys import env_var_for_provider
 from whetstone_gate.runner.lanes import load_lanes
 from whetstone_gate.runner.redaction import refuse_if_secret_bearing
+from whetstone_gate.runner.usage import UsageLog
 
 
 class DriverClientError(RuntimeError):
@@ -426,6 +429,23 @@ _GROQ_CHAT_URL = "https://api.groq.com/openai/v1/chat/completions"
 #: 2): it changes no reported number, and §8.6's constants table — the authoritative list the
 #: hard-rule-9 tripwire scans against — contains nothing of this kind.
 _USER_AGENT = "whetstone-gate/1.0 (+research harness; Razorpay Track 01)"
+
+#: The one message a liveness probe sends. ⚠️ **AS SMALL AS A CALL CAN BE**, because this is
+#: spend against a single-shot run's own ceiling: `arch-lanes-1` measured the equivalent probe
+#: at **21 tokens**. It carries no policy text, no world state and no corpus content, so it
+#: cannot prime, warm or otherwise influence the attacker it precedes.
+#:
+#: ⚠️ **NOT A `CONTEXT.md` §8.6 CONSTANT.** Like :data:`_USER_AGENT` it is a Class B
+#: implementation choice (hard rule 2): it changes no reported number, and §8.6's constants
+#: table — the authoritative list the hard-rule-9 tripwire scans against — has no row of this
+#: kind.
+_LIVENESS_MESSAGES: tuple[dict[str, str], ...] = ({"role": "user", "content": "ping"},)
+
+#: The ``episode`` field on a liveness row. ⚠️ **IT IS NOT AN EPISODE SLUG AND MUST NOT LOOK
+#: LIKE ONE**: every real slug is ``<block>__<arm>__<seed>__<model>``, and a reader or a
+#: replay that mistook a preflight call for an episode would put a call in a denominator
+#: (hard rule 11) that no episode produced.
+_LIVENESS_EPISODE = "PREFLIGHT_LIVENESS"
 
 #: The cap on a carried provider error type. ⚠️ **This is what makes "a SHORT error type" a
 #: property rather than a hope:** a provider that puts a paragraph in ``type`` must not
@@ -889,6 +909,76 @@ class MeteredProviderClient:
             ({"role": "system", "content": system}, {"role": "user", "content": user}),
             None,
         )
+
+    def liveness_probe(
+        self,
+        lane: str,
+        *,
+        usage: "UsageLog",
+        block: str,
+        date: str,
+        utc: str,
+    ) -> int:
+        """⚠️⚠️ **ONE MINIMAL CALL ON ONE LANE. RETURNS THE HTTP STATUS AND NOTHING ELSE.**
+
+        `QUESTIONS.md` `Q-193`, and `INCIDENTS.md` `INC-142`'s own proposed guardrail. It is
+        the probe :func:`whetstone_gate.driver.run.liveness_refusal` takes, and it lives
+        **here** rather than in ``run.py`` for one reason: **only this layer sees the
+        provider's own ``usage`` block**, and the ruling requires the cost to be recorded
+        rather than estimated.
+
+        ⚠️ **THE STATUS IS ALL THAT CROSSES THE RETURN BOUNDARY — no body, no header,
+        nothing that could carry a credential** (`INC-142`; :class:`ProviderFailed`). A
+        status is an integer from a fixed set and cannot quote anything.
+
+        ⚠️ **THE ROW GOES TO A SEPARATE FILE, ``evals/usage/liveness-<block>-<date>.jsonl``,
+        AND THE RULING SAYS SO IN TERMS:** *"each run's own liveness calls are spend, and
+        they are written to a SEPARATE usage file as arch-lanes-1 did, never into the run's
+        own log."* ``arch-lanes-1``'s reason, restated rather than rediscovered:
+        ``evals/usage/<lane>-<date>.jsonl`` is the file `INC-143`'s eight measured numbers
+        are read from **and** the file this project's own tests replay, and `evals/` is
+        append-only with operator-only deletion. ⚠️ **The cost of that separation is
+        `arch-lanes-1`'s too and is not hidden here: a later preflight reading
+        ``<lane>-<date>.jsonl`` will NOT see these calls and under-counts the day's spend by
+        them.**
+
+        ⚠️ **``0`` IS RETURNED WHEN THE PROVIDER REPORTED NO STATUS AT ALL** — a DNS failure,
+        a refused connection, a timeout. It is **not** an HTTP status and is not presented as
+        one: the usage row **omits** the ``status`` key entirely in that case, because
+        :class:`ProviderFailed` carries ``None`` and *"an absent value is reported as absent
+        and never synthesised"*. ``0`` is non-2xx, so it refuses, which is the correct
+        outcome for a lane that could not be reached.
+
+        ⚠️ **A ``DriverClientError`` IS NOT CAUGHT.** A missing key **name** or an unknown
+        lane is not a provider answering badly — it is this run being misconfigured — and it
+        must surface as itself rather than as a fabricated dead lane.
+        """
+        route = self._route(lane, role="liveness")
+        status: int | None = 200
+        tokens = 0
+        outcome = usage_module.OUTCOME_OK
+        error_type: str | None = None
+        try:
+            reply = self._call(route, _LIVENESS_MESSAGES, 0.0)
+            tokens = usage_total_tokens(dict(reply.usage))
+        except RateLimited:
+            # ⚠️ Golden 8 fixture D, verbatim: a 429'd call contributes ZERO tokens. The
+            # request was refused by the rate limiter and never ran.
+            status, outcome = 429, usage_module.OUTCOME_RATE_LIMITED
+        except ProviderFailed as failed:
+            status, outcome, error_type = failed.status, usage_module.OUTCOME_ERROR, failed.error_type
+        usage.append(
+            model=f"liveness-{block}",
+            date=date,
+            utc=utc,
+            lane=lane,
+            episode=_LIVENESS_EPISODE,
+            total_tokens=tokens,
+            outcome=outcome,
+            status=status,
+            error_type=error_type,
+        )
+        return status if status is not None else 0
 
     def _route(self, lane: str, *, role: str) -> _LaneCall:
         """⚠️ **THE WHOLE OF THE ROUTING, AND IT IS A LOOKUP RATHER THAN A DECISION.**

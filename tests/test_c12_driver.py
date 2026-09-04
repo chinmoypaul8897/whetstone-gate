@@ -2257,6 +2257,23 @@ def _short_clock(shortfall: float):
     return _Clock()
 
 
+def _liveness_answers_200(_lane: str) -> int:
+    """⚠️ **`QUESTIONS.md` `Q-193`: a REAL run now REFUSES without a liveness probe**, so
+    every test below that declares one has to supply it — exactly as `Q-161` made ``lane``
+    required and every caller had to pass it.
+
+    ⚠️ **THIS IS AN ADDED ARGUMENT, NOT A LOOSENED ASSERTION.** These tests drive the real
+    path over a **fake transport**; a probe that dispatched through that transport would
+    consume a reply the fixture budgeted for an episode and would change what they measure.
+    It is injected for the same reason ``clock`` and ``sleep`` beside it are.
+
+    ⚠️ **THE REFUSAL ITSELF IS NOT WEAKENED BY BEING STUBBED HERE — IT IS PINNED ELSEWHERE**:
+    ``tests/test_arch_cal_prep.py`` asserts that a real run reaching preflight with **no**
+    probe refuses, that a dead lane refuses, and that every dead lane is named.
+    """
+    return 200
+
+
 def _declared_request(tmp_path, matrix, attacker_lanes):
     """`evals/pilot/RUN_DECLARED.md` §1's own matrix, as a :class:`RunRequest`."""
     return driver_run.RunRequest(
@@ -2320,6 +2337,7 @@ def test_the_DECLARED_COMMAND_SURVIVES_A_SLEEP_THAT_UNDERSHOOTS(
         client=client,
         clock=clock,
         sleep=clock.sleep,
+        liveness_probe=_liveness_answers_200,
     )
 
     # (1) ⚠️ THE UNDERSHOOT HAPPENED. Without this the test could pass by never sleeping
@@ -2401,6 +2419,7 @@ def test_the_DECLARED_COMMAND_COMPLETES_ALL_TWENTY_EPISODES_when_the_clock_is_ex
         client=client,
         clock=clock,
         sleep=clock.sleep,
+        liveness_probe=_liveness_answers_200,
     )
 
     assert len(result.episodes) == 20
@@ -2483,6 +2502,7 @@ def _real_episode_messages(tmp_path):
         client=capturing,
         clock=clock,
         sleep=clock.sleep,
+        liveness_probe=_liveness_answers_200,
     )
     return capturing.attacker_messages
 
