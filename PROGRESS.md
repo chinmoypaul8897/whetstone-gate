@@ -1,3 +1,85 @@
+## SESSION-TOKEN 9a4d63b2 — C14, CAL PREP 1 — 2026-09-04
+
+**Role:** FIX. **Chunk:** C14. **Everything below ships UNREVIEWED. Not self-certified. No tag cut.**
+⚠️ **FULL RECORD: `docs/sessions/arch-cal-prep-1.txt`.**
+⚠️⚠️ **THE CALIBRATION WAS NOT RUN. THIS SESSION PREPARED IT AND HANDED OVER ONE COMMAND.**
+`PROCESS.md` §1: a run over two hours executes in the operator's terminal, never inside a session
+that might close.
+⚠️ **SPEND: ZERO. No provider call was made in any mode.** The only driver invocation was
+`--dry-run` to a fresh OS temp directory outside the repository. `evals/episodes/`,
+`evals/checkpoints/` and `evals/usage/` were never touched — verified byte-identical, 28 files
+before and after.
+⚠️ **`git rev-parse prereg-v1` DOES NOT RESOLVE — verified as this session's first act.**
+`probe-v1` **DOES** resolve, which is the correct state for this run. **NO TAG WAS CUT OR MOVED.**
+
+**CONCURRENCY, MEASURED FIRST, BY `INC-140`'s FOUR-STEP RECIPE.** Six top-level `claude.exe` sessions.
+⚠️ **`a775827b` (`ARCH CAL BUILD 1`, `8f3c72e1`) WAS LIVE AND HAD WRITTEN TO `src/`, `tests/` AND
+`config/`** — this session's exact collision set. **The prompt's stop test was applied rather than
+assumed:** it does **not** hold `9a4d63b2` (0 occurrences in its transcript), and its last repository
+write was `08:48:17Z`, **twenty minutes before this session's first edit** — since then, scratchpad
+only, in its journal phase. The architect console (`99119ca6`) holds `9a4d63b2` **because it authored
+this prompt**, and is **read-only by role**: zero `Write`, `Edit` or `NotebookEdit` across 2,380
+records. ⚠️ **AND `git status` REPORTED TWO `src/` FILES MODIFIED WHILE `git diff` WAS EMPTY AND BOTH
+BLOBS WERE IDENTICAL TO `HEAD`** — a stale index stat cache, `OF-213`'s exact species, indistinguishable
+at a glance from another session's uncommitted work. Every write below was a pure append or a
+single-line insert, per `INC-136`'s remedy.
+
+**GATE 0 — ONE RULING RECORDED VERBATIM, BEFORE A LINE OF CODE (hard rule 5).** `Q-193`, the wiring of
+`liveness_refusal` into preflight. Committed alone, `16d72b2`, carrying no source change on purpose.
+⚠️ **THE RULING'S PREMISE WAS VERIFIED RATHER THAN ACCEPTED AND IT IS TRUE:**
+`grep -rn "liveness_refusal" --include=*.py src/` minus its own `def` returns **EMPTY**.
+⚠️ **WHY A GREEN SUITE MISSED IT, WHICH IS THE PART WORTH KEEPING:** four tests at
+`tests/test_arch_lanes.py`:815-857 drive that function and pass, and **every one calls it directly**.
+**A function can be fully specified, fully tested and entirely unreachable.**
+
+**GATE 1 — WIRED, AND TESTED FROM THE OPERATOR'S SIDE.** `preflight` now takes a `liveness_probe` and
+a real run **refuses** without one — hard rule 9's *"a missing value is a hard refusal, never a silent
+fallback"* applied to a callable. It runs **LAST**, after every free refusal, because it is the only
+precondition that itself **spends**. The probe lives on `MeteredProviderClient` because only that layer
+sees the provider's own `usage` block, so the cost is **recorded, never estimated**, into
+`evals/usage/liveness-<block>-<date>.jsonl` — **never the run's own lane log**, `arch-lanes-1`'s
+convention and its reason.
+**+12 tests, +26 asserts, in ONE NEW FILE, every one PROVED RED first.** AST-measured on
+`ast.FunctionDef`/`ast.Assert`, not `grep -c assert`: **1187 → 1199 tests, 3680 → 3706 asserts, ZERO
+removals and ZERO assert-count drops in any file.**
+⚠️ **FOUR EXISTING TESTS WENT RED AND WERE FIXED BY SUPPLYING THE ARGUMENT, NOT BY SOFTENING THE
+REFUSAL** — `INC-154`, which names the one-line alternative that would have turned all four green and
+re-introduced the exact defect `Q-193` closes.
+
+**GATE 2 — `evals/cal/RUN_DECLARED.md` WRITTEN, COMMITTED AND PUSHED.** It did not exist; `Q-189`
+BLOCKER 3. Every value read from `config/` or a frozen artefact, each naming its source in §11.
+⚠️ **§8's TWO LINES ARE BLANK. The operator fills them at the moment of starting.**
+⚠️ **§5.1 STATES THE TOKEN CEILING'S PROVENANCE AND THREE THINGS ADVERSE TO IT** — it rests on eight
+calls in one episode, all early turns on a rising trend, and **the measurement meant to inform it is
+the one the pilot REFUSED to produce**. It is derived from the wreckage of the run that was supposed
+to derive it, and the declaration says so.
+
+**GATE 3 — REHEARSED, 30 OF 30, EXIT 0.** Seeds read back **off the artefacts the run wrote**, not off
+the command line: **2201–2230**, all thirty, **no overlap with the pilot's 2101–2110 or the scored
+2001–2050**. 30/30 checkpoints and 30/30 ledgers stamped `cal__`; **zero `pilot__` anywhere**;
+`PACER_REFUSED` printed in the denominator; the repository's own `evals/` unchanged.
+
+**GATE 4 — HANDED OVER, NOT RUN.** One `&&`-chained command that fills §8 with the current UTC time
+(refusing on any other changed line — **tested on a copy, and it refuses on a second run**), commits,
+pushes, **verifies `origin/main` before proceeding**, and only then starts the calibration.
+
+**FULL SUITE:** measured on the committed tree; the standing reds and this session's contribution are
+attributed **per test** in `docs/sessions/arch-cal-prep-1.txt` §7. ⚠️ **THE PROMPT'S BASELINE OF
+"5 failed / 1451 passed" IS THREE SESSIONS STALE** — this session measured **8 failed / 1465 passed**
+*before touching source*, and `INC-154` records why a stale baseline in a prompt is worse than none.
+`make check-roles`: **20 passed, 1 failed** — E1, still on `2e5b8a47`, **another session's** token.
+⚠️ **THIS SESSION REGISTERED ITS OWN TOKEN AND ONLY ITS OWN**; `INC-141`'s conclusion stands.
+
+**INCIDENTS:** `INC-153` — the CAL report calls its own measurement `PILOT MEASUREMENT` and prints the
+pilot's N-decision beneath it; **found in the rehearsal, recorded, and deliberately NOT fixed** in the
+hour the declaration was pushed. `INC-154` — the four red tests, above.
+
+**NOT DONE, DELIBERATELY:** the calibration itself; any tag; `probe.void_threshold_breach_rate`
+(still `TODO_C14_CALIBRATION`); any interpretation of the threshold or any statement about whether a
+run would void; `docs/reviews/OPEN_FINDINGS.md` (a review session's duty, `CLAUDE.md` §6.5).
+
+---
+
 ## SESSION-TOKEN 8f3c72e1 — ARCH, CAL BUILD 1 — 2026-09-04
 
 **Role:** FIX. **Chunk:** ARCH. **Everything below ships UNREVIEWED. Not self-certified. No tag.**

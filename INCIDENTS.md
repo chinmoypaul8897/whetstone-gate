@@ -11778,3 +11778,137 @@ because `src/whetstone_gate/check_roles.py` is inside this session's fence but a
 would retroactively fail commits is a change to what the project asserts about its own history — and
 that is a Class A decision, not a fix session's tidy-up. **It is item 7 of this session's operator
 list.**
+
+
+## INC-153 — the calibration's own report calls its measurement `PILOT MEASUREMENT` and prints the pilot's N-decision beneath it, so the single most consequential run in the project describes itself as a different run
+
+**Date:** 2026-09-04 (ARCH CAL PREP 1, `9a4d63b2`). Fix SHA under **Fix**.
+
+**Event:** Gate 3's rehearsal — `--block cal --dry-run`, 30 of 30, exit 0, every other check clean —
+printed this beneath a correct CAL denominator:
+
+    PILOT MEASUREMENT - attacker tokens per episode (CONTEXT.md S13.4)
+      attacker tokens ... : 1800000
+      tokens/episode over COMPLETED  (the S13.4 figure, ceil) : 60000
+      USABLE TO SELECT N : True
+    N DECISION: REFUSED, and the refusal is the result -
+      a DRY RUN may not select the N branch
+      ... The pilot is SINGLE-SHOT (PROCESS.md S6b) and its output directory is the record
+
+⚠️ **EVERY ONE OF THOSE SIX LINES IS ABOUT THE PILOT, AND THIS WAS A CALIBRATION.** The block label
+reached every checkpoint and every ledger correctly — 30 of 30 stamped `cal__`, zero `pilot__`
+anywhere — **but it did not reach the report's own prose.** The string is a literal at
+`driver/pilot.py:265`, and `driver/cal.py` deliberately reuses `driver/run.py`'s reporting path
+because *"a calibration that needed its own runner would be a second, unreviewed execution path for
+the single most consequential run in the project."* **That reuse is right; the unconditional label
+came with it.**
+
+**Action:** recorded, **not fixed**, and the reasoning is the entry's substance. `driver/pilot.py` is
+inside this session's fence and the change is three lines. ⚠️ **It was not made because
+`evals/cal/RUN_DECLARED.md` was about to be committed and pushed, and `PROCESS.md` §6b arms the
+single-shot clock on that push.** A cosmetic edit to the module that computes the pilot's
+tokens-per-episode figure, landing in the same hour as the declaration and reviewed by nobody, is a
+change to the reporting path of an unrepeatable run **for the sake of a caption**. The rehearsal that
+would have to re-validate it is the only thing standing between `Q-191`'s sliding window, `--block
+cal` and that run. **The label is wrong and harmless; touching it now is right and not harmless.**
+
+**Expectation:** `driver/cal.py`'s own docstring states the property the block label is supposed to
+carry: *"A CAL episode cannot be mistaken for a PILOT or a SCORED one by any reader or by any later
+replay."* **The artefacts honour that in full. The report does not** — and the report is what the
+operator reads after a five-hour run, and what a later session transcribes into `RESULTS.md`.
+
+**Missing:** any test that asserts the **report text** of a `cal` block differs from a `pilot` block's.
+`tests/test_arch_cal_build.py` has seventeen tests and they pin the matrix, the seeds, the arm, the
+count and the slugs — **the data, all of it, and none of the prose.** The block label is checked
+everywhere it is *structured* and nowhere it is *printed*, which is exactly the gap that let a
+correct implementation ship a misleading caption.
+
+**Missed:** ⚠️ **NOTHING WAS MISSED BY ANOTHER SESSION — THIS SESSION ALMOST MISSED IT ITSELF, AND HOW
+IS THE POINT.** The rehearsal's four required checks (30 of 30, exit 0, nothing under `evals/`,
+`cal__` on every key) **all passed**, and the prompt's checklist was satisfied at that moment. The
+label was seen only because the report was read past the line the checklist ended on. ⚠️ **A
+rehearsal is checked against a list of things known to go wrong, so it is structurally blind to the
+ones that are not on the list** — which is `INC-142`'s own lesson arriving a second time in a smaller
+key: there, a clean seven-item preflight preceded a run that measured nothing, because nothing on the
+list asked whether the lane answered.
+
+**Diagnosis:** `driver/cal.py` reuses `driver/run.py`'s report path on purpose, and that path emits an
+unconditional literal from `driver/pilot.py:265` that names the pilot; the block label is threaded
+through every `EpisodeKey` but never through the report's prose, so the one artefact a human actually
+reads is the one place the CAL/PILOT distinction does not reach.
+
+**Fix:** ⚠️ **NONE IN THIS SESSION, DELIBERATELY, AND THE COST IS ACCEPTED AND NAMED ABOVE.** Owed:
+make the measurement heading and the N-decision block conditional on the block label, and add the
+missing test — the one that compares a `cal` report's text to a `pilot` report's. **It belongs to a
+session that is not also pushing the pre-registration of an unrepeatable run in the same hour.**
+
+**Systemic guardrail:** ⚠️ **none — accepted, because the general form is `INC-142`'s and is already
+recorded there.** What is specific and cheap enough to be worth stating: **the block label is a
+property of the run and should be asserted wherever the run describes itself, not only where it
+indexes itself** — the same distinction `INC-138` drew between a shipped path and a tested one. That
+is one test, and it is owed rather than installed.
+
+
+## INC-154 — wiring one required argument into `preflight` turned FOUR existing tests red, and the only thing that found them was running them
+
+**Date:** 2026-09-04 (ARCH CAL PREP 1, `9a4d63b2`). Fix SHA under **Fix**.
+
+**Event:** `Q-193` was implemented as ruled: `preflight` takes a `liveness_probe`, and a real run that
+reaches it with `None` **refuses**. The twelve new tests passed. The full-suite check then reported
+
+    FAILED tests/test_c12_driver.py::test_the_DECLARED_COMMAND_SURVIVES_A_SLEEP_THAT_UNDERSHOOTS
+    FAILED tests/test_c12_driver.py::test_the_DECLARED_COMMAND_COMPLETES_ALL_TWENTY_EPISODES_when_the_clock_is_exact
+    FAILED tests/test_c12_driver.py::test_a_REAL_EPISODES_MESSAGES_ENCODE_ON_BOTH_PROVIDERS_and_the_TEXT_IS_IDENTICAL
+    FAILED tests/test_c12_driver.py::test_the_DISCLOSED_MERGE_DIFFERENCE_IS_REAL_but_DOES_NOT_ARISE_in_C6s_OWN_OUTPUT
+
+all four raising the **new** `RunRefused` at `driver/run.py:396`. They declare
+`spend_real_tokens=True` over a **fake transport** — a legitimate pattern, and the exact callers a
+new mandatory argument breaks.
+
+**Action:** each was given the probe rather than the refusal being softened. ⚠️ **THE ALTERNATIVE WAS
+AVAILABLE AND IS NAMED SO THE CHOICE IS ON THE RECORD: defaulting `liveness_probe` to "then don't
+check" would have turned all four green with no test edit at all** — and would have restored the
+pre-`Q-193` behaviour for every future caller that forgot the argument, silently, with a green suite.
+**That is the defect `Q-193` exists to close, re-introduced as its own fix.** The refusal stayed, and
+`test_a_real_run_with_NO_PROBE_REFUSES_rather_than_skipping_the_check` pins it. **The four edits add
+one keyword argument and touch no assertion:** measured on the AST, `tests/test_c12_driver.py`'s
+`test_*` names and `ast.Assert` count are **unchanged**, and the file does not appear in the
+before/after diff at all.
+
+**Expectation:** hard rule 6 is *"never weaken a test"*, and the honest reading of a newly-required
+argument is `Q-161`'s precedent — when `lane` became required on both protocol methods, every caller
+had to pass it, and that was not a weakening. **The expectation this session had to check against was
+its own convenience**, because the two remedies are one line apart and only one of them is right.
+
+**Missing:** any signal, short of the full nine-minute suite, that a change to `preflight`'s signature
+had broken callers elsewhere. The four tests are in a different file from the change and from the new
+tests; nothing links them. ⚠️ **A targeted run of the modules under change would NOT have found them** —
+`tests/test_arch_cal_prep.py` and `tests/test_arch_lanes.py` were both green while these four were
+red.
+
+**Missed:** ⚠️ **A SIGNAL WAS PRESENT AND WAS READ CORRECTLY, WHICH IS WHY THIS ENTRY IS SHORT ON
+DAMAGE AND LONG ON ORDERING.** The session had already measured a clean pre-change baseline
+(8 failed / 1465 passed) **before** touching source, precisely so that any new red would be
+attributable rather than arguable. Without that baseline the four would have been indistinguishable
+from the suite's standing reds, which have been red for days and which this session's own prompt
+described with a **stale** count (*"5 failed / 1451 passed"*, `arch-lanes-1`'s figure, three sessions
+old). ⚠️ **A stale baseline in a prompt is worse than none: it invites a session to attribute its own
+breakage to a number it did not measure.**
+
+**Diagnosis:** making a parameter required is a breaking change to every caller, and Python surfaces
+it at call time rather than at import time, so a partial test run cannot see it; the four callers
+lived in a file the change had no textual connection to.
+
+**Fix:** `69fe3ad` — the four call sites take `_liveness_answers_200`, a named module-level helper
+whose docstring records why it is an added argument and not a loosened assertion, and points at the
+file where the refusal is actually pinned. `tests/test_c12_driver.py` went 4 failed → **79 passed,
+2 skipped**.
+
+**Systemic guardrail:** ⚠️ **none installed — accepted, because the control that worked already
+exists and is procedural: measure the full suite BEFORE the first source edit, on a committed tree,
+and treat every new red as yours until proved otherwise.** This session's prompt required exactly
+that and it is the reason the four were attributed in minutes rather than argued about. ⚠️ **The one
+improvement worth naming is not a test but a habit: a prompt should carry the baseline's SHA, not
+just its counts** — `arch-cal-build-1` had already recorded that a clean "before" was unobtainable on
+a moving tree (`INC-149`), and a count with no SHA cannot be re-measured by the session it is given
+to.

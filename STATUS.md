@@ -1,3 +1,72 @@
+*⚠️⚠️ **UPDATE, C14 CAL PREP 1 (`9a4d63b2`), 2026-09-04 — THE CALIBRATION IS PREPARED, DECLARED AND
+HANDED OVER. ⚠️ IT WAS NOT RUN, AND THIS SESSION SPENT ZERO TOKENS IN EVERY MODE.**
+`evals/cal/RUN_DECLARED.md` NOW EXISTS, IS COMMITTED AND PUSHED, AND ITS §8 START TIME IS **BLANK**.
+`liveness_refusal` — BUILT BY `arch-lanes-1` AND **CALLED FROM NOTHING** — IS WIRED INTO PREFLIGHT AND
+REFUSES A REAL RUN ON ANY DEAD LANE, NAMING **ALL** OF THEM. REHEARSED **30 OF 30, EXIT 0**, ON SEEDS
+**2201–2230** READ BACK OFF THE ARTEFACTS. ⚠️ **`git rev-parse prereg-v1` DOES NOT RESOLVE, VERIFIED
+AS THIS SESSION'S FIRST ACT; `probe-v1` DOES.** ⚠️ **`make check-roles` IS STILL RED — E1, ON
+`2e5b8a47`, ANOTHER SESSION'S TOKEN (`Q-194`, `INC-149`), AND THIS SESSION AGAIN DID NOT WRITE THAT
+ROW.** NO TAG CUT. NOT SELF-CERTIFIED.***
+
+**GATE 0 — ONE RULING RECORDED VERBATIM BEFORE A LINE OF CODE (hard rule 5), `Q-193`,** committed
+alone as `16d72b2` carrying no source change. ⚠️ **THE RULING'S PREMISE WAS VERIFIED, NOT ACCEPTED:**
+`grep -rn "liveness_refusal" --include=*.py src/` minus its own `def` returns **EMPTY**. ⚠️ **AND THE
+REASON A GREEN SUITE MISSED IT IS THE FINDING WORTH KEEPING: four tests drive that function and pass,
+and every one of them calls it DIRECTLY. A function can be fully specified, fully tested and entirely
+unreachable.** So not one of the twelve new tests calls it; every one drives `preflight`.
+
+**GATE 1 — WIRED, WITH ITS COST DISCLOSED IN THREE PLACES.** `preflight` takes a `liveness_probe`;
+a real run **refuses** without one (hard rule 9 applied to a callable, because a default of *"then
+don't check"* restores the old behaviour for every caller that forgets it, **with a green suite**).
+It runs **LAST**, after every free refusal, because it is the only precondition that itself **spends**.
+The probe sits on `MeteredProviderClient` so the token cost is the **provider's own** and never an
+estimate, and is written to `evals/usage/liveness-<block>-<date>.jsonl`, **never the run's own lane
+log** — `arch-lanes-1`'s convention, whose disclosed cost (a later preflight under-counts the day by
+those calls) is restated rather than rediscovered. ⚠️ **A `--dry-run` PROBES NOTHING AND THE REPORT
+SAYS SO ON ITS OWN LINE**, so the rehearsal still cannot tell an operator whether a lane is alive —
+`INC-142`'s own `Expectation`, **NOT closed**, and not claimed to be.
+**+12 tests / +26 asserts in ONE NEW FILE, every one proved RED first; AST-measured, ZERO removals and
+ZERO assert-count drops anywhere.**
+
+**GATE 2 — `evals/cal/RUN_DECLARED.md`, 584 LINES, EVERY VALUE READ AND EVERY SOURCE NAMED IN §11.**
+Seeds `2201–2230` (`seeds.cal_*`, `Q-189`(a)); 30 episodes (`probe.n_cal`, §13.4's CAL row, frozen
+`HOLES.md` §3.5); turn budget 20 (two artefacts, one frozen); arm 1 (two artefacts, one frozen, both
+*"arm 1 only"*); one lane `gemma-26b`; ceilings **600 / 4,800,000** (`Q-189`(b)).
+⚠️ **§5.1 PUBLISHES THE TOKEN CEILING'S PROVENANCE AND THREE THINGS ADVERSE TO IT** — eight calls in
+one episode, all early turns on a rising trend, **and the measurement meant to inform it is the one
+the pilot REFUSED to produce.** ⚠️ **§7.3 CARRIES AN EIGHTH PRECONDITION THE PILOT DID NOT HAVE**, and
+says plainly that it does **not** predict a 429. ⚠️ **§7.4 DISCLOSES THAT `Q-191`'s SLIDING WINDOW,
+`--block cal` AND `Q-193`'s WIRING ARE ALL UNREVIEWED**, and that §6.1's rehearsal is the only thing
+between them and an unrepeatable run.
+
+**GATE 3 — 30 OF 30, EXIT 0, AND THE SEEDS WERE READ BACK OFF THE ARTEFACTS RATHER THAN OFF THE
+COMMAND LINE.** `2201–2230`, all thirty; **no overlap** with the pilot's `2101–2110` or the scored
+`2001–2050`; 30/30 checkpoints and 30/30 ledgers stamped `cal__`; **zero `pilot__` anywhere**;
+`PACER_REFUSED` printed in the denominator; the repository's own `evals/` **byte-identical, 28 files
+before and after**.
+
+**GATE 4 — HANDED OVER, NOT RUN.** One `&&`-chained command that fills §8 with the **current** UTC
+time and refuses on any other changed line — **tested against a copy, and it refuses on a second
+run** — commits, pushes, **verifies `origin/main` equals it before proceeding**, and only then starts
+the calibration.
+
+⚠️ **`INC-153` — FOUND IN THE REHEARSAL AND DELIBERATELY NOT FIXED: the CAL report calls its own
+measurement `PILOT MEASUREMENT` and prints the pilot's N-decision beneath it.** The block label reaches
+every checkpoint and every ledger and **does not reach the report's prose**. `driver/pilot.py` is
+inside this session's fence and the change is three lines; it was **not made**, because a cosmetic
+edit to the reporting path of an unrepeatable run, landing in the same hour its pre-registration is
+pushed and reviewed by nobody, is not worth a caption. **Owed.**
+⚠️ **`INC-154` — four existing tests went red on the new required argument and were fixed by SUPPLYING
+it, not by softening the refusal.** The one-line alternative that would have turned all four green is
+named in the entry, because it re-introduces the exact defect `Q-193` closes.
+
+**NOT DONE, DELIBERATELY, AND NONE OF IT IS OWED TO THIS SESSION:** the calibration itself; any tag;
+`probe.void_threshold_breach_rate` (still `TODO_C14_CALIBRATION`, the loader RAISES); **any**
+interpretation of the threshold or statement about whether a run would void; the witness gist;
+`docs/reviews/OPEN_FINDINGS.md` (a review session's duty, `CLAUDE.md` §6.5).
+
+---
+
 *⚠️⚠️ **UPDATE, ARCH CAL BUILD 1 (`8f3c72e1`), 2026-09-04 — FIVE RULINGS RECORDED VERBATIM; DEGRADATION
 RUNG 4 **EXECUTED IN `config/`**; `Q-191`'s 60-SECOND SLIDING WINDOW IMPLEMENTED AND REPLAYED ON THE
 PILOT'S OWN TRACE; **THE CALIBRATION PATH BUILT** (`Q-189` BLOCKER 1 CLOSED); AND **GROQ ACCEPTS THE
