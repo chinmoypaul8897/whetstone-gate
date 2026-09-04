@@ -2672,3 +2672,50 @@ measurement that raised it, and **whether the disposition is right is the next r
 finding closes nothing. `OF-254`'s gap is open in a security guard **today**; `OF-255`'s residual is
 open on the lane that spent the pilot; `OF-256`'s question is open on the pacer that will run the
 sweep. **The count of open findings in this file went UP by three today, and no row was closed.**
+
+### ⚠️ NOTE APPENDED BY `ARCH PUBLISH 1` (`2e5b8a47`), 2026-09-04 — TWO OF THE THREE ROWS ABOVE WERE OVERTAKEN BY EVENTS WITHIN MINUTES OF BEING FILED, AND THE ROWS ARE **NOT** EDITED
+
+⚠️⚠️ **THIS IS NOT A CLOSURE. NO ROW ABOVE IS ALTERED, NO STATUS CELL IS TOUCHED, AND NOTHING IS
+MARKED CLOSED.** This file's header says a finding is *"closed only explicitly, with the SHA that
+closed it"*, and **the SHA in question is another session's** — whether its work discharges these
+rows is a **reviewer's** call, not the filing session's and not the fixing session's. What is
+recorded here is only the **measurement**, so that a reader who reaches `OF-255` or `OF-256` is not
+told something the tree has already contradicted.
+
+**`OF-255` — its central claim was UNMEASURED, and it was MEASURED six minutes after filing.**
+The row was filed at `0287e80` and says *"whether Groq accepts the `User-Agent` this repository
+actually ships is **UNMEASURED**"*, with the remedy *"one sanctioned call on the `qwen-27b` lane
+carrying the SHIPPED `_USER_AGENT` verbatim"*. **That call is on disk.**
+`evals/usage/liveness-8f3c72e1-2026-09-04.jsonl`, session `8f3c72e1`, one row:
+
+    "probe": "GATE2b_SHIPPED_USER_AGENT", "lane": "qwen-27b", "status": 200,
+    "outcome": "OK", "total_tokens": 21,
+    "note": "the SHIPPED request with the SHIPPED User-Agent
+             'whetstone-gate/1.0 (+research harness; Razorpay Track 01)'.
+             NOTHING SUBSTITUTED - no browser string.
+             Groq's edge ACCEPTS this project's own identifier."
+
+⚠️ **SO THE RESIDUAL IS ANSWERED AND THE ANSWER IS THE FAVOURABLE ONE — WHICH IS EXACTLY WHY IT IS
+RECORDED HERE RATHER THAN USED TO QUIETLY DELETE THE ROW.** ⚠️ **AND THE ROW'S SECOND HALF IS
+UNTOUCHED BY IT:** `driver/run.py:liveness_refusal` is still **not wired into `preflight`**, so the
+seven preconditions `RUN_DECLARED.md` §7.3 lists still all pass while a lane is incapable of
+answering. **One header is proved; the interlock that would have caught it before the pilot was
+spent is still absent.** A reviewer closing `OF-255` should close the measured half and say so.
+
+**`OF-256` — its status cell says `runner/buckets.py` is UNCHANGED, and it stopped being true four
+and a half minutes after filing.** The row states, correctly at its filing moment, that
+`git diff -- src/whetstone_gate/runner/buckets.py` was **EMPTY** and the module still documented
+itself as *"refilled continuously"*. **Measured since:** `runner/buckets.py` now defines
+`class SlidingWindow` and the change is committed at **`c5a83fd`**, which also **executed rung 4 in
+`config/`** and **landed a calibration code path**. The row's own remedy — *"close this row with the
+SHA that lands it, not the SHA that ruled it"* — **now has a SHA to point at**, and it is `c5a83fd`.
+
+⚠️ **THE HONEST NOTE, BECAUSE IT CUTS AGAINST THE SESSION THAT WROTE THESE ROWS.** Both rows asserted
+a **present-tense state of a working tree that another session was actively rewriting**, and both
+were overtaken inside ten minutes. Scoping each claim to its filing moment — which they do — makes
+them *defensible* but does not make them *useful*: a reader arriving later reads a live finding that
+is not live. **The general remedy is the one the same session wrote into `README.md` §13.7 and then
+failed to apply to its own findings: every status assertion in a shared tree must carry the form
+*"as of `<commit>`, with the concurrent state named beside it"*.** These three rows carry it for
+`buckets.py` and not for the rest. **That is a defect in how they were written, and it is recorded
+against them rather than around them.**

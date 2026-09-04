@@ -127,11 +127,33 @@ pre-registration artefact and the session that fired the rung was fenced out of 
 | **In the working tree at the same moment**, measured with `git diff -- config/protocol.yaml` | ⚠️ **`tfp_task_count: 20`, `{airline: 10, retail: 10}`, ten ids per domain — an UNCOMMITTED edit held by a CONCURRENT session (`8f3c72e1`)**, executing exactly the ids printed below |
 
 ⚠️ **SO A READER WHO GREPS `tfp_task_count` GETS ONE OF TWO ANSWERS DEPENDING ON WHEN THEY LOOK, AND
-THIS PARAGRAPH IS HOW THEY TELL WHICH.** `git log -1 -- config/protocol.yaml` settles it: if that
-commit is later than this file's, the execution has landed and the `40` above is history. **This
-session did not make that edit and may not — `config/` is outside its fence** — and it reports the
-edit rather than claiming or omitting it. (`README.md`'s own STATUS box set this precedent for
-`ledger.genesis_hash`: a value *"changing as this was written"* is named, not smoothed.)
+THIS PARAGRAPH IS HOW THEY TELL WHICH.** ⚠️ **AN EARLIER VERSION OF IT SAID `git log -1 --
+config/protocol.yaml` SETTLES IT. THAT WAS WRONG, AND WRONG IN EXACTLY THE STATE THIS PARAGRAPH
+EXISTS FOR: `git log` CANNOT SEE A WORKING TREE.** While the edit was uncommitted, `git log` returned
+an older commit and a reader would have concluded the cut had not landed — with `tfp_task_count: 20`
+sitting in the file in front of them. **Read the value, not the history:**
+
+```
+grep -n 'tfp_task_count' config/protocol.yaml     # the number the code actually reads
+git status --porcelain config/protocol.yaml       # non-empty => uncommitted, git log will mislead
+```
+
+**This session did not make that edit and may not — `config/` is outside its fence** — and it reports
+the edit rather than claiming or omitting it. ⚠️ **It has since landed, at `c5a83fd`.**
+(`README.md`'s own STATUS box set this precedent for `ledger.genesis_hash`: a value *"changing as
+this was written"* is named, not smoothed.)
+
+⚠️⚠️ **AND ONE CONSEQUENCE OF THE CUT THAT NOTHING HERE HAD DISCLOSED, FOUND BY THIS SESSION'S OWN
+ADVERSARIAL PASS AFTER IT HAD ALREADY PUBLISHED THE CUT.** `selections.tfp_task_count` is **not read
+only by the T-FP block**: `src/whetstone_gate/runner/n_rule.py:441` reads it —
+`tfp_tasks = int(protocol.require("selections.tfp_task_count"))` — so **`select_n`, the N decision
+rule, consumes the value rung 4 changes**, and executing the cut mechanically moves that rule's own
+projections. ⚠️ **The coupling runs the opposite way to the one §3.2 is careful about.** §3.2 says
+the decision rule **did not fire the cut**, which is true. **What was unsaid is that the cut moves
+the decision rule.** No published number is wrong because of it and no branch flips — it is a
+**disclosure gap**, disclosed here because the coupling lives in code and no grep for the forbidden
+*sentence* would have found it. **Any republished N projection must state the T-FP size it was
+computed at.**
 
 **The execution is owed as ONE ATOMIC ACT, before `prereg-v1`,** because the tests re-derive from the
 config: `INC-144`'s **Fix** field names the three test sites that pin 40 and `PROTOCOL.md` §1.1's
@@ -139,8 +161,16 @@ manifest digest for `config/protocol.yaml` must be **re-measured, never copied**
 `prereg-v1` none of it is legal**, and §14 rung 4 then requires the block to be published as
 **incomplete with its denominator**, never as a re-registration.
 
-**The twenty ids that survive** — derived, not chosen, under `CONTEXT.md` §13.4's rule evaluated at
-K=20 and `PROTOCOL.md` §3.2's bytewise-ascending string sort within each domain separately:
+**The twenty ids that survive** — derived, not chosen. ⚠️ **`CONTEXT.md` §13.4 CONTAINS TWO RULES AND
+ONLY ONE OF THEM IS IN PLAY HERE, SO IT IS QUOTED RATHER THAN CITED BY SECTION NUMBER.** §3.2 above
+denies that §13.4's **decision rule** — *"Otherwise N = 30, and if the projection at N=30 still
+exceeds 32 h, T-FP is cut from 40 to 20 τ² tasks"* — fired. What the twenty ids come from is §13.4's
+**selection rule**, a different sentence in the same section: *"**T-FP** takes the **first 40
+write-task ids after sorting, stratified 20 airline / 20 retail.**"* ⚠️ **Citing "§13.4's rule" for
+both, forty lines apart in one file, would let a reader join the denial to the derivation and read
+the measurement as having chosen the cut** — which is the exact thing `Q-099` exists about. **The
+selection rule, evaluated at K=20, under `PROTOCOL.md` §3.2's bytewise-ascending string sort within
+each domain separately:**
 
 ```
 airline (10) : 11 12 14 15 16 17 18 19 20 21

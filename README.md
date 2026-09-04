@@ -42,14 +42,25 @@ below is estimated and no placeholder was filled to produce it.
 | **the external witness** | `find . -name '*.sha256' -o -name '*.ots'`; `grep -rn 'gist.github'` | ⚠️ **DOES NOT EXIST.** No `prereg-v1.sha256`, no OTS receipt, and no gist id anywhere — the only gist id anywhere in this repository is the unfilled `GIST_ID` placeholder inside [§12.1](#121-the-reviewer-procedure--run-this)'s `curl` command. **Neither the fingerprint nor the receipt has ever existed on any ref** |
 | **the pilot** | `evals/` on disk, and the driver's own report (`INC-142`) | ⚠️ **RAN. SPENT. IT IS THE RECORD.** Output committed at `d5b660e`; declaration `evals/pilot/RUN_DECLARED.md` pushed **before** the run at `733c4fe`. **20 attempted · 0 completed · 11 truncated · 9 never started · 20 == 0 + 11 + 9.** `PROCESS.md` §6b: the first execution that runs to completion **is** the run — **there is no retry clause and none was reached for** |
 | **the N decision** | the pilot's report; `config/protocol.yaml` lines 389–390 | ⚠️ **REFUSED. NO N IS SELECTED.** `selected_branch` and `measured_tokens_per_episode` both still **`TODO_C14_PILOT`**; neither the N=50 nor the N=30 branch is chosen. See the precision note below — **the component that refused is not the one usually named** |
-| **the calibration** | `find evals -type d`; `git log -- evals/cal` | ⚠️ **HAS NOT RUN, AND NEVER STARTED.** `evals/cal/` does not exist and never has on any ref; **no calibration `RUN_DECLARED.md` was written**, because `PROCESS.md` §6b arms one on push and `Q-189` records that no code path in this repository runs a calibration at all |
+| **the calibration** | `find evals -type d`; `git log -- evals/cal` | ⚠️ **HAS NOT RUN, AND NEVER STARTED.** `evals/cal/` does not exist and never has on any ref; **no calibration `RUN_DECLARED.md` was written**. ⚠️ **The REASON given here has an expiry and it has expired:** at `3f07907` it was `Q-189`'s — *no code path in this repository ran a calibration at all*. **A later session then wrote one** (`src/whetstone_gate/driver/cal.py`, `c5a83fd`). **The headline is unchanged and is the load-bearing half: the calibration has still not run.** What changed is that its first blocker did |
 | `probe.void_threshold_breach_rate` | [`config/protocol.yaml`](config/protocol.yaml) line 335 | **`TODO_C14_CALIBRATION`** — an explicit sentinel. The loader **raises** on it; it is never defaulted. ⚠️ **So no calibrated VOID verdict is computable today** — see below |
 | `ledger.genesis_hash` | `config/protocol.yaml` line 363 | ⚠️ **CHANGED SINCE THE C19 MEASUREMENT.** It read **`PRE-FREEZE`** at `a691d13`; it now reads **`170bd3ff4abfdd8f87f64055972a60c82cc54efc`** — `probe-v1`'s tag object id (`Q-153`). **Measured in the pilot's own ledgers: all 11 carry that genesis.** They chain from `probe-v1`, **not** from `prereg-v1`, which does not exist — so **no ledger in this repository is a scored one, cryptographically**, and the binding still holds. [§12.3](#123-the-genesis-binding--one-free-proof) |
 | `vendor.agentdojo_sha` | `config/protocol.yaml` line 403 | **`TODO_C13_C16`** — the sentinel **stays**, and the loader **keeps raising**. That is the visible consequence of a published cut, not a defect (see [§11](#11-the-degradation-ladder--every-cut-named)) |
 | `selections.tfp_task_count` | `config/protocol.yaml` line 421 | ⚠️ **`40` at this commit — and degradation rung 4 has FIRED, cutting it to 20.** The cut is declared and recorded (`INC-144`); its execution in `config/` was still owed. [§9.3](#93-rung-4-fired--t-fp-the-false-positive-block-40-write-tasks-cut-to-20) |
-| `evals/` | `find evals -type f \| wc -l` | ⚠️ **26 files** (it was **one** on 2026-09-03): 11 episode ledgers, 11 checkpoints, 3 usage logs, 1 declaration. **All 26 are the pilot's. There is no sweep run directory and no `evals/results/`** |
+| `evals/` | `find evals -type f`, and `git log` **per file** | ⚠️ **26 files at `3f07907`** (it was **one** on 2026-09-03): 11 episode ledgers, 11 checkpoints, 3 usage logs, 1 declaration. ⚠️ **NOT all of them are the pilot's, and an earlier version of this row said they were — see the correction note below.** 25 were committed by the pilot at `d5b660e`; **one usage log is post-pilot diagnostic spend by a later session** (`bc20e9e`). **There is no sweep run directory and no `evals/results/`** |
 | **the sweep** | every checkpoint's `block` field; `git log --all -- evals/` | ⚠️ **HAS NOT RUN.** The distinct set of `block` values across all 11 checkpoints is **`['PILOT']`** — zero episodes for M-ADV, T-NEG, T-FP, M-BEN or AD-CMP, and none has ever existed on any ref |
 | **the test suite** | `make test` run **live** at this commit, plus the dated counts in `docs/sessions/` | ⚠️ **RED, UNDER BOTH INSTRUMENTS, AND THEY ARE DIFFERENT INSTRUMENTS WITH DIFFERENT NUMBERS.** `make test` **live at `3f07907`: `7 failed, 1447 passed, 2 skipped, 2 deselected`, exit 1** — ⚠️ **but 3 of the 7 are artefacts of another session's uncommitted edits in this shared tree, not of the committed tree.** Bare `pytest`: `5 failed, 1451 passed, 2 skipped` (`arch-lanes-1.txt`:517). **See the third precision note below — the instrument, not just the number, is the thing to get right** |
+
+⚠️⚠️ **A CORRECTION TO THIS BOX, MADE BY THE SESSION THAT WROTE IT, AFTER ITS OWN ADVERSARIAL PASS —
+AND IT IS THE ONE DIRECTION THIS PROJECT MUST NEVER ROUND.** An earlier version of the `evals/` row
+read *"**All 26 are the pilot's.**"* **That was false when it was committed, not stale.** Measured
+per file with `git log`: 25 of the 26 were committed by the pilot at `d5b660e`, but
+`evals/usage/liveness-6d1a94f3-2026-09-04.jsonl` was committed at **`bc20e9e`** by a **later**
+session, and its rows are marked `"probe": "GATE2_LIVENESS"` — **89 tokens of post-pilot diagnostic
+spend, not pilot spend** (`INC-145`). ⚠️ **Attributing a later session's provider calls to the
+single-shot artefact inflates what the pilot cost and blurs the boundary `PROCESS.md` §6b draws
+around it.** The row now says which is which. **A count of files under `evals/` is not a count of
+one run's files, and only `git log` per file can tell them apart.**
 
 ⚠️ **THREE PRECISION NOTES, BECAUSE THE SHORT FORM OF EACH IS THE ONE THIS PROJECT WOULD BE CAUGHT ON.**
 
@@ -850,10 +861,44 @@ contradiction:** the cut is **declared and recorded**, and at the commit that ca
 that fired the rung was fenced out of it. Its execution is **operator-owed, before `prereg-v1`, as one
 atomic act** including the three test sites that pin 40, because the tests re-derive from the config.
 ⚠️ **And it was being executed as this was written:** a concurrent session held an uncommitted
-`config/protocol.yaml` setting `tfp_task_count: 20` and the ten ids per domain above. `git log -1 --
-config/protocol.yaml` settles which state you are looking at. **After `prereg-v1` none of it is legal**,
-and §14 then requires the block to be published as **incomplete with its denominator**, never as a
-re-registration.
+`config/protocol.yaml` setting `tfp_task_count: 20` and the ten ids per domain above. ⚠️ **It has
+since landed, at `c5a83fd`.**
+
+⚠️ **AN EARLIER VERSION OF THIS PARAGRAPH TOLD YOU TO RUN `git log -1 -- config/protocol.yaml` TO
+SETTLE WHICH STATE YOU WERE LOOKING AT. THAT INSTRUCTION WAS WRONG, AND IT WAS WRONG PRECISELY IN THE
+STATE THE PARAGRAPH EXISTS TO DESCRIBE: `git log` CANNOT SEE A WORKING TREE.** While the edit was
+uncommitted, `git log` returned an *older* commit and a reader would have concluded the cut had not
+landed — with `tfp_task_count: 20` sitting in the file in front of them. **Read the value, not the
+history:**
+
+```
+grep -n 'tfp_task_count' config/protocol.yaml     # the number the code actually reads
+git status --porcelain config/protocol.yaml       # non-empty => uncommitted, git log will mislead
+```
+
+**After `prereg-v1` none of this is legal**, and §14 then requires the block to be published as
+**incomplete with its denominator**, never as a re-registration.
+
+⚠️⚠️ **AND ONE CONSEQUENCE OF RUNG 4 THAT NOTHING PUBLISHED HERE HAD DISCLOSED, FOUND BY THIS
+SESSION'S OWN ADVERSARIAL PASS AFTER IT HAD ALREADY PUBLISHED THE CUT.** `selections.tfp_task_count`
+is **not read only by the T-FP block.** `src/whetstone_gate/runner/n_rule.py:441` reads it:
+
+```python
+tfp_tasks = int(protocol.require("selections.tfp_task_count"))
+```
+
+**So `select_n` — the N decision rule — consumes the very value rung 4 changes**, and executing the
+cut mechanically moves that rule's own token and wall-clock projections. ⚠️ **The direction of the
+coupling is the opposite of the one this section is careful about.** §9.3 says at length that the
+**decision rule did not fire the cut** — which is true, and is `Q-099`'s whole point. **What was not
+said is that the cut moves the decision rule.** `n_rule.py:314-320`'s own docstring already names
+this hazard for the AgentDojo block — *"a projection that quietly dropped it would no longer
+reproduce the … figures the ruling is stated against, and the rule would stop being checkable
+against the published table"* — **and the same adjacency has now arrived through T-FP.** ⚠️ **No
+number published anywhere in this repository is wrong because of it, and no branch flips**; it is a
+**disclosure gap**, and it is disclosed here because a grep for the forbidden *sentence* would never
+have found it — the coupling lives in code, not prose. **What is owed is that any republished N
+projection state the T-FP size it was computed at.**
 
 **Rungs 1 and 5 also fired; rungs 2 and 6 did not.** See
 [§11](#11-the-degradation-ladder--every-cut-named) for the full ladder with every rung's state, and
@@ -1303,6 +1348,13 @@ clauses, not pinned in copy 2.** That is published here rather than left in a fi
 |---|---|---|---|---|
 | **The parser `RESULTS.md` uses** — table rows whose status cell says `OPEN` | **193** | 11 | 106 | 76 |
 | **A row-by-row resolution**, each id taken at its **last** occurrence | **185** of 239 unique ids | 12 | 99 | 74 |
+
+⚠️ **BOTH ROWS ARE THE C19 SESSION'S MEASUREMENT AT `a691d13` AND NEITHER IS RE-TAKEN HERE — WHICH
+MEANS BOTH ARE NOW LOW BY AT LEAST THREE.** On 2026-09-04 session `2e5b8a47` **appended `OF-254`,
+`OF-255` and `OF-256` and closed nothing**, so the open count went **up**. It is deliberately not
+restated: a third number taken by a third method would look like a resolution of a disagreement this
+section exists to publish. **`git log -- docs/reviews/OPEN_FINDINGS.md` is the authority on what has
+been appended since, and the file itself is the authority on the count.**
 
 **Where they differ, named:**
 
@@ -1787,8 +1839,11 @@ about.**
    continued.
 4. ⚠️ **The PROVENANCE final pass was NOT done.** `PROVENANCE.md` is a **frozen artefact** and is
    outside this session's fence.
-5. ⚠️ **`docs/reviews/OPEN_FINDINGS.md` was not emptied.** 193 findings remain OPEN; see
-   [§9.14](#914-what-the-process-still-cannot-close).
+5. ⚠️ **`docs/reviews/OPEN_FINDINGS.md` was not emptied.** 193 findings remained OPEN at that
+   session's measurement; see [§9.14](#914-what-the-process-still-cannot-close) and
+   [§10.2](#102--two-honest-counts-of-the-open-findings-and-they-disagree), which prints two counts
+   and why they disagree. ⚠️ **Three more were appended on 2026-09-04 and none was closed**, so the
+   figure is now low by at least three.
 6. **No tag was cut.** Tagging is a review session's act, and **this document has not been reviewed.**
 
 ### 18.1 ⚠️ AND WHAT THE 2026-09-04 PUBLISHING PASS DID NOT DO — a second session, a second list
