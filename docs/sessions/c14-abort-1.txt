@@ -280,3 +280,42 @@
 ================================================================================
  END. NOT SELF-CERTIFIED. A FRESH ADVERSARIAL REVIEW FOLLOWS.
 ================================================================================
+
+================================================================================
+8. ADDENDUM - TWO THINGS MEASURED AFTER THE FIRST COMMIT (cb367b9)
+================================================================================
+
+ !! WRITTEN AS AN ADDENDUM, NOT FOLDED INTO S6, BECAUSE cb367b9 IS PUSHED AND
+    HISTORY IS NEVER REWRITTEN. INC-152's lesson is the reason this exists at
+    all: an omission found AFTER a commit is recorded, not quietly absorbed.
+
+ 8.1 make check-roles RE-RUN WITH cb367b9 IN THE LOG - STILL GREEN.
+     21 passed, 0 failed, 3 n/a, exit 0. E1 PASS, E5 PASS. E4's n/a list is
+     UNCHANGED at 18 commits, 17 of them with no Session-Token: line anywhere -
+     cb367b9 IS NOT IN IT, so check-roles' parser DOES read this session's
+     trailer. That mattered enough to measure, because `git log --format=
+     %(trailers:key=Session-Token)` returns EMPTY for cb367b9 - git's own
+     parser reads only the LAST paragraph, which is Co-Authored-By. Measured
+     against the house's own recent commits: 30e87bc and e105283 return EMPTY
+     TOO. So this is the established house format, not a defect this session
+     introduced, and check-roles is the check that actually governs it.
+
+ 8.2 !! THE ATTEMPT-1 LOG IS UNTRACKED, AND ONLY THE OPERATOR CAN CHANGE THAT.
+     git status shows `?? evals/cal/run-20260904T132934Z.log`. It is NOT
+     gitignored - .gitignore:58 says in terms "evals/ CONTENT IS COMMITTED
+     EVIDENCE, NOT IGNORED OUTPUT" and ignores only *.partial, *.tmp, *.lock,
+     tmp/ and .checkpoint-inflight/. evals/ IS OUTSIDE THIS SESSION'S FENCE and
+     is operator-only, so it was NOT staged.
+     ! STATED FAIRLY: this matches the existing precedent rather than breaking
+       it. `git ls-files evals/ | grep '\.log$'` returns NOTHING - the pilot's
+       own run log was never committed either, and 28 tracked paths under evals/
+       are all declarations, episodes, checkpoints and usage rows.
+     ! AND THE EVIDENCE IS PRESERVED REGARDLESS: INC-157 quotes the log's
+       ENTIRE 164-byte contents verbatim and states its byte count, its line
+       count and its mtime to the millisecond, so the abort is reconstructable
+       from git even if the log file itself is never committed.
+     THE DECISION IS THE OPERATOR'S and is flagged rather than taken.
+
+================================================================================
+ END OF ADDENDUM. NOT SELF-CERTIFIED.
+================================================================================
