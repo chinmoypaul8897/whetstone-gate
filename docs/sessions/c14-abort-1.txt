@@ -1,0 +1,282 @@
+================================================================================
+ C14 ABORT 1        SESSION-TOKEN 3d7f21ac      ROLE: FIX           2026-09-04
+================================================================================
+
+ PUSHED SHA: this file is committed IN the single commit that carries the whole
+             abort record, so it cannot contain its own hash. THAT commit's SHA
+             is the first line of the chat report. The convention is
+             arch-cal-build-1's and arch-wilson-1's: a record cannot contain the
+             hash of the commit that creates it. Beneath it: 63c70ec.
+
+ The full record is committed VERBATIM at docs/sessions/c14-abort-1.txt BEFORE
+ this was printed. CLAUDE.md S6.1: the FILE is the record; this is the
+ convenience copy, and a paraphrase on the way is detectable against it.
+
+================================================================================
+0. THE HEADLINE
+================================================================================
+
+ THE SINGLE-SHOT CALIBRATION'S ATTEMPT 1 IS RECORDED AS INC-157, AND IT WAS
+ WRITTEN BEFORE ANY RETRY, WHICH IS WHAT PROCESS.md S6b REQUIRES.
+
+ !! THE WINDOW IS NOT SPENT. NOTHING IS VOID. S6b's record is "the first
+    execution that runs to COMPLETION". Attempt 1 started NO episode, so no
+    execution has completed and the declaration still awaits its run.
+
+ PARTIAL EPISODE COUNT, of the declared 30:  completed 0
+                                             TRUNCATED 0
+                                             never started 30
+ TOKENS SPENT: ZERO.
+
+ THE ENTRY: INC-157, all EIGHT of hard rule 13's fields, Diagnosis and Missed
+ both filled. Appended, never read-modify-written. INCIDENTS.md 12052 -> 12187
+ lines; entry count 154 -> 155.
+
+================================================================================
+1. THE THREE FACTS, VERIFIED FIRST-HAND, WITH THE COMMANDS
+================================================================================
+
+ The prompt said to check every fact rather than copy it. All three held, and
+ checking turned up a fourth thing the prompt had slightly wrong (S3).
+
+ FACT 1 - THE LOG IS 164 BYTES AND ONE LINE.
+   wc -c evals/cal/run-20260904T132934Z.log   ->  164
+   wc -l evals/cal/run-20260904T132934Z.log   ->  1
+   cat   evals/cal/run-20260904T132934Z.log   ->  exactly:
+     C:\Program Files\Python312\python.exe: Error while finding module
+     specification for 'whetstone_gate.tasks' (ModuleNotFoundError: No module
+     named 'whetstone_gate')
+
+ FACT 2 - PARTIAL EPISODE COUNT IS ZERO.
+   find evals -name '*cal__*' | wc -l         ->  0
+   ls -la evals/cal/                          ->  two files only:
+                                                  RUN_DECLARED.md and the log
+
+ FACT 3 - TOKENS SPENT ARE ZERO.
+   wc -l evals/usage/gemma-26b-2026-09-04.jsonl  ->  9
+   cat  (same file)  -> every row is pilot__1__2101__gemma-26b, stamped
+        03:26:42Z .. 03:30:22Z, the last one RATE_LIMITED with 0 tokens.
+   TZ=UTC ls -l --time-style=full-iso  -> the file's own mtime is 03:30Z,
+        TEN HOURS BEFORE the 13:29Z attempt. Nothing reached a provider.
+
+ CORROBORATION NOT ASKED FOR, TAKEN ANYWAY:
+   TZ=UTC ls -l --time-style=full-iso evals/cal/run-20260904T132934Z.log
+     -> 2026-09-04 13:29:34.175373400 +0000
+   git log -1 --format=%cd 63c70ec  -> 2026-09-04T18:59:25+05:30 = 13:29:25Z
+   So the failure is NINE SECONDS after the declared start, and those nine
+   seconds are the commit, the push and the push-verification, and nothing else.
+
+================================================================================
+2. THE DECLARATION WAS FILLED EXACTLY ONCE, AND THE GUARD IS WHY
+================================================================================
+
+ !! THIS IS THE ONE THING THAT WENT RIGHT AND THE PROMPT ASKED FOR IT TO BE
+    RECORDED SO A LATER READER CAN SEE THAT IT DID. IT IS MEASURED, NOT TAKEN
+    ON TRUST.
+
+   git log --oneline -- evals/cal/RUN_DECLARED.md
+     -> TWO commits ever: 37ae34a (created it, S8 blank) and 63c70ec (filled
+        S8). ONE commit touches S8.
+   git show 63c70ec --stat  -> 1 file changed, 2 insertions(+), 2 deletions(-)
+        i.e. exactly the two placeholder lines.
+   git status --porcelain -- evals/cal/RUN_DECLARED.md  -> EMPTY. Committed and
+        unmodified in the working tree.
+   ls -1 evals/cal/*.log | wc -l  -> 1
+
+ The operator pasted the handover block a SECOND time by accident.
+ fill_cal_start.py's already-filled branch refused -
+
+   "REFUSED: the start time is ALREADY FILLED: ...
+    PROCESS.md S6b: the first completed execution IS the run.
+    To RESUME an interrupted run, do NOT paste this block again -
+    run ONLY the `python -m whetstone_gate.tasks drive` command."
+
+ - and because every link of that chain is joined by &&, the non-zero exit
+ stopped it BEFORE the second commit, BEFORE the second push and BEFORE the
+ driver. The `tee` that writes the log sits after the guard, so a second driver
+ invocation would have left a second log file. There is one. THE GUARD HELD.
+
+================================================================================
+3. THE CAUSE - AND IT IS SHARPER THAN THE PROMPT'S WORDING
+================================================================================
+
+ The prompt offered: "Git Bash resolved bare `python` to the SYSTEM interpreter".
+ That is true of the operator's shell and FALSE as a general statement about Git
+ Bash, and the difference matters, so it is written the accurate way.
+
+   which python   (in THIS session's Git Bash)
+     -> /c/Users/chinm/whetstone-gate/.venv/Scripts/python
+   echo $VIRTUAL_ENV  -> c:\Users\chinm\whetstone-gate\.venv
+
+ This session's shell resolves bare `python` to the VENV, because it inherited
+ an activated environment from its parent process. The operator's window did not.
+ There is nothing on the machine to activate one automatically:
+
+   ~/.bash_profile  ABSENT     ~/.bashrc  ABSENT     ~/.profile  ABSENT
+
+ So the name fell through PATH to C:\Program Files\Python312\python.exe. BOTH
+ HALVES MEASURED, so neither is assumed:
+
+   "/c/Program Files/Python312/python.exe" -c "import whetstone_gate"
+     -> ModuleNotFoundError: No module named 'whetstone_gate'
+   ./.venv/Scripts/python.exe -c "import whetstone_gate; print(sys.executable)"
+     -> IMPORTS OK from C:\Users\chinm\whetstone-gate\.venv\Scripts\python.exe
+
+ !! AND THE BARE `python` IS NOT A DEFECT TO BE HUNTED OUT OF THE REPOSITORY.
+    Makefile:16 is `PYTHON ?= python` and it is DELIBERATE - the Makefile header
+    says a reviewer with no `make`, on any OS, must run
+    `python -m whetstone_gate.tasks <target>` and get a byte-identical result
+    (CONTEXT.md S16, S20), and README.md:1760 tells that reader to create and
+    activate the venv first. THE DEFECT IS A LAUNCHER THAT INHERITED THE
+    CONVENTION WITHOUT CARRYING THE ACTIVATION THE CONVENTION ASSUMES.
+
+================================================================================
+4. THE FINDING WORTH KEEPING - INC-157's `Missed`
+================================================================================
+
+ !! THE DECLARATION STATES THE ORDERING PRINCIPLE THE LAUNCHER INVERTED, ONE
+    SECTION ABOVE THE LINES THE LAUNCHER WAS FILLING.
+
+ RUN_DECLARED.md S7, verbatim:
+   "ROW 8 RUNS LAST, AFTER EVERY FREE REFUSAL, BECAUSE IT IS THE ONLY
+    PRECONDITION THAT ITSELF SPENDS."
+
+ The handover chain does the REVERSE one level out: its IRREVERSIBLE step -
+ filling, committing and pushing a single-shot pre-registration - runs FIRST,
+ and the free check (can this interpreter import the package) never runs at all.
+
+ Worse: S7 quotes INC-142's Expectation on that same page - "What no
+ precondition tests is whether either lane ANSWERS" - and this abort is that
+ identical shape one layer further down: WHAT NO PRECONDITION TESTS IS WHETHER
+ THE INTERPRETER CAN IMPORT. The lesson was on the page and was read as being
+ about lanes.
+
+ `Missing`: S7 enumerates EIGHT preconditions and they are thorough. ALL EIGHT
+ EXECUTE INSIDE THE PACKAGE, so not one of them can fire in the failure where
+ the package does not import. A ninth precondition in preflight would not help
+ and is rejected in the entry so it is not re-proposed: the check must run in
+ the shell, ABOVE the interpreter, or it cannot run in this failure mode.
+
+ SYSTEMIC GUARDRAIL - PROPOSED, NOT INSTALLED. src/ and the frozen handover
+ under docs/sessions/ were OUTSIDE this fence and this session changed no
+ launcher. The rule the failure earns: IN ANY CHAIN WHOSE STEPS DIFFER IN
+ REVERSIBILITY, EVERY FREE CHECK RUNS BEFORE THE FIRST IRREVERSIBLE ONE - which
+ is S7's own row-8 principle applied to the launcher instead of to preflight.
+ Had `python -c "import whetstone_gate"` sat ABOVE fill_cal_start.py, attempt 1
+ would have refused for ZERO cost, S8 would still be blank, and there would be
+ no declared-versus-actual gap to disclose at all.
+
+================================================================================
+5. BOTH TIMES, AND WHAT WAS DELIBERATELY NOT DONE
+================================================================================
+
+ DECLARED UTC START TIME : 2026-09-04T13:29:25Z   (S8, filled by the operator,
+                                                   committed as 63c70ec)
+ ATTEMPT 1 ACTUAL START  : 2026-09-04T13:29:34Z   (the log's own mtime, and its
+                                                   filename)
+ ATTEMPT 2 ACTUAL START  : LATER STILL, and unknown to this session.
+
+ !! evals/cal/RUN_DECLARED.md WAS NOT EDITED AND MUST NOT BE. The gap is
+    DISCLOSED in INC-157 and is NEVER closed by editing the artefact. The
+    declaration was pushed BEFORE any attempt, which is the direction S6b
+    protects; moving it now to match what happened would be re-writing a
+    pre-registration to fit its outcome, which is the exact thing this project
+    exists to refuse. RESULTS.md prints declared-versus-actual start times
+    beside the threshold, so the gap is PUBLISHED, not hidden.
+
+ !! THE CALIBRATION WAS NOT RUN BY THIS SESSION AND NO PROVIDER CALL WAS MADE IN
+    ANY MODE. This session held NO TOKEN SANCTION. SPEND: ZERO.
+
+ !! NOTHING UNDER evals/ WAS CREATED, EDITED, DELETED OR TRUNCATED.
+
+ THE REMEDY, WHICH IS THE OPERATOR'S DECISION UNDER S6b, IS A NUMBERED ATTEMPT
+ IN THE SAME DIRECTORY (S10 clause 3) - the attempt-1 log is not deleted or
+ overwritten, and the `tee` timestamps a new filename beside it. THE FILL STEP
+ IS NOT RE-RUN AND THE BLOCK IS NOT RE-PASTED; S8 is filled, 63c70ec is pushed,
+ and the guard would refuse anyway.
+
+ !! THE INTERPRETER IS FIXED BY ACTIVATING THE VENV, NOT BY REWORDING S1's
+    DECLARED COMMAND. S1 declares the command with a bare `python`, and
+    CLAUDE.md S1 rule 4 makes the frozen artefact authoritative, so the safe
+    form runs S1 VERBATIM under an interpreter that satisfies it:
+
+      cd /c/Users/chinm/whetstone-gate
+      . .venv/Scripts/activate
+      python -c "import whetstone_gate"      # the free check, FIRST
+      python -m whetstone_gate.tasks drive -- --spend-real-tokens \
+        --block cal \
+        --arm 1 \
+        --s3-binding authorization-is-the-payment \
+        --call-ceiling 600 --token-ceiling 4800000 \
+        --sanction-lane gemma-26b \
+        2>&1 | tee "evals/cal/run-$(date -u +%Y%m%dT%H%M%SZ).log"
+
+    Naming ./.venv/Scripts/python.exe by path runs the same code - S1 says as
+    much of the tasks/driver pair - but ACTIVATION keeps the executed text
+    identical to the declared text, which is the property worth having on a
+    pre-registered run. STATED AS A RECOMMENDATION; THIS SESSION RAN NONE OF IT.
+
+================================================================================
+6. WHAT WAS WRITTEN - THE FENCE, HONOURED
+================================================================================
+
+ INCIDENTS.md   INC-157 APPENDED (never read-modify-written). 12052 -> 12187
+                lines. Eight fields present, Diagnosis and Missed both filled.
+ QUESTIONS.md   ONE row, single-line insert:
+                  | `3d7f21ac` | C14 | FIX | 2026-09-04 |
+                git diff: 1 insertion(+), 0 deletions. NO ruling was made and NO
+                question was raised - nothing in this task was ambiguous.
+ STATUS.md      C14 row's review-history column APPENDED TO, NEVER ERASED (the
+                column's own convention, " . APPENDED, NEVER ERASED (...)"), and
+                ONE new top-block paragraph. 16 insertions(+), 1 deletion - the
+                single deletion is the C14 row itself being rewritten longer;
+                its column count is unchanged at 7 pipes.
+                !! WHY THE TOP BLOCK: it still read "THE CALIBRATION IS
+                PREPARED, DECLARED AND HANDED OVER. IT WAS NOT RUN", which is no
+                longer true. IT IS LEFT STANDING AND UNSTRUCK, with the
+                correction beside it. That block's staleness is precisely what
+                INC-156 records, one session ago.
+ PROGRESS.md    ONE entry, newest on top. 77 insertions(+), 0 deletions - a PURE
+                PREPEND, proved by git diff --numstat, not asserted.
+ docs/sessions/ THIS FILE.
+
+ NOT TOUCHED: evals/ (append-only, and RUN_DECLARED.md deliberately untouched),
+ config/, src/, tests/, tests/goldens/, CONTEXT.md, PROCESS.md, HOLES.md,
+ PROTOCOL.md, README.md, RESULTS.md, corpora/, docs/submission/, any tag, .env.
+
+ GIT: PROCESS.md S7b with INC-139's correction - a private index in a FRESH OS
+ TEMP DIRECTORY, seeded from LIVE HEAD with `git read-tree HEAD`, staged and
+ committed in ONE command, then `env -u GIT_INDEX_FILE git reset --` on THE SAME
+ explicit paths, then the shared index proved clean. LF only, verified with
+ file(1) on all four edited files: all report "UTF-8 text" with no CRLF.
+
+ CONCURRENCY: the prompt named C17 BUILD (7a1e3b52) holding docs/render/ and
+ tests/test_c17_render.py. Neither is in this fence and neither was touched. NO
+ SESSION HOLDS 3d7f21ac. The stale ` M` entries on benign/blindness.py and
+ benign/executor.py are another session's and were left alone - which is exactly
+ why the private-index recipe is not optional.
+
+ make check-roles (run through the venv interpreter): 21 passed, 0 failed,
+ 3 n/a, exit 0. E1 clean at 88 issued rows - the 3d7f21ac row parses. E4 lists
+ 63c70ec as carrying no trailer, which is CORRECT and is what that commit's own
+ message says it should be: it is the operator's keystroke and no token was
+ issued for it.
+
+================================================================================
+7. WHAT THIS SESSION DID NOT DO
+================================================================================
+
+ - DID NOT run the calibration, or any part of it, in any mode.
+ - DID NOT make a provider call. It held no token sanction. SPEND: ZERO.
+ - DID NOT edit evals/cal/RUN_DECLARED.md, or anything else under evals/.
+ - DID NOT write that the calibration is spent, void, or unrepeatable. It is
+   none of those; attempt 1 completed nothing.
+ - DID NOT install a guardrail it then claimed - src/ was outside the fence.
+ - DID NOT cut a tag. DID NOT self-certify.
+ - DID NOT compute, derive, estimate or mention any threshold value.
+   config/protocol.yaml probe.void_threshold_breach_rate is untouched at
+   TODO_C14_CALIBRATION and the loader still RAISES on it.
+
+================================================================================
+ END. NOT SELF-CERTIFIED. A FRESH ADVERSARIAL REVIEW FOLLOWS.
+================================================================================

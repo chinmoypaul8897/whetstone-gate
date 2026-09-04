@@ -135,6 +135,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `9a4d63b2` | C14 | FIX | 2026-09-04 |
 | `2e5b8a47` | ARCH | FIX | 2026-09-04 |
 | `5c9e08f4` | ARCH | FIX | 2026-09-04 |
+| `3d7f21ac` | C14 | FIX | 2026-09-04 |
 
 ⚠️⚠️ **THE `5d7e2b91` ROW IS SELF-RECORDED, AND IT IS THE ROW FOR A TOKEN THAT WAS ISSUED TO **TWO**
 LIVE SESSIONS.** `QUESTIONS.md` `Q-180` and `Q-187` — two independent detections of one event.

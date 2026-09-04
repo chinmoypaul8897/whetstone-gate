@@ -12050,3 +12050,138 @@ recorded rather than built: **a prompt should state run-liveness as a measuremen
 `INC-154`'s closing note that *"a prompt should carry the baseline's SHA, not just its counts."* Two
 consecutive sessions have now found the same class of defect in their own prompts, and that is the
 part worth keeping.
+
+---
+
+## INC-157 — THE SINGLE-SHOT CALIBRATION'S ATTEMPT 1 DIED **NINE SECONDS** AFTER ITS DECLARATION WAS PUSHED, ON A BARE `python` THAT RESOLVED TO AN INTERPRETER WITHOUT THE PACKAGE. **0 OF 30 EPISODES, 0 TOKENS.** ⚠️ **The irreversible step had already run, because the chain ordered it AHEAD of the free one**
+
+**Date:** 2026-09-04 (C14 ABORT 1, `3d7f21ac`). Fix SHA under **Fix**.
+
+**Event:** the operator pasted `docs/sessions/arch-cal-prep-1.txt` §11's handover block into Git Bash.
+Its `&&` chain did exactly what it promises, in order: `/tmp/fill_cal_start.py` filled
+`evals/cal/RUN_DECLARED.md` §8's two blank lines with **`DECLARED UTC START TIME: 2026-09-04T13:29:25Z`**
+and `FILLED BY: Chinmoy  (operator)`; `git commit` produced **`63c70ec`**; `git push` sent it; and the
+`git rev-parse HEAD` / `git ls-remote origin refs/heads/main` comparison verified it. **The declaration
+was public and the single-shot clock was armed.** Then the last link —
+`python -m whetstone_gate.tasks drive -- --spend-real-tokens --block cal --arm 1 …` — ran, and
+`evals/cal/run-20260904T132934Z.log` is **164 bytes and exactly one line**:
+
+```
+C:\Program Files\Python312\python.exe: Error while finding module specification for 'whetstone_gate.tasks' (ModuleNotFoundError: No module named 'whetstone_gate')
+```
+
+The log's mtime is **`2026-09-04 13:29:34.175Z`**. **Nine seconds** separate the declared start from the
+failure, and every one of them was the commit, the push and the verification.
+
+⚠️ **PARTIAL EPISODE COUNT, AS A NUMBER, PER §10 CLAUSE 2 — of the declared 30: `completed 0`,
+`TRUNCATED 0`, `never started 30`.** No episode was dispatched, so none entered a denominator;
+`find evals -name '*cal__*'` returns **0**, and `evals/cal/` holds two files, the declaration and that
+log. ⚠️ **TOKENS SPENT: ZERO.** `evals/usage/gemma-26b-2026-09-04.jsonl` still holds **9 rows**, every
+one `pilot__1__2101__gemma-26b` and stamped `03:26:42Z`–`03:30:22Z` — the last of them the pilot's
+`RATE_LIMITED` — and the file's own mtime is `03:30Z`, **ten hours before this attempt**. Nothing
+reached a provider.
+
+⚠️ **AND THE ONE THING THAT WENT RIGHT, RECORDED SO A LATER READER CAN SEE IT DID: THE GUARD WORKED.**
+The operator pasted the block a **second** time by accident. `fill_cal_start.py`'s already-filled branch
+refused — *"REFUSED: the start time is ALREADY FILLED … PROCESS.md S6b: the first completed execution IS
+the run. To RESUME an interrupted run, do NOT paste this block again"* — and because the links are
+joined by `&&`, that non-zero exit stopped the chain **before** the second commit, **before** the second
+push and **before** the driver. Both facts are checkable rather than asserted:
+`git log -- evals/cal/RUN_DECLARED.md` shows **one** commit touching §8 (`63c70ec`, 2 insertions /
+2 deletions) with the working tree clean, and `ls -1 evals/cal/*.log | wc -l` returns **1** — the `tee`
+sits after the guard, so a second driver invocation would have left a second log and did not. **The
+declaration was filled exactly once, and the idempotence `CAL PREP 1` built and tested is the reason.**
+
+**Action:** nothing was retried, nothing under `evals/` was edited, and no provider call was made — this
+session held no token sanction. This entry was written **first**, per `PROCESS.md` §6b and §10 clause 1.
+⚠️ **`evals/cal/RUN_DECLARED.md` WAS NOT TOUCHED.** Its declared start stands at `13:29:25Z` while
+attempt 2 will start later; **that gap is disclosed here and is never closed by editing the artefact.**
+The declaration was pushed *before* any attempt, which is the direction §6b protects; moving it now to
+match what happened would be re-writing a pre-registration to fit its outcome, which is the single thing
+this project exists to refuse. `RESULTS.md` prints declared-versus-actual start times beside the
+threshold (`PROCESS.md` §6b), so the gap is published, not hidden.
+
+**Expectation:** that the interpreter which passed Gate 3's rehearsal **30 of 30** would be the
+interpreter the handover block actually invoked. And, failing that — since a wrong interpreter is a
+cheap, certain, instantly-detectable condition — that a run unable to import its own package would
+refuse **before** consuming the single-shot declaration, not nine seconds after it had been committed
+and pushed to a public record.
+
+**Missing:** any precondition that guards the **runtime**. `RUN_DECLARED.md` §7 enumerates eight and
+they are thorough — the mode flag, `probe-v1` resolving, both ceilings, `--arm` against frozen
+`HOLES.md` §3.5, every reserved lane sanctioned by name, every provider key **name**, the pinned
+corpora, and `Q-193`'s one-token liveness probe. ⚠️ **All eight execute inside the package, so not one
+of them can fire in the failure where the package does not import.** A precondition written in
+`whetstone_gate` is unreachable by construction when `whetstone_gate` cannot be found; the check that
+was needed could only have lived **outside** the interpreter under test — one line in the launcher —
+and no artefact owns the launcher. Nothing else was missing: the log named the offending interpreter by
+absolute path, which is why the cause took one command to confirm.
+
+**Missed:** ⚠️ **the declaration states the ordering principle this chain inverted, one section above
+the lines the chain was filling.** §7 puts every **free** refusal ahead of the liveness probe and says
+why in terms: *"⚠️ **ROW 8 RUNS LAST, AFTER EVERY FREE REFUSAL, BECAUSE IT IS THE ONLY PRECONDITION
+THAT ITSELF SPENDS.**"* The handover chain does the **reverse** one level out: its irreversible step —
+filling, committing and pushing a single-shot pre-registration — runs **first**, and the free check
+never runs at all. ⚠️ **Worse, §7 quotes `INC-142`'s `Expectation` verbatim on the same page** —
+*"What no precondition tests is whether either lane ANSWERS"* — and this abort is that identical shape
+one layer further down: what no precondition tests is whether the **interpreter can import**. The
+lesson was on the page and was read as being about lanes. Second, and smaller: `CAL PREP 1` tested the
+block's **git** behaviour — the idempotent refusal that has just proved itself, and push-failure
+stopping the chain — and never tested that the operator's shell would resolve `python` to the
+interpreter its own rehearsal had used.
+
+**Diagnosis:** bare `python` is resolved per shell by `PATH`, and the operator's Git Bash window had no
+venv on it — this machine has no `~/.bashrc`, `~/.bash_profile` or `~/.profile` to activate one — so the
+name fell through to `C:\Program Files\Python312\python.exe`, which carries no editable install of the
+package. The abort is total and harmless in itself, but it landed *after* the declaration was public
+because the chain ordered the irreversible step ahead of the free one.
+
+**Fix:** ⚠️ **no code change, and NO SHA IS CLAIMED FOR A FIX THAT DOES NOT EXIST** — `src/`, `config/`,
+`tests/` and `evals/` were all outside this session's fence, and an invented remedy has no commit any
+more than an invented incident does. This entry lands in the journal commit that follows `63c70ec`. The
+remedy is attempt 2, which is the operator's decision under §6b, and it is a **numbered attempt in the
+same directory** per §10 clause 3 — `evals/cal/run-20260904T132934Z.log` is not deleted or overwritten,
+and the `tee` timestamps a new filename beside it. ⚠️ **The fill step is NOT re-run and the block is NOT
+re-pasted**; §8 is filled, `63c70ec` is pushed, and the guard would refuse anyway.
+
+⚠️ **THE INTERPRETER IS FIXED BY ACTIVATING THE VENV, NOT BY REWORDING §1'S DECLARED COMMAND.** §1
+declares the command with a bare `python`, and `CLAUDE.md` §1 rule 4 makes the frozen artefact
+authoritative, so the safe form runs §1 **verbatim** under an interpreter that satisfies it:
+
+```sh
+cd /c/Users/chinm/whetstone-gate
+. .venv/Scripts/activate
+python -c "import whetstone_gate"          # the free check, FIRST. Costs nothing, refuses for free.
+python -m whetstone_gate.tasks drive -- --spend-real-tokens \
+  --block cal \
+  --arm 1 \
+  --s3-binding authorization-is-the-payment \
+  --call-ceiling 600 --token-ceiling 4800000 \
+  --sanction-lane gemma-26b \
+  2>&1 | tee "evals/cal/run-$(date -u +%Y%m%dT%H%M%SZ).log"
+```
+
+Measured this session, so the two halves are not assumed: the system interpreter at
+`C:\Program Files\Python312\python.exe` raises `ModuleNotFoundError` on `import whetstone_gate`, and
+`./.venv/Scripts/python.exe` imports it and prints its own `sys.executable`. Naming
+`./.venv/Scripts/python.exe` by path runs the same code — §1 says as much of the `tasks`/`driver`
+pair — but activation keeps the executed text identical to the declared text, which is the property
+worth having on a pre-registered run.
+
+**Systemic guardrail:** ⚠️ **PROPOSED, NOT INSTALLED — `src/` and the frozen handover under
+`docs/sessions/` were outside this fence and this session changed no launcher.** The rule the failure
+earns is one line: ⚠️ **in any chain whose steps differ in reversibility, every free check runs before
+the first irreversible one** — which is §7's own row-8 principle, applied to the launcher instead of to
+`preflight`. Concretely, `python -c "import whetstone_gate"` belongs **above** `fill_cal_start.py`, not
+below it; had it been there, attempt 1 would have refused for **zero** cost, §8 would still be blank,
+and there would be no declared-versus-actual gap to disclose at all. ⚠️ **The obvious alternative is
+the wrong one and is rejected here so that it is not re-proposed:** this cannot be fixed by adding a
+ninth precondition to `preflight`, because `preflight` lives in the package that failed to import — the
+check must run in the shell, above the interpreter, or it cannot run in this failure mode. Note also
+that `Makefile:16` is `PYTHON ?= python`, the same bare name, and it is **deliberate** — the header
+explains that a reviewer with no `make` must be able to run `python -m whetstone_gate.tasks <target>`
+and get a byte-identical result (`CONTEXT.md` §16, §20), and `README.md:1760` tells that reader to
+create and activate the venv first. ⚠️ **So the bare `python` is not a defect to be hunted out of the
+repository; the defect is a launcher that inherited the convention without carrying the activation the
+convention assumes.** Whether the frozen handover text is amended for this launcher's successors is the
+architect's call, and is recorded here rather than taken.

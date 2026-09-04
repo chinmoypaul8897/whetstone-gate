@@ -1,3 +1,80 @@
+## SESSION-TOKEN 3d7f21ac — C14, ABORT 1 — 2026-09-04
+
+**Role:** FIX. **Chunk:** C14. **One job:** write the single-shot calibration's aborted attempt 1 to
+`INCIDENTS.md` **before any retry**, per `PROCESS.md` §6b and `evals/cal/RUN_DECLARED.md` §10 clause 1.
+⚠️ **FULL RECORD: `docs/sessions/c14-abort-1.txt`.**
+⚠️ **SPEND: ZERO. No provider call was made in any mode**, and this session held no token sanction.
+⚠️ **THE CALIBRATION WAS NOT RUN BY THIS SESSION, AND NOTHING UNDER `evals/` WAS EDITED.**
+
+⚠️⚠️ **THE WINDOW IS NOT SPENT AND NOTHING IS VOID.** §6b's record is *"the first execution that runs
+to **COMPLETION**"*. Attempt 1 never started an episode, so no execution has completed and the
+declaration still awaits its run. **Nothing here says or implies that the calibration is spent.**
+
+**WHAT HAPPENED, MEASURED FIRST-HAND BEFORE IT WAS WRITTEN.** The operator pasted
+`docs/sessions/arch-cal-prep-1.txt` §11's handover block. Its `&&` chain filled §8, committed
+`63c70ec`, pushed it and verified it against `origin/main` — and then the driver died in **nine
+seconds**. `evals/cal/run-20260904T132934Z.log` is **164 bytes, one line**:
+`C:\Program Files\Python312\python.exe: … ModuleNotFoundError: No module named 'whetstone_gate'`.
+
+**THREE FACTS, EACH VERIFIED BY COMMAND RATHER THAN ACCEPTED FROM THE PROMPT.** (1) The log is
+`wc -c` **164**, `wc -l` **1**, and `cat` shows that single line. (2) **PARTIAL EPISODE COUNT — of the
+declared 30: `completed 0`, `TRUNCATED 0`, `never started 30`**; `find evals -name '*cal__*' | wc -l`
+returns **0** and `evals/cal/` holds exactly two files. (3) **TOKENS: ZERO** —
+`evals/usage/gemma-26b-2026-09-04.jsonl` is still **9 rows**, every one `pilot__1__2101__gemma-26b`
+stamped `03:26:42Z`–`03:30:22Z`, the last `RATE_LIMITED`, and its mtime is `03:30Z`, **ten hours
+before** the attempt.
+
+⚠️ **THE GUARD WORKED, AND IT IS RECORDED SO A LATER READER CAN SEE THAT IT DID.** The operator pasted
+the block a second time by accident; `fill_cal_start.py`'s already-filled branch REFUSED, and the `&&`
+chain stopped before the second commit, the second push and the driver. **Measured, not asserted:**
+`git log -- evals/cal/RUN_DECLARED.md` shows **one** commit touching §8 (2 insertions / 2 deletions,
+working tree clean) and `ls -1 evals/cal/*.log | wc -l` returns **1** — the `tee` sits after the
+guard, so a second driver invocation would have left a second log. **The declaration was filled
+exactly once.**
+
+⚠️ **`evals/cal/RUN_DECLARED.md` WAS NOT EDITED, ON PURPOSE. BOTH TIMES ARE STATED: declared start
+`2026-09-04T13:29:25Z`, attempt 1 actual `13:29:34Z`, attempt 2 later still.** The gap is disclosed in
+`INC-157` and is **never** closed by editing the artefact — the declaration was pushed *before* any
+attempt, which is the direction §6b protects, and moving it now to match the outcome is the one thing
+this project exists to refuse.
+
+**CAUSE, AND IT IS SHARPER THAN "GIT BASH USES SYSTEM PYTHON".** Bare `python` resolves per shell by
+`PATH`; the operator's window had no venv on it — this machine has **no** `~/.bashrc`, `~/.bash_profile`
+or `~/.profile` — so the name fell through to `C:\Program Files\Python312\python.exe`, which carries no
+editable install. Both halves were measured this session: the system interpreter raises
+`ModuleNotFoundError`, `./.venv/Scripts/python.exe` imports the package. ⚠️ **`Makefile:16` is
+`PYTHON ?= python` and that is DELIBERATE** (`CONTEXT.md` §16/§20 — a reviewer without `make` must get
+a byte-identical result), with `README.md:1760` telling that reader to activate the venv first. **So
+the bare `python` is not a defect to hunt out of the repository; the defect is a launcher that
+inherited the convention without carrying the activation it assumes.**
+
+⚠️ **THE FINDING WORTH KEEPING — `INC-157`'s `Missed`.** `RUN_DECLARED.md` §7 states the ordering
+principle this chain inverted, one section above the lines it was filling: *"ROW 8 RUNS LAST, AFTER
+EVERY FREE REFUSAL, BECAUSE IT IS THE ONLY PRECONDITION THAT ITSELF SPENDS."* The handover does the
+reverse one level out — its **irreversible** step runs first and the free check never runs at all. And
+§7 quotes `INC-142` on the same page — *"What no precondition tests is whether either lane ANSWERS"* —
+which is this abort's exact shape one layer down: **what no precondition tests is whether the
+interpreter can import.** All eight of §7's preconditions execute *inside* the package, so **not one
+can fire in the failure where the package does not import** — which is why the guardrail must live in
+the shell, above the interpreter, and why adding a ninth to `preflight` would not work. **PROPOSED, NOT
+INSTALLED:** `src/` and the frozen handover were outside this fence and no launcher was changed.
+
+**WRITTEN:** `INCIDENTS.md` **`INC-157`** (appended, never read-modify-written; eight fields, with
+`Diagnosis` and `Missed` both filled), `QUESTIONS.md`'s session-token row for `3d7f21ac` (single-line
+insert), this entry, and `STATUS.md` — the C14 row's review-history column **appended to, never
+erased**, and one new top-block paragraph, because that block still read *"IT WAS NOT RUN"* and is left
+standing and unstruck beside the correction. **No ruling was made and no question was raised.**
+
+**CONCURRENCY:** the prompt named C17 BUILD (`7a1e3b52`) holding `docs/render/` and
+`tests/test_c17_render.py`; neither is in this fence and neither was touched. **No session holds
+`3d7f21ac`.** The stale `M` entries on `benign/blindness.py` and `benign/executor.py` are another
+session's and were left alone — every commit here is staged from a **private index seeded from live
+`HEAD`** (`PROCESS.md` §7b with `INC-139`'s correction).
+
+**NOT SELF-CERTIFIED. NO TAG CUT. `evals/`, `config/`, `src/`, `tests/`, `tests/goldens/`,
+`CONTEXT.md`, `PROCESS.md`, `HOLES.md`, `PROTOCOL.md`, `README.md`, `RESULTS.md` AND `corpora/`
+UNTOUCHED.**
+
 ## SESSION-TOKEN 5c9e08f4 — ARCH, WILSON 1 — 2026-09-04
 
 **Role:** FIX. **Chunk:** ARCH. **Everything below ships UNREVIEWED. Not self-certified. No tag cut.**
