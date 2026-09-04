@@ -55,6 +55,88 @@ class BucketError(RuntimeError):
 
 
 @dataclass
+class ObservedCost:
+    """The **admission estimate**: the largest cost this role's calls have actually returned.
+
+    ⚠️⚠️ **THIS IS WHAT THE PACER WAITS FOR. IT IS *NOT* WHAT THE BUCKETS ARE CHARGED, AND
+    THAT SEPARATION IS THE ENTIRE FIX —** `INCIDENTS.md` **INC-161**, `QUESTIONS.md` `Q-206`.
+
+    An **admission** test is *prospective*: it must answer *"can this lane afford the call I
+    am about to make?"* before the call exists, so it can only use an **estimate**. An
+    **accounting** entry is *retrospective*: the provider has answered and returned
+    ``usage.total_tokens``, so it must use the **truth**. Until INC-161 both jobs were done
+    by one number — ``attacker.target_tokens_per_episode // turn_budget`` — and that number
+    is **by construction the mean**, so it was wrong for the first job and only ever a floor
+    for the second.
+
+    ⚠️ **MEASURED, ON THE RUN THAT DIED.** `evals/usage/gemma-26b-2026-09-04.jsonl` records
+    the calibration's attempt 3 admitting **8,421** and then **9,037** tokens **26 seconds
+    apart** — **17,458 against a declared ``tpm`` of 16,000** — because both were admitted
+    against a reservation of **3,000**. The provider answered HTTP 429 one second later and
+    **29 of 30 declared episodes never started.**
+
+    ⚠️ **NO NEW SPEC VALUE (hard rule 9).** :attr:`floor` is the reservation the run already
+    computes from `config/`, and :attr:`largest` is a figure the **provider itself**
+    returned. There is no multiplier, no headroom factor and no safety margin here, and
+    there is nothing to add to `config/`.
+
+    ⚠️ **THE FLOOR IS A FLOOR, NOT A SEED, AND THAT IS A DELIBERATE CLASS B CHOICE.** The
+    obvious reading — *"use the formula until there is data, then use the data"* — makes the
+    reservation **fall** to 512 after one cheap opening turn, which is a worse estimate than
+    the one it replaced. Taking the ``max`` of the two instead means this change can only
+    ever pace the runner **slower**, never faster, and *"slower"* is the direction that does
+    not earn a 429. ⚠️ **That is also the exact property `INC-143` found the old docstring
+    claiming falsely**, and it is true of this class rather than asserted about it.
+
+    ⚠️ **MONOTONE, AND IT NEVER FORGETS.** The estimate rises and never falls, so a cheap
+    opening turn cannot buy headroom for an expensive later one. The cost of that is
+    conservatism at the start of each episode, where the context — and therefore the cost —
+    is small again; the benefit is that the pacer is never surprised twice by the same size
+    of call. `QUESTIONS.md` `Q-191` already ruled the direction of this trade in terms: *"a
+    paced wait costs seconds, a 429 costs the lane."*
+
+    ⚠️ **PURE.** No clock, no I/O, no randomness — hard rule 8. It holds one integer and
+    takes every number from its caller.
+    """
+
+    #: The reservation `config/` already produces. A **floor** beneath every estimate.
+    floor: int
+    #: The largest ``usage.total_tokens`` this role has been billed. ``0`` means *no call
+    #: has answered yet* — it is an absence, not a limit, which is why it is a floor below
+    #: and never a capacity.
+    largest: int = 0
+
+    def __post_init__(self) -> None:
+        if self.floor <= 0:
+            raise BucketError(
+                f"an ObservedCost floor of {self.floor} is not a reservation. The floor is "
+                f"the figure `config/` already produces; a non-positive one would admit "
+                f"every call against nothing and is the defect INC-161 records, not a "
+                f"smaller version of it"
+            )
+
+    @property
+    def reservation(self) -> int:
+        """What the pacer must find room for: the floor, or the worst this role has cost."""
+        return max(self.floor, self.largest)
+
+    def observe(self, actual: int) -> None:
+        """Record what the provider **actually** billed for one call.
+
+        ⚠️ **THE CALLER MUST PASS THE PROVIDER'S OWN ``usage.total_tokens`` AND NEVER AN
+        ESTIMATE.** `CONTEXT.md` golden 8 is explicit that token figures are *"NEVER
+        estimated"*, and an estimate fed back in here would make the pacer's own guess look
+        like evidence on the next call — a measurement laundering itself.
+        """
+        if actual < 0:
+            raise BucketError(
+                f"ObservedCost was told a call cost {actual} tokens. A provider bills a "
+                f"count, never a credit; a negative here means the usage block was misread"
+            )
+        self.largest = max(self.largest, actual)
+
+
+@dataclass
 class Bucket:
     """One limit: ``capacity`` units per ``window_seconds``, refilled continuously.
 

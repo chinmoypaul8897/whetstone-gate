@@ -84,6 +84,7 @@ from whetstone_gate.ledger.chain import Ledger, load_chain_spec
 from whetstone_gate.runner import lanes as runner_lanes
 from whetstone_gate.runner import report as runner_report
 from whetstone_gate.runner import usage as runner_usage
+from whetstone_gate.runner.buckets import ObservedCost
 from whetstone_gate.runner.budget import Ceilings, LaneBudget, usage_total_tokens
 from whetstone_gate.runner.checkpoint import CheckpointStore, build_document
 from whetstone_gate.runner.episodes import EpisodeKey, EpisodeOutcome, RunDenominator
@@ -488,6 +489,52 @@ class _PacedClient:
     reason the fix is not a bigger constant: every charge is either the reservation the run
     already used or a figure the **provider** returned. There is no multiplier, no headroom
     factor and no safety margin to put in `config/`.
+
+    ⚠️⚠️ **AND IT FIXED THE ACCOUNTING WHILE LEAVING THE *ADMISSION* DECIDING ON THE SAME
+    FALSIFIED 3,000. `INCIDENTS.md` INC-161 IS THE COST OF THAT.** `INC-143`'s own fix note
+    says it in its own words -- the top-up *"does not explain, and would not have prevented,
+    the pilot's 429"* -- and `Q-191`'s sliding window then made the **limit** correct while
+    leaving the **estimate** wrong. The calibration's attempt 3 admitted **8,421** and then
+    **9,037** tokens **26 seconds apart** -- **17,458 against a declared ``tpm`` of 16,000** --
+    because :meth:`_pace` asked the window for room for **3,000** both times. HTTP 429 one
+    second later; **29 of 30 declared episodes never started.**
+
+    ⚠️ **THE TWO NUMBERS ARE NOW SEPARATE, BECAUSE THEY ANSWER TWO DIFFERENT QUESTIONS.**
+
+        what the pacer WAITS FOR   :class:`~whetstone_gate.runner.buckets.ObservedCost` --
+                                   ``max(config's reservation, the worst this ROLE has
+                                   actually cost)``. **Prospective**, so it can only ever be
+                                   an estimate; derived from measurement, not from a guess.
+        what the buckets are CHARGED
+                                   ``max(reservation, actual)``, **exactly as before**.
+                                   **Retrospective**, so it is the provider's own number.
+
+    ⚠️⚠️ **`INC-143`'s NO-REFUND RULE WAS RE-EXAMINED RATHER THAN INHERITED, AND IT IS
+    KEPT -- BUT ONLY BECAUSE THE ADAPTIVE NUMBER NEVER REACHES THE CHARGE.** The objection to
+    inheriting it is real and was **measured**, not argued: replaying this lane's 32 real
+    calls with the adaptive figure *taken* as well as *waited for*, and no refund, pins the
+    trailing window at **15,564 for twenty-one consecutive calls**, charges **234,736** for
+    **155,672** of real spend (**+51%**), sleeps **633 s** instead of **339 s** -- **and still
+    breaches ``tpm``, by 203.** That is precisely the *"throttle the run to a crawl"* failure,
+    and it is what inheriting the rule onto an adaptive **charge** would have bought.
+
+    ⚠️ **A REFUND -- settling the SIGNED difference -- ALSO WORKS (15,221; 313 s) AND WAS
+    REJECTED ON ITS MERITS RATHER THAN IGNORED.** It buys **26 seconds** across 32 calls, and
+    it costs a new direction of travel through
+    :meth:`~whetstone_gate.runner.buckets.SlidingWindow.settle`, whose refusal of a negative
+    charge is the line that makes *"the buckets are never told less than the provider billed"*
+    checkable at all. **Keeping the reservation out of the charge reaches the same number
+    without opening that door**, so the rule stands for the regime it was written for -- which
+    is still the regime the *charge* is in, even though it is no longer the regime the
+    *admission* is in. **That is the whole re-examination, and it is why the answer is "keep"
+    rather than "inherit".**
+
+    ⚠️ **MEASURED ON THE REAL 32-CALL TRACE** (`tests/test_c14_pacer_admission.py`):
+
+        worst trailing-60s window BEFORE : **18,175**   -- over ``tpm`` by 2,175
+        worst trailing-60s window AFTER  : **15,221**   -- inside ``tpm``
+        pacer sleep, before / after      : 43 s / 339 s  (`Q-191`: *"IT WILL SLOW THE SWEEP
+                                           AND THAT IS THE CORRECT TRADE"*)
     """
 
     inner: MeteredModelClient
@@ -498,28 +545,83 @@ class _PacedClient:
     clock: Callable[[], float]
     sleep: Callable[[float], None]
 
+    #: ⚠️⚠️ **OPTIONAL, AND THE DEFAULT IS THE DANGEROUS ONE — WHICH IS WHY IT IS ONLY EVER
+    #: THE DEFAULT IN A TEST.** :func:`execute` builds **one estimate per (lane, role) for
+    #: the whole run** and injects it here, because :class:`_PacedClient` **is rebuilt for
+    #: every episode** while the :class:`~whetstone_gate.runner.buckets.Buckets` it paces
+    #: against are built **once per lane**. An estimate constructed here instead would reset
+    #: to the `config/` floor at the start of each of the 30 episodes and re-learn this
+    #: lane's cost from scratch every time — **which is `INC-161` happening thirty times
+    #: instead of once**, against a window that remembers everything. The estimate must have
+    #: the lifetime of the limit it is estimating for, and that lifetime is the lane's.
+    #:
+    #: ⚠️ **ONE PER ROLE, NEVER ONE PER LANE, AND THAT IS `INC-111`'s DISTINCTION.**
+    #: `CONTEXT.md` §13.3.2 puts the reference attacker and the gate judge on the **same**
+    #: lane, `gemma-26b`. A single shared estimate would make every small judge call wait for
+    #: the room the attacker's largest turn needed, and would file the attacker's cost under
+    #: the judge's name — the same conflation that made an arm-1 episode of 20 calls report
+    #: 120,000 tokens where the answer is 60,000.
+    attacker_observed: ObservedCost | None = None
+    judge_observed: ObservedCost | None = None
+
+    def __post_init__(self) -> None:
+        # A caller that supplies no estimate gets a fresh one floored at the reservation it
+        # did supply, so a client built in isolation paces exactly as the injected one does
+        # on its first call. It simply does not REMEMBER across episodes, and only
+        # :func:`execute` has episodes.
+        if self.attacker_observed is None:
+            self.attacker_observed = ObservedCost(floor=self.attacker_reservation)
+        if self.judge_observed is None:
+            self.judge_observed = ObservedCost(floor=self.judge_reservation)
+
     def complete_attacker(
         self, *, messages: tuple[dict[str, str], ...], temperature: float, lane: str
     ) -> ModelReply:
         self._agree(lane, self.attacker_buckets, role="attacker")
-        admitted_at = self._pace(self.attacker_buckets, self.attacker_reservation)
+        admitted_at = self._pace(
+            self.attacker_buckets,
+            admit_tokens=self.attacker_observed.reservation,
+            take_tokens=self.attacker_reservation,
+        )
         reply = self.inner.complete_attacker(
             messages=messages, temperature=temperature, lane=lane
         )
-        self._settle(self.attacker_buckets, self.attacker_reservation, reply, admitted_at)
+        self._settle(
+            self.attacker_buckets,
+            self.attacker_reservation,
+            self.attacker_observed,
+            reply,
+            admitted_at,
+        )
         return reply
 
     def complete_judge(self, *, system: str, user: str, lane: str) -> ModelReply:
         self._agree(lane, self.judge_buckets, role="judge")
-        admitted_at = self._pace(self.judge_buckets, self.judge_reservation)
+        admitted_at = self._pace(
+            self.judge_buckets,
+            admit_tokens=self.judge_observed.reservation,
+            take_tokens=self.judge_reservation,
+        )
         reply = self.inner.complete_judge(system=system, user=user, lane=lane)
-        self._settle(self.judge_buckets, self.judge_reservation, reply, admitted_at)
+        self._settle(
+            self.judge_buckets,
+            self.judge_reservation,
+            self.judge_observed,
+            reply,
+            admitted_at,
+        )
         return reply
 
     def _settle(
-        self, buckets: Any, reservation: int, reply: ModelReply, admitted_at: float
+        self,
+        buckets: Any,
+        reservation: int,
+        observed: ObservedCost,
+        reply: ModelReply,
+        admitted_at: float,
     ) -> None:
-        """Charge the buckets ``max(0, actual - reservation)`` now the real cost is known.
+        """Charge the buckets ``max(0, actual - reservation)`` now the real cost is known,
+        **and teach the next admission what this call actually cost**.
 
         ⚠️ **`INCIDENTS.md` INC-143's OWN PROPOSED GUARDRAIL, VERBATIM:** *"THE HONEST FIX IS
         NOT A BIGGER CONSTANT — IT IS TO CHARGE THE BUCKET THE DIFFERENCE ONCE THE REAL COST
@@ -551,6 +653,13 @@ class _PacedClient:
         """
         actual = usage_total_tokens(reply.usage)
         buckets.settle(extra_tokens=max(0, actual - reservation), now=admitted_at)
+        # ⚠️ **THE ONE NEW LINE, AND IT CHARGES NOTHING.** `INC-161`: the settle already had
+        # the provider's own figure in hand and threw it away after spending it. It is now
+        # also remembered, so the NEXT call's admission asks the window for room the size of
+        # the worst call this role has actually made rather than the size of a mean that the
+        # run had already falsified. **This is the only place the estimate is ever written**,
+        # and it is written from `usage.total_tokens` and nothing else.
+        observed.observe(actual)
 
     @staticmethod
     def _agree(lane: str, buckets: Any, *, role: str) -> None:
@@ -587,8 +696,44 @@ class _PacedClient:
                 f"are read (QUESTIONS.md Q-161)"
             )
 
-    def _pace(self, buckets: Any, tokens: int) -> float:
-        """Wait until the buckets permit ``tokens``, then charge them. **One clock read.**
+    def _pace(self, buckets: Any, *, admit_tokens: int, take_tokens: int) -> float:
+        """Wait until the buckets permit ``admit_tokens``, then charge them ``take_tokens``.
+        **One clock read.**
+
+        ⚠️⚠️ **TWO ARGUMENTS BECAUSE THERE ARE TWO QUESTIONS, AND `INCIDENTS.md` INC-161 IS
+        WHAT ONE ARGUMENT COST.** ``admit_tokens`` is the *prospective* estimate -- what this
+        call is expected to cost, from
+        :class:`~whetstone_gate.runner.buckets.ObservedCost`. ``take_tokens`` is the
+        *reservation* the run has always charged, which :meth:`_settle` then tops up to the
+        provider's own figure at this same instant. **The window therefore still ends up
+        holding ``max(reservation, actual)`` -- unchanged -- while the WAIT is now decided by
+        a number the lane's own calls produced.**
+
+        ⚠️ **``take_tokens <= admit_tokens`` IS WHY THE TAKE CANNOT FAIL.**
+        :meth:`~whetstone_gate.runner.buckets.SlidingWindow.wait_seconds` is monotone in
+        cost: if there is room for the larger figure there is room for the smaller. The
+        admission the wait just granted therefore cannot be refused by the take, and no
+        second clock reading is involved in either -- `Q-179`(1) again.
+
+        ⚠️ **THE GAP BETWEEN THE TAKE AND THE TOP-UP IS ZERO SECONDS AND ZERO EVENTS.**
+        :meth:`_settle` runs immediately after the provider answers and charges at
+        ``admitted_at``, the *same* reading, so no other admission can observe the window
+        holding only the reservation. Under-recording is momentary in the code and
+        non-existent in the arithmetic.
+
+        ⚠️ **A CALL LARGER THAN ``tpm`` ITSELF STOPS THE LANE, AND THAT IS THE DECISION
+        RATHER THAN AN OVERSIGHT.** Once this role has been billed more for one call than the
+        lane's whole per-minute capacity, ``admit_tokens`` exceeds that capacity and
+        :meth:`~whetstone_gate.runner.buckets.SlidingWindow.wait_seconds` raises
+        :class:`~whetstone_gate.runner.buckets.BucketError` -- *"waiting cannot help"* --
+        which `driver/episode.py` books as ``PACER_REFUSED``: **counted, named, zero tokens,
+        zero calls, and no packet on the wire** (`Q-179`(2), `INC-160`). ⚠️ **The alternative
+        was to clamp the estimate down to ``tpm`` and send anyway, which is deliberately
+        buying the 429 that `Q-191` ruled we do not buy** -- *"a paced wait costs seconds, a
+        429 costs the lane"* -- and hard rule 12 forbids retrying into another. ⚠️ **This
+        branch was UNREACHABLE on this lane before `INC-161`**, because ``_pace`` only ever
+        asked for 3,000 against a 16,000 ``tpm``; it is reachable now, it is pinned by
+        `tests/test_c14_pacer_admission.py`, and it is disclosed at `QUESTIONS.md` `Q-206`.
 
         ⚠️⚠️ **`Q-179`(1), RULED 2026-09-04 — THE PACER USED TO READ THE CLOCK TWICE AND LET
         THE SECOND READING REFUSE WHAT THE FIRST AUTHORISED.** The pre-ruling body was::
@@ -617,9 +762,9 @@ class _PacedClient:
         """
         while True:
             now = self.clock()
-            wait = buckets.wait_seconds(tokens=tokens, now=now)
+            wait = buckets.wait_seconds(tokens=admit_tokens, now=now)
             if wait <= 0:
-                buckets.take(tokens=tokens, now=now)
+                buckets.take(tokens=take_tokens, now=now)
                 # ⚠️ RETURNED so :meth:`_settle` can charge the top-up against **this** same
                 # reading rather than taking a second one. See its docstring, and `Q-179`(1).
                 return now
@@ -834,6 +979,22 @@ def execute(
         )
     pending = scheduler.pending(keys, completed_slugs)
 
+    # ⚠️⚠️ **RUN-SCOPED, KEYED BY (LANE, ROLE) — `INCIDENTS.md` INC-161's SECOND HALF.**
+    # `_PacedClient` is rebuilt inside the loop below (`Q-179`(3) requires it to be built on
+    # every run, including a dry one), but `lane_states[...].buckets` are built **once per
+    # lane** before it. An adaptive reservation held on the per-episode client would
+    # therefore forget, at the start of every episode, everything the window it paces
+    # against still remembers — and the first turns of all 30 episodes would be admitted
+    # against the same falsified 3,000 that stopped attempt 3. **The estimate is scoped to
+    # the limit it estimates for.**
+    # ⚠️ The ROLE is part of the key and not folded away: `CONTEXT.md` §13.3.2 puts the
+    # attacker and the judge on one lane, and their per-call costs are nothing like each
+    # other (`INC-111`).
+    observed_costs: dict[tuple[str, str], ObservedCost] = {}
+
+    def _observed(lane_name: str, role: str, floor: int) -> ObservedCost:
+        return observed_costs.setdefault((lane_name, role), ObservedCost(floor=floor))
+
     for key in pending:
         lane = request.matrix.lane_for(key)
         judge_lane = request.matrix.judge_lane
@@ -883,6 +1044,14 @@ def execute(
             judge_reservation=settings.judge_call_reservation_tokens,
             clock=clock,
             sleep=sleep,
+            # ⚠️ INC-161: injected, so the estimate survives this episode ending. See the
+            # dictionary's own comment above the loop.
+            attacker_observed=_observed(
+                lane, "attacker", settings.attacker_call_reservation_tokens
+            ),
+            judge_observed=_observed(
+                judge_lane, "judge", settings.judge_call_reservation_tokens
+            ),
         )
 
         world = world_semantics.build(
