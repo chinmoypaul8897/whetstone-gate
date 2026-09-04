@@ -133,6 +133,8 @@ appears that was never issued**, or if a token is reused across roles.
 | `6d1a94f3` | ARCH | FIX | 2026-09-04 |
 | `8f3c72e1` | ARCH | FIX | 2026-09-04 |
 | `9a4d63b2` | C14 | FIX | 2026-09-04 |
+| `2e5b8a47` | ARCH | FIX | 2026-09-04 |
+| `5c9e08f4` | ARCH | FIX | 2026-09-04 |
 
 ⚠️⚠️ **THE `5d7e2b91` ROW IS SELF-RECORDED, AND IT IS THE ROW FOR A TOKEN THAT WAS ISSUED TO **TWO**
 LIVE SESSIONS.** `QUESTIONS.md` `Q-180` and `Q-187` — two independent detections of one event.
@@ -936,6 +938,49 @@ minutes apart** (`e9dd0346`, `ca0dd160`, `7a1e6c84`, and now this pair). Each wa
 instant, and `OF-67`/`OF-70`/`OF-78`'s remedy — **`check_roles.py` counting the table itself** —
 remains owed and is now **nineteen** sessions old.
 
+
+
+⚠️ **`2e5b8a47` IS ROW 87 AND IS THE FIRST ROW IN THIS TABLE THAT IS NEITHER SELF-RECORDED NOR PART
+OF A BATCH — IT IS ANOTHER SESSION'S ROW, WRITTEN ON EXPLICIT INSTRUCTION, AND THAT DISTINCTION IS
+THE WHOLE REASON IT IS LEGAL.** `CLAUDE.md` §5: *"Never invent one and never reuse one … If your
+prompt did not carry a token, do not fabricate one."* **The token WAS issued.** ⚠️ **VERIFIED, NOT
+ACCEPTED FROM THE PROMPT:** it opened the ARCH PUBLISH 1 prompt as `SESSION-TOKEN: 2e5b8a47   CHUNK
+ARCH   ROLE: FIX`, read from that session's own transcript, so the chunk cell and the role cell are
+**read off the issued header** rather than inferred from its commits. Its seven commits — `97fe84b`,
+`0287e80`, `4ae054a`, `a9f4150`, `dc9b842`, `d84d630`, `3ced8ab`, all 2026-09-04 — each carry the
+trailer `Session-Token: 2e5b8a47`, and `make check-roles` **E1** named exactly those seven:
+*"FORGED/UNISSUED: {'2e5b8a47': [...]} - not present in QUESTIONS.md ## Session tokens"*.
+
+⚠️ **THIS ROW IS THE REMEDY `Q-194` DECLARED OWED, IN `Q-194`'s OWN WORDS AND ITS OWN CHARACTERS.**
+That entry ends *"OWED TO: `ARCH PUBLISH 1`, or to the operator if that session has ended. One row:
+`` | `2e5b8a47` | ARCH | FIX | 2026-09-04 | ``."* ⚠️ **THREE SESSIONS DECLINED TO WRITE IT
+UNINSTRUCTED AND EVERY ONE OF THEM WAS RIGHT** (`INC-141`, `INC-149`, `Q-194`): an uninstructed
+session cannot tell an issued token from a forged one without the issuing prompt, and E1 exists
+precisely to refuse that guess. **This session's prompt instructs the row and names its exact text,
+which discharges that objection — it does not overrule it.** `Q-194`'s second ground has also
+expired by measurement rather than by assumption: **ARCH PUBLISH 1 is no longer live** — the process
+enumeration below found no session resuming its transcript — so the read-modify-write hazard it
+named (*"two sessions appending the same row"*) can no longer fire for this row. The precedent for
+writing another session's row against a named remedy is `Q-021`, where C2 BUILD placed C3's
+`da356dbb` row for the identical red.
+
+⚠️ **`5c9e08f4` IS ROW 88 AND IS SELF-RECORDED.** This session's own token, ARCH / FIX, 2026-09-04.
+**Row 87 alone would not have held, and that is worth stating because the prompt asked only for
+row 87:** E1 is evaluated against the commit log, so the moment this session commits under
+`5c9e08f4` the same red returns on its own commits — the choice is again between a self-recorded row
+and a broken `make check-roles`, exactly as the labelled paragraphs above record. ⚠️ **NO
+SELF-RECORD ORDINAL IS CLAIMED**, on the ground `ff6d79ae` measured and `OF-225` files: the numbered
+sequence stops at `363a2e9f` (*"THE TWENTY-EIGHTH … ROW 43"*) and how many rows since were
+self-recorded **is not derivable from this file**. An ordinal here would be a number in the shape of
+a measurement.
+
+⚠️ **COUNTED FROM THE FILE IMMEDIATELY BEFORE APPENDING, NOT INHERITED** (`OF-67`): **86 data rows,
+`9a4d63b2` last**, so these are rows **87 and 88**. A second session holds this file — `7a1e3b52`
+(C17 BUILD), live, with `QUESTIONS.md` outside its fence — and a row landing in between would make
+an inherited count wrong. (86 data rows against `check-roles`'s **85 issued row(s)** is not a
+discrepancy: the extra row is `WG-2026-08-30-CTX-13.4-A`, `Q-014 (iv)`'s recorded non-hex one-off.)
+**Both rows were appended in one insert; no other session's line was touched; the file's bytes were
+re-verified LF-only after the append.**
 
 ## ⚠️ THE TOKEN BATCH, 2026-08-31 — and this is what ends the collision class
 
