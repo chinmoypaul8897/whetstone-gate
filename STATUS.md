@@ -2500,3 +2500,39 @@ sites that pin 40) · `prereg-v1` **not cut** · the **witness gist** does not e
 not run · **N** and the **void threshold** are still `TODO_` sentinels · **39 placeholders unfilled**
 · the repository is **still private** · **C18 has not run** and `RESULTS.md` is a stub · **no chunk
 gained a tag and 14 remain unreviewed.**
+
+### ⚠️ POSTSCRIPT — `d84d630` — FIVE DEFECTS IN THIS SESSION'S OWN PUBLISHED TEXT, FOUND AFTER IT PUSHED
+
+**Its own completeness critic returned five, every one re-measured first-hand before anything moved.
+Nothing amended; each is replaced in the file and named in it.** Full record:
+`docs/sessions/arch-publish-1.txt` §12.
+
+- ⚠️ **FALSE WHEN COMMITTED, NOT STALE:** the STATUS box said of `evals/` *"All 26 are the pilot's."*
+  **`git log` per file: 25 were the pilot's (`d5b660e`); `evals/usage/liveness-6d1a94f3-*.jsonl` was
+  `bc20e9e`'s** — 89 tokens of **post-pilot diagnostic spend** (`INC-145`). ⚠️ **Attributing a later
+  session's provider calls to the single-shot artefact inflates what the pilot cost.**
+- ⚠️ **A PUBLISHED DECISION PROCEDURE THAT RETURNS THE WRONG ANSWER:** *"`git log -1 --
+  config/protocol.yaml` settles which state you are looking at."* **`git log` cannot see a working
+  tree**, and it was wrong in exactly the state the paragraph exists for. Replaced with: read the
+  **value**, and check `git status --porcelain`.
+- ⚠️⚠️ **`n_rule.py:441` READS `selections.tfp_task_count` — so `select_n`, the N decision rule,
+  consumes the value rung 4 changes.** The published text says at length that the decision rule did
+  not fire the cut (true, `Q-099`); **what was unsaid is that the cut moves the decision rule.** No
+  number is wrong and no branch flips — **a disclosure gap, now disclosed**, with what is owed: any
+  republished N projection must state the T-FP size it was computed at.
+- ⚠️ **`CONTEXT.md` §13.4 holds TWO rules and `RESULTS.md` cited "§13.4's rule" for both**, forty
+  lines apart — the denial and the derivation. Both are now **quoted**, not cited by number.
+- **The calibration row's REASON expired** (`driver/cal.py` landed at `c5a83fd`); **its headline did
+  not — the calibration has still not run.** `README.md` §10.2's and §18's open-findings totals are
+  marked as predating this session's three appends rather than re-counted.
+
+⚠️ **AND TWO OF THE THREE FINDINGS FILED TODAY WERE OVERTAKEN WITHIN TEN MINUTES.** `OF-255`'s
+"UNMEASURED" shipped `User-Agent` **was measured — 200, 21 tokens, nothing substituted**
+(`evals/usage/liveness-8f3c72e1-*.jsonl`); `OF-256`'s "`buckets.py` unchanged" ended when
+`class SlidingWindow` landed at `c5a83fd`. **A dated note is APPENDED to `OPEN_FINDINGS.md`; no row
+was edited and none was closed — the SHA is another session's and the closure is a reviewer's call.**
+⚠️ **`OF-255`'s second half is untouched: `liveness_refusal` is STILL not wired into `preflight`.**
+
+⚠️ **HEAD MOVED TWICE UNDER THIS SESSION** (`c5a83fd`, `5960120` — both `8f3c72e1`'s). The private
+index was seeded from **live HEAD** each time, which is why `INC-139` forbids a pinned SHA;
+`dc9b842` remains an ancestor of HEAD. **Nothing was swept in either direction.**

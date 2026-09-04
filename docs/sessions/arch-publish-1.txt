@@ -698,3 +698,134 @@
     already committed the claim it corrects.
 
 ================================================================================
+
+================================================================================
+12. ! POSTSCRIPT - WRITTEN AFTER S0-S11 WERE COMMITTED, PUSHED AND PRINTED
+================================================================================
+
+ ! S0-S11 ABOVE ARE NOT REWRITTEN. They were committed at dc9b842 and printed to
+ the architect verbatim. This postscript is APPENDED beneath them so the printed
+ copy stays detectable against this file and the correction reads as a
+ correction. PROCESS.md S7 forbids a history rewrite; INC-139 and INC-146
+ established the treatment, and this is the SECOND time today this session has
+ needed it on its own work.
+
+ WHAT HAPPENED: this session's own completeness critic - the last agent of the
+ adversarial verification pass, still running when S0-S11 were pushed - returned
+ FIVE DEFECTS IN THE PUBLISHED TEXT. Every one was re-measured by me first-hand
+ before anything was changed. Fixed in d84d630 across README.md, RESULTS.md and
+ docs/reviews/OPEN_FINDINGS.md.
+
+ 12a. !! THE ONE THAT WAS FALSE WHEN COMMITTED, NOT STALE - AND IT ROUNDS IN THE
+      ONE DIRECTION THIS PROJECT MUST NEVER ROUND.
+      The STATUS box's evals/ row said "All 26 are the pilot's."
+      MEASURED PER FILE:
+        git log -- evals/usage/gemma-26b-2026-09-04.jsonl        -> d5b660e  (pilot)
+        git log -- evals/usage/liveness-6d1a94f3-2026-09-04.jsonl -> bc20e9e  (NOT)
+      and that file's rows read "probe": "GATE2_LIVENESS", "session": "6d1a94f3"
+      - 89 tokens of POST-PILOT DIAGNOSTIC SPEND by a LATER session (INC-145).
+      ! ATTRIBUTING A LATER SESSION'S PROVIDER CALLS TO THE SINGLE-SHOT ARTEFACT
+      INFLATES WHAT THE PILOT COST and blurs the boundary PROCESS.md S6b draws
+      around it. I wrote it, I did not measure it, and I inherited the "26" from
+      a file count instead of from git. A COUNT OF FILES UNDER evals/ IS NOT A
+      COUNT OF ONE RUN'S FILES.
+
+ 12b. ! A PUBLISHED DECISION PROCEDURE THAT RETURNS THE WRONG ANSWER IN EXACTLY
+      THE STATE IT EXISTS FOR. README S9.3 and RESULTS.md S3.3 told the reader
+      that `git log -1 -- config/protocol.yaml` settles whether rung 4's
+      execution had landed. GIT LOG CANNOT SEE A WORKING TREE. Measured while it
+      was still uncommitted: git log returned b1bab1c (older than my file's
+      commit -> reader concludes NOT LANDED) while `grep tfp_task_count` on the
+      same file returned 20. Replaced with a procedure that works in both
+      states - read the VALUE, and check `git status --porcelain` for whether
+      history can be trusted at all.
+
+ 12c. !! A CONSEQUENCE OF RUNG 4 THAT LIVES IN CODE AND THAT NO GREP FOR THE
+      FORBIDDEN SENTENCE WOULD EVER HAVE FOUND, AND IT IS THE MOST SUBSTANTIVE
+      OF THE FIVE.
+        src/whetstone_gate/runner/n_rule.py:441
+          tfp_tasks = int(protocol.require("selections.tfp_task_count"))
+      SO select_n - THE N DECISION RULE - READS THE VERY VALUE RUNG 4 CHANGES,
+      and executing the cut mechanically moves that rule's own projections.
+      ! THE COUPLING RUNS THE OPPOSITE WAY TO THE ONE EVERYTHING I PUBLISHED IS
+      CAREFUL ABOUT. S9.3 and RESULTS.md S3.2 say at length that the DECISION
+      RULE DID NOT FIRE THE CUT - true, and Q-099's whole point. WHAT NOBODY
+      SAID IS THAT THE CUT MOVES THE DECISION RULE.
+      n_rule.py:314-320's own docstring already names this hazard for the
+      AgentDojo block - "a projection that quietly dropped it would no longer
+      reproduce the figures the ruling is stated against, and the rule would
+      stop being checkable against the published table" - and the same adjacency
+      has now arrived through T-FP.
+      ! NO PUBLISHED NUMBER IS WRONG AND NO BRANCH FLIPS. It is a DISCLOSURE
+      GAP. It is now disclosed in both files with what is owed: any republished
+      N projection must state the T-FP size it was computed at.
+      ! AND I DID NOT PUBLISH THE HOUR FIGURES THE COUPLING WOULD MOVE, because
+      I did not compute them. The coupling is published as a coupling.
+
+ 12d. ! CONTEXT.md S13.4 CONTAINS TWO RULES AND RESULTS.md CITED "S13.4's rule"
+      FOR BOTH, FORTY LINES APART IN ONE FILE. S3.2 denies the DECISION rule
+      fired; S3.3 then cited "S13.4's rule" as the source of the twenty
+      surviving ids - which is the SELECTION rule. A reader could join the
+      denial to the derivation and read the measurement as having chosen the
+      cut, WHICH IS THE EXACT THING Q-099 EXISTS ABOUT. Both sentences are now
+      QUOTED rather than cited by number. README S9.3 already did this correctly
+      by quoting; RESULTS.md was the weaker text and it is the one a reader who
+      greps T-FP lands in, by its own preamble.
+
+ 12e. THE CALIBRATION ROW'S REASON EXPIRED; ITS HEADLINE DID NOT. "no code path
+      in this repository runs a calibration at all" was true at 3f07907 and is
+      now false - src/whetstone_gate/driver/cal.py landed at c5a83fd. THE
+      LOAD-BEARING HALF IS UNCHANGED: THE CALIBRATION HAS STILL NOT RUN,
+      evals/cal/ has never existed on any ref, and no calibration RUN_DECLARED.md
+      was ever written. The row now separates the two.
+      Also marked as predating this session's three appends, rather than
+      re-counted: README S10.2's two open-findings totals and S18 item 5's "193".
+
+ 12f. TWO OF THE THREE FINDINGS I FILED WERE OVERTAKEN WITHIN TEN MINUTES OF
+      FILING, AND A DATED NOTE IS APPENDED TO OPEN_FINDINGS.md - NO ROW EDITED,
+      NONE CLOSED.
+        OF-255 said the SHIPPED User-Agent was UNMEASURED. The call is on disk:
+          evals/usage/liveness-8f3c72e1-2026-09-04.jsonl - status 200, 21 tokens,
+          "the SHIPPED User-Agent ... NOTHING SUBSTITUTED - no browser string.
+           Groq's edge ACCEPTS this project's own identifier."
+          SIX MINUTES AFTER FILING. ! THE ANSWER IS THE FAVOURABLE ONE, WHICH IS
+          WHY IT IS RECORDED RATHER THAN USED TO QUIETLY DELETE THE ROW - and the
+          row's SECOND half is untouched: liveness_refusal is STILL not wired
+          into preflight.
+        OF-256's status cell says buckets.py is UNCHANGED from HEAD.
+          `class SlidingWindow` landed FOUR AND A HALF MINUTES LATER, at c5a83fd.
+          Its own remedy - "close this row with the SHA that lands it, not the
+          SHA that ruled it" - now has a SHA to point at.
+      ! NOT CLOSED, DELIBERATELY. The file says a finding is closed "only
+      explicitly, with the SHA that closed it", AND THE SHA IS ANOTHER SESSION'S.
+      Whether its work discharges these rows is a REVIEWER's call.
+      ! AND THE NOTE RECORDS THE DEFECT AGAINST THE ROWS RATHER THAN AROUND
+      THEM: both asserted a PRESENT-TENSE state of a tree another session was
+      actively rewriting. Scoping to the filing moment makes them defensible,
+      not useful. THE REMEDY IS THE FORM THIS SESSION WROTE INTO README S13.7 AND
+      THEN FAILED TO APPLY TO ITS OWN FINDINGS - "as of <commit>, with the
+      concurrent state named beside it."
+
+ 12g. HEAD MOVED TWICE UNDER THIS SESSION DURING THE CORRECTION PASS - c5a83fd
+      then 5960120, both session 8f3c72e1's (rung 4 EXECUTED in config/, Q-191's
+      sliding window, and the calibration path wired to a command). The private
+      index was seeded from LIVE HEAD each time, WHICH IS EXACTLY WHY INC-139
+      forbids a pinned SHA, and the name-only guard passed on the correction
+      commit as it did on the first five. dc9b842 remains an ancestor of HEAD -
+      verified with `git merge-base --is-ancestor`. NOTHING OF MINE WAS SWEPT AND
+      I SWEPT NOTHING.
+
+ 12h. WHAT THIS COSTS THE SESSION'S OWN CLAIMS, SAID PLAINLY.
+      S4 above says no number I published was invented. THAT STANDS - 12a was a
+      wrong ATTRIBUTION of correctly-counted files, not an invented figure, and
+      the placeholder count was 39 before and after every commit.
+      But S3(8)'s one-line "evals/ - 26 files, not one. All the pilot's." IS THE
+      DEFECT, in the report as well as in the README. It is left standing above
+      and corrected here, because that is what this file is for.
+      ! AND THE PATTERN ACROSS ALL SIX OF TODAY'S SELF-FOUND DEFECTS IS ONE
+      SENTENCE: EVERY ONE CAME FROM TRUSTING A DOCUMENT, A FILE COUNT OR A
+      PROMPT INSTEAD OF RUNNING THE COMMAND THAT WOULD HAVE SETTLED IT. The
+      suite instrument, the FAIL-10, the evals attribution, the git-log
+      procedure, the S13.4 ambiguity and the n_rule coupling - six for six.
+
+================================================================================

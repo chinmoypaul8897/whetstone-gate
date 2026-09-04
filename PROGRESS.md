@@ -64,6 +64,49 @@ committed — only key NAMES.** A fresh adversarial review follows; nothing here
 
 ---
 
+## SESSION-TOKEN 2e5b8a47 — ARCH, PUBLISH 1 — **POSTSCRIPT** — 2026-09-04
+
+⚠️ **THE ENTRY BELOW IS NOT REWRITTEN.** It was committed at `dc9b842` and its FINAL OUTPUT printed.
+**Five defects in this session's own published text were then found by its own completeness critic,
+re-measured first-hand, and fixed in `d84d630`.** Full record: `docs/sessions/arch-publish-1.txt`
+§12. This is the **second** time today this session has had to correct itself without amending.
+
+- ⚠️⚠️ **ONE WAS FALSE WHEN COMMITTED, NOT STALE, AND IT ROUNDS IN THE ONE DIRECTION THIS PROJECT
+  MUST NEVER ROUND.** The STATUS box said of `evals/` *"All 26 are the pilot's."* **Measured per
+  file: 25 were (`d5b660e`); `evals/usage/liveness-6d1a94f3-*.jsonl` was `bc20e9e`'s — 89 tokens of
+  post-pilot diagnostic spend** (`INC-145`). **Attributing a later session's provider calls to the
+  single-shot artefact inflates what the pilot cost.** I took a file count instead of `git log`.
+- ⚠️ **A PUBLISHED DECISION PROCEDURE RETURNED THE WRONG ANSWER IN THE STATE IT EXISTS FOR.**
+  `git log` cannot see a working tree; while rung 4's execution was uncommitted it returned an older
+  commit while the file read `20`. Replaced with: read the value, check `git status --porcelain`.
+- ⚠️⚠️ **`runner/n_rule.py:441` READS `selections.tfp_task_count`, SO `select_n` CONSUMES THE VALUE
+  RUNG 4 CHANGES.** Everything published says the decision rule **did not fire the cut** — true.
+  **Nobody said the cut moves the decision rule.** `n_rule.py:314-320` already names this hazard for
+  AgentDojo and it has now arrived through T-FP. **No number is wrong, no branch flips — a
+  disclosure gap, now disclosed**, and the hour figures it would move are **not** published because
+  this session did not compute them.
+- ⚠️ **`CONTEXT.md` §13.4 HOLDS TWO RULES** — the decision rule (denied) and the selection rule (the
+  derivation) — **and `RESULTS.md` cited "§13.4's rule" for both, forty lines apart.** A reader could
+  join them and read the measurement as having chosen the cut, which is `Q-099`'s exact subject.
+  Both are now **quoted**.
+- **The calibration row's reason expired** (`driver/cal.py`, `c5a83fd`); **its headline did not.**
+
+⚠️ **TWO OF THE THREE FINDINGS FILED TODAY WERE OVERTAKEN WITHIN TEN MINUTES OF FILING.** `OF-255`'s
+shipped-`User-Agent` residual **was measured — 200, 21 tokens, nothing substituted**; `OF-256`'s
+"`buckets.py` unchanged" ended when `class SlidingWindow` landed. **A dated note is APPENDED; no row
+edited, none closed — the SHA is another session's and the closure is a reviewer's call.**
+⚠️ **`OF-255`'s second half stands: `liveness_refusal` is STILL not wired into `preflight`.**
+
+⚠️ **THE PATTERN ACROSS ALL SIX OF TODAY'S SELF-FOUND DEFECTS IS ONE SENTENCE: EVERY ONE CAME FROM
+TRUSTING A DOCUMENT, A FILE COUNT OR A PROMPT INSTEAD OF RUNNING THE COMMAND THAT WOULD HAVE SETTLED
+IT.** The suite instrument, the FAIL-10, the `evals/` attribution, the `git log` procedure, the
+§13.4 ambiguity and the `n_rule` coupling — **six for six.**
+
+⚠️ **HEAD MOVED TWICE UNDER THIS SESSION** (`c5a83fd`, `5960120`). The private index was seeded from
+**live HEAD** each time; `dc9b842` remains an ancestor. **Nothing swept, in either direction.**
+
+---
+
 ## SESSION-TOKEN 2e5b8a47 — ARCH, PUBLISH 1 — 2026-09-04
 
 **Role:** FIX. **Chunk:** ARCH. **Everything below ships UNREVIEWED. Not self-certified. No tag.**
