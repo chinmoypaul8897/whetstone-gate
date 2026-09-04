@@ -2255,42 +2255,39 @@ def _declared_request(tmp_path, matrix, attacker_lanes):
     )
 
 
-def test_the_DECLARED_COMMAND_now_ROUTES_and_is_STOPPED_BY_A_DIFFERENT_DEFECT(
+def test_the_DECLARED_COMMAND_SURVIVES_A_SLEEP_THAT_UNDERSHOOTS(
     tmp_path, _no_provider_call, _key_names
 ):
-    """⚠️⚠️ **UPDATED BY `Q-171`, RULED 2026-09-04 — AND THE NAME IS STILL TRUE.**
+    """⚠️⚠️ **RENAMED AND UPDATED — NOT DELETED — BY `Q-179`(1), RULED 2026-09-04.**
 
-    ⚠️ **THE OLD BODY ASSERTED THE `tool`-ROLE DEFECT AND ITS OWN DOCSTRING SAID SO:**
-    *"THIS TEST ASSERTS THE DEFECT ON PURPOSE, AND MUST BE UPDATED RATHER THAN DELETED
-    WHEN IT IS RULED."* It is updated, not deleted. `Q-171` is closed, ``tool`` maps on
-    both providers, and the run no longer dies on the second call of the first episode.
+    ⚠️ **ITS OLD NAME WAS**
+    ``test_the_DECLARED_COMMAND_now_ROUTES_and_is_STOPPED_BY_A_DIFFERENT_DEFECT`` **and
+    its old body asserted the defect ON PURPOSE**, exactly as the body before it asserted
+    `INC-129`'s. That body's own docstring set the rule this change obeys: *"THIS TEST
+    ASSERTS THE DEFECT ON PURPOSE, AND MUST BE UPDATED RATHER THAN DELETED WHEN IT IS
+    RULED."* The defect is ruled, so the test is updated. **The name had to change because
+    the old one is now FALSE** — the declared command is no longer stopped by that defect,
+    and a test whose name states a fact that has stopped being true is worse than no name.
 
-    ⚠️⚠️ **AND IT IS STOPPED BY A DIFFERENT DEFECT AGAIN — A NEW, FOURTH BLOCKER.**
-    `QUESTIONS.md` **Q-179**, `INCIDENTS.md` **INC-134**. ``run._PacedClient._pace``
-    computes a wait, sleeps it, then requires the clock to have advanced by **at least**
-    that much::
+    ⚠️ **THE FLIP IS PROVABLY MEANINGFUL, WHICH HARD RULE 6 REQUIRES.** Against the
+    **pre-fix** ``_pace`` this body FAILS: ``driver_run.execute`` raises ``BucketError``
+    and never returns, so ``result`` is never bound and every assertion below is
+    unreachable. Against the post-fix ``_pace`` it passes with 20/20. It is not possible
+    for both bodies to pass the same code.
 
-        wait = buckets.wait_seconds(tokens=tokens, now=self.clock())
-        if wait > 0:
-            self.sleep(wait)
-        buckets.take(tokens=tokens, now=self.clock())
-
-    ``Buckets.permits`` tests ``wait_seconds(...) == 0.0`` **exactly**, so a clock that
-    advances even **one microsecond** less than the sleep it was handed turns a bucket
-    refusal into a ``BucketError`` that escapes the run — contradicting the contract
-    `runner/buckets.py` states in its own message, *"A bucket refusal is a WAIT, not an
-    abort"*. ⚠️ **NOT HYPOTHETICAL ON THIS PROJECT'S PLATFORM:** see
-    :func:`_short_clock` for the 300-sample measurement of ``time.monotonic`` on the
-    operator's own machine.
-
-    ⚠️ **THE SHORTFALL IS INJECTED RATHER THAN WAITED FOR, DELIBERATELY.** Driving this
-    with the real ``time.sleep`` reproduces it — that is how it was found — but as a
-    **race**, which is a flaky test and also a three-minute one. The injected clock makes
-    the same defect deterministic, and `Q-179` carries the real-clock measurement.
-
-    ⚠️ **IT IS OUTSIDE THIS SESSION'S FENCE** (``driver/run.py``, ``runner/buckets.py``)
-    and is therefore pinned here rather than fixed, exactly as `INC-129` pinned the defect
-    this test used to assert.
+    ⚠️ **WHAT WAS DELETED FROM THE OLD BODY, NAMED RATHER THAN LEFT TO A DIFF** —
+    `INCIDENTS.md` **INC-138** is this suite's own precedent for why that sentence is
+    written out:
+      * the ``pytest.raises(BucketError)`` context and its two message assertions
+        (*"does not permit"*, *"a WAIT, not an abort"*). **They asserted the defect. The
+        defect is fixed, so an assertion that it still fires would be a test asserting the
+        bug against the ruling.** Their replacement is stronger and is below: the run
+        **completes**, which the old body could not even reach.
+      * the two ``"has no Google/Groq equivalent" not in str(raised.value)`` lines, which
+        read a ``raised.value`` **that no longer exists**. `Q-171`'s closure is what they
+        witnessed and it is witnessed better by 20 completed episodes.
+    ⚠️ **NOTHING ELSE WAS REMOVED.** The ``issubclass`` guard and the whole of (5)'s
+    ``api_model_id`` block are carried over **verbatim**.
     """
     transport = _RoutingTransport()
     matrix = pilot_module.load_pilot(arm="1")
@@ -2300,67 +2297,51 @@ def test_the_DECLARED_COMMAND_now_ROUTES_and_is_STOPPED_BY_A_DIFFERENT_DEFECT(
         judge_lane=matrix.judge_lane,
         transport=transport,
     )
-    clock = _short_clock(0.000001)
+    clock = _clock_that_undershoots_only_its_FIRST_sleep(0.000001)
 
-    with pytest.raises(BucketError) as raised:
-        driver_run.execute(
-            _declared_request(tmp_path, matrix, attacker_lanes),
-            client=client,
-            clock=clock,
-            sleep=clock.sleep,
-        )
+    # ⚠️ NO `pytest.raises`. THAT IS THE ASSERTION. The pre-fix code cannot get here.
+    result = driver_run.execute(
+        _declared_request(tmp_path, matrix, attacker_lanes),
+        client=client,
+        clock=clock,
+        sleep=clock.sleep,
+    )
 
-    # (1) ⚠️ Q-171 IS CLOSED: THE OLD STOPPING POINT IS GONE.
-    assert "has no Google equivalent" not in str(raised.value)
-    assert "has no Groq equivalent" not in str(raised.value)
+    # (1) ⚠️ THE UNDERSHOOT HAPPENED. Without this the test could pass by never sleeping
+    #     at all, which would make the whole exercise vacuous — INC-138's species.
+    assert clock.sleeps > 0, (
+        "no sleep was requested, so the undershoot this test exists to survive never "
+        "occurred and nothing was measured"
+    )
 
-    # (2) ⚠️ AND THE RUN GOT FAR PAST TURN 2, WHICH IS THE THING Q-171 BOUGHT. The old
-    #     body asserted `len(transport.seen) == 1`; a tool result now encodes, so turn 2
-    #     and every turn after it reach a provider.
+    # (2) ⚠️ AND THE RUN COMPLETED ALL TWENTY, under the very clock that used to kill it.
+    assert len(result.episodes) == 20
+    result.denominator.reconcile()
+
+    # (3) ⚠️ AND THE RUN GOT FAR PAST TURN 2, which is the thing Q-171 bought. Carried
+    #     over from the old body unchanged.
     assert len(transport.seen) > 2, (
         "the run still dies at turn 2; Q-171's mapping is not in effect"
     )
 
-    # (3) ⚠️ THE NEW STOPPING POINT, NAMED. A bucket refusal reached the caller as an
-    #     abort, which runner/buckets.py's own message says it must never be.
-    assert "does not permit" in str(raised.value)
-    assert "a WAIT, not an abort" in str(raised.value)
-
-    # (4) ⚠️ AND IT IS AN UNCAUGHT ESCAPE, SO HARD RULE 11's DENOMINATOR IS LOST WITH
-    #     THE RUN — `Q-174`'s finding, unchanged, now reached by a second route.
-    #
-    # ⚠️⚠️ THE LINE BELOW IS **VACUOUS AND IS LABELLED AS SUCH RATHER THAN DELETED.**
-    #     `INCIDENTS.md` INC-138. `pytest.raises(BucketError)` above already FIXES the
-    #     type, and `BucketError`, `RateLimited` and `ProviderFailed` are three SIBLING
-    #     subclasses of `RuntimeError` — measured:
-    #         issubclass(BucketError, RateLimited)    -> False
-    #         issubclass(BucketError, ProviderFailed) -> False
-    #     so this assertion is TRUE BY CONSTRUCTION and CANNOT EVER FAIL. It does NOT
-    #     establish the sentence above it. ⚠️ It is KEPT because hard rule 6 forbids
-    #     DELETING an assertion, and a vacuous assertion that says so is honest where a
-    #     silent one is not; the NON-vacuous form is added beneath it.
-    assert not isinstance(raised.value, (RateLimited, driver_clients.ProviderFailed))
-
-    # ⚠️ THE NON-VACUOUS FORM, WHICH IS WHAT (4) MEANT TO SAY: the escape is not booked
-    #    by `_MeteredCall.run`, so nothing on the dispatch path CONVERTS it. Asserted
-    #    against the CONVERSION TABLE itself rather than against the raised object's
-    #    type, which the `pytest.raises` above has already decided.
+    # (4) ⚠️ CARRIED OVER VERBATIM. Still true, still meaningful, and now for a SECOND
+    #     reason: `_MeteredCall.run` books `BucketError` under its OWN except clause
+    #     (Q-179(2)), so if it ever became a subclass of either converted failure it would
+    #     be booked under the WRONG category rather than not at all.
     assert not issubclass(BucketError, (RateLimited, driver_clients.ProviderFailed)), (
         "if BucketError ever became a subclass of either converted failure, "
-        "_MeteredCall.run WOULD book it and Q-174's finding would be closed by "
-        "accident rather than by a ruling"
+        "_MeteredCall.run would book it under that category instead of PACER_REFUSED, "
+        "and a distinct failure mode would vanish into an existing number"
     )
 
-    # (5) ⚠️⚠️ RESTORED BY `5d7e2b91` UNDER HARD RULE 6 — `INCIDENTS.md` INC-138.
+    # (5) ⚠️⚠️ CARRIED OVER VERBATIM FROM THE `5d7e2b91` RESTORATION — INC-138.
     #     The rewrite of this test DELETED, and did not replace, the ONLY assertion in
     #     this suite that the URL built inside the declared command's REAL
     #     `driver_run.execute` path carries `config/lanes.yaml`'s own `api_model_id`
     #     rather than a literal. Measured after the deletion: the intersection of
     #     {tests that call driver_run.execute} and {tests that assert api_model_id} was
-    #     **EMPTY** — the three surviving `api_model_id` assertions all build their
-    #     request BY HAND and never go through `execute`, so hard rule 9's guard on the
-    #     SHIPPED path had no test at all. It is restored here, unchanged in substance
-    #     from the line the diff removed, and it is additive: nothing above is weakened.
+    #     **EMPTY**. It is preserved here across a SECOND rewrite of this test, which is
+    #     the point of naming it.
     lanes = runner_lanes.load_lanes()
     assert transport.urls[0].startswith(driver_clients._GOOGLE_BASE)
     assert transport.urls[0].endswith(
@@ -2661,4 +2642,135 @@ def test_EVERY_ROLE_C6_CAN_EMIT_IS_A_KEY_IN_BOTH_PROVIDER_MAPS(_no_provider_call
         f"roles {sorted(emitted - both)} are emitted by attacker/context.py and are NOT "
         f"keys in BOTH provider maps. That is INC-129 exactly: no episode can reach the "
         f"turn that first carries such a role"
+    )
+
+
+def _clock_that_undershoots_only_its_FIRST_sleep(shortfall: float):
+    """A clock whose **first** ``sleep`` returns ``shortfall`` seconds early, then is exact.
+
+    ⚠️⚠️ **WHY THIS EXISTS ALONGSIDE :func:`_short_clock` RATHER THAN REPLACING IT, AND THE
+    REASON IS A PROPERTY OF THE FAKE AND NOT OF THE FIX.** ``_short_clock`` subtracts a
+    **fixed absolute** ``shortfall`` from every sleep, so once the pacer loops (`Q-179`(1)'s
+    ruling) and the residual wait falls **to or below** that shortfall,
+    ``max(0.0, seconds - shortfall)`` is **0.0** and the fake clock stops advancing **for
+    ever**. That is a degenerate fake, not a platform: a real ``time.sleep`` cannot return
+    with ``time.monotonic`` having advanced by exactly zero on every one of an unbounded
+    number of consecutive calls, because real time passes whether or not the sleep does.
+    ⚠️ **`_short_clock` IS LEFT EXACTLY AS IT WAS** and its two remaining callers are
+    untouched — nothing is weakened; this is an addition.
+
+    ⚠️ **ONE UNDERSHOOT IS ALL THE DEFECT EVER NEEDED**, which is why this is the faithful
+    model rather than a convenience. `Q-179`/`INC-134`'s own 300-sample measurement on the
+    operator's win32 machine found ``time.sleep(w)`` returning before ``time.monotonic``
+    had advanced by ``w`` **139 times**, worst shortfall **-0.011 s** — single events, not
+    a permanent skew. The pre-fix ``_pace`` dies on the **first** one.
+    """
+
+    class _Clock:
+        def __init__(self) -> None:
+            self.t = 0.0
+            self.sleeps = 0
+
+        def __call__(self) -> float:
+            return self.t
+
+        def sleep(self, seconds: float) -> None:
+            self.sleeps += 1
+            if self.sleeps == 1:
+                self.t += max(0.0, seconds - shortfall)
+            else:
+                self.t += seconds
+
+    return _Clock()
+
+
+def test_the_pacer_reads_the_clock_ONCE_and_charges_the_bucket_AGAINST_THAT_SAME_READING():
+    """⚠️⚠️ **`Q-179`(1), RULED 2026-09-04 BY THE ARCHITECT — THE PACER'S TWO CLOCK READS.**
+
+        *"``_pace`` reads the clock twice and lets the second reading refuse what the first
+        authorised. FIX IT BY READING THE CLOCK ONCE AND LETTING THAT ONE READING DECIDE
+        BOTH: take ``now`` once, ask ``wait_seconds`` against it, and if the wait is not
+        positive call ``take`` WITH THAT SAME ``now``; otherwise sleep and loop. ⚠️ NO
+        EPSILON, NO TOLERANCE, NO GRACE CONSTANT — a tolerance is a hardcoded spec value
+        and hard rule 9 forbids it."*
+
+    ⚠️ **THIS ASSERTS THE MECHANISM, NOT THE SYMPTOM, AND THAT IS THE POINT.** The symptom
+    (a ``BucketError`` escaping a 20-episode run) is asserted end-to-end by
+    :func:`test_the_DECLARED_COMMAND_SURVIVES_A_SLEEP_THAT_UNDERSHOOTS`. **A symptom test
+    alone would pass against an epsilon**, a tolerance, or a grace constant — every one of
+    which the ruling forbids by name and hard rule 9 forbids as a hardcoded spec value.
+    Only an assertion that the **same reading** reached both calls can tell the ruled fix
+    from a fudged one, so it is written here as its own test.
+
+    ⚠️ **PROVED RED AGAINST THE PRE-FIX CODE.** The pre-fix body is::
+
+        wait = buckets.wait_seconds(tokens=tokens, now=self.clock())
+        if wait > 0:
+            self.sleep(wait)
+        buckets.take(tokens=tokens, now=self.clock())
+
+    Against a clock that returns a later value on every read — which is what ``monotonic``
+    means — ``asked`` is ``[1.0]`` and ``charged`` is ``[2.0]``, and ``clock.reads`` is
+    **2**. Measured, both assertions below fail. There is no value of the fake for which
+    the pre-fix code can pass this test, because it reads the clock twice unconditionally.
+    """
+
+    class _Recorder:
+        def complete_attacker(self, *, messages, temperature, lane):
+            return driver_clients.ModelReply(text="ok", usage={"total_tokens": 1})
+
+        def complete_judge(self, *, system, user, lane):
+            return driver_clients.ModelReply(text="ok", usage={"total_tokens": 1})
+
+    class _RecordingBuckets:
+        """Records the ``now`` it was handed. **Always admits**, so the only thing under
+        test is which reading arrived — never whether the bucket agreed."""
+
+        def __init__(self, lane: str) -> None:
+            self.lane = lane
+            self.asked: list[float] = []
+            self.charged: list[float] = []
+
+        def wait_seconds(self, *, tokens, now):
+            self.asked.append(now)
+            return 0.0
+
+        def take(self, *, tokens, now):
+            self.charged.append(now)
+
+    class _EverAdvancingClock:
+        """⚠️ **EVERY READ RETURNS A LATER VALUE, WHICH IS WHAT A MONOTONIC CLOCK IS.**
+        A fake returning a constant would let the pre-fix code pass and would therefore
+        measure nothing — the defect is precisely that the second reading differs."""
+
+        def __init__(self) -> None:
+            self.reads = 0
+
+        def __call__(self) -> float:
+            self.reads += 1
+            return float(self.reads)
+
+    buckets = _RecordingBuckets("qwen-27b")
+    clock = _EverAdvancingClock()
+    paced = driver_run._PacedClient(
+        inner=_Recorder(),
+        attacker_buckets=buckets,
+        judge_buckets=_RecordingBuckets("gemma-26b"),
+        attacker_reservation=1_000,
+        judge_reservation=1_000,
+        clock=clock,
+        sleep=lambda _seconds: None,
+    )
+
+    paced.complete_attacker(messages=(), temperature=0.7, lane="qwen-27b")
+
+    assert buckets.asked == buckets.charged == [1.0], (
+        f"the bucket was ASKED about {buckets.asked} and CHARGED against "
+        f"{buckets.charged}. Q-179(1) rules that ONE reading decides both; two readings "
+        f"let the second refuse what the first authorised, which is INC-134"
+    )
+    assert clock.reads == 1, (
+        f"_pace read the clock {clock.reads} time(s) on a call it did not have to sleep "
+        f"for. The ruling is 'take `now` once'; a second read is the defect itself, not "
+        f"an implementation detail"
     )

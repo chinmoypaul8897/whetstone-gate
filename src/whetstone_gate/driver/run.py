@@ -456,10 +456,40 @@ class _PacedClient:
             )
 
     def _pace(self, buckets: Any, tokens: int) -> None:
-        wait = buckets.wait_seconds(tokens=tokens, now=self.clock())
-        if wait > 0:
+        """Wait until the buckets permit ``tokens``, then charge them. **One clock read.**
+
+        ⚠️⚠️ **`Q-179`(1), RULED 2026-09-04 — THE PACER USED TO READ THE CLOCK TWICE AND LET
+        THE SECOND READING REFUSE WHAT THE FIRST AUTHORISED.** The pre-ruling body was::
+
+            wait = buckets.wait_seconds(tokens=tokens, now=self.clock())
+            if wait > 0:
+                self.sleep(wait)
+            buckets.take(tokens=tokens, now=self.clock())
+
+        :meth:`whetstone_gate.runner.buckets.Buckets.take` admits only on
+        ``wait_seconds(...) == 0.0`` **exactly**, so a ``sleep`` that returned even one
+        microsecond before the monotonic clock had advanced by the full wait turned a bucket
+        refusal into a :class:`~whetstone_gate.runner.buckets.BucketError` — **an abort,
+        which this module's own docstring says a bucket refusal must never be.**
+        ⚠️ **MEASURED ON THIS PROJECT'S OWN PLATFORM** (`INCIDENTS.md` **INC-134**): in 300
+        samples on the operator's win32 machine, ``time.sleep(w)`` returned before
+        ``time.monotonic`` had advanced by ``w`` **139 times**, worst shortfall **-0.011 s**.
+
+        ⚠️ **THE FIX IS EXACT AND INTRODUCES NO CONSTANT**, which the ruling requires in
+        capitals: *"NO EPSILON, NO TOLERANCE, NO GRACE CONSTANT — a tolerance is a hardcoded
+        spec value and hard rule 9 forbids it."* One reading of the clock decides **both**
+        questions. When the wait is not positive, ``take`` is called with **that same**
+        ``now``, so ``refill_to(now)`` sees ``elapsed == 0`` and cannot arrive at a smaller
+        balance than the one ``wait_seconds`` just approved. **The admission cannot expire
+        between being granted and being used, because no time passes between them.**
+        """
+        while True:
+            now = self.clock()
+            wait = buckets.wait_seconds(tokens=tokens, now=now)
+            if wait <= 0:
+                buckets.take(tokens=tokens, now=now)
+                return
             self.sleep(wait)
-        buckets.take(tokens=tokens, now=self.clock())
 
 
 # --------------------------------------------------------------------------------------
