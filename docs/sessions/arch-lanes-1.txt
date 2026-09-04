@@ -1,0 +1,676 @@
+================================================================================
+ ARCH LANES 1        SESSION-TOKEN 6d1a94f3      ROLE: FIX        2026-09-04
+================================================================================
+
+ PUSHED SHA: 9ebbfea   (this file is committed on top of it; that commit's SHA
+             is the first line of the chat report)
+
+ The full record is committed VERBATIM at docs/sessions/arch-lanes-1.txt BEFORE
+ this was printed. CLAUDE.md S6.1: the FILE is the record; this is the
+ convenience copy, and a paraphrase on the way is detectable against it.
+
+================================================================================
+0. THE HEADLINE
+================================================================================
+
+ INC-142(b) IS DIAGNOSED. IT WAS ONE MISSING HTTP HEADER.
+
+ qwen-27b failed 10 of 10 pilot calls, 0 tokens each, instantly, because Groq's
+ edge answers HTTP 403 to a request that carries no User-Agent. MEASURED as a
+ CONTROLLED COMPARISON, not inferred - calls 3 and 4 of this session's sanction
+ were BYTE-IDENTICAL requests, same credential, same api_model_id, same URL,
+ same JSON body, same shipped builder and transport, seconds apart, differing
+ ONLY in that header:
+
+     call 3   the SHIPPED request      HTTP 403   body 17 bytes, NOT JSON
+     call 4   IDENTICAL + User-Agent   HTTP 200   21 tokens, reply "OK"
+
+ ! THE PROMPT'S TWO PRE-EXCLUDED HYPOTHESES ARE NOW EXCLUDED BY MEASUREMENT
+ RATHER THAN BY ASSERTION. Call 4's 200 proves the credential valid and the
+ model id served: neither a 401 nor a 404 is made to disappear by a header.
+
+ gemma-26b answered HTTP 200 on 68 tokens. THE LANE IS ALIVE.
+
+ SPEND: 4 of 4 calls, 89 of 20,000 tokens. No 429. Nothing retried. No lane
+ substituted for another.
+
+ ! AND THIS SESSION FOUND A FALSE CLAIM IN ITS OWN FIRST COMMIT, 40 MINUTES
+ AFTER LANDING IT (INC-146), AND ONE IN A SAFETY GUARD THE PROJECT RELIES ON
+ (INC-147) - WHICH THEN BIT ITS OWN NEW CODE (INC-148). All three are
+ below, none is buried.
+
+ ! git rev-parse prereg-v1 DOES NOT RESOLVE - verified as this session's first
+ act - so every act below was legal.
+
+================================================================================
+1. THE CONCURRENCY TEST - MEASURED FIRST, BY INC-140's RECIPE, AND NOT MET
+================================================================================
+
+ The prompt's test, and the only one that binds: "STOP ONLY IF ANOTHER LIVE
+ SESSION HOLDS 6d1a94f3 OR IS WRITING TO evals/, config/, src/ OR tests/."
+
+ STEP 1-2, live processes and their --resume UUIDs:
+   PID 14232  --resume=ca0152c1-e1f8-4230-85a7-0280e3cb17fa
+   PID  2260  --resume=99119ca6-e452-4c89-9b29-843c95128397
+   PID 25228  (no --resume)
+
+ STEP 3-4, each UUID resolved to its transcript's own cwd:
+   ca0152c1  ->  C:\Users\chinm\role playoff hackathon    DIFFERENT REPO
+   99119ca6  ->  c:\Users\chinm\whetstone-gate            THIS TREE
+   569446d1  ->  C:\Users\chinm\whetstone-gate            THIS SESSION (me)
+
+ PID 2260 is THE ARCHITECT CONSOLE. The prompt says it is READ-ONLY BY ROLE.
+ ! THAT WAS MEASURED RATHER THAN ACCEPTED ON THE PROMPT'S WORD. Every tool call
+ in its whole 2,206-record transcript, counted:
+
+     120  Bash        21  Read         4  Grep
+       1  ToolSearch   1  WebFetch     1  AskUserQuestion
+       0  Write        0  Edit         0  NotebookEdit
+
+ ZERO WRITE TOOLS, EVER. Its last call is the AskUserQuestion at 05:06:12Z that
+ put rung 4 to the operator.
+
+ ! NO OTHER LIVE SESSION HOLDS 6d1a94f3. The token appears in exactly one other
+ transcript - the console's - EXACTLY ONCE, inside the message that authored
+ this prompt.
+ ! NOTHING WAS WRITING TO evals/, config/, src/ OR tests/. The shared index was
+ clean before anything (OF-213: `git diff --cached` exit 0), and the three files
+ git status flags "M" are byte-identical to HEAD:
+     benign/blindness.py  3658539894766611abef3d80475b212d28f4b009 == HEAD
+     benign/executor.py   13f0e7aaf40414ff55ac008d505a2b09a74a0476 == HEAD
+     tests/test_c12_driver.py  d6e43231ba6fab922213c01675d2ff584f4f5ed5 == HEAD
+ A stat-cache artefact. arch-night-1b.txt and arch-pilot-run-5.txt both said
+ exactly this and both were right.
+
+ TEST NOT MET -> PROCEEDED. I did not stop on it.
+
+================================================================================
+2. GATE 0 - DEGRADATION RUNG 4 FIRED           COMMIT a551a31
+================================================================================
+
+ THE OPERATOR RULED: "RUNG 4 FIRES. RUNGS 2 AND 6 DO NOT." Recorded VERBATIM in
+ QUESTIONS.md BEFORE any file was touched (hard rule 5), then INC-144 AT THE
+ MOMENT OF THE CUT (05:27 UTC) with the time, the rung and the reason, then
+ PROTOCOL.md S5.1, S5.2 and S3.2.
+
+ 2a. THE TRIGGER IS THE LADDER, NOT THE S13.4 DECISION RULE, AND CONFLATING THEM
+     WOULD BE A FALSE CLAIM.
+
+     Two instruments can order this same cut and only one fired.
+       CONTEXT.md S13.4's rule fires on the pilot's MEASURED tokens/episode.
+       INC-142: the pilot completed 0 of 20 and select_n returned
+       "USABLE TO SELECT N: False". THE INPUT DOES NOT EXIST, and
+       n_decision.selected_branch is still TODO_C14_PILOT.
+       PROCESS.md S14 rung 4 fires on SCHEDULE, at the operator's decision.
+     ! NOTHING IN THIS REPOSITORY SAYS THE PILOT SELECTED THIS CUT.
+
+ 2b. THE SELECTION RULE - DERIVED WITH CITATIONS, NOT PICKED BY TASTE.
+
+     CONTEXT.md S13.4: "T-FP takes the first 40 write-task ids after sorting,
+       stratified 20 airline / 20 retail."
+     PROTOCOL.md S3.2: "The sort is BYTEWISE ASCENDING on the ids AS STRINGS,
+       within each domain separately - architect-ruled, because retail puts
+       "100".."109" ahead of "11" and a numeric sort selects a DIFFERENT sample."
+     PROCESS.md S14 rung 4: "T-FP 40 -> 20 tau2 tasks."
+
+     That is ONE PARAMETERISED RULE - first K/2 per domain, bytewise ascending,
+     within each domain - evaluated at K=40. Rung 4 sets K=20. Same rule, same
+     sort, smaller K:
+
+       airline (10) RUN:  11 12 14 15 16 17 18 19 20 21
+       retail  (10) RUN:  0 1 100 101 102 103 104 105 106 107
+
+       airline (10) NOT RUN: 22 23 24 25 29 30 32 33 35 37
+       retail  (10) NOT RUN: 108 109 11 110 111 112 113 13 14 15
+
+     MEASURED against config/protocol.yaml:461-465: each surviving list is an
+     EXACT PREFIX of its domain's pre-registered twenty. NOTHING ENTERS THE
+     SAMPLE THAT WAS NOT ALREADY IN IT, so this is a reduction and NOT a
+     re-registration - the hazard S14 names for a cut made after the tag. It is
+     made BEFORE it, which S14 says to do "if at all possible".
+
+     THREE READINGS REJECTED, NAMED SO THE CHOICE IS AUDITABLE:
+       "first 20 of the combined list" - violates "stratified"; the 40 are listed
+         airline-then-retail, so it would be all airline and zero retail.
+       "re-derive 20 from the full 130 pool" - NOT WRONG; it yields the IDENTICAL
+         answer, and is named only so a reader who checks finds it checked.
+       "every other id" / "a seeded random sample" / "the ten with most tool
+         calls" - none is stated anywhere; each is the taste-based pick S14 and
+         the prompt forbid.
+
+ 2c. tau2-BENCH IS NOT CUT, AND THE ENTRY SAYS SO EXPLICITLY.
+     PROCESS.md S14's never-cut list opens with tau2-bench; CONTEXT.md S21.4
+     item 4 says "It is never dropped" and adds that its SCOPE is staged.
+     ONLY THE BREADTH OF ONE BLOCK IS STAGED. T-NEG keeps all 34 must-not-write
+     tasks. The externally-authored-answer-key claim - the project's thesis - is
+     INTACT. That sentence is in INC-144, in PROTOCOL.md S3.2 and S5.2, and in
+     the words C18/C19 must publish, because a reader who skims must not mistake
+     a staged breadth for a dropped comparator.
+
+================================================================================
+3. ! THE CORRECTION - THIS SESSION'S OWN COMMIT CARRIED A FALSE CLAIM (INC-146)
+================================================================================
+
+ a551a31 asserted, in a PRE-REGISTRATION ARTEFACT, in an INCIDENTS.md Missing
+ and Diagnosis, and in its own commit message:
+     "there is no `tfp_task_count` key of any name, so the sample size exists
+      only as the LENGTH of a pre-registered list"
+
+ THAT IS FALSE. MEASURED, in the working tree and in the committed blob:
+
+     config/protocol.yaml:421:  tfp_task_count: 40
+     config/protocol.yaml:422:  tfp_stratification: { airline: 20, retail: 20 }
+
+ read through the one loader by THREE first-party modules -
+ tau2/enumerate.py:555, benign/manifest.py:207, runner/n_rule.py:441 - and
+ runner/n_rule.py:158 ALREADY CARRIES `TFP_REDUCED = 20`, whose own comment
+ points at the key by name. A previous session wrote down the exact fact this
+ one denied, in the file it denied it about.
+
+ HOW IT HAPPENED: the session ran `grep -A30 "tfp_task_ids"` - a search for the
+ IDS - read the 40 ids it returned, and asserted a UNIVERSAL NEGATIVE about a
+ DIFFERENT KEY. The strongest available form on the weakest available evidence.
+ The answer was 40 lines above the one it read, in the same YAML block.
+
+ HANDLING, and it follows this project's own precedent rather than inventing
+ one: PROTOCOL.md's sentence is CORRECTED IN PLACE (this session's own sentence,
+ inside its fence, prereg-v1 does not resolve, and a measurably false statement
+ standing in a pre-registration artefact is worse than the edit). INC-144 and
+ the QUESTIONS.md ruling are NOT REWRITTEN - INC-146 and an appended correction
+ stand beside them, which is exactly what INC-139 did with a stale citation and
+ Q-189 CORRECTION did with three wrong claims. The commit message cannot be
+ corrected at all: PROCESS.md S7 forbids the rewrite.
+
+ ! THE CUT AND THE TWENTY SURVIVING IDS ARE UNAFFECTED. What changes is the
+ REASON the rung is not yet executable: not "it has no seam" - IT HAS TWO - but
+ "config/ is outside this session's fence". The operator-owed act is a THREE-KEY
+ EDIT, and it is duller and smaller than the entry originally claimed.
+
+================================================================================
+4. GATE 2 - BOTH LANES DIAGNOSED. 4 CALLS, 89 TOKENS.       (Q-190, INC-145)
+================================================================================
+
+ HARD RULE 12, THE READ BEFORE THE FIRST CALL:
+   gemma-26b-2026-09-04.jsonl   42,930 tokens,  8 calls   (file existed: True)
+   qwen-27b-2026-09-04.jsonl         0 tokens, 10 calls   (file existed: True)
+
+ ACTUAL SPEND, BY MODEL, AGAINST 4 CALLS AND 20,000 TOKENS COMBINED:
+
+   lane        calls  tokens   result
+   gemma-26b     1      68     HTTP 200 - ALIVE, credential works
+   qwen-27b      3      21     HTTP 403, HTTP 403, then HTTP 200
+   TOTAL         4      89     ceiling reached on CALLS, never on tokens
+
+ ! NO 429 WAS RECEIVED. NOTHING WAS RETRIED. NO LANE WAS SUBSTITUTED.
+ ! THIS WAS A LIVENESS PROBE, NOT AN EPISODE. The driver was not run, no episode
+ was run, and evals/episodes/ and evals/checkpoints/ were never touched.
+ ! IT WENT THROUGH THE SHIPPED BODY BUILDERS AND THE SHIPPED TRANSPORT, so a
+ body-shape rejection would have reproduced exactly what the pilot provoked.
+ ! NO KEY VALUE WAS READ INTO ANY RECORD. Only the header carried the secret,
+ exactly as the shipped client does; the probe printed key NAMES only.
+
+ WHAT THE 403's BODY WAS, WITHOUT REPRODUCING IT: 17 bytes, does not parse as
+ JSON, first byte 'e', and a boolean membership test against a fixed needle list
+ chosen in advance hit only "error". A boolean over a needle written in the
+ script cannot carry a credential; that is why the shape was reported that way.
+
+ THE ONE RESIDUAL RISK, STATED BECAUSE THE SANCTION IS SPENT:
+ the measurement used "Mozilla/5.0", the string most likely to be accepted.
+ ! THE SHIPPED VALUE IS "whetstone-gate/1.0 (+research harness; Razorpay Track
+ 01)". This project does not get past a filter by pretending to be a browser it
+ is not, in a repository whose thesis is other people's unsound claims.
+ WHETHER GROQ'S EDGE ACCEPTS THAT STRING IS UNMEASURED. The mitigation is not
+ the string; it is liveness_refusal, which turns a refusal into something found
+ BEFORE a run rather than inside one.
+
+================================================================================
+5. GATE 1 - THE FIXES                              COMMITS bc20e9e, 9ebbfea
+================================================================================
+
+ 1a. THE STATUS SURVIVES `from None`.
+     ProviderFailed gains `status` and a short `error_type`; episode.py catches
+     it AS A VALUE; runner/usage.py records both.
+     ! THE `from None` AND THE BODY SUPPRESSION BOTH STAY. INC-142 calls that
+     suppression "deliberate and its stated reason sound - a provider error can
+     quote the credential it rejected", and it is right. A STATUS IS AN INTEGER
+     AND CANNOT QUOTE ANYTHING; it was discarded WITH the body for no reason but
+     proximity.
+     _ERROR_TYPE_KEYS = ("type","code","status","reason"). `message` IS
+     DELIBERATELY ABSENT - it is the free-text field a provider would quote a
+     credential into. Capped at 64 chars. Secret-scanned, refusing not masking.
+     ! AN `OK` USAGE ROW IS BYTE-IDENTICAL TO THE ONES THE PILOT WROTE. The new
+     keys are omitted when None, because evals/ is append-only and INC-143's
+     eight numbers are measured from those rows - and this session's own new
+     test replays them.
+
+ 1b. liveness_refusal - INC-142's OWN PROPOSED GUARDRAIL.
+     One call per lane. REFUSES, does not warn: S6b makes the first completed
+     execution THE run, so a warning above a single-shot pilot is a warning above
+     a spent artefact. NAMES EVERY DEAD LANE, not just the first - the pilot's
+     two lanes were broken in two DIFFERENT ways, and a check that stopped at the
+     first would have sent the operator back for a second single-shot run to find
+     the second. There is no second single-shot run. A 429 counts as a refusal.
+     Only the STATUS crosses the boundary.
+     ! IT IS NOT YET WIRED INTO preflight. Said, not implied. Operator item 4.
+
+================================================================================
+6. GATE 3 - THE PACER, AND THE HALF THAT DOES NOT FLATTER THE FIX
+================================================================================
+
+ INC-143's own proposed guardrail, implemented: a settle-side top-up charging
+ max(0, actual - reservation) once the real cost is known. Token buckets ONLY,
+ never the request buckets - one call is one request however many tokens it cost.
+ It MAY drive a bucket negative, and that is arithmetic rather than policy: the
+ provider has ALREADY BILLED those tokens, so a bucket that declined to record
+ them would describe a spend that did not happen. The debt is a DELAY that
+ refills away at the published rate.
+ ! NO NEW SPEC VALUE, which is what hard rule 9 requires and why the fix is not
+ a bigger constant. Every charge is either the reservation the run already used
+ or a figure the PROVIDER returned. No multiplier, no headroom, no margin.
+
+ THE DOCSTRING'S FALSE CLAIM IS GONE AND A TEST PINS THAT IT CANNOT RETURN. It
+ promised "A reservation is an upper bound ... it can only make the runner slower
+ than the provider's published limit, NEVER FASTER". Measured against the pilot's
+ own eight calls that was false on SEVEN of them, the largest by 2.59x. The
+ removed sentence is QUOTED in the replacement, so a reader learns what was
+ believed and why it was wrong - and the test asserts the SUBSTANCE, not the
+ absence of a phrase, because a bare "never faster" not-in check would pass on a
+ silent deletion and fail on an honest correction.
+
+ REPLAYED AGAINST THE PILOT'S OWN EIGHT TOKEN COUNTS, read from the COMMITTED
+ usage log rather than a hand-written fixture (INC-143's Missing says why):
+
+     reservation charged, every call : 3,000  = 60,000 // 20
+     ACTUAL, in order  : 790 3203 4002 6201 6665 7439 7782 6848
+     OLD   charged 24,000 for calls that cost 42,930   UNDER by 18,930
+     FIXED charged max(3000, actual) per call = 45,140   NEVER under
+
+ ! AND THE HALF THAT DOES NOT FLATTER THE FIX, MEASURED RATHER THAN ASSUMED:
+
+     OLD    tpm after each call: 13000 every time    call 9: SENT IMMEDIATELY
+     FIXED  tpm after each call: 13000 12797 11998 9799 9335 8561 8218 6170
+                                                    call 9: SENT IMMEDIATELY
+     calls delayed by the pacer, either way: 0
+
+ THE FIX CORRECTS A DOCUMENTED PROPERTY THAT WAS MEASURABLY FALSE. IT DOES NOT
+ EXPLAIN, AND WOULD NOT HAVE PREVENTED, THE PILOT'S 429. The prompt forbade
+ asserting the reservation caused the 429; the simulation now says the fix would
+ not have stopped it either, and that is published rather than left implied.
+
+================================================================================
+7. GATE 4 - THE LANE LIMITS. config/lanes.yaml UNTOUCHED.          (Q-191)
+================================================================================
+
+ WHAT THE EVIDENCE DOES SUPPORT, measured from the committed usage log:
+
+ (1) rpm and rpd are not remotely implicated. Max requests in any 60s window: 3,
+     against a declared 30. Requests that day: 9, against 14,400.
+
+ (2) A strict 60-SECOND SLIDING WINDOW IS EXCEEDED, TWICE:
+
+       call  t(s)  tokens   tokens in the preceding 60s
+         6    171    7439      14,104
+         7    201    7782      21,886   *** EXCEEDS 16,000 ***
+         8    219    6848      22,069   *** EXCEEDS 16,000, 1.38x ***
+         9    220      -       HTTP 429
+
+ (3) Wall-clock-ALIGNED minutes never exceed it - 790 / 7,205 / 6,201 / 14,104 /
+     14,630 - BUT the 429 arrived at 03:30:22 inside a minute already holding
+     14,630 of 16,000, i.e. 1,370 of headroom, and the 9th call's prompt alone
+     would have been of the order of call 8's 6,848. A limiter counting a
+     request's tokens at ADMISSION refuses that under EITHER window shape.
+
+ (4) ! THE DECLARED tpm: 16000 IS THEREFORE CONSISTENT WITH THE OBSERVED 429.
+     WHAT THE EVIDENCE CONTRADICTS IS NOT THE NUMBER - IT IS OUR MODEL OF HOW IT
+     IS ENFORCED. runner/buckets.py models every limit as a continuously-
+     refilling bucket, and simulated against these eight real calls it NEVER
+     EMPTIES: minimum 6,170 of 16,000. INC-143 reported exactly that and the
+     architect re-ran it independently. Both results are true; they are two
+     different limiter shapes, and the provider's is the stricter one.
+
+ WHAT THE EVIDENCE DOES NOT SUPPORT:
+   - It does not establish WHICH enforcement Google uses. Sliding, aligned-with-
+     admission-counting and a burst rule are all consistent with nine points.
+   - It does not establish a "true" limit to write anywhere. No retry-after, no
+     header, no body, no error type was recorded. INC-142 again: THE RECORD
+     CONTAINS THE STRING "429" AND NOTHING ELSE. This session's Gate 1a fix means
+     the NEXT 429 carries its status and type - prospective, and it cannot
+     recover this one.
+   - It does not rule out an undeclared account-level or burst limit. It also
+     does not support one: the two lanes are different providers on different
+     credentials, so no cross-lane interaction is available as an explanation.
+   - It says nothing about gemma-31b or either Flash-Lite lane, never called.
+
+ ! NO NUMBER WAS GUESSED AND NONE WAS COPIED FROM A PROVIDER'S PUBLIC PAGE.
+ `git status --porcelain config/` was EMPTY at every step and is empty at the
+ commit. Changing the row would also invalidate PROTOCOL.md S1.1's manifest
+ digest for config/lanes.yaml, which three sessions have now re-measured.
+
+================================================================================
+8. ! INC-147 - A GAP IN A SAFETY GUARD, FOUND BY THIS SESSION'S OWN TEST
+================================================================================
+
+ runner/redaction.py's key scan is PREFIX-ANCHORED: _looks_like_a_key tests
+ `value.startswith(prefix)` (line 72) and the environment branch tests
+ `value == env_value` (line 82). Both are WHOLE-STRING tests.
+
+ MEASURED, through the public entry point, on a usage-row-shaped dict:
+
+     the key ALONE                      -> REFUSED (SecretInPayload)
+     the same key with a LEADING SPACE  -> WRITTEN, no refusal
+     the key EMBEDDED in a sentence     -> WRITTEN, no refusal
+     the key as a JSON fragment         -> WRITTEN, no refusal
+     an AIza key inside an error line   -> WRITTEN, no refusal
+
+ ! THE MODULE'S OWN DOCSTRING GIVES THREE REASONS IT EXISTS AND THE SECOND IS
+ "a provider error message quoting the credential it rejected". A message
+ quoting a credential is BY CONSTRUCTION a credential inside a longer string -
+ THE EXACT SHAPE THAT PASSES. The guard does not cover its own headline case.
+
+ Its disclosed limitation is real and honest - "not of a known prefix shape, and
+ not equal to anything set ... passes" - but it is the WRONG limitation, which is
+ why this went unexamined: it reads as though a key OF a known shape is covered.
+ The gap is not shape. It is POSITION.
+
+ ! NOT FIXED, DELIBERATELY, AND THE REASON IS NOT THE FENCE - runner/ IS INSIDE
+ IT. The one-line change (startswith -> containment) alters the behaviour of the
+ project's central safety guard, which REFUSES rather than masks - so a false
+ positive does not annotate a record, IT ABORTS AN EPISODE - and "AIza" is four
+ characters that occur in ordinary text and in the attacker corpus. That trade
+ belongs to a chunk with its own build and its own adversarial review, not to a
+ fix session's last hour. THIS SESSION'S OWN NEW FIELD DOES NOT DEPEND ON THE
+ SCAN: `message` is never read, and the test asserts the structural property
+ first and the scan only as a backstop.
+ ! The honest note, because it cuts against the finding: raising this and not
+ fixing it leaves a known gap open, and "it deserved a review" is exactly the
+ sentence a session writes when it is out of time. Operator item 5.
+
+================================================================================
+8b. ! INC-148 - INC-147 ARRIVED IN PRACTICE, INSIDE THE HOUR, IN THIS SESSION'S
+    OWN NEW CODE - AND THE FIRST TEST OF IT PASSED BY AN ACCIDENT OF LENGTH
+================================================================================
+
+ _short_error_type joins the provider's short error fields. As FIRST WRITTEN it
+ JOINED, THEN SCANNED THE JOIN. redaction.py is prefix-anchored (INC-147), so:
+
+   OLD (join-then-scan) -> 'invalid_api_key/' + <the planted 40-char key shape>
+        contains the planted credential : True   <- THE WHOLE VALUE, IN THE RECORD
+   NEW (scan-each-part) -> 'WITHHELD-SECRET-SHAPED'
+        contains the planted credential : False
+
+ The joined string begins with neither gsk_ nor AIza, so the guard never fired.
+ An ordinary enum in `type` was enough to hide a credential in `code`.
+
+ ! AND THE PART THAT MATTERS MORE THAN THE BUG: THE FIRST VERSION OF THE TEST
+ PASSED, FOR A REASON THAT HAD NOTHING TO DO WITH SAFETY. The planted value was
+ 52 characters; joined with "invalid_api_key/" it overflowed the 64-char cap and
+ THE TAIL WAS TRUNCATED OFF. The leak was already in the working tree and a green
+ test was reporting otherwise. It surfaced only because the repository's own
+ check_roles C1 scan refused the key-shaped LITERAL in the tracked test file - an
+ unrelated invariant firing for an unrelated reason - which forced the constant
+ to be rebuilt at runtime TWELVE CHARACTERS SHORTER, and it went red on the next
+ run. A cap that silently truncates is a cap that can make a leak test pass.
+
+ FIXED: each part is scanned BEFORE the join, which restores the anchor. A
+ refused field yields _ERROR_TYPE_WITHHELD = "WITHHELD-SECRET-SHAPED".
+ ! WITHHELD, NOT MASKED, AND NOT REPORTED AS ABSENT. A raise was rejected: it
+ would replace a booked PROVIDER_ERROR with an exception on the one path INC-142
+ exists to keep diagnosable. None was rejected: absent and refused are DIFFERENT
+ FACTS, and None would say the provider sent no type when it sent one this client
+ would not repeat. Three tests pin the three distinctions, and the leak test is
+ proved RED by driving BOTH implementations over the same body side by side.
+
+ ! AND check_roles C1 REFUSED THIS SESSION TWICE IN ONE HOUR, OVER THE SAME
+ PLANTED SHAPE - first the literal in tests/test_arch_lanes.py, then the leaked
+ string quoted verbatim in the INCIDENTS.md entry ABOUT that first refusal
+ ("HITS: INCIDENTS.md:11426 - Groq API key"). Both times it was right, and it is
+ the only check in this repository that fired on this class unprompted. The
+ entry now elides the shape.
+
+ ! THIS IS THE STRONGEST EVIDENCE AVAILABLE THAT INC-147 IS LIVE AND NOT
+ THEORETICAL: it bit the one place this session had just built to carry provider
+ error data, in the hour INC-147 was written. It also makes INC-147's "not fixed,
+ owed to a review" harder to accept, which is why it is recorded separately
+ rather than folded in.
+
+================================================================================
+9. TESTS - EVERY ONE PROVED RED FIRST
+================================================================================
+
+ tests/test_arch_lanes.py, a NEW FILE, against HEAD before any fix:
+     21 FAILED, 3 passed
+ The 3 that passed are named rather than counted as evidence: two are regression
+ guards that SHOULD be green on HEAD (the OK-usage-row byte-identity guard, and
+ the precondition that the committed pilot log still holds the eight numbers),
+ and the third is the planted-key test discussed below.
+ AFTER THE FIXES: 27 passed (the extra three are INC-148's, written after
+ the leak below was found).
+
+ ! THE PLANTED-KEY TEST IS THE ONE EXCEPTION AND ITS OWN DOCSTRING SAYS SO.
+ Against HEAD it fails STRUCTURALLY - there is no `.status` attribute - not
+ because anything leaked, so that red proves nothing about redaction. It was
+ therefore proved RED against the NAIVE form of this session's own fix, the
+ one-line version that adds `message` to _ERROR_TYPE_KEYS. RE-MEASURED at the
+ FINAL code, against a body with the credential in `message` and an ordinary
+ enum in `type`:
+
+   COMMITTED  -> 'invalid_api_key'                       15 chars, planted: NO
+   NAIVE      -> 'invalid_api_key/invalid api key gsk_<32 chars of the key>'
+                                                         64 chars
+
+ ! READ THE SECOND LINE CAREFULLY, BECAUSE IT IS WORSE THAN A BOOLEAN SUGGESTS.
+ An equality test for the WHOLE planted value returns False on it - not because
+ nothing leaked, but because THE 64-CHARACTER CAP TRUNCATED THE TAIL. THIRTY-TWO
+ CHARACTERS OF THE CREDENTIAL ARE IN THAT STRING. It is the same truncation
+ accident that made the first version of this very test pass (INC-148), showing
+ up a second time in the demonstration OF that accident.
+
+ ! AND THE PER-PART SCAN DOES NOT SAVE THE NAIVE VERSION EITHER: "invalid api
+ key gsk_..." does not START with gsk_, so redaction never fires on it. INC-147,
+ again. THE ONLY THING THAT PROTECTS THIS FIELD IS THE STRUCTURAL EXCLUSION -
+ `message` IS NEVER READ AT ALL - and the scan is a backstop that cannot
+ substitute for it. That is why _ERROR_TYPE_KEYS is a closed four-item tuple and
+ why a test asserts the marker, the absent case and the withheld case separately.
+
+ AST-EXACT TEST DIFF FOR EVERY TEST FILE TOUCHED (INC-138). Counted as
+ `ast.Assert` statements, NOT `grep -c assert`, which also counts the word
+ "assertion" in prose and would have reported +7 where the truth is +1:
+
+   file                        def test_*        ast.Assert      names
+   tests/test_c12_driver.py     80 ->  80        245 -> 246      +0 / -0
+   tests/test_c14_prereg.py     15 ->  15         49 ->  49      +0 / -0
+   tests/test_c18_results.py    92 ->  92        208 -> 208      +1 / -1 RENAME
+   tests/test_arch_lanes.py      0 ->  27          0 ->  63      NEW FILE
+
+ ! NOT ONE ASSERTION WAS DELETED FROM ANY FILE. NOT ONE TEST WAS REMOVED.
+
+   test_c12_driver.py +1: three bucket doubles gained a `settle` method because
+     INC-143's top-up WIDENED the bucket protocol. _RecordingBuckets records it
+     in its OWN list, so `asked == charged` is untouched, and a NEW assertion
+     `buckets.settled == [1.0]` EXTENDS Q-179(1)'s one-clock-read property to the
+     new code path rather than relaxing it.
+   test_c14_prereg.py: one assertion's VALUE flipped, {1,3,5} -> {1,3,4,5}.
+     ! THIS TEST ASKED TO BE FLIPPED, IN ITS OWN WORDS: "a rung may be fired ...
+     but PROTOCOL.md is a FROZEN artefact and its table must be re-checked by a
+     human, not by this assertion." The human re-check is the operator's ruling.
+   test_c18_results.py: RENAMED and both tuples flipped.
+     ! THE NAME MOVED BECAUSE THE NAME WAS AN ASSERTION. Q-099 is the entry about
+     a prompt claiming rung 4 had fired when it had not, so leaving
+     `..._1_3_5_FIRED_while_2_4_6_DID_NOT` on a test that checks the new set
+     would be that exact defect wearing a passing test's clothes. Both tuples are
+     still exact and still exhaustive over all six rungs: rung 4 MOVED between
+     them, nothing was dropped from either.
+
+ BOTH FLIPS PROVED MEANINGFUL AGAINST THE OLD ARTEFACTS (hard rule 6), not
+ merely re-run green:
+   INCIDENTS.md @ b60e198 -> {1,3,5}                          new assertion RED
+   INCIDENTS.md @ HEAD    -> {1,3,4,5}                        new assertion PASS
+   PROTOCOL.md  @ b60e198 -> fired=(1,3,5) not_fired=(2,4,6)  BOTH RED
+   PROTOCOL.md  @ worktree-> fired=(1,3,4,5) not_fired=(2,6)  BOTH PASS
+
+================================================================================
+10. THE FULL SUITE, BEFORE AND AFTER - AND IT IS NOT GREEN
+================================================================================
+
+ AFTER, at the final tree, measured (not predicted):
+
+     5 failed, 1451 passed, 2 skipped in 484.18s (0:08:04)
+
+ ! IT IS NOT GREEN, AND IT WAS NOT GREEN BEFORE THIS SESSION EITHER.
+ docs/sessions/arch-pilot-run-4.txt:304 records the suite as
+ "5 failed, 1421 passed, 2 skipped in 638.90s" and arch-night-1.txt:537 as
+ "AFTER : 5 failed, 1419 passed, 2 skipped, 2 deselected ... EXIT 1". THE SUITE
+ HAS BEEN RED FOR DAYS. This session did not make it green and does not claim to.
+
+ THE SURVIVING FAILURES, EACH ATTRIBUTED RATHER THAN COUNTED:
+   tests/test_c12_benign.py::test_the_benign_package_imports_no_model_client_WAY_ONE_the_transitive_ast_walk
+   tests/test_c7_ledger.py::test_Q069_nothing_in_this_repository_imports_the_ledger_yet
+   tests/test_c8_scorer.py::test_golden2_coverage_block_reproduces
+   tests/test_c8_scorer.py::test_null_is_not_empty_a_scorer_returning_empty_for_absent_subjects_passes_seven_of_eight
+   tests/test_lanes_operator_placeholders.py::test_the_camel_branch_is_decided_before_any_camel_run
+
+ ! NONE OF THEM IS THIS SESSION'S, AND THAT IS MEASURED RATHER THAN ASSERTED:
+   test_c12_benign's urllib closure comes from `f45721d` making benign/shell.py
+     import driver.clients; `git diff b60e198 -- src/whetstone_gate/benign/` is
+     EMPTY, so benign/ is byte-identical to the tree this session started from.
+   test_lanes_operator_placeholders' camel branch is `TODO_C13_RUN1`, one of the
+     five declared config/ sentinels check-roles F2 lists as CORRECT.
+   test_c7_ledger, test_c8_scorer x2 and test_repo_invariants' two are in the
+     pre-existing set that arch-pilot-run-4 and arch-night-1b both recorded.
+ ! THE 13 FAILURES THE FIRST FULL RUN OF THIS SESSION SHOWED ARE DOWN TO THIS
+ SET: six were this session's and every one was fixed - three test doubles that
+ had to implement the widened bucket protocol, two rung tripwires that ASKED to
+ be flipped, and the CRLF that A3/A4 caught.
+
+
+ ! make check-roles: 21 passed, 0 failed, 3 n/a.
+ ! IT WENT RED MID-SESSION AND THIS SESSION CAUSED IT. A python helper rewrote
+ src/whetstone_gate/driver/run.py through `write_text`, converting ALL 1,135
+ line endings to CRLF; A3 and A4 both caught it. That is INC-16's exact class,
+ in the session that was writing three other incident entries. Fixed by
+ rewriting the bytes, and every one of the 13 staged files was then CR-audited:
+ all clean, 0 CR bytes each.
+
+================================================================================
+11. WHAT WAS NOT TOUCHED - VERIFIED, NOT ASSERTED
+================================================================================
+
+   the pilot's two usage logs   byte-identical to b60e198
+                                (git hash-object == git rev-parse b60e198:path)
+   evals/episodes/              git status --porcelain EMPTY
+   evals/checkpoints/           git status --porcelain EMPTY
+   tests/goldens/               EMPTY at every step
+   config/                      EMPTY at every step
+   CONTEXT.md, PROCESS.md,      not opened for writing
+   corpora/, docs/submission/,
+   README.md, RESULTS.md
+   tags                         none cut, none moved
+   .env                         NEVER READ, PRINTED, ECHOED OR COMMITTED.
+                                Only NAMES were read, through runner/keys.py,
+                                which has no code path that returns a value.
+
+ ! THE LIVENESS PROBE WROTE A SEPARATE FILE ON PURPOSE:
+ evals/usage/liveness-6d1a94f3-2026-09-04.jsonl, rather than appending to
+ gemma-26b-2026-09-04.jsonl. That file is the record INC-143's eight numbers are
+ measured from AND the file this session's own new test replays; appending to it
+ would have altered an artefact the project's own incident log cites.
+ ! THE COST OF THAT CHOICE, STATED: a future preflight reading
+ <model>-<date>.jsonl will NOT see these 4 calls / 89 tokens and will under-count
+ today's spend by that much. Disclosed here and in INC-145 rather than fixed by
+ contaminating the record.
+
+================================================================================
+12. WHAT I COULD NOT DO
+================================================================================
+
+ 1. EXECUTE rung 4. config/protocol.yaml is outside the fence. The cut is
+    DECLARED and RECORDED and is NOT yet executable. Operator item 1.
+ 2. PUBLISH the cut in RESULTS.md and README.md. Both outside the fence. S14
+    requires a cut item to be named in both; the EXACT WORDS are in INC-144's
+    table so nothing is lost. Operator items 2 and 3.
+ 3. WRITE docs/reviews/OPEN_FINDINGS.md. Outside the fence, and CLAUDE.md S6.5
+    makes it a REVIEW session's duty. INC-147 says so rather than claiming the
+    finding is filed there.
+ 4. WIRE liveness_refusal into preflight. It is implemented and tested; wiring it
+    touches the preflight refusal path and its seven declared preconditions,
+    which is a change to what stands between an operator and a single-shot run
+    and deserves its own review rather than a fix session's last hour.
+ 5. MEASURE whether Groq accepts the SHIPPED User-Agent. The 4-call sanction was
+    spent establishing the cause. Operator item 6.
+ 6. ESTABLISH the true lane limit. Nine data points cannot separate the candidate
+    limiter shapes, and PROCESS.md S8 forbids a session calling the models
+    endpoint. Written to QUESTIONS.md as an operator-owed attestation (Q-191).
+
+================================================================================
+13. WHAT THE OPERATOR MUST DO NEXT
+================================================================================
+
+ 1. EXECUTE RUNG 4 IN config/, BEFORE prereg-v1. Three keys plus the tests that
+    pin 40 - and it must be ONE atomic act, because the tests re-derive from the
+    config:
+      config/protocol.yaml:421  tfp_task_count: 40 -> 20
+      config/protocol.yaml:422  tfp_stratification: {airline:20,retail:20}
+                                                 -> {airline:10,retail:10}
+      config/protocol.yaml:461  tfp_task_ids -> the first 10 per domain, i.e.
+        airline: 11 12 14 15 16 17 18 19 20 21
+        retail:  0 1 100 101 102 103 104 105 106 107
+    AND, IN THE SAME COMMIT, THE THREE TEST SITES THAT PIN 40 - each located and
+    read, not guessed:
+      tests/test_c12_benign.py:811  the whole test
+        `test_the_TFP_manifest_reads_FORTY_ids_from_config_stratified_twenty_and_twenty`
+        - :813 `manifest.task_count == 40`, :817 `declared_count == 40`,
+          :818 `quota_by_domain == {"airline": 20, "retail": 20}`
+        ! ITS OWN FAILURE MESSAGE IS A TRIPWIRE THAT NAMES THIS RUNG: "PROCESS.md
+          S14's rung 4 (40 -> 20) is NOT FIRED and config/'s
+          selections.tfp_task_count is the authority". LIKE test_c14_prereg's and
+          test_c18_results', IT ASKS TO BE FLIPPED - and its NAME says FORTY, so
+          the name must move with it, for the same reason test_c18's did.
+      tests/test_c3_tau2_enumeration.py:277 and :291
+    ! tests/ IS inside this session's fence and config/ is NOT, which is exactly
+    why these were LEFT ALONE: flipping them first would turn them red against a
+    config that still says 40, and hard rule 6 forbids a test that is green for
+    the wrong reason as much as one that is weakened.
+    AND PROTOCOL.md S1.1's manifest digest for config/protocol.yaml must be
+    RE-MEASURED, never copied - PROTOCOL.md S1.1's own rule, and INC-139 is the
+    entry about that row being stale for two days.
+    ! AFTER prereg-v1 NONE OF THIS IS LEGAL, and S14 rung 4 then requires the
+    block to be published as INCOMPLETE WITH ITS DENOMINATOR.
+
+ 2. C18 must publish, in RESULTS.md, the T-FP row VERBATIM from INC-144's table.
+ 3. C19 must publish the same words in README.md. Both are in INC-144 in full.
+
+ 4. RULE ON WIRING liveness_refusal INTO preflight. It is the single change that
+    converts BOTH of the pilot's failures from "discovered by spending the
+    artefact" to "refused before it", and it costs one call per lane per run.
+
+ 5. RULE ON INC-147. Either accept the prefix-anchored scan as a stated
+    limitation and say so in the module's docstring in the RIGHT terms (the gap
+    is POSITION, not shape), or schedule the containment change with a review
+    that measures the false-positive rate against the 498-entry attacker corpus.
+
+ 6. RE-ATTEST config/lanes.yaml's gemma-26b limits from the dashboard and update
+    limits_read_on. They are operator-attested and FIVE DAYS STALE, and
+    CONTEXT.md S21.6 already names free-tier drift as an open risk. ! DO NOT
+    change a number on this session's evidence: it says the declared 16,000 is
+    CONSISTENT with what happened.
+
+ 7. RULE ON Q-191's OPEN QUESTION: should runner/buckets.py model TPM as a
+    60-second SLIDING window rather than a continuously-refilling bucket? On the
+    pilot's trace the sliding shape would have refused calls 7 and 8 that the
+    bucket admitted. It is NOT proposed here - it would make the runner
+    materially slower across a 30-hour sweep and the evidence cannot say the
+    provider's shape is sliding rather than aligned.
+
+ 8. Q-189's THREE BLOCKERS ARE UNTOUCHED AND STILL BLOCK THE CALIBRATION: there
+    is no code path that runs one, no CAL seed block in config/, and no
+    sanctioned ceilings for a 30-episode block. This session did not build the
+    CAL path - that is the next chunk - and did not spend anything toward it.
+
+ 9. A FRESH ADVERSARIAL REVIEW OF THIS SESSION. Nothing here is self-certified
+    and no tag was cut. ! THREE of the four things this session found wrong were
+    ITS OWN, and each was found only after the fact - INC-146 by its own
+    adversarial pass 40 minutes AFTER committing a false claim into a
+    pre-registration artefact; INC-148 by its own test, and only because an
+    UNRELATED invariant forced a constant twelve characters shorter; the CRLF by
+    check-roles. NONE was caught by the session reading its own work. THAT IS THE
+    ARGUMENT FOR THE REVIEW, NOT A SUBSTITUTE FOR IT.

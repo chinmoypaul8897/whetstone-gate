@@ -2251,3 +2251,94 @@ raised as **`Q-I`**.
 
 **The other 20 checks pass**, including A3 (no CRLF), A5 (no control byte) and D1–D4 (the moat;
 allow-list still **0**).
+
+
+---
+
+## ⚠️ ARCH LANES 1 — `6d1a94f3` — 2026-09-04 — **APPENDED, NOT MERGED INTO ANY LIVE ROW**
+
+**Role FIX. Chunk ARCH. Everything below ships UNREVIEWED. No tag was cut and nothing is
+self-certified.** Full record: `docs/sessions/arch-lanes-1.txt`. Commits `a551a31`, `bc20e9e`, `9ebbfea`,
+plus this entry's own. ⚠️ **`git rev-parse prereg-v1` DOES NOT RESOLVE** — verified as this
+session's first act.
+
+⚠️⚠️ **DEGRADATION RUNG 4 IS FIRED. `STATUS.md`'s glance-state must now read: rungs 1, 3, 4 and
+5 FIRED; rungs 2 and 6 NOT FIRED.** Operator's ruling of 2026-09-04, recorded verbatim in
+`QUESTIONS.md` before any file was touched; `INCIDENTS.md` **`INC-144`** written at the moment
+of the cut (05:27 UTC). **T-FP: 40 τ² write tasks → 20, stratified 10 airline / 10 retail.**
+⚠️ **Fired on SCHEDULE, by the operator — NOT by `CONTEXT.md` §13.4's decision rule**, whose
+input the pilot never produced (`INC-142`: 0 of 20 completed, N REFUSED). ⚠️ **τ²-bench is NOT
+cut** — only this one block's breadth is staged, which `CONTEXT.md` §21.4 permits in terms; the
+externally-authored-answer-key claim is intact.
+
+⚠️ **THE CUT IS DECLARED AND RECORDED AND IS *NOT YET EXECUTABLE*.** The keys the code reads —
+`config/protocol.yaml:421 tfp_task_count: 40`, `:422 tfp_stratification`, `:461 tfp_task_ids` —
+are outside this session's fence. **Operator-owed, before `prereg-v1`, as one atomic act
+including the tests that pin 40.** `INC-144` and `INC-146`.
+
+**`INC-142`(b) IS DIAGNOSED: ONE MISSING `User-Agent` HEADER.** Measured as a controlled
+comparison under a 4-call / 20,000-token sanction — call 3 (shipped request) **HTTP 403**, 17-byte
+non-JSON body; call 4 (byte-identical plus the header) **HTTP 200**, 21 tokens. `gemma-26b`
+answered **200** on 68 tokens: **the lane is alive.** **Spend: 4/4 calls, 89/20,000 tokens. No
+429, nothing retried, no lane substituted.** `INC-145`, `Q-190`.
+
+**PRE-SPEND READINESS MOVES ONE STEP AND ONLY ONE.** `driver/run.py:liveness_refusal` exists and
+is tested — `INC-142`'s own proposed guardrail, refusing a run and naming every lane that will
+not answer. ⚠️ **IT IS NOT WIRED INTO `preflight`.** Until it is, the seven preconditions
+`RUN_DECLARED.md` §7.3 lists still pass while a lane is incapable of returning a reply, which is
+exactly what spent the pilot.
+
+**`config/lanes.yaml` IS UNTOUCHED** (`git status --porcelain config/` EMPTY throughout).
+Gate 4's evidence says the declared `tpm: 16000` is **consistent** with the pilot's 429 — a
+60-second **sliding** window peaks at 22,069 (1.38×) — and that what it contradicts is our
+**model** of the limiter, not the number. No number was guessed and none was copied from a
+provider's page. Operator-owed attestation: `Q-191`.
+
+### ⚠️ FOUR THINGS THIS SESSION FOUND WRONG, THREE OF THEM ITS OWN
+
+- **`INC-146` — this session's own commit `a551a31` carried a FALSE claim into a pre-registration
+  artefact**: *"there is no `tfp_task_count` key of any name."* It is at
+  `config/protocol.yaml:421` and three modules read it. Found by the session's own adversarial
+  pass ~40 minutes after landing. `PROTOCOL.md`'s sentence corrected in place; `INC-144` and the
+  ruling **not rewritten** but corrected beside themselves (`INC-139`'s treatment). **The cut and
+  the twenty surviving ids are unaffected.**
+- **`INC-147` — `runner/redaction.py`'s key scan is PREFIX-ANCHORED**, so a credential embedded
+  in a longer string passes — and *"a provider error message quoting the credential it rejected"*
+  is the module's own stated reason for existing. ⚠️ **NOT FIXED, deliberately**: the guard
+  **refuses rather than masks**, so a false positive **aborts an episode**, and `AIza` is four
+  characters that occur in ordinary text. **Owed to a review, not a fix session's last hour.**
+- **`INC-148` — `INC-147` bit THIS SESSION'S OWN NEW CODE within the hour.** `_short_error_type`
+  joined the provider's error fields and scanned the **join**; prefix-anchored, so an ordinary
+  enum in `type` carried a whole credential in `code` past the guard. ⚠️ **The first test of it
+  passed only because the join overflowed the 64-char cap and the tail was truncated off** —
+  surfaced by the repository's own C1 literal scan forcing the planted constant twelve characters
+  shorter. Fixed: each part scanned **before** the join; a refused field becomes
+  `WITHHELD-SECRET-SHAPED`, **withheld rather than masked and distinguishable from absent**.
+  **This makes `INC-147`'s "owed to a review" harder to accept, which is why it is recorded
+  separately rather than folded in.**
+- **`make check-roles` went RED mid-session and this session caused it** — a helper rewrote
+  `driver/run.py` through `write_text`, converting all 1,135 line endings to CRLF. **`INC-16`'s
+  exact class.** A3 and A4 both caught it; fixed, and all 13 staged files then CR-audited clean.
+  **`check-roles` at the commit: 21 passed, 0 failed, 3 n/a.**
+
+### THE SUITE
+
+**Full suite at the final tree: `5 failed, 1451 passed, 2 skipped in 484.18s (0:08:04)`.** ⚠️ **NOT GREEN — and it was not green
+before this session either** (`arch-pilot-run-4.txt`:304: *"5 failed, 1421 passed, 2 skipped"*).
+The survivors are all pre-existing and each is attributed in `docs/sessions/arch-lanes-1.txt` §10;
+`benign/` is byte-identical to `b60e198`, so its `urllib` closure is `f45721d`'s. **This session's
+first full run showed 13 failures; six were its own and every one is fixed.**
+
+**AST-exact test diff, every file touched — ⚠️ NOT ONE ASSERTION DELETED, NOT ONE TEST REMOVED:**
+`test_c12_driver.py` 80→80 tests, 245→**246** asserts · `test_c14_prereg.py` 15→15, 49→49 (one
+value flipped) · `test_c18_results.py` 92→92, 208→208 (one **rename**) · `test_arch_lanes.py`
+**NEW**, 0→27 tests, 0→63 asserts. Both flips proved RED against the pre-cut artefacts.
+
+### ⚠️ STILL OPEN, UNCHANGED BY THIS SESSION
+
+`Q-189`'s **three blockers still block the calibration**: no code path runs one, no CAL seed
+block in `config/`, no sanctioned ceilings for a 30-episode block. **This session did not build
+the CAL path and spent nothing toward it.** `prereg-v1` not cut · the pilot not re-run · **N**
+and the void threshold still `TODO_` sentinels · the witness gist untouched · the repository
+still private · `RESULTS.md` / `README.md` / `docs/reviews/OPEN_FINDINGS.md` not written (all
+outside the fence; the exact words C18 and C19 must publish are in `INC-144`).

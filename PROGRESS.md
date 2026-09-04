@@ -1,3 +1,185 @@
+## SESSION-TOKEN 6d1a94f3 — ARCH, LANES 1 — 2026-09-04
+
+**Role:** FIX. **Chunk:** ARCH. **Everything below ships UNREVIEWED. Not self-certified. No tag.**
+⚠️ **FULL RECORD: `docs/sessions/arch-lanes-1.txt`.**
+
+⚠️⚠️ **`INC-142`(b) IS DIAGNOSED AND IT WAS ONE MISSING HTTP HEADER.** `qwen-27b` failed 10 of 10
+pilot calls at 0 tokens each because Groq's edge answers **HTTP 403** to a request carrying no
+`User-Agent`. **MEASURED as a controlled comparison, not inferred:** calls 3 and 4 of this
+session's sanction were byte-identical requests — same credential, same `api_model_id`, same
+URL, same JSON body, same shipped builder and transport, seconds apart — differing **only** in
+that header. **Call 3: 403, body 17 bytes, not JSON. Call 4: 200, 21 tokens, reply `"OK"`.**
+The prompt's two pre-excluded hypotheses are now excluded **by measurement**: call 4's 200
+proves the credential valid and the model id served. `INC-145`.
+
+**TOKEN SPEND, BY MODEL, AGAINST THE SANCTIONED 4 CALLS / 20,000 TOKENS COMBINED:**
+`gemma-26b` **1 call / 68 tokens (HTTP 200 — the lane is alive)** · `qwen-27b` **3 calls /
+21 tokens (403, 403, 200)**. **TOTAL 4/4 calls, 89/20,000 tokens.** No 429. Nothing retried,
+no lane substituted. `evals/usage` read **before** the first call (hard rule 12).
+
+**COMMITS, IN ORDER:** `a551a31` (GATE 0 — rung 4 fired; the `QUESTIONS.md` ruling, `INC-144`,
+`PROTOCOL.md`) · `bc20e9e` (GATES 1–4 — the fixes, `tests/test_arch_lanes.py`, `INC-145`,
+`INC-146`, `INC-147`, `Q-190`, `Q-191`, and the **correction of `a551a31`'s own false
+claim**) · `9ebbfea` (**`INC-148` — the leak this session's own new test then found in this
+session's own new code**) · plus this entry's own.
+
+---
+
+**CONCURRENCY, MEASURED FIRST BY `INC-140`'s RECIPE, AND NOT MET — SO THIS SESSION PROCEEDED.**
+Three `claude.exe`: PID 14232 in a **different repository** (`role playoff hackathon`); **PID
+2260 = the architect console** (`99119ca6`) in this tree, whose whole 2,206-record transcript
+uses **120 `Bash`, 21 `Read`, 4 `Grep`, 1 `ToolSearch`, 1 `WebFetch`, 1 `AskUserQuestion` and
+ZERO write tools** — read-only **measured**, not accepted on the prompt's word; PID 25228 = this
+session. **`6d1a94f3` appears in exactly one other transcript, the console's, ONCE, inside the
+message that authored this prompt.** Nothing was writing to `evals/`, `config/`, `src/` or
+`tests/`; the shared index was clean (`OF-213`) and the three files `git status` flags `M` are
+byte-identical to `HEAD`.
+
+⚠️ **`git rev-parse prereg-v1` DOES NOT RESOLVE** — verified as this session's first act, so
+every act below was legal.
+
+**GATE 0 — RUNG 4 FIRED (`a551a31`).** The operator's ruling recorded **verbatim before any file
+was touched** (hard rule 5), then `INC-144` **at the moment of the cut** (05:27 UTC), then
+`PROTOCOL.md` §5.1, §5.2 and §3.2. ⚠️ **THE TRIGGER IS THE LADDER, NOT `CONTEXT.md` §13.4's
+DECISION RULE** — that rule reads the pilot's measured tokens/episode and `INC-142` records
+**0 of 20** completed with N **REFUSED**, so its input does not exist. **Nothing says the pilot
+selected this cut.** The surviving 20 were **derived, not picked**: §13.4 and `PROTOCOL.md`
+§3.2 state one parameterised rule — *first K/2 per domain, bytewise ascending on the ids as
+strings, within each domain* — at K=40; rung 4 sets K=20. **airline `11 12 14 15 16 17 18 19 20
+21`, retail `0 1 100 101 102 103 104 105 106 107`** — each an **exact prefix** of its domain's
+pre-registered twenty, so it is a reduction and **not a re-registration**. The twenty **dropped**
+are named too. Three rejected readings are recorded so the choice is auditable. ⚠️ **τ²-bench is
+NOT cut** — only this one block's breadth is staged, which §21.4 permits in terms.
+
+⚠️⚠️ **AND THIS SESSION'S OWN ADVERSARIAL PASS FOUND `a551a31` CARRYING A FALSE CLAIM — `INC-146`.**
+It asserted, in `PROTOCOL.md`, in `INC-144`'s **Missing** and **Diagnosis**, and in its own commit
+message, that *"there is no `tfp_task_count` key of any name."* **`config/protocol.yaml:421` IS
+`tfp_task_count: 40`**, `:422` is `tfp_stratification`, **three** modules read them
+(`tau2/enumerate.py`:555, `benign/manifest.py`:207, `runner/n_rule.py`:441), and
+`runner/n_rule.py`:158 is already `TFP_REDUCED = 20`. The claim came from a `grep` for
+`tfp_task_ids` — a search for the **ids** — from which a universal negative about a **different
+key** was asserted, in the strongest available form on the weakest available evidence.
+`PROTOCOL.md`'s sentence is **corrected in place** (this session's own sentence, inside its
+fence, before the tag); `INC-144` and the ruling are **not rewritten** but corrected beside
+themselves, which is `INC-139`'s treatment. ⚠️ **THE CUT AND THE TWENTY IDS ARE UNAFFECTED.**
+The operator-owed act is now a **three-key edit**, not a missing seam.
+
+**GATE 1a — THE STATUS SURVIVES `from None`.** `ProviderFailed` carries `status` and a short
+`error_type`; `episode.py` catches it **as a value**; `runner/usage.py` records both. ⚠️ **THE
+`from None` AND THE BODY SUPPRESSION BOTH STAY** — `INC-142` calls that suppression sound and it
+is. **A status is an integer and cannot quote a credential; it was discarded with the body for
+no reason but proximity.** `_ERROR_TYPE_KEYS` is `("type","code","status","reason")` —
+**`message` is deliberately absent**, capped at 64 chars, secret-scanned. ⚠️ **An `OK` usage row
+is BYTE-IDENTICAL to the ones the pilot wrote**, because `evals/` is append-only and `INC-143`'s
+eight numbers are measured from those rows.
+
+**GATE 1b — `liveness_refusal`**, `INC-142`'s own proposed guardrail: one call per lane, refuses
+rather than warns, **names every dead lane not just the first** (the pilot's two were broken in
+two different ways, and there is no second single-shot run), counts a 429 as a refusal, and lets
+only the **status** cross the boundary. ⚠️ **IT IS NOT YET WIRED INTO `preflight`** — said, not
+implied. Operator item 4.
+
+**GATE 3 — THE PACER.** `INC-143`'s settle-side top-up: `max(0, actual − reservation)`, token
+buckets only, **never** the request buckets, and it **may go negative** because the provider has
+already billed those tokens — the debt is a delay that refills away. **No new spec value**
+(hard rule 9). The docstring's measured-false *"never faster … upper bound"* claim is replaced
+by the measurement that refutes it, and a test pins that it cannot return by copy-paste.
+⚠️⚠️ **AND THE HALF THAT DOES NOT FLATTER THE FIX: replayed against the pilot's own eight calls,
+the FIXED pacer STILL sends call 9 immediately** — tpm bottoms at **6,170 of 16,000**, **0 calls
+delayed either way**. **The fix corrects a false documented property. It does NOT explain, and
+would NOT have prevented, the pilot's 429.**
+
+**GATE 4 — `config/lanes.yaml` UNTOUCHED**, `git status --porcelain config/` **EMPTY**. The
+declared `tpm: 16000` is **consistent** with the 429: a strict 60-second **sliding** window peaks
+at **22,069 (1.38×)** on calls 7–8, and the 429's own aligned minute already held **14,630 of
+16,000** with the 9th request's prompt still to count. ⚠️ **What the evidence contradicts is not
+the number but our MODEL of it** — `runner/buckets.py` refills continuously and **never empties**
+on this trace. **Nine data points cannot separate sliding from aligned from burst**, and the
+record holds the string `429` and nothing else. Operator-owed attestation and the open question
+(should TPM be modelled as a sliding window?) are **`Q-191`**; no number was guessed and none
+was copied from a provider's page.
+
+**`INC-147`, FOUND WHILE PROVING THIS SESSION'S OWN PLANTED-KEY TEST DISCRIMINATES.**
+`runner/redaction.py`'s scan is **prefix-anchored** (`value.startswith`), so a credential
+**embedded** in a longer string passes — and *"a provider error message quoting the credential it
+rejected"* is the module's **own stated reason for existing**. MEASURED: key alone **REFUSED**;
+the same key with a leading space, in a sentence, or in a JSON fragment all **WRITTEN**.
+⚠️ **NOT FIXED, DELIBERATELY** — the one-line change makes `AIza`, four characters that occur in
+ordinary text, a **run-aborting** refusal anywhere in the corpus, and that trade belongs to a
+review. This session's own field is safe by a **different** mechanism: `message` is never read.
+
+**`INC-148` — `INC-147` ARRIVED IN PRACTICE, INSIDE THE HOUR, IN THIS SESSION'S OWN NEW CODE.**
+`_short_error_type` joined the provider's error fields **and scanned the join**; the scan is
+prefix-anchored, so an ordinary enum in `type` hid a whole credential in `code`:
+`'invalid_api_key/gsk_…'` **went straight through the guard**. ⚠️ **AND THE FIRST VERSION OF
+THE TEST PASSED FOR A REASON THAT HAD NOTHING TO DO WITH SAFETY** — the join overflowed the
+64-char cap and the tail was **truncated off**. It surfaced only because the repository's own
+`check_roles` C1 scan refused the key-shaped **literal** in the tracked test file, forcing the
+constant to be rebuilt at runtime **twelve characters shorter**. **A cap that silently truncates
+is a cap that can make a leak test pass.** Fixed by scanning each part **before** the join;
+a refused field becomes `WITHHELD-SECRET-SHAPED` — ⚠️ **withheld, not masked, and not reported
+as absent**, because absent and refused are different facts. Proved RED by driving **both**
+implementations over the same body side by side.
+
+**TESTS — EVERY ONE PROVED RED FIRST.** `tests/test_arch_lanes.py` against `HEAD`: **21 failed,
+3 passed** (two are regression guards, correctly green; the third is named in its own docstring).
+After: **27 passed** (the extra three are `INC-148`'s). ⚠️ **The planted-key test is the one exception and its docstring says so**:
+against `HEAD` it fails **structurally** (no `.status`), so it was proved RED against the
+**naive** form of this fix — `message` added to the keys — **committed fix GREEN (15 chars, no
+leak), naive fix RED (84 chars, planted key present)**. ⚠️ **And the redaction backstop did NOT
+catch that naive leak, which is how `INC-147` was found.**
+
+**AST-EXACT TEST DIFF (`INC-138`), counted as `ast.Assert` statements rather than `grep -c
+assert`, which also counts the word "assertion" in prose and would have reported +7 where the
+truth is +1:**
+
+    tests/test_c12_driver.py    def test_*  80 ->  80    ast.Assert  245 -> 246    names +0/-0
+    tests/test_c14_prereg.py    def test_*  15 ->  15    ast.Assert   49 ->  49    names +0/-0
+    tests/test_c18_results.py   def test_*  92 ->  92    ast.Assert  208 -> 208    names +1/-1 (RENAME)
+    tests/test_arch_lanes.py    def test_*   0 ->  27    ast.Assert    0 ->  63    NEW FILE
+
+⚠️ **NOT ONE ASSERTION WAS DELETED FROM ANY FILE AND NOT ONE TEST WAS REMOVED.** Both flips are
+proved meaningful against the **old** artefacts, not merely re-run green: `INCIDENTS.md` at
+`b60e198` gives `{1,3,5}` (**RED**) and at `HEAD` `{1,3,4,5}` (**PASS**); `PROTOCOL.md` at
+`b60e198` gives `fired=(1,3,5) not_fired=(2,4,6)` — **both** new assertions **RED**.
+
+**THE FULL SUITE, BEFORE AND AFTER — AND IT IS NOT GREEN, IN EITHER DIRECTION.**
+**AFTER, at the final tree, measured:** `5 failed, 1451 passed, 2 skipped in 484.18s (0:08:04)`.
+⚠️ **IT IS NOT GREEN, AND IT WAS NOT GREEN BEFORE THIS SESSION EITHER** —
+`docs/sessions/arch-pilot-run-4.txt`:304 records *"5 failed, 1421 passed, 2 skipped in
+638.90s"*. **The suite has been red for days; this session did not make it green and does not
+claim to.** The survivors are:
+`tests/test_c12_benign.py::test_the_benign_package_imports_no_model_client_WAY_ONE_the_transitive_ast_walk` · `tests/test_c7_ledger.py::test_Q069_nothing_in_this_repository_imports_the_ledger_yet` · `tests/test_c8_scorer.py::test_golden2_coverage_block_reproduces` · `tests/test_c8_scorer.py::test_null_is_not_empty_a_scorer_returning_empty_for_absent_subjects_passes_seven_of_eight` · `tests/test_lanes_operator_placeholders.py::test_the_camel_branch_is_decided_before_any_camel_run`
+⚠️ **None is this session's, and that is MEASURED:** `benign/` is byte-identical to `b60e198`
+(`git diff` empty), so its `urllib` closure comes from `f45721d`; the camel branch is a declared
+`TODO_C13_RUN1` sentinel `check-roles` F2 lists as correct; the rest are in the pre-existing set
+`arch-pilot-run-4` and `arch-night-1b` both recorded. **This session's first full run showed 13
+failures; six were its own and every one is fixed.**
+
+⚠️ **`make check-roles`: 21 passed, 0 failed, 3 n/a.** It went **RED mid-session and this session
+caused it** — a `python` helper wrote `src/whetstone_gate/driver/run.py` back through
+`write_text`, converting **all 1,135 line endings to CRLF**, which A3 and A4 both caught. That is
+`INC-16`'s exact class. Fixed by rewriting the bytes; every file staged was then CR-audited and
+all thirteen are clean.
+
+**APPEND-ONLY AND FROZEN PATHS, VERIFIED RATHER THAN ASSERTED:** the pilot's two usage logs are
+**byte-identical to `b60e198`** (`hash-object` == `rev-parse`); `evals/episodes/` and
+`evals/checkpoints/` untouched; `tests/goldens/` and `config/` both **EMPTY** in
+`git status --porcelain` throughout. ⚠️ **The liveness probe wrote a SEPARATE file**,
+`evals/usage/liveness-6d1a94f3-2026-09-04.jsonl`, rather than appending to the pilot's own log —
+which `INC-143`'s numbers are measured from and which this session's new test **replays**. **A
+future preflight therefore under-counts today by 4 calls / 89 tokens**, disclosed in `INC-145`
+rather than fixed by contaminating an artefact.
+
+⚠️ **NOT DONE, AND NAMED:** `prereg-v1` not cut · the pilot **not** re-run · the calibration
+**not** built and **not** spent · **N** and the void threshold **not** written to `config/` ·
+the witness gist untouched · the repository still private · `RESULTS.md` and `README.md` **not**
+written (outside the fence — the exact words C18 and C19 must publish are in `INC-144`) ·
+`docs/reviews/OPEN_FINDINGS.md` **not** written (outside the fence; `INC-147` says so) ·
+`liveness_refusal` **not** wired into `preflight` · **nothing self-certified, no tag cut.**
+
+---
+
 ## SESSION-TOKEN 4b8e12c9 — ARCH, PILOT RUN 5 — 2026-09-04
 
 **Role:** FIX. **Chunk:** ARCH. **Everything below ships UNREVIEWED. Not self-certified. No tag.**
