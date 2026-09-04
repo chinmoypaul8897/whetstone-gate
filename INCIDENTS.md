@@ -12307,3 +12307,260 @@ precisely where it was needed. A mutation gate over `tests/test_c17_render.py`, 
 re-runs each new assertion against the pre-fix blob, is the thing that closes it, and **it is the
 architect's to install, not this session's** — `PROCESS.md` and the review protocol are both outside
 this fence. Recorded as owed rather than asserted as done.
+
+---
+
+## INC-159 — THE SINGLE-SHOT CALIBRATION'S ATTEMPT 2 DIED AT `2026-09-04T14:41:51Z` ON AN UNCAUGHT `TimeoutError` FROM THE SSL READ, **13 CALLS AND 56,855 TOKENS INTO EPISODE 1 OF 30, LEAVING NO EPISODE FILE, NO CHECKPOINT, NO REPORT AND NO DENOMINATOR.** ⚠️ **THIS IS THE THIRD ESCAPE OF ONE CLASS IN THREE DAYS, AND BOTH EARLIER FIXES ADDED ONE MORE NAME TO A CATCH LIST**
+
+**Date:** 2026-09-04 (C14 ABORT 2, `8c2f5e91`). Fix SHA under **Fix**.
+⚠️ **THIS ENTRY WAS DRAFTED AS `INC-158` AND RENUMBERED BEFORE IT WAS COMMITTED.** A **C17 FIX 1**
+session (token `1b9e4c73`) is live in this same working tree and took `INC-158` at `23:53:54+0530`,
+between this session's first commit (`7ae1f83`) and this append. **The collision is recorded rather
+than tidied away** — `INCIDENTS.md` `INC-136`, `INC-140`, `INC-149`; `QUESTIONS.md` `Q-180`, `Q-187`.
+The tail-byte assertion in this session's append script is what caught it, and it refused rather
+than overwriting 122 lines of another session's work.
+⚠️ **THIS IS AN ABORT, NOT A COMPLETED RUN, AND THE DISTINCTION IS `INC-142`'s IN REVERSE.**
+`PROCESS.md` §6b: *"The first execution that runs to **completion** IS the run."* **No execution has
+completed.** Attempt 1 died on `ModuleNotFoundError` (`INC-157`); attempt 2 died on the traceback
+below. The driver exited on an exception, printed no report, and reconciled no denominator.
+⚠️ **THE CALIBRATION IS THEREFORE NEITHER SPENT NOR VOID, AND NOTHING IN THIS ENTRY MAY BE READ AS
+SAYING IT IS.** §6b's clause for exactly this case is the reason this entry exists: *"If an attempt
+aborts before completion, the abort, its cause and its partial episode count are written to
+`INCIDENTS.md` **before** any retry, and the retry is a numbered attempt in the same directory."*
+
+**Event:** `evals/cal/RUN_DECLARED.md` §1's command was run under the venv this time, and §7's eight
+preconditions all passed — `evals/cal/run-attempt2-20260904T143317Z.log` opens with
+`-- drive - the episode driver ---` and `probe-v1 resolves : True`, and `Q-193`'s one-token liveness
+probe answered: `evals/usage/liveness-CAL-2026-09-04.jsonl` holds exactly one row,
+`{"episode": "PREFLIGHT_LIVENESS", "lane": "gemma-26b", "outcome": "OK", "status": 200,
+"total_tokens": 232, "utc": "2026-09-04T14:33:18Z"}`. **`INC-142`'s guardrail worked, and is recorded
+here as having worked.** Twelve seconds later the first episode began dispatching, and **thirteen
+consecutive attacker calls succeeded**, every one `outcome: OK`:
+
+| call | utc | tokens | | call | utc | tokens |
+|---|---|---|---|---|---|---|
+| 1 | `14:33:30Z` | 512 | | 8 | `14:35:31Z` | 3,994 |
+| 2 | `14:33:55Z` | 2,882 | | 9 | `14:36:06Z` | 3,780 |
+| 3 | `14:34:07Z` | 3,333 | | 10 | `14:37:05Z` | 4,874 |
+| 4 | `14:34:23Z` | 3,918 | | 11 | `14:37:35Z` | 5,305 |
+| 5 | `14:34:44Z` | 4,251 | | 12 | `14:38:24Z` | 6,819 |
+| 6 | `14:35:03Z` | 4,831 | | 13 | `14:38:50Z` | 7,181 |
+| 7 | `14:35:19Z` | 5,175 | | | **TOTAL** | **56,855** |
+
+The **fourteenth** did not return. The log's last frames, verbatim:
+
+    File "C:\Users\chinm\whetstone-gate\src\whetstone_gate\driver\clients.py", line 542, in _http_post
+      with urllib.request.urlopen(request, timeout=_TIMEOUT_SECONDS) as response:
+    ...
+    File "C:\Program Files\Python312\Lib\ssl.py", line 1104, in read
+      return self._sslobj.read(len, buffer)
+    TimeoutError: The read operation timed out
+
+⚠️ **THE ARITHMETIC IS EXACT AND IS THE PROOF OF CAUSE, NOT AN INFERENCE FROM THE WORD "timeout".**
+`driver/clients.py:475` is `_TIMEOUT_SECONDS = 180`. The 13th call's usage row is stamped
+`14:38:50Z`; the log file's final byte was written at `14:41:51.149Z`. **181.1 seconds separate
+them**, against a 180-second socket timeout — leaving ~1.1 s for the pacer's wait, the request write
+and the traceback. **The 14th call spent essentially its whole life blocked in one socket read.**
+
+⚠️ **PARTIAL EPISODE COUNT, AS NUMBERS, PER §6b — AND THE PROMPT'S FIGURES ARE CORRECTED HERE, NOT
+COPIED.** The C14 ABORT 2 prompt stated *"0 completed, 0 truncated, 30 never started"*. **Measured in
+this tree, the first two are right and the third is wrong in substance:**
+
+| | count | how it was measured |
+|---|---|---|
+| declared | **30** | `RUN_DECLARED.md` §6: arm 1, `gemma-26b`, seeds 2201…2230 |
+| completed | **0** | `evals/episodes/` holds 11 files, **all** `pilot__*`; no name anywhere under `evals/` contains `cal__` |
+| truncated | **0** | a truncation is a *booked* `LaneStopped` outcome; the escape produced none |
+| ⚠️ **dispatched, and left NO record** | **1** | seed **2201** — 13 provider calls, **56,855 tokens**, `evals/usage/gemma-26b-2026-09-04.jsonl` |
+| never dispatched | **29** | 30 − 1 |
+
+⚠️ **"30 NEVER STARTED" WOULD HAVE PUBLISHED 56,855 SPENT TOKENS AS AN EPISODE THAT NEVER HAPPENED.**
+Episode 2201 started, ran 13 of its 20 turns, and died; it is invisible under `evals/` **only**
+because publish-on-complete writes the ledger at the end and the end never came. The filesystem's
+answer and the truth differ, and that row is the difference. ⚠️ **AND NOT ONE OF THESE FIVE NUMBERS
+IS THE DRIVER'S** — it printed no report at all, so every one was reconstructed from `evals/` by this
+session. **That is precisely the loss hard rule 11 forbids: the denominator did not shrink silently,
+it was never computed at all.**
+
+⚠️ **TOKENS SPENT, BY MODEL, PER `CLAUDE.md` §4:** `gemma-26b` **56,855** across 13 calls (mean
+4,373, max 7,181), plus **232** on the preflight liveness probe = **57,087** on the one sanctioned
+lane, against declared ceilings of 600 calls / 4,800,000 tokens — **1.19% of the token ceiling,
+2.33% of the call ceiling.** No other lane was touched: `evals/usage/qwen-27b-2026-09-04.jsonl` is
+unchanged since `03:33:07Z`, ten hours earlier.
+
+**Action:** ⚠️ **NOTHING WAS RETRIED, NOTHING WAS MOVED TO ANOTHER LANE, AND NOTHING UNDER `evals/`
+WAS EDITED, DELETED OR TRUNCATED.** This entry is written **before** any retry (§6b) and **before**
+this session changed a line of code (hard rule 13). ⚠️ **`evals/cal/RUN_DECLARED.md` §8 IS NOT
+RE-FILLED.** Its declared start stands at `13:29:25Z`; attempt 2 actually started at `14:33:17Z`, and
+attempt 3 will start later still. **That gap is disclosed, never closed by editing the artefact** —
+`RESULTS.md` prints declared-versus-actual start times beside the threshold (§6b). Attempt 3 is a
+**numbered attempt in the same directory**: `run-20260904T132934Z.log` and
+`run-attempt2-20260904T143317Z.log` both remain, untouched.
+
+**Expectation:** that a transient network failure on one call of one episode would cost **that
+call**, be booked under a named cause, and let the other 29 episodes run. Hard rule 11 requires every
+dropped episode to be counted, categorised and printed; hard rule 12 requires a **429** to stop a
+lane and says nothing about a read timeout. ⚠️ **A run of 30 pre-registered episodes that dies
+because one HTTPS read did not answer within 180 seconds is a run that can never finish** — and on a
+single-shot artefact that is not a bug with a workaround, it is an instrument that cannot take a
+measurement.
+
+**Missing:** ⚠️ **NOTHING ABOUT THE DIAGNOSIS WAS MISSING, AND THAT IS ITSELF THE FINDING.** The
+traceback names the file, the line, the function and the exception type; the usage log gives the call
+count, the per-call tokens and the timestamps to the second; `_TIMEOUT_SECONDS` is one read away and
+the arithmetic closes to 1.1 s. **This abort was fully diagnosable in about four minutes.** What is
+missing is not evidence — it is **the 29 episodes that would have run**, and the report that would
+have printed what the run attempted. Missing too, and smaller: `driver/clients.py:_http_post`
+converts `urllib.error.URLError` into `ProviderFailed`, and **`TimeoutError` is not a `URLError`
+subclass**, so the one function in this package whose job is turning transport faults into counted
+outcomes had a hole that is invisible from reading that function alone.
+
+**Missed:** ⚠️⚠️ **THIS IS THE THIRD ESCAPE OF ONE CLASS IN THREE DAYS, AND BOTH EARLIER FIXES
+CLOSED THE INSTANCE INSTEAD OF THE CLASS.**
+
+| # | what escaped `_MeteredCall.run` | recorded as | what the fix did |
+|---|---|---|---|
+| 1 | `DriverClientError` | `Q-174`, 2026-09-04 — *"propagates straight out of `execute` … no report, no denominator"* | raised the question; upstream `Q-171` fixed the **cause** of that one error |
+| 2 | `BucketError` | `Q-179`(2), 2026-09-04, **RULED** — *"BOOK IT AS ITS OWN NAMED COUNTED CATEGORY"* | added `except BucketError` — **one more name** |
+| 3 | `TimeoutError` | **this entry** | — |
+
+⚠️ **`Q-174` STATED THE GENERAL FORM AND IT WAS READ AS A PARTICULAR.** Its headline names
+`DriverClientError`, but its **reasoning** is entirely about shape: *"should a … error reaching the
+dispatch loop be booked as a counted, categorised outcome before the run ends, so that a single-shot
+run which dies at episode 1 still publishes what it attempted?"* **Nothing in that sentence is about
+`DriverClientError`.** `Q-179`(2) then answered it for `BucketError`, in a ruling whose own text says
+*"a new failure mode gets its own name"* — and the fix that followed added exactly one `except`
+clause and left the floor open. ⚠️ **A catch list is a list of the failures somebody predicted, and
+the whole lesson of `INC-142` and `INC-157` is that the failure which spends an unrepeatable artefact
+is the one nobody predicted.** Second signal, quieter, in this repository's own source:
+`_http_post`'s docstring says urlopen *"**raises** on any status outside 200-299"* and handles two
+exception types — **nobody asked which exceptions it does not raise through those two.**
+
+**Diagnosis:** `_MeteredCall.run` wrapped `call()` in three named `except` clauses — `RateLimited`,
+`ProviderFailed`, `BucketError` — and had **no floor**, so a fourth exception type escaped `run`,
+escaped `run_one_episode`'s `except LaneStopped`, escaped `execute`'s dispatch loop, and killed the
+process before `result.denominator.reconcile()` and `render()` could run. A read timeout on an HTTPS
+socket raises `TimeoutError`, a subclass of `OSError` and **not** of `urllib.error.URLError`, so
+`_http_post`'s `URLError` branch — the one written to turn transport faults into `PROVIDER_ERROR` —
+never saw it.
+
+**Fix:** `PENDING_FIX_SHA` (unreviewed) — the architect's ruling of 2026-09-04, transcribed verbatim
+at `QUESTIONS.md` **`Q-200`**: a **catch-all floor** beneath the three named branches in
+`driver/episode.py:_MeteredCall.run`, booking whatever escapes under the new counted cause
+`runner/episodes.py:UNEXPECTED_ERROR` and letting the run continue to the next episode. **It does not
+retry** (a timed-out call may already have been billed and may already have mutated the world),
+**does not stop the lane** (a transient fault is not a spent window), **introduces no new spec value**
+(no retry count, no backoff, no threshold — hard rule 9), and **stores the exception's TYPE NAME and
+never its message** (`INC-147`: `runner/redaction.py`'s key scan is prefix-anchored, so a credential
+inside a longer string passes it, and a provider message is therefore not safe to store).
+`KeyboardInterrupt` and `SystemExit` are `BaseException` and pass through untouched. ⚠️ **AND THE FIX
+FOUND A FOURTH INSTANCE OF THE SAME CLASS WHILE IT WAS BEING WRITTEN** — `INC-160`, immediately
+below: the `BucketError` branch that `Q-179`(2)'s own fix installed **could not book its outcome at
+all**, because it hands `"PACER_REFUSED"` to a usage log that declares three outcomes and refuses a
+fourth.
+
+**Systemic guardrail:** ⚠️ **THE FLOOR IS THE GUARDRAIL, AND ITS TEST IS THE PART THAT MAKES IT ONE.**
+`tests/test_c14_unexpected_escape.py` injects a **bare `RuntimeError`** — a type named in no client,
+no cause table and no ruling — partway through a multi-episode matrix, and asserts that `execute`
+**returns**, that the episode is booked under `UNEXPECTED_ERROR`, that **later episodes still
+complete**, that the cause prints in the denominator with its count, and that the denominator
+reconciles. A test written against `TimeoutError` alone would have re-closed the instance; this one
+goes red if the floor is ever narrowed back into a list. ⚠️ **WHAT IT DOES NOT CLOSE, STATED SO IT IS
+NOT MISTAKEN FOR CLOSED:** the floor covers exceptions escaping **the model call**. An exception
+raised in world construction, gate construction, ledger writing or checkpoint publication still
+escapes the dispatch loop — and `INC-160` is proof that such a site can exist *inside a fix for this
+very class*. Whether the floor is widened to the whole per-episode body is a **Class A** question
+this session did **not** decide; it is raised at `Q-202`, because widening it would let a corrupted
+world or an unwritable ledger be booked as an episode outcome instead of stopping the run, and that
+trade is the architect's.
+
+---
+
+## INC-160 — ⚠️⚠️ **THE `except BucketError` BRANCH THAT `Q-179`(2) RULED INTO EXISTENCE TO STOP AN UNCAUGHT ESCAPE CANNOT BOOK ITS OWN OUTCOME, AND RAISES A `UsageError` THAT ESCAPES THE SAME WAY.** The fix for instance #2 of this class IS instance #4 of it
+
+**Date:** 2026-09-04 (C14 ABORT 2, `8c2f5e91`), found while writing `INC-159`'s fix and **proved
+first-hand before it was written down**. Fix SHA under **Fix**.
+
+**Event:** `INC-159`'s ruling required a catch-all floor beneath the three named `except` clauses in
+`driver/episode.py:_MeteredCall.run`. Reading those three to place the floor correctly, the
+`BucketError` clause — added days earlier as the fix for `Q-179`(2), *"BOOK IT AS ITS OWN NAMED
+COUNTED CATEGORY"* — reads:
+
+    except BucketError:
+        self.on_usage(self.lane, 0, runner_episodes.PACER_REFUSED)
+        raise LaneStopped(runner_episodes.PACER_REFUSED) from None
+
+⚠️ **`on_usage` IS `driver/run.py:_usage_sink`, WHICH CALLS `runner/usage.py:UsageLog.append`, WHOSE
+THIRD POSITIONAL ARGUMENT IS AN `outcome` VALIDATED AGAINST A CLOSED LIST OF THREE:**
+`OUTCOMES = ("OK", "RATE_LIMITED", "ERROR")`. **`PACER_REFUSED` is not one of them**, and `append`'s
+first statement is `if outcome not in OUTCOMES: raise UsageError(...)`.
+
+**PROVED TWICE, IN A FRESH OS TEMP DIRECTORY, AGAINST THE SHIPPED CODE, WITH NO PROVIDER CALL:**
+
+  1. `UsageLog.append(..., outcome=episodes.PACER_REFUSED)` →
+     `UsageError: 'PACER_REFUSED' is not a declared outcome; declared: ['OK', 'RATE_LIMITED',
+     'ERROR']`. The control — the same call with `outcome=OUTCOME_ERROR, error_type="BucketError"` —
+     wrote its row without complaint.
+  2. End-to-end through the **real** `_MeteredCall.run` with the **real** `_usage_sink` and a
+     `call()` that raises `BucketError`:
+     **EXPECTED** `LaneStopped('PACER_REFUSED')`; **ACTUAL** `UsageError` escaped —
+     `isinstance(exc, LaneStopped)` is **False**, `isinstance(exc, RuntimeError)` is **True**.
+
+**Action:** the defect was proved before a word of this entry was written and before a line of
+`src/` changed, and it is fixed in the same commit as `INC-159`'s floor because the floor cannot
+stand above it: **a `UsageError` raised inside a sibling `except` clause is not caught by a later
+`except` clause**, so `INC-159`'s catch-all would have shipped with this hole still open beneath it.
+
+**Expectation:** that `Q-179`(2)'s ruling — *"BOOK IT AS ITS OWN NAMED COUNTED CATEGORY, AND PRINT IT
+AS A NUMBER LIKE EVERY OTHER"* — had been carried out. It was carried out for the **cause**
+(`PACER_REFUSED` is a member of `UNFINISHED_CAUSES`, `Denominator.by_cause()` prints it including its
+zero) and **not** for the **usage row**, and nothing distinguished the two halves at the call site
+because they are one line apart and share a spelling.
+
+**Missing:** any test that drives the `BucketError` branch through a **real** `UsageLog`. The branch
+is covered, but through a stub sink that accepts any string — so the assertion *"the pacer refusal is
+booked"* was true of the test double and false of the program. ⚠️ **This is `CLAUDE.md`'s golden-fixture
+worry in a different costume:** a test whose double is more permissive than the real collaborator
+proves the caller compiles, not that the system works.
+
+**Missed:** ⚠️ **`runner/episodes.py`'s OWN MODULE DOCSTRING WARNS ABOUT EXACTLY THIS CONFUSION, ONE
+VOCABULARY OVER.** It carries a titled block — *"⚠️ THE CAUSE VOCABULARY IS THE LIVE SIDE'S, NOT THE
+SCORER'S"* — saying *"Neither list is the other's subset … A reviewer looking for drift between the
+two should look for a **mapping** defect."* **There are not two vocabularies in this program; there
+are three** — `episodes.py`'s **causes**, `scorer/drops.py`'s **categories**, and `usage.py`'s
+**outcomes** — and the one pair nobody wrote the warning for is the pair that is crossed here.
+`driver/episode.py` even contains the correct join for the other pair, `CAUSE_FOR_STOP`, written out
+by hand *"for the reason `runner/scheduler` gives for its own copy: the two vocabularies are
+deliberately separate and a mapping table is where a reviewer can see the join."* **The cause →
+outcome join was never written, so the call site passed a cause where an outcome was required.**
+Second signal, in the same three lines: the two neighbouring branches both pass **string literals** —
+`"RATE_LIMITED"` and `"ERROR"` — and only this one passes a module constant. **The odd one out was
+the broken one, and it looked like the tidy one.**
+
+**Diagnosis:** `runner/episodes.py`'s **cause** vocabulary was passed to `runner/usage.py`'s
+**outcome** parameter, which validates against a disjoint three-value list and refuses; because the
+refusal is raised from inside an `except` handler in `_MeteredCall.run`, it escapes `run`,
+`run_one_episode` and `execute` exactly as the `BucketError` it was installed to contain. The defect
+survived review because every test of that branch injects a sink that accepts any string.
+
+**Fix:** `PENDING_FIX_SHA` (unreviewed) — the branch now passes `usage.OUTCOME_ERROR` with
+`error_type="BucketError"`, which is a **declared** outcome and preserves the diagnosis in the field
+`INC-142` built for it. ⚠️ **THE `LaneStopped` CAUSE IS UNCHANGED AND STAYS `PACER_REFUSED`**: the
+episode is still booked, counted and printed under its own name, so `Q-179`(2)'s ruling is now
+actually in force rather than nominally so. ⚠️ **`PACER_REFUSED` WAS DELIBERATELY *NOT* ADDED TO
+`usage.OUTCOMES`**, which was the other available fix: `OUTCOMES` is the usage file's on-disk
+vocabulary, `spent_today` branches on `row["outcome"] == OUTCOME_OK`, and `tests/test_arch_lanes.py`
+pins the committed rows' shape — widening it would re-shape an append-only record to fix a call site.
+**Zero tokens and zero calls are still charged**, because the pacer refuses before the wire and no
+provider saw anything. ⚠️ **No published number moves: the row this fix writes is a row the program
+could not previously write at all.** **Class B**, disclosed at `QUESTIONS.md` `Q-201`.
+
+**Systemic guardrail:** the new test asserts through a **real** `UsageLog` writing to a real
+temporary directory, so a cause smuggled into an outcome parameter fails at the assertion rather than
+at the double. ⚠️ **What this does not close, and is accepted, because closing it is a Class A change
+to a frozen-adjacent vocabulary:** nothing in the type system stops the next call site doing the same
+thing — `on_usage`'s third parameter is `str`, and both vocabularies are `str` constants. The
+type-level fix is an `enum` per vocabulary, or a `CAUSE_FOR_OUTCOME` join written out beside
+`CAUSE_FOR_STOP`; the join is the cheaper of the two and is proposed at `Q-201`, **proposed, not
+installed**, because inventing a third mapping table inside a FIX session whose fence names two
+findings would be exactly the scope creep `CLAUDE.md` §6 forbids.
