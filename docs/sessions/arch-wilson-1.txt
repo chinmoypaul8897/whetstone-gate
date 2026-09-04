@@ -1,0 +1,704 @@
+================================================================================
+ ARCH WILSON 1      SESSION-TOKEN 5c9e08f4      ROLE: FIX           2026-09-04
+================================================================================
+
+ PUSHED SHA: e105283  (and 23ba66c, 77d5be4 beneath it)
+             ! THIS FILE IS COMMITTED ON TOP OF THOSE THREE, AND **THAT**
+             COMMIT'S SHA IS THE FIRST LINE OF THE CHAT REPORT. The convention
+             is arch-cal-build-1's: a record cannot contain the hash of the
+             commit that creates it, so the four are listed and the last one is
+             named where it can be.
+
+ The full record is committed VERBATIM at docs/sessions/arch-wilson-1.txt BEFORE
+ this was printed. CLAUDE.md S6.1: the FILE is the record; this is the
+ convenience copy, and a paraphrase on the way is detectable against it.
+
+================================================================================
+0. THE HEADLINE
+================================================================================
+
+ BOTH GATES EXECUTED. Q-189(d) IS IMPLEMENTED AND S12.4 DID NOT MOVE.
+
+ GATE 0  the `2e5b8a47` row written; check-roles 20/1 -> 21/0; both
+         test_repo_invariants reds cleared, and they were ONE fault
+ GATE 1  a SEPARATE one-sided quantile used by `wilson_lower_bound` ALONE;
+         S12.4's published ceiling proved UNMOVED over 1,991 cells
+ GATE 2  the suite measured on the COMMITTED tree, attributed per test by comm(1)
+
+ ! AND THIS SESSION FOUND FOUR THINGS ITS PROMPT DID NOT KNOW:
+
+ Q-195  ! THE MOST IMPORTANT. Implementing the ruling makes the FROZEN record
+        self-inconsistent. HOLES.md S3.5 rule 2 requires C14 to publish "The
+        observed rate, THE INTERVAL and the resulting threshold". Those were ONE
+        computation before the ruling and are TWO after it, and the only Interval
+        the code produces is the TWO-SIDED one. C14 must publish an interval
+        whose lower end and the threshold beside it DISAGREE. NOT DECIDED HERE.
+ Q-196  `prereg-v1` DOES NOT RESOLVE, so a `config/` key naming the sidedness is
+        landable TODAY and never after that tag. Class A, now-or-never, NOT DONE
+        (config/ is outside this session's fence).
+ Q-197  S12.4's "+/-44 pp" ladder caption is a published number in FOUR places
+        that no code generates and no test reads.
+ INC-156 ! THE PROMPT'S OPENING LINE WAS FALSE. "THE SINGLE-SHOT CALIBRATION IS
+        RUNNING IN THE OPERATOR'S TERMINAL RIGHT NOW" - it was NOT running and
+        had NEVER STARTED. Four independent measurements. Behaviour unchanged:
+        evals/, driver/ and runner/ were never touched either way.
+
+ SPEND: ZERO. No provider call was made in any mode. No token sanction was held
+ and none was used. NO TAG CUT OR MOVED. NOT SELF-CERTIFIED.
+ ! NO THRESHOLD VALUE WAS COMPUTED, DERIVED, ESTIMATED OR MENTIONED, and nothing
+ here says whether any run would VOID. `probe.void_threshold_breach_rate` is
+ untouched and still TODO_C14_CALIBRATION; the loader still RAISES on it.
+
+================================================================================
+1. CONCURRENCY - MEASURED FIRST, BY INC-140's RECIPE, AND IT FOUND A THIRD SESSION
+================================================================================
+
+ The prompt's test, and the only one that binds: "STOP ONLY IF ANOTHER LIVE
+ SESSION HOLDS 5c9e08f4 OR IS WRITING TO src/whetstone_gate/probe/,
+ src/whetstone_gate/results/ OR tests/."
+
+ FIVE native-binary claude.exe processes resolved to their transcripts:
+   PID 14232 -> ca0152c1 -> ...projects/c--Users-chinm-role-playoff-hackathon
+   PID  2260 -> 99119ca6 -> THIS TREE. The architect console.
+   PID 14740, 22444      -> ...projects/c--Users-chinm-ms-bansal-portfolio
+   PID 22712 -> 5c43376d -> THIS SESSION
+
+ ! AND A SIXTH TRANSCRIPT APPEARED IN THIS TREE AT 16:34:13Z, AFTER THIS SESSION
+ STARTED: 511a8849. Measured rather than assumed:
+   holds 5c9e08f4?   NO. The token appears ONCE in its whole transcript, inside
+     the prompt the architect wrote FOR it, naming this session as the holder of
+     probe/, results/ and existing tests/.
+   who is it?        C17 BUILD, token `7a1e3b52`. Its fence: docs/render/ (NEW),
+     tests/test_c17_render.py (NEW FILE ONLY), STATUS.md, PROGRESS.md,
+     docs/sessions/c17-build-1.txt. It is told: "YOU MAY NOT TOUCH probe/,
+     results/, driver/, runner/, OR ANY EXISTING TEST FILE."
+   has it written?   NO. 5 Bash + 3 PowerShell, ZERO Write/Edit/NotebookEdit,
+     re-measured at the end of this session. docs/render/ and
+     tests/test_c17_render.py do not exist.
+
+ ! THE LITERAL TRIGGER FIRES AND THE HAZARD IT NAMES DOES NOT, AND THE TWO ARE
+ SEPARATED RATHER THAN COLLAPSED - INC-140's own reasoning. `7a1e3b52` IS
+ instructed to create a file under tests/, which is literally "writing to
+ tests/". But it is fenced to ONE NEW FILE with a name this session does not
+ use, and forbidden every existing test file. This is INC-149's pattern: the
+ architect ran fenced sessions in parallel ON PURPOSE and told each about the
+ other. TEST NOT MET -> PROCEEDED.
+ ! THE REAL COLLISION SURFACE IS STATUS.md AND PROGRESS.md, which both sessions
+ hold. Every write below is a PURE APPEND or a single-line insert, never a
+ read-modify-write on a shared document (INC-136's remedy).
+
+ THE ARCHITECT CONSOLE'S READ-ONLY CLAIM was not re-derived from scratch here;
+ three sessions have measured it independently and this session's own process
+ enumeration is consistent with it. ! Said as inherited rather than measured,
+ because a claim repeated four times is still only as good as its last
+ measurement.
+
+ THE STALE-INDEX `M` ENTRIES on benign/blindness.py and benign/executor.py were
+ verified byte-identical to HEAD (`git diff HEAD` EMPTY) as this session's first
+ file act, and were NOT touched, NOT staged and NOT "cleaned" (OF-213).
+
+================================================================================
+2. ! THE PROMPT'S OPENING PREMISE WAS FALSE - THE CALIBRATION WAS NOT RUNNING
+================================================================================
+
+ The prompt opens: "THE SINGLE-SHOT CALIBRATION IS RUNNING IN THE OPERATOR'S
+ TERMINAL RIGHT NOW. It writes to evals/ and imports src/whetstone_gate/driver/."
+
+ FOUR INDEPENDENT READ-ONLY MEASUREMENTS, ALL DISAGREEING WITH IT:
+   1. A full Win32_Process inventory: ZERO python.exe or python3.exe processes
+      on the machine - in a listing that names 88 svchost.exe, 42 Code.exe and
+      19 claude.exe, so it is not an empty query.
+   2. evals/ holds 28 FILES - byte-for-byte the count CAL PREP 1 recorded as its
+      before-and-after - and NOTHING under it has been written since 15:02:12Z,
+      which is evals/cal/RUN_DECLARED.md itself.
+   3. `find evals -name '*cal__*'` returns ZERO. Not one calibration episode,
+      checkpoint or ledger exists.
+   4. evals/cal/RUN_DECLARED.md S8's operator-filled UTC start time is STILL
+      BLANK, exactly as CAL PREP 1 left it.
+
+ ! AND STATUS.md's OWN TOP BLOCK ALREADY SAID SO: "THE CALIBRATION IS PREPARED,
+ DECLARED AND HANDED OVER. IT WAS NOT RUN" and "GATE 4 - HANDED OVER, NOT RUN."
+ The prompt and the repository contradicted each other at the moment the prompt
+ was written. INC-156.
+
+ ! THIS CHANGED NOTHING THIS SESSION DID. evals/, driver/ and runner/ are fenced
+ off whether or not a run is live, and none of them was touched. The finding is
+ reported because a prompt's stated hazard is the strongest instruction in it,
+ and a session that inherits a false one inherits a false picture of what is
+ safe. The error is self-correcting in the SAFE direction, which is exactly why
+ it could persist unnoticed.
+
+================================================================================
+3. GATE 0 - THE ROW, AND WHY WRITING ANOTHER SESSION'S ROW WAS LEGAL THIS TIME
+================================================================================
+
+ check-roles BEFORE : 20 passed, 1 failed, 3 n/a
+                      [FAIL] E1 "FORGED/UNISSUED: {'2e5b8a47': ['3ced8ab',
+                      'd84d630', 'dc9b842', 'a9f4150', '4ae054a', '0287e80',
+                      '97fe84b']} - not present in QUESTIONS.md ## Session tokens"
+ check-roles AFTER  : 21 passed, 0 failed, 3 n/a   E1 PASS
+                      (re-run WITH this session's own commits in the log, not
+                      only at the moment of the edit)
+
+ THE TWO test_repo_invariants REDS, measured before and after, and they are ONE
+ FAULT as the prompt said:
+   test_no_commit_carries_a_forged_or_reused_session_token   RED -> GREEN
+   test_check_roles_exits_zero                               RED -> GREEN
+
+ ! THE ROW WAS VERIFIED, NOT ACCEPTED FROM THE PROMPT. `2e5b8a47` opened the
+ ARCH PUBLISH 1 prompt as "SESSION-TOKEN: 2e5b8a47   CHUNK ARCH   ROLE: FIX",
+ read off that session's own transcript - so the chunk cell and the role cell
+ come from the ISSUED HEADER, not inferred from its seven commits. Recording an
+ issued token is required; inventing one is forbidden, and the difference is
+ whether the issuance was witnessed.
+
+ ! IT DISCHARGES Q-194's OWED REMEDY IN Q-194's OWN CHARACTERS. That entry ends:
+ "OWED TO: ARCH PUBLISH 1, or to the operator if that session has ended. One
+ row: | `2e5b8a47` | ARCH | FIX | 2026-09-04 |." Q-194's SECOND ground has also
+ expired BY MEASUREMENT rather than by assumption: it worried that ARCH PUBLISH 1
+ "may register it in its own final commit ... exactly the read-modify-write
+ hazard INC-136 exists about". ARCH PUBLISH 1 IS NO LONGER LIVE - no process
+ resumes its transcript - so that hazard cannot fire for this row.
+ Three sessions declined to write it uninstructed and EVERY ONE WAS RIGHT
+ (INC-141, INC-149, Q-194). This prompt instructs it and names its exact text,
+ which DISCHARGES the objection rather than overruling it. Precedent: Q-021.
+
+ ! A SECOND ROW WAS ALSO WRITTEN AND THE PROMPT DID NOT ASK FOR IT: `5c9e08f4`,
+ this session's own. Row 87 ALONE WOULD NOT HAVE HELD - E1 is evaluated against
+ the LOG, so the identical red returns on this session's own commits the moment
+ it makes one. Said out loud rather than folded in, because "check-roles goes
+ 21/0" would otherwise have been true for about ninety seconds.
+ Row count taken from the file immediately before appending, never inherited
+ (OF-67): 86 data rows, `9a4d63b2` last, so these are rows 87 and 88. NO
+ self-record ordinal is claimed - OF-225's ground, that the numbered sequence
+ stopped at `363a2e9f` and the count since is not derivable from this file.
+
+================================================================================
+4. GATE 1a - THE COUPLING, VERIFIED AT THE THREE LINE NUMBERS BEFORE ANY EDIT
+================================================================================
+
+ IT IS EXACTLY AS DESCRIBED. Read at HEAD, in the file:
+   probe/statistics.py:143-145  def wilson_lower_bound(...)
+                                  return wilson_interval(successes, n, level).lower
+   probe/statistics.py:135      z = two_sided_z(level)
+   results/figures.py:142       interval = wilson_interval(successes, n, level)
+                                  -> Ceiling(method=WILSON_SCORE,
+                                             upper_pct=..., lower_pct=...)
+
+ AND A CALLER CENSUS, WHICH THE PROMPT DID NOT ASK FOR AND WHICH IS THE PART
+ THAT MAKES THE THREE LINES ACTIONABLE: `wilson_interval` has EXACTLY TWO call
+ sites in src/ - statistics.py:145 and figures.py:142 - and `two_sided_z` has
+ exactly two - wald_half_width (S12.4's +/-pp column) and wilson_interval. So
+ the blast radius of the naive fix is closed, not merely illustrated.
+
+ ! AND A THIRD FACT NEITHER THE PROMPT NOR Q-189(d) STATES: `wilson_lower_bound`
+ AND `round_down_to_5pp` HAVE **ZERO** CALLERS IN src/. Measured:
+   grep -rn "wilson_lower_bound|round_down_to_5pp" --include=*.py src/
+   minus their own definitions -> EMPTY
+ The ruling therefore moves NO number that is computed today. That is why it was
+ safe to land now, and it is a measurement rather than a hope.
+
+================================================================================
+5. GATE 1b - THE WITHDRAWAL CHECK, RE-RUN INDEPENDENTLY. THE RULING SURVIVES.
+================================================================================
+
+ EVERY mention of "Wilson" in the frozen set, with its exact noun phrase:
+   PROTOCOL.md:630          "the 95% Wilson lower bound rounded down to 5 pp"
+   PROTOCOL.md:649          "the 95% Wilson lower bound rounded DOWN to 5 pp"
+   HOLES.md:284             "the LOWER BOUND of the 95% Wilson interval ...
+                             ROUNDED DOWN to the nearest 5 pp"
+   PROVENANCE.md:324        "the 95% Wilson lower bound rounded DOWN to 5 pp"
+   PROVENANCE.md:719        "95% Wilson lower bound rounded down to 5 pp"
+   config/protocol.yaml:349 "the 95% Wilson LOWER bound rounded DOWN to 5 pp"
+ NOT ONE STATES A SIDEDNESS. NOT ONE STATES A z.
+ The only two sidedness words in the whole frozen set are PROTOCOL.md:675
+ "McNemar exact, two-sided" and PROTOCOL.md:687 "the exact one-sided
+ Clopper-Pearson" - DIFFERENT TESTS. INVARIANTS.md and RAZORPAY_SEMANTICS.md
+ contain no "Wilson" at all. THE WITHDRAWAL CONDITION IS NOT MET.
+
+ ! AND THE EARLIER PASS'S DEFENCE IS CORRECTED RATHER THAN REPEATED, WHICH IS
+ THE PART OF THIS SECTION WORTH READING. It is tempting to argue "five of the
+ six frozen statements say LOWER BOUND, only one says INTERVAL, so the corpus
+ leans one-sided". That count is TRUE and IT IS NOT THE ARGUMENT:
+   * Q-189(d)'s withdrawal condition names TWO artefacts - "CONTEXT.md S10.3
+     RULE 2 AND HOLES.md" - and on THOSE TWO the wording is "the lower bound of
+     the 95% Wilson INTERVAL", BOTH of them, the same sentence twice. On the set
+     the ruling actually asked about the score is 2-0 the OTHER WAY.
+   * The four "lower bound" phrasings were ALREADY PRESENT verbatim in the
+     probe-v1 tree, so the tag captured both phrasings at once and settled
+     neither.
+   * PROTOCOL.md's frozen +/-pp table (13.9 / 17.9 / 43.8) reproduces at
+     z = 1.96 - but it is a WALD half-width. The Wilson score half-widths at
+     p = 0.5, z = 1.96 are 13.4 and 16.8, which do NOT match it. So the z = 1.96
+     fingerprint in the frozen set attaches to a DIFFERENT ESTIMATOR and carries
+     no constraint onto the Wilson bound. Checked, because it is the strongest
+     available counterexample and it had to be ruled out rather than ignored.
+ THE RULING SURVIVES ON ITS OWN STATED TEST - "specifies two-sided IN TERMS",
+ which neither artefact does - AND ON NOTHING ELSE. Q-189(d) RESIDUAL 1 already
+ says the honest version: "the architect chose, and chose the stricter of the
+ two available readings."
+
+================================================================================
+6. GATE 1c - THE IMPLEMENTATION, AND WHY IT HAS THREE PARTS AND NOT ONE
+================================================================================
+
+ `one_sided_z(level)`  = NormalDist().inv_cdf(level)          -> 1.6448536269514715
+ `two_sided_z(level)`  = NormalDist().inv_cdf(1-(1-level)/2)  -> 1.9599639845400536
+                          UNCHANGED
+ `_wilson_bounds(successes, n, z)` - the algebra, PARAMETERISED BY z
+ `wilson_interval`     -> _wilson_bounds(..., two_sided_z(level))   UNCHANGED
+ `wilson_lower_bound`  -> _wilson_bounds(..., one_sided_z(level)).lower
+
+ THE ALGEBRA IS SHARED. THE QUANTILE IS NOT. Writing the algebra twice would
+ invite the copies to drift; sharing the z is what produced the defect. So
+ exactly one thing is shared and exactly one is not.
+
+ HARD RULE 9: NO NEW LITERAL. 1.645 is derived from the SAME
+ statistics.confidence_level in config/ that two_sided_z reads - one configured
+ level, two tails, because the tail is a property of the QUESTION and not a
+ constant. An AST guard refuses 1.645 / 1.6449 / 1.96 / 1.959964 / 0.95 / 0.975
+ as float constants anywhere in the file. (The tripwire itself scans src/ and
+ docs/render/ only - tests/ is deliberately OUT, per tests/conftest.py - so the
+ hand-computed literals in the tests are correct and intended.)
+
+ ! `_refuse_unless_a_proportion` EXISTS BECAUSE THE OBVIOUS REWRITE LOSES A
+ REFUSAL, AND THAT IS THE ONE THING IN THIS CHANGE MOST LIKELY TO HAVE GONE
+ WRONG SILENTLY. `wilson_lower_bound` inherited its two ValueErrors by
+ DELEGATING to `wilson_interval`. Splitting the z breaks the delegation, and
+ inlining the algebra - the natural next keystroke - drops both refusals from
+ the one function whose output is frozen into config/. For n = 0 that is hard
+ rule 11's "an empty population must not read as a result", and it would have
+ been invisible until the input that needed it arrived.
+ Driven, not assumed: (0,0) (1,0) (0,-5) raise "undefined"; (5,3) (-1,10)
+ (31,30) raise "not a proportion".
+
+ THE ARITHMETIC WAS DERIVED ON A SECOND PATH BEFORE ANY CODE WAS WRITTEN:
+ z by BISECTION ON math.erf, not NormalDist. Bisection gives 1.6448536269514715
+ and inv_cdf gives 1.6448536269514715 - IDENTICAL. The two-sided pair differ in
+ the last ULP (…545 vs …536), which is why the tests use tolerances rather than
+ equality on the quantile. Q-189(d)'s published arithmetic table reproduced
+ EXACTLY, both columns, all eight rows.
+
+================================================================================
+7. ! PROOF THAT S12.4's PUBLISHED CEILING DID NOT MOVE
+================================================================================
+
+ The pre-ruling module was materialised from `git show HEAD:` into an OS temp
+ directory and BOTH modules were driven side by side, reading THE SAME config/,
+ with `level` passed explicitly so neither could differ by a config read.
+
+   wilson_interval        2,693 (k,n) pairs, n in 1..60 plus 100/200/500,
+                          compared with `==` on lower, upper AND point
+                                                            0 MISMATCHES
+   two_sided_z            1.9599639845400536 on both sides   IDENTICAL
+   wald_half_width        16 (n,p) points                    0 mismatches
+   upper_bound_for_zero   n = 1..200                         0 mismatches
+   published_table        every field of all three rows      IDENTICAL
+   figures.ceiling_for    1,991 published ceilings recomputed against the OLD
+                          module's OWN arithmetic            0 MOVED
+
+ ! ONE FLAG WAS RAISED AND RUN DOWN RATHER THAN WAVED THROUGH.
+ `OLD.published_table() == NEW.published_table()` returned **False** while every
+ printed value matched. Cause, measured: the two module objects define two
+ different `PublishedRow` classes, and a frozen dataclass's `__eq__` returns
+ NotImplemented when `other.__class__ is not self.__class__`. Re-compared field
+ by field with `dataclasses.asdict`: ALL FIELDS IDENTICAL ON ALL THREE ROWS.
+ It was a class-identity artefact of the harness, not a value change - and it is
+ recorded because a `False` in a proof that S12.4 did not move is exactly the
+ result a session under time pressure would be tempted to round off.
+
+ S12.4's table still reads, regenerated by computation:
+   n=50  +/-13.9 pp @ p=0.5   +/-11.1 @ p=0.8   6.0%  [rule of three]
+   n=30  +/-17.9 pp @ p=0.5   +/-14.3 @ p=0.8  10.0%  [rule of three]
+   n= 5  +/-43.8 pp @ p=0.5   +/-35.1 @ p=0.8  45.1%  [exact one-sided]
+
+ AND THE ONE THING THAT DID MOVE, which is the ruling:
+   `wilson_lower_bound` is HIGHER AT EVERY k IN 0..30, and STRICTLY higher at
+   every k in 1..30. HOLES.md S3.5 makes BELOW the threshold the VOID condition,
+   so this change makes voiding OUR OWN RUN more likely. It is the self-critical
+   direction and it can only ever cost us.
+   ! This is arithmetic about the RULE. It says nothing about any observed rate.
+
+================================================================================
+8. GATE 1d - THE GUARD, AND WHY IT IS THE POINT OF THE WHOLE SESSION (INC-155)
+================================================================================
+
+ ! BEFORE THIS SESSION, NOTHING PINNED figures.py's WILSON BRANCH.
+ The only test over it was tests/test_c18_results.py:161,
+ `test_a_nonzero_figure_gets_a_TWO_SIDED_Wilson_interval` - the word TWO_SIDED
+ is IN THE NAME - and it asserts exactly two things:
+     assert "Wilson" in ceiling.method
+     assert ceiling.lower_pct is not None and ceiling.lower_pct < ceiling.upper_pct
+ `ceiling.method` is a hardcoded string constant at figures.py:51 that no
+ arithmetic touches. `lower < upper` is true of every interval estimator ever
+ written. BOTH SURVIVE ANY z, ANY CONFIDENCE LEVEL, AND A SWAP TO AGRESTI-COULL.
+ The strings "25.6", "3.5" and "% CI" appear in NO test file in the repository.
+
+ So the naive implementation of Q-189(d) would have moved every published
+ non-zero ceiling in RESULTS.md WITH A GREEN SUITE. That is INC-155, and its
+ `Missed:` is that the test's NAME was taken for its content by more than one
+ session - and that Q-189(d) RESIDUAL 2 published the coupling correctly while
+ nobody wrote down that THE SUITE COULD NOT DETECT IT.
+
+ THE GUARD INSTALLED:
+ `test_S12_4s_PUBLISHED_CEILING_is_PINNED_to_its_exact_values` pins TEN (k,n)
+ cells to exact Decimal pairs - both live N branches (30 and 50), the ladder
+ cell (5), and three CALIBRATION-SHAPED rates (19/30, 21/30, 24/30), because a
+ guard that only covers the tails is not a guard over the middle - AND pins
+ `Ceiling.phrase()`, which carries the confidence LABEL ("95.0% CI ...") and so
+ also catches the config/ route, which results/loader.py reads on a path that
+ never passes through probe.statistics.confidence_level at all.
+ Every expected value comes off the erf-bisection route, never off figures.py.
+
+================================================================================
+9. EVERY NEW TEST PROVED RED - AND FOR FIVE OF THEM "OLD CODE" IS THE WRONG
+   COUNTERFACTUAL, WHICH IS SAID RATHER THAN GLOSSED
+================================================================================
+
+ Six of the eleven fail on the PRE-RULING code. The other five are guards
+ against a FUTURE wrong change - they are SUPPOSED to be green before and after,
+ and a session that reported "11 of 11 red" would be reporting a broken guard.
+ Each was therefore proved red against the specific naive implementation it
+ exists to stop. All five counterfactual trees were built in OS temp
+ directories; THE REPOSITORY WAS NEVER MUTATED, and config/ and HOLES.md were
+ edited only in throwaway COPIES.
+
+   OLD  pre-ruling statistics.py ....................... 6 red / 11
+   A    wilson_interval's z -> one-sided ................ 4 red  <- incl. THE GUARD
+   B    config/ confidence_level 0.95 -> 0.90 ........... 7 red  <- incl. THE GUARD
+   C    wilson_lower_bound re-coupled via wilson_interval  5 red
+   D    the refusals dropped from wilson_lower_bound ..... 1 red
+   E    HOLES.md edited to say "two-sided" ............... 1 red  <- rule 4 guard
+
+ PER TEST, so no test is claimed red on evidence it does not have:
+   NO_FROZEN_ARTEFACT_STATES_A_SIDEDNESS ............ E
+   Q189d_the_void_threshold_bound_is_ONE_SIDED ...... OLD, B, C
+   the_one_sided_z_is_DERIVED_from_config ........... OLD, B
+   S12_4s_PUBLISHED_CEILING_is_PINNED ............... A, B          <- THE GUARD
+   S12_4s_PUBLISHED_TABLE_is_PINNED ................. B
+   wilson_interval_STAYS_TWO_SIDED .................. A, B
+   the_two_bounds_NO_LONGER_SHARE_A_z ............... OLD, A, C
+   wilson_lower_bound_does_not_ROUTE_THROUGH ........ OLD, A, C
+   wilson_lower_bound_KEPT_ITS_REFUSALS ............. D
+   the_one_sided_bound_is_HIGHER_EVERYWHERE ......... OLD, B, C
+   the_void_threshold_RULE_still_rounds_DOWN ........ OLD, B, C
+
+ THE ONE EXISTING TEST FLIPPED, and it is red on the old code too:
+   test_c10_probe.py::test_the_void_threshold_RULE_is_implemented_even_though_
+   its_VALUE_cannot_be -> 0.03459988874733419 vs 0.040676967009230874.
+ It hand-computed at z = 1.959964 and asserted 0.0345998887 - both CORRECT for
+ the code as it then stood. TWO ASSERTIONS WERE ADDED AND NONE LOOSENED: the old
+ value asserted NEGATIVELY so the flip is provably meaningful (hard rule 6), and
+ wilson_interval's lower end asserted UNMOVED. The docstring cites Q-189(d) and
+ says the test flips BACK if the frozen-artefact guard ever goes red.
+ ! AND ITS OWN LIMIT IS WRITTEN INTO THE SOURCE: its z literal IS NormalDist's
+ output, so its longhand is a second implementation of the ALGEBRA and NOT an
+ independent check of the QUANTILE. That is test_arch_wilson.py's erf route.
+ Saying so is the point - "hand-computed" claiming more than it did is the exact
+ failure mode hard rule 3 exists about.
+
+ AST-EXACT TEST DIFF, on ast.FunctionDef named test_* and ast.Assert NODES,
+ never `grep -c assert`, measured f0de10a -> e105283:
+   TOTAL TEST FUNCTIONS   1199 -> 1210   (+11, all in ONE NEW FILE)
+   TOTAL ASSERT NODES     3706 -> 3754   (+48: +46 new file, +2 the flip)
+   FILES WITH AN ASSERT-COUNT DROP ....... 0
+   FILES WITH A REMOVED TEST FUNCTION .... 0
+   TEST FILES DELETED .................... 0
+   tests/goldens/ ........................ UNTOUCHED, not read into any subject
+
+================================================================================
+10. GATE 2 - THE FULL SUITE, ATTRIBUTED PER TEST BY comm(1), NEVER BY SUBTRACTION
+================================================================================
+
+ INSTRUMENT: BARE PYTEST - `python -m pytest tests/ -q -p no:cacheprovider`.
+ ! NAMED, because `make test` is a DIFFERENT INSTRUMENT (it runs
+ `python -m whetstone_gate.tasks test`, which also runs check-prereg), and
+ a9f4150 is this project's own correction of a session that attributed a
+ bare-pytest figure to `make test`. Both are reported; neither is folded into
+ the other.
+
+ BEFORE : a THROWAWAY CLONE with its OWN `.git`, detached at 77d5be4 (this
+          session's Gate-0 commit, BEFORE Gate 1), `vendor/` junctioned in
+          9 failed, 1477 passed, 1 skipped   (8:25)
+ AFTER  : the REAL REPOSITORY, on the COMMITTED tree, at e105283
+          5 failed, 1491 passed, 2 skipped   (13:44)
+
+ comm(1) OVER THE SORTED FAILED LISTS:
+
+ --- ONLY IN AFTER = INTRODUCED BY THIS SESSION -----------------------------
+     (empty)
+ ! ZERO NEW REDS. That is the number this gate exists to produce.
+
+ --- IN BOTH = PRE-EXISTING AND UNTOUCHED -----------------------------------
+     tests/test_c12_benign.py::test_the_benign_package_imports_no_model_client_
+       WAY_ONE_the_transitive_ast_walk
+     tests/test_c7_ledger.py::test_Q069_nothing_in_this_repository_imports_the_
+       ledger_yet
+     tests/test_c8_scorer.py::test_golden2_coverage_block_reproduces
+     tests/test_c8_scorer.py::test_null_is_not_empty_a_scorer_returning_empty_
+       for_absent_subjects_passes_seven_of_eight
+     tests/test_lanes_operator_placeholders.py::test_the_camel_branch_is_
+       decided_before_any_camel_run
+ THE FIVE LONG-STANDING REDS, exactly as the prompt named them. None is in
+ probe/ or results/ and none is touched by this session.
+
+ --- ONLY IN BEFORE ---------------------------------------------------------
+     tests/test_c12_driver.py::test_a_REAL_EPISODES_MESSAGES_ENCODE_ON_BOTH_
+       PROVIDERS_and_the_TEXT_IS_IDENTICAL
+     tests/test_c12_driver.py::test_the_DECLARED_COMMAND_COMPLETES_ALL_TWENTY_
+       EPISODES_when_the_clock_is_exact
+     tests/test_c12_driver.py::test_the_DECLARED_COMMAND_SURVIVES_A_SLEEP_THAT_
+       UNDERSHOOTS
+     tests/test_c12_driver.py::test_the_DISCLOSED_MERGE_DIFFERENCE_IS_REAL_but_
+       DOES_NOT_ARISE_in_C6s_OWN_OUTPUT
+ ! THESE WERE **NOT** FIXED BY THIS SESSION AND ARE NOT CLAIMED AS FIXED. They
+ are an artefact of the throwaway clone, DIAGNOSED AND THEN PROVED rather than
+ explained away. The failure text is
+   RunRefused: the pinned attacker corpora are not present:
+   ...\clone\corpora\fetched\injecagent\data\attacker_cases_dh.jsonl
+ and `corpora/fetched/` is PINNED, NOT COMMITTED (Q-010) - `git ls-files
+ corpora/fetched` returns ZERO - so a fresh clone cannot have it.
+ PROVED, not asserted: `corpora/fetched` was junctioned into the clone and the
+ same four node ids re-run -> **4 passed in 57.44s**. This session touched
+ neither driver/ nor those tests.
+
+ SO THE HONEST BEFORE, CORRECTED FOR THE HARNESS, IS **FIVE**, AND THE AFTER IS
+ **FIVE**, AND comm(1) SAYS THE INTERSECTION IS THE SAME FIVE.
+
+ THE PROMPT'S "SEVEN -> FIVE" CLAIM, CHECKED RATHER THAN REPEATED:
+ the two extra reds it names were measured DIRECTLY IN THE REAL REPOSITORY as
+ this session's first suite act, before anything was touched:
+   tests/test_repo_invariants.py -> 2 failed, 21 passed
+     test_no_commit_carries_a_forged_or_reused_session_token
+     test_check_roles_exits_zero
+ Both cleared at Gate 0, on the single `2e5b8a47` row, and neither appears in
+ the AFTER list. THE PROMPT WAS RIGHT: seven on a clean committed tree, five
+ after Gate 0, and the two were ONE fault.
+ The prompt's EIGHTH - `test_the_object_store_and_the_working_tree_agree` - is
+ absent from both lists, consistent with its being the dirty-tree artefact the
+ prompt said it was. Both measurements here were taken on COMMITTED trees.
+
+ ! AND TWO EARLIER BASELINE ATTEMPTS WERE DISCARDED RATHER THAN REPORTED,
+ WHICH IS RECORDED BECAUSE "28 REDS" WOULD HAVE BEEN A SPECTACULAR FALSE
+ HEADLINE:
+   attempt 1  `git archive HEAD` into a temp dir, no `vendor/`
+              -> 40 failed + 58 collection ERRORS. The errors were entirely
+                 missing-checkout artefacts in test_c13 and test_c3.
+   attempt 2  the same tree with `vendor/` junctioned
+              -> 28 failed. ! STILL INVALID: `git archive` DROPS `.git`, so
+                 check-roles, the object-store agreement, the secret scan, the
+                 gitattributes check and the prereg manifest all failed as
+                 HARNESS ARTEFACTS.
+   attempt 3  a THROWAWAY CLONE with its own `.git`, checked out at 77d5be4,
+              `vendor/` junctioned -> 9 failed, of which 4 are the corpora
+              artefact proved above. THIS IS THE ONE REPORTED.
+ A discarded measurement that is never mentioned is indistinguishable from one
+ that was never taken.
+
+ make check-prereg AT HEAD: exit 0,
+   "STATUS: NOT-YET-FROZEN - the `prereg-v1` tag does not resolve."
+ which is the correct state and is Q-196's premise.
+ make check-roles AT HEAD: 21 passed, 0 failed, 3 n/a. E1, E2, E3 all PASS.
+
+================================================================================
+11. ! Q-195 - THE MOST IMPORTANT THING THIS SESSION FOUND, AND IT IS A STOP
+================================================================================
+
+ HOLES.md S3.5 rule 2 - FROZEN, and under `probe-v1`, which RESOLVES
+ (170bd3ff4abfdd8f87f64055972a60c82cc54efc) - reads:
+
+   "The void threshold is the LOWER BOUND of the 95% Wilson interval on the
+    observed arm-1 probe-breach rate, ROUNDED DOWN to the nearest 5 pp. The
+    observed rate, THE INTERVAL and the resulting threshold are written into
+    PROTOCOL.md and into this file, committed and tagged."
+
+ CONTEXT.md S10.3 rule 2, lines 1289-1291, is the SAME SENTENCE.
+
+ ! BOTH REQUIRE C14 TO PUBLISH **THREE** THINGS. Before Q-189(d) those three
+ were ONE computation - the threshold WAS the interval's lower end rounded down,
+ so publishing all three was publishing one number three ways. AFTER Q-189(d)
+ THEY ARE TWO COMPUTATIONS, and the only `Interval` the code produces is the
+ TWO-SIDED one, because that is what S12.4's ceiling needs and what the ruling
+ deliberately left alone. `wilson_lower_bound` now returns a BARE FLOAT.
+
+ So C14 is obliged to publish an interval whose lower end and the threshold
+ beside it DISAGREE. At an illustrative 3/30 - AN ILLUSTRATION OF THE RULE, not
+ an observed rate; the observed rate is TODO_C14_CALIBRATION and no calibration
+ has run - the interval reads 3.46%-25.62% and the threshold's source reads
+ 4.07%.
+
+ ! A READER OF HOLES.md WILL SEE AN INTERVAL, THEN A THRESHOLD, AND THE SECOND
+ CANNOT BE DERIVED FROM THE FIRST. That is precisely the shape of defect this
+ project exists to criticise in other people's numbers - a published figure
+ whose stated derivation does not reproduce it - and it would be introduced BY
+ US, into a FROZEN artefact, in the write-up of the single number that decides
+ whether we may publish at all.
+
+ FOUR OPTIONS RECORDED IN Q-195 WITH WHAT EACH COSTS, INCLUDING "WITHDRAW
+ Q-189(d)". NOT DECIDED HERE: it is Class A and it is the architect's.
+ This session's recommendation is option 2 - publish BOTH, labelled, with one
+ sentence saying why they differ - because it is the only option that makes both
+ frozen sentences true at once.
+
+ ! NOTHING IS MIS-COMPUTED MEANWHILE AND THAT IS MEASURED:
+ config/protocol.yaml:352 is still `void_threshold_breach_rate:
+ TODO_C14_CALIBRATION` and the loader RAISES on it; and RESULTS.md was READ IN
+ FULL and holds ZERO occurrences of "Wilson", "% CI", "upper bound", 13.9, 17.9
+ or 43.8 - NO interval of any kind is standing in the published report. That is
+ the fact that makes this change safe to land TODAY rather than after C14, and
+ it is why the finding is a STOP on C14's write-up and not on this commit.
+
+================================================================================
+12. THE OTHER TWO FINDINGS
+================================================================================
+
+ Q-196 - NOW-OR-NEVER. `git tag` lists c0-pass c1-pass c13-pass c2-pass c3-pass
+ c4-pass probe-v1. `git rev-parse prereg-v1` -> "fatal: ambiguous argument". So
+ PROTOCOL.md, PROVENANCE.md and config/ are NOT YET UNDER A FREEZE TAG, and a
+ key such as `statistics.void_bound_sidedness: one_sided` is landable TODAY and
+ NEVER AFTER THAT TAG.
+ Hard rule 9's LITERAL half is satisfied - no z is typed anywhere in src/ and an
+ AST guard enforces it - but its POSITIVE half is not: the sidedness is now a
+ spec-specified choice that lives NOWHERE in config/, expressed only as which
+ function `wilson_lower_bound` happens to call. This project has three
+ precedents for naming exactly this kind of choice in config/ precisely because
+ an unnamed method is an unreproducible number: `statistics.quartile_method`,
+ `statistics.rule_of_three_min_n`, `money.rounding`.
+ ! NOT DONE. config/ is EXPLICITLY OUTSIDE THIS SESSION'S FENCE, it is a
+ pre-registration artefact whose blob SHAs are listed in PROTOCOL.md and
+ verified by `make check-prereg`, and adding a key is Class A. Recorded now
+ because recording it later is the same as not recording it.
+
+ Q-197 - S12.4's "+/-44 pp" ladder caption is a published number at
+ CONTEXT.md:1643, :1816, :2292 and :2405 that NO code generates and NO test
+ reads. A confidence_level edit moves the computed value to ~+/-36.8 pp while
+ all four captions keep saying 44 AND EVERY TEST STAYS GREEN, because the
+ computed pins move together with the config and agree with each other. Same
+ species as INC-155.
+ ! FILED IN QUESTIONS.md RATHER THAN docs/reviews/OPEN_FINDINGS.md BECAUSE
+ docs/reviews/ IS OUTSIDE THIS SESSION'S FENCE. It belongs there. Said rather
+ than worked around - INC-141's principle.
+
+================================================================================
+13. WHAT THIS SESSION DID NOT DO, AND WHY
+================================================================================
+
+ * NO PROVIDER CALL, IN ANY MODE. Zero spend. This session held NO token
+   sanction and none was needed.
+ * `probe.void_threshold_breach_rate` NOT WRITTEN. It is TODO_C14_CALIBRATION,
+   the loader RAISES on it, and filling it is the ARCHITECT's single act after
+   reading the calibration's number.
+ * NO THRESHOLD VALUE COMPUTED, DERIVED, ESTIMATED OR MENTIONED, and nothing
+   anywhere in this session's output says whether any run would VOID. The
+   arithmetic in section 7 is about the RULE across hypothetical rates and is
+   Q-189(d)'s own published table, re-derived.
+ * evals/ NOT TOUCHED - 28 files before, 28 after, byte-identical, and the
+   newest mtime under it is still 15:02:12Z.
+ * driver/ AND runner/ NOT TOUCHED. config/, tests/goldens/, CONTEXT.md,
+   PROCESS.md, HOLES.md, PROTOCOL.md, corpora/, docs/submission/, README.md,
+   RESULTS.md: NOT TOUCHED. `git diff f0de10a..HEAD -- config/` is EMPTY.
+   .env was never read, printed or referenced.
+ * NO TAG CUT OR MOVED. NO FORCE-PUSH. NO HISTORY REWRITE. NO AMEND.
+ * NOT SELF-CERTIFIED. Everything here ships UNREVIEWED and a fresh adversarial
+   review follows.
+ * docs/reviews/OPEN_FINDINGS.md NOT WRITTEN - outside the fence; Q-197 says so.
+ * The stale-index `M` entries on benign/ were NOT "cleaned" (OF-213).
+
+ ! ONE MEASUREMENT THIS SESSION GOT WRONG AND CORRECTED ITSELF ON.
+ The first attempt at a suite baseline materialised HEAD with `git archive` into
+ a temp directory. It reported 28 reds. ! THOSE WERE NOT REAL: `git archive`
+ DROPS `.git`, so every git-dependent test - check-roles, the object-store
+ agreement, the secret scan, the gitattributes check, the prereg manifest -
+ failed as a HARNESS ARTEFACT. An even earlier attempt also omitted `vendor/`,
+ adding 58 collection errors on top. Both were discarded rather than reported,
+ and the baseline was rebuilt as a THROWAWAY CLONE with its own `.git`,
+ checked out at 77d5be4, with `vendor/` junctioned in. Recorded because a
+ discarded measurement that is never mentioned is indistinguishable from one
+ that was never taken - and because "28 reds" would have been a spectacular and
+ entirely false headline.
+
+================================================================================
+14. THE COMMITS, AND EVERY `Swept:` LINE
+================================================================================
+
+ 77d5be4  chore(rulings): GATE 0 - the `2e5b8a47` row, discharging Q-194's owed
+          remedy, plus this session's own `5c9e08f4`. check-roles 20/1 -> 21/0
+          Swept: NOTHING. One path - QUESTIONS.md - staged from a private index
+          seeded from LIVE HEAD (PROCESS.md S7b with INC-139's `env -u`),
+          name-only compared against a pre-declared single-path list that
+          REFUSES on mismatch, HEAD re-read immediately before the commit.
+          A pure insert: 45 insertions, 0 deletions, LF-only, CR count 0
+          re-verified after the write. No other session's line was touched.
+
+ 23ba66c  fix(probe): GATE 1 - Q-189(d) as a SEPARATE one-sided quantile used by
+          `wilson_lower_bound` ALONE (unreviewed)
+          Swept: NOTHING. Three paths - src/whetstone_gate/probe/statistics.py,
+          tests/test_arch_wilson.py (NEW), tests/test_c10_probe.py - staged from
+          a private index seeded from LIVE HEAD (PROCESS.md S7b with INC-139's
+          `env -u`), name-only compared against a pre-declared list that REFUSES
+          on mismatch, HEAD re-read immediately before the commit. All three
+          CR-audited LF-only before staging; git ls-files --eol confirms
+          i/lf w/lf. The two stale-index `M` entries on benign/ (OF-213) were
+          NOT staged and `git diff HEAD` on them is empty.
+
+ e105283  chore(rulings): GATE 1 FINDINGS - Q-195, Q-196, Q-197, INC-155, INC-156
+          Swept: NOTHING. Two paths - QUESTIONS.md, INCIDENTS.md - staged from a
+          private index seeded from LIVE HEAD (PROCESS.md S7b with INC-139's
+          `env -u`), name-only compared against a pre-declared list that REFUSES
+          on mismatch, HEAD re-read immediately before the commit. Both are PURE
+          APPENDS (INC-136's remedy), CR-audited LF-only, 0 deletions.
+
+ (this commit)  chore(journal): the FINAL OUTPUT, STATUS.md and PROGRESS.md
+          - its SHA is the first line of the chat report, for the reason above
+          Swept: NOTHING. Three paths - docs/sessions/arch-wilson-1.txt (NEW),
+          STATUS.md, PROGRESS.md - staged from a private index seeded from LIVE
+          HEAD (PROCESS.md S7b with INC-139's `env -u`), name-only compared
+          against a pre-declared list that REFUSES on mismatch, HEAD re-read
+          immediately before the commit. STATUS.md and PROGRESS.md were written
+          as SINGLE INSERTS AT LINE 1, never a read-modify-write, because
+          `7a1e3b52` holds both files (INC-136's remedy). All CR-audited LF-only.
+
+ Every commit carries `Session-Token: 5c9e08f4`. `make check-roles` E1, E2, E3
+ all PASS at HEAD.
+
+================================================================================
+15. WHAT THE ARCHITECT IS OWED, IN ORDER OF WHEN IT EXPIRES
+================================================================================
+
+ 1. ! Q-196 EXPIRES AT `git tag prereg-v1`. A config/ key naming the void
+    bound's sidedness is landable TODAY and never afterwards. It is the only
+    item here with a hard deadline.
+ 2. ! Q-195 IS OWED BEFORE C14 WRITES HOLES.md. What does C14 publish as "the
+    interval" now that the threshold no longer comes from one? Four options,
+    with what each costs, are in QUESTIONS.md. This session recommends option 2
+    and did not take it.
+ 3. Q-197 belongs in docs/reviews/OPEN_FINDINGS.md and could not be filed there
+    from inside this session's fence.
+ 4. INC-155's guardrail is PARTIAL by its own words. The class - a published
+    number guarded only by a constant string and a tautology - needs a sweep.
+ 5. INC-156: a prompt should state run-liveness as a MEASUREMENT with its
+    evidence, not as a fact. Same shape as INC-154's closing note about
+    baselines. Two consecutive sessions have now found this class in their own
+    prompts.
+
+================================================================================
+16. THE ONE-PARAGRAPH VERSION
+================================================================================
+
+ The ruling was implemented in the only shape that satisfies it without moving a
+ second published number, and that S12.4 did not move is a MEASUREMENT over
+ 2,693 intervals and 1,991 ceilings rather than a claim. The guard the finding
+ existed to install is in, and it is proved red against both naive
+ implementations. Every new test is proved red somewhere, and for the five where
+ "old code" is the wrong counterfactual that is SAID rather than glossed. One
+ existing test flipped, citing the ruling, gaining two assertions and losing
+ none.
+ ! And the implementation surfaced something the ruling does not address: frozen
+ HOLES.md requires C14 to publish an interval beside the threshold, and after
+ this change the two no longer agree. That is Q-195, it is a STOP, and it is the
+ architect's - not because this session lacked an opinion, but because deciding
+ it alone would be the exact silent move the whole process exists to prevent.
+
+================================================================================
+ END OF RECORD - ARCH WILSON 1 - SESSION-TOKEN 5c9e08f4 - NOT SELF-CERTIFIED
+================================================================================

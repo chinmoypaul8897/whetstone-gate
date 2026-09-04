@@ -1,3 +1,175 @@
+## SESSION-TOKEN 5c9e08f4 — ARCH, WILSON 1 — 2026-09-04
+
+**Role:** FIX. **Chunk:** ARCH. **Everything below ships UNREVIEWED. Not self-certified. No tag cut.**
+⚠️ **FULL RECORD: `docs/sessions/arch-wilson-1.txt`.**
+⚠️ **SPEND: ZERO. No provider call was made in any mode**, and this session held no token sanction.
+⚠️ **NO THRESHOLD VALUE WAS COMPUTED, DERIVED, ESTIMATED OR MENTIONED**, and nothing here says
+whether any run would VOID. `config/protocol.yaml:352` is untouched at `TODO_C14_CALIBRATION` and the
+loader still RAISES on it. `git diff f0de10a..HEAD -- config/` is **EMPTY**.
+
+⚠️⚠️ **THE PROMPT'S OPENING LINE WAS FALSE, AND IT IS `INC-156`.** *"THE SINGLE-SHOT CALIBRATION IS
+RUNNING IN THE OPERATOR'S TERMINAL RIGHT NOW."* **It was not running and had never started.** Four
+read-only measurements: **zero** `python.exe` processes in a `Win32_Process` inventory that names 88
+`svchost.exe` and 19 `claude.exe`; `evals/` at **28 files**, unchanged since **15:02:12Z**; **zero**
+`cal__` artefacts anywhere; and `evals/cal/RUN_DECLARED.md` §8's operator start time **still blank**.
+⚠️ **It changed nothing** — `evals/`, `driver/` and `runner/` are fenced off whether or not a run is
+live, and none was touched. ⚠️ **`STATUS.md`'s own top block already said *"IT WAS NOT RUN"***: the
+prompt and the repository contradicted each other when the prompt was written. The error is
+self-correcting in the **safe** direction, which is exactly why it could persist.
+
+**CONCURRENCY, MEASURED FIRST, BY `INC-140`'s RECIPE — AND IT FOUND A SESSION THAT STARTED AFTER
+THIS ONE.** Five native-binary `claude.exe` processes resolved to their trees; ⚠️ **a sixth
+transcript, `511a8849`, appeared in this tree at 16:34:13Z, after this session began.** Measured, not
+assumed: it is **C17 BUILD**, token `7a1e3b52`, and **it does not hold `5c9e08f4`** — the token
+appears **once** in its whole transcript, inside the prompt the architect wrote *for* it, naming this
+session as the holder of `probe/`, `results/` and existing `tests/`. It had made **5 `Bash` + 3
+`PowerShell` calls and ZERO writes**, re-measured at the end of this session; `docs/render/` and
+`tests/test_c17_render.py` do not exist. ⚠️ **The prompt's literal stop test fires — `7a1e3b52` IS
+instructed to create a file under `tests/` — and the hazard it names does not**, because that file is
+a NEW one with a name this session does not use and it is forbidden every existing test file. That is
+`INC-149`'s pattern: fenced sessions run in parallel **on purpose**, each told about the other.
+**PROCEEDED, and the real collision surface — `STATUS.md` and `PROGRESS.md` — was written by pure
+append or single-line insert only** (`INC-136`'s remedy). The stale-index `M` entries on `benign/`
+were verified byte-identical to HEAD as this session's first file act and were **not** "cleaned"
+(`OF-213`).
+
+**GATE 0 — `make check-roles` 20 passed/1 failed → 21 passed/0 failed/3 n/a**, re-run **with this
+session's own commits in the log** rather than only at the moment of the edit. The two
+`test_repo_invariants` reds — `test_no_commit_carries_a_forged_or_reused_session_token` and
+`test_check_roles_exits_zero` — were **ONE fault** and cleared together, exactly as the prompt said.
+⚠️ **`2e5b8a47` WAS VERIFIED, NOT ACCEPTED FROM THE PROMPT:** it opened the ARCH PUBLISH 1 prompt as
+`SESSION-TOKEN: 2e5b8a47   CHUNK ARCH   ROLE: FIX`, read off that session's own transcript, so both
+cells come from the **issued header**. It discharges `Q-194`'s owed remedy in `Q-194`'s own
+characters, and `Q-194`'s second ground has **expired by measurement**: ARCH PUBLISH 1 is no longer
+live, so the read-modify-write hazard it named cannot fire. ⚠️ **A second row the prompt did not ask
+for was also written** — `5c9e08f4` — because E1 is evaluated against the **log**, so "21/0" would
+otherwise have been true for about ninety seconds.
+
+**GATE 1 — `Q-189`(d) IMPLEMENTED, AND THE TRAP AVOIDED BY MEASUREMENT.** The coupling was verified
+at all three named line numbers **before** anything was edited, and a caller census — which the
+prompt did not ask for — closed the blast radius: `wilson_interval` has **exactly two** call sites in
+`src/`, and ⚠️ **`wilson_lower_bound` and `round_down_to_5pp` have ZERO**, so the ruling moves **no
+number that is computed today**. The shape shipped is `one_sided_z` + a private
+`_wilson_bounds(successes, n, z)`: **the algebra is shared, the quantile is not.**
+⚠️ **`_refuse_unless_a_proportion` exists because the obvious rewrite loses a refusal** —
+`wilson_lower_bound` inherited its two `ValueError`s by **delegating**, and inlining the algebra would
+have dropped both from the one function whose output is frozen into `config/`. Driven, not assumed.
+⚠️ **HARD RULE 9: no new literal.** The quantile derives from the **same**
+`statistics.confidence_level`, and an AST guard refuses `1.645`/`1.96`/`0.95`/`0.975` as float
+constants anywhere in the file.
+
+⚠️ **PROOF THAT §12.4 DID NOT MOVE, run against the pre-ruling module driven side by side on the same
+`config/`:** 2,693 `wilson_interval` `(k,n)` pairs compared **bit-for-bit with `==`** — **0
+mismatches**; **1,991** published ceilings recomputed through `figures.ceiling_for` against the OLD
+module's own arithmetic — **0 MOVED**; `two_sided_z`, `wald_half_width` and `upper_bound_for_zero`
+identical. ⚠️ **One flag was raised and run down rather than waved through:** `published_table() ==
+published_table()` returned **False** while every printed value matched — cause measured as *two
+module objects define two different `PublishedRow` classes*, and a frozen dataclass's `__eq__`
+returns `NotImplemented` across classes. Re-compared with `dataclasses.asdict`: **all fields
+identical on all three rows.** Recorded because a `False` inside a proof that §12.4 did not move is
+exactly the result a session under time pressure would round off.
+
+⚠️ **THE WITHDRAWAL CHECK WAS RE-RUN INDEPENDENTLY AND THE RULING SURVIVES** — six frozen statements
+name this bound (`PROTOCOL.md`:630,:649; `HOLES.md`:284; `PROVENANCE.md`:324,:719;
+`config/protocol.yaml`:349) and **not one states a sidedness or a `z`**; the only two sidedness words
+in the frozen set are McNemar's and Clopper–Pearson's, **different tests**. ⚠️ **AND THE EARLIER
+PASS'S DEFENCE IS CORRECTED RATHER THAN REPEATED:** counting *"five say lower bound, one says
+interval"* measures a set the ruling did not ask about. On the **two** artefacts `Q-189`(d) actually
+named, the wording is *"the lower bound of the 95% Wilson **interval**"* — **both of them, the same
+sentence twice**. The strongest available counterexample was also run down: `PROTOCOL.md`'s frozen
+±pp table reproduces at z = 1.96, but it is a **Wald** half-width — the Wilson score half-widths at
+p = 0.5 are 13.4/16.8 and do **not** match it — so that fingerprint attaches to a **different
+estimator** and constrains nothing here.
+
+**GATE 1d — THE GUARD, AND IT IS THE WHOLE POINT (`INC-155`).** ⚠️ **Nothing pinned `figures.py`'s
+Wilson branch.** Its only test was named `test_a_nonzero_figure_gets_a_TWO_SIDED_Wilson_interval` —
+**the word `TWO_SIDED` is in the name** — and asserted `"Wilson" in ceiling.method`, a hardcoded
+string constant at `figures.py:51` that no arithmetic touches, and `lower_pct < upper_pct`, true of
+every interval estimator ever written. **Both survive any `z`, any confidence level, and a swap to
+Agresti–Coull.** The strings `"25.6"`, `"3.5"` and `"% CI"` appeared in **no test file in the
+repository**. The new guard pins **ten** `(k,n)` cells — both live N branches, the ladder cell, and
+three **calibration-shaped** rates — to exact `Decimal` pairs **and** to `Ceiling.phrase()`, which
+carries the confidence **label** and so also catches the `config/` route that `results/loader.py`
+reads without passing through `probe.statistics.confidence_level` at all.
+
+**+11 tests / +48 asserts in ONE NEW FILE plus the flip. AST-measured on `ast.FunctionDef` named
+`test_*` and `ast.Assert` NODES, never `grep -c assert`: 1199 → 1210 tests, 3706 → 3754 asserts,
+ZERO assert-count drops, ZERO removals, ZERO deletions, `tests/goldens/` untouched.**
+⚠️ **EVERY NEW TEST PROVED RED — and for five of them "old code" is the WRONG counterfactual, which
+is said rather than glossed.** Six fail on the pre-ruling code; the other five are guards against a
+**future** wrong change and were each proved red against the naive implementation they exist to stop,
+in five throwaway OS temp trees (**A** `wilson_interval` → one-sided: 4 red **including the guard**;
+**B** `config/` level → 0.90: 7 red **including the guard**; **C** re-coupled: 5; **D** refusals
+dropped: 1; **E** `HOLES.md` edited to say "two-sided": 1). ⚠️ **ONE existing test flipped citing the
+ruling**, with **two assertions ADDED and none loosened** — the old value asserted **negatively** so
+the flip is provably meaningful, and `wilson_interval`'s lower end asserted **unmoved** — and it is
+red on the pre-ruling code. ⚠️ **Its own limit is written into the source:** its `z` literal *is*
+`NormalDist`'s output, so its longhand is a second implementation of the **algebra** and **not** an
+independent check of the **quantile**; that is `tests/test_arch_wilson.py`'s `math.erf`-bisection
+route.
+
+**GATE 2 — THE SUITE, ON COMMITTED TREES, ATTRIBUTED PER TEST BY `comm(1)` AND NEVER BY SUBTRACTING
+TOTALS.** Instrument named, because `make test` is a **different** instrument and `a9f4150` is this
+project's own correction of a session that conflated them: these are **bare pytest**.
+**BEFORE** — a throwaway clone with its **own `.git`**, detached at `77d5be4` (post-Gate-0,
+pre-Gate-1), `vendor/` junctioned: **9 failed, 1477 passed, 1 skipped**.
+**AFTER** — the real repository, committed, at `e105283`: **5 failed, 1491 passed, 2 skipped**.
+⚠️ **`comm -13` — reds INTRODUCED by this session — is EMPTY. ZERO new reds.** `comm -12` is the
+**five long-standing reds** (`test_c12_benign` non-use walk, `test_c7_ledger` Q069,
+`test_c8_scorer` ×2, `test_lanes_operator_placeholders` camel branch) — none in `probe/` or
+`results/`, none touched. ⚠️ **`comm -23` is four `test_c12_driver` tests, and they are NOT claimed
+as fixed by this session:** they fail in the clone with `RunRefused: the pinned attacker corpora are
+not present`, because `corpora/fetched/` is **pinned, not committed** (`Q-010`; `git ls-files
+corpora/fetched` returns **zero**). **Proved, not explained away:** `corpora/fetched` was junctioned
+into the clone and the same four node ids re-run → **4 passed**. **So the honest BEFORE, corrected
+for the harness, is FIVE, and the AFTER is FIVE.**
+⚠️ **THE PROMPT'S "SEVEN → FIVE" WAS CHECKED, NOT REPEATED:** `tests/test_repo_invariants.py`
+measured **directly in the real repository** before anything was touched gave **2 failed, 21
+passed** — `test_no_commit_carries_a_forged_or_reused_session_token` and `test_check_roles_exits_zero`
+— and both cleared at Gate 0 on the single row. The prompt's eighth,
+`test_the_object_store_and_the_working_tree_agree`, is in **neither** list, consistent with it being
+the dirty-tree artefact the prompt said it was. **The prompt was right.**
+⚠️ **AND TWO EARLIER BASELINES WERE DISCARDED RATHER THAN REPORTED:** `git archive` into a temp
+directory gave 40 failed + 58 collection errors without `vendor/`, and **28 failed** with it — still
+invalid, because `git archive` **drops `.git`** and every git-dependent test then fails as a harness
+artefact. *"28 reds"* would have been a spectacular and entirely false headline.
+`make check-prereg` at HEAD: exit 0, *"NOT-YET-FROZEN — the `prereg-v1` tag does not resolve"*.
+`make check-roles` at HEAD: **21 passed, 0 failed, 3 n/a**.
+
+⚠️⚠️ **`Q-195` — THE MOST IMPORTANT THING THIS SESSION FOUND, AND IT IS A HARD-RULE-1 STOP RATHER
+THAN A DEFECT IN THE IMPLEMENTATION.** Frozen `HOLES.md` §3.5 rule 2 — under `probe-v1`, which
+resolves — requires C14 to publish **three** things: *"The observed rate, **the interval** and the
+resulting threshold."* `CONTEXT.md` §10.3 rule 2 is the same sentence. Those were **one** computation
+before the ruling and are **two** after it, and the only `Interval` the code produces is the
+**two-sided** one. **So C14 is obliged to publish an interval whose lower end and the threshold
+beside it disagree** — at an illustrative 3/30, 3.46% against 4.07%. ⚠️ **That is the exact shape of
+defect this project exists to criticise in other people's numbers**, and it would be introduced by
+us, into a frozen artefact, in the write-up of the single number that decides whether we may publish.
+Four options recorded with what each costs, **including withdrawing the ruling**. **Not decided here
+— Class A.** ⚠️ **Nothing is mis-computed meanwhile and that is measured:** the sentinel still raises
+and `RESULTS.md`, read in full, holds **zero** occurrences of *"Wilson"*, *"% CI"*, *"upper bound"*,
+`13.9`, `17.9` or `43.8`.
+
+⚠️ **`Q-196` — NOW-OR-NEVER.** `git rev-parse prereg-v1` **fails**; `probe-v1` resolves. So `config/`
+is not yet under a freeze tag and a key naming the sidedness is landable **today** and never after.
+Hard rule 9's *literal* half is satisfied; its **positive** half is not — the sidedness lives nowhere
+in `config/`, only in which function `wilson_lower_bound` calls, where this project names
+`quartile_method`, `rule_of_three_min_n` and `money.rounding` for exactly that reason. **NOT DONE:
+`config/` is outside this session's fence and it is Class A.**
+⚠️ **`Q-197`** — §12.4's *"±44 pp"* ladder caption is a published number in four places that no code
+generates and no test reads. **Filed in `QUESTIONS.md` rather than `docs/reviews/OPEN_FINDINGS.md`
+because `docs/reviews/` is outside this session's fence** — `INC-141`'s principle, said rather than
+worked around.
+
+⚠️ **ONE MEASUREMENT THIS SESSION GOT WRONG AND CORRECTED ITSELF ON.** The first suite baseline was
+materialised with `git archive` into a temp directory and reported **28 reds**. **They were not
+real:** `git archive` drops `.git`, so every git-dependent test failed as a harness artefact; an
+earlier attempt also omitted `vendor/`, adding 58 collection errors. Both were **discarded rather
+than reported**, and the baseline was rebuilt as a **throwaway clone with its own `.git`**, checked
+out at `77d5be4` with `vendor/` junctioned in. Recorded because *"28 reds"* would have been a
+spectacular and entirely false headline, and a discarded measurement never mentioned is
+indistinguishable from one never taken.
+
 ## SESSION-TOKEN 9a4d63b2 — C14, CAL PREP 1 — 2026-09-04
 
 **Role:** FIX. **Chunk:** C14. **Everything below ships UNREVIEWED. Not self-certified. No tag cut.**
