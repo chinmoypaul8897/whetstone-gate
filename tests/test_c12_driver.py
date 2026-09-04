@@ -2876,3 +2876,75 @@ def test_a_BucketError_is_BOOKED_AS_ITS_OWN_NAMED_CATEGORY_AND_REACHES_THE_PRINT
         f"PACER_REFUSED must print with its COUNT beside it, as every other cause does. "
         f"Rendered:\n{text}"
     )
+
+
+def test_a_DRY_RUN_BUILDS_THE_PACER_so_the_REHEARSAL_ENTERS_THE_PATH_THE_REAL_RUN_TAKES(
+    tmp_path,
+):
+    """⚠️⚠️ **`Q-179`(3), RULED 2026-09-04 BY THE ARCHITECT.**
+
+        *"A rehearsal that cannot enter the path the real run takes is not a rehearsal, and
+        last night's prompt called it 'the only thing between an unreviewed provider
+        boundary and an unrepeatable run' — which was WRONG, and the session was right to
+        say so. ⚠️ ``--dry-run`` MUST BUILD THE PACER, WITH AN INJECTED CLOCK AND AN
+        INJECTED SLEEP so it costs no wall-clock time. ``execute`` already takes ``clock``
+        and ``sleep`` parameters."*
+
+    ⚠️ **THE PRE-FIX SHAPE, WHICH IS WHAT MADE THE REHEARSAL HOLLOW**::
+
+        paced = client
+        if request.spend_real_tokens:
+            paced = _PacedClient(...)
+
+    A dry run therefore dispatched through the **raw** client: ``_PacedClient.__init__``,
+    ``_agree`` and ``_pace`` were **never executed**, so `Q-161`'s lane-agreement check and
+    `Q-179`(1)'s pacing arithmetic had no rehearsal at all — and `Q-179`(1)'s defect could
+    not have been found by rehearsing, only by spending.
+
+    ⚠️ **PROVED RED AGAINST THE PRE-FIX CODE.** ``clock.sleeps`` is **0** there, because
+    nothing on a dry run's path can sleep: the assertion below fails on the pre-fix tree and
+    passes on the post-fix one. It is asserted through **behaviour** — a sleep actually
+    requested — rather than by an ``isinstance`` on an internal, because the ruling is about
+    the path being entered and not about a class name.
+
+    ⚠️ **AND IT COSTS NO WALL-CLOCK TIME**, which is the ruling's own condition: the clock
+    advances only when it is slept on, so the twenty episodes pace a full lane-hour of
+    ``rpm``/``tpm`` arithmetic in microseconds. That is also why the pacer could be added to
+    the dry-run path at all — with the real ``time.sleep`` this suite would sit out every
+    rate-limit wait it rehearses.
+    """
+    matrix = pilot_module.load_pilot(arm="1")
+    clock = _clock_that_undershoots_only_its_FIRST_sleep(0.0)
+
+    result = driver_run.execute(
+        _request(matrix, tmp_path / "rehearsed"),
+        client=TranscriptClient(
+            attacker_replies=rehearsal.attacker_transcript(matrix.episode_count)
+        ),
+        corpus_entries=(),
+        clock=clock,
+        sleep=clock.sleep,
+    )
+
+    # (1) ⚠️ THE PACER RAN. The declared matrix makes ~400 attacker calls against lanes
+    #     whose published `rpm` is far below that, so a run that never waits is a run that
+    #     never paced.
+    assert clock.sleeps > 0, (
+        "a dry run of the declared matrix requested ZERO sleeps, so _PacedClient was not "
+        "on the path. Q-179(3): the rehearsal must enter the path the real run takes"
+    )
+
+    # (2) ⚠️ AND IT STILL COMPLETES ALL TWENTY. Pacing a rehearsal must not cost it
+    #     episodes; a pacer that turned a dry run into a partial one would be a worse
+    #     rehearsal than none.
+    assert len(result.episodes) == matrix.episode_count
+    result.denominator.reconcile()
+    assert result.denominator.denominator == matrix.episode_count
+
+    # (3) ⚠️ AND THE CLOCK IT ADVANCED IS THE INJECTED ONE, not the wall clock. If this
+    #     were `time.monotonic` the value would be a machine uptime; it is the sum of the
+    #     waits the buckets asked for, starting from zero.
+    assert clock() > 0.0, (
+        "the injected clock never advanced, so the sleeps were counted but not applied "
+        "and the bucket arithmetic under test was not actually driven forward"
+    )

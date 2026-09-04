@@ -509,14 +509,61 @@ def _date(moment: datetime) -> str:
     return moment.strftime("%Y-%m-%d")
 
 
+class _VirtualClock:
+    """A clock that advances **only when it is slept on**. `Q-179`(3).
+
+    ⚠️ **THIS IS WHAT MAKES PACING A DRY RUN FREE.** The pacer's arithmetic is driven in
+    full — every ``rpm``/``tpm``/``rpd`` refill, every wait the buckets ask for — while the
+    wall clock does not move, so a rehearsal of the declared matrix pays the lane-hours it
+    simulates in microseconds. With ``time.sleep`` on that path a 20-episode rehearsal would
+    sit out every rate-limit wait it rehearses, which is why the ruling names an injected
+    clock and an injected sleep in the same sentence as the requirement itself.
+
+    ⚠️ **IT IS EXACT, AND THAT IS DELIBERATE.** It advances by precisely what it was asked
+    for, so it never undershoots and `Q-179`(1)'s race cannot fire on a dry run *by accident*
+    — a rehearsal must not report a defect the real clock would not produce. The undershoot
+    is injected explicitly by the tests that mean to study it.
+    """
+
+    def __init__(self) -> None:
+        self.t = 0.0
+
+    def __call__(self) -> float:
+        return self.t
+
+    def sleep(self, seconds: float) -> None:
+        self.t += max(0.0, seconds)
+
+
+def _pacing_clock(
+    request: RunRequest,
+    clock: Callable[[], float] | None,
+    sleep: Callable[[float], None] | None,
+) -> tuple[Callable[[], float], Callable[[float], None]]:
+    """The clock and sleep the pacer runs on. **A caller's own always wins.**
+
+    ⚠️ **A REAL RUN GETS THE REAL PAIR AND A DRY RUN GETS THE VIRTUAL ONE**, because
+    `Q-179`(3) requires the dry run to build the pacer *"WITH AN INJECTED CLOCK AND AN
+    INJECTED SLEEP so it costs no wall-clock time"*. Resolving it here rather than at each
+    call site means every entry point — the CLI, the tests, a future harness — gets the
+    behaviour the ruling describes without having to remember to ask for it.
+    """
+    if clock is not None and sleep is not None:
+        return clock, sleep
+    if request.dry_run:
+        virtual = _VirtualClock()
+        return (clock or virtual), (sleep or virtual.sleep)
+    return (clock or time.monotonic), (sleep or time.sleep)
+
+
 def execute(
     request: RunRequest,
     *,
     client: MeteredModelClient,
     corpus_entries: Sequence[Any] | None = None,
     now: Callable[[], datetime] = _utc_now,
-    clock: Callable[[], float] = time.monotonic,
-    sleep: Callable[[float], None] = time.sleep,
+    clock: Callable[[], float] | None = None,
+    sleep: Callable[[float], None] | None = None,
     repo_root: Path | None = None,
 ) -> RunResult:
     """Run every pending episode of ``request.matrix``, then report. **Resumable.**
@@ -531,6 +578,9 @@ def execute(
     count: hard rule 11 counts *"skipped cases"* too, and a resumed run that reported only
     what it re-ran would publish a shrinking denominator every time it was restarted.
     """
+    # ⚠️ `Q-179`(3): a dry run that named no clock gets the VIRTUAL pair, so building the
+    # pacer on its path — which the ruling requires — costs it no wall-clock time.
+    clock, sleep = _pacing_clock(request, clock, sleep)
     root = repo_root or cfg.repo_root()
     started = now()
     result = RunResult()
@@ -618,17 +668,26 @@ def execute(
             continue
 
         episode_started = now()
-        paced = client
-        if request.spend_real_tokens:
-            paced = _PacedClient(
-                inner=client,
-                attacker_buckets=attacker_state.buckets,
-                judge_buckets=judge_state.buckets,
-                attacker_reservation=settings.attacker_call_reservation_tokens,
-                judge_reservation=settings.judge_call_reservation_tokens,
-                clock=clock,
-                sleep=sleep,
-            )
+        # ⚠️⚠️ **`Q-179`(3), RULED 2026-09-04 — THE PACER IS BUILT ON EVERY RUN, INCLUDING A
+        # DRY ONE.** This used to read `paced = client` and wrap it only
+        # `if request.spend_real_tokens:`, so a `--dry-run` dispatched through the **raw**
+        # client and `_PacedClient.__init__`, `_agree` and `_pace` were **never executed**.
+        # ⚠️ **A REHEARSAL THAT CANNOT ENTER THE PATH THE REAL RUN TAKES IS NOT A
+        # REHEARSAL** — and it is not a theoretical gap: `Q-179`(1)'s pacer race lived on
+        # exactly the lines a dry run skipped, so no amount of rehearsing could have found
+        # it and only spending could.
+        # ⚠️ **IT COSTS NO WALL-CLOCK TIME**, which is the ruling's own condition: a dry run
+        # that names no clock is given the virtual pair built in :func:`_pacing_clock`, so
+        # the buckets' arithmetic is driven in full while the wall clock does not move.
+        paced = _PacedClient(
+            inner=client,
+            attacker_buckets=attacker_state.buckets,
+            judge_buckets=judge_state.buckets,
+            attacker_reservation=settings.attacker_call_reservation_tokens,
+            judge_reservation=settings.judge_call_reservation_tokens,
+            clock=clock,
+            sleep=sleep,
+        )
 
         world = world_semantics.build(
             world_generator.generate_world(seed), semantics_spec, oracle
