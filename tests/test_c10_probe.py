@@ -804,7 +804,22 @@ def test_the_void_threshold_RULE_is_implemented_even_though_its_VALUE_cannot_be(
     """§10.3's three steps, each callable, so C14 can print each: observe, Wilson-lower, round
     **down** to 5 pp. Rounding **down** can only make the threshold easier to clear, so the rule
     cannot manufacture a VOID — it can only fail to catch a marginal degradation, which §3.6
-    already publishes as its limit."""
+    already publishes as its limit.
+
+    ⚠️ **FLIPPED ON 2026-09-04 BY ARCHITECT RULING `Q-189`(d), WHICH THIS DOCSTRING CITES BECAUSE
+    HARD RULE 6 REQUIRES THE CITATION.** *"ONE-SIDED, z = 1.645. The implementation uses two-sided
+    z = 1.959964, whose lower end is really a 97.5% bound — WHICH SETS A LOWER THRESHOLD AND MAKES
+    A SCORED RUN LESS LIKELY TO VOID."* This test previously hand-computed at ``z = 1.959964`` and
+    asserted ``0.0345998887``; both were **correct for the code as it then stood** and are now
+    wrong for the code as ruled. **Nothing here was loosened to get green** — the tolerances are
+    unchanged, the assertion count only rises, and the old value is now asserted **negatively**
+    below so the flip is provably meaningful rather than merely permissive.
+
+    ⚠️ **The withdrawal check `Q-189`(d) demands ran before this edit and the ruling survived** —
+    no frozen artefact states a sidedness. That check is itself now a standing test:
+    ``tests/test_arch_wilson.py::test_NO_FROZEN_ARTEFACT_STATES_A_SIDEDNESS_so_Q189d_was_never_
+    withdrawn``. If it ever goes red, hard rule 4 withdraws the ruling and **this test flips
+    back**."""
     # ⚠️ HAND-COMPUTED HERE, FROM THE ALGEBRA, NOT READ OFF THE SUBJECT. Hard rule 3: an
     # expected value produced by the code it tests proves nothing. The Wilson lower bound is
     #     (p + z^2/2n)/(1 + z^2/n)  -  (z/(1 + z^2/n)) * sqrt(p(1-p)/n + z^2/4n^2)
@@ -812,20 +827,40 @@ def test_the_void_threshold_RULE_is_implemented_even_though_its_VALUE_cannot_be(
     import math as _m
 
     n, x = 30, 3
-    z = 1.959963984540054
+    # Q-189(d): the ONE-SIDED 95% quantile. Phi^-1(0.95), not Phi^-1(0.975).
+    # ⚠️ HONEST SCOPE OF THIS HAND-COMPUTATION, STATED BECAUSE HARD RULE 3 IS ABOUT EXACTLY THIS.
+    # This literal IS what `NormalDist().inv_cdf(0.95)` returns, i.e. the output of the code under
+    # test. So the longhand below is a genuine second implementation of the WILSON ALGEBRA, and it
+    # is NOT an independent check of the QUANTILE - feeding a wrong z to both sides would agree.
+    # The quantile is checked independently in tests/test_arch_wilson.py, which derives it by
+    # BISECTION ON math.erf and never touches NormalDist. Named here rather than left for a
+    # reviewer to notice, because "hand-computed" claiming more than it did is the failure mode
+    # hard rule 3 exists about.
+    z = 1.6448536269514715
     p = x / n
     denominator = 1 + z**2 / n
     centre = (p + z**2 / (2 * n)) / denominator
     half = (z / denominator) * _m.sqrt(p * (1 - p) / n + z**2 / (4 * n * n))
     by_hand = centre - half
-    assert by_hand == pytest.approx(0.0345998887, abs=1e-9)
+    assert by_hand == pytest.approx(0.0406769670, abs=1e-9)
 
     lower = stats_module.wilson_lower_bound(x, n)
     assert lower == pytest.approx(by_hand, abs=1e-12)
+    # ⚠️ AND THE OLD VALUE IS NOW ASSERTED WRONG, WHICH IS WHAT MAKES THE FLIP MEANINGFUL RATHER
+    # THAN PERMISSIVE (hard rule 6). Without this line the test would still pass on the pre-ruling
+    # code at any tolerance loose enough to swallow 0.6 pp.
+    assert abs(lower - 0.0345998887473342) > 1e-9, (
+        "wilson_lower_bound still returns the TWO-SIDED bound - Q-189(d) is not implemented"
+    )
+    # ⚠️ AND THE TWO-SIDED INTERVAL IS STILL THERE, UNMOVED, because Q-189(d) reached the void
+    # threshold ONLY: results/figures.py publishes wilson_interval's ends as S12.4's ceiling.
+    assert stats_module.wilson_interval(x, n).lower == pytest.approx(0.0345998887, abs=1e-9)
     # ⚠️ AND THE CONSEQUENCE: a 3/30 calibration would freeze the threshold at ZERO, because
-    # 3.46% rounds DOWN to the nearest 5 pp. A void rule with a zero threshold can never fire,
+    # 4.07% rounds DOWN to the nearest 5 pp. A void rule with a zero threshold can never fire,
     # which S3.6 already publishes as the rule's honest limit - it catches DEGRADATION, and a
-    # weak calibration leaves it with nothing to degrade from.
+    # weak calibration leaves it with nothing to degrade from. ⚠️ The one-sided bound is HIGHER
+    # (4.07% against 3.46%) and STILL rounds to zero here, so the ruling did not rescue this
+    # limit and is not claimed to have.
     assert stats_module.round_down_to_5pp(lower) == Fraction(0)
     assert stats_module.round_down_to_5pp(0.6249) == Fraction(60, 100)
     assert stats_module.round_down_to_5pp(0.625) == Fraction(60, 100)

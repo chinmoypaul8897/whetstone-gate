@@ -6,17 +6,33 @@ published table **by computation** — ±13.9 pp at n=50 / ±17.9 at n=30 / ±43
 McNemar exact, paired bootstrap over seeds (10,000 resamples), rule-of-three at n ≥ 30 and exact
 one-sided Clopper–Pearson below it"*.
 
-⚠️ **THE TWO INTERVALS IN §12.4's TABLE ARE NOT THE SAME INTERVAL, AND CONFLATING THEM IS THE
-EASIEST WAY TO GET THIS FILE WRONG.**
+⚠️ **THE INTERVALS IN THIS FILE ARE NOT THE SAME INTERVAL, AND CONFLATING THEM IS THE EASIEST
+WAY TO GET IT WRONG. THERE ARE THREE, AND THEY DO NOT SHARE A ``z``.**
 
   * The **±pp half-width column** is the textbook **normal-approximation (Wald)** half-width,
     ``z × sqrt(p(1−p)/n)``, quoted *at* a stated ``p`` — §12.4's own column headings are *"95% CI
     half-width **at p≈0.5**"* and *"**at p=0.8**"*. A Wilson interval is **not symmetric**, so it
-    has no single half-width and cannot produce that table at all.
-  * The **void threshold** is the **Wilson score** lower bound (§10.3), because it is computed on
-    an observed rate near the edge where the Wald interval is known to misbehave.
+    has no single half-width and cannot produce that table at all. **TWO-SIDED.**
+  * The **published ceiling on a measured non-zero rate** is the **two-sided Wilson score
+    interval** — :func:`wilson_interval`, consumed by
+    :func:`whetstone_gate.results.figures.ceiling_for`, which publishes *both* its ends.
+    **TWO-SIDED, and correctly so:** §12.4.4 attaches an interval to a measurement.
+  * The **void threshold** is the Wilson **LOWER BOUND** (§10.3) — :func:`wilson_lower_bound`.
+    ⚠️ **ONE-SIDED, z ≈ 1.645, BY ARCHITECT RULING `Q-189`(d), 2026-09-04.** A 95% *lower* bound
+    is a one-sided bound; taking the lower end of a two-sided 95% interval yields a **97.5%**
+    bound, which sets a **lower** threshold and makes a scored run **less likely to VOID** —
+    the self-serving direction. See :func:`one_sided_z`.
 
-Both are implemented, separately, and :func:`published_table` regenerates §12.4's grid from
+⚠️ **WHY :func:`wilson_interval` AND :func:`wilson_lower_bound` DO NOT SHARE THEIR ``z``, WHICH IS
+THE WHOLE POINT OF THIS FILE'S SHAPE.** Until 2026-09-04 they did: ``wilson_lower_bound`` was
+``wilson_interval(...).lower``, so **one ``z`` fed two different published numbers**. Implementing
+`Q-189`(d) by changing :func:`wilson_interval`'s ``z`` — or by changing
+``statistics.confidence_level`` in ``config/`` — would have satisfied the ruling **and silently
+moved §12.4's published ceiling**, which `PROCESS.md` §12's C10 done-when pins *by computation*.
+The algebra is shared through :func:`_wilson_bounds`; **the quantile is not**. `Q-189`(d) residual 2
+records the coupling; `INCIDENTS.md` **INC-155** records that no test would have caught the move.
+
+All three are implemented separately, and :func:`published_table` regenerates §12.4's grid from
 ``config/``'s confidence level so that the six published half-widths and the three published
 ceilings are **checked, not transcribed**.
 
@@ -82,6 +98,39 @@ def two_sided_z(level: float | None = None) -> float:
     return NormalDist().inv_cdf(1.0 - (1.0 - level) / 2.0)
 
 
+def one_sided_z(level: float | None = None) -> float:
+    """The **one-sided** normal quantile for ``level``. ⚠️ **`Q-189`(d), 2026-09-04.**
+
+    ⚠️ **THIS IS NOT :func:`two_sided_z` AND THE DIFFERENCE IS THE RULING.** At the configured
+    95%, this is ``Φ⁻¹(0.95) ≈ 1.6449`` where :func:`two_sided_z` is ``Φ⁻¹(0.975) ≈ 1.9600``.
+    The ruling, verbatim: *"ONE-SIDED, z = 1.645. The implementation uses two-sided z = 1.959964,
+    whose lower end is really a 97.5% bound — ⚠️ WHICH SETS A LOWER THRESHOLD AND MAKES A SCORED
+    RUN LESS LIKELY TO VOID. That is the self-serving direction. A 95% LOWER bound is one-sided."*
+
+    ⚠️ **IT COSTS US AND CAN ONLY EVER COST US, WHICH IS WHY IT IS SAFE TO RULE AFTER A FREEZE.**
+    The one-sided bound is **higher at every observed rate** (measured across 9/30 … 30/30), and
+    `HOLES.md` §3.5 makes *below* the calibrated threshold the VOID condition — so a higher
+    threshold makes voiding **our own run** more likely. It is the self-critical direction.
+
+    ⚠️ **DERIVED, NEVER WRITTEN DOWN — hard rule 9.** ``1.645`` is as hardcoded in practice as
+    ``1.96`` and is a rounding of 1.6448536269514715. It comes from the **same**
+    ``statistics.confidence_level`` in ``config/`` that :func:`two_sided_z` reads, through the
+    standard library's own inverse normal CDF. There is **one** configured level; what differs
+    between the two functions is the tail, which is a property of the *question*, not a constant.
+
+    ⚠️ **AND NO FROZEN ARTEFACT CONTRADICTS IT — CHECKED, NOT ASSUMED.** The ruling withdraws
+    itself if any frozen artefact states a sidedness *in terms*. Six frozen statements name this
+    bound — `PROTOCOL.md`:630 and :649, `HOLES.md`:284, `PROVENANCE.md`:324 and :719, and
+    ``config/protocol.yaml``:349 — and **not one states a sidedness or a z**. Five of the six say
+    *"95% Wilson **lower bound**"*; only `HOLES.md` says *"the lower bound of the 95% Wilson
+    **interval**"*. `PROTOCOL.md`'s two sidedness words are about **different tests** — McNemar
+    (two-sided) and Clopper–Pearson (one-sided). Rule 4 was applied and did not fire.
+    """
+    if level is None:
+        level = confidence_level()
+    return NormalDist().inv_cdf(level)
+
+
 # --------------------------------------------------------------------------------------
 # 1. The Wald half-width — §12.4's ±pp column, and ONLY that column.
 # --------------------------------------------------------------------------------------
@@ -118,31 +167,72 @@ class Interval:
         return math.isclose(self.point - self.lower, self.upper - self.point, abs_tol=1e-12)
 
 
-def wilson_interval(successes: int, n: int, level: float | None = None) -> Interval:
-    """The **Wilson score interval** on ``successes/n``.
+def _refuse_unless_a_proportion(successes: int, n: int) -> None:
+    """The two refusals every Wilson computation owes, **held here so neither can lose them**.
 
-    §10.3: the void threshold is *"the LOWER BOUND of the 95% Wilson interval on the observed
-    arm-1 probe-breach rate, ROUNDED DOWN to the nearest 5 pp"* — see :func:`wilson_lower_bound`
-    and :func:`round_down_to_5pp`, which are kept separate so that C14 can print each step.
-
-    Wilson rather than Wald because the calibration observes a rate that may sit near 0 or 1,
-    where the Wald interval famously runs outside ``[0, 1]`` and undercovers badly.
+    ⚠️ **EXTRACTED ON PURPOSE, AND THIS IS THE FAILURE MODE IT EXISTS TO PREVENT.**
+    :func:`wilson_lower_bound` used to inherit these by *delegating* to :func:`wilson_interval`.
+    Splitting the ``z`` broke that delegation, and the obvious rewrite — inlining the algebra into
+    :func:`wilson_lower_bound` — would have **silently dropped both refusals** from the one
+    function whose output is frozen into ``config/``. A refusal lost in a refactor is invisible
+    until the input that needed it arrives, which for ``n = 0`` is exactly hard rule 11's
+    *"an empty population must not read as a result"*.
     """
     if n <= 0:
         raise ValueError(f"a Wilson interval over {n} observations is undefined.")
     if not 0 <= successes <= n:
         raise ValueError(f"{successes} successes out of {n} is not a proportion.")
-    z = two_sided_z(level)
+
+
+def _wilson_bounds(successes: int, n: int, z: float) -> tuple[float, float, float]:
+    """The Wilson score algebra, **parameterised by ``z``**, returned as ``(lower, upper, p)``.
+
+    ⚠️ **THE ALGEBRA IS SHARED; THE QUANTILE IS NOT.** This is the whole shape of `Q-189`(d)'s
+    correct implementation. Writing the algebra twice would invite the two copies to drift;
+    sharing the ``z`` is what produced the defect the ruling's residual 2 names. So exactly one
+    thing is shared, exactly one thing is not, and each caller states its own tail.
+
+    Not a public name: nothing outside this module should be choosing a ``z`` for itself.
+    """
     p = successes / n
     denominator = 1.0 + z * z / n
     centre = (p + z * z / (2 * n)) / denominator
     half = (z / denominator) * math.sqrt(p * (1.0 - p) / n + z * z / (4.0 * n * n))
-    return Interval(lower=max(0.0, centre - half), upper=min(1.0, centre + half), point=p)
+    return (max(0.0, centre - half), min(1.0, centre + half), p)
+
+
+def wilson_interval(successes: int, n: int, level: float | None = None) -> Interval:
+    """The **two-sided Wilson score interval** on ``successes/n``.
+
+    ⚠️ **TWO-SIDED, AND IT MUST STAY TWO-SIDED.** Its consumer is
+    :func:`whetstone_gate.results.figures.ceiling_for`, which publishes **both** ends as §12.4.4's
+    ceiling on a measured non-zero rate. `Q-189`(d) is about the **void threshold**, which is
+    :func:`wilson_lower_bound` — a different function, a different tail, and since 2026-09-04 a
+    different ``z``. **Changing the quantile here moves a published number**, and
+    ``tests/test_c10_probe.py`` pins these values precisely so that it cannot happen quietly.
+
+    Wilson rather than Wald because the calibration observes a rate that may sit near 0 or 1,
+    where the Wald interval famously runs outside ``[0, 1]`` and undercovers badly.
+    """
+    _refuse_unless_a_proportion(successes, n)
+    lower, upper, p = _wilson_bounds(successes, n, two_sided_z(level))
+    return Interval(lower=lower, upper=upper, point=p)
 
 
 def wilson_lower_bound(successes: int, n: int, level: float | None = None) -> float:
-    """§10.3's input to the frozen void threshold."""
-    return wilson_interval(successes, n, level).lower
+    """§10.3's input to the frozen void threshold. ⚠️ **ONE-SIDED — `Q-189`(d), 2026-09-04.**
+
+    ⚠️ **NOT** ``wilson_interval(...).lower``, which is what it was until this ruling landed and
+    which is a **97.5%** bound wearing a 95% label. See :func:`one_sided_z` for the ruling
+    verbatim, the direction-of-harm argument, and the frozen-artefact check that had to pass
+    before it could be implemented.
+
+    The step after this one is :func:`round_down_to_5pp`; they are kept separate so C14 can print
+    the observed rate, the bound and the rounded threshold as three distinct numbers.
+    """
+    _refuse_unless_a_proportion(successes, n)
+    lower, _upper, _point = _wilson_bounds(successes, n, one_sided_z(level))
+    return lower
 
 
 def round_down_to_5pp(proportion: float) -> Fraction:
