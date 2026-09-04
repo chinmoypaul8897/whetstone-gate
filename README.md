@@ -49,7 +49,7 @@ below is estimated and no placeholder was filled to produce it.
 | `selections.tfp_task_count` | `config/protocol.yaml` line 421 | ⚠️ **`40` at this commit — and degradation rung 4 has FIRED, cutting it to 20.** The cut is declared and recorded (`INC-144`); its execution in `config/` was still owed. [§9.3](#93-rung-4-fired--t-fp-the-false-positive-block-40-write-tasks-cut-to-20) |
 | `evals/` | `find evals -type f \| wc -l` | ⚠️ **26 files** (it was **one** on 2026-09-03): 11 episode ledgers, 11 checkpoints, 3 usage logs, 1 declaration. **All 26 are the pilot's. There is no sweep run directory and no `evals/results/`** |
 | **the sweep** | every checkpoint's `block` field; `git log --all -- evals/` | ⚠️ **HAS NOT RUN.** The distinct set of `block` values across all 11 checkpoints is **`['PILOT']`** — zero episodes for M-ADV, T-NEG, T-FP, M-BEN or AD-CMP, and none has ever existed on any ref |
-| **the test suite** | `make test`, and the dated counts in `docs/sessions/` | ⚠️ **RED, AND RED FOR DAYS: `5 failed, 1451 passed, 2 skipped`** at `arch-lanes-1`'s final tree. Also `5 failed, 1421 passed, 2 skipped` (`arch-pilot-run-4.txt`:304) and `5 failed, 1419 passed, 2 skipped, 2 deselected` (`arch-night-1.txt`:537). **See below — the number is dated on purpose** |
+| **the test suite** | `make test` run **live** at this commit, plus the dated counts in `docs/sessions/` | ⚠️ **RED, UNDER BOTH INSTRUMENTS, AND THEY ARE DIFFERENT INSTRUMENTS WITH DIFFERENT NUMBERS.** `make test` **live at `3f07907`: `7 failed, 1447 passed, 2 skipped, 2 deselected`, exit 1** — ⚠️ **but 3 of the 7 are artefacts of another session's uncommitted edits in this shared tree, not of the committed tree.** Bare `pytest`: `5 failed, 1451 passed, 2 skipped` (`arch-lanes-1.txt`:517). **See the third precision note below — the instrument, not just the number, is the thing to get right** |
 
 ⚠️ **THREE PRECISION NOTES, BECAUSE THE SHORT FORM OF EACH IS THE ONE THIS PROJECT WOULD BE CAUGHT ON.**
 
@@ -68,13 +68,31 @@ below is estimated and no placeholder was filled to produce it.
    reaches `config/` for the threshold **raises**, no entry point supplies one from anywhere else, and
    the calibration that would set it has not run. **The precise form — the repository's own, at
    `void.py` and `Q-106` — is *"no VOID verdict is computable FROM `config/` today, on any input."***
-3. ⚠️ **A SUITE COUNT IN A DOCUMENT IS STALE THE MOMENT ANOTHER SESSION LANDS A TEST**
-   (`OF-214`), which is why [§13.7](#137--a-suite-count-here-is-not-reproducible) refuses to print a
-   bare total and tells you to run `make test` yourself. **That instruction stands.** The three counts
-   above are printed **with their commits and their dates** for one purpose only: to establish that
-   the suite has been red **across days and across sessions**, which no single number can show. **The
-   five surviving failures are named and attributed in `docs/sessions/arch-lanes-1.txt` §10**, and
-   none is new.
+3. ⚠️⚠️ **"THE SUITE IS RED" IS TRUE; "RED FOR DAYS" IS TRUE OF ONE INSTRUMENT AND OVERSTATES THE
+   OTHER — AND AN EARLIER DRAFT OF THIS BOX ATTRIBUTED A BARE-`pytest` FIGURE TO `make test`. BOTH
+   ARE CORRECTED HERE RATHER THAN QUIETLY.** `make test` is `python -m whetstone_gate.tasks test`,
+   which runs `pytest -q -m "not operator_gate"` (`tasks.py:80`) and **deselects 2 tests**; bare
+   `pytest` runs all **1458**. The tell is the word *deselected* in a reported count.
+
+   | instrument | count | when | red since |
+   |---|---|---|---|
+   | **`make test`** | **`7 failed, 1447 passed, 2 skipped, 2 deselected`**, exit 1 | **run live at `3f07907`, 2026-09-04** | **2026-09-03 04:20 IST** — last recorded GREEN was `801 passed, 0 failed, 1 skipped, 2 deselected` earlier that morning (`PROGRESS.md`), first red after at `c8-build-1.txt`. ⚠️ **That is about a day and a half, not "days" — the plural overstates this instrument** |
+   | bare `pytest` | `5 failed, 1451 passed, 2 skipped` | `arch-lanes-1.txt`:517, 2026-09-04 | **at least 2026-08-31** (`c2-review-1.txt`:325, *"2 failed, 230 passed, 1 skipped"*) — ⚠️ **and structurally guaranteed**, because a bare run includes the deliberately-red `operator_gate` file that `make test` deselects |
+
+   ⚠️ **`5 / 1451` IS A BARE-`pytest` NUMBER AND CANNOT BE A `make test` ONE.** `5 + 1451 + 2 = 1458`
+   — the full collection, with nothing deselected — and one of its five failures,
+   `test_lanes_operator_placeholders.py::test_the_camel_branch_is_decided_before_any_camel_run`, sits
+   in a file carrying `pytestmark = pytest.mark.operator_gate` (`:56`), **so `make test` cannot report
+   it.** The other four are pre-existing and are named and attributed in
+   `docs/sessions/arch-lanes-1.txt` §10.
+   ⚠️ **AND THE LIVE RUN DEMONSTRATES `OF-214` RATHER THAN MERELY CITING IT: 3 of its 7 failures are
+   the shared tree, not the code** — `test_c14_prereg`'s *"`config/` has uncommitted changes"*,
+   `test_c3_tau2_enumeration`'s *"assert 20 == 40"* (a concurrent session mid-way through executing
+   rung 4), and `test_repo_invariants`' object-store-vs-working-tree check, which named **this
+   session's own uncommitted `README.md` among the offenders.** **A suite count taken in a
+   multi-session tree measures the sessions as much as the code.**
+   [§13.7](#137--a-suite-count-here-is-not-reproducible) still says what it said: **run the target
+   yourself.**
 
 **What follows from that, stated rather than implied:**
 
@@ -1566,12 +1584,19 @@ stale the moment another session lands a test — and this repository has had **
 sessions writing all day.** So this README prints **no suite total as a current fact**, and instead
 names what a reader should do: **run `make test` yourself and read the number it prints.**
 
-⚠️ **AND THE STATUS BOX NOW PRINTS THREE SUITE COUNTS, WHICH IS NOT A REVERSAL OF THAT RULE — SO THE
+⚠️ **AND THE STATUS BOX NOW PRINTS SUITE COUNTS, WHICH IS NOT A REVERSAL OF THAT RULE — SO THE
 DISTINCTION IS WRITTEN OUT RATHER THAN LEFT TO BE SPOTTED.** OF-214's defect is an **undated** count
-presented as the tree's present state. What the STATUS box carries is **three counts, each pinned to a
-session, a file and a line**, whose only job is to establish a property no single number can: **the
-suite has been red across days and across sessions.** ⚠️ **Do not read any of the three as the count
-you will get.** Run the target.
+presented as the tree's present state. What the STATUS box carries is counts **pinned to an
+instrument, a commit, a session and a line**, whose job is to establish a property no single number
+can: **the suite is red, under both instruments, and has been across sessions.** ⚠️ **Do not read any
+of them as the count you will get.** Run the target.
+
+⚠️⚠️ **AND `OF-214` WAS DEMONSTRATED RATHER THAN CITED WHILE THIS SECTION WAS BEING WRITTEN.** The
+live `make test` at `3f07907` returned **7 failures, and 3 of them were the shared working tree** —
+another session's uncommitted `config/protocol.yaml` mid-rung-4, and an object-store-versus-worktree
+check that **named this very file among the offenders because it was itself uncommitted at the time.**
+**A suite count taken in a multi-session tree measures the sessions as much as the code**, which is
+`OF-214`'s claim arriving as evidence.
 
 Every measurement in the C19 build session's version of this README was taken on the tree at commit
 `a691d13` with a clean shared index. **Two other sessions were live in the same working tree while it
