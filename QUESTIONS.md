@@ -132,6 +132,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `4b8e12c9` | ARCH | FIX | 2026-09-04 |
 | `6d1a94f3` | ARCH | FIX | 2026-09-04 |
 | `8f3c72e1` | ARCH | FIX | 2026-09-04 |
+| `9a4d63b2` | C14 | FIX | 2026-09-04 |
 
 ⚠️⚠️ **THE `5d7e2b91` ROW IS SELF-RECORDED, AND IT IS THE ROW FOR A TOKEN THAT WAS ISSUED TO **TWO**
 LIVE SESSIONS.** `QUESTIONS.md` `Q-180` and `Q-187` — two independent detections of one event.
@@ -15405,3 +15406,89 @@ TURNED THE CHECK GREEN:**
 **OWED TO: `ARCH PUBLISH 1`, or to the operator if that session has ended.** One row:
 `` | `2e5b8a47` | ARCH | FIX | 2026-09-04 | ``. Until it exists, `make check-roles` reports
 **20 passed, 1 failed, 3 n/a**, and this session's `STATUS.md` row says so rather than rounding it up.
+
+---
+
+## ⚠️ `Q-193` — ONE RULING RECORDED VERBATIM: WIRING `liveness_refusal` INTO PREFLIGHT (ARCH CAL PREP 1, `9a4d63b2`)
+
+**Recorded by ARCH CAL PREP 1, `9a4d63b2`, 2026-09-04.** Hard rule 5: **recorded before this session
+touched a line of code.** The ruling arrived in this session's prompt, authored by the architect
+console (session `99119ca6`, re-measured live in this tree at `2026-09-04T09:02Z` and **read-only by
+role** — **zero `Write`, `Edit` or `NotebookEdit` across its whole 2,380-record transcript**).
+
+⚠️ **`git rev-parse prereg-v1` DOES NOT RESOLVE — verified as this session's first act.** This
+ruling touches `src/` and `tests/` only, not `config/`, so the window is not what makes it legal;
+it is verified and recorded because the prompt requires it before any `config/`-adjacent act.
+
+### ⚠️ RULING ON WIRING `liveness_refusal` (architect, 2026-09-04) — VERBATIM
+
+> "`liveness_refusal` was built by arch-lanes-1 and is CALLED FROM NOTHING — it exists at
+>  driver/run.py:568 and no code path reaches it. ⚠️ WIRE IT INTO preflight, BEFORE the calibration.
+>  The pilot's two failures were a lane that 429'd at turn 8 and a lane that 403'd on every call, and
+>  BOTH would have been refused before a token was spent. It costs ONE CALL PER LANE. ⚠️ IT MUST
+>  REFUSE, NOT WARN, and it must NAME EVERY DEAD LANE rather than only the first. Class B: it changes
+>  no reported number — it changes whether an unrepeatable artefact is spent against a dead lane.
+>  ⚠️ THE COST IS DISCLOSED, NOT HIDDEN: each run's own liveness calls are spend, and they are
+>  written to a SEPARATE usage file as arch-lanes-1 did, never into the run's own log."
+
+### ⚠️ THE RULING'S PREMISE WAS VERIFIED RATHER THAN ACCEPTED, AND IT IS TRUE
+
+    grep -rn "liveness_refusal" --include=*.py src/ | grep -v "def liveness_refusal"
+      -> EMPTY. Called from nothing, exactly as the ruling states.
+    src/whetstone_gate/driver/run.py:568  def liveness_refusal(...)   -> the line is exact.
+    tests/test_arch_lanes.py:815-857      four tests drive it as a PURE FUNCTION and pass.
+
+⚠️ **THE FOUR EXISTING TESTS ARE WHY THIS DEFECT SURVIVED, AND THAT IS THE POINT WORTH RECORDING.**
+They assert everything about `liveness_refusal` **except that anything calls it** — every one of them
+invokes it directly. **A function can be fully specified, fully tested and entirely unreachable, and
+a green suite says nothing about the difference.** This is `INC-138`'s species seen from the other
+side: there, the only test of a shipped path had been deleted; here, the tests exist and the path
+does not. The new tests added under this ruling therefore drive **`preflight`**, never
+`liveness_refusal`, because the reachability is the whole content of the change.
+
+### ⚠️ WHAT THIS SESSION IMPLEMENTED, AND THE TWO CHOICES INSIDE THE RULING THAT IT HAD TO MAKE
+
+**(1) WHERE IN PREFLIGHT — LAST, AFTER EVERY FREE REFUSAL.** The ruling says *"wire it into
+preflight"* and does not say where in it. It is placed **at the end of the real-run path**, after
+`probe-v1`, after the lane reservations, after the key **names**, after the day's usage file and
+after the corpus resolve. ⚠️ **The reason is that this is the ONLY precondition that itself
+spends.** Every other check is free, so ordering liveness first would spend one call per lane to
+discover a refusal a free check was about to make anyway. **A guardrail against wasted spend that
+wastes spend to run is the wrong shape.**
+
+**(2) A DRY RUN PROBES NOTHING, AND THAT IS A REFUSAL TO SPEND RATHER THAN A GAP.** `--dry-run`
+dispatches to a `TranscriptClient` and makes no network call; a liveness probe on that path would be
+the only real provider call in a rehearsal, which is precisely what `--dry-run` promises not to do.
+⚠️ **THE COST OF THAT CHOICE IS STATED RATHER THAN HIDDEN: the rehearsal therefore CANNOT tell the
+operator whether the lanes are alive.** That is the same gap `INC-142`'s `Expectation` field names
+— *"the rehearsal is the artefact that is supposed to tell an operator whether the run will work"* —
+and this session does **not** claim to have closed it. What is closed is the narrower thing the
+ruling names: the **real** run refuses before spending. A test asserts the dry-run path makes zero
+probe calls, so the choice is pinned rather than left to a reader's trust.
+
+### ⚠️ THE DISCLOSED COST, IN NUMBERS
+
+**One call per lane, per real run.** The calibration dispatches on **one** lane (`gemma-26b`), so the
+calibration's liveness cost is **1 call**. Its tokens are whatever a one-token probe returns —
+`arch-lanes-1` measured 21 tokens for the equivalent probe (`evals/usage/liveness-8f3c72e1-2026-09-04.jsonl`).
+Against `Q-189`(b)'s ceilings of **600 calls / 4,800,000 tokens** this is **0.17% of the call ceiling
+and under 0.0005% of the token ceiling**.
+
+⚠️ **AND IT IS WRITTEN TO A SEPARATE USAGE FILE, `evals/usage/liveness-<token>-<date>.jsonl`, EXACTLY
+AS `arch-lanes-1` DID AND FOR ITS REASON:** appending to `<lane>-<date>.jsonl` would alter the file
+`INC-143`'s eight measured numbers are read from and that this project's own tests replay.
+⚠️ **THE COST OF *THAT* CHOICE IS ALSO `arch-lanes-1`'s OWN, RESTATED RATHER THAN REDISCOVERED:** a
+later preflight reading `<lane>-<date>.jsonl` will **not** see these calls and will under-count the
+day's spend by them. **Disclosed, not fixed by contaminating the record.**
+
+### ⚠️ WHAT THIS RULING DOES NOT SAY, RECORDED SO IT IS NOT READ INTO IT
+
+1. It does **not** make the liveness probe part of `RUN_DECLARED.md` §7.3's seven preconditions.
+   Those are a frozen list in a **pushed** declaration for the **pilot**; this is an eighth check
+   that did not exist when that file was written. `evals/cal/RUN_DECLARED.md` §7.3 names it as its
+   own row **8**, because that file is being written now and can name what is true now.
+2. It does **not** claim the probe proves a lane will *complete* an episode. `gemma-26b` was alive
+   at the pilot's start and still took a 429 at turn 8. ⚠️ **A liveness probe separates *"the lane
+   is dead"* from *"the lane was paced too fast"*; it does not predict the second.** `Q-191`'s
+   sliding window is the change aimed at that, and it is a different one.
+3. It does **not** close `OF-240`, `Q-143` or `Q-145`.
