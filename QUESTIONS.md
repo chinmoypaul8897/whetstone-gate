@@ -126,6 +126,8 @@ appears that was never issued**, or if a token is reused across roles.
 | `d4e7b920` | ARCH | FIX | 2026-09-04 |
 | `5f8a3e61` | ARCH | FIX | 2026-09-04 |
 | `5d7e2b91` | ARCH | FIX | 2026-09-04 |
+| `8c47b1e0` | ARCH | FIX | 2026-09-04 |
+| `c7b41f6a` | ARCH | FIX | 2026-09-04 |
 
 ⚠️⚠️ **THE `5d7e2b91` ROW IS SELF-RECORDED, AND IT IS THE ROW FOR A TOKEN THAT WAS ISSUED TO **TWO**
 LIVE SESSIONS.** `QUESTIONS.md` `Q-180` and `Q-187` — two independent detections of one event.
@@ -14378,3 +14380,76 @@ adjustments to apply*; **this is a third figure neither side computed** — the 
 is one too high, for a reason that is a defect in the parser rather than a judgement about a finding.
 ⚠️ **It is NOT fixed here.** `src/whetstone_gate/results/loader.py` is outside this session's fence,
 and changing how open findings are counted moves a number `README.md` publishes, which is Class A.
+
+---
+
+## ⚠️ FOUR RULINGS RECORDED VERBATIM — `Q-179`(1)(2)(3), `Q-174`, `Q-183`, RULED 2026-09-04 BY THE ARCHITECT (ARCH ROLE FIX, `c7b41f6a`)
+
+**`CLAUDE.md` hard rule 5: rulings are recorded verbatim in `QUESTIONS.md` before anything else is
+touched.** These four arrived in the `c7b41f6a` prompt, GATE 0, and are transcribed here **word for
+word**, dated **2026-09-04**, attributed to **the architect**. Nothing is paraphrased, summarised,
+reordered or abridged; the emphasis marks are the architect's own.
+
+⚠️ **APPENDED, NOT MERGED INTO THE `Q-179` / `Q-174` / `Q-183` ENTRIES ABOVE.** A second live session
+is in this working tree (`INC-140`, below), and `INC-136`'s measured remedy is that *"all subsequent
+writes to the four shared documents are **pure appends** (`>>`), never read-modify-write, because two
+sessions rewriting a 761 KB file from separate in-memory reads is a lost-update race that `git`
+cannot see."* The rulings are therefore recorded **here**, at the end of the file, and the entries
+they rule are named in each heading so the link is not lost.
+
+---
+
+### RULING ON `Q-179`(1) — THE PACER'S TWO CLOCK READS
+
+> "`_pace` reads the clock twice and lets the second reading refuse what the first authorised.
+>  FIX IT BY READING THE CLOCK ONCE AND LETTING THAT ONE READING DECIDE BOTH: take `now` once,
+>  ask `wait_seconds` against it, and if the wait is not positive call `take` WITH THAT SAME
+>  `now`; otherwise sleep and loop. ⚠️ NO EPSILON, NO TOLERANCE, NO GRACE CONSTANT — a tolerance
+>  is a hardcoded spec value and hard rule 9 forbids it. The loop is exact and introduces no
+>  constant. This is Class B: it changes no reported number and no published behaviour."
+
+### RULING ON `Q-179`(2) / `Q-174` — AN UNCAUGHT `BucketError`
+
+> "A `BucketError` escaping `execute` drops every remaining episode and PRINTS NOTHING. That is
+>  hard rule 11's named failure exactly — silent denominator shrinkage — and it is not
+>  permitted. CATCH IT AT THE SAME SITE THAT BOOKS `RateLimited` AND `ProviderFailed`, BOOK IT
+>  AS ITS OWN NAMED COUNTED CATEGORY, AND PRINT IT AS A NUMBER LIKE EVERY OTHER. ⚠️ DO NOT make
+>  it a silent retry and DO NOT fold it into an existing category — a new failure mode gets its
+>  own name. Class B: it converts an unreported loss into a reported one, which is what rule 11
+>  requires. ⚠️ Q-174 IS CLOSED BY THIS SAME RULING."
+
+### RULING ON `Q-179`(3) — `--dry-run` DOES NOT BUILD THE PACER
+
+> "A rehearsal that cannot enter the path the real run takes is not a rehearsal, and last
+>  night's prompt called it 'the only thing between an unreviewed provider boundary and an
+>  unrepeatable run' — which was WRONG, and the session was right to say so. ⚠️ `--dry-run`
+>  MUST BUILD THE PACER, WITH AN INJECTED CLOCK AND AN INJECTED SLEEP so it costs no wall-clock
+>  time. `execute` already takes `clock` and `sleep` parameters. Class B."
+
+### RULING ON `Q-183` — THE GATE JUDGE'S HARDCODED `0.0`
+
+> "⚠️ CLASS A, AND IT IS RULED: the judge temperature is a REQUIRED KEY in `config/lanes.yaml`
+>  WITH NO DEFAULT. A missing value is a hard refusal, never a silent fallback — hard rule 9,
+>  in terms. The `0.0` literal at driver/clients.py:782 GOES, the docstring that asserts the
+>  opposite is CORRECTED, and the value is threaded from config to the request body. ⚠️ THIS IS
+>  LEGAL ONLY WHILE `prereg-v1` DOES NOT RESOLVE. It does not touch the pilot: arm 1 has no
+>  gate (Q-144). ⚠️ CHOOSE NO VALUE YOURSELF — write the key with the value the CONTEXT.md
+>  section governing the judge states; if CONTEXT.md states none, STOP, say so, and leave
+>  config/ untouched, because inventing a spec value is the deviation this ruling exists to
+>  prevent."
+
+---
+
+**`prereg-v1` PRECONDITION, MEASURED BEFORE ANY OF THE FOUR WAS IMPLEMENTED**, because the `Q-183`
+ruling is legal only while the tag does not resolve:
+
+    $ git rev-parse prereg-v1
+    fatal: ambiguous argument 'prereg-v1': unknown revision or path not in the working tree.
+    prereg-v1
+    exit=128
+
+    $ git tag -l
+    c0-pass  c1-pass  c13-pass  c2-pass  c3-pass  c4-pass  probe-v1
+
+**`prereg-v1` DOES NOT RESOLVE. `config/` IS NOT YET FROZEN, AND THE `Q-183` EDIT IS LEGAL.**
+`probe-v1` **does** resolve, at `170bd3ff4abfdd8f87f64055972a60c82cc54efc`.
