@@ -136,6 +136,8 @@ appears that was never issued**, or if a token is reused across roles.
 | `2e5b8a47` | ARCH | FIX | 2026-09-04 |
 | `5c9e08f4` | ARCH | FIX | 2026-09-04 |
 | `3d7f21ac` | C14 | FIX | 2026-09-04 |
+| `7a1e3b52` | C17 | BUILD | 2026-09-04 |
+| `4e8b91d3` | C17 | REVIEW | 2026-09-04 |
 
 ⚠️⚠️ **THE `5d7e2b91` ROW IS SELF-RECORDED, AND IT IS THE ROW FOR A TOKEN THAT WAS ISSUED TO **TWO**
 LIVE SESSIONS.** `QUESTIONS.md` `Q-180` and `Q-187` — two independent detections of one event.
@@ -15679,3 +15681,84 @@ Not fixed here: `CONTEXT.md` is outside this session's fence, and the remedy (a 
 the four captions and diffs them against `published_table()`, in the shape of
 `tests/test_c3_tau2_enumeration.py`, which already parses `CONTEXT.md` §11.1's counts back out of
 the prose) is a chunk's work rather than a line.
+
+## ⚠️ `Q-198` — **THE C17 REVIEW PROMPT PREDICTED TWO `test_repo_invariants` REDS AND THERE WERE THREE. THE THIRD IS THE LIVE CALIBRATION MUTATING A TRACKED FILE, AND IT IS NOT CLEARABLE BY ANY SESSION**
+
+**Raised by:** C17 REVIEW 1 (`4e8b91d3`) · **Date:** 2026-09-04 · **Status:** ⚠️ **OPEN — recorded
+under hard rule 1, which says a prompt and a tree that disagree is a thing to write down, not to
+reconcile silently**
+**Blocking:** nothing. Gate 0 completed and both predicted reds cleared.
+**Deviation class:** **C** for this session (it changed nothing I did); ⚠️ **but it is the
+observable half of `OF-259`, which is MEDIUM and is not C17's.**
+
+**Context.** The prompt stated: *"Verify E1 goes green and that **BOTH** `test_repo_invariants` reds
+clear — they are one fault."* **Measured before Gate 0, there were THREE reds, not two:**
+
+| test | before Gate 0 | after Gate 0 |
+|---|---|---|
+| `test_no_commit_carries_a_forged_or_reused_session_token` | FAIL | **PASS** |
+| `test_check_roles_exits_zero` | FAIL | **PASS** |
+| `test_the_object_store_and_the_working_tree_agree` | FAIL | ⚠️ **STILL FAILS** |
+
+**The prompt's claim is correct about the two it names** — they are one fault, the missing
+`7a1e3b52` issued row, and they cleared together on one row exactly as predicted. **The third is a
+different fault and was already red before this session touched anything.** It compares every tracked
+file's worktree bytes to `git show HEAD:<path>` and named
+`evals/usage/gemma-26b-2026-09-04.jsonl` — **a tracked file the live single-shot calibration is
+appending to**, 13 OK calls beyond HEAD at the time of measurement.
+
+⚠️ **NO SESSION CAN CLEAR IT AND NONE SHOULD TRY.** `evals/` is read-only to a session; the run is
+live; the file is append-only by design. It clears when the **operator** commits that file. After
+Gate 0 it additionally names `QUESTIONS.md`, which is this session's own uncommitted edit and clears
+on this session's commit.
+
+**Why this is worth a question rather than a line in a report.** A red that is **guaranteed to be
+present during every live run** is a red that trains reviewers to discount that test — and this same
+mechanism produced **six further reds** in `test_arch_cal_build.py` and `test_arch_lanes.py` this
+session, which a less careful review would have attributed to C17. **The general shape is `OF-259`:
+a test that pins a committed artefact must read the committed artefact (`git show HEAD:`), not the
+working tree.** `test_the_object_store_and_the_working_tree_agree` is the one test that *legitimately*
+compares the two, so it is not itself defective — it is the canary, and what it is reporting is real.
+
+**Options seen, none of them this review's to choose:**
+  1. **Leave it.** The test is doing its job; the noise is the cost of an append-only `evals/` in a
+     tracked tree. ⚠️ Costs nothing today and costs a misattributed BLOCKER on the day a reviewer
+     stops reading the file list.
+  2. **Exclude `evals/usage/*.jsonl` from that one test, by name, with the reason.** Cheap, and
+     narrows a test — ⚠️ **which hard rule 6 makes a decision requiring a ruling, not a build move.**
+  3. **`.gitignore` the live usage files and commit them only at run end.** Changes the run
+     protocol mid-run; ⚠️ **refuse while the calibration is live.**
+
+**⚠️ THIS REVIEW PICKED NONE OF THEM AND CHANGED NOTHING.** The finding is recorded, the six
+downstream reds are attributed by measurement in `REVIEW_C17_1.md` §2.4, and `OF-259` carries the
+remedy for the helpers that are actually wrong.
+
+---
+
+## ⚠️ `Q-199` — **C17 BUILD 1's SEVEN QUESTIONS OWED: WHICH ONE THIS REVIEW ANSWERED, WHICH ONE IT MEASURED, AND WHICH FIVE ARE STILL THE ARCHITECT'S**
+
+**Raised by:** C17 REVIEW 1 (`4e8b91d3`) · **Date:** 2026-09-04 · **Status:** ⚠️ **OPEN — five of
+seven still owed to the architect**
+**Blocking:** nothing in the FIX session, which is scoped to the review's named findings.
+**Deviation class:** **C** — bookkeeping, so that seven questions raised by a build session are not
+silently absorbed into a FAIL verdict and lost.
+
+⚠️ **A FAIL VERDICT IS NOT AN ANSWER TO A QUESTION THE BUILD SESSION RAISED**, and the risk is that a
+FIX session reads only the findings and treats the seven as closed. They are not.
+
+| # | C17 BUILD 1's question | This review's disposition |
+|---|---|---|
+| **1** | *"§18 says five money bars; §12.2 says the four are never summed. I built four component tracks with five bars each."* | ⚠️ **ANSWERED — the architect RULED, and this review VERIFIED COMPLIANCE rather than re-litigating.** The ruling: four component tracks with five bars each is **CORRECT**; a stacked five-bar chart would put the forbidden sum on screen as a **LENGTH**. **MEASURED:** `race.frame()` loops components outer / arms inner — four labelled tracks, five arm rows each, each track independently scaled; **no stacked bar and no cross-component aggregate anywhere in 130,129 characters of rendered output**. **The build session's choice was the right one and it was right to raise it.** |
+| **2** | *"§18's 1400 ms/turn has no home in `config/`, and `config/` is frozen."* | ⚠️ **STILL OWED.** This review adds one measurement the question lacked: **1400 appears in `CONTEXT.md` at §18 only and is NOT in §8.6's constants table**, which is the tripwire's authoritative list under hard rule 9 — and `tests/conftest.py`'s `implementation_sources` **does** scan `docs/render/`. So `MS_PER_TURN = 1400` is **correctly not a tripwire violation**, and declaring it as a named, overridable, presentation-only module constant is defensible **as built**. The ruling still owed is whether it should become a `config/` key before the video. |
+| **3** | *"The placeholder is spelled `<<PENDING-RUN: N>>`; `README.md` already carries `<<PENDING-RUN: N-branch>>` for what looks like the same quantity."* | ⚠️ **STILL OWED.** Not this review's to harmonise. **What this review can add: no N is invented in either spelling** — 42 placeholder occurrences, zero fabrications, and neither branch value (50, 30) appears anywhere in `docs/render/` source or output. **Whichever spelling wins, nothing false is on screen today.** |
+| **4** | *"`Q-069`'s test does not scan `docs/render/`, and `docs/render/` now imports the ledger."* | ⚠️ **VERIFIED ACCURATE AND FILED AS `OF-262` (LOW).** Re-measured rather than accepted: the red's offenders are `benign/{executor,shell}.py` and `driver/{episode,run}.py` — **zero from `docs/render/`**, so **C17 did not widen that red**. The import is legitimate under `Q-069`'s ruling (the renderer is a replay reader, the same side of the moat as `scorer/`). |
+| **5** | *"The `7a1e3b52` issued row is missing."* | ✅ **CLOSED by this session's Gate 0**, on the architect's instruction naming its exact text. `check-roles` E1 went **red → clean**. ⚠️ **The build session's refusal to write it was correct and is not overturned** — `INC-141`. |
+| **6** | *"Two stored episodes exist for seed 2101 arm 1 (gemma AND qwen). Which one the video's race beat should use is not a build decision."* | ⚠️ **STILL OWED, and this review sharpens it.** The renderer picks `gemma` deterministically (sorted filename) and **discloses the other on screen**, which is the right behaviour. ⚠️ **But the qwen episode at that seed is `EMPTY`, and `B-2` means an `EMPTY` episode currently renders as *"MEASURED ZERO (the episode ran; nothing moved)"* — so if the video were ever pointed at the qwen file, it would put that false sentence on screen.** The choice matters more than the build session could know when it raised it. |
+| **7** | *"`INC-140`'s recipe is only partially executable from inside a session on this machine."* | ⚠️ **STILL OWED — and this review is a second, independent data point.** This session did not attempt the process enumeration at all (its prompt set no such stop condition), so it neither confirms nor refutes the refusal; **it records that the question is unanswered and that a prompt mandating `INC-140` should say what a session does when step 4 is refused.** |
+
+**⚠️ ONE FURTHER ITEM, RAISED BY THIS REVIEW AND NOT BY THE BUILD:** `docs/render/README.md` states
+the socket guard *"proves the capability is absent"*. **It does not** — `ctypes` evades all four
+proofs (`OF-257`). That sentence is in a **submission-facing** artefact, which is why it is filed as
+a finding rather than left as a question.
+
+---

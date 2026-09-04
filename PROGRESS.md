@@ -1,3 +1,88 @@
+## SESSION-TOKEN 4e8b91d3 — C17, REVIEW 1 — 2026-09-04 — ⛔ **FAIL**
+
+**Role:** REVIEW (`code`, downgraded from `full` by rung 5, `INC-63`). **Chunk:** C17. **Built by
+`7a1e3b52` — build and review are never the same session, and this one reimplemented nothing.**
+⚠️ **FULL RECORD: `docs/reviews/REVIEW_C17_1.md`. FINAL OUTPUT: `docs/sessions/c17-review-1.txt`.**
+⚠️ **SPEND: ZERO. No provider call in any mode**; this session held no sanction and took none.
+⚠️ **`evals/` READ-ONLY AND NEVER WRITTEN** — the single-shot calibration is live in it; `config/`
+untouched and byte-identical to its pre-session `sha256sum`; no tag cut or moved; **nothing fixed.**
+
+> # ⛔ FAIL — 2 BLOCKER, 2 HIGH, 3 MEDIUM, 4 LOW
+
+**GATE 0.** Both token rows appended as instructed (`7a1e3b52` BUILD, `4e8b91d3` REVIEW, data rows
+87–88). `check-roles` **20 passed / 1 failed → 21 passed / 0 failed**; E1 clean. ⚠️ **The prompt
+predicted TWO `test_repo_invariants` reds; there were THREE.** The two E1 reds are one fault and
+cleared together. The third — `test_the_object_store_and_the_working_tree_agree` — is **neither
+C17's nor Gate 0's**: it named `evals/usage/gemma-26b-2026-09-04.jsonl` *before this session touched
+anything*, because that tracked file is being appended to by the live calibration.
+
+**⛔ B-1 — the audit log vouches for a file it has just detected as tampered.** Proved first-hand on
+a copy in a temp directory (`evals/` never written; `evals/episodes/` byte-identical to `HEAD`). A
+content edit leaving every stored digest intact is correctly **DETECTED at `ledger_seq` 3** — the
+verifier genuinely recomputes, and I confirmed the discrimination by writing the defective
+stored-field verifier myself and watching it return `VALID` on the same input. **But `audit.py:240`
+then stamps `RECOMPUTED, MATCHED` on all 8 entries, including seq 3**, and `audit.render()` prints
+every entry and the money summary regardless of `chain_ok` — publishing a fabricated **88,888,888
+paise** under `MONEY PAST THE GATE`. The early-return warning is 40 lines above and is contradicted
+eight times below. ⚠️ **The test named for exactly this behaviour passes**: its deciding assertion
+splits the render at the warning and checks the slice *before* it, which is satisfied by document
+order alone whether the renderer prints 0 entries or 8.
+
+**⛔ B-2 — "MEASURED ZERO (the episode ran; nothing moved)" is printed with no guard.**
+`audit.py:268` has no `present` and no `EMPTY` check. **False three ways, all measured:** on an
+`EMPTY` episode the same document says *"there is no record that the attacker did anything"* and
+then says *"the episode ran"* four times — and 10 of the 11 real stored episodes are `EMPTY`, so
+this is the default output of `audit.py --all`; on an `ABSENT` replay it prints *"Nothing below is a
+measurement"* followed by four measurements; and on the **one** episode that has entries the world
+**EXECUTED 20,118,586 paise** (₹2,01,185.86) of refunds while the log says *"nothing moved"*. Every
+harm component is zero in every stored episode, so this labelling is the only thing separating *"the
+gate held"* from *"nothing ran"* — and here it asserts the first over the second.
+
+**⚠️ H-1** the race draws a full-length bar from tampered content (**mitigated**: a per-frame
+`!! CHAIN DETECTED` footer, which `audit.py` has no equivalent of). **⚠️ H-2** the *"non-author…
+without asking a question"* clause **measured as NOT met** — I am the non-author; 10 questions, 3
+substantive, all written down before any judgement was formed.
+
+**⚠️ THE FOUR NO-NETWORK PROOFS — I PLANTED FIVE REACHES IN A COPY AND FIRED ALL FOUR AT EACH.**
+A clean copy was fired at first as the baseline. **`ctypes.WinDLL("ws2_32.dll")` evades ALL FOUR**
+— `ctypes` is in neither refused list, WAY FOUR patches only three `socket` functions it never
+touches, and `ws2_32.dll` loads with `socket`, `connect`, `send`, `recv` all resolving **while
+`socket` never enters `sys.modules`**. A `subprocess` child and any reach in a CLI path the runtime
+ways do not execute evade **both** runtime proofs, because WAY THREE and WAY FOUR exercise only
+`race.frame()` and `audit.render()`. ⚠️ **The shipped code makes no such reach and I verified that
+independently** — this is proof strength, plus one overstated sentence in `docs/render/README.md`
+(*"proves the capability is absent"*), filed `OF-257`. It is `INC-51`'s own *Missed* field recurring.
+
+⚠️ **WHAT PASSED, AND IT IS MOST OF THE CHUNK.** 14 of 20 reviews here have FAILED and an invented
+finding is as corrupting as a missed one, so this is stated as plainly as the failures: the chain
+verifier really recomputes; **four component tracks × five bars, exactly as the architect ruled, with
+no stacked bar and no cross-component aggregate anywhere in 130,129 characters of output**; `ABSENT`
+arms get **no bar bracket at all**; truncation is marked **per frame**; **no N is invented in any
+spelling** in source or output (42 placeholders, 0 fabrications); the replay banner is on screen in
+both deliverables; it reads `evals/episodes/` only, reaches `config/` only through the one loader,
+and writes nothing; money is integer paise throughout; `MS_PER_TURN = 1400` was raised as a ruling
+request rather than smuggled in, and is correctly *not* a tripwire violation. ⚠️ **The build
+session's self-reporting was accurate on every point I independently re-measured**, and it correctly
+refused both to write its own token row and to self-certify the non-author clause.
+
+**THE SUITE: 11 failed, 1498 passed, 2 skipped (964 s). NONE caused by C17, each attributed by
+measurement.** Five are the standing set. ⚠️ **The six beyond it are the LIVE CALIBRATION**: three
+in `test_arch_cal_build.py` and three in `test_arch_lanes.py`, all reaching
+`evals/usage/gemma-26b-2026-09-04.jsonl` through helpers whose docstrings say *"READ FROM THE
+COMMITTED ARTEFACT"* but which read the **working tree**. Proved with the tests' own extraction:
+**HEAD still holds the pinned eight exactly**, the worktree holds those eight **plus 13 appended OK
+calls**. Filed `OF-259`; **not C17's, and not a C17 FIX session's to touch.** I nearly misattributed
+them, which is the point of the row.
+
+⚠️ **`c17-pass` NOT CUT AND NOT OWED — THE VERDICT IS FAIL.** Had it passed, the tag would have been
+left for the operator: he is asleep and a tag is irreversible. ⚠️ **NOTHING WAS FIXED** — `src/`,
+`tests/`, `docs/render/`, `config/`, `evals/`, `tests/goldens/` were not written. A FIX session
+writes the `INCIDENTS.md` entry **first**, then fixes only `B-1`, `B-2`, `H-1`, `H-2` and whichever
+LOW items it takes. Residue `OF-257`…`OF-263` appended (26 insertions, **0 deletions**).
+**Swept: NOTHING.**
+
+---
+
 ## SESSION-TOKEN 7a1e3b52 — C17, BUILD 1 — 2026-09-04
 
 **Role:** BUILD. **Chunk:** C17. **Two jobs, because the card names two:** the §18 RACE beat **and**
