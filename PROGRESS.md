@@ -1,3 +1,100 @@
+## SESSION-TOKEN 4b8e12c9 — ARCH, PILOT RUN 5 — 2026-09-04
+
+**Role:** FIX. **Chunk:** ARCH. **Everything below ships UNREVIEWED. Not self-certified. No tag.**
+⚠️ **FULL RECORD: `docs/sessions/arch-pilot-run-5.txt`.**
+
+⚠️⚠️ **THE PILOT RAN. IT IS SPENT. IT MEASURED NOTHING, AND THAT IS THE RECORD.**
+`PROCESS.md` §6b: *"the first execution that runs to completion IS the run, and its output
+directory is the record whatever number it contains."* **It ran to completion — exit 0, 20/20
+attempted, denominator reconciling `20 == 0 + 11 + 9`.** There is no retry clause to reach for and
+none was reached for. **0 completed · 11 truncated · 9 never started. N DECISION: REFUSED.**
+
+**TOKEN SPEND, BY MODEL, AGAINST THE SANCTIONED PER-LANE CEILINGS OF 200 CALLS / 600,000 TOKENS:**
+`gemma-26b` **8/200 calls, 42,930/600,000 tokens, stopped by 429** · `qwen-27b` **10/200 calls,
+0/600,000 tokens, provider error on 100% of its calls**. Pooled 18 calls / 42,930 tokens — a
+disclosure, never a ceiling input. **No ceiling was reached, no ceiling was widened, nothing was
+retried and nothing moved to another lane.**
+
+**COMMITS, IN ORDER:** `a53de08` (GATE 0a — two issued token rows; `check-roles` E1 **RED → GREEN**)
+· `1055299` (GATE 0b — `INC-141`) · `733c4fe` (GATE 1c — the declared start time + the `Q-186`
+ruling, **pushed BEFORE the run**) · `d5b660e` (**the pilot's output directory** + `INC-142`,
+`INC-143`) · `5c15fdd` (`Q-189` — GATE 2's stop) · plus this entry's own.
+
+---
+
+**THE CONCURRENCY TEST THE PROMPT SET WAS RUN FIRST, AND IT WAS NOT MET — SO THIS SESSION
+PROCEEDED.** `INC-140`'s four-step recipe: three `claude.exe` processes; PID 14232 in a different
+repository; **PID 2260 = the architect console** (`99119ca6`), which authored this prompt at
+`03:10:31Z` and is **READ-ONLY BY ROLE**; PID 5480 = this session. **No other live session holds
+`4b8e12c9`** — measured: it appears in exactly one other transcript, the console's, **3 times, all
+inside the single message that wrote this prompt**. The predecessor (`c7b41f6a`) and C21
+(`9e2c81d4`) both closed at `03:11:09–10Z`; no process holds either. **Nothing was writing to
+`evals/`, `config/`, `src/` or `tests/`:** `git diff` was EMPTY and the three files `git status`
+flags `M` are byte-identical to `HEAD` (`hash-object` == `rev-parse HEAD:path`) — a stat-cache
+artefact, which is what `arch-night-1b.txt` said and it was right.
+
+**GATE 0 — LANDED.** `a53de08`: the rows for `9e2c81d4` and `4b8e12c9`, both **ISSUED by the
+architect** and neither fabricated, inserted at an anchor verified to occur exactly once, proved
+additions-only by a unified diff over the before/after byte images (**removed==0, added==2**).
+`check-roles` E1 went from *"FORGED/UNISSUED: {'9e2c81d4': ['4aec3bf','183d063','22293d2',
+'685ca50']}"* to **21 passed, 0 failed, 3 n/a**. `1055299`: **`INC-141`** — a session fenced out of
+`QUESTIONS.md` **cannot commit without turning E1 red**, because §7a and the fence are, for it,
+mutually unsatisfiable. It fixes the instance and **not** the class, and says so.
+
+**GATE 1 — THE PILOT, SPENT.** Preflight on the real two-lane matrix **RETURNED, no refusal**
+(`probe-v1` resolves; key **NAMES** `['google','groq']` present, values never read; 498 pinned
+corpus entries, hashes verified; nothing written under `evals/`). The 20-episode rehearsal ran to a
+fresh OS temp dir **outside** the repository: **20 of 20, exit 0**, 42 files there and **zero** under
+`evals/`, **and `PACER_REFUSED : 0` printed in the denominator**, so `Q-179`(3)'s ruling held and the
+rehearsal traversed the shipped path. ⚠️ **AND IT STILL PREDICTED NEITHER FAILURE.** Declaration
+`733c4fe` filled §8 lines 318/319 and was **committed and pushed before the run, in one chained
+command that could not start the run unless the push succeeded**: declared `03:26:24Z`, actual start
+`03:26:31Z`, end `03:33:07Z` — **a 7-second gap, which is exactly the commit and the push, reported
+rather than smoothed.**
+
+**`INC-142`** — the run measured nothing, and **it is not an abort**. All seven of
+`RUN_DECLARED.md` §7.3's preconditions passed. ⚠️ **NOTHING BETWEEN THE OPERATOR AND A SINGLE-SHOT
+RUN EVER ASKS A PROVIDER A QUESTION**: preflight reads a key **name**, the rehearsal dispatches to a
+transcript fixture. So a 100%-failing Groq lane was discovered **by spending the artefact**. And the
+qwen cause is **unrecoverable from the record** — `driver/episode.py`:381 re-raises `from None`, so
+the HTTP status dies with the body it was right to suppress.
+
+**`INC-143`** — measured from the run's own usage log: the pacer's per-call token reservation is
+documented as an **upper bound** that *"can only make the runner slower … never faster, which is the
+direction that does not earn a 429"*. It is `target_tokens_per_episode // turn_budget` = **3,000**,
+i.e. **a mean**. Actual: `790, 3203, 4002, 6201, 6665, 7439, 7782, 6848` — **7 of 8 exceeded it, the
+largest 2.59×**. ⚠️ **Its contribution to the 429 is NOT asserted**, because a simulated
+16,000-capacity bucket does not empty against the real timestamps. **What is established is that a
+documented safety property is false.**
+
+**GATE 2 — STOPPED ITSELF, ON THE PROMPT'S OWN INSTRUCTION.** `Q-189`. Three values are not
+derivable and none was invented. ⚠️ **Blocker 1 is not an ambiguity but a measured absence: there
+is no code path that runs a calibration.** `driver/pilot.py`:57 hardcodes `PILOT_BLOCK = "PILOT"`;
+`load_pilot` always builds **two** cells on `seeds.pilot_*` = **20** episodes; `drive` is the only
+spend-capable target; `probe.n_cal` is read in one place where it projects lane-hours and drives no
+execution. **`PROCESS.md` §12's C14 card step (c) has no implementation.** Blocker 2: **no CAL seed
+block exists** in any document, config key or line of code — four options written out with what each
+costs. Blocker 3: **no sanctioned ceilings** for a 30-episode block; `Q-147`'s derivation is
+explicitly ten episodes on each of two lanes. ⚠️ **`evals/cal/RUN_DECLARED.md` was NOT written** —
+§6b arms it on push, and a declaration naming a command that exits 2 and a seed block chosen by a
+session would be the Class A deviation the STOP rule exists to prevent, wearing a
+pre-registration's format. **The 30-of-30 rehearsal was not run because no 30-episode matrix can be
+constructed.**
+
+⚠️ **THE GATE 2 STOP IS ON THOSE GROUNDS AND EXPRESSLY NOT ON CONCURRENCY**, which the prompt
+correctly forbade re-litigating and which this session tested first and found **not met**.
+
+**NOT DONE, DELIBERATELY:** `prereg-v1` **not cut** and **no tag of any kind** · the sweep **not
+started** · the witness gist **not published, simulated or worked around** · the repository **still
+private** · **N not written** and **the threshold not written** — `n_decision.selected_branch`,
+`n_decision.measured_tokens_per_episode` and `probe.void_threshold_breach_rate` all remain their
+`TODO_` sentinels · **not self-certified**. `git status --porcelain` on `config/`, `tests/goldens/`,
+`CONTEXT.md`, `PROCESS.md`, `corpora/` and `README.md` was **EMPTY at every step and is empty now**.
+**No key value was read, printed, echoed or committed, and `.env` was never opened.**
+**`make check-roles`: 21 passed, 0 failed, 3 n/a.** `make check-prereg`: **NOT-YET-FROZEN**, correct.
+
+---
+
 ## SESSION-TOKEN c7b41f6a — ARCH, PILOT RUN 4 — 2026-09-04
 
 **Role:** FIX. **Chunk:** ARCH. **Everything below ships UNREVIEWED. Not self-certified. No tag.**
