@@ -15765,3 +15765,187 @@ proofs (`OF-257`). That sentence is in a **submission-facing** artefact, which i
 a finding rather than left as a question.
 
 ---
+
+## ⚠️⚠️ `Q-200` — **ONE RULING RECORDED VERBATIM: ANY EXCEPTION ESCAPING THE MODEL CALL IS BOOKED AS A COUNTED, NAMED OUTCOME AND THE RUN CONTINUES. THIS CLOSES `Q-174` AND THE THIRD HALF OF `Q-179`(2)**
+
+**Status:** **RULED**, 2026-09-04, by the architect, in the C14 ABORT 2 prompt. **Transcribed here
+before this session touched a line of code** (hard rule 5: *"RULINGS ARE RECORDED VERBATIM in
+QUESTIONS.md before anything else is touched"*). **Recorded by:** C14 ABORT 2 (`8c2f5e91`).
+`INCIDENTS.md` **`INC-159`**.
+
+**THE RULING, VERBATIM. Not paraphrased, not summarised, not reordered:**
+
+> "⚠️ ANY exception escaping the model call is BOOKED AS A COUNTED, NAMED OUTCOME AND THE RUN
+> CONTINUES TO THE NEXT EPISODE. Not a longer list of caught types — a catch-all that books whatever
+> escapes. Three named types have now escaped in three days and the third destroyed an unrepeatable
+> run; a fourth name would be the same defect wearing a new label.
+> ⚠️ IT DOES NOT RETRY THE CALL. A read timeout may already have been billed AND may already have
+> mutated the world; retrying risks double-billing and double-execution, and hard rule 12's
+> no-retry discipline is not weakened by a timeout being transient.
+> ⚠️ IT DOES NOT STOP THE LANE. A 429 stops a lane because the window is genuinely spent; a
+> transient network failure is not that, and a run that dies on one is a run that can never finish.
+> ⚠️ THE EPISODE IS BOOKED WITH ITS OWN NAMED CAUSE, IN UNFINISHED_CAUSES, PRINTED IN THE
+> DENOMINATOR LIKE EVERY OTHER — hard rule 11: every dropped episode counted, categorised, printed.
+> ⚠️ INTRODUCE NO NEW SPEC VALUE — no retry count, no backoff, no consecutive-failure threshold.
+> Hard rule 9 forbids the constant and the simple form needs none. If every episode fails this way,
+> the denominator says so honestly and that IS the result. Class B: it converts an unreported loss
+> into a reported one, which is what rule 11 requires."
+
+**AND THE TWO CONSTRAINTS THE SAME PROMPT ATTACHED, ALSO VERBATIM:**
+
+> "⚠️ KEEP the existing RateLimited / ProviderFailed / BucketError branches and their distinct
+> causes — this is a floor beneath them, not a replacement. ⚠️ DO NOT swallow a KeyboardInterrupt or
+> a SystemExit."
+
+> "⚠️ NEVER let the booked record carry a provider body or anything key-shaped — pass the exception's
+> TYPE NAME, not its message. INC-147 measured that redaction.py's scan is PREFIX-ANCHORED and misses
+> a credential inside a longer string, so a message is not safe to store."
+
+**WHAT IT CLOSES.** `Q-174` (OPEN since 2026-09-04) asked whether *"a `DriverClientError` reaching
+the dispatch loop should be booked as a counted, categorised outcome before the run ends"*, and said
+it was raised rather than fixed *"because choosing a cause category moves a published number, which
+is Class A."* **The architect has now chosen the category and declared the change Class B.**
+`Q-179`(2) asked the identical question for `BucketError` and was ruled for that type alone.
+⚠️ **BOTH ARE NOW ANSWERED GENERALLY RATHER THAN TYPE BY TYPE**, which is the whole content of the
+ruling: `INC-159`'s `Missed` field records that both earlier fixes added one name to a catch list and
+the class then arrived a third time and killed a single-shot run.
+
+### `Q-200`(a) — HOW IT WAS IMPLEMENTED, AND THE THREE CLASS B CHOICES INSIDE IT
+
+**Class B**, per the ruling's own last sentence. Recorded with rationale, judged at review.
+
+**1. THE CAUSE NAME IS `UNEXPECTED_ERROR`, AND IT IS A NINTH MEMBER OF `UNFINISHED_CAUSES`.**
+The ruling requires *"its own named cause, in UNFINISHED_CAUSES"*. The name says what the category
+is — an exception nobody predicted — rather than what any one instance was. It is deliberately **not**
+`PROVIDER_ERROR`: that category means *the provider returned an error that is not a 429*, and a
+`TimeoutError` on a socket read, a `UsageError` from our own log and a `ZeroDivisionError` in our own
+arithmetic are not the provider's answers. Filing them there would publish our faults as the
+provider's, which is `PACER_REFUSED`'s stated reason for existing, one category over.
+⚠️ **`tests/test_c11_runner.py:872`'s `assert len(ep.UNFINISHED_CAUSES) == 8` FLIPS TO `== 9`**, and
+the flip is **provably meaningful**: it is red on the pre-ruling code, so hard rule 6's condition is
+met and nothing is loosened. Two assertions are **added** beside it and none is removed.
+
+**2. THE CALL IS COUNTED AND ITS TOKEN COST IS RECORDED AS ZERO.**
+This follows `ProviderFailed`'s existing branch — *"a non-429 error has no `usage` block, so its
+token cost is unknown and is recorded as ZERO — an UNDER-count, published rather than estimated. The
+call itself IS counted, because the request was made."* ⚠️ **The difference, stated because it is a
+real weakening of that argument:** for `ProviderFailed` we **know** a request was made; for an
+arbitrary escaping exception we **do not**. The ruling's own words settle the direction — *"a read
+timeout may already have been billed"* — and hard rule 12 is a ceiling, so counting a call that may
+not have been sent makes the ceiling bind **earlier**, which is the safe side. Not counting it would
+under-report spend against a sanctioned lane, which is the unsafe side. ⚠️ **This is the one place
+this session chose against a possible reading, and it is named here so a review can overturn it.**
+It is **not** the `BucketError` branch's reasoning, which correctly charges nothing because the pacer
+refuses *before* the wire and no provider ever saw the request.
+
+**3. THE RECORD CARRIES `type(exc).__name__` AND NOTHING ELSE FROM THE EXCEPTION.**
+Per the ruling. It is written to the usage row's `error_type`, the field `INC-142` added for exactly
+this purpose, with `status=None` so the key is omitted. **The message, the args, the traceback and
+the `__cause__` are all dropped** — `INC-147` measured `runner/redaction.py`'s key scan as
+prefix-anchored, so a credential inside a longer string passes it, and `INC-148` measured a whole
+credential getting through that scan in code written in the same hour to carry provider errors.
+⚠️ **A type name is a Python identifier. It cannot contain a credential.**
+
+⚠️ **WHAT WAS DELIBERATELY NOT DONE, LISTED SO IT IS NOT READ AS AN OVERSIGHT:**
+no retry, no backoff, no sleep, no consecutive-failure threshold, no new key in `config/`, no change
+to `_TIMEOUT_SECONDS`, no widening of `_http_post`'s `except` list — **that last one is the tempting
+fix and it is the exact defect the ruling names**, a fourth name on a catch list. `config/` was not
+opened. `KeyboardInterrupt` and `SystemExit` derive from `BaseException`, not `Exception`, so the
+catch-all does not see them and **a test asserts that** rather than leaving it to the reader.
+
+---
+
+## ⚠️ `Q-201` — **CLASS B, DISCLOSED: THE `BucketError` BRANCH NOW WRITES `usage.OUTCOME_ERROR` INSTEAD OF `episodes.PACER_REFUSED`, BECAUSE THE LATTER IS NOT A DECLARED USAGE OUTCOME AND THE CALL RAISED**
+
+**Status:** **DISCLOSED, Class B.** Not a question this session needs answered to finish, and not one
+it decided quietly. **Raised by:** C14 ABORT 2 (`8c2f5e91`), 2026-09-04. `INCIDENTS.md` **`INC-160`**.
+
+**THE FACT, PROVED TWICE FIRST-HAND IN A FRESH OS TEMP DIRECTORY BEFORE IT WAS WRITTEN DOWN.**
+`driver/episode.py`'s `except BucketError` branch called `self.on_usage(self.lane, 0,
+runner_episodes.PACER_REFUSED)`. `runner/usage.py:UsageLog.append` validates its `outcome` against
+`OUTCOMES = ("OK", "RATE_LIMITED", "ERROR")` and refuses anything else. Measured: `UsageError:
+'PACER_REFUSED' is not a declared outcome`, escaping the real `_MeteredCall.run` with the real
+`_usage_sink` — `isinstance(exc, LaneStopped)` **False**.
+
+**THE CHANGE.** The branch passes `usage.OUTCOME_ERROR` with `error_type="BucketError"`.
+⚠️ **THE `LaneStopped` CAUSE IS UNCHANGED AND STAYS `PACER_REFUSED`** — the episode is still booked,
+counted and printed under its own name, so `Q-179`(2)'s ruling is now in force in fact and not only
+on paper. Zero tokens and zero calls are still charged.
+
+**WHY THIS AND NOT THE OTHER FIX.** The alternative is adding `PACER_REFUSED` to `usage.OUTCOMES`.
+It was rejected: `OUTCOMES` is the **on-disk vocabulary of an append-only record**,
+`UsageLog.spent_today` branches on `row["outcome"] == OUTCOME_OK`, and `tests/test_arch_lanes.py`
+pins the committed pilot rows' shape. **Widening a published file format to fix a call site is the
+wrong direction**, and `usage.append`'s own docstring says why — an `OK` row must stay byte-identical
+to the ones the pilot committed.
+
+**WHY IT IS CLASS B AND NOT CLASS A.** ⚠️ **No published number moves, because the row this writes is
+a row the program could not previously write at all** — the old call raised before reaching the file.
+Nothing in `evals/` changes; no existing row is re-shaped; the denominator's `PACER_REFUSED` count is
+untouched.
+
+**THE STRUCTURAL RESIDUE, PROPOSED AND NOT INSTALLED.** There are **three** string vocabularies in
+this program — `episodes.py`'s **causes**, `usage.py`'s **outcomes**, `scorer/drops.py`'s
+**categories** — and `episodes.py`'s module docstring warns about drift between exactly one of the
+three pairs. `driver/episode.py` already writes out `CAUSE_FOR_STOP` by hand for another pair,
+*"because a mapping table is where a reviewer can see the join"*. **The cause → outcome join was
+never written, which is how a cause reached an outcome parameter.** Writing a `CAUSE_FOR_OUTCOME`
+beside it, or making each vocabulary an `enum`, would make this defect unrepresentable.
+⚠️ **This session did neither**: inventing a third mapping table inside a FIX session whose prompt
+names two gates would be the scope creep `CLAUDE.md` §6 forbids, and the `enum` change touches every
+call site of both vocabularies. **The architect's call.**
+
+---
+
+## ⚠️⚠️ `Q-202` — **CLASS A, OPEN, AND STOPPED ON DELIBERATELY: `Q-200`'s FLOOR COVERS THE MODEL CALL. AN EXCEPTION FROM WORLD BUILD, GATE BUILD, LEDGER WRITE OR CHECKPOINT PUBLISH STILL KILLS THE RUN**
+
+**Status:** **OPEN. Class A.** **Raised by:** C14 ABORT 2 (`8c2f5e91`), 2026-09-04.
+`INCIDENTS.md` **`INC-159`** (`Systemic guardrail`), **`INC-160`**.
+
+**THE GAP, STATED EXACTLY.** `Q-200`'s ruling says *"any exception escaping **the model call**"*, and
+that is where the floor was installed — `_MeteredCall.run`, wrapping `call()`. **`driver/run.py`'s
+dispatch loop does five other things per episode outside that wrapper**, and each can raise:
+
+    world  = world_semantics.build(world_generator.generate_world(seed), semantics_spec, oracle)
+    gate   = gate_shell.build_gate(arm, _placeholder_judge_client(arm))
+    ledger = Ledger(spec=chain_spec, seed=seed, arm=arm)
+    episode = run_one_episode(...)     # <- the floor is INSIDE this
+    _publish(episode, episode_dir=..., checkpoints=..., ...)
+
+An `OSError` from `_publish` on a full disk, or a `LedgerError` on entry 14 of 20, still escapes
+`execute` with **no report and no denominator** — which is the identical failure `INC-159` records,
+one frame out.
+
+⚠️ **AND THIS IS NOT HYPOTHETICAL, WHICH IS WHY IT IS RAISED RATHER THAN LEFT AS A NOTE.**
+`INC-160` is precisely such a site: an exception raised **inside an `except` handler** in
+`_MeteredCall.run`, where a later `except` clause cannot see it. **The class re-appeared inside the
+fix for the class**, at a spot one line from the floor. Any claim that the model call is the only
+risky frame is now measurably false.
+
+**WHY THIS SESSION DID NOT JUST WIDEN IT.** The trade is real and it is the architect's:
+
+| | widen the floor to the whole per-episode body | leave it at the model call |
+|---|---|---|
+| a full disk at `_publish` | booked, run continues, 29 more episodes attempted | run dies, denominator lost |
+| a **corrupted world** or an **unwritable ledger** | ⚠️ **booked as an ordinary episode outcome and the run keeps going**, publishing episodes whose world may be wrong | run stops loudly |
+
+⚠️ **THE SECOND ROW IS THE WHOLE OBJECTION.** `CONTEXT.md`'s determinism guarantee is that *"the
+world, the ledger schema, the scorer and the replay are byte-identical from the same seed"*. A floor
+that books a world-construction failure as `UNEXPECTED_ERROR` and carries on would let a run publish
+a **measurement** taken against an instrument that failed to build — the exact shape of
+`INC-142`'s *"discovery and expenditure were the same event"*, but silent. **Booking a failed model
+call is honest; booking a failed world is a lie with a category attached.**
+
+**THE OPTIONS AS THIS SESSION SEES THEM.**
+  1. **Leave the floor at the model call.** The gap is published as a limitation. Cheapest, and
+     `INC-160` says the residue is real.
+  2. **Widen to `_publish` only** — an I/O failure after a complete episode loses nothing about the
+     measurement, and it is the frame most likely to fail on a 32-hour sweep.
+  3. **Widen to the whole body, with world/gate/ledger construction failures raising a distinct,
+     non-episode `RunAborted`** that stops the run loudly while still printing the denominator for
+     what ran. **Most work, and it is the only option that gets both properties.**
+
+**STOPPED?** ⚠️ **Yes, for this item, and deliberately.** Hard rule 1: *"a session that stops on a
+real ambiguity has succeeded."* Hard rule 2 makes option 3 Class A — it changes which failures end a
+run. **The floor the ruling ordered is built and tested; this is the part the ruling did not order,
+and this session did not take it.**
