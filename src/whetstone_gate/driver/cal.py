@@ -72,6 +72,7 @@ block"* is about arms and configurations, and `gemma-31b` exists with the role
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Iterable
 
 from whetstone_gate import config as cfg
 from whetstone_gate.driver import pilot as pilot_module
@@ -147,6 +148,22 @@ class CalMatrix:
             for cell in self.cells
             for seed in cell.seeds
         )
+
+    def dispatch_order(self, pending: Iterable[EpisodeKey]) -> list[EpisodeKey]:
+        """``pending`` in dispatch order: **the scheduler's own key sort, unchanged.**
+
+        ⚠️ **DECLARED RATHER THAN INHERITED.** See
+        :meth:`whetstone_gate.driver.pilot.PilotMatrix.dispatch_order` for why every matrix now
+        states its order instead of receiving :meth:`Scheduler.pending`'s.
+
+        ⚠️ **FOR A ONE-ARM, ONE-CELL BLOCK THE TWO ORDERS ARE THE SAME LIST AND CANNOT DIVERGE.**
+        Every key here shares a ``block``, an ``arm`` and an ``attacker_model``, so
+        :class:`EpisodeKey`'s ordering reduces to ``seed_or_task`` ascending — which is exactly
+        the order :meth:`keys` builds. The calibration is **spent and single-shot**
+        (`PROCESS.md` §6b), so this method is required to change nothing, and
+        ``tests/test_c18_sweep.py`` asserts the identity rather than reasoning about it.
+        """
+        return sorted(pending)
 
     def lane_for(self, key: EpisodeKey) -> str:
         """Which lane an episode key runs on. **Refuses an unknown key**, never guesses."""

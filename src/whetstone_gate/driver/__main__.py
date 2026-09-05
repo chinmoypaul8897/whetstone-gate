@@ -27,6 +27,7 @@ from whetstone_gate.driver import episode as driver_episode
 from whetstone_gate.driver import pilot as pilot_module
 from whetstone_gate.driver import rehearsal
 from whetstone_gate.driver import run as driver_run
+from whetstone_gate.driver import scored as scored_module
 from whetstone_gate.driver.clients import MeteredProviderClient, TranscriptClient
 from whetstone_gate.runner import usage as runner_usage
 from whetstone_gate.runner.budget import Ceilings
@@ -60,12 +61,14 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--block",
-        choices=("pilot", "cal"),
+        choices=("pilot", "cal", "scored"),
         default="pilot",
         help=(
             "which pre-registered block to run. 'cal' is CONTEXT.md S10.3's ARM-1 "
             "CALIBRATION (one cell, probe.n_cal episodes on seeds.cal_*, every ledger and "
-            "checkpoint stamped CAL). ⚠️ DEFAULTS TO 'pilot' AND MUST: "
+            "checkpoint stamped CAL). 'scored' is CONTEXT.md S13.4's M-ADV block - FIVE ARMS "
+            "x N on seeds.scored_n<N>_*, dispatched SEED-MAJOR, every ledger and checkpoint "
+            "stamped SCORED. ⚠️ DEFAULTS TO 'pilot' AND MUST: "
             "evals/pilot/RUN_DECLARED.md S1's committed command carries no --block, and a "
             "required flag here would make a PUSHED pre-registration of an ALREADY-SPENT "
             "single-shot run exit 2 (PROCESS.md S6b)"
@@ -73,13 +76,19 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--arm",
-        required=True,
+        default=None,
         help=(
             "the arm the pilot runs. NOT in config/ and NOT defaulted: CONTEXT.md S13.4 and "
             "PROTOCOL.md S3.1 both say '1 ref arm' and neither says which (QUESTIONS.md Q-144). "
-            "⚠️ With --block cal it is still REQUIRED but is CHECKED rather than obeyed: "
+            "⚠️ REQUIRED for --block pilot and --block cal, and its ABSENCE is a refusal there "
+            "- argparse's own `required` is not used because the answer now depends on --block, "
+            "and a flag that is required for two of three blocks cannot say so in one word. "
+            "⚠️ With --block cal it is REQUIRED but is CHECKED rather than obeyed: "
             "CONTEXT.md S10.3 and FROZEN HOLES.md S3.5 both say 'arm 1 only', so a "
-            "disagreement is a refusal and not a choice"
+            "disagreement is a refusal and not a choice. "
+            "⚠️ With --block scored it is REFUSED IF GIVEN: S13.4's M-ADV row is '5 arms x N' "
+            "and the published claim is the comparison BETWEEN them, so naming one arm would "
+            "run a block the pre-registration does not describe"
         ),
     )
     parser.add_argument(
@@ -169,6 +178,70 @@ def _transcript_client(
 
 def main(argv: list[str] | None = None) -> int:
     arguments = build_parser().parse_args(argv)
+
+    # ⚠️⚠️ `--arm` IS REQUIRED FOR TWO BLOCKS AND REFUSED FOR THE THIRD, SO ARGPARSE'S OWN
+    # `required=True` CANNOT EXPRESS IT AND THE CHECK IS HERE, IN BOTH DIRECTIONS.
+    # Absent for pilot/cal is the pre-existing refusal, unchanged in effect: the pilot's arm is
+    # Q-144's and the calibration's is CHECKED against S10.3's. PRESENT for scored is the new
+    # one, and it is a refusal rather than a value quietly ignored - an operator who typed
+    # `--arm 1` and saw a run start would reasonably believe they had run arm 1, and what would
+    # actually have started is all five arms of the SCORED block on the SCORED seeds.
+    if arguments.block == "scored" and arguments.arm is not None:
+        say(
+            f"REFUSED: --block scored runs CONTEXT.md S13.4's M-ADV block, which is "
+            f"'5 arms x N' - ALL FIVE, because the published claim is the comparison BETWEEN "
+            f"them. --arm was given as {arguments.arm!r}. Naming one arm here would either run "
+            f"a block the pre-registration does not describe, or be silently ignored while the "
+            f"operator believed it had been obeyed. Drop --arm and run the block as declared."
+        )
+        return 2
+    if arguments.block in ("pilot", "cal") and arguments.arm is None:
+        say(
+            f"REFUSED: --block {arguments.block} requires --arm. CONTEXT.md S13.4 and "
+            f"PROTOCOL.md S3.1 both say '1 ref arm' and neither says WHICH (QUESTIONS.md "
+            f"Q-144), and config/ carries no key for it, so it is the caller's and has no "
+            f"default. Under --block cal it is still required and is CHECKED against S10.3's "
+            f"'Arm 1 only' rather than obeyed."
+        )
+        return 2
+
+    try:
+        matrix = _matrix_for(arguments)
+    except (
+        scored_module.ScoredError,
+        cal_module.CalError,
+        pilot_module.PilotError,
+        cfg.ConfigError,
+    ) as refused:
+        # ⚠️ A MATRIX THAT CANNOT BE ASSEMBLED IS A NAMED REFUSAL WITH A NON-ZERO EXIT, NEVER A
+        # TRACEBACK - this module's own rule about the provider client, applied one step
+        # earlier. It matters most for `--block scored`: `load_scored()` refuses while
+        # `n_decision.measured_tokens_per_episode` is a `TODO_` sentinel, and that refusal is
+        # the single most likely thing an operator will see from this path. The loader's own
+        # message NAMES WHO OWES THE VALUE, so it is printed rather than summarised.
+        say("REFUSED - and the refusal is the outcome, not an error to work around:")
+        for part in str(refused).split(". "):
+            say(f"  {part}")
+        return 2
+    if matrix is None:
+        return 2
+    return _run(arguments, matrix)
+
+
+def _matrix_for(arguments: argparse.Namespace):
+    """The block's matrix. **Raises rather than returning a half-built one.**
+
+    ``None`` means a refusal that has already been printed — the calibration's arm mismatch,
+    which needs the matrix in hand to state what the arm should have been.
+    """
+    if arguments.block == "scored":
+        # ⚠️ `load_scored()` TAKES NOTHING. Every parameter of the block is pre-registered:
+        # the five arms are PROTOCOL.md S2.1's, N is DERIVED by S13.4's rule from
+        # `n_decision.measured_tokens_per_episode`, and the seed band follows N. ⚠️ IT REFUSES
+        # WHILE THAT KEY IS A `TODO_` SENTINEL, and the refusal is the correct outcome: a
+        # scored block sized by a session under deadline is what PROTOCOL.md S3 forbids in
+        # capitals.
+        return scored_module.load_scored()
     if arguments.block == "cal":
         # ⚠️ CONTEXT.md S10.3 rule 1 and FROZEN HOLES.md S3.5 rule 1 both say "arm 1 only",
         # so `load_cal()` takes nothing and `--arm` is CHECKED against it rather than
@@ -185,10 +258,13 @@ def main(argv: list[str] | None = None) -> int:
                 f"the first execution that runs to completion IS the run, so this refuses "
                 f"rather than running the wrong block."
             )
-            return 2
-    else:
-        matrix = pilot_module.load_pilot(arm=arguments.arm)
+            return None
+        return matrix
+    return pilot_module.load_pilot(arm=arguments.arm)
 
+
+def _run(arguments: argparse.Namespace, matrix) -> int:
+    """Everything after the matrix exists. **Unchanged from what `main` used to do inline.**"""
     out_root = arguments.out_root
     if out_root is None:
         if arguments.dry_run:

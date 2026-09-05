@@ -124,6 +124,26 @@ class PilotMatrix:
             for seed in cell.seeds
         )
 
+    def dispatch_order(self, pending: Iterable[EpisodeKey]) -> list[EpisodeKey]:
+        """``pending`` in dispatch order: **the scheduler's own key sort, unchanged.**
+
+        ⚠️ **DECLARED RATHER THAN INHERITED, AND THAT IS THE WHOLE REASON THIS METHOD EXISTS.**
+        :mod:`whetstone_gate.driver.run` used to dispatch whatever
+        :meth:`whetstone_gate.runner.scheduler.Scheduler.pending` returned, so **every** block
+        silently got that method's sort — which is arm-major, because :class:`EpisodeKey` is
+        ordered on ``(block, arm, seed_or_task, attacker_model)``. For a block whose arms are a
+        published comparison that default is wrong (:mod:`whetstone_gate.driver.scored`), and a
+        matrix now says which order it runs in rather than receiving one.
+
+        ⚠️ **FOR THE PILOT THE ANSWER IS THE ONE IT ALREADY HAD, AND IT MUST STAY THAT WAY.**
+        ``evals/pilot/RUN_DECLARED.md`` is a committed, pushed pre-registration of a run that has
+        already been spent (`INC-142`), so this block's dispatch order is a matter of record and
+        not of preference. ``sorted`` here reproduces it exactly, and
+        ``tests/test_c18_sweep.py`` asserts that it does — byte for byte against the list
+        ``Scheduler.pending`` returns.
+        """
+        return sorted(pending)
+
     def lane_for(self, key: EpisodeKey) -> str:
         """Which lane an episode key runs on. **Refuses an unknown key**, never guesses."""
         for cell in self.cells:
@@ -259,10 +279,21 @@ class TokensPerEpisode:
         """True only when **every** pilot episode completed. See this module's docstring."""
         return self.completed > 0 and self.truncated == 0
 
-    def lines(self) -> list[str]:
-        """ASCII. Both denominators, and the refusal stated as a value."""
+    def lines(self, *, block: str = PILOT_BLOCK) -> list[str]:
+        """ASCII. Both denominators, and the refusal stated as a value.
+
+        ⚠️ **``block`` EXISTS BECAUSE THE CALIBRATION'S OWN REPORT MISNAMED ITSELF, MEASURED.**
+        ``evals/cal/run-attempt4-20260904T204118Z.log`` prints ``block label : CAL`` at the top
+        and then, at the bottom, ``PILOT MEASUREMENT`` over the calibration's thirty episodes —
+        because this header was a literal. The slugs were right throughout (``cal__…``), so
+        nothing computed was wrong, but **the printed record named the wrong run**, and a record
+        that misnames the run it describes is the kind of thing a reader is entitled to hold
+        against every other number beside it. It is a **label**, not a spec value (`cal.py` says
+        so in terms), so its default is this class's own home block and every caller that knows
+        better passes what it knows.
+        """
         rendered = [
-            "PILOT MEASUREMENT - attacker tokens per episode (CONTEXT.md S13.4)",
+            f"{block} MEASUREMENT - attacker tokens per episode (CONTEXT.md S13.4)",
             f"  attacker tokens (API's OWN usage.total_tokens, never estimated) : "
             f"{self.attacker_tokens}",
             f"  episodes COMPLETED                                             : "

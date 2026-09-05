@@ -200,19 +200,41 @@ class RunResult:
         fence — so a resumed episode of arm 2, 2S or 3 cannot have its attacker share
         recovered. For a judge-less arm ``tokens_spent`` **is** the attacker figure, so the
         resume is exact there. A refusal, never an estimate. `OPEN_FINDINGS.md` **OF-240**.
+
+        ⚠️⚠️ **THE ARM IS READ OFF EACH RESUMED CHECKPOINT, NOT OFF THE MATRIX, AND THAT IS
+        WHAT MAKES THIS CORRECT FOR A MULTI-ARM BLOCK.** This used to ask ``matrix.arm``, which
+        exists only because the pilot and the calibration each run **one** arm. `CONTEXT.md`
+        §13.4's **M-ADV** row is *"5 arms × N"* (:mod:`whetstone_gate.driver.scored`), and on
+        that matrix a single ``arm`` attribute would have to name one of five and would be
+        false whichever it named — so a resumed sweep would either refuse on every arm or on
+        none of them, and *"none"* is the direction that publishes a judge's tokens inside the
+        attacker's figure. ``arm`` is a declared field of
+        :data:`~whetstone_gate.runner.checkpoint.DOCUMENT_KEYS`, so it is read rather than
+        inferred, and **the refusal now names the arms it actually found.**
+
+        ⚠️ **ON A ONE-ARM MATRIX THIS IS THE SAME BEHAVIOUR IT REPLACES**, because every
+        resumed document of such a matrix carries that matrix's arm — asserted in
+        ``tests/test_c18_sweep.py`` rather than argued here.
         """
         ran = sum(episode.attacker_tokens for episode in self.episodes)
         if not self.resumed:
             return ran
-        if matrix.arm in JUDGED_ARMS:
+        judged = sorted(
+            {
+                str(document["arm"])
+                for document in self.resumed
+                if str(document["arm"]) in JUDGED_ARMS
+            }
+        )
+        if judged:
             raise RunRefused(
-                f"this invocation resumed {len(self.resumed)} episode(s) of arm "
-                f"{matrix.arm!r}, which runs a gate judge, and a checkpoint carries ONE "
+                f"this invocation resumed {len(self.resumed)} episode(s), of which some are "
+                f"on arm(s) {judged}, which run a gate judge, and a checkpoint carries ONE "
                 f"tokens_spent with no attacker/judge split (runner/checkpoint.py's "
                 f"DOCUMENT_KEYS, C11's schema). The attacker share of a resumed judged "
                 f"episode is therefore not recoverable, and CONTEXT.md S13.4's figure is "
                 f"about ATTACKER tokens. This is a refusal rather than an estimate "
-                f"(OPEN_FINDINGS.md OF-240). Run the pilot's judged arm in one go, or read "
+                f"(OPEN_FINDINGS.md OF-240). Run the judged arm in one go, or read "
                 f"the split off evals/usage/ once it carries a role column"
             )
         # ⚠️ INC-110: a resumed run's tokens live in its CHECKPOINTS, not in this
@@ -977,7 +999,19 @@ def execute(
                 cause=document["cause"],
             )
         )
-    pending = scheduler.pending(keys, completed_slugs)
+    # ⚠️⚠️ **THE MATRIX DECLARES ITS OWN DISPATCH ORDER, AND IT IS NOT A DETAIL.**
+    # `Scheduler.pending` returns its list SORTED BY `EpisodeKey`, whose field order is
+    # `(block, arm, seed_or_task, attacker_model)` — so the scheduler's sort is **arm-major**,
+    # and every block used to inherit it. For `driver/scored.py` that default destroys the
+    # deliverable: the published claim is a COMPARISON BETWEEN ARMS, the sweep is expected to
+    # be cut off by the deadline, and arm-major truncation leaves the later arms EMPTY — a
+    # third of the tokens spent on a number that cannot be published. Seed-major truncation
+    # leaves every arm at the same n on the SAME SEEDS, which is a real result with wide
+    # intervals and is the PAIRED comparison §12.3's counter-metric needs.
+    # ⚠️ Every matrix declares this method, so there is no `hasattr` fallback and no silent
+    # default: `pilot` and `cal` return `sorted(...)`, which is the list `pending` just
+    # produced, and `tests/test_c18_sweep.py` asserts that identity rather than assuming it.
+    pending = request.matrix.dispatch_order(scheduler.pending(keys, completed_slugs))
 
     # ⚠️⚠️ **RUN-SCOPED, KEYED BY (LANE, ROLE) — `INCIDENTS.md` INC-161's SECOND HALF.**
     # `_PacedClient` is rebuilt inside the loop below (`Q-179`(3) requires it to be built on
@@ -1315,14 +1349,81 @@ def render(request: RunRequest, result: RunResult, *, started: datetime) -> str:
     return "\n".join(lines)
 
 
+def _block_label(request: RunRequest) -> str:
+    """The block every key of this matrix is stamped with. **Read off the keys, never typed.**
+
+    The same source that stamps every checkpoint and every ledger, so the report cannot name a
+    different run than the files it describes — `Q-193`'s reasoning for the liveness log, applied
+    to the report. **Refuses an empty matrix rather than guessing a label.**
+    """
+    keys = request.matrix.keys()
+    if not keys:
+        raise RunRefused(
+            "this matrix produces no episode key, so the block this report describes cannot be "
+            "read. A report headed with a guessed block label would name a run that did not "
+            "happen"
+        )
+    return keys[0].block
+
+
 def _measurement_lines(request: RunRequest, result: RunResult) -> list[str]:
-    """The pilot's figure, and the N decision **or the refusal instead of one**."""
+    """This block's attacker-tokens figure, and the N decision **or the refusal instead of one**.
+
+    ⚠️⚠️ **ONLY THE PILOT MAY SELECT N, AND THAT IS ENFORCED HERE RATHER THAN ASSUMED.**
+    `CONTEXT.md` §13.4 names the selector in terms — *"the 31 Aug **pilot's** measured attacker
+    tokens/episode"* — and `PROTOCOL.md` §3 adds *"No other branch. No post-hoc adjustment."*
+    Until now this function ran :func:`..pilot.decide_n` on **whatever block had just run**, so a
+    real calibration or, worse, a real **scored** run would print an N decision computed from its
+    own tokens. ⚠️ **N sizes the scored block, so a scored run that printed an N decision would
+    be publishing a number selected by the very episodes it decides the size of** — the exact
+    circularity `PROTOCOL.md` §2.2 keeps the pilot's seeds disjoint to prevent, arriving through
+    the report instead of through the seed block. Every other block gets the **measurement**,
+    which is an honest disclosure of what it cost, and a **named refusal** in place of a
+    decision.
+    """
+    block = _block_label(request)
+    try:
+        attacker_tokens = result.attacker_tokens(request.matrix)
+    except RunRefused as refusal:
+        # ⚠️⚠️ **THE FIGURE REFUSES; THE DENOMINATOR MUST NOT GO DOWN WITH IT.**
+        # `attacker_tokens` refuses when a resumed episode is on a judged arm, because a
+        # checkpoint carries ONE `tokens_spent` and no attacker/judge split (`OF-240`). That
+        # refusal is right and it stays. ⚠️ **But it is raised from inside `render`, so it used
+        # to abort the WHOLE report** — and on a scored sweep that is not a corner case: 90 of
+        # the 150 episodes are on arms 2/2S/3, the run spans days by design, and **every resume
+        # that skipped one judged episode would print nothing at all** — no denominator, no
+        # per-cause counts, no per-lane budget. That is hard rule 11's named failure (*"an
+        # episode that is in none of the three categories has left the denominator without
+        # saying so"*) caused by a guard against a different error.
+        # ⚠️ **SO THE REFUSAL IS PRINTED AS THE OUTCOME AND EVERYTHING ELSE STILL PRINTS** —
+        # the shape this function already used for `decide_n`, and `PROCESS.md` §9's rule that
+        # every evidence pack states what it is NOT. **The figure is not estimated, not
+        # defaulted and not silently zeroed**; it is absent, by name, with its reason.
+        # `QUESTIONS.md` `Q-212`.
+        return [
+            f"{block} MEASUREMENT: REFUSED, and the refusal is the result -",
+            *(f"  {part}" for part in str(refusal).split(". ")),
+            "  ⚠️ THE DENOMINATOR ABOVE IS UNAFFECTED AND IS THIS BLOCK'S WHOLE MATRIX.",
+            "  Only the attacker/judge SPLIT of the resumed episodes is unrecoverable; every",
+            "  episode is still counted, categorised and printed (hard rule 11), and every",
+            "  per-lane token figure above is the provider's own.",
+        ]
     measurement = pilot_module.measure_tokens_per_episode(
-        attacker_tokens=result.attacker_tokens(request.matrix),
+        attacker_tokens=attacker_tokens,
         completed=result.completed,
         truncated=result.truncated,
     )
-    lines = list(measurement.lines())
+    lines = list(measurement.lines(block=block))
+    if block != pilot_module.PILOT_BLOCK:
+        lines.append(
+            f"N DECISION: NOT THIS BLOCK'S TO MAKE, and that is the result - "
+            f"CONTEXT.md S13.4 names the PILOT's measured tokens/episode as the selector and "
+            f"PROTOCOL.md S3 adds 'No other branch. No post-hoc adjustment.'. This is the "
+            f"{block} block. Its figure above is a DISCLOSURE of what it cost, never an input "
+            f"to N - a block that selected N from its own episodes would be sized by the very "
+            f"episodes it decides the size of"
+        )
+        return lines
     try:
         decision = pilot_module.decide_n(measurement, dry_run=request.dry_run)
     except pilot_module.PilotError as refusal:
@@ -1349,12 +1450,21 @@ def limitations(request: RunRequest) -> list[str]:
         "written. One-directional and identical across arms (QUESTIONS.md Q-142).",
         f"S3's authorization binding is an OPEN Class A question (QUESTIONS.md Q-141) and "
         f"this run used {request.s3_binding!r}. It changes arm 4's verdicts.",
-        "The pilot's ARM is not in config/ and was supplied by the caller "
-        "(QUESTIONS.md Q-144).",
         "The per-lane call and token ceilings are NOT in config/ either; hard rule 12's "
         "sanction comes from the prompt, and this driver requires BOTH explicitly rather "
         "than defaulting either (QUESTIONS.md Q-147).",
     ]
+    # ⚠️ THE ARM LIMITATION IS THE PILOT'S AND IS PRINTED ONLY ON THE PILOT'S OWN BLOCK.
+    # It was printed on every block, so the calibration's committed log carries it - and it is
+    # FALSE THERE: CONTEXT.md S10.3 and FROZEN HOLES.md S3.5 both fix the calibration at arm 1
+    # and `--arm` is CHECKED rather than obeyed. The scored block runs all five arms and takes
+    # no `--arm` at all. A limitation stated where it does not apply spends the reader's trust
+    # in every limitation beside it, which is PROCESS.md S9's whole point.
+    if _block_label(request) == pilot_module.PILOT_BLOCK:
+        stated.append(
+            "The pilot's ARM is not in config/ and was supplied by the caller "
+            "(QUESTIONS.md Q-144)."
+        )
     if request.dry_run:
         stated.insert(
             0,
