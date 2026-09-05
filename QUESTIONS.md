@@ -16798,6 +16798,28 @@ five renumber BENEATH `Q-215`**, exactly as `INC-159`/`INC-160` and the `Q-207`�
 ### ⚠️⚠️ `Q-216` — **CLASS A, BLOCKING, AND IT IS THE ONE THAT STOPS THE SWEEP: `n_decision.measured_tokens_per_episode` IS STILL `TODO_C14_PILOT`, SO `load_scored()` REFUSES AND NO SCORED EPISODE CAN BE DISPATCHED — AND THE FIGURE IT SHOULD CARRY IS ITSELF CONTESTED, BECAUSE THE CALIBRATION'S OWN `decide_n` REFUSED TO SELECT N**
 
 **Status: OPEN. Class A. BLOCKING THE SWEEP.** **Raised by:** C18 BUILD 1 (`6a4f28de`), 2026-09-05.
+⚠️⚠️ **CLOSED THE SAME DAY, BY A CONCURRENT SESSION, WHILE THIS ENTRY WAS BEING WRITTEN — AND THE
+ENTRY IS KEPT RATHER THAN DELETED.** `c3aa9b4` (**C14 FIX**, `3e91b7c5`) landed
+``n_decision.measured_tokens_per_episode: 144668`` and ``selected_branch: 30``, *"re-derived FOUR
+independent ways from the stored ledgers, and the ruling transcribed VERBATIM before the keys were
+touched"*. **RE-MEASURED IN THIS TREE IMMEDIATELY AFTER, and the sweep path now assembles from the
+real `config/` with nothing typed:**
+
+    N            : 30            (DERIVED via runner/n_rule.py:select_n from 144,668)
+    episodes     : 150           (5 arms x 30 seeds)
+    first / last : scored__1__2001__gemma-26b / scored__4__2030__gemma-26b
+    imbalance    : 1             (seed-major, over all 151 prefixes)
+
+⚠️ **THE QUESTION IS LEFT STANDING IN FULL BECAUSE ITS BODY IS STILL THE RECORD OF WHY THE CODE
+REFUSES, AND THAT REFUSAL IS STILL LIVE** — restore the sentinel and `load_scored()` stops again,
+which `tests/test_c18_sweep.py` now drives against a fixture `config/` precisely so the guard does
+not quietly die now that the value exists. **Option (a) is what was taken**, and the four candidate
+figures and their objections are kept as the record of what was *not* chosen.
+⚠️ **ONE THING IN THIS ENTRY IS VINDICATED AND IS WORTH NAMING:** `selected_branch` landed as the
+integer **30**, not a letter or a branch name. `driver/scored.py` reads
+``measured_tokens_per_episode`` and **derives** through the rule rather than parsing
+``selected_branch``, whose format this session could not know — so nothing had to be guessed and
+nothing has to change now that the format is visible.
 **Owner:** the architect. ⚠️ **This is not a defect in the path this session built; it is the
 precondition that path correctly refuses without.**
 

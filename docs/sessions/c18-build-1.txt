@@ -2,8 +2,13 @@
  C18 BUILD 1 - THE SWEEP PATH   SESSION-TOKEN 6a4f28de   ROLE: BUILD   2026-09-05
 ================================================================================
 
- PUSHED SHA: 72df9e5   (and 18f6477 and 8171458 beneath it; this file is
- committed on top, so its own SHA is the push's, stated in the report.)
+ THIS SESSION'S COMMITS, oldest first:
+   8171458  feat(driver)   the sweep path + the seed-major dispatch order
+   18f6477  fix(test)      a claim that became false while it was being written
+   72df9e5  chore(records) Q-216..Q-220, INC-165, INC-166, STATUS, PROGRESS
+   afc4eba  test(sweep)    the N-sentinel refusal un-skipped, driven on a fixture
+   <this>   chore(journal) this file, plus Q-216's resolution note
+ PUSHED SHA: the last of these, stated as the first line of the report.
 
  The full record is committed VERBATIM at docs/sessions/c18-build-1.txt BEFORE
  this was printed. CLAUDE.md S6.1: the FILE is the record; this is the copy.
@@ -17,20 +22,31 @@
  150-episode dry run completes end to end, writes 150 ledgers and 150
  checkpoints, and reconciles 150 == 150 + 0 + 0.
 
- !! AND THE SWEEP STILL CANNOT START. TWO BLOCKERS, NEITHER OF THEM MINE TO
- CLOSE, AND BOTH ARE RECORDED RATHER THAN ROUTED AROUND:
+ !! ONE BLOCKER REMAINS, AND IT IS NOT MINE TO CLOSE.
 
-   Q-216  N IS NOT SELECTABLE. `n_decision.measured_tokens_per_episode` is
-          still TODO_C14_PILOT, so `load_scored()` REFUSES. The refusal is
-          CORRECT. And the figure is CONTESTED: the pilot produced none
-          (INC-142, 0 of 20) and the calibration's own report REFUSED to
-          select N. Four candidate figures, three options, NONE PICKED.
-   Q-218  C14 REVIEW 1's OPEN BLOCKER B-1 SITS ON 90 OF THE 150 EPISODES.
-          Any LaneStopped inside a judge call raises DenominatorError out of
-          `execute`: no report, no denominator, every remaining episode
-          unattempted. The calibration and the pilot both ran arm 1 with NO
-          JUDGE AT ALL, so the sweep is the FIRST block that can trigger it
-          and the ONLY block whose numbers are published. GO/NO-GO.
+   Q-216  N IS NOT SELECTABLE -- ! RESOLVED MID-SESSION, BY SOMEBODY ELSE.
+          This was written while `n_decision.measured_tokens_per_episode` was
+          TODO_C14_PILOT, so `load_scored()` REFUSED - correctly, and this
+          session deliberately did not route around it. The concurrent C14 FIX
+          (`3e91b7c5`) then landed `c3aa9b4`: 144668 and selected_branch 30.
+          RE-MEASURED IMMEDIATELY AFTER: the sweep path now assembles from the
+          REAL config/ with nothing typed - N=30, 150 episodes,
+          scored__1__2001__gemma-26b .. scored__4__2030__gemma-26b,
+          imbalance 1. THE ENTRY IS KEPT IN FULL, because its body is the
+          record of WHY the code refuses and that refusal is still live.
+          ! One thing in it is vindicated: `selected_branch` landed as the
+          INTEGER 30, not a letter or a branch name. driver/scored.py reads
+          the MEASURED figure and DERIVES through the rule rather than parsing
+          `selected_branch`, whose format this session could not know - so
+          nothing had to be guessed and nothing changes now it is visible.
+
+   Q-218  !! STILL OPEN AND IT GATES THE RUN. C14 REVIEW 1's BLOCKER B-1 SITS
+          ON 90 OF THE 150 EPISODES. Any LaneStopped inside a judge call
+          raises DenominatorError out of `execute`: no report, no denominator,
+          every remaining episode unattempted. The calibration and the pilot
+          both ran arm 1 with NO JUDGE AT ALL, so the sweep is the FIRST block
+          that can trigger it and the ONLY block whose numbers are published.
+          GO/NO-GO.
 
  SPEND: ZERO. No provider call in any mode. This session held no token
  sanction and took none. THE SWEEP WAS NOT RUN. NO TAG CUT OR MOVED.
@@ -197,11 +213,23 @@
  for a reason unrelated to their assertions. `_protocol_override` now delegates
  every other name to the real loader, and its docstring records why.
 
- GREEN IN THE WORKING TREE: 36 passed, 0 skipped.
- ! ZERO SKIPS IS DELIBERATE. One test originally skipped when probe-v1
- resolved - which is HERE, TODAY - making it vacuous exactly where the tag
- exists. It is driven against a directory that is not a git repository
- instead, and asserts BOTH directions. A skip is how a check dies quietly.
+ GREEN IN THE WORKING TREE: 36 passed, 0 SKIPPED, +116 ast.Assert.
+ ! ZERO SKIPS IS DELIBERATE AND IT COST TWO ROUNDS OF WORK, BOTH RECORDED.
+   (a) One test skipped when probe-v1 resolved - which is HERE, TODAY - making
+       it vacuous exactly where the tag exists. It is driven against a
+       directory that is not a git repository instead, and asserts BOTH
+       directions.
+   (b) !! The N-sentinel refusal test skipped once the key was DETERMINED, and
+       the key LANDED MID-SESSION (c3aa9b4). That guard was correct while the
+       key was a sentinel and became a PERMANENT SKIP the moment it was not -
+       on the refusal that stops a scored run BEFORE N is selected, with a
+       green tick beside it. It now copies config/ into tmp_path, restores the
+       sentinel THERE, and drives the CLI against it via WHETSTONE_CONFIG_DIR,
+       asserting the fixture really restored the sentinel so it cannot pass by
+       asserting a refusal that cannot happen. The repository's config/ is a
+       frozen artefact and is NOT touched. Commit afc4eba.
+ A SKIP IS HOW A CHECK DIES QUIETLY, and (b) would have died exactly when it
+ began to matter.
 
 ================================================================================
 5. THE AST-EXACT TEST DIFF
@@ -210,9 +238,9 @@
  ast.Assert statements, session-start HEAD ed5eb5c vs the committed tree:
 
    file                                     ed5eb5c    now  delta
-   tests/test_c18_sweep.py                        0    114   +114
+   tests/test_c18_sweep.py                        0    116   +116
    ------------------------------------------------------------------
-   TOTAL ast.Assert across tests/              4078   4192   +114
+   TOTAL ast.Assert across tests/              4078   4194   +116
 
  ! ONE ROW. NO OTHER TEST FILE DIFFERS BY A SINGLE ASSERTION, AND NONE WAS
  OPENED. NOTHING DELETED, NOTHING SKIPPED, NOTHING WEAKENED. `git show
@@ -386,6 +414,9 @@
 9. EVERY `Swept:` LINE
 ================================================================================
 
+ ! FIVE COMMITS, and the two after the first push are corrections this session
+ made to ITSELF rather than defects left for a reviewer to find.
+
  8171458  feat(driver) - src/whetstone_gate/driver/{scored.py NEW, run.py,
           __main__.py, pilot.py, cal.py, __init__.py} and
           tests/test_c18_sweep.py NEW. No shared markdown in this commit.
@@ -393,6 +424,11 @@
 
  18f6477  fix(test) - tests/test_c18_sweep.py. Prose only; ast.Assert
           unchanged at 114.
+
+ afc4eba  test(sweep) - tests/test_c18_sweep.py. The N-sentinel refusal driven
+          against a FIXTURE config/ in tmp_path instead of skipping now that
+          the key has landed. ast.Assert 114 -> 116; both additions are in
+          that one test and NOTHING was removed or weakened.
 
  72df9e5  chore(records) - QUESTIONS.md (token row + Q-216..Q-220),
           INCIDENTS.md (INC-165, INC-166), PROGRESS.md (one entry, newest on
@@ -434,8 +470,10 @@
 ================================================================================
 
  1. SELECT N. Q-216. config/ is a pre-registration artefact and outside this
-    fence, the figure is contested, and choosing it is exactly what PROTOCOL.md
-    S3 forbids in capitals.
+    fence, the figure was contested, and choosing it is exactly what
+    PROTOCOL.md S3 forbids in capitals. ! The concurrent C14 FIX landed it at
+    c3aa9b4 during this session and the path now assembles from it - so the
+    refusal was the correct posture and cost nothing.
  2. FIX C14 REVIEW 1's BLOCKER B-1. Q-218. driver/episode.py IS inside this
     fence, and it was deliberately not touched: the defect is C14's under an
     open review FAIL, a FIX session owes the INCIDENTS entry BEFORE changing a
@@ -456,12 +494,10 @@
 12. WHAT THE ARCHITECT OWES, IN THE ORDER IT BLOCKS THINGS
 ================================================================================
 
- 1. !! RULE Q-216 AND LAND THE KEY. Until then the sweep cannot be dispatched
-    at all. Four candidate figures and three options are laid out; the ANSWER
-    is not in doubt (every candidate exceeds BOTH conjuncts, so all select the
-    same branch and Q-121 is not engaged) - only its PROVENANCE is, and
-    PROTOCOL.md S3 wants a recorded derivation, not a number that is right.
- 2. !! DECIDE Q-218. Either B-1 lands first, or the sweep is launched knowing
+ 1. Q-216 - ! ALREADY DONE, by the concurrent C14 FIX at c3aa9b4, while this
+    session was still running. Nothing owed. Re-measured here: the sweep path
+    assembles from the real config/ at N=30, 150 episodes.
+ 2. !! DECIDE Q-218. THIS IS NOW THE ONLY THING BETWEEN THE PATH AND THE RUN. Either B-1 lands first, or the sweep is launched knowing
     a judge-side fault on 60% of its episodes costs the entire run's report -
     and that acceptance belongs in evals/scored/RUN_DECLARED.md in terms.
  3. RULE Q-217, THE BLOCK LABEL. One keystroke now; impossible after the first
