@@ -522,3 +522,45 @@ miscount).
 ================================================================================
 END OF FINAL OUTPUT - C14 FIX - SESSION-TOKEN 6e2b8a53
 ================================================================================
+
+================================================================================
+ADDENDUM - COMMITTED AFTER THE BLOCK ABOVE, AND SAYING SO
+================================================================================
+
+  THIS FILE WAS COMMITTED AT 7e090a7 BEFORE THE FINAL TWO COMMITS EXISTED, WHICH
+  IS WHAT CLAUDE.md S6 DUTY 1 REQUIRES ("commit your FINAL OUTPUT ... BEFORE you
+  print it"). Two commits followed it, and one of them was NOT anticipated by
+  the table in this file's header. Both are named here so the printed report and
+  this file agree, rather than the printed report carrying a fact this record
+  does not.
+
+    7e090a7   docs/sessions/c14-witness-record-1.txt   524   0   this file
+    25abd60   PROGRESS.md                               89   0   the records
+              STATUS.md                                  1   1   commit
+    7832b37   INCIDENTS.md                               5   2   !! NOT
+                                                                 ANTICIPATED
+
+  !! WHY 7832b37 EXISTS. Hard rule 13 requires an INCIDENTS.md entry's `Fix:`
+     field to carry ITS COMMIT SHA - and the same rule requires the entry to be
+     written BEFORE the fix. At dd70f5a the field could therefore only hold a
+     FORWARD REFERENCE. Once ca859b9 and 7a60d76 existed, the field was filled
+     with the real SHAs, and the replacement text SAYS it held forward
+     references and why, rather than reading as though the SHAs were known all
+     along. "An invented incident has no commit." INC-172 has three.
+
+     THE ONLY TEXT CHANGED WAS ONE FIELD OF THIS SESSION'S OWN ENTRY, WRITTEN
+     TWENTY MINUTES EARLIER. No other entry was edited, moved or erased, and the
+     INCIDENTS.md heading count is unchanged at 170.
+
+  !! THE REGRESS IS NOT CLOSED AND IS NAMED RATHER THAN HIDDEN. This addendum is
+     itself committed by a commit it cannot name. A session's last commit can
+     never appear in its own record; what a record CAN do is say which commit is
+     last and why, which is what this paragraph does. The pushed SHA is the
+     first line of the printed report and resolves in the repository.
+
+  Swept: NOTHING. One declared path, append-only, read from live HEAD, name
+  comparison matched. Nothing above this addendum was altered.
+
+================================================================================
+END OF ADDENDUM - C14 FIX - SESSION-TOKEN 6e2b8a53
+================================================================================
