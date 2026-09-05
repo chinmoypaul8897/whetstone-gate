@@ -13392,3 +13392,195 @@ take it in one line.**
 `STATUS.md` already carries the `C12-DRIVER` precedent for exactly this — and the two records stop
 computing the same filename at all. **A uniqueness check catches the collision; a distinct chunk id
 means there is no collision to catch.**
+
+---
+
+## INC-171 — ⚠️⚠️ **A `LaneStopped` RAISED INSIDE THE GATE JUDGE'S MODEL CALL LEAVES THE TURN COUNTED AND UNCATEGORISED, SO `EpisodeCounts.reconcile()` — HARD RULE 11's OWN GUARD — RAISES `DenominatorError` OUT OF `execute` AND DESTROYS THE DENOMINATOR IT EXISTS TO PROTECT. FIFTH APPEARANCE OF ONE CLASS IN FOUR DAYS, SITTING ON 90 OF THE SWEEP'S 150 EPISODES**
+
+**Date:** 2026-09-05 (C14 FIX, `4c7e90ba`). ⚠️ **WRITTEN BEFORE THIS SESSION CHANGED A LINE OF
+CODE**, which is hard rule 13's requirement of a FIX session and `CLAUDE.md` §1's. Fix SHA under
+**Fix**.
+**Found by:** C14 REVIEW 1 (`2f7a6d18`) — `docs/reviews/REVIEW_C14_FLOOR_1.md` §1.2 and `B-1`,
+verdict **FAIL**, no tag cut. ⚠️ **RE-MEASURED FIRST-HAND HERE RATHER THAN COPIED**: a FIX session
+that takes a review's numbers on trust cannot tell a fixed defect from a mis-stated one, and
+`INC-158` is this repository's own entry about a renderer restating a record it had not checked.
+**Questions:** `Q-200` (the ruling this falsifies on three of five arms), `Q-202`, `Q-207`, `Q-218`
+(the go/no-go it gates), and **`Q-226`** — the architect's ruling this session was issued and
+implements, recorded there verbatim before this entry was written.
+
+**Event:** on arms **2, 2S and 3** — the three arms of five that run a gate judge — the floor
+`Q-200` installed books its usage row, raises `LaneStopped` **from inside `gate.decide`**, and the
+run dies anyway one statement later. `driver/episode.py:_Executor.execute` counts a turn at
+`self.counts.attempted += 1` (`:655`) and categorises it at `self.counts.decided += 1` (`:681`),
+with `self.gate.decide(action, state)` between them at `:680`. On a judged arm that call is
+`gates/judge.py:ModelGate.decide`, whose `self.client.complete(...)` at `judge.py:237` is wrapped in
+no `try` at all, and which runs `driver/episode.py:_JudgeClient.complete` → `_MeteredCall.run` →
+the floor. **Any** `LaneStopped` it raises — a **429**, a token- or call-ceiling stop, a
+`PACER_REFUSED`, or the floor's own `UNEXPECTED_ERROR` — therefore abandons the turn **between**
+the two increments. `attacker/loop.py:278` has no handler, `run_one_episode` catches the
+`LaneStopped` at `:834`, and its **next statement** is `executor.counts.reconcile()` at `:837`,
+outside the floor, which raises `DenominatorError`, which nothing catches.
+
+⚠️ **MEASURED BY THIS SESSION ON LIVE `HEAD` = `19c0738`, BEFORE ANY EDIT**, with the pilot
+matrix at **arm 2** (20 episodes × 20 turns), the real `MeteredProviderClient` over a fake
+transport, the real `_PacedClient`, the real `execute` dispatch loop,
+`driver/clients.py:_http_post` replaced by a function that **raises**, the output root a **fresh OS
+temp directory**, attacker replies a parseable on-surface `fetch_payments` call so the judge is
+genuinely reached, and judge replies `DENY`. The fault is injected at **judge call 25** — inside
+episode 2, so "the run continues" is a real assertion and not a vacuous one:
+
+    MODE       ARM  OUTCOME                                        faults  judge_calls
+    none       2    RETURNED  causes=[None]                             0          400
+    timeout    2    RAISED DenominatorError @ episode.py:195           1           25
+    runtime    2    RAISED DenominatorError @ episode.py:195           1           25
+    429        2    RAISED DenominatorError @ episode.py:195           1           25
+    500        2    RAISED DenominatorError @ episode.py:195           1           25
+    none       1    RETURNED  causes=[None]                             0            0
+    timeout    1    RETURNED  causes=[None]                             0            0
+    runtime    1    RETURNED  causes=[None]                             0            0
+    429        1    RETURNED  causes=[None]                             0            0
+    500        1    RETURNED  causes=[None]                             0            0
+
+⚠️ **THE `none` ROW IS THE CONTROL AND IT IS WHAT MAKES THE OTHER FOUR MEAN ANYTHING:** with
+no fault, arm 2 completes every episode in the matrix through **400 real judge calls**, so the
+harness genuinely drives the judged path. ⚠️ **THE ARM-1 ROWS ARE WHY NOBODY SAW IT** — arm 1
+has no gate and no judge, so the identical injection is survived, and arm 1 is the only arm this
+project has ever run. The escape, verbatim:
+
+    File "src/whetstone_gate/driver/run.py", line 1097, in execute
+        episode = run_one_episode(
+    File "src/whetstone_gate/driver/episode.py", line 837, in run_one_episode
+        executor.counts.reconcile()
+    File "src/whetstone_gate/driver/episode.py", line 195, in reconcile
+        raise runner_episodes.DenominatorError(
+    whetstone_gate.runner.episodes.DenominatorError: turn counts do not reconcile: 5 attempted
+    against 4 decided + 0 unparsed + 0 off-surface = 4. A turn in none of the three categories
+    has left the record without saying so (hard rule 11)
+
+⚠️ **THE 429 ROW IS THE ONE TO READ TWICE.** Hard rule 12 and `PROCESS.md` §8 say *"a 429
+means the window is already spent: STOP and report"*. On a judged arm it does not report — it
+crashes. **And the shared lane makes that the common case rather than the rare one:**
+`PROTOCOL.md` §2.1 puts the reference attacker **and** the gate judge for arms 2/2S/3 on the same
+lane, `gemma-26b`, so `run.py`'s `lane_states[lane]` and `lane_states[judge_lane]` resolve to the
+**same `LaneBudget` object**; when the shared ceiling binds, whichever role is offered next raises,
+and on a judged arm the judge's raise is inside `gate.decide`. `INC-161` records a real 429 on that
+exact lane at the calibration's **second call**.
+
+⚠️ **THE BLAST RADIUS, FROM `Q-218`'s OWN MEASUREMENT OF THE BLOCK THAT WOULD HIT IT:** of the
+sweep's **150** scored episodes, **90 (60%)** are on arms 2/2S/3. **The calibration and the pilot
+both ran arm 1 and could not reach this path, so the sweep is the first block that can trigger it
+and the only block whose numbers are published.**
+
+⚠️ **IT IS NOT A REGRESSION, AND THAT IS STATED SO THE SEVERITY IS NOT INFLATED.** C14 REVIEW 1
+hashed every frame on the path at `67839d0` and `b01edaa` and only `_MeteredCall.run` differs; a
+judge-side 429 killed the run this way **before** the floor existed. What is new is that `Q-200`
+states the property *"THE RUN CONTINUES TO THE NEXT EPISODE"*, and on three of the five arms the
+sweep runs, it did not.
+
+**Action:** ⚠️ **NOTHING WAS RUN, NOTHING WAS RETRIED AND NOT ONE PROVIDER TOKEN WAS SPENT.**
+This session held no sanction and took none; every measurement above and below replaced
+`driver/clients.py:_http_post` with a function that raises, so a reach for the real transport is an
+`AssertionError` and not a spend. `evals/` was **read and never written** — every harness wrote to
+a fresh `tempfile.TemporaryDirectory()`, never into the repository. `config/`, `PROTOCOL.md`,
+`tests/goldens/` and every frozen artefact were untouched (a concurrent C14 FIX session, `5b8c31e7`,
+holds two of them). **No tag was cut or moved.** In order: the architect's ruling was transcribed
+verbatim to `Q-226`; **this entry was written and committed**; then, and only then, the fix and its
+tests.
+
+**Expectation:** `Q-200`'s ruling in its own words — *"ANY exception escaping the model call is
+BOOKED AS A COUNTED, NAMED OUTCOME **AND THE RUN CONTINUES TO THE NEXT EPISODE**"* — and hard rule
+11's *"every dropped episode is counted, categorised and printed as a number"*. A judge call is a
+model call. What actually happened is that the episode **was** booked, correctly, with its correct
+cause, and then the process died before a single number reached the report: no denominator, no
+per-cause counts, no per-lane budget, and every remaining episode never attempted. **A guard that
+destroys the record it guards is worse than no guard**, because the failure it produces is the one
+it was installed to prevent.
+
+**Missing:** ⚠️ **A CATEGORY TO WRITE IT INTO.** `EpisodeCounts` had exactly three turn
+categories — `decided`, `unparsed`, `off_surface` — and the state *"counted, then abandoned
+before it could be categorised"* is representable in **none** of them, so even a session that saw
+the failure had nothing honest to record. Missing too, and smaller but real: the `DenominatorError`
+message states the arithmetic (*"5 attempted against 4 decided"*) and names **neither the turn that
+was abandoned nor the cause that abandoned it**, so from the traceback alone an operator cannot
+separate a judge-lane 429 from a ledger defect — and `raise ... from None` in the floor has already
+discarded the frame that would have said. ⚠️ **And the largest one: no test anywhere in `tests/`
+drove a `LaneStopped` out of a judge call on a judged arm.** `tests/test_c14_unexpected_escape.py`
+drives `load_pilot(arm="1")` only, and its fake transport returns text that `parse_call` refuses, so
+**every turn of both its end-to-end tests is counted `unparsed` and `gate.decide` is never
+executed** — measured by the review at 384 of 384 turns. The five unit tests build a bare
+`_MeteredCall` with `lane="gemma-26b"`, **which is the judge lane**, and there is no judge, no
+`ModelGate` and no `gate.decide` anywhere in the file: the lane name creates the appearance of judge
+coverage without any.
+
+**Missed:** ⚠️⚠️ **TWO SIGNALS, BOTH WRITTEN DOWN BY THIS PROJECT, BOTH READ AS
+REASSURANCE.**
+
+1. **`Q-202` NAMED THE GAP AND STOPPED ON IT — AND ITS LIST IS THE WRONG LIST.** The session that
+   built the floor enumerated four uncovered sites — **world build, gate build, ledger write,
+   `_publish`** — and correctly refused to widen into them. **`executor.counts.reconcile()` is
+   none of the four.** It is *inside* `run_one_episode`, **one statement after the handler the
+   floor's own `LaneStopped` is caught by** — closer to the floor than any site the open question
+   lists, and reachable by the floor's own new exception. The gap was written down, accurately, and
+   the accuracy of the four made the absence of the fifth invisible.
+2. ⚠️ **THE SELF-INCRIMINATING ONE: `Q-144`'s RULING NAMED THE EXACT PRECONDITION AND TWO
+   SESSIONS READ IT AS A DESCRIPTION OF THE RISK RATHER THAN OF THE COVERAGE.** Its text says of
+   `OF-240`: *"the resumed-judged-arm token split that `runner/checkpoint.py` cannot recover —
+   **cannot fire on this run** … `OF-240` stays OPEN; it is merely not on this run's path."*
+   **That sentence names a judged arm plus a resume, and the sweep is the first block to have
+   both.** `INC-166` is that same sentence firing, in `render`, on the same block, hours before
+   this entry — **so the class had already arrived once today and the second instance was still
+   not looked for.** The general form nobody wrote: *every finding scoped "not on this run's path"
+   is a dated claim about **a run**, and it expires the moment the next block is built.* The pilot
+   ran arm 1 (`Q-144`), §10.3 and frozen `HOLES.md` §3.5 fix the calibration at arm 1, and every
+   test of the floor drives arm 1 — so *"no judge has ever run"* was true of the entire project's
+   history, and was never turned into *"the first block that runs one is the only block whose
+   numbers are published."*
+
+**Diagnosis:** `_Executor.execute` increments `attempted` **before** `gate.decide` and the matching
+category **after** it, so a `LaneStopped` raised inside the judge's `_MeteredCall` abandons the turn
+between the two and leaves `attempted > decided + unparsed + off_surface`; `run_one_episode`'s
+`executor.counts.reconcile()` then fires — correctly, one statement past the `except LaneStopped`
+that catches the stop and outside the floor — and raises `DenominatorError`, which nothing catches.
+**The class is unchanged in all five instances — `Q-174`'s `DriverClientError`, `Q-179`(2)'s
+`BucketError`, `INC-159`'s `TimeoutError`, `INC-160`'s `UsageError` from inside the `BucketError`
+handler, and this one — the escape ends the run one frame outside whatever catch was last
+installed.**
+
+**Fix:** `FIX_SHA_PENDING` (unreviewed) — under the architect's ruling of 2026-09-05, transcribed
+verbatim at `QUESTIONS.md` **`Q-226`**: *"a `LaneStopped` raised inside a judge call MUST BE BOOKED
+AND REPORTED, exactly as one raised inside an attacker call already is."*
+**`EpisodeCounts` gains a fourth turn category, `abandoned`**, and `_Executor.execute` books the
+turn into it when — and **only** when — a `LaneStopped` leaves that turn in none of the other
+three, then **re-raises the same exception unchanged**. The per-episode identity becomes
+`attempted == decided + unparsed + off_surface + abandoned`, `reconcile()` keeps refusing anything
+else, and the count **prints in every episode's turn accounting including at zero**
+(`PROCESS.md` §9). ⚠️ **NO CAUSE IS LAUNDERED**: the handler catches `LaneStopped` alone,
+records a count and re-raises — a 429 on the judge lane stays `RATE_LIMIT_429`, a ceiling stop
+stays a ceiling stop, and the episode is booked under its own cause exactly as before. ⚠️ **THE
+FLOOR IS NOT WIDENED**: no other exception type is caught anywhere, so a failed world build, a
+failed gate build, a `LedgerEntryError` and a `_publish` `OSError` still stop the run loudly, which
+is `Q-202`'s reasoning and it stands. ⚠️ **NO NEW SPEC VALUE** — nothing was added to `config/`
+and `config/` was not opened (hard rule 9). ⚠️ **NOTHING FROM THE EXCEPTION REACHES THE RECORD**
+— the fix books an integer; the only thing this path ever stores from an exception is still the
+floor's `type(exc).__name__`, never a message (`INC-147`, `INC-148`).
+
+**Systemic guardrail:** ⚠️ **THE TEST IS THE GUARDRAIL, AND ITS ARM IS WHAT MAKES IT ONE.**
+`tests/test_c14_judge_lane_stop.py` drives a **judged arm through a multi-episode matrix** — the
+shape `H-2` proved the existing suite structurally could not see — with attacker replies that
+genuinely parse as on-surface tool calls, so `gate.decide` really runs (asserted: the control makes
+**400** judge calls, and a test that made zero would be measuring nothing). It raises the stop
+**inside the judge call**, in four shapes with three different causes, and asserts that `execute`
+**returns**, that the cause is **not relabelled**, that the denominator **reconciles**, and that the
+cause **and the new `abandoned` count reach the printed report** — because an outcome booked and
+never printed is the same silence in a new place. ⚠️ **IT INCLUDES A RESUME**, which is the
+review's own stated precondition and `INC-166`'s: a judged arm plus a resume. ⚠️ **AND IT KEEPS
+THE DETECTOR HONEST**: one test asserts that `reconcile()` still refuses a turn abandoned with no
+category booked, so the fix cannot be mistaken for `Q-207`'s option 4 — catching the
+`DenominatorError` — which would have converted hard rule 11's one detector into a silence.
+⚠️ **WHAT IT DOES NOT CLOSE, STATED SO IT IS NOT MISTAKEN FOR CLOSED:** `H-1` (the floor's own
+`on_usage` can raise from inside its `except` clause, `INC-160`'s mechanism, and the same exposure
+is in all three sibling branches and on the success path) is **not** touched here — it is outside
+the one finding this session was issued, and it remains open. The **general** guardrail — *"no
+per-turn accounting may be left un-reconciled by any exception"* — would need every raise site
+between `attempted += 1` and the categorisation to be enumerated, which is `Q-202`'s Class A trade
+and still the architect's.

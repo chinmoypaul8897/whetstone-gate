@@ -146,6 +146,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `3e91b7c5` | C14 | FIX | 2026-09-05 |
 | `6a4f28de` | C18 | BUILD | 2026-09-05 |
 | `5b8c31e7` | C14 | FIX | 2026-09-05 |
+| `4c7e90ba` | C14 | FIX | 2026-09-05 |
 
 ⚠️⚠️ **THE `5d7e2b91` ROW IS SELF-RECORDED, AND IT IS THE ROW FOR A TOKEN THAT WAS ISSUED TO **TWO**
 LIVE SESSIONS.** `QUESTIONS.md` `Q-180` and `Q-187` — two independent detections of one event.
@@ -17415,3 +17416,131 @@ enumerate."*). **Owner:** the architect. ⚠️ **Every row expires at `git tag 
 here five days later, because the ruling assigned it to *"a session that holds `config/`, §8.6 and
 the registry"* and **no such session has been issued.** Everything else in this table is an open
 question; row 1 is a **closed** one that nobody could execute.
+
+---
+
+## ⚠️⚠️ RAISED BY C14 FIX — THE JUDGE-LANE STOP (`4c7e90ba`), 2026-09-05 — `Q-226`
+
+⚠️ **NUMBERED FROM `git show HEAD:QUESTIONS.md` IMMEDIATELY BEFORE THE APPEND** (`INC-137`), at
+`HEAD` = `19c0738`, where the highest was **`Q-225`**. A concurrent **C14 FIX** session
+(`5b8c31e7`) may still be live in this working tree holding `config/` and `PROTOCOL.md`, so this
+append refused unless `QUESTIONS.md` still equalled `HEAD`'s blob **byte for byte**
+(`INC-140`, `INC-149`). **If a collision happened anyway, this renumbers BENEATH the other
+session's**, exactly as `INC-159`/`INC-160` and the `Q-207`…`Q-209` block did. **Nothing of anybody
+else's text was edited, renumbered or reordered.**
+
+---
+
+### ⚠️⚠️ `Q-226` — **ARCHITECT RULING, 2026-09-05, RECORDED VERBATIM (hard rule 5): A `LaneStopped` RAISED INSIDE A JUDGE CALL MUST BE BOOKED AND REPORTED, EXACTLY AS ONE RAISED INSIDE AN ATTACKER CALL ALREADY IS. THIS CLOSES C14 REVIEW 1's BLOCKER `B-1` AND ANSWERS `Q-207` IN SUBSTANCE**
+
+**Status:** **RULED.** **Issued to:** C14 FIX (`4c7e90ba`), 2026-09-05, in that session's prompt.
+**Transcribed here before this session touched a line of code**, and before `INCIDENTS.md`
+**`INC-171`** was written — hard rule 5: *"RULINGS ARE RECORDED VERBATIM in QUESTIONS.md before
+anything else is touched."*
+**The finding:** `docs/reviews/REVIEW_C14_FLOOR_1.md` §2.1 **`B-1`**, verdict **FAIL**.
+**Blocking:** the sweep — `Q-218`'s go/no-go, `PROCESS.md` §12 RUN-3.
+
+**THE RULING, VERBATIM. Not paraphrased, not summarised, not reordered:**
+
+> "⚠️ A `LaneStopped` raised inside a judge call MUST BE BOOKED AND REPORTED, exactly as one raised
+> inside an attacker call already is. The run must print a reconciling denominator and every remaining
+> episode must be counted and categorised (hard rule 11).
+> ⚠️ CONSTRAINTS, ALL BINDING:
+>  * ⚠️ DO NOT CAUSE-LAUNDER. `b01edaa` guards the floor from relabelling an already-booked
+>    `LaneStopped`; a 429 on the judge lane must stay a 429 and keep its cause. A stop that arrives
+>    already booked is REPORTED AS BOOKED, never re-categorised as an unexplained fault.
+>  * ⚠️ DO NOT WIDEN THE FLOOR INTO WORLD OR GATE CONSTRUCTION. Q-202 stopped on that deliberately
+>    and its reasoning stands: booking a failed world-build as an episode outcome publishes a
+>    measurement taken against an instrument that failed to build. ⚠️ THIS FIX IS ABOUT THE JUDGE
+>    CALL, WHICH IS A MODEL CALL, AND NOTHING ELSE.
+>  * ⚠️ INTRODUCE NO NEW SPEC VALUE. Hard rule 9.
+>  * ⚠️ NEVER LET A PROVIDER MESSAGE OR ANYTHING KEY-SHAPED REACH A BOOKED RECORD — the TYPE NAME
+>    only. INC-147 measured redaction.py's scan as prefix-anchored and INC-148 measured a whole
+>    credential getting past it."
+
+**AND THE PROOF OBLIGATION THE SAME PROMPT ATTACHED, ALSO VERBATIM:**
+
+> "⚠️ THE TEST MUST DRIVE A JUDGED ARM (2, 2S or 3) THROUGH A MULTI-EPISODE MATRIX, RAISE THE STOP
+> INSIDE THE JUDGE CALL, AND ASSERT: `execute` RETURNS rather than raising; the episode is booked with
+> the RIGHT cause; the run continues or stops as the cause requires; the denominator RECONCILES; and
+> the cause with its count REACHES THE PRINTED REPORT. ⚠️ AN OUTCOME BOOKED BUT NEVER PRINTED IS THE
+> SAME SILENCE IN A NEW PLACE.
+> ⚠️ ADD A RESUME CASE — the review's own precondition is JUDGED ARM PLUS RESUME."
+
+---
+
+### `Q-226`(a) — ⚠️ **HOW IT WAS IMPLEMENTED, AND THE ONE CHOICE THE RULING DID NOT NAME. `Q-207` PRICED FOUR OPTIONS AND CALLED EVERY ONE OF THEM CLASS A; THIS SESSION TOOK OPTION 1 AND SAYS SO HERE SO A REVIEW CAN OVERTURN IT**
+
+**THE CHOICE, STATED PLAINLY BEFORE ITS DEFENCE.** `Q-207` — raised by the review that found `B-1`
+— sets out **four** repairs and observes that *"every available repair changes what is printed"*,
+which makes the shape **Class A**. **The ruling above orders the fix and does not name a shape.**
+So the order is the Class A authorisation and the *shape* is this session's, taken because a FIX
+session that stopped on the shape would deliver nothing on the day the sweep is the long pole —
+and it is recorded here, with the three rejected options and their costs, precisely so the review
+that is owed can overturn it rather than have to reconstruct it.
+
+**TAKEN — `Q-207` OPTION 1: A FOURTH TURN CATEGORY, `abandoned`, COUNTED AND PRINTED.**
+`EpisodeCounts` gains `abandoned: int = 0`; `_Executor.execute` books the turn into it when — and
+only when — a `LaneStopped` leaves that turn in none of the other three; the per-episode identity
+becomes `attempted == decided + unparsed + off_surface + abandoned`; and the figure prints in every
+episode's turn accounting **including at zero** (`PROCESS.md` §9). `Q-207`'s own table describes
+this option as *"keeps `attempted` honest and makes the loss visible, hard rule 11's own shape"*,
+and that is the whole argument: hard rule 11 requires every dropped unit to be **counted,
+categorised and printed as a number**, and this is the only one of the four that does all three.
+
+**REJECTED, WITH THE REASON, RATHER THAN LEFT UNSAID:**
+
+| | why not |
+|---|---|
+| **2. move `attempted += 1` after the categorisation** | the attacker call for that turn **was made and was billed**; a turn that stopped being counted because it did not finish is denominator shrinkage in miniature, which is hard rule 11's named failure |
+| **3. roll `attempted` back** | same objection as 2, and it makes a counter that decreases — `evals/` is append-only in spirit as well as on disk |
+| **4. catch the `DenominatorError` at `run_one_episode`** | ⚠️ **it swallows the one assertion in this program that detects an uncounted turn.** `Q-207` calls this *"the tempting one"* and the review says it would refuse it. It is hard rule 6's shape applied to an invariant, and `INC-159`'s lesson about catch lists says the same thing one level up: **a detector converted into a silence is worse than the failure it detected** |
+
+**WHAT MOVES IN A PRINTED RECORD, STATED EXACTLY, BECAUSE THAT IS WHY `Q-207` IS CLASS A:**
+  - **One line is added** to each episode's `PER-EPISODE TURN ACCOUNTING` block in the run report.
+    On any run with no abandoned turn it reads `ABANDONED mid-turn : 0`.
+  - **No existing count changes value.** `attempted`, `decided`, `unparsed`, `off_surface`,
+    `denied`, `indeterminate`, `executed`, `turns_run` and every token and call figure are
+    untouched, and `truncated` is still derived from `turns_run < turn_budget`.
+  - ⚠️ **NOTHING UNDER `evals/` CHANGES SHAPE.** `runner/checkpoint.py:DOCUMENT_KEYS` — C11's
+    frozen schema — carries **no per-turn counts at all**, so no checkpoint, no ledger and no usage
+    row gains, loses or alters a field. The calibration's and the pilot's committed logs still say
+    exactly what they said. **Only what a future report prints changes, and only by one line.**
+  - **`reconcile()`'s refusal message** now names four categories instead of three. It is a refusal
+    string, not a published number.
+
+**THE FOUR BINDING CONSTRAINTS, EACH ANSWERED WHERE IT IS ENFORCED RATHER THAN PROMISED:**
+  - **No cause laundering.** The new handler catches `LaneStopped` **alone**, increments an integer
+    and **re-raises the same exception object** — there is no `raise ... from`, no new exception and
+    no cause argument anywhere in it. A 429 on the judge lane arrives at `run_one_episode` as
+    `RATE_LIMIT_429` and the episode is booked under `RATE_LIMIT_429`. Asserted by test, per cause.
+  - **The floor is not widened.** No exception type other than `LaneStopped` is caught by this
+    change, and `LaneStopped` is raised in exactly one place in the program — `_MeteredCall.run`,
+    the model call. A failed world build, a failed gate build, a `LedgerEntryError` and a `_publish`
+    `OSError` all still stop the run loudly. **`Q-202`'s trade is untouched and its four sites stay
+    open.**
+  - **No new spec value.** `config/` was not opened and nothing was added to it. `abandoned` is a
+    counter, not a `CONTEXT.md` §8.6 constant; the hard rule 9 tripwire scans §8.6's table and there
+    is nothing here for it to find.
+  - **Nothing key-shaped reaches the record.** This change books an **integer**. The only thing this
+    path ever stores from an exception remains the floor's `type(exc).__name__` (`INC-147`,
+    `INC-148`), and that is unchanged.
+
+⚠️ **`Q-207` IS ANSWERED IN SUBSTANCE AND IS THE ARCHITECT'S TO CLOSE FORMALLY.** Its question is
+*"what does the record say when a turn is abandoned between `attempted += 1` and its
+categorisation?"* — and the record now says `abandoned`, with a number, in the report. **Not one
+byte of `Q-207`, `Q-208` or `Q-209` was edited**, and this entry does not mark them closed.
+⚠️ **`Q-218` IS NOT CLOSED BY THIS EITHER.** That entry is a **go/no-go on launching the sweep**;
+what this session can say is that `B-1` no longer destroys the run, measured on the shape that
+would have destroyed it. **The fix ships UNREVIEWED and a fresh adversarial review is owed**
+(`CLAUDE.md` §6.9); whether the sweep starts is the architect's.
+
+⚠️ **WHAT THIS SESSION DID NOT FIX, NAMED SO IT IS NOT MISTAKEN FOR FIXED.** The review's `H-1` —
+the floor's own `self.on_usage(...)` can raise an `OSError` from inside its `except` clause, where
+no sibling handler can see it, which is `INC-160`'s mechanism living inside the fix for
+`INC-160`'s class, and which the review measured in **all three sibling branches and on the success
+path** — is **outside the one finding this session was issued** (`CLAUDE.md` §1: *"fixes only the
+findings named"*) and **remains open**. `M-1`, `M-2`, `M-3`, `L-1` and `L-2` are likewise untouched.
+`INC-166`/`OF-240` was **not** touched either: the review names it in §2.5 and says in terms that it
+is *"not raised as a new finding and not carried to `OPEN_FINDINGS.md`"*, and it already carries a
+Fix SHA (`8171458`). **The review's findings are not this session's to edit or close.**
