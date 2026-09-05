@@ -13588,3 +13588,183 @@ the one finding this session was issued, and it remains open. The **general** gu
 per-turn accounting may be left un-reconciled by any exception"* — would need every raise site
 between `attempted += 1` and the categorisation to be enumerated, which is `Q-202`'s Class A trade
 and still the architect's.
+---
+
+## INC-172 — ⚠️⚠️ **`PROCESS.md` §6a.2 STEP 7 ENDS *"THEN, AND ONLY THEN, THE FIRST SCORED EPISODE MAY RUN."* THE STEP WAS NOT DONE AND THE SWEEP STARTED ANYWAY. ⚠️ THE SUBSTANTIVE PRECONDITION IT GUARDS *WAS* MET, IN ORDER, WITH 2 min 57 s TO SPARE — WHAT WAS SKIPPED IS THE STEP THAT MAKES THE WITNESS FINDABLE BY ANYONE BUT THE OPERATOR**
+
+**Date:** 2026-09-05 (C14 FIX, `6e2b8a53`). ⚠️ **WRITTEN BEFORE THIS SESSION CHANGED ANY OTHER LINE**,
+hard rule 13. ⚠️ **IT IS THE ARCHITECT'S ERROR, NOT A SESSION'S**: he sequenced *tag → gist → sweep*
+and omitted the recording step that sits between the second and the third. No session held
+`INCIDENTS.md` in its fence at the moment it was due, and no session was asked to do it.
+
+**Event:** `PROCESS.md` §6a.2 is the operator procedure for the freeze. Step 6 publishes the public
+gist. **Step 7 reads, verbatim:**
+
+> **7. Record the gist's own coordinates**, because a gist can be edited later and the reviewer must
+> check the *first* revision: […] Write `created_at` and `first_version` into `INCIDENTS.md` and into
+> the README's verification section. **Then, and only then, the first scored episode may run.**
+
+⚠️ **Step 7 was not performed.** No `curl` was run, no `created_at` and no `first_version` were
+written into `INCIDENTS.md` or the README, and the scored sweep began. **What actually happened, in
+order — every timestamp UTC, and every one with the source a third party reads it from:**
+
+| UTC | event | source, and whether it is ours to set |
+|---|---|---|
+| `2026-09-05T09:05:17Z` | `prereg-v1` tagger date | the tag object. ⚠️ **client-settable — printed for completeness, NOT as evidence** |
+| **`2026-09-05T09:10:29Z`** | ⚠️ **GIST #1 PUBLISHED *SECRET*** — `a148d01a7bb609ef51713e097a7fcb89` | GitHub `created_at`. **`"public": false`**, measured by this session |
+| **`2026-09-05T09:14:25Z`** | **GIST #2 PUBLISHED *PUBLIC*** — `5e6478a57cb5903b55b0e12775db85e0` — **THE WITNESS** | GitHub `created_at`, server-assigned; the create endpoint takes only `description`, `files`, `public` |
+| — | ⚠️⚠️ **STEP 7. NOT DONE.** | — |
+| `2026-09-05T09:17:03Z` | `879012a` commits `PREREG_FINGERPRINT.txt` and `prereg-v1.sha256` | git author date |
+| `2026-09-05T09:17:07Z` | the operator's declared start | `evals/scored/RUN_DECLARED.md` §8 |
+| `2026-09-05T09:17:12Z` | the preflight liveness call | `evals/usage/liveness-SCORED-2026-09-05.jsonl` |
+| **`2026-09-05T09:17:22Z`** | ⚠️ **THE FIRST SCORED EPISODE'S FIRST PROVIDER CALL** | `evals/usage/gemma-26b-2026-09-05.jsonl`, first row whose `episode` is `scored__1__2001__gemma-26b` |
+| `2026-09-05`, this entry | step 7 performed, ≈ **8 h 45 m late** | this entry, and `README.md` §12.4 |
+
+⚠️⚠️ **AND THE SCOPE, STATED EXACTLY, BECAUSE OVERSTATING THIS IS AS DISHONEST AS OMITTING IT.** The
+**substantive** precondition — `prereg-v1` cut, **then** the public witness gist, **then** the first
+scored provider call — **WAS MET, IN THAT ORDER, AND IT IS CHECKABLE WITHOUT TRUSTING US**:
+`09:17:22Z − 09:14:25Z = 00:02:57`. One side of that subtraction is a timestamp GitHub's servers
+assigned; the other is a row in a committed file. **Nothing about the freeze's ordering is in doubt,
+and this entry does not claim otherwise.** ⚠️ **What was skipped is narrower, and is still real: the
+step that puts the witness's coordinates inside the repository, so that a judge can find and check
+the gist without the operator handing them the id.** Until this entry, `git grep -i gist` over the
+tracked tree returned **no gist id at all** (measured by C21 BUILD 3, `8d3b04fe`), and `README.md`
+printed its verification `curl` with a literal `<<PENDING-RUN: GIST_ID>>` until `2a7f95c1` filled it
+this afternoon. **The witness existed and was unfindable. That is the defect, and it is neither more
+nor less than that.**
+
+**Action:** this session ran step 7's `curl` for the **first time**, against **both** gists, and
+recorded every field. ⚠️ **The recovery was time-critical and is now permanent**: `history[]` is
+GitHub's, not ours, and **if either gist is ever edited, the oldest entry's fields are the only thing
+that still identifies what was published — and `created_at` is not that field.**
+
+```
+curl -s https://api.github.com/gists/5e6478a57cb5903b55b0e12775db85e0
+curl -s https://api.github.com/gists/a148d01a7bb609ef51713e097a7fcb89
+```
+
+| | **GIST #2 — the PUBLIC witness** | **GIST #1 — the SECRET first attempt** |
+|---|---|---|
+| id | `5e6478a57cb5903b55b0e12775db85e0` | `a148d01a7bb609ef51713e097a7fcb89` |
+| `public` | **`true`** | ⚠️ **`false`** |
+| **`created_at`** | **`2026-09-05T09:14:25Z`** | `2026-09-05T09:10:29Z` |
+| `updated_at` | `2026-09-05T09:14:26Z` | `2026-09-05T09:10:30Z` |
+| `len(history)` | **1** | **1** |
+| **oldest `history[]` `version`** (= `first_version`) | **`c8951a5a9ed2a8c22424e47467f050eb930fee5e`** | `54b2dc89378c7d6a05341997bf19efcd34428c56` |
+| **oldest `history[]` `committed_at`** | **`2026-09-05T09:14:25Z`** | `2026-09-05T09:10:29Z` |
+| filename | `whetstone-gate-prereg-v1.txt` | `whetstone-gate-prereg-v1.txt` |
+
+⚠️ **`len(history) == 1` ON BOTH, WHICH IS THE FIELD THAT MATTERS AND THE ONE NOBODY HAD LOOKED AT.**
+Neither gist has been edited even once, so the oldest revision **is** the current one and
+`created_at == committed_at` on both. **That equality is a measurement taken today, not a property —
+it stops holding the moment anyone edits either gist, which is precisely why §6a.2 orders the fields
+recorded rather than re-derived on demand.**
+
+⚠️ **WHY THERE ARE TWO GISTS, RECORDED RATHER THAN CONCEALED.** The first was published **secret**.
+A secret gist is *unlisted*, not private — anyone holding the URL reads it — but it is not
+discoverable, so it **cannot serve as the public anchor `PROCESS.md` §6a specifies**. A second,
+public gist was created **3 m 56 s** later with the same filename, and the first was **left in place
+rather than deleted**. ⚠️⚠️ **CONCEALING THE SECRET ONE WOULD BE THE EXACT DEFECT THIS ARTEFACT
+EXISTS TO RULE OUT**: deleting a failed timestamp attempt is indistinguishable, to any reader, from
+deleting an inconvenient one. **Both ids are now in this repository. The claim rests on the
+`09:14:25Z` public one, and it is still 2 m 57 s ahead of the first scored provider call.**
+
+⚠️⚠️ **AND ONE THING THAT GOT BETTER, MEASURED HERE FOR THE FIRST TIME AND NOT PREVIOUSLY CLAIMED.**
+`README.md` §12.4 has said since `2a7f95c1` that **the gist's body is unverified from inside this
+repository** — *"a witness whose body does not match the manifest witnesses nothing"* — and it was
+right not to assume. This session fetched the body and checked it:
+
+```
+the gist body's 10 manifest lines, extracted and written LF  ==  prereg-v1.sha256  (diff clean, byte-identical)
+sha256 of those 10 lines                                     ->  5ac111538247831f145260a275bf77df258a4fc21a22962a0419c954cd60acaf
+the COMBINED FINGERPRINT printed in the gist body            ->  5ac111538247831f145260a275bf77df258a4fc21a22962a0419c954cd60acaf
+PREREG_FINGERPRINT.txt in this repository                    ->  5ac111538247831f145260a275bf77df258a4fc21a22962a0419c954cd60acaf
+```
+
+**The witness attests THIS fingerprint.** ⚠️ **And the evidentiary status does not change:** this is
+a network fetch performed by one session at one time, **not** a fact this repository proves about
+itself. It is recorded as *"measured by `6e2b8a53` on 2026-09-05, and reproducible by any reader who
+runs the same `curl`"* — and it is **not** promoted into `README.md` §12.4's *"half one"*, which is
+reserved for what the repository re-derives from its own objects.
+
+⚠️ **ONE DISCREPANCY IN THE GIST BODY, NAMED BECAUSE THIS ENTRY READ THE BODY AND WOULD OTHERWISE BE
+SUPPRESSING IT.** The body's own prose line reads `Published:  2026-09-05T09:10:00Z (approx)` — the
+minute of the **secret** first attempt, carried forward unchanged into the public re-post. It is
+wrong by ≈ 4 minutes and **in the direction that flatters us** (earlier than the truth). ⚠️ **It is
+not the authoritative field, and the body says so itself in the next paragraph**: *"the authoritative
+timestamp for this pre-registration is THIS GIST'S server-assigned `created_at`, not any git date."*
+**The authoritative field reads `2026-09-05T09:14:25Z`, and every document in this repository
+publishes that one.** ⚠️ **The gist is NOT edited to correct the prose** — an edit would destroy the
+single-entry `history[]` recorded above, and that is worth more than a tidy line.
+
+**Expectation:** step 7 is an **ordering gate**, not bookkeeping — its last sentence is *"Then, and
+only then, the first scored episode may run."* It should have blocked the sweep until the two fields
+were committed. Instead the sweep started, and the fields were recovered ≈ 8 h 45 m later by a
+session that had to be handed the second gist's id **in its prompt**, because nothing in the tree
+carried it.
+
+**Missing:** ⚠️ **any mechanical link between the recording and the run.**
+`evals/scored/RUN_DECLARED.md` §7.1 gates the run on *"no scored episode may run until `prereg-v1` is
+cut AND the external witness gist is published"* — the **substantive** half — and says nothing about
+the **recording** half, so the runner's own declaration could be satisfied in full while step 7 stood
+undone. There is no preflight check that `README.md` contains a gist id, no `make` target that fails
+on `<<PENDING-RUN: GIST_ID>>`, and no test asserting that a scored episode's start is preceded by a
+commit carrying the witness's coordinates. ⚠️ **And `PROCESS.md` §6a.2 splits the requirement across
+two files — `INCIDENTS.md` *and* the README — while the C-session prompts of 5 September fenced at
+least one of them out of every session that noticed.** The step had no single owner at the moment it
+was due.
+
+**Missed:** ⚠️⚠️ **TWO SESSIONS WROTE THIS EXACT VIOLATION DOWN, IN CAPITALS, HOURS BEFORE THIS
+ENTRY, AND NEITHER COULD ACT ON IT.** C21 BUILD 3 (`8d3b04fe`) recorded it as `Q-N`, quoting step 7's
+last sentence and stating *"The first scored episode ran at 09:17:22Z"*; C19 BUILD (`2a7f95c1`)
+recorded the same gap as `Q-232` and wrote into `README.md` §12.4 that the oldest history entry's two
+fields are *"recorded NOWHERE"* and that this is *"an owed item, not a closed one."* ⚠️ **Both were
+fenced out of `INCIDENTS.md` — the one file the rule names as a destination was the one file neither
+could open**; `Q-234` records that fence ambiguity in terms. ⚠️ **AND EARLIER STILL:** `PROTOCOL.md`
+§9 — **frozen**, and therefore read by every session in the freeze — already required the operator to
+record *"the gist's `created_at` and its OLDEST history entry's `version` and `committed_at`"*. **The
+requirement sat in a frozen artefact, was restated in the process document, and was raised twice as
+an open question, and the sweep still started without it.**
+
+**Diagnosis:** `PROCESS.md` §6a.2's ordering gate is enforced by nothing but the operator reading
+step 7 in sequence, and he sequenced *tag → gist → sweep*, skipping the one step between gist and
+sweep that produces no artefact the next step consumes. **Every downstream check — `RUN_DECLARED.md`
+§7.1, `make check-prereg`, the reviewer procedure — tests the freeze's *substance*, which was
+correct, so nothing anywhere went red on a missing *record*.**
+
+**Fix:** `<the QUESTIONS.md and README.md commits of this session, 6e2b8a53 — their SHAs are listed
+in docs/sessions/c14-witness-record-1.txt §6 and in this session's FINAL OUTPUT>`. Both gists'
+`created_at`, `public` flag, oldest `history[]` `version` and `committed_at` are recorded above and in
+`README.md` §12.4; **the secret gist's id is recorded in this repository for the first time**;
+`README.md`'s `<<PENDING-RUN: GIST_ID>>` was already filled by `2a7f95c1` and is confirmed here at
+**zero remaining occurrences**. ⚠️ **THE SWEEP WAS NOT STOPPED, SIGNALLED OR READ INTO, AND NOTHING
+IS RETROACTIVELY DATED.** The recording is stamped with the time it actually happened, and the gap
+above is published rather than closed by silence — **an ordering violation cannot be un-skipped, only
+disclosed.**
+
+**Systemic guardrail:** ⚠️ **PROPOSED, NOT SHIPPED, AND THE REASON IS THE FENCE AND THE LIVE SWEEP.**
+The check that closes this class is a preflight assertion in the runner's own start path: **refuse to
+dispatch a scored episode unless `README.md` §12 contains a 32-hex gist id and `INCIDENTS.md`
+contains its `created_at`** — mechanical, cheap, and **red at `09:17:22Z` on 5 September**, which is
+what makes it a real check rather than a tautology. **This session did not add it:** `src/` is
+untouchable while the sweep is live — a crash-resume re-imports it and this run cannot be repeated —
+and a guard landing unreviewed on the run's own dispatch path is worse than the gap it closes. It is
+written here so the next session with `src/` in its fence can take it in one assertion.
+⚠️ **AND THE NARROWER GUARDRAIL THAT NEEDS NO CODE, WHICH IS THE ONE THIS ENTRY ACTUALLY
+RECOMMENDS:** `PROCESS.md` §6a.2 step 7 names two destination files and **no owner**. Give it one —
+the session that publishes the gist records the coordinates, in the same half-hour, with both files
+in its fence — **or the step will keep falling into the gap between two fences.** That is `INC-141`'s
+mechanism (a duty whose only destination is a file the session may not open) and this is a further
+appearance of it.
+
+⚠️ **AND WHAT THIS ENTRY DOES *NOT* CLAIM, RECORDED HERE SO THE WITNESS IS NOT READ AS STRONGER THAN
+IT IS: THERE IS NO OPENTIMESTAMPS RECEIPT.** `find . -name '*.ots' -not -path './.git/*'` returns
+nothing; `opentimestamps-client` was never installed and `ots stamp` was never run. **Three of this
+project's own documents say otherwise and one of them is FROZEN** — `PROTOCOL.md`:1082–1083
+(*"OpenTimestamps is stamped alongside as a secondary, Bitcoin-backed anchor"*), `CONTEXT.md`:2107,
+and `PROCESS.md`:714–717 and :1490 — which is `Q-231`, ruled **record, do not fix**. **The gist's
+server-assigned `created_at` IS the witness and it is the only one, so the anchor is GitHub's word
+rather than Bitcoin's.** ⚠️⚠️ **AND NO RECEIPT WAS STAMPED TODAY, DELIBERATELY: a receipt created on
+the evening of 2026-09-05 would witness an instant EIGHT HOURS AFTER the first scored episode, and an
+anchor pointing at the wrong instant is worse than an absent one** — it would read as a
+pre-registration and be nothing of the kind.
