@@ -6,8 +6,11 @@
    8171458  feat(driver)   the sweep path + the seed-major dispatch order
    18f6477  fix(test)      a claim that became false while it was being written
    72df9e5  chore(records) Q-216..Q-220, INC-165, INC-166, STATUS, PROGRESS
+   52faf81  chore(journal) this file - AND IT CLOBBERED ANOTHER SESSION'S. INC-170
    afc4eba  test(sweep)    the N-sentinel refusal un-skipped, driven on a fixture
-   <this>   chore(journal) this file, plus Q-216's resolution note
+   f2ac432  chore(journal) Q-216's resolution note + this file corrected
+   f2be793  fix(journal)   THE CLOBBER RESTORED byte-for-byte + INC-170
+   <this>   chore(journal) this file, completed with INC-170
  PUSHED SHA: the last of these, stated as the first line of the report.
 
  The full record is committed VERBATIM at docs/sessions/c18-sweep-build-1.txt
@@ -340,7 +343,33 @@
           Guardrail: "none - accepted, because" a blanket except around the
           report is the shape Q-200's floor is careful NOT to be.
 
- THE THIRD is recorded as Q-219(d) rather than an incident, because nothing
+ INC-170  !! THIS SESSION OVERWROTE ANOTHER SESSION'S 1,045-LINE FINAL OUTPUT
+          AND PUSHED IT. CLAUDE.md S6.1 puts a record at
+          docs/sessions/<chunk>-<role>-<attempt>.txt; this session is C18 /
+          BUILD / 1, so it wrote c18-build-1.txt - WHICH ALREADY HELD THE OTHER
+          C18 BUILD'S RECORD (the RESULTS.md deliverable, 23903a0, 3 Sep).
+          FOUND BY THIS SESSION, reading `git show --numstat` over its own
+          commits and stopping on a line impossible for a new file:
+              52faf81   457   1024   docs/sessions/c18-build-1.txt
+          RESTORED BYTE FOR BYTE from the object store (blob 3453b9d, verified
+          with git hash-object); mine moved to c18-sweep-build-1.txt, likewise
+          verified. NOTHING LOST - git had both. The overwriting commits are
+          NOT rewritten and stand with INC-170 beside them.
+          MISSED, and it is the self-incriminating one: THE FILE WAS LISTED BY
+          NAME IN THIS SESSION'S OWN FIRST DIRECTORY LISTING, and this session
+          had ALREADY WRITTEN THE COLLISION UP AS Q-220 - then wrote to the
+          colliding FILENAME twenty minutes later without connecting the two.
+          The Write tool reported "updated" rather than "created" and that word
+          was not read.
+          GUARDRAIL PROPOSED, NOT SHIPPED, and the reason is the fence: one line
+          in tests/test_repo_invariants.py - every path under docs/sessions/
+          introduced by exactly ONE commit, RED today until the restore lands.
+          Not added because that is an existing test file outside this session's
+          "a NEW file, so 0 files changed for every existing suite" discipline.
+          ! AND THE REAL FIX IS Q-220, ALREADY OPEN: a distinct chunk id means
+          there is no collision to catch.
+
+ THE FOURTH is recorded as Q-219(d) rather than an incident, because nothing
  broke: the report ran `decide_n` on WHATEVER BLOCK HAD JUST FINISHED and its
  header was the literal "PILOT MEASUREMENT". ! MEASURED IN THE CALIBRATION'S
  OWN COMMITTED LOG, which prints `block label : CAL` at the top and `PILOT
@@ -516,6 +545,12 @@
  6. RULE Q-220, THE CHUNK LABEL, so a reviewer knows which deliverable "review
     C18" means - and note golden 6 is OWED and blocks ONE of the two.
  7. JUDGE Q-219(d). It changes what a future cal or pilot report prints.
- 8. A FRESH ADVERSARIAL REVIEW OF THIS SESSION. Nothing here is self-certified
-    and no tag was cut.
+ 8. ! TAKE INC-170's ONE-LINE GUARDRAIL, or rule Q-220 and make it moot. Every
+    path under docs/sessions/ introduced by exactly ONE commit.
+ 9. A FRESH ADVERSARIAL REVIEW OF THIS SESSION. Nothing here is self-certified
+    and no tag was cut. ! START WITH INC-170: this session destroyed another
+    session's record, pushed it, and found it only on its own final sweep. The
+    restore is verified by blob hash, but the class it belongs to - "the guard
+    that would have caught this was written by this session, as a question,
+    twenty minutes earlier" - is the one worth pressing on.
 ================================================================================
