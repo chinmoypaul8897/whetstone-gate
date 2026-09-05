@@ -151,6 +151,9 @@ appears that was never issued**, or if a token is reused across roles.
 | `2a7f95c1` | C19 | BUILD | 2026-09-05 |
 | `6e2b8a53` | C14 | FIX | 2026-09-05 |
 | `8d3b04fe` | C21 | BUILD | 2026-09-05 |
+| `1f7c3a9e` | C21 | BUILD | 2026-09-05 |
+| `4d9e17b3` | C21 | BUILD | 2026-09-05 |
+| `7b2e04c5` | C18 | BUILD | 2026-09-05 |
 
 ⚠️⚠️ **THE `5d7e2b91` ROW IS SELF-RECORDED, AND IT IS THE ROW FOR A TOKEN THAT WAS ISSUED TO **TWO**
 LIVE SESSIONS.** `QUESTIONS.md` `Q-180` and `Q-187` — two independent detections of one event.

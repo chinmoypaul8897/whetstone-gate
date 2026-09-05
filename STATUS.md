@@ -3253,3 +3253,15 @@ never opened; `make test` / `make eval` / `check-prereg` **not run** (README §1
 **Also owed:** the R2.3 grep defect (an `INCIDENTS.md` entry under hard rule 13, and a Class A
 question — §8's method is prescribed and it under-matches); and a ruling on the fifth hit, which is
 what 🔴 HOLD is waiting on.
+
+---
+
+## C18 — `eval` / the results document — **PUBLISHED, UNREVIEWED** (appended 2026-09-05, `SESSION-TOKEN 7b2e04c5`)
+
+| Chunk | State | Review history (⚠️ APPENDED, NEVER ERASED) |
+|---|---|---|
+| **C18** | ⚠️ **BUILT, UNREVIEWED, NOT SELF-CERTIFIED.** `RESULTS.md` rewritten from the ledgers committed at snapshot **`12df0b5`**, **with the sweep still in flight**. ⚠️ **THE VOID VERDICT IS PUBLISHED FIRST: THE RUN IS NOT VOID — arm-1 CANARY-A 5/8 = 62.50% against the frozen 20%, at n = 8, 95% Wilson [30.6%, 86.1%].** ⚠️ **`make eval` REFUSED (exit 2, no `evals/results/`)** and the refusal is published verbatim; the numbers were produced **by hand** through the repository's own scorer, so **`CONTEXT.md` §20's one-command claim is STILL NOT SATISFIED**. Arms 2 / 2S / 3 are **CONFOUNDED** (reach 0 vs arm 1's 14) and the **pre-registered arm-2-vs-arm-2S headline is published as CONFOUNDED and not compared** | **BUILD 1** — `7b2e04c5`, 2026-09-05, `docs/sessions/c18-eval-1.txt`. **No review yet. No `c18-pass` tag.** |
+
+⚠️ **THE NUMBERS DESCRIBE A SNAPSHOT, NOT THE RUN:** 36 episodes of a declared denominator of 150
+(arm 1 n=8; arms 2 / 2S / 3 / 4 n=7 each), 114 never started, 6 truncated and all six counted, 0
+dropped, all 36 chains `VALID`. **A later snapshot will carry more episodes and different numbers.**
