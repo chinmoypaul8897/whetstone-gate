@@ -997,9 +997,19 @@ PY
 ```
 
 ⚠️ **`evals/episodes/cal__1__*` ONLY.** The eleven `pilot__*` files are a **different block** (seeds
-2101–2110) and a careless `*gemma-26b*` glob sweeps them in. Two further stray episode files exist
-under `rev/` — seed 2199 and an arm-4 episode — which are **not** under `evals/` and entered nothing
-above.
+2101–2110) and a careless `*gemma-26b*` glob sweeps them in — one of them,
+`pilot__1__2101__gemma-26b`, carries **arm `1` AND lane `gemma-26b`**, so it is separable from the
+calibration **only by the `block` field**, and including it would give 2,936,277 tokens and a
+tokens/episode of 146,814 instead of 144,668. **Filter on the fields, never on the filename.**
+
+⚠️⚠️ **AND TWO STRAY EPISODE FILES EXIST UNDER `rev/`, WHICH IS NOT UNDER `evals/` AND ENTERED
+NOTHING ABOVE — BUT THEIR FILENAMES LIE, AND THAT IS WHY THEY ARE NAMED HERE RATHER THAN WAVED AT.**
+Measured 2026-09-05: `rev/evals/episodes/pilot__1__2199__gemma-26b.json` and
+`rev/evals/episodes/pilot__4__2101__gemma-26b.json` are **both internally `arm: 1`, `seed: 2101`,
+8 ledger entries**. The strings `2199` and `arm 4` appear **only in the names**. ⚠️ **That is exactly
+the filename-versus-field agreement the thirty calibration files were verified to HOLD** — so these
+two are the standing counter-example, and a reader who trusts a slug anywhere in this repository
+should look at them first.
 ---
 
 ## 7. THE PRE-REGISTERED HEADLINE COMPARISON — exactly one, named before the run
