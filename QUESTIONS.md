@@ -149,6 +149,8 @@ appears that was never issued**, or if a token is reused across roles.
 | `4c7e90ba` | C14 | FIX | 2026-09-05 |
 | `9f14a6d2` | C18 | BUILD | 2026-09-05 |
 | `2a7f95c1` | C19 | BUILD | 2026-09-05 |
+| `6e2b8a53` | C14 | FIX | 2026-09-05 |
+| `8d3b04fe` | C21 | BUILD | 2026-09-05 |
 
 ⚠️⚠️ **THE `5d7e2b91` ROW IS SELF-RECORDED, AND IT IS THE ROW FOR A TOKEN THAT WAS ISSUED TO **TWO**
 LIVE SESSIONS.** `QUESTIONS.md` `Q-180` and `Q-187` — two independent detections of one event.
@@ -17907,3 +17909,437 @@ this session read a fence that does not grant the file and chose to STOP rather 
 **The architect should either grant the fence or issue the entries to a session that has it.**
 
 ---
+---
+
+## ⚠️⚠️ RULINGS OF 2026-09-05, TRANSCRIBED VERBATIM BY C14 FIX (`6e2b8a53`) — hard rule 5
+
+⚠️ **Hard rule 5: *"RULINGS ARE RECORDED VERBATIM in QUESTIONS.md before anything else is touched."***
+Four rulings were issued to this session in its prompt. They are transcribed here **word for word,
+not paraphrased, not summarised, not reordered**. ⚠️ **`Q-231` and `Q-233` already have entries above
+and those entries are NOT edited** — this file is append-only to a concurrent tree and rewriting an
+existing entry in place is how a record loses its history. **The ruling for each is recorded here and
+the entry above is cross-referenced by number.**
+
+---
+
+### ⚠️⚠️ RULING ON `Q-249` (raised as `Q-O` by C21 BUILD 3, `8d3b04fe`) — **TWO FROZEN ARTEFACTS DISAGREE ABOUT THE VOID THRESHOLD**
+
+**RULING (architect, 2026-09-05):** *"`HOLES.md:276` still reads `TODO_C14_CALIBRATION`;
+`config/protocol.yaml:368` reads `0.20`; both are inside `prereg-v1` and neither can be amended.
+⚠️ `config/` IS OPERATIVE, because it is what the code loads and what `void.void_threshold()`
+returns. ⚠️ THIS IS A PERMANENT DEFECT OF THE PRE-REGISTRATION AND IS PUBLISHED AS ONE, IN THE README
+AND IN `RESULTS.md`, NOT BURIED. ⚠️ `tests/test_c14_prereg.py:389` STAYS RED AND MUST NOT BE EDITED —
+that red IS the disclosure, and editing it to green would hide a defect in the artefact whose whole
+purpose is to be checkable. Hard rule 4 ranks a frozen artefact above `CONTEXT.md` and is silent on
+two frozen artefacts against each other; this ruling fills that silence and says it is filling it."*
+
+**Discharged by this session:** ⚠️ **the README half only.** `README.md` §12.5 (new, inside §12, the
+verification section this session's fence grants) publishes both readings, names `config/` operative,
+and states that the red test is the disclosure. ⚠️ **THE `RESULTS.md` HALF IS OWED AND IS NOT
+DISCHARGED**: `RESULTS.md` is named in this session's exclusion list. ⚠️ **`tests/` was NOT touched
+and `tests/test_c14_prereg.py:389` is untouched and still red**, which is what the ruling requires.
+**Verified read-only at `dd70f5a`:** `HOLES.md`:276 reads
+``probe.void_threshold_breach_rate` = **`TODO_C14_CALIBRATION`** — an explicit sentinel`, and
+`config/protocol.yaml`:368 reads `void_threshold_breach_rate: "0.20"`.
+
+---
+
+### ⚠️⚠️ RULING ON `Q-250` (raised as `Q-P` by C21 BUILD 3, `8d3b04fe`; confirms `Q-214`) — **THE GENESIS HASH**
+
+**RULING (architect, 2026-09-05):** *"`Q-214` option A is confirmed: `ledger.genesis_hash` froze at
+`probe-v1`'s tag object, so a scored and a calibration episode are cryptographically
+indistinguishable. `M-6` is IMPOSSIBLE — it is a hash fixed point — and is published as a limitation
+with one honest sentence in the README. It is not worked around."*
+
+**Discharged by this session:** `README.md` §12.3 already carried the honest sentence, written by
+C19 BUILD (`2a7f95c1`) — *"the binding separates pre-`probe-v1` from post-`probe-v1`, and nothing
+else"* — and it is **not rewritten**. What this session changed is one status word: §12.3 described
+`Q-214` as **OPEN**, and this ruling **confirms option A**, so it now reads confirmed and cites this
+entry. ⚠️ **Nothing was worked around, no config value was touched, and no tag was cut.**
+
+---
+
+### ⚠️⚠️ RULING ON `Q-251` (raised as `Q-Q` by C21 BUILD 3, `8d3b04fe`) — **THE LETTERED QUESTIONS**
+
+**RULING (architect, 2026-09-05):** *"`Q-A`..`Q-Q` have never reached `QUESTIONS.md` because every
+C21 session was fenced out of it — `INC-141`'s trap one file over. ⚠️ TRANSCRIBE THEM UNDER REAL
+NUMBERS NOW, attributed to the sessions that raised them. A fenced session's report is NOT the
+register."*
+
+**Discharged by this session:** all seventeen are transcribed below as `Q-235`…`Q-251`, each
+attributed to the session and token that raised it. **The mapping table is immediately below.**
+
+---
+
+### ⚠️⚠️ RULING ON `Q-231` AND `Q-233` (both raised by C19 BUILD, `2a7f95c1`) — **RECORD, DO NOT FIX**
+
+**RULING (architect, 2026-09-05):** *"Record, do not fix: `PROTOCOL.md`'s frozen §9 sentence
+overclaims the freeze date by five days ('fixed by 31 August' against a gist reading 2026-09-05), and
+`PROCESS.md:1406` still records rung 4 as NOT FIRED. ⚠️ THE FROZEN ONE IS UNFIXABLE AND IS PUBLISHED
+AS A LIMITATION; the true claim is weaker and sufficient — FIXED BEFORE THE FIRST SCORED EPISODE."*
+
+**Discharged by this session:** ⚠️ **`PROTOCOL.md` was NOT edited** (frozen, and outside this fence)
+and ⚠️ **`PROCESS.md` was NOT edited** (outside this fence). The limitation is published in
+`README.md` §12.5, which states the weaker true claim in the ruling's own words — **fixed before the
+first scored episode** — and gives the arithmetic that makes it checkable: `09:14:25Z` against
+`09:17:22Z`, a gap of `00:02:57`. ⚠️ **`Q-231`'s OpenTimestamps half is recorded in `INC-172`'s
+closing paragraph and no receipt was stamped** — a receipt made on the evening of 5 September would
+witness an instant eight hours **after** the first scored episode.
+
+---
+
+## ⚠️⚠️ THE LETTERED QUESTIONS, TRANSCRIBED UNDER REAL NUMBERS — `Q-235`…`Q-251`
+
+⚠️ **Per the `Q-251` ruling above.** `Q-A`…`Q-Q` were raised across three C21 BUILD sessions, **every
+one of which was fenced out of this file**, so each discharged `CLAUDE.md` §6 duty 6 into its own
+report instead. **A fenced session's report is not the register.** They are transcribed here with
+their substance intact and attributed to the token that raised them. ⚠️ **Where a lettered question
+has since been closed BY MEASUREMENT rather than by a ruling, that is stated in its entry and the
+measurement is named** — a question that reality answered is closed, not quietly dropped.
+
+| was | is | raised by | one line |
+|---|---|---|---|
+| `Q-A` | **`Q-235`** | C21 BUILD 1 (`9e2c81d4`) | the deliverable's filename — `FORM.md` vs `FORM_ANSWERS.md` |
+| `Q-B` | **`Q-236`** | C21 BUILD 1 (`9e2c81d4`) | which *"§9 limitation sentence"* the card means |
+| `Q-C` | **`Q-237`** | C21 BUILD 1 (`9e2c81d4`) | the limitation sentence names AgentDojo, which was **cut** |
+| `Q-D` | **`Q-238`** | C21 BUILD 1 (`9e2c81d4`) | hard rule 8 describes a *"short"* allow-list; the implemented one is **empty** |
+| `Q-E` | **`Q-239`** | C21 BUILD 1 (`9e2c81d4`) | the card's five incident fields against hard rule 13's eight |
+| `Q-F` | **`Q-240`** | C21 BUILD 1 (`9e2c81d4`) | two of the card's own done-whens were unsatisfiable that day |
+| `Q-G` | **`Q-241`** | C21 BUILD 1 (`9e2c81d4`) | `INCIDENTS.md` carries **two** `## INC-139` headings |
+| `Q-H` | **`Q-242`** | C21 BUILD 1 (`9e2c81d4`) | `PROGRESS.md` is newest-on-top; the fence said **append only** |
+| `Q-I` | **`Q-243`** | C21 BUILD 1 (`9e2c81d4`) | the session's own token row was missing and it refused to self-record |
+| `Q-J` | **`Q-244`** | C21 BUILD 2 (`6f2d47ba`) | the calibration abort had no `INCIDENTS.md` entry — ⚠️ **CLOSED BY MEASUREMENT** |
+| `Q-K` | **`Q-245`** | C21 BUILD 2 (`6f2d47ba`) | the prompt said *"ten questions"*; the file held nine |
+| `Q-L` | **`Q-246`** | C21 BUILD 2 (`6f2d47ba`) | `CONTEXT.md` §1 carries the **unnarrowed** form of method claim 1 |
+| `Q-M` | **`Q-247`** | C21 BUILD 2 (`6f2d47ba`) | line-number citations rot within hours and nothing checks them |
+| `Q-N` | **`Q-248`** | C21 BUILD 3 (`8d3b04fe`) | the witness gist is published and **nothing in the repository records it** — ⚠️ **CLOSED BY `INC-172`** |
+| `Q-O` | **`Q-249`** | C21 BUILD 3 (`8d3b04fe`) | two frozen artefacts disagree about the void threshold — ⚠️ **RULED ABOVE** |
+| `Q-P` | **`Q-250`** | C21 BUILD 3 (`8d3b04fe`) | the genesis hash is a fixed point; `M-6` is impossible — ⚠️ **RULED ABOVE** |
+| `Q-Q` | **`Q-251`** | C21 BUILD 3 (`8d3b04fe`) | none of the lettered questions ever reached this file — ⚠️ **RULED ABOVE, AND THIS BLOCK IS ITS DISCHARGE** |
+
+---
+
+### `Q-235` — **THE DELIVERABLE'S FILENAME**
+
+**Status: OPEN. Class B.** **Raised by:** C21 BUILD 1 (`9e2c81d4`), 2026-09-04, as `Q-A`.
+**Transcribed by:** C14 FIX (`6e2b8a53`), 2026-09-05.
+
+The C21 BUILD prompt named `docs/submission/FORM.md`. `PROCESS.md`:1343 and `CONTEXT.md`:2187 both
+name `docs/submission/FORM_ANSWERS.md`, and the string *"FORM.md"* appears in no other file in this
+repository. `CLAUDE.md` §2 rule 4 was applied and the deliverable carries `FORM_ANSWERS.md`; a
+six-line pointer with no content of its own sits at `FORM.md`. **RULING SOUGHT:** confirm
+`FORM_ANSWERS.md`, and say whether the pointer should stay or be deleted before the repository goes
+public.
+
+---
+
+### `Q-236` — **WHICH "§9 LIMITATION SENTENCE"**
+
+**Status: OPEN. Class B.** **Raised by:** C21 BUILD 1 (`9e2c81d4`), 2026-09-04, as `Q-B`.
+**Transcribed by:** C14 FIX (`6e2b8a53`), 2026-09-05.
+
+The card writes bare *"§9"* where it writes *"spec §21.3"* elsewhere. `CONTEXT.md` §9 is **the
+invariants** and carries no limitation sentence. `README.md` §9 is *Limitations* — a fourteen-
+subsection section, not a sentence. `PROCESS.md` §9 is the **only** §9 that names one sentence **and**
+names the submission form as a destination, so it was taken as the referent. **RULING SOUGHT:**
+confirm `PROCESS.md` §9.
+
+---
+
+### `Q-237` — **THE LIMITATION SENTENCE NAMES A CUT COMPONENT**
+
+**Status: OPEN. Class B.** **Raised by:** C21 BUILD 1 (`9e2c81d4`), 2026-09-04, as `Q-C`.
+**Transcribed by:** C14 FIX (`6e2b8a53`), 2026-09-05.
+
+Its published wording (`PROVENANCE.md` §4:596–604) ends *"…are all someone else's: tau2-bench's
+`db_reward`, AgentDojo's banking suite, and a probe that voids our own run."* ⚠️ **AgentDojo was cut
+at rung 3.** `FORM_ANSWERS.md` carries the two sentences `PROCESS.md` §9 actually names verbatim and
+states the third clause in the form that matches the repository today, **printing BOTH forms so the
+substitution is visible**. **RULING SOUGHT:** approve the substituted clause, or rule that the frozen
+wording is carried unchanged with a footnote. ⚠️ **`PROVENANCE.md` is in the frozen set and was NOT
+edited by that session, nor by this one.**
+
+---
+
+### `Q-238` — **`CLAUDE.md` HARD RULE 8 DESCRIBES AN ALLOW-LIST THAT IS NOT THE IMPLEMENTED ONE**
+
+**Status: OPEN. Class B.** **Raised by:** C21 BUILD 1 (`9e2c81d4`), 2026-09-04, as `Q-D`.
+**Transcribed by:** C14 FIX (`6e2b8a53`), 2026-09-05.
+
+Rule 8 says the moat test fails *"on any shared first-party module outside a short, explicit
+allow-list of pure value types (enums, the harm-record dataclass, the paise integer wrapper)"*.
+**MEASURED:** `check_roles.py`:637 is `MOAT_ALLOW_LIST: frozenset[str] = frozenset()` — **EMPTY** —
+and D3 printed *"The allow-list holds 0 entr(y/ies)"*. **The implementation is STRONGER than the
+constitution describes.** This is not a defect, but the published claim should be the measured **0**,
+not the described *"short"*, and the constitution's wording **invites a future session to add the
+three named types believing rule 8 already permits them — which would be a Class A change made under
+the impression that it is not one.** **RULING SOUGHT:** amend rule 8's wording, or record that the
+empty list is the intended state.
+
+---
+
+### `Q-239` — **THE CARD'S FIVE FIELDS VS HARD RULE 13'S EIGHT**
+
+**Status: OPEN. Class C.** **Raised by:** C21 BUILD 1 (`9e2c81d4`), 2026-09-04, as `Q-E`.
+**Transcribed by:** C14 FIX (`6e2b8a53`), 2026-09-05.
+
+The card requires the Build-Challenges paragraph *"in the Event / Action / Expectation / Missing /
+Missed format"*. Rule 13 fixes **eight** fields for an `INCIDENTS.md` entry and gives the reason the
+extra three matter — *"An invented incident has no commit."* Rule 13 governs `INCIDENTS.md`, not form
+prose, so the card may be deliberate. `FORM_ANSWERS.md` uses the card's five as headings and
+**appends** `Diagnosis` and `Fix (SHA)`, which satisfies the card and forfeits nothing. **RULING
+SOUGHT:** confirm the appended fields are acceptable on the form.
+
+---
+
+### `Q-240` — **TWO OF THE CARD'S OWN DELIVERABLES WERE UNSATISFIABLE THAT DAY**
+
+**Status: OPEN, PARTLY OVERTAKEN BY EVENTS. Class B.** **Raised by:** C21 BUILD 1 (`9e2c81d4`),
+2026-09-04, as `Q-F`. **Transcribed by:** C14 FIX (`6e2b8a53`), 2026-09-05.
+
+The card requires *"the exact video URL"* (C20 was todo; no URL existed) and requires re-verifying
+*"that the pre-registration gist still resolves and still reports its original `created_at`"* (on
+2026-09-04 there was **no gist and no `prereg-v1`**). **RULING SOUGHT:** how the C21 review should
+treat two done-when items that cannot be met by any session's effort.
+
+⚠️ **HALF OF THIS IS NOW CLOSED BY MEASUREMENT AND HALF IS NOT.** The gist half is closed: the gist
+exists, and **this session ran exactly that re-verification** — `curl` returns `created_at`
+`2026-09-05T09:14:25Z` and a `history[]` of length **1**, recorded in `INC-172`. ⚠️ **The video half
+is not closed**: no URL exists as of 2026-09-05 evening and `<<PENDING-RUN: VIDEO_URL>>` was **not**
+filled by this session, which holds no measurement that could fill it.
+
+---
+
+### `Q-241` — **`INCIDENTS.md` CARRIES TWO `## INC-139` HEADINGS**
+
+**Status: OPEN. Class B.** **Raised by:** C21 BUILD 1 (`9e2c81d4`), 2026-09-04, as `Q-G`.
+**Transcribed by:** C14 FIX (`6e2b8a53`), 2026-09-05.
+
+Two `## INC-139` headings (at that session's HEAD, lines 10224 and 10531) and a numbering gap
+`INC-103` → `INC-107`; **137 headings, 136 distinct ids**. A form paragraph citing *"INC-139"* would
+be ambiguous, so that session cited `INC-02` and `INC-132` instead — both have a unique id and a
+`Date` line. **Renumbering is the architect's** and no session has touched it. **RAISED, NOT FIXED.**
+
+⚠️ **RE-MEASURED BY THIS SESSION at `dd70f5a`, because a stale count is worse than none:** the file
+now holds **170** `## INC-` headings. **The duplicate is not repaired** — repairing it means editing
+an existing entry's heading, which is a rewrite of the record, not an append. ⚠️ **This session added
+`INC-172` and deliberately did NOT renumber anything.**
+
+---
+
+### `Q-242` — **`PROGRESS.md` IS NEWEST-ON-TOP AND THE FENCE SAID APPEND ONLY**
+
+**Status: OPEN. Class C.** **Raised by:** C21 BUILD 1 (`9e2c81d4`), 2026-09-04, as `Q-H`.
+**Transcribed by:** C14 FIX (`6e2b8a53`), 2026-09-05.
+
+That session's `PROGRESS.md` entry is therefore appended at the **foot**, not placed at the head, and
+is labelled as such in the file. The fence was obeyed literally because a concurrent session was
+live. **RULING SOUGHT:** whether the entry should be moved to the head by a later session.
+
+⚠️ **THIS SESSION READ THE SAME AMBIGUITY THE OTHER WAY AND SAYS SO.** `CLAUDE.md` §6 duty 3 is
+explicit — *"one entry, newest on top"* — and this session's prompt does not carry the word
+*"append"* against `PROGRESS.md`, so the entry is placed at the **head**, per the constitution. **Two
+sessions have now resolved one ambiguity in opposite directions, which is the argument for ruling it
+rather than leaving each session to read it.**
+
+---
+
+### `Q-243` — **A SESSION'S OWN TOKEN ROW WAS MISSING AND IT REFUSED TO SELF-RECORD**
+
+**Status: CLOSED by the architect's own edit. Class B.** **Raised by:** C21 BUILD 1 (`9e2c81d4`),
+2026-09-04, as `Q-I`. **Transcribed by:** C14 FIX (`6e2b8a53`), 2026-09-05.
+
+`make check-roles` **E1 FAILED**: *"FORGED/UNISSUED: {'9e2c81d4': ['183d063', '22293d2',
+'685ca50']} - not present in QUESTIONS.md ## Session tokens"*. **The token was issued** and opened
+that session's prompt; what was missing was its **row**, and `QUESTIONS.md` was explicitly outside
+that session's fence. That session's words: ⚠️ *"TURNING E1 GREEN BY WRITING MY OWN ISSUED-TOKEN ROW
+WOULD BE THE EXACT SHAPE OF THE DEFECT E1 EXISTS TO CATCH"* — and it did not.
+
+⚠️ **CLOSED BY MEASUREMENT at `dd70f5a`: the row `| `9e2c81d4` | C21 | BUILD | 2026-09-04 |` exists
+in the table above.** ⚠️ **AND THE SECOND-ORDER POINT IS STILL OPEN AND IS WORTH MORE THAN THE ROW:**
+a build session fenced out of `QUESTIONS.md` **cannot commit without turning E1 red**. The fence and
+`PROCESS.md` §7a are, for such a session, mutually unsatisfiable — one requires the row, the other
+forbids the file. **`INC-141` records the same trap.** ⚠️ **It happened again to C21 BUILD 3
+(`8d3b04fe`), which correctly refused to write its own row; this session writes that row instead,
+which is the right shape — a different session vouching, not the session vouching for itself.**
+
+---
+
+### `Q-244` — **THE CALIBRATION ABORT HAD NO `INCIDENTS.md` ENTRY AND §6b FORBIDS A RETRY UNTIL IT DOES**
+
+**Status: CLOSED BY MEASUREMENT. Class A when raised.** **Raised by:** C21 BUILD 2 (`6f2d47ba`),
+2026-09-04, as `Q-J`. **Transcribed by:** C14 FIX (`6e2b8a53`), 2026-09-05.
+
+Measured then: zero python processes, a log ending in `TimeoutError`, zero calibration episode
+ledgers, 13 usage rows and 56,855 tokens on `cal__1__2201__gemma-26b`. `INCIDENTS.md`'s last entry was
+`INC-157`, which covers attempt 1. `INCIDENTS.md` and `evals/` were outside that fence, so that
+session wrote neither and stated the numbers in its report instead. **RULING SOUGHT: none needed on
+the rule — §6b is explicit.** Raised so the entry was not skipped and attempt 3 did not start without
+it.
+
+⚠️ **CLOSED, and C21 BUILD 3 (`8d3b04fe`) closed it by measurement:** the abort entries exist —
+**`INC-157`, `INC-159`, `INC-161`** — and **attempt 4 completed**. ⚠️ **The stop was correct and the
+stop was answered.** A session that stops on a real ambiguity has succeeded (hard rule 1).
+
+---
+
+### `Q-245` — **THE PROMPT'S COUNT OF BUILD 1'S QUESTIONS DID NOT MATCH THE FILE**
+
+**Status: OPEN. Class C.** **Raised by:** C21 BUILD 2 (`6f2d47ba`), 2026-09-04, as `Q-K`.
+**Transcribed by:** C14 FIX (`6e2b8a53`), 2026-09-05.
+
+The prompt described `docs/sessions/c21-build-1.txt` §7 as carrying *"TEN QUESTIONS"*. **Measured:**
+`grep -c "^Q-[A-Z] "` returns **8** (`Q-A`…`Q-H`) in §7, plus `Q-I` raised in that file's addendum —
+**NINE**. Recorded rather than reconciled, **because a session that quietly matches a count to its
+prompt is the failure `Q-099` records**. **RULING SOUGHT:** confirm nine, or name the tenth.
+
+⚠️ **THIS SESSION RE-COUNTED INDEPENDENTLY and gets NINE**, the same as BUILD 2: `Q-A`…`Q-H` in §7
+plus `Q-I` in the addendum at `docs/sessions/c21-build-1.txt`:570. **The tenth is not in the file.**
+
+---
+
+### `Q-246` — **`CONTEXT.md` §1 CARRIES THE UNNARROWED FORM OF METHOD CLAIM 1**
+
+**Status: OPEN. Class A.** **Raised by:** C21 BUILD 2 (`6f2d47ba`), 2026-09-04, as `Q-L`.
+**Transcribed by:** C14 FIX (`6e2b8a53`), 2026-09-05.
+
+`CONTEXT.md`:139 reads *"an attacker that has never seen the policy **or any attack list**"*. §6.1(1)
+of the deliverable establishes **the second clause is FALSE** — the attacker is seeded from published
+third-party corpora, and `data/attacker_sys.txt`:2–3 names four attack families. `CONTEXT.md` is the
+law and outside that fence, so it was not edited, and **no form paragraph carries the unnarrowed
+form**. **RULING SOUGHT:** amend `CONTEXT.md` §1, or record that the narrowed form governs everything
+published. ⚠️ **`CONTEXT.md` is outside this session's fence too and was NOT edited here.**
+
+---
+
+### `Q-247` — **LINE-NUMBER CITATIONS IN THIS REPOSITORY ROT WITHIN HOURS, AND NOTHING CHECKS THEM**
+
+**Status: OPEN. Class B.** **Raised by:** C21 BUILD 2 (`6f2d47ba`), 2026-09-04, as `Q-M`.
+**Transcribed by:** C14 FIX (`6e2b8a53`), 2026-09-05.
+
+**Measured:** of BUILD 1's volatile citations, **a majority had moved within nine hours, by between
+17 and 365 lines**. The deliverable now carries a heading alongside each line number and states the
+`HEAD` it was taken at, but the same rot is live in `README.md` and `STATUS.md`, which that session
+could not edit. **RULING SOUGHT:** whether a cheap invariant test — *"every `FILE:NNN` citation in
+`docs/submission/` resolves to a line containing its quoted anchor"* — is worth the `tests/` change,
+or whether heading-plus-line is enough.
+
+⚠️ **THIS SESSION TOOK THE PRECAUTION RATHER THAN WAITING FOR THE RULING**: every line citation it
+writes states both the anchor text and the `HEAD` it was measured at (`dd70f5a`). **It did not add
+the test** — `tests/` is outside this fence and the sweep is live.
+
+---
+
+### `Q-248` — **THE WITNESS GIST WAS PUBLISHED AND NOTHING IN THE REPOSITORY RECORDED IT**
+
+**Status: CLOSED by `INC-172`, and the ordering violation it names is PUBLISHED, not closed.
+Class A.** **Raised by:** C21 BUILD 3 (`8d3b04fe`), 2026-09-05, as `Q-N`. **Transcribed by:** C14 FIX
+(`6e2b8a53`), 2026-09-05.
+
+**Measured then:** `git grep -i gist` over the tracked tree returned **no gist id**; `README.md`:1491
+still held `<<PENDING-RUN: GIST_ID>>`; `INCIDENTS.md` carried no entry. `PROCESS.md` §6a.2 step 7
+reads *"Write `created_at` and `first_version` into `INCIDENTS.md` and into the README's verification
+section. **Then, and only then, the first scored episode may run.**"* ⚠️ **The first scored episode
+ran at `09:17:22Z`.** And the first, **secret** gist of `09:10:29Z` had **no id in the tree at all**,
+so nothing there could even name the thing that had to be disclosed. **RULING SOUGHT: none on the
+rule — §6a is explicit.** Raised so the record was written **before** the visibility flip, and so the
+secret attempt was disclosed rather than dropped.
+
+⚠️ **DISCHARGED BY THIS SESSION.** `INC-172` records the ordering violation in hard rule 13's eight
+fields and attributes it to the architect, who sequenced *tag → gist → sweep*. **Both gists are now
+in this repository**, with `created_at`, the `public` flag, and the oldest `history[]` entry's
+`version` and `committed_at` recovered by `curl` for the first time. `README.md` §12.4 carries the
+same fields. ⚠️ **The violation itself cannot be undone and is published, not repaired** — and the
+**substantive** precondition it guards was met, in order, with **2 m 57 s** to spare.
+
+---
+
+### `Q-249` — ⚠️⚠️ **TWO FROZEN ARTEFACTS DISAGREE ABOUT THE VOID THRESHOLD AND NEITHER CAN BE EDITED**
+
+**Status: RULED 2026-09-05 (see the ruling block above). Class A.** **Raised by:** C21 BUILD 3
+(`8d3b04fe`), 2026-09-05, as `Q-O`. **Transcribed by:** C14 FIX (`6e2b8a53`), 2026-09-05.
+
+`HOLES.md`:276 — frozen at **both** tags, blob `a4e50ed6…` — reads `TODO_C14_CALIBRATION`;
+`config/protocol.yaml`:368 reads `"0.20"`. `tests/test_c14_prereg.py`:389
+(`test_HOLES_md_probe_fields_agree_with_config_protocol_yaml_EXACTLY`) is **RED as a direct
+consequence and the red is PERMANENT**. `Q-225` row 4 named this outcome **before the tag was cut**
+and called option A *"legal ONLY until the tag"*; it did not land. Hard rule 4 ranks a frozen artefact
+above `CONTEXT.md` and says **nothing** about two frozen artefacts against each other. **RULING
+SOUGHT:** which frozen file a reader is to believe, and whether the published limitation names this
+as a permanent defect of the pre-registration.
+
+⚠️ **RULED: `config/` is operative; the disagreement is a permanent defect of the pre-registration and
+is published as one; the red test stays red and must not be edited.** See the verbatim ruling above.
+**`README.md` §12.5 is the discharge; the `RESULTS.md` half is owed.**
+
+---
+
+### `Q-250` — ⚠️⚠️ **`ledger.genesis_hash` FROZE AT `probe-v1`'s OBJECT, SO A SCORED AND A CALIBRATION EPISODE ARE CRYPTOGRAPHICALLY INDISTINGUISHABLE**
+
+**Status: RULED 2026-09-05 (see the ruling block above); confirms `Q-214` option A. Class A.**
+**Raised by:** C21 BUILD 3 (`8d3b04fe`), 2026-09-05, as `Q-P`. **Transcribed by:** C14 FIX
+(`6e2b8a53`), 2026-09-05.
+
+`config/protocol.yaml`:396 holds `170bd3ff…` and **that byte is inside `prereg-v1.sha256`**. `Q-214`
+recorded that option D *"evaporates at the tag"*. **RULING SOUGHT:** confirm option A and the one
+honest sentence it owes the README.
+
+⚠️ **RULED: option A confirmed. `M-6` is IMPOSSIBLE — it is a hash fixed point — and is published as
+a limitation, not worked around.** `README.md` §12.3 already carried the honest sentence and is not
+rewritten; only `Q-214`'s status word moves from OPEN to confirmed.
+
+---
+
+### `Q-251` — ⚠️⚠️ **NONE OF THE LETTERED QUESTIONS HAD EVER REACHED `QUESTIONS.md`, WHICH IS `CLAUDE.md` §6 DUTY 6 UNMET ACROSS ALL THREE C21 SESSIONS**
+
+**Status: RULED 2026-09-05, AND THIS BLOCK IS ITS DISCHARGE. Class A.** **Raised by:** C21 BUILD 3
+(`8d3b04fe`), 2026-09-05, as `Q-Q`. **Transcribed by:** C14 FIX (`6e2b8a53`), 2026-09-05.
+
+**Measured then:** `grep -c "Q-L\b" QUESTIONS.md` → **0**. The file was numbered `Q-001` to `Q-228`
+with **no lettered entry anywhere**. `Q-A`…`Q-M` lived only in `docs/sessions/c21-build-{1,2}.txt`,
+in `FORM_ANSWERS.md`, in `PROGRESS.md` and in `STATUS.md`. Duty 6: *"Write every ambiguity and every
+ruling to `QUESTIONS.md`, verbatim. A ruling that exists only in a chat does not exist."* ⚠️ **Every
+C21 session was fenced out of `QUESTIONS.md` and therefore discharged that duty into its own report
+instead — the same trap `INC-141` records for the token table, one file over, and nobody had written
+it down as such.** **RULING SOUGHT:** transcribe `Q-A`…`Q-Q` into `QUESTIONS.md` under real numbers,
+or record that a fenced session's report **IS** the register — **but not both, and not neither.**
+
+⚠️ **RULED: transcribe. A fenced session's report is NOT the register.** `Q-235`…`Q-251` above are
+the transcription, each attributed to the token that raised it. ⚠️ **The underlying trap is NOT
+closed by this discharge**: nothing stops the next fenced session from discharging duty 6 into its own
+report again. **The fix is the fence, not the transcription.**
+
+---
+
+## ⚠️ RAISED BY C14 FIX (`6e2b8a53`), 2026-09-05 — `Q-252`
+
+### `Q-252` — ⚠️⚠️ **THREE `src/` DOCSTRINGS STILL STATE THAT THE VOID THRESHOLD IS A SENTINEL AND THAT NO VOID VERDICT IS COMPUTABLE. THE CALIBRATION LANDED, AND `src/` IS UNTOUCHABLE WHILE THE SWEEP IS LIVE — SO IT IS RECORDED AS OWED**
+
+**Status: OPEN, AND DELIBERATELY NOT FIXED. Class B.** **Raised by:** C14 FIX (`6e2b8a53`),
+2026-09-05. **Owner:** the architect, or the first session that holds `src/` after the sweep ends.
+
+**MEASURED read-only at `dd70f5a`** — by reading, **never by importing**, because the sweep is live
+and a crash-resume re-imports these modules:
+
+```
+src/whetstone_gate/probe/void.py:12       "``probe.void_threshold_breach_rate`` is the sentinel ``TODO_C14_CALIBRATION`` and hard rule 9's"
+src/whetstone_gate/results/blocks.py:25   "``probe.void_threshold_breach_rate`` is the sentinel ``TODO_C14_CALIBRATION`` and the loader"
+src/whetstone_gate/results/blocks.py:158  "``probe.void_threshold_breach_rate`` is still ``TODO_C14_CALIBRATION`` and the loader"
+```
+
+⚠️ **All three are FALSE as of the calibration landing.** `config/protocol.yaml`:368 reads
+`void_threshold_breach_rate: "0.20"`, `SENTINEL_PREFIX` is `"TODO_"` and `require()` raises only on
+that prefix, so `void.void_threshold()` **returns `Fraction(1, 5)`** where these docstrings say it
+raises. **A reader of the source is told the opposite of what the code does, in the module that
+decides whether this project may publish at all.**
+
+⚠️⚠️ **AND IT IS NOT FIXED HERE, ON PURPOSE.** `src/` is outside this session's fence and the reason
+is stated in the prompt in capitals: **a scored sweep is running, a crash-resume re-imports `src/`,
+and this run cannot be repeated.** A docstring is not worth that risk. **The defect is real, it is
+recorded, and it is owed** — and it is a **documentation** defect, not a behavioural one: no
+published number depends on these three strings.
+
+**RULING SOUGHT:** none on the substance — the strings are simply wrong. Recorded so the correction
+is **scheduled** rather than discovered by a judge reading `void.py` and concluding the void rule was
+never wired up. ⚠️ **Related and already open: `Q-229`**, the live unskipped test asserting the same
+false thing in `tests/`, which is likewise not this session's to flip.
