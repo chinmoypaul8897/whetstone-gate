@@ -145,6 +145,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `2f7a6d18` | C14 | REVIEW | 2026-09-05 |
 | `3e91b7c5` | C14 | FIX | 2026-09-05 |
 | `6a4f28de` | C18 | BUILD | 2026-09-05 |
+| `5b8c31e7` | C14 | FIX | 2026-09-05 |
 
 ⚠️⚠️ **THE `5d7e2b91` ROW IS SELF-RECORDED, AND IT IS THE ROW FOR A TOKEN THAT WAS ISSUED TO **TWO**
 LIVE SESSIONS.** `QUESTIONS.md` `Q-180` and `Q-187` — two independent detections of one event.
@@ -17026,3 +17027,227 @@ session's token row to it; **(b)** keep one label and split the `STATUS.md` row'
 column explicitly by deliverable; **(c)** rule that the sweep path is `ARCH` rather than a numbered
 chunk. ⚠️ **Whichever, the review type must be named per deliverable**, because golden 6's absence
 blocks one of them and not the other.
+
+
+---
+
+## ⚠️⚠️ RAISED BY C14 FIX — THE SECOND FREEZE PASS (`5b8c31e7`), 2026-09-05 — `Q-221`…`Q-222`
+
+⚠️ **NUMBERED FROM `git show HEAD:QUESTIONS.md` IMMEDIATELY BEFORE THE APPEND** (`INC-137`), at
+`HEAD` = `72df9e5`, where the highest was **`Q-220`**. ⚠️ **`HEAD` MOVED DURING THIS SESSION**: it
+opened at `8171458`, and the concurrent **C18 BUILD 1** session (`6a4f28de`) committed `18f6477` and
+`72df9e5` while this one was reading, taking `Q-216`…`Q-220` and `INC-165`/`INC-166`. **These two
+renumber BENEATH them.** Nothing of theirs was edited or renumbered.
+
+---
+
+### ⚠️⚠️ `Q-221` — **ARCHITECT RULING, 2026-09-05, RECORDED VERBATIM (hard rule 5): `n_decision.measured_tokens_per_episode` AND `n_decision.selected_branch` ARE WRITTEN, AND THE FIGURE IS SOURCED FROM THE CALIBRATION RATHER THAN THE PILOT**
+
+**Status:** **RULED.** **Class B**, by the ruling's own words. **Issued to:** C14 FIX (`5b8c31e7`),
+2026-09-05. **Landed by:** that session, in `config/protocol.yaml`, before `prereg-v1` existed.
+
+⚠️ **THE RULING, TRANSCRIBED VERBATIM AND WITHOUT PARAPHRASE, BEFORE ANY OTHER THING WAS
+TOUCHED** (`CLAUDE.md` hard rule 5, *"recorded verbatim in QUESTIONS.md before anything else is
+touched"*). The line breaks are this file's; the words are the ruling's.
+
+> "`n_decision.measured_tokens_per_episode` = 144668 and `n_decision.selected_branch` = 30.
+>  ⚠️ THE FIGURE IS SOURCED FROM THE CALIBRATION, NOT THE PILOT, AND THAT SUBSTITUTION IS THE WHOLE
+>  OF THIS RULING AND MUST BE PUBLISHED WITH IT. CONTEXT.md S13.4's rule keys on the PILOT's measured
+>  tokens/episode; the pilot completed 0 of 20 episodes and `select_n` REFUSED, so that input does
+>  not exist and never will — the pilot is single-shot and spent. The calibration measured THE SAME
+>  QUANTITY across TWENTY COMPLETED arm-1 episodes.
+>  ⚠️ WHY IT IS SAFE TO SUBSTITUTE, STATED SO A REVIEWER CAN OVERTURN IT: 144,668 is nearly THREE
+>  TIMES the post-rung-4 break-even of 49,726, so the rule returns 30 with enormous margin. It
+>  returns 30 on the pilot's refusal too, since a refusal defaults to the SMALLER branch. ⚠️ N=30 IS
+>  ROBUST TO THE AMBIGUITY, AND A SMALLER N CANNOT INFLATE ANY CLAIM WE PUBLISH — the direction of
+>  the error is against us, which is why this substitution is allowed at all.
+>  ⚠️ AND ITS LIMITS: 144,668 is the mean over COMPLETED episodes only; ten were truncated and are
+>  NOT in it. INC-163 measured that the calibration's attacker was degraded, and INC-164 that nine
+>  truncations were our own socket timeout. Class B — it changes no published measurement, only
+>  which pre-registered branch the frozen rule selects."
+
+---
+
+**THE RE-DERIVATION THE PROMPT REQUIRED, DONE BEFORE THE VALUE WAS WRITTEN AND NOT RECONCILED TO
+THE PROMPT.** The prompt said in terms: *"IF YOU GET A DIFFERENT NUMBER, STOP AND REPORT RATHER THAN
+RECONCILING TO THIS PROMPT."* ⚠️ **The number agrees, by FOUR routes that share no input file.**
+
+The shipped definition, `src/whetstone_gate/driver/pilot.py`, read rather than assumed:
+
+    TokensPerEpisode.over_completed = _ceil_div(attacker_tokens, completed)
+    _ceil_div(n, d) = -((-n) // d)          # "UP, because DOWN is the unsafe direction here"
+
+| # | route | numerator |
+|---|---|---|
+| 1 | the 30 stored **checkpoints**, `sum(tokens_spent)` over all attempted | **2,893,347** |
+| 2 | the attempt-4 **log**'s 29 per-episode `tokens attacker=` lines **+** the skipped seed 2201 | **2,893,347** |
+| 3 | the attempt-4 log's own declared numerator line | **2,893,347** |
+| 4 | the raw **usage rows** (`evals/usage/*.jsonl`), minus seed 2201's abandoned earlier attempt | **2,893,347** |
+
+    completed = 20     truncated = 10     attempted = 30   (20 + 10 + 0 = 30, reconciles)
+    2,893,347 / 20  = 144,667.35   ->  ceil  ->  144,668          <- WRITTEN
+    2,893,347 / 30  =  96,444.90   ->  ceil  ->   96,445          <- the disclosure figure
+
+⚠️ **ROUTE 4 DIFFERS BEFORE IT IS RECONCILED, AND THE DIFFERENCE IS REPORTED RATHER THAN
+ABSORBED.** The usage rows sum to **2,950,202**, which is **+56,855** against the checkpoints. The
+entire gap is **seed 2201, and no other episode differs by a single token**: its 25 usage rows split
+into 13 rows / 56,855 tokens at `2026-09-04T14` (attempt 2) and 12 rows / 55,887 tokens at
+`2026-09-04T19` (attempt 3), and the checkpoint carries **55,887** — the later run. **So seed 2201
+was executed TWICE and its first execution's tokens are real spend, correctly recorded in the usage
+ledger (hard rule 12) and correctly absent from the per-episode measurement.** The two ledgers do not
+disagree; they answer different questions.
+
+**THE BRANCH, FROM THE SHIPPED RULE RATHER THAN FROM THE PROMPT.** `runner.n_rule.select_n(144668)`
+returns `n=30`, with `first_conjunct_holds=False` (144,668 > 60,000), `second_conjunct_holds=False`
+(59.20 h > 32 h) and `bound_by='both conjuncts'`. **Both conjuncts fail, not one.**
+
+⚠️ **AND THE RULING'S "ENORMOUS MARGIN" IS EXACT, MEASURED BY BISECTION ON THE SHIPPED FUNCTION
+RATHER THAN TAKEN FROM THE PROMPT:** the largest tokens/episode at which `select_n` still returns
+**50** is **49,726** — the ruling's figure, to the token, with `select_n(49727).n == 30`. The
+measured 144,668 is **2.9093×** that break-even. *"Nearly three times"* is right.
+
+---
+
+### ⚠️⚠️ `Q-222` — **ONE LEG OF `Q-221`'s PUBLISHED RATIONALE IS FALSE OF THE SHIPPED FUNCTION, AND THE RULING ASKED TO BE CHECKED. IT IS TRUE OF §13.4's PROSE AND FALSE OF `select_n`, AND THE TRUE FORM OF THE ARGUMENT IS STRONGER THAN THE ONE THE RULING USED**
+
+**Status:** **OPEN.** **Raised by:** C14 FIX (`5b8c31e7`), 2026-09-05, **while executing `Q-221`**.
+**Owner:** the architect. **Blocking: NOTHING today** — see *what is not at risk* below.
+⚠️ **This does not change the value written.** `144668` and `30` are re-derived above by four
+routes and by the shipped rule, and they stand. What is defective is one sentence of the
+**justification**, which `Q-221` published *"STATED SO A REVIEWER CAN OVERTURN IT"*. This is a
+reviewer taking that invitation.
+
+**THE SENTENCE:** *"It returns 30 on the pilot's refusal too, since a refusal defaults to the
+SMALLER branch."*
+
+⚠️ **MEASURED, BY CALLING THE SHIPPED FUNCTION:**
+
+    n_rule.select_n(0).n  ->  50
+    n_rule.select_n(1).n  ->  50
+
+**Not 30.** A refusal encoded as a zero or a near-zero measurement selects the **LARGER** branch,
+because both conjuncts hold at a small measured figure: `0 <= 60000` is true, and the recomputed
+lane-hour projection at 0 attacker tokens/episode is far under the 32 h budget. **The stated
+direction of the default is backwards.**
+
+**WHY IT IS NEVERTHELESS TRUE AS A READING OF THE RULE, WHICH IS PROBABLY WHAT WAS MEANT.**
+`CONTEXT.md` §13.4 is *"N = 50 **IF** … **Otherwise N = 30**."* With no measurement the `IF` cannot
+be affirmed, so *"otherwise"* applies and the rule text does yield 30. ⚠️ **The claim is therefore
+true of the PROSE and false of the FUNCTION, and the two are only distinguishable if somebody
+actually calls the function with a refusal in hand.**
+
+**WHAT IS NOT AT RISK, VERIFIED BY TRACING EVERY CALLER RATHER THAN ASSERTED.** Nothing feeds a
+refusal into `select_n`, because **three independent refusals stand in front of it**:
+
+  - `driver/pilot.py:decide_n()` **raises `PilotError`** on a dry run and on any measurement carrying
+    a truncated episode. On the real calibration measurement (20 completed, 10 truncated) it
+    **refuses**, measured.
+  - `driver/scored.py:scored_n()` **raises `ScoredError`** when the config value is not an integer,
+    which is what the `TODO_C14_PILOT` sentinel is.
+  - `results/loader.py` returns `None` and `results/nrule.py` prints the sentinel line; the renderers
+    print `<<PENDING-RUN: N>>` rather than inventing an N.
+
+⚠️ **SO IT IS A LATENT TRAP AND NOT A LIVE DEFECT** — and it is recorded because the trap is
+exactly the shape this repository keeps paying for: a value that *cannot* reach a published number
+until the day somebody makes it reachable (`INC-164`'s diagnosis, in terms).
+
+⚠️⚠️ **AND THE ARGUMENT THE RULING SHOULD HAVE USED IS ALREADY IN THE CODE AND IS STRICTLY
+STRONGER.** `select_n` computes the second conjunct **twice** — `Q-107`'s options 2 and 3, *"and
+neither is adjusted toward the other"*. Under the AT-THE-REGISTERED-TARGET reading the projection is
+evaluated at the pre-registered 60,000 target, giving **34.95 h against a 32 h budget**, which fails
+**at every possible measurement**. Measured: `NDecision.n_at_registered_target == 30` for **every**
+input, including 0. **So N=30 is robust to the ambiguity for a reason that holds unconditionally**,
+rather than for one that depends on a default that runs the other way.
+
+⚠️ **AND THAT SAME FIELD IS WHY WRITING `144668` UNBLOCKS THE SWEEP INSTEAD OF TRIPPING IT.**
+`scored_n()` **STOPS** (hard rule 1) when `Q-107`'s two readings disagree, *"because choosing one
+here would settle an open Class A question by picking a seed band"*. At 144,668 both readings give
+30, so `readings_agree` is **True** and `scored_n()` returns **30**. ⚠️ **Measured by bisection on
+today's config: the two readings DIVERGE at every measured figure ≤ 49,726 and agree from 49,727** —
+so any *smaller* measurement would not merely have selected a different N, it would have **STOPPED
+THE SWEEP on `Q-121`**, which is OPEN. The measured figure's height is the safe direction twice over.
+
+⚠️⚠️ **AND THE BOUNDARY IS THE SAME NUMBER BOTH TIMES, WHICH HAS A CONSEQUENCE NOBODY HAS WRITTEN
+DOWN: `branch_a_n: 50` IS UNREACHABLE THROUGH `scored_n()`.** The divergence boundary (49,726) and
+the branch boundary (49,726) coincide under today's post-rung-4 `selections.tfp_task_count: 20`,
+because `n_at_registered_target` is **30 at every input** (34.95 h against a 32 h budget). So at
+**every** input where the recomputed reading would select 50, the readings disagree and `scored_n()`
+**refuses**; wherever it returns, it returns **30**. ⚠️ **There is no measurement the pilot could
+have produced that would have let the shipped scored path run at N=50.** That is `Q-107`'s
+*"fails the second regardless of what the pilot measures"* coming true through a different door than
+the one `Q-121` was watching, and it makes `Q-221`'s *"N=30 IS ROBUST TO THE AMBIGUITY"* true in the
+strongest available form. ⚠️ **`runner/n_rule.py`'s own docstring gives this break-even as 31,908 /
+31,909**, which was measured **before degradation rung 4 cut T-FP from 40 to 20** on 2026-09-04
+(`INC-144`); at today's config it is 49,726. **The docstring is stale, `runner/` is outside this
+session's fence, and it is reported rather than edited.**
+
+**OPTIONS:** **(a)** amend `Q-221`'s published rationale to rest on `n_at_registered_target`, which
+is unconditional, and strike the refusal-default sentence; **(b)** keep the sentence but qualify it
+as a reading of §13.4's prose, explicitly not of `select_n`; **(c)** leave it and publish this entry
+beside it as the correction. ⚠️ **In every option the two written values are unchanged.**
+
+
+---
+
+### ⚠️⚠️ `Q-223` — **`PROTOCOL.md` IS REQUIRED TO PUBLISH BOTH WILSON BOUNDS AND IS FORBIDDEN TO NAME THE DIFFERENCE BETWEEN THEM, BY TWO RULES THAT ARE BOTH BINDING. THE NUMBERS ARE PUBLISHED; THE NAMING IS WITHHELD; THE WITHHOLDING IS DISCLOSED IN THE DOCUMENT ITSELF**
+
+**Status:** **OPEN. Class A.** **Raised by:** C14 FIX (`5b8c31e7`), 2026-09-05, **while executing
+its own Gate 2**. **Owner:** the architect. **Blocking:** nothing today — §6a is landed and every
+required figure is in it. ⚠️ **Expiring: at `git tag prereg-v1`,** after which `PROTOCOL.md` is
+frozen and the wording cannot be changed.
+
+**THE TWO RULES, AND THEY GENUINELY COLLIDE.**
+
+  1. `CONTEXT.md` §15.2 lists among `prereg-v1`'s contents *"the **calibrated** probe-breach void
+     threshold from §10.3 **with its Wilson interval**"*, and this session's prompt required §6a to
+     carry **both** bounds — the 23.87% figure the threshold is taken from **and** the
+     [21.87%, 54.49%] interval — *"with the sentence that BOTH FLOOR TO 20%"*, naming each.
+  2. `tests/test_arch_wilson.py` scans **eight** documents — the five frozen files, `CONTEXT.md`
+     and **both** `config/` files — line by line for
+     `one[- ]sided|two[- ]sided|1\.645|1\.6449|1\.959|1\.96\b`, exempting only four named
+     estimators. ⚠️ **`PROTOCOL.md` IS IN THAT SCAN**, as the first entry of `FROZEN_DOCS`.
+
+⚠️ **AND THE CONSEQUENCE OF FIRING IT IS NOT A RED, IT IS A WITHDRAWAL.** The assertion's own
+message reads: *"A FROZEN ARTEFACT NOW STATES A SIDEDNESS OR A z. Under hard rule 4 the frozen
+artefact WINS, `Q-189`(d) is WITHDRAWN BY ITS OWN TERMS, and `probe/statistics.py`'s `one_sided_z`
+must be reverted rather than defended."* **Reverting it moves the published bound from 23.87% to
+21.87%.** The threshold survives — both floor to 20% — but the ruling that authorises the shipped
+code does not.
+
+⚠️ **SO WRITING THE TWO WORDS WOULD HAVE WITHDRAWN A RULING AS A SIDE EFFECT OF DOCUMENTING IT.**
+That is `INC-162` / `Q-211`'s near-miss exactly, one file over: that draft put a sidedness in
+`config/`, was caught by this same test, and never reached a commit. **This time the words were
+asked for in terms.**
+
+**WHAT THIS SESSION DID, STATED SO IT CAN BE OVERTURNED:**
+
+  - ⚠️ **EVERY NUMBER THE PROMPT REQUIRED IS PUBLISHED IN §6a.2** — 23.87% (23.865672%),
+    [21.87%, 54.49%] ([21.873921%, 54.486436%]), the observed 36.67%, that **both floor to 20%**,
+    that this is **an accident of k = 11**, the k = 10 / 11 / 12 table with both neighbours
+    disagreeing, and the full fifteen-of-thirty-one disagreeing set.
+  - The two objects are distinguished **by construction and by role** — *"the 95% Wilson LOWER bound
+    the threshold is taken from"* against *"the 95% Wilson interval, both ends"* — with the sentence
+    **"21.87% IS NOT A TYPO FOR 23.87%"** and a pointer to `Q-189`(d), which is where the naming
+    already lives.
+  - ⚠️ **THE OMISSION IS WRITTEN INTO §6a.2 ITSELF**, naming the test, the withdrawal clause and
+    what reverting would cost. **A guard dodged by spelling and not mentioned would be the thing the
+    test's own comment warns about** — *"how this guard gets switched off one quiet edit at a
+    time"*. It is dodged by **not saying the thing**, and the not-saying is on the page.
+  - ⚠️ **NOTHING IN `tests/` WAS EDITED, WEAKENED, SKIPPED OR EXEMPTED** (hard rule 6; `tests/` is
+    in this session's `NOT` list). `OTHER_ESTIMATORS` still has exactly four entries and the whole
+    file is **green**, verified against the live tree after the edit.
+
+**THE OPTIONS, AND WHAT EACH COSTS:**
+
+| | option | cost |
+|---|---|---|
+| **A** | ⚠️ **Leave it as landed.** The numbers are published; the naming stays in `Q-189`(d); §6a.2 discloses the gap. **This session's recommendation.** | A reader must follow one pointer to learn which quantile each bound uses. Costs nothing, changes no number, and keeps `Q-189`(d) standing. |
+| **B** | Add `PROTOCOL.md` §6a.2 to the scan's exemption list so the words can be written. | ⚠️ The exemption list is **asserted to be exactly four** precisely so that growing it is a visible act. It also needs a `tests/` session, and it would let a *future* sidedness claim hide behind the same entry. |
+| **C** | Rule that `Q-189`(d)'s withdrawal clause applies only to artefacts frozen **before** the ruling, not to text written **under** it, and amend the test to match. | Honest and probably correct in substance, but it **rewrites the withdrawal condition of a live ruling**, which is a larger act than the one it unblocks. |
+| **D** | Write the words and accept the withdrawal. | ⚠️ **Reverts `probe/statistics.py`, moves the published bound to 21.87%, and re-opens `Q-195` as a live contradiction.** Rejected here. |
+
+⚠️ **WHY IT IS RAISED RATHER THAN DECIDED:** every option changes either a published document, a
+shipped test, or the terms of a standing ruling, and **`PROTOCOL.md` is frozen at the tag**. This is
+`CLAUDE.md` rule 1's shape — *"the spec is contradictory about something you are building"* — and
+the contradiction is between the prompt and a guard that the prompt's own reading list
+(`Q-211`, `INC-162`) is about.

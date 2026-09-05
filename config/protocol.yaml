@@ -417,10 +417,46 @@ n_decision:
   # config/lanes.yaml's two Gemma lanes and needs no row (Q-120 states why).
   projected_lane_hour_budget_h: 32
   fallback_if_branch_b_still_exceeds: "cut T-FP from 40 to 20 tau2 tasks — the ONE pre-declared further reduction"
-  # ⚠️ NOT YET DETERMINED. Selected by C14's pilot, by the rule above, from MEASURED
-  # tokens/episode — never by preference and never by schedule pressure.
-  selected_branch: TODO_C14_PILOT
-  measured_tokens_per_episode: TODO_C14_PILOT
+  # ⚠️ DETERMINED 2026-09-05 BY ARCHITECT RULING, recorded VERBATIM in `QUESTIONS.md`
+  # `Q-221` (hard rule 5) BEFORE this key was touched, and landed by session `5b8c31e7`
+  # while `git rev-parse prereg-v1` still did NOT resolve — verified as that session's
+  # first act. After that tag exists this file is frozen and this value is unfixable.
+  #
+  # ⚠️ THE FIGURE IS THE CALIBRATION'S, NOT THE PILOT'S, AND THE SUBSTITUTION IS PUBLISHED
+  # WITH IT BECAUSE THE RULING REQUIRES THAT. CONTEXT.md §13.4 keys the rule on THE PILOT'S
+  # measured attacker tokens/episode. The pilot completed 0 of 20 episodes and `select_n`
+  # REFUSED (INCIDENTS.md INC-142), so that input does not exist and never will — the pilot
+  # is SINGLE-SHOT (PROCESS.md §6b) and spent. The arm-1 calibration measured THE SAME
+  # QUANTITY across TWENTY COMPLETED episodes, and this is that measurement.
+  # ⚠️ THE LINE THIS COMMENT REPLACES READ "Selected by C14's pilot, by the rule above,
+  # from MEASURED tokens/episode". That sentence is exactly why the substitution needed a
+  # ruling and was not a session's to take.
+  #
+  # PROVENANCE — re-derived from the stored ledgers by FOUR routes sharing no input file
+  # (the 30 checkpoints; the attempt-4 log's per-episode lines; the log's own declared
+  # numerator; the raw `evals/usage/` rows). ALL FOUR RETURNED 2,893,347:
+  #     attacker tokens, ALL 30 ATTEMPTED arm-1 episodes : 2,893,347
+  #     episodes COMPLETED                               : 20
+  #     episodes TRUNCATED (counted, hard rule 11)       : 10   (30 == 20 + 10 + 0)
+  #     driver/pilot.py `over_completed` = ceil(2,893,347 / 20) = 144,668
+  # ⚠️ THE NUMERATOR SPANS ALL ATTEMPTED WHILE THE DENOMINATOR COUNTS ONLY COMPLETED, AND
+  # THE DIVISION IS `ceil`. Both choices read the figure HIGH, and HIGH selects the SMALLER
+  # N — the direction that cannot inflate anything this project publishes. The figure over
+  # hard rule 11's denominator is 96,445 and is carried in the run report beside it.
+  #
+  # THE BRANCH IS THE RULE'S OUTPUT, NOT A CHOICE: `runner/n_rule.select_n(144668)` returns
+  # n=30 with BOTH conjuncts failing (144,668 > 60,000; 59.20 h > 32 h). The largest figure
+  # that still selects 50 is 49,726, measured by bisection on the shipped function, so the
+  # measurement clears the branch boundary by 2.91x.
+  #
+  # ⚠️ ITS LIMITS, PUBLISHED WITH THE NUMBER RATHER THAN BENEATH IT: `INC-163` measured that
+  # the calibration's attacker was DEGRADED — 114 of 600 turns lost to UNPARSED and 68 to
+  # truncation — and `INC-164` that NINE of the ten truncations were OUR OWN 180-SECOND
+  # SOCKET TIMEOUT. Those ten episodes' tokens are IN the numerator and their episodes are
+  # NOT in the denominator, which is the conservative direction and is stated so a reviewer
+  # can check it rather than infer it.
+  selected_branch: 30
+  measured_tokens_per_episode: 144668
 
 # ── Vendored third parties, pinned ────────────────────────────────────────────
 vendor:
