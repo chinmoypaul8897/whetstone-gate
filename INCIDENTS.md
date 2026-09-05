@@ -13421,7 +13421,11 @@ the two increments. `attacker/loop.py:278` has no handler, `run_one_episode` cat
 `LaneStopped` at `:834`, and its **next statement** is `executor.counts.reconcile()` at `:837`,
 outside the floor, which raises `DenominatorError`, which nothing catches.
 
-⚠️ **MEASURED BY THIS SESSION ON LIVE `HEAD` = `19c0738`, BEFORE ANY EDIT**, with the pilot
+⚠️ **MEASURED BY THIS SESSION ON THE COMMITTED SOURCE AT `19c0738`, BEFORE ANY EDIT**
+(⚠️ `HEAD` moved to **`8fce8e6`** under this session while it was reading — a concurrent
+**C14 FIX** session's `PROTOCOL.md` correction. `git diff --numstat 19c0738 8fce8e6` touches
+`PROTOCOL.md` and one session record **only**, so **every frame measured here is byte-identical at
+both**, and this sentence is corrected rather than left saying `19c0738` was live), with the pilot
 matrix at **arm 2** (20 episodes × 20 turns), the real `MeteredProviderClient` over a fake
 transport, the real `_PacedClient`, the real `execute` dispatch loop,
 `driver/clients.py:_http_post` replaced by a function that **raises**, the output root a **fresh OS

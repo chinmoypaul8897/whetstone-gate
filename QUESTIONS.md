@@ -17421,8 +17421,15 @@ question; row 1 is a **closed** one that nobody could execute.
 
 ## ⚠️⚠️ RAISED BY C14 FIX — THE JUDGE-LANE STOP (`4c7e90ba`), 2026-09-05 — `Q-226`
 
-⚠️ **NUMBERED FROM `git show HEAD:QUESTIONS.md` IMMEDIATELY BEFORE THE APPEND** (`INC-137`), at
-`HEAD` = `19c0738`, where the highest was **`Q-225`**. A concurrent **C14 FIX** session
+⚠️ **NUMBERED FROM `git show HEAD:QUESTIONS.md` IMMEDIATELY BEFORE THE APPEND** (`INC-137`),
+where the highest was **`Q-225`**. ⚠️ **THIS SESSION'S OWN FIRST STATEMENT OF THE SHA WAS
+WRONG AND IS CORRECTED HERE RATHER THAN LEFT STANDING:** it read *"at `HEAD` = `19c0738`"*, which
+is where `HEAD` stood when this session **opened**. The concurrent **C14 FIX** session (`5b8c31e7`)
+committed **`8fce8e6`** while this one was reading, so the append actually ran against `8fce8e6`.
+⚠️ **THE NUMBERING IS UNAFFECTED, AND THAT IS MEASURED RATHER THAN ASSUMED:**
+`git diff --numstat 19c0738 8fce8e6` lists `PROTOCOL.md` and `docs/sessions/c14-freeze-2.txt`
+**and nothing else**, it adds no `Q-` and no `INC-` heading, and the append's guard compared the
+working file against `git show HEAD:` **at the moment it ran** and would have refused otherwise. A concurrent **C14 FIX** session
 (`5b8c31e7`) may still be live in this working tree holding `config/` and `PROTOCOL.md`, so this
 append refused unless `QUESTIONS.md` still equalled `HEAD`'s blob **byte for byte**
 (`INC-140`, `INC-149`). **If a collision happened anyway, this renumbers BENEATH the other
