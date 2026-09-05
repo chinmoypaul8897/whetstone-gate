@@ -8,7 +8,7 @@ and which cannot be got wrong by hand.
 
 ⚠️ **IT IS `test_c18_sweep.py` AND NOT `test_c18_results.py`.** That file already exists and holds
 C18's *other* deliverable — `RESULTS.md` + ``make eval``, built 3 Sep. The two are unrelated
-deliverables carrying one chunk label, which is raised as `QUESTIONS.md` **`Q-211`** and is **not**
+deliverables carrying one chunk label, which is raised as `QUESTIONS.md` **`Q-220`** and is **not**
 resolved by naming a file.
 
 **WHAT THIS FILE PINS**
@@ -957,16 +957,39 @@ def test_the_COMMITTED_CALIBRATION_PREREGISTRATION_COMMAND_STILL_PARSES(repo_roo
     assert parsed.block == "cal" and parsed.arm == "1"
 
 
-def test_A_MATRIX_THAT_CANNOT_BE_ASSEMBLED_IS_A_NAMED_REFUSAL_never_a_traceback(capsys):
+def test_A_MATRIX_THAT_CANNOT_BE_ASSEMBLED_IS_A_NAMED_REFUSAL_never_a_traceback(
+    capsys, monkeypatch, tmp_path, repo_root
+):
     """⚠️ **THIS MODULE'S OWN RULE ABOUT THE PROVIDER CLIENT, APPLIED ONE STEP EARLIER.**
 
     ``load_scored()`` refuses while ``n_decision.measured_tokens_per_episode`` is a ``TODO_``
-    sentinel, and that refusal is the single most likely thing an operator will see from this
-    path. It must exit 2 with the loader's own message — **which names who owes the value** — and
-    never as a traceback.
+    sentinel. It must exit **2** with the loader's own message — **which names who owes the
+    value** — and never as a traceback.
+
+    ⚠️⚠️ **DRIVEN AGAINST A FIXTURE `config/`, AND THAT IS THE POINT RATHER THAN A CONVENIENCE.**
+    This test first guarded itself with ``pytest.skip`` when the key was determined — and the key
+    **landed while this session was still running** (`c3aa9b4`), which turned the guard into a
+    permanent skip on the refusal that **stops a scored run before N is selected**. ⚠️ **A skip is
+    how a check dies quietly, and this one would have died the moment it started mattering.**
+    ``whetstone_gate.config.config_dir`` honours ``WHETSTONE_CONFIG_DIR`` *"so a test can point at
+    a fixture directory without monkey-patching the loader"*, so the sentinel is restored in a
+    **copy** and the real `config/` — a frozen pre-registration artefact — is never touched.
     """
-    if cfg.load("protocol").has("n_decision.measured_tokens_per_episode"):
-        pytest.skip("the measured figure has landed; this refusal is no longer reachable")
+    fixture = tmp_path / "config"
+    fixture.mkdir()
+    for name in ("protocol", "lanes"):
+        source = (repo_root / "config" / f"{name}.yaml").read_text(encoding="utf-8")
+        if name == "protocol":
+            source = re.sub(
+                r"(?m)^(\s*measured_tokens_per_episode:).*$", r"\1 TODO_C14_PILOT", source
+            )
+            assert "measured_tokens_per_episode: TODO_C14_PILOT" in source, (
+                "the fixture failed to restore the sentinel, so this test would assert a refusal "
+                "that cannot happen — which is the failure mode it exists to avoid"
+            )
+        (fixture / f"{name}.yaml").write_text(source, encoding="utf-8", newline="\n")
+    monkeypatch.setenv("WHETSTONE_CONFIG_DIR", str(fixture))
+
     code = driver_main.main(
         [
             "--dry-run", "--block", "scored", "--s3-binding", S3_BINDING,
@@ -977,6 +1000,7 @@ def test_A_MATRIX_THAT_CANNOT_BE_ASSEMBLED_IS_A_NAMED_REFUSAL_never_a_traceback(
     printed = capsys.readouterr().out
     assert "REFUSED" in printed
     assert "measured_tokens_per_episode" in printed
+    assert "TODO_C14_PILOT" in printed, "the loader's message must NAME who owes the value"
     assert "Traceback" not in printed
 
 
