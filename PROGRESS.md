@@ -1,3 +1,100 @@
+## SESSION-TOKEN 4c7e90ba — C14, FIX (THE JUDGE-LANE STOP) — 2026-09-05 — ✅ **C14 REVIEW 1's BLOCKER `B-1` IS FIXED AND MEASURED CLOSED. ⛔ IT SHIPS UNREVIEWED, NO TAG WAS CUT, AND WHETHER THE SWEEP STARTS IS STILL `Q-218`**
+
+**Role:** FIX. **Chunk:** C14. **Fixes:** `docs/reviews/REVIEW_C14_FLOOR_1.md` **`B-1`** (verdict
+FAIL) under the architect's ruling at `QUESTIONS.md` **`Q-226`**, verbatim.
+⚠️ **FULL RECORD: `docs/sessions/c14-floor-fix-1.txt`.** ⚠️ **NOT `c14-fix-1.txt`** — the path was
+checked not to exist before it was written, which is `INC-170`'s guardrail applied by hand.
+⚠️ **SPEND: ZERO. No provider call in any mode; this session held no token sanction and took none.**
+⚠️ **`config/`, `PROTOCOL.md`, `tests/goldens/`, `evals/`, `CONTEXT.md`, `PROCESS.md`, `HOLES.md`,
+`docs/reviews/`, `docs/render/`, `docs/submission/`, `README.md`, `RESULTS.md` and `corpora/` were
+READ AND NEVER WRITTEN. THE SWEEP WAS NOT RUN. NO TAG CUT OR MOVED. NOT SELF-CERTIFIED.**
+
+> ### ⚠️⚠️ GATE 0 FIRST, AND THE COMMIT IS THE PROOF
+> `9750aab` carries `INC-171` and `Q-226` and **contains no source and no test change at all.**
+> Hard rule 13 and `CLAUDE.md` §1 require the entry before a line of code; a report can claim that
+> order and a commit can prove it, so the records were committed alone.
+
+**THE DEFECT, RE-MEASURED FIRST-HAND RATHER THAN COPIED FROM THE REVIEW.** `_Executor.execute`
+counts a turn at `attempted += 1` and categorises it after `gate.decide`. On arms **2, 2S and 3**
+`gate.decide` is a **model call**, so every `LaneStopped` it raises abandoned the turn between the
+two, and `run_one_episode`'s `executor.counts.reconcile()` — one statement past the handler that
+catches the stop, **outside `Q-200`'s floor** — raised `DenominatorError` out of `execute`. No
+report, no denominator, every remaining episode unattempted, on **90 of the sweep's 150 episodes**.
+
+    MODE      BEFORE                                    AFTER
+    none      RETURNED  (400 judge calls, the CONTROL)   RETURNED  (400)
+    timeout   RAISED DenominatorError @ episode.py:195   RETURNED  UNEXPECTED_ERROR
+    runtime   RAISED DenominatorError @ episode.py:195   RETURNED  UNEXPECTED_ERROR
+    429       RAISED DenominatorError @ episode.py:195   RETURNED  RATE_LIMIT_429
+    500       RAISED DenominatorError @ episode.py:195   RETURNED  PROVIDER_ERROR
+    (every arm-1 row RETURNED in both — arm 1 has no judge at all)
+
+**THE FIX** (`a2f4cdc`, unreviewed; `driver/episode.py` **96/7**). `EpisodeCounts` gains a **fourth
+turn category, `abandoned`**, booked by `_Executor.execute` when — and **only** when — a
+`LaneStopped` leaves that turn in none of the other three, then **re-raising the same object**. The
+identity becomes `attempted == decided + unparsed + off_surface + abandoned`; `reconcile()` keeps
+refusing anything else; the figure prints in every episode's accounting **including at zero**.
+⚠️ **NO CAUSE LAUNDERED** — the handler catches `LaneStopped` alone, counts an integer and `raise`s:
+no `from`, no new exception, no cause argument, asserted per cause. ⚠️ **THE FLOOR IS NOT WIDENED** —
+`LaneStopped` is raised in exactly one place in this program, the model call, so a failed world
+build, a failed gate build, a `LedgerEntryError` and a `_publish` `OSError` still stop the run
+loudly and **`Q-202`'s four sites stay OPEN**. ⚠️ **NO NEW SPEC VALUE; `config/` was not opened.**
+⚠️ **NOTHING UNDER `evals/` CHANGES SHAPE** — `runner/checkpoint.py:DOCUMENT_KEYS`, C11's frozen
+schema, carries no per-turn counts, so **only a future report prints one more line.**
+
+⚠️ **THE ONE CHOICE THE RULING DID NOT NAME IS DISCLOSED, NOT ABSORBED.** `Q-207` prices **four**
+repairs and calls every one **Class A**; the ruling orders the fix and names no shape. Option 1 was
+taken and the other three are refused **in writing** at `Q-226`(a) — option 4, catching the
+`DenominatorError`, would convert hard rule 11's one detector into a silence.
+
+**TESTS — `tests/test_c14_judge_lane_stop.py`, NEW.** A **judged** arm through the real
+multi-episode matrix, the stop raised **inside the judge call** in four shapes with three causes,
+**plus a resume** (the review's own precondition, and `INC-166`'s). Every test refuses to pass
+vacuously: **0 turns unparsed** and `decided > 0` are asserted, against the existing arm-1 fixture's
+measured **384 of 384 UNPARSED** with `gate.decide` never executed — which is `H-2` exactly.
+⚠️ **ALL SIX RED ON THE PRE-FIX TREE** (a `git clone --local` of `HEAD` in a fresh OS temp
+directory — real tags, corpora junctioned, import path printed per `INC-17`): **6 failed in 9.55s →
+6 passed in 97.22s**, and ⚠️ **five of the six are red with the `DenominatorError` escaping
+`execute`**, not a structural `AttributeError`. The sixth is a regression guard, red on the refusal
+**message**, and is labelled as such in its own docstring rather than presented as a red-to-green.
+⚠️ **The first attempt at the pre-fix tree was WRONG and is recorded rather than hidden:**
+`git archive HEAD` has no tags and no corpora, so all six went red on `probe-v1 does not resolve` —
+red for the wrong reason, which proves nothing.
+
+**AST-EXACT DIFF** (`ast.FunctionDef` / `ast.Assert` / `pytest.raises` over `git show HEAD:` versus
+the working tree, never `grep -c assert`): **one NEW file — raw fn 19, qualified 17, `ast.Assert`
+46, `pytest.raises` 1 — and ZERO existing `tests/*.py` changed.** Nothing could be removed,
+loosened or skipped (hard rule 6). **FULL SUITE, ATTRIBUTED PER TEST WITH `comm(1)` AND NEVER BY SUBTRACTING TOTALS** — the
+totals are not comparable, which is the reason: live tree **16 failed, 1621 passed, 2 skipped,
+0 errors**; the pre-fix clone **34 failed, 1545 passed, 2 skipped, 58 ERRORS**, the 58 being
+tests it could not collect at all because the **pinned, git-ignored** vendored checkouts are
+absent from a clone (`Q-010`). ⚠️ **`comm -13 before after` IS EMPTY — not one test in this
+repository fails after this fix that was not already failing before it**, and since that set is
+empty, no clone-side error can be masking a regression either. The 18 before-only entries are
+this session's own **6** (red → green) plus **12** clone-environment `tau2`/`camel` reds that are
+green in the live tree both before and after. **All 16 standing reds are pre-existing and are
+named one by one in `docs/sessions/c14-floor-fix-1.txt` §6** — several visibly the concurrent
+`5b8c31e7`'s live `config/` work (`test_config_is_not_edited_and_no_sentinel_is_resolved_by_this_chunk`
+fails *"DID NOT RAISE UndeterminedValue"* because that session resolved the sentinel), and **none
+of them was touched here**. `make check-roles`: **21 passed, 0 failed, 3 n/a.**
+
+⚠️⚠️ **THIS SESSION STATED THE WRONG `HEAD` SHA IN ITS OWN NUMBERING NOTE AND CORRECTED IT AT
+`92f8cb8`.** `HEAD` moved `19c0738` → `8fce8e6` (the concurrent `5b8c31e7`) while this session was
+reading, so both appends ran against `8fce8e6`. Caught by the first push printing
+`8fce8e6..a2f4cdc`. The numbering is unaffected and it is **measured**: `git diff --numstat
+19c0738 8fce8e6` lists `PROTOCOL.md` and one session record only — no `Q-`, no `INC-` — and
+`8fce8e6` touches no `src/` and no `tests/`, so every measured frame is byte-identical at both.
+
+⚠️ **NOT FIXED AND NOT CLOSED, NAMED SO NOTHING IS MISTAKEN FOR DONE:** `H-1` (the floor's own
+`on_usage` can raise from inside its `except` clause — `INC-160`'s mechanism, in all three sibling
+branches **and** on the success path), `M-1`, `M-2`, `M-3`, `L-1`, `L-2`, `Q-207`, `Q-208`, `Q-209`
+and `Q-218`. **`INC-166`/`OF-240` was left alone on the prompt's own condition** — the review names
+it in §2.5 and says in terms it is *"not raised as a new finding and not carried to
+`OPEN_FINDINGS.md`"*, and it already carries a Fix SHA (`8171458`). **The review's findings are not
+this session's to edit or close, and none is marked closed anywhere.**
+
+---
+
 ## SESSION-TOKEN 5b8c31e7 — C14, FIX (THE SECOND FREEZE PASS) — 2026-09-05 — ✅ **THE N DECISION IS WRITTEN AND `PROTOCOL.md` PUBLISHES THE CALIBRATION. ⛔ THE TAG STILL MAY NOT BE CUT: `P3` AND `P4` STAND, AND NEITHER IS MINE**
 
 **Role:** FIX. **Chunk:** C14.
