@@ -1,3 +1,136 @@
+## SESSION-TOKEN 5b8c31e7 — C14, FIX (THE SECOND FREEZE PASS) — 2026-09-05 — ✅ **THE N DECISION IS WRITTEN AND `PROTOCOL.md` PUBLISHES THE CALIBRATION. ⛔ THE TAG STILL MAY NOT BE CUT: `P3` AND `P4` STAND, AND NEITHER IS MINE**
+
+**Role:** FIX. **Chunk:** C14.
+⚠️ **FULL RECORD: `docs/sessions/c14-freeze-2.txt`.**
+⚠️ **SPEND: ZERO. No provider call in any mode; this session held no token sanction and took none.**
+⚠️ **FIRST ACT, AS THE PROMPT REQUIRED:** `git rev-parse prereg-v1` → *unknown revision*;
+`git tag -l` → the six `cN-pass` tags plus `probe-v1`. **Every `config/` edit below is legal ONLY
+because that held.** ⚠️ **`evals/`, `tests/`, `tests/goldens/`, `src/`, `HOLES.md`, `CONTEXT.md`,
+`PROCESS.md`, `config/lanes.yaml`, `docs/render/`, `docs/reviews/`, `README.md`, `RESULTS.md` and
+`corpora/` were READ AND NEVER WRITTEN. NO TAG CUT OR MOVED. NO GIST. NOT SELF-CERTIFIED.**
+
+> ### ⚠️⚠️ THE NUMBER WAS RE-DERIVED, NOT ACCEPTED — AND THE PROMPT SAID TO STOP IF IT DIFFERED
+> It does not differ. **FOUR routes sharing no input file** all returned **2,893,347**:
+>
+>     1. the 30 stored checkpoints, sum(tokens_spent) over ALL attempted
+>     2. the attempt-4 log's 29 per-episode `tokens attacker=` lines + the SKIPPED seed 2201
+>     3. the attempt-4 log's own declared numerator line
+>     4. the raw evals/usage/ rows, minus seed 2201's abandoned earlier attempt
+>
+>     completed 20   truncated 10   attempted 30   (30 == 20 + 10 + 0)
+>     driver/pilot.py over_completed = ceil(2,893,347 / 20) = 144,668
+>
+> ⚠️ **ROUTE 4 DIFFERS BEFORE RECONCILIATION AND THE DIFFERENCE IS REPORTED RATHER THAN ABSORBED.**
+> The usage rows total **2,950,202**, **+56,855**, and the **entire** gap is **seed 2201, which ran
+> TWICE** — 13 rows / 56,855 tokens at `14Z`, 12 rows / 55,887 at `19Z`, the checkpoint holding the
+> later run. **No other episode differs by a single token.** The spend ledger and the episode record
+> answer different questions and are reported that way.
+
+**GATE 1 — TWO KEYS, AND THE RULING FIRST.** The architect's ruling is transcribed **VERBATIM** into
+`QUESTIONS.md` **`Q-221`** before either key was touched, as hard rule 5 requires. Its substance:
+`CONTEXT.md` §13.4 keys the rule on **the PILOT's** measured attacker tokens/episode; the pilot
+completed 0 of 20 and `select_n` REFUSED (`INC-142`), so that input **does not exist and never
+will** — the pilot is single-shot and spent. The calibration measured the same quantity, and the
+ruling substitutes it. ⚠️ **That substitution is published WITH the value**, in `config/` and in
+`Q-221`, because the ruling requires exactly that.
+
+    n_decision.measured_tokens_per_episode : TODO_C14_PILOT -> 144668
+    n_decision.selected_branch             : TODO_C14_PILOT -> 30
+
+**THE BRANCH IS THE RULE'S OUTPUT, NOT A TRANSCRIPTION.** `select_n(144668).n = 30` with **BOTH**
+conjuncts failing (144,668 > 60,000; 59.20 h > 32 h; `bound_by='both conjuncts'`). The largest figure
+still selecting 50 is **49,726**, measured **by bisection on the shipped function** — the ruling's
+cited break-even **to the token** — so the measurement clears it by **2.91×**. `selected_branch`
+**equals `select_n`'s own output, checked by identity rather than typed.**
+⚠️ **AND `driver/scored.py:scored_n()` NOW RETURNS 30 WHERE IT PREVIOUSLY RAISED**, because
+`Q-107`'s two readings **agree** at this figure — below 49,726 they diverge and it would have
+**STOPPED** on `Q-121`.
+
+**GATE 2 — `PROTOCOL.md` §6a IS NEW, AND IT IS `Q-212` DISCHARGED.** `CONTEXT.md` §15.2 lists the
+calibrated threshold **with its Wilson interval** among `prereg-v1`'s CONTENTS and this file
+published **neither**, while §6's own heading reads *"WHY `prereg-v1` MAY NOT BE CUT TODAY"*. Every
+figure was **re-derived first-hand by the shipped code AND an independent implementation** (closed
+form plus bisection on `erf`), agreeing to `1e-12`:
+
+    numerator 11 EPISODES / denominator 30 ATTEMPTED (all ten truncated INCLUDED) = 36.67%
+    breach ENTRIES 11 -- a DISTINCT published figure, of 418 ledger entries
+    the bound the threshold is taken from : 23.87%  (23.865672%)
+    the interval, both ends               : [21.87%, 54.49%]  ([21.873921%, 54.486436%])
+    BOTH FLOOR TO 20%   <- and that is an ACCIDENT OF k=11
+
+⚠️ **AT n=30 THE TWO FLOORS DISAGREE AT 15 OF THE 31 POSSIBLE k, INCLUDING BOTH NEIGHBOURS**
+(k=10 → 20% vs 15%; k=12 → 25% vs 20%). `Q-195` stays OPEN and a reader is told not to take it as
+settled. **`INC-163` and `INC-164` are printed BESIDE the number, not in a footnote**, with the
+direction named — both push the threshold DOWN, and DOWN makes a later VOID **LESS** likely — and
+**one breach among the six non-breaching timed-out episodes (2211, 2213, 2221, 2222, 2228, 2230)
+would have moved it 20% → 25%**, computed rather than feared.
+
+**§6's FOUR STALE ITEMS, ALL CORRECTED:** the void-threshold row still read `TODO_C14_CALIBRATION`;
+the count read the word *"four"* and is now **ONE outstanding of the four registered**, with
+`check-roles` F2's **different** set explained rather than conflated; §6:662's *"`ledger.genesis_hash`
+is currently the literal `PRE-FREEZE`"* **has been false since `Q-153`** and is replaced by the
+measurement; and the `3e91b7c5` block's *"THE LAST `config/` EDIT THIS PROJECT WILL EVER MAKE"*,
+which it was not. ⚠️ **`ledger.genesis_hash` ITSELF WAS NOT TOUCHED** — reported and stopped on, as
+the prompt required. Its value is `170bd3ff4abfdd8f87f64055972a60c82cc54efc`, **equal to
+`git rev-parse probe-v1`, the TAG OBJECT** (`probe-v1^{commit}` is `4ce8f566…`), and all thirty
+stored ledgers chain from it. `Q-214`'s impossibility is now recorded in `PROTOCOL.md` itself.
+
+**THE MANIFEST ROW, RE-MEASURED FROM THE GIT BLOB AND NEVER COPIED** (`Q-181`: `check-prereg`
+recomputes nothing before the tag; `INC-139` is the entry about **this exact row** standing stale).
+The **standing** row was **verified correct against `HEAD` BEFORE the file was edited**, so the
+difference is this session's one edit and nothing else: `4785ae4d…`, **37,531 B**, blob
+`fdb40ebb…`, 0 CR, and **the one-hunk claim is PROVED BY DIFF** — `420,423c420,459`.
+`config/lanes.yaml` untouched and independently re-measured **unchanged**.
+
+⚠️⚠️ **THREE THINGS RAISED, NONE DECIDED, AND TWO OF THEM ARE ABOUT THIS SESSION'S OWN
+INSTRUCTIONS.**
+
+**`Q-222` — ONE LEG OF THE RULING'S OWN PUBLISHED RATIONALE IS FALSE OF THE SHIPPED FUNCTION**, and
+the ruling asked in capitals to be checkable. *"A refusal defaults to the SMALLER branch"* —
+measured, `select_n(0).n` and `select_n(1).n` are **both 50**. It is true of §13.4's **prose**
+(*"Otherwise N = 30"*) and false of the **function**. **Nothing feeds a refusal into `select_n`** —
+three independent refusals stand in front of it, traced — so it is a **latent trap, not a live
+defect**, and **the written value is unchanged**. ⚠️ **The argument the ruling should have used is
+already in the code and is strictly stronger:** `n_at_registered_target` is **30 at every input**, so
+**`branch_a_n: 50` is UNREACHABLE through `scored_n()`** at today's post-rung-4 config. And
+`runner/n_rule.py`'s docstring still quotes the **pre-rung-4** break-even (31,908/31,909) where today
+it is **49,726** — `runner/` is outside this fence, so it is reported, not edited.
+
+**`Q-223`, CLASS A — §6a WAS REQUIRED TO WRITE TWO WORDS THAT A SHIPPED GUARD SCANS THIS VERY FILE
+FOR.** `tests/test_arch_wilson.py` scans `PROTOCOL.md` — the **first** entry of its `FROZEN_DOCS` —
+and on a hit its own message declares `Q-189`(d) **WITHDRAWN BY ITS OWN TERMS** and orders
+`probe/statistics.py` reverted, which moves the published bound from 23.87% to 21.87%. ⚠️ **Writing
+them would have withdrawn a ruling as a side effect of documenting it.** **Every required number is
+published**, the two objects are distinguished by construction and by role with *"21.87% IS NOT A
+TYPO FOR 23.87%"*, and ⚠️ **the omission is written into §6a.2 itself**, naming the test and what
+firing it would cost — because a guard dodged by spelling and not mentioned is precisely what that
+test's own comment warns about. **NOTHING in `tests/` was edited, weakened, skipped or exempted**;
+`OTHER_ESTIMATORS` still holds exactly four entries and the file is **GREEN** against the live tree.
+
+**TWO INCIDENTS. `INC-167`** — the above, recorded as **`INC-162`'s class, second instance**: the
+prior fix removed the words from `config/` and its lesson was written as being about `config/`, when
+it was about the **eight-document scan list**, of which `PROTOCOL.md` is one. **`INC-168`** —
+`OF-213`'s first-command check reported **478 staged deletions** across three record files and **the
+correct response was to do nothing**: `HEAD` moved `8171458` → `72df9e5` mid-session and it was the
+concurrent session's commit **in flight**, which that check **cannot distinguish** from the stale
+index it exists to catch — and its documented remedy, `git reset`, is destructive in that case.
+
+**GATE 3 — WHAT STILL BLOCKS THE TAG, AND WHAT IS NOT MINE.**
+✅ **`P1` CLEARED** by §6a. ✅ **`P2` CLEARED BY THE OPERATOR** — `evals/` is now **fully tracked
+(94 files)** and `git status --porcelain evals/` is **EMPTY**, verified.
+⚠️ **`P3` STILL BLOCKS**: four untracked paths remain — `du.exe.stackdump`, `grep.exe.stackdump`,
+`verify.py` and `rev/` (which holds two stray episode files, one of them **ARM 4**) — and
+`PROCESS.md` §6a.2 step 0 requires `git status --porcelain` to be **EMPTY**.
+⚠️ **`P4` STILL HOLDS**: `6a4f28de` is live and committed twice while this session ran.
+**EXPIRING `config/` ITEMS ENUMERATED WITH THEIR COSTS, NONE FIXED:** `Q-036` (RULED, UPHELD, with an
+explicit pre-tag deadline, **not landed in five days** — and it needs `config/` **plus** `CONTEXT.md`
+§8.6 **plus** the registry, of which this fence held **one**), `Q-163`, ⚠️ **`Q-183` — measured
+sharper than it was recorded:** `clients.py:1019` substitutes a literal `0.0` on the **Google** path
+only, `_groq_body` correctly sends nothing, and **both judge lanes are `provider: google`** — so
+**every arm 2/2S/3 verdict would run at an undeclared `0.0`** under a docstring saying in capitals
+that none is sent. `Q-196`/`Q-211` and `Q-151` likewise reported and not decided.
+
+
 ## SESSION-TOKEN 6a4f28de — C18, BUILD 1 (THE SWEEP PATH) — 2026-09-05 — ✅ **`--block scored` EXISTS AND IS INVOCABLE. ⛔ THE SWEEP CANNOT START: `Q-216` AND `Q-218` ARE BOTH BLOCKING AND NEITHER IS MINE TO CLOSE**
 
 **Role:** BUILD. **Chunk:** C18 — ⚠️ **and that label is contested; see `Q-220`.**

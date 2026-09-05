@@ -13118,3 +13118,138 @@ a bare catch here would swallow a genuine `DriverError` and print a report that 
 the checkpoint schema — and that is `runner/checkpoint.py`, C11's frozen schema, outside this
 session's fence.** It is left OPEN as `OF-240` and named here as the thing that would close this
 class rather than contain it.
+
+
+---
+
+## INC-167 — ⚠️⚠️ **A SESSION PROMPT REQUIRED, IN CAPITALS, THAT TWO WORDS BE WRITTEN INTO A FROZEN-SET DOCUMENT — AND WRITING THEM WOULD HAVE WITHDRAWN THE RULING THE SENTENCE WAS DOCUMENTING. SECOND INSTANCE OF `INC-162`'s CLASS, ONE FILE OVER, AND THIS TIME IT WAS THE INSTRUCTION RATHER THAN A DRAFTING SLIP**
+
+**Date:** 2026-09-05 (C14 FIX — THE SECOND FREEZE PASS, `5b8c31e7`). Fix SHA under **Fix**.
+⚠️ **NUMBERED FROM `git show HEAD:INCIDENTS.md` IMMEDIATELY BEFORE THE APPEND** (`INC-137`), at
+`HEAD` = `d42a32c`, where the highest was `INC-166`.
+
+**Event:** this session's Gate 2 instruction read, verbatim: *"⚠️ BOTH BOUNDS: the one-sided 95%
+Wilson lower bound 23.87% AND the two-sided interval [21.87%, 54.49%], with the sentence that BOTH
+FLOOR TO 20%"*, to be written into **`PROTOCOL.md`**. ⚠️ **`PROTOCOL.md` is the FIRST ENTRY of
+`tests/test_arch_wilson.py`'s `FROZEN_DOCS`**, and that test scans eight documents line by line for
+`one[- ]sided|two[- ]sided|1\.645|1\.6449|1\.959|1\.96\b`, exempting four named estimators.
+**The instructed sentence matches the pattern twice.**
+
+**Action:** the words were **not** written and the guard was **not** touched. §6a.2 publishes every
+required figure — 23.87% (23.865672%), [21.87%, 54.49%] ([21.873921%, 54.486436%]), the observed
+36.67%, that **both floor to 20%**, that this is an **accident of k = 11**, the k = 10/11/12 table
+with both neighbours disagreeing, and the full fifteen-of-thirty-one disagreeing set — distinguishing
+the two objects **by construction and by role** (*"the bound the threshold is taken from"* against
+*"the interval, both ends"*) with the sentence **"21.87% IS NOT A TYPO FOR 23.87%"**. ⚠️ **AND THE
+OMISSION IS WRITTEN INTO §6a.2 ITSELF**, naming the test, the withdrawal clause and what firing it
+would cost. Recorded as `QUESTIONS.md` **`Q-223`**, Class A, with four options and a recommendation.
+
+**Expectation:** that documenting a ruling is safe. ⚠️ **It is not, when the ruling's withdrawal
+condition is keyed on the presence of words rather than on the presence of a conflicting *decision*.**
+`Q-189`(d) withdraws itself *"if either FROZEN artefact specifies two-sided in terms"* — a clause
+written to detect a **pre-existing** frozen artefact that had already settled the question. The test
+that mechanises it cannot distinguish that from **text written under the ruling, restating it**. The
+assertion's own message would then have ordered `probe/statistics.py` reverted, moving the published
+bound from 23.87% to 21.87%.
+
+**Missing:** ⚠️ **any signal at the point of instruction.** The prompt named `Q-211` and `INC-162` in
+its reading list — the entries that are *about this exact guard* — and still asked for the words,
+because nothing connects the guard to the file it protects except a session reading the test. **There
+is no lint, no comment in `PROTOCOL.md` saying "this file is scanned", and no note in `Q-189`(d)
+listing what the scan covers.** A session that wrote the sentence first and ran the suite afterwards
+would have seen a red whose message tells it to revert a module — **and reverting is the wrong
+response**, so the guard's own remedy is misleading in exactly this case.
+
+**Missed:** ⚠️ **`INC-162` IS THIS SAME FAILURE, FOUR HOURS EARLIER, AND ITS OWN GUARDRAIL DID NOT
+GENERALISE.** `INC-162` was caught *by the test* after the words were drafted into `config/`; its
+lesson was recorded as being about **`config/`**. ⚠️ **It was about the SCAN LIST**, which has eight
+entries, and `PROTOCOL.md` is one of them. **The prior incident's fix was to remove the words from
+one file; nothing asked which other files the same sentence would break.** This session found it only
+because it read `test_arch_wilson.py` **before** writing, and it read it only because `Q-196`'s entry
+in `c14-freeze-1.txt` happened to mention the eight-document scope in passing.
+
+**Diagnosis:** a withdrawal clause written about **prior art** was mechanised as a **textual scan**,
+so any restatement of the ruling inside its own scope is indistinguishable from a contradiction of it
+— and the scope includes the document the ruling's results must be published in.
+
+**Fix:** ⚠️ **NONE IN CODE, NONE IN `tests/`, AND BOTH ABSTENTIONS ARE DELIBERATE.** `tests/` is in
+this session's `NOT` list and hard rule 6 forbids weakening an assertion to get green; the exemption
+list is *"asserted to be exactly four"* precisely so growing it is a visible act needing a ruling.
+**What landed instead is the disclosure**: `PROTOCOL.md` §6a.2 and `QUESTIONS.md` `Q-223`. SHA in the
+FINAL OUTPUT block of `docs/sessions/c14-freeze-2.txt`.
+
+**Systemic guardrail:** ⚠️ **none yet, and the honest reason is that the only real one is the
+architect's.** The guard cannot tell a restatement from a contradiction, and no wording this session
+controls changes that. **The candidate that would work is `Q-223` option C** — rule that the
+withdrawal clause applies to artefacts frozen **before** the ruling, not to text written **under** it,
+and amend the test to match — **and it rewrites the terms of a live ruling, which is larger than the
+thing it unblocks.** ⚠️ **The cheap partial guardrail, which this session also cannot land: one line
+in `PROTOCOL.md`, `HOLES.md`, `INVARIANTS.md`, `PROVENANCE.md` and `RAZORPAY_SEMANTICS.md` saying
+"this file is scanned by `tests/test_arch_wilson.py`; see `Q-189`(d) before writing about the bound."
+Four of those five are frozen artefacts this session may not edit, which is why it is named here
+rather than done.
+
+---
+
+## INC-168 — ⚠️ **`OF-213`'s FIRST-COMMAND CHECK REPORTED 478 STAGED DELETIONS ACROSS THREE RECORD FILES, AND THE CORRECT RESPONSE WAS TO DO NOTHING. IT WAS A CONCURRENT SESSION'S COMMIT IN FLIGHT, AND THE CHECK CANNOT TELL THAT FROM THE HAZARD IT EXISTS TO CATCH**
+
+**Date:** 2026-09-05 (C14 FIX — THE SECOND FREEZE PASS, `5b8c31e7`). Fix SHA under **Fix**.
+
+**Event:** `OF-213` makes `git diff --cached` *"the FIRST command of a session, BEFORE the read
+order"*, on the ground that *"a non-empty result on a path you do not own is inherited, not yours: a
+bare commit by anyone would land it."* Run as instructed, at `HEAD` = `8171458`, it returned:
+
+    INCIDENTS.md | 129 ------------------------------
+    PROGRESS.md  |  98 -----------------------
+    QUESTIONS.md | 250 -----------------------------------------------------------
+    STATUS.md    |   2 +-
+    4 files changed, 1 insertion(+), 478 deletions(-)
+
+**All four paths are in this session's fence.** Read literally, `PROCESS.md` §7b's step 5 — *"a
+non-zero exit is a hard-rule-1 STOP"* — and `INC-91`'s precedent (*"419 lines left staged for
+DELETION"*) both point at cleaning it up with `git reset`.
+
+**Action:** ⚠️ **NOTHING WAS RESET, AND THAT WAS RIGHT BY LUCK OF ORDER RATHER THAN BY THE CHECK.**
+The blobs were compared before anything was touched: `git ls-files -s` and `git rev-parse HEAD:<path>`
+returned the **identical** blob id for all four paths, and the worktree matched too. Minutes later
+`HEAD` had moved from `8171458` to `72df9e5` — **two new commits by the concurrent C18 session
+(`6a4f28de`)** — and `git diff --cached --quiet` exited **0**. ⚠️ **What the first command caught was
+another session's `git add`/`git commit` mid-flight through the SHARED index, not a stale one.**
+
+**Expectation:** that a non-empty `git diff --cached` on paths you own means a stale index that will
+be committed by the next bare `git commit`. ⚠️ **Here it meant the opposite: the index was
+transiently AHEAD of nothing and BEHIND `HEAD` only because another session had seeded it and had not
+yet committed.** Resetting those paths would have destroyed a live staging area mid-commit — the
+**mirror image** of `INC-139`, where a session's own index work reverted somebody else's commit.
+
+**Missing:** ⚠️ **any way to tell the two apart, and the two demand OPPOSITE responses.** `git diff
+--cached` reports a difference; it cannot report *whose* or *when it was staged*. **A stale entry and
+an in-flight commit are byte-identical in that output.** Nothing in `OF-213`, `INC-91` or §7b step 5
+says "compare the staged blob against `HEAD` before concluding", which is the cheap check that
+resolves it — and it resolves it completely, because a **stale** entry differs from `HEAD` in
+content while an **in-flight** one is a tree the other session is about to commit.
+
+**Missed:** ⚠️ **the timestamp was on the screen and was not read as a clock.** `git status --porcelain`
+in the same breath listed ` M tests/test_c18_sweep.py`, and this session's own prompt opens with
+*"⚠️ SESSION `6a4f28de` IS LIVE AND HOLDS `src/whetstone_gate/driver/` AND `tests/`."* **A live session
+holding `tests/` with `tests/test_c18_sweep.py` modified is a session about to commit**, and the
+staged deletions appeared and vanished across exactly that window. The prompt named the concurrent
+session in capitals and the inference was still made from the blob comparison rather than from it.
+
+**Diagnosis:** `OF-213`'s check is a snapshot of a mutable shared resource with no ownership or
+recency information, so it cannot distinguish a hazard from a neighbour mid-write, and its documented
+remedy (`git reset`) is destructive in the second case.
+
+**Fix:** ⚠️ **none in code — there is no code here to fix**; the finding is about a documented
+procedure, `PROCESS.md` §7b and `docs/reviews/OPEN_FINDINGS.md` `OF-213`, **both outside this
+session's fence.** What this session did instead is recorded above and is the recommended step:
+**compare the staged blob to `HEAD:<path>` before drawing any conclusion, and re-run.** SHA in the
+FINAL OUTPUT block of `docs/sessions/c14-freeze-2.txt`.
+
+**Systemic guardrail:** ⚠️ **available and NOT taken here, because §7b is not this session's to
+edit.** One line added to §7b step 5 would close it — *"if `--cached` is non-empty, compare each
+staged blob against `HEAD:<path>` before resetting; equal blobs mean a concurrent commit in flight,
+and the correct action is to WAIT, not to reset."* ⚠️ **And the honest limit of even that: it removes
+the false positive, not the race.** Two sessions sharing one `.git/index` is the underlying condition,
+and §7b's private-index recipe already fixes it **for the session that follows the recipe** — it
+cannot fix it for the session that does not, and nothing here can tell which one the neighbour is.
