@@ -62,9 +62,8 @@ from whetstone_gate.runner.scheduler import Scheduler
 
 S3_BINDING = driver_episode.S3_AUTHORIZATION_IS_THE_PAYMENT
 
-#: The calibration's own run log. ⚠️ **UNTRACKED at the time this file was written** — see
-#: :func:`_calibration_log`, which returns ``None`` rather than pretending. The one test that reads
-#: it parses the measured tokens/episode out of it rather than typing the figure.
+#: The calibration's own run log. The one test that reads it parses the measured tokens/episode
+#: **out of it** rather than typing the figure — see :func:`_calibration_log`.
 _CAL_LOG = "evals/cal/run-attempt4-20260904T204118Z.log"
 
 
@@ -141,14 +140,17 @@ def _full_length_matrix():
 def _calibration_log() -> str | None:
     """The calibration's own run log, **or ``None`` if it is not in this tree**.
 
-    ⚠️⚠️ **IT IS UNTRACKED AT THE TIME THIS FILE WAS WRITTEN, AND THAT IS A FINDING RATHER THAN
-    A CONVENIENCE.** ``evals/cal/run-attempt4-…log`` and the calibration's thirty checkpoints and
-    thirty episode ledgers are present in the operator's working tree and **absent from
-    ``git archive HEAD``** — so the record of the spent, single-shot run that sets the void
-    threshold is not in the repository. ``evals/`` is outside this session's fence and committing
-    them is the operator's act, so this is **reported, not worked around**: the one test that
-    reads the log says out loud when it cannot, and no load-bearing assertion in this file depends
-    on it.
+    ⚠️ **THE ``None`` BRANCH IS NOT DEFENSIVE PADDING; IT WAS REACHABLE WHILE THIS FILE WAS
+    BEING WRITTEN, AND MEASURED SO.** At this session's start `HEAD` was ``ed5eb5c``, and
+    ``git archive`` of that commit carried **eleven** checkpoints and **no** calibration run log:
+    the record of the spent, single-shot run that sets the void threshold was in the operator's
+    working tree and **not in the repository**. It was committed **during** this session by the
+    concurrent C14 FIX (``170f41c``, ``37a2032``), which is why the branch is now unreachable in
+    this tree and why the claim is stated as history rather than as a present finding.
+
+    ⚠️ **NO LOAD-BEARING ASSERTION IN THIS FILE DEPENDS ON THE LOG.** The one test that reads it
+    says out loud when it cannot, rather than passing quietly — a skip is how a check dies
+    quietly, so this one names what is missing and why.
     """
     path = cfg.repo_root() / _CAL_LOG
     if not path.is_file():
@@ -349,10 +351,10 @@ def test_AT_THE_CALIBRATIONS_MEASURED_FIGURE_BOTH_Q107_READINGS_AGREE_and_BOTH_c
     log = _calibration_log()
     if log is None:
         pytest.skip(
-            f"{_CAL_LOG} is not in this tree. It is UNTRACKED in the operator's working tree, so "
-            f"the record of the spent single-shot calibration is not in the repository. "
-            f"Committing it is the operator's act (evals/ is append-only and outside a build "
-            f"session's fence); this test cannot run until it is."
+            f"{_CAL_LOG} is not in this tree, so the record of the spent single-shot calibration "
+            f"cannot be read and the figure the N rule will be handed cannot be re-measured. "
+            f"evals/ is append-only and outside a build session's fence, so restoring it is the "
+            f"operator's act. This test does not pass in its absence; it says what is missing."
         )
     found = re.findall(r"tokens/episode over COMPLETED[^:]*:\s*(\d+)", log)
     assert len(found) == 1, (
