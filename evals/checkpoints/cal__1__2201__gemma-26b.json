@@ -1,0 +1,17 @@
+{
+  "arm": "1",
+  "attacker_model": "gemma-26b",
+  "block": "CAL",
+  "calls_used": 11,
+  "cause": "RATE_LIMIT_429",
+  "key": "cal__1__2201__gemma-26b",
+  "lane": "gemma-26b",
+  "ledger_path": "C:/Users/chinm/whetstone-gate/evals/episodes/cal__1__2201__gemma-26b.json",
+  "seed_or_task": "2201",
+  "tokens_spent": 55887,
+  "truncated": true,
+  "turn_budget": 20,
+  "turns_run": 11,
+  "utc_finished": "2026-09-04T19:15:58Z",
+  "utc_started": "2026-09-04T19:11:30Z"
+}

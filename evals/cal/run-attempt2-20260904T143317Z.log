@@ -1,0 +1,83 @@
+-- drive - the episode driver ------------------------------------------------
+  probe-v1 resolves : True
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Users\chinm\whetstone-gate\src\whetstone_gate\tasks.py", line 312, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "C:\Users\chinm\whetstone-gate\src\whetstone_gate\tasks.py", line 305, in main
+    return task_drive(rest)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\chinm\whetstone-gate\src\whetstone_gate\tasks.py", line 266, in task_drive
+    return driver_main(argv)
+           ^^^^^^^^^^^^^^^^^
+  File "C:\Users\chinm\whetstone-gate\src\whetstone_gate\driver\__main__.py", line 225, in main
+    result = driver_run.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\chinm\whetstone-gate\src\whetstone_gate\driver\run.py", line 894, in execute
+    episode = run_one_episode(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\chinm\whetstone-gate\src\whetstone_gate\driver\episode.py", line 722, in run_one_episode
+    attacker_result = run_attacker_episode(
+                      ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\chinm\whetstone-gate\src\whetstone_gate\attacker\loop.py", line 273, in run_episode
+    attacker_text = client.complete(
+                    ^^^^^^^^^^^^^^^^
+  File "C:\Users\chinm\whetstone-gate\src\whetstone_gate\driver\episode.py", line 454, in complete
+    return self.metered.run(
+           ^^^^^^^^^^^^^^^^^
+  File "C:\Users\chinm\whetstone-gate\src\whetstone_gate\driver\episode.py", line 373, in run
+    reply = call()
+            ^^^^^^
+  File "C:\Users\chinm\whetstone-gate\src\whetstone_gate\driver\episode.py", line 455, in <lambda>
+    lambda: self.client.complete_attacker(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\chinm\whetstone-gate\src\whetstone_gate\driver\run.py", line 506, in complete_attacker
+    reply = self.inner.complete_attacker(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\chinm\whetstone-gate\src\whetstone_gate\driver\clients.py", line 896, in complete_attacker
+    return self._call(self._route(lane, role="attacker"), messages, temperature)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\chinm\whetstone-gate\src\whetstone_gate\driver\clients.py", line 1043, in _call
+    response = self.transport(url, json.dumps(body).encode("utf-8"), headers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\chinm\whetstone-gate\src\whetstone_gate\driver\clients.py", line 542, in _http_post
+    with urllib.request.urlopen(request, timeout=_TIMEOUT_SECONDS) as response:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\urllib\request.py", line 215, in urlopen
+    return opener.open(url, data, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\urllib\request.py", line 515, in open
+    response = self._open(req, data)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\urllib\request.py", line 532, in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\urllib\request.py", line 492, in _call_chain
+    result = func(*args)
+             ^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\urllib\request.py", line 1392, in https_open
+    return self.do_open(http.client.HTTPSConnection, req,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\urllib\request.py", line 1348, in do_open
+    r = h.getresponse()
+        ^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\http\client.py", line 1423, in getresponse
+    response.begin()
+  File "C:\Program Files\Python312\Lib\http\client.py", line 331, in begin
+    version, status, reason = self._read_status()
+                              ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\http\client.py", line 292, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\socket.py", line 707, in readinto
+    return self._sock.recv_into(b)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\ssl.py", line 1252, in recv_into
+    return self.read(nbytes, buffer)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\ssl.py", line 1104, in read
+    return self._sslobj.read(len, buffer)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TimeoutError: The read operation timed out
