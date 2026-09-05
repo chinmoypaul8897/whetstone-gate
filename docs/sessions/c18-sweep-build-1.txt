@@ -1,0 +1,521 @@
+================================================================================
+ C18 BUILD 1 - THE SWEEP PATH   SESSION-TOKEN 6a4f28de   ROLE: BUILD   2026-09-05
+================================================================================
+
+ THIS SESSION'S COMMITS, oldest first:
+   8171458  feat(driver)   the sweep path + the seed-major dispatch order
+   18f6477  fix(test)      a claim that became false while it was being written
+   72df9e5  chore(records) Q-216..Q-220, INC-165, INC-166, STATUS, PROGRESS
+   afc4eba  test(sweep)    the N-sentinel refusal un-skipped, driven on a fixture
+   <this>   chore(journal) this file, plus Q-216's resolution note
+ PUSHED SHA: the last of these, stated as the first line of the report.
+
+ The full record is committed VERBATIM at docs/sessions/c18-sweep-build-1.txt
+ BEFORE this was printed. CLAUDE.md S6.1: the FILE is the record; this is the
+ copy.
+ !! NOT `c18-build-1.txt`. THAT PATH ALREADY HELD THE *OTHER* C18 BUILD'S 1045-
+ LINE RECORD (the RESULTS.md deliverable, 23903a0) AND THIS SESSION OVERWROTE IT
+ AT 52faf81. IT IS RESTORED BYTE-FOR-BYTE (blob 3453b9d) AND THE FAILURE IS
+ WRITTEN UP AS INC-170. Q-220's chunk-label collision, arriving in the
+ FILESYSTEM: CLAUDE.md S6.1 names the record `<chunk>-<role>-<attempt>.txt`, and
+ two deliverables under one chunk label produce ONE filename.
+
+================================================================================
+0. THE HEADLINE
+================================================================================
+
+ ! THE SWEEP PATH EXISTS AND IS INVOCABLE. `--block scored` builds CONTEXT.md
+ S13.4's M-ADV matrix - FIVE ARMS x N - and dispatches it SEED-MAJOR. A full
+ 150-episode dry run completes end to end, writes 150 ledgers and 150
+ checkpoints, and reconciles 150 == 150 + 0 + 0.
+
+ !! ONE BLOCKER REMAINS, AND IT IS NOT MINE TO CLOSE.
+
+   Q-216  N IS NOT SELECTABLE -- ! RESOLVED MID-SESSION, BY SOMEBODY ELSE.
+          This was written while `n_decision.measured_tokens_per_episode` was
+          TODO_C14_PILOT, so `load_scored()` REFUSED - correctly, and this
+          session deliberately did not route around it. The concurrent C14 FIX
+          (`3e91b7c5`) then landed `c3aa9b4`: 144668 and selected_branch 30.
+          RE-MEASURED IMMEDIATELY AFTER: the sweep path now assembles from the
+          REAL config/ with nothing typed - N=30, 150 episodes,
+          scored__1__2001__gemma-26b .. scored__4__2030__gemma-26b,
+          imbalance 1. THE ENTRY IS KEPT IN FULL, because its body is the
+          record of WHY the code refuses and that refusal is still live.
+          ! One thing in it is vindicated: `selected_branch` landed as the
+          INTEGER 30, not a letter or a branch name. driver/scored.py reads
+          the MEASURED figure and DERIVES through the rule rather than parsing
+          `selected_branch`, whose format this session could not know - so
+          nothing had to be guessed and nothing changes now it is visible.
+
+   Q-218  !! STILL OPEN AND IT GATES THE RUN. C14 REVIEW 1's BLOCKER B-1 SITS
+          ON 90 OF THE 150 EPISODES. Any LaneStopped inside a judge call
+          raises DenominatorError out of `execute`: no report, no denominator,
+          every remaining episode unattempted. The calibration and the pilot
+          both ran arm 1 with NO JUDGE AT ALL, so the sweep is the FIRST block
+          that can trigger it and the ONLY block whose numbers are published.
+          GO/NO-GO.
+
+ SPEND: ZERO. No provider call in any mode. This session held no token
+ sanction and took none. THE SWEEP WAS NOT RUN. NO TAG CUT OR MOVED.
+
+================================================================================
+1. THE MATRIX, EVERY VALUE WITH ITS SOURCE
+================================================================================
+
+   value              setting             SOURCE
+   block label        "SCORED"            THE BUILD PROMPT, in terms. ! PROTOCOL.md
+                                          S3.1 HEADS THAT ROW "M-ADV" and uses
+                                          "scored" as its STATE column, and the
+                                          other two blocks took their row's
+                                          HEADING. RAISED AS Q-217, not smoothed
+                                          over. Cheap now; impossible after the
+                                          first episode is written.
+   arms               1, 2, 2S, 3, 4      gates/verdict.py:ARMS, CROSS-CHECKED
+                                          against runner/n_rule.py:ARMS - S13.4's
+                                          projection multiplies by it, so a
+                                          divergence would mean the block that RUNS
+                                          is not the block whose lane-hours were
+                                          PROJECTED, and the projection selected N
+   N                  DERIVED, NOT TYPED  n_decision.measured_tokens_per_episode ->
+                                          runner/n_rule.py:select_n (C11's rule as
+                                          Q-107 ruled it) -> the branch.
+                                          ! REFUSES while that key is a sentinel.
+   seed band          seeds.scored_n<N>_* PROTOCOL.md S2.2 names a key pair for EACH
+                                          branch; WHICH is read is decided by the
+                                          rule above. CROSS-CHECKED to carry
+                                          exactly N seeds, refusing otherwise.
+   episodes           5 x N               DERIVED. At the branch the rule yields
+                                          from the calibration's own figure: 150.
+   turn budget        20                  config attacker.turn_budget
+   reference lane     gemma-26b           config/lanes.yaml, the lane whose role
+                                          names the REFERENCE attacker - the same
+                                          reader pilot.py and cal.py use, not a
+                                          second copy of the predicate
+   judge lane         gemma-26b           config/lanes.yaml "gate judge for arms
+                                          2/2S/3" - the SAME lane (S13.3.2), which
+                                          is why the split must be BY ROLE (INC-111)
+   judged / unjudged  90 / 60             DERIVED from run.py:JUDGED_ARMS, read
+                                          rather than re-declared
+
+ ! NOTHING WAS INVENTED AND THE ONE VALUE THAT COULD HAVE BEEN IS A REFUSAL.
+ Writing N here - even the N the arithmetic plainly yields - would be choosing
+ the size of the published run by preference on the day of the deadline, which
+ is what PROTOCOL.md S3 forbids in capitals.
+
+ ! THE BLOCK LABEL REACHES EVERY LEDGER AND EVERY CHECKPOINT, MEASURED:
+   150 keys; ALL slugs begin `scored__`; first scored__1__2001__gemma-26b,
+   last scored__4__2030__gemma-26b; slugs INJECTIVE; ZERO collision with the
+   41 checkpoints on disk (30 cal + 11 pilot, and the prefix set is asserted);
+   seeds DISJOINT from the pilot and calibration bands and DELIBERATELY
+   OVERLAPPING the ladder band, which is asserted POSITIVELY so a reader is
+   not left to infer which silence means what.
+
+================================================================================
+2. !! THE DISPATCH ORDER - PROVED SEED-MAJOR AND PROVED BALANCED
+================================================================================
+
+ THE DEFECT IT FIXES IS IN run.py, NOT ONLY IN THE NEW MODULE.
+ `Scheduler.pending` returns its list SORTED BY EpisodeKey, and that dataclass
+ is order=True over (block, arm, seed_or_task, attacker_model). SO THE
+ SCHEDULER'S OWN SORT IS ARM-MAJOR, and `execute` dispatched what it returned -
+ discarding whatever order the matrix built. INC-165.
+
+ MEASURED OVER EVERY ONE OF THE 151 PREFIXES OF THE REAL 150-KEY MATRIX, both
+ orders driven side by side rather than one asserted:
+
+     seed-major worst per-arm imbalance : 1
+     arm-major  worst per-arm imbalance : 30      (a whole arm's worth = N)
+     at a one-third cut-off, seed-major : {1:10, 2:10, 2S:10, 3:10, 4:10}
+     at a one-third cut-off, arm-major  : {1:30, 2:20, 2S:0, 3:0, 4:0}
+
+ !! WHY IT IS THE DELIVERABLE. The published claim is a COMPARISON BETWEEN
+ ARMS. Arm-major truncation leaves THREE ARMS EMPTY - a third of the tokens
+ spent on a number that cannot be published at all. Seed-major at the same
+ instant leaves every arm at the SAME n on the SAME SEEDS: a real result with
+ wide intervals, and the PAIRED comparison S12.3's counter-metric and S10.2's
+ ARM CONFOUNDED rule both need. PROCESS.md S14 pre-authorises publishing it.
+
+ PROVED IN THE REAL RUN, NOT ONLY IN THE MATRIX. The 150-episode dry run's own
+ dispatch, read off the episodes that actually ran:
+
+     scored__1__2001  scored__2__2001  scored__2s__2001  scored__3__2001
+     scored__4__2001  scored__1__2002  scored__2__2002   scored__2s__2002
+     ...              scored__2s__2030 scored__3__2030   scored__4__2030
+
+ EVERY MATRIX NOW DECLARES ITS ORDER; NOTHING INHERITS ONE. PilotMatrix and
+ CalMatrix return `sorted(pending)`, WHICH IS THE LIST `pending` ALREADY
+ PRODUCED, and the identity is ASSERTED against Scheduler.pending's own output
+ rather than argued - both blocks are SPENT and single-shot, so their order is
+ a matter of record and not of preference. ! No `hasattr` fallback was used:
+ that is a silent default, and run.py:_agree already records the
+ RAW_SOURCE_SCAN tripwire refusing a dynamic reach by name as INC-51's species.
+
+================================================================================
+3. THE RESUME TEST - KILLED MID-RUN AND RESUMED
+================================================================================
+
+ tests/test_c18_sweep.py::test_kill_mid_run_and_resume_dispatches_ONLY_what_
+ has_no_checkpoint_with_ZERO_duplicates, on a 5-arm x 4-seed matrix:
+
+   pass 1  KeyboardInterrupt after 7 episodes -> 7 checkpoints on disk
+           ! and the 7 are EXACTLY the first 7 keys of the declared order,
+             so the arms are still within ONE of each other at the instant it
+             died. That is the whole claim, asserted at the crash point.
+   pass 2  resumes: 7 already_complete, 13 run, and the 13 are THE TAIL OF THE
+           SAME DECLARED ORDER - asserted key by key, not by count
+   pass 3  re-runs NOTHING and makes ZERO model calls
+
+ KeyboardInterrupt is a BaseException and Q-200's floor is spelled `except
+ Exception`, so it passes straight through - which is the point: a floor that
+ booked an operator's Ctrl-C as an episode outcome would make a 42-hour sweep
+ unstoppable.
+
+ AND THE DENOMINATOR SURVIVES THE RESUME: a second invocation reports the same
+ `attempted` as the first, 150 whatever ran (INC-110's defect, in this block's
+ terms).
+
+================================================================================
+4. EVERY TEST PROVED RED FIRST - AND ONE IS HONESTLY NOT A BEHAVIOUR RED
+================================================================================
+
+ METHOD: `git archive ed5eb5c | tar -x` into a fresh OS temp directory, the new
+ test file copied in, PYTHONPATH pointed at the exported src and VERIFIED to
+ win over the editable install by printing whetstone_gate.__file__ - because
+ the FIRST attempt at this proof silently loaded the WORKING TREE'S package and
+ reported 32 tests "passing" against the new code. That false green was caught
+ by reading the paths in the failure output, and it is recorded here because a
+ red proof that proves nothing is worse than none.
+
+ STAGE A - the whole file, against the pristine export:
+   COLLECTION ERROR. `cannot import name 'scored' from whetstone_gate.driver`.
+   Every test in the file is red; the module does not exist.
+
+ STAGE B - the discriminating proof: driver/scored.py copied in, EVERY OTHER
+ MODULE LEFT AT ed5eb5c. 13 red, each for the exact behaviour it pins:
+
+   run_py_DISPATCHES_IN_THE_MATRIXS_ORDER_AND_NOT_THE_SCHEDULERS_SORT
+   the_PILOT_AND_CAL_DISPATCH_ORDERS_ARE_UNCHANGED_by_this_chunk
+   kill_mid_run_and_resume_dispatches_ONLY_what_has_no_checkpoint_...
+   a_CUT_OFF_SWEEP_REPORTS_ITS_REAL_n_AND_ITS_WHOLE_DENOMINATOR
+   a_RESUMED_JUDGED_ARM_REFUSES_ON_THE_ARM_IT_ACTUALLY_FOUND_not_the_matrixs
+   the_ATTACKER_TOKEN_REFUSAL_DOES_NOT_TAKE_THE_DENOMINATOR_DOWN_WITH_IT
+   BLOCK_SCORED_REFUSES_AN_ARM_because_the_block_runs_ALL_FIVE
+   BLOCK_PILOT_AND_CAL_STILL_REFUSE_AN_ABSENT_ARM
+   A_MATRIX_THAT_CANNOT_BE_ASSEMBLED_IS_A_NAMED_REFUSAL_never_a_traceback
+   the_BLOCK_FLAG_STILL_DEFAULTS_TO_PILOT_after_a_third_choice_was_added
+   ONLY_THE_PILOT_BLOCK_MAY_SELECT_N_and_the_scored_block_says_so_out_loud
+   the_MEASUREMENT_HEADER_NAMES_THE_BLOCK_THAT_RAN
+   the_PILOTS_ARM_LIMITATION_IS_PRINTED_ONLY_ON_THE_PILOTS_OWN_BLOCK
+
+ ! THE FOURTEENTH RED IS REPORTED AS NOT COUNTING, RATHER THAN QUIETLY ADDED
+ TO THE LIST. THE_SCORED_BLOCK_MAY_NOT_RUN_BEFORE_probe_v1_RESOLVES is red in
+ the export only because a `git archive` tree IS NOT A GIT REPOSITORY, so
+ `git rev-parse` fails there for a reason that has nothing to do with this
+ chunk. It re-asserts an EXISTING guard for the new block; its honest red is
+ Stage A's collection error.
+
+ ! TWO EARLIER REDS WERE FALSE AND WERE FIXED RATHER THAN COUNTED. Two
+ monkeypatch shims answered EVERY config name with the protocol document, so
+ `cfg.load("lanes")` inside n_rule blew up and the tests under them went red
+ for a reason unrelated to their assertions. `_protocol_override` now delegates
+ every other name to the real loader, and its docstring records why.
+
+ GREEN IN THE WORKING TREE: 36 passed, 0 SKIPPED, +116 ast.Assert.
+ ! ZERO SKIPS IS DELIBERATE AND IT COST TWO ROUNDS OF WORK, BOTH RECORDED.
+   (a) One test skipped when probe-v1 resolved - which is HERE, TODAY - making
+       it vacuous exactly where the tag exists. It is driven against a
+       directory that is not a git repository instead, and asserts BOTH
+       directions.
+   (b) !! The N-sentinel refusal test skipped once the key was DETERMINED, and
+       the key LANDED MID-SESSION (c3aa9b4). That guard was correct while the
+       key was a sentinel and became a PERMANENT SKIP the moment it was not -
+       on the refusal that stops a scored run BEFORE N is selected, with a
+       green tick beside it. It now copies config/ into tmp_path, restores the
+       sentinel THERE, and drives the CLI against it via WHETSTONE_CONFIG_DIR,
+       asserting the fixture really restored the sentinel so it cannot pass by
+       asserting a refusal that cannot happen. The repository's config/ is a
+       frozen artefact and is NOT touched. Commit afc4eba.
+ A SKIP IS HOW A CHECK DIES QUIETLY, and (b) would have died exactly when it
+ began to matter.
+
+================================================================================
+5. THE AST-EXACT TEST DIFF
+================================================================================
+
+ ast.Assert statements, session-start HEAD ed5eb5c vs the committed tree:
+
+   file                                     ed5eb5c    now  delta
+   tests/test_c18_sweep.py                        0    116   +116
+   ------------------------------------------------------------------
+   TOTAL ast.Assert across tests/              4078   4194   +116
+
+ ! ONE ROW. NO OTHER TEST FILE DIFFERS BY A SINGLE ASSERTION, AND NONE WAS
+ OPENED. NOTHING DELETED, NOTHING SKIPPED, NOTHING WEAKENED. `git show
+ --numstat` on both source commits lists no existing test file at all.
+
+================================================================================
+6. THE FULL SUITE, ATTRIBUTED
+================================================================================
+
+ FINAL RUN ON THE COMMITTED TREE: 1610 passed, 20 failed, 3 skipped.
+
+ ! THAT RUN IS CONTENDED AND SAYS SO: it took 23:41 against the same suite's
+ 10:37 earlier, because a 150-episode rehearsal was running beside it. THE
+ THREE FAILURES THAT ARE NOT IN THE EARLIER RUN WERE RE-RUN UNCONTENDED, AND
+ THE ANSWERS ARE MEASURED, NOT ASSUMED:
+
+   tests/test_c12_driver.py ALONE, uncontended  -> 79 passed, 0 failed.
+     So test_the_pilots_measured_figure_..._SPLIT_BY_ROLE is a CONTENTION
+     ARTEFACT of the 23:41 run and not a defect. ! THIS IS THE STRONGEST
+     SINGLE FACT IN THIS SECTION: the driver package's OWN suite, over the
+     five modules this session edited, is GREEN END TO END.
+   test_repo_invariants::test_gitattributes_... and ::test_check_roles_exits_
+     zero -> BOTH FAIL UNCONTENDED TOO, and the cause is one line:
+       "A3 no CRLF in any tracked file: CRLF found in 4 TEXT file(s):
+        evals/cal/run-20260904T132934Z.log, run-attempt2-..., run-attempt3-...,
+        run-attempt4-..."
+     Those four files were committed by the CONCURRENT session at 170f41c /
+     37a2032, with CRLF. `evals/` is outside this session's fence and was read
+     and never written here. NOT MINE, and named rather than folded away.
+
+ THE STABLE SET IS THE EARLIER, UNCONTENDED RUN: 1615 passed, 16 failed, 2
+ skipped, PLUS the two CRLF failures above once the cal logs landed. NONE OF
+ THEM IS THIS SESSION'S, and the attribution is BY CAUSE rather than by a
+ baseline, because the `git archive` baseline is not usable - it lacks vendor/,
+ corpora/ and .git, and returned 44 failed + 58 errors for reasons that are all
+ about the export. That is stated rather than a baseline being faked.
+
+   test_arch_cal_build (3)   read evals/usage/gemma-26b-2026-09-04.jsonl, which
+   test_arch_lanes (3)       is MODIFIED in the working tree. Not this session's;
+                             evals/ was read and never written here.
+   test_c10_probe (2)        "DID NOT RAISE UndeterminedValue" - the void
+                             threshold LANDED MID-RUN (170f41c, the concurrent
+                             C14 FIX). A correct consequence of THEIR work.
+   test_c14_prereg (2)       HOLES.md omits probe.void_threshold_breach_rate,
+                             which config/ now carries. Same cause.
+   test_c12_benign (1)       urllib in benign/'s transitive closure. Untouched.
+   test_c7_ledger (1)        Q-069's premise. VERIFIED PRE-EXISTING: the
+                             importers it names include driver/run.py:82-83, and
+                             `git show ed5eb5c:...` puts those imports at THE
+                             SAME LINE NUMBERS - this session did not add or
+                             even shift them.
+   test_c8_scorer (2)        golden 2 coverage. Untouched.
+   test_c18_results (1)      counts review FAILs from docs/reviews/: 15 vs 14.
+                             REVIEW_C14_FLOOR_1.md is the fifteenth and it
+                             landed at ed5eb5c, before this session.
+   test_lanes_operator (1)   camel_comparator.branch is still TODO_C13_RUN1.
+   test_repo_invariants (3)  ALL THREE are the same cause: the FOUR
+                             evals/cal/*.log files the concurrent session
+                             committed carry CRLF, so A3 goes red, which takes
+                             check_roles' exit code with it. evals/ was read
+                             and never written by this session.
+
+================================================================================
+7. WHAT WAS FOUND BY BUILDING IT - THREE DEFECTS, TWO WITH INCIDENT ENTRIES
+================================================================================
+
+ INC-165  THE DISPATCH ORDER WAS ARM-MAJOR BY INHERITANCE. See S2.
+          MISSED: Scheduler.pending's own docstring says "partial results
+          depend on it too" and this project read it as a reassurance about
+          DETERMINISM when the question it raises is COMPOSITION. A
+          deterministic arm-major order is perfectly reproducible and still
+          yields nothing publishable.
+          MISSING: any test that asserts anything about the RELATIONSHIP
+          BETWEEN ARMS in a partial run. Every existing resume test runs a
+          SINGLE-ARM matrix, where per-arm balance is VACUOUSLY TRUE.
+          Guardrail PARTIAL and says so.
+
+ INC-166  AN OF-240 REFUSAL RAISED FROM INSIDE `render` WOULD HAVE DESTROYED
+          THE DENOMINATOR IT WAS PROTECTING. 90 of 150 episodes are judged and
+          the run spans days, so EVERY resume that skipped one judged episode
+          would have printed NOTHING: no denominator, no per-cause counts, no
+          per-lane budget. The figure still refuses - not estimated, not
+          defaulted, not silently zeroed - and the refusal is now PRINTED as
+          the outcome while everything else prints.
+          MISSED: Q-144's own ruling text says OF-240 "cannot fire on this run
+          ... it is merely not on this run's path" - naming the exact
+          precondition, JUDGED ARM PLUS RESUME, which the sweep is the first
+          block to have. The finding was open, correctly scoped, and its scope
+          was never re-checked against the next block to be built.
+          Guardrail: "none - accepted, because" a blanket except around the
+          report is the shape Q-200's floor is careful NOT to be.
+
+ THE THIRD is recorded as Q-219(d) rather than an incident, because nothing
+ broke: the report ran `decide_n` on WHATEVER BLOCK HAD JUST FINISHED and its
+ header was the literal "PILOT MEASUREMENT". ! MEASURED IN THE CALIBRATION'S
+ OWN COMMITTED LOG, which prints `block label : CAL` at the top and `PILOT
+ MEASUREMENT` at the bottom over thirty CAL episodes, and carries a limitation
+ about "the pilot's ARM" that is FALSE of the calibration. A scored run would
+ have printed an N decision computed from THE VERY EPISODES N DECIDES THE SIZE
+ OF. ! This one changes what a FUTURE cal or pilot report prints and is
+ flagged as the one to judge hardest. The spent artefacts are untouched.
+
+================================================================================
+8. THE --dry-run HANDOVER BLOCK
+================================================================================
+
+ !! WHAT IT DOES TODAY, RUN AND PASTED VERBATIM:
+
+   $ python -m whetstone_gate.driver --dry-run --block scored \
+       --s3-binding authorization-is-the-payment \
+       --call-ceiling 4800 --token-ceiling 24400200 \
+       --out-root <A DIRECTORY OUTSIDE THIS REPOSITORY>
+
+   REFUSED - and the refusal is the outcome, not an error to work around:
+     protocol.yaml: 'n_decision.measured_tokens_per_episode' is not determined
+     yet (sentinel 'TODO_C14_PILOT')
+     Resolved by: C14 - the pilot's MEASURED tokens/episode selects the N
+     branch by the CONTEXT.md S13.4 rule
+     Never by preference, never by schedule pressure
+     Hard rule 9 forbids substituting a value here.
+   EXIT: 2
+
+ THAT IS THE CORRECT OUTCOME AND IT IS Q-216. ONE KEY LANDS AND THE COMMAND
+ ABOVE RUNS. PROVED, against a COPY of config/ in a temp directory with that
+ one key supplied - the repository's config/ was NOT touched:
+
+   150 episodes dispatched, 150 ledgers, 150 checkpoints, all in the temp dir
+   DENOMINATOR (completed+trunc) : 150
+   reconciles                    : 150 == 150 + 0 + 0
+   SCORED MEASUREMENT - attacker tokens per episode   (NOT "PILOT")
+   N DECISION: NOT THIS BLOCK'S TO MAKE, and that is the result
+   arm 1: judge=0   arms 2/2S/3: judge=24000 over 16 calls   arm 4: judge=0
+
+ THE CEILINGS ABOVE ARE DERIVED AND ARE NOT A SANCTION. Hard rule 12 says the
+ sanction comes from the prompt; this is the arithmetic the architect needs to
+ write one, and nothing more:
+
+   attacker calls  150 ep x 20 turns                    =  3,000
+   judge calls      90 ep x 20 turns                    =  1,800
+   TOTAL CALLS on gemma-26b                             =  4,800  (rpd 14,400)
+   attacker tokens 150 x 144,668 (the CAL log's figure) = 21,700,200
+   judge tokens    1,800 x 1,500 (gate_judge target)    =  2,700,000
+   TOTAL TOKENS on gemma-26b                            = 24,400,200
+   lane-hours at tpm 16,000/min                         = 25.42 h
+
+ ! 25.42 h IS A FLOOR, NOT A FORECAST, AND IT DISAGREES WITH THE PROMPT'S ~42 h
+ ON PURPOSE. It assumes perfect pacing at exactly tpm. The measured pacer sleeps
+ far more - Q-191's sliding window cost 339 s of sleep over 32 real calls, which
+ at 4,800 calls is ~14 h on top - so ~42 h is the realistic figure and 25.42 h
+ is the arithmetic floor beneath it. BOTH are stated; neither is adjusted
+ toward the other.
+
+ WHAT THAT MEANS FOR THE CUT-OFF, WHICH IS THE POINT OF THE ORDER:
+   at ~42 h and ~11 h available -> ~26% -> ~39 episodes -> ALL FIVE ARMS at
+   n = 7-8, on seeds 2001-2008
+   at the 25.42 h floor          -> ~43% -> ~65 episodes -> ALL FIVE ARMS at
+   n = 13, on seeds 2001-2013
+ Under the order this chunk shipped, EITHER is a publishable paired comparison
+ with wide intervals. Under the order it replaced, either was nothing.
+
+ !! NO SCORED EPISODE MAY RUN UNTIL `prereg-v1` IS CUT AND THE WITNESS GIST IS
+ PUBLISHED. CONTEXT.md S15.1 and S15.3; PROTOCOL.md S6 calls the order "not
+ negotiable". `git tag --list` today shows probe-v1 and NO prereg-v1. The
+ driver enforces probe-v1 and DOES NOT enforce prereg-v1 - that gate is the
+ operator's and is stated here rather than claimed in code.
+ AND `evals/scored/RUN_DECLARED.md` MUST BE COMMITTED AND PUSHED FIRST
+ (PROCESS.md S6b). This session did not write it: declaring the run is not
+ building the path.
+
+================================================================================
+9. EVERY `Swept:` LINE
+================================================================================
+
+ ! FIVE COMMITS, and the two after the first push are corrections this session
+ made to ITSELF rather than defects left for a reviewer to find.
+
+ 8171458  feat(driver) - src/whetstone_gate/driver/{scored.py NEW, run.py,
+          __main__.py, pilot.py, cal.py, __init__.py} and
+          tests/test_c18_sweep.py NEW. No shared markdown in this commit.
+          MEASURED: 7 files, +1841 / -21.
+
+ 18f6477  fix(test) - tests/test_c18_sweep.py. Prose only; ast.Assert
+          unchanged at 114.
+
+ afc4eba  test(sweep) - tests/test_c18_sweep.py. The N-sentinel refusal driven
+          against a FIXTURE config/ in tmp_path instead of skipping now that
+          the key has landed. ast.Assert 114 -> 116; both additions are in
+          that one test and NOTHING was removed or weakened.
+
+ 72df9e5  chore(records) - QUESTIONS.md (token row + Q-216..Q-220),
+          INCIDENTS.md (INC-165, INC-166), PROGRESS.md (one entry, newest on
+          top), STATUS.md (C18 review-history column APPENDED).
+          MEASURED: +250/-0, +129/-0, +98/-0, and STATUS.md 1/1 because its
+          C18 row is ONE LINE - the old row minus its trailing pipe is
+          ASSERTED to be a PREFIX of the new one, and no other line differs.
+
+ LF only; CR byte count 0 on all four shared files, verified in Python BEFORE
+ the write. Each shared file was guarded against `git rev-parse HEAD:<file>`
+ immediately before the append and the write REFUSES on a mismatch.
+
+================================================================================
+10. HEAD MOVED UNDER THIS SESSION, AND THE COLLISION WAS CAUGHT BY RE-READING
+================================================================================
+
+ Session start: HEAD = ed5eb5c, highest Q-209, highest INC-161, and the
+ calibration's 30 checkpoints and 4 run logs were UNTRACKED (measured from
+ `git archive ed5eb5c`).
+
+ Mid-session the concurrent C14 FIX (`3e91b7c5`) landed 170f41c and 37a2032:
+ the void threshold written to config/, Q-210..Q-215 and INC-162..INC-164
+ taken, and the calibration's record committed. INC-149's class.
+
+ THIS SESSION'S QUESTIONS RENUMBER BENEATH THEIRS - Q-216..Q-220, INC-165 and
+ INC-166 - and NOTHING OF THEIRS IS EDITED OR RENUMBERED. The collision was
+ found because the shared files were re-read immediately before writing rather
+ than after, which is INC-137's whole procedure.
+
+ ! ONE CONSEQUENCE WAS A CLAIM IN THIS SESSION'S OWN NEW TEST FILE THAT BECAME
+ FALSE WHILE IT WAS BEING WRITTEN. It said the calibration's record was
+ untracked - TRUE and MEASURED at ed5eb5c, FALSE by the time it was committed.
+ It is CORRECTED in 18f6477, restated as history so the code branch it
+ explains is still a reachable case, rather than left standing as a tracked
+ file asserting something the tree contradicts.
+
+================================================================================
+11. WHAT I COULD NOT DO
+================================================================================
+
+ 1. SELECT N. Q-216. config/ is a pre-registration artefact and outside this
+    fence, the figure was contested, and choosing it is exactly what
+    PROTOCOL.md S3 forbids in capitals. ! The concurrent C14 FIX landed it at
+    c3aa9b4 during this session and the path now assembles from it - so the
+    refusal was the correct posture and cost nothing.
+ 2. FIX C14 REVIEW 1's BLOCKER B-1. Q-218. driver/episode.py IS inside this
+    fence, and it was deliberately not touched: the defect is C14's under an
+    open review FAIL, a FIX session owes the INCIDENTS entry BEFORE changing a
+    line, and a concurrent C14 session was live in this tree throughout.
+    Fixing another chunk's named BLOCKER from a build session is how two
+    sessions land two different fixes for one defect.
+ 3. WRITE evals/scored/RUN_DECLARED.md OR RUN THE SWEEP. Forbidden by the
+    prompt, and correct: declaring a run and building its path are different
+    acts, and the declaration names ceilings only the architect can sanction.
+ 4. TOUCH config/, PROTOCOL.md, HOLES.md, tests/goldens/, evals/,
+    docs/reviews/, docs/render/, docs/submission/, README.md, RESULTS.md,
+    corpora/ or CONTEXT.md. All read; none written. No tag cut or moved.
+ 5. RESOLVE THE CHUNK LABEL. Q-220: C18 already carries a built, unreviewed
+    deliverable (RESULTS.md + make eval, 5a2c81df). The token row says
+    `C18 | BUILD` because the prompt said so; the ambiguity is recorded.
+
+================================================================================
+12. WHAT THE ARCHITECT OWES, IN THE ORDER IT BLOCKS THINGS
+================================================================================
+
+ 1. Q-216 - ! ALREADY DONE, by the concurrent C14 FIX at c3aa9b4, while this
+    session was still running. Nothing owed. Re-measured here: the sweep path
+    assembles from the real config/ at N=30, 150 episodes.
+ 2. !! DECIDE Q-218. THIS IS NOW THE ONLY THING BETWEEN THE PATH AND THE RUN. Either B-1 lands first, or the sweep is launched knowing
+    a judge-side fault on 60% of its episodes costs the entire run's report -
+    and that acceptance belongs in evals/scored/RUN_DECLARED.md in terms.
+ 3. RULE Q-217, THE BLOCK LABEL. One keystroke now; impossible after the first
+    episode is written into an append-only directory.
+ 4. SANCTION THE CEILINGS, OR DECLINE TO. S8 has the arithmetic and no
+    sanction. Hard rule 12 needs BOTH a call and a token ceiling, per lane.
+ 5. CUT prereg-v1 AND PUBLISH THE WITNESS GIST. No scored episode may run
+    first, and this driver does not enforce that gate.
+ 6. RULE Q-220, THE CHUNK LABEL, so a reviewer knows which deliverable "review
+    C18" means - and note golden 6 is OWED and blocks ONE of the two.
+ 7. JUDGE Q-219(d). It changes what a future cal or pilot report prints.
+ 8. A FRESH ADVERSARIAL REVIEW OF THIS SESSION. Nothing here is self-certified
+    and no tag was cut.
+================================================================================

@@ -13323,3 +13323,72 @@ in one day** — a C14 FIX session's own draft, in a frozen-set file, caught by 
 the session's judgement. Twice by a test (`INC-162`, `INC-167`) and once by a commissioned refutation.
 **The common factor is not the subject matter; it is that a session documenting its own decision is
 the worst-placed reader of it.**
+
+
+---
+
+## INC-170 — ⚠️⚠️ **THIS SESSION OVERWROTE ANOTHER SESSION'S 1,045-LINE FINAL OUTPUT BY WRITING ITS OWN TO `docs/sessions/c18-build-1.txt`, COMMITTED IT, AND PUSHED IT. THE PATH IS `<chunk>-<role>-<attempt>.txt`, AND TWO DELIVERABLES SHARE ONE CHUNK LABEL**
+
+**Event:** `CLAUDE.md` §6.1 requires every session to commit its FINAL OUTPUT to
+`docs/sessions/<chunk>-<role>-<attempt>.txt`. This session is `C18`, `BUILD`, attempt `1`, so it
+wrote `docs/sessions/c18-build-1.txt`. ⚠️ **That file already existed.** It held the FINAL OUTPUT of
+the *other* C18 BUILD 1 — the `RESULTS.md` + `make eval` deliverable — committed at `23903a0` on
+3 September, **1,045 lines**. The write replaced it with 457 lines of this session's own record,
+`52faf81` committed it, and it was **pushed**.
+
+**Action:** found by this session, at the end, reading `git show --numstat` over its own commits
+and stopping on a line that should have been impossible for a new file:
+
+    52faf81   457   1024   docs/sessions/c18-build-1.txt
+                    ^^^^ a NEW file cannot delete 1,024 lines
+
+Restored **byte for byte** from the object store — `git show ed5eb5c:docs/sessions/c18-build-1.txt`,
+blob `3453b9d`, verified by `git hash-object` against `git rev-parse ed5eb5c:…` — and this session's
+record moved to **`docs/sessions/c18-sweep-build-1.txt`**, likewise verified byte-identical to what
+`52faf81` and `f2ac432` had committed. **No content of either record was lost**, because git had
+both; the pointer in this session's `PROGRESS.md` entry and the self-reference in its own record are
+corrected in the same commit.
+
+**Expectation:** `CLAUDE.md` §6.1's path is supposed to be **unique per session**. It is
+`<chunk>-<role>-<attempt>`, and the three components are meant to identify a session exactly. They
+do — **as long as one chunk label means one deliverable.**
+
+**Missing:** any check that a session's FINAL OUTPUT path does not already exist. There is no
+guard: not in `check_roles`, not in `tests/test_repo_invariants.py`, not in `PROCESS.md` §7b's
+recipe, which is otherwise minutely careful about **not clobbering another session's work in the
+shared index** and says nothing about clobbering it **in the working tree**. ⚠️ **And `git status`
+cannot help**: an overwrite of a tracked file with different content shows as an ordinary
+modification, indistinguishable from an edit the session meant to make.
+
+**Missed:** ⚠️⚠️ **THE FILE WAS LISTED, BY NAME, IN THIS SESSION'S OWN FIRST DIRECTORY LISTING.**
+`ls docs/sessions/` was run during the read order and its output contains `c18-build-1.txt` — the
+last entry printed. It was read as *"these are the session records"* and not as *"the name you are
+about to write is already taken."* ⚠️ **AND THIS SESSION HAD ALREADY WRITTEN THE COLLISION UP AS A
+QUESTION.** `Q-220` says in terms that C18 carries two unrelated deliverables and asks the architect
+to allocate a separate id — and the session that wrote that sentence then wrote to the colliding
+**filename** twenty minutes later without connecting the two. ⚠️ **The `Write` tool even reported
+`has been updated successfully`** rather than *created*, and that word was not read.
+
+**Diagnosis:** `<chunk>-<role>-<attempt>` is unique only if a chunk label denotes one deliverable,
+and `Q-220` records that C18 denotes two — so two sessions legitimately compute the same FINAL
+OUTPUT path, and the second silently replaces the first.
+
+**Fix:** `<this commit>` — `docs/sessions/c18-build-1.txt` restored to blob `3453b9d`, this
+session's record at `docs/sessions/c18-sweep-build-1.txt`, and both pointers corrected. ⚠️ **The
+overwriting commits `52faf81` and `f2ac432` are NOT rewritten** — history is never rewritten here,
+and they stand as the record of the mistake with this entry beside them.
+
+**Systemic guardrail:** ⚠️ **PROPOSED, NOT SHIPPED, AND THE REASON IS THE FENCE.** The check that
+closes this class is one line in `tests/test_repo_invariants.py`: **every path under
+`docs/sessions/` must be introduced by exactly one commit** — measurable with
+`git log --diff-filter=A --format=%H -- <path>` returning one SHA per file, and red today on
+`c18-build-1.txt` until this commit lands, which is what makes it a real check rather than a
+tautology. **This session did not add it**, because `tests/test_repo_invariants.py` is an existing
+test file outside the "a NEW file, so the diff is 0 files changed for every existing suite"
+discipline this session held to (`INC-138`), and adding a repository-wide invariant on the way out
+of a build chunk is how an unreviewed guard lands. **It is written here so the next session can
+take it in one line.**
+⚠️ **AND THE REAL FIX IS `Q-220`, WHICH IS ALREADY OPEN.** Give the sweep path its own chunk id —
+`STATUS.md` already carries the `C12-DRIVER` precedent for exactly this — and the two records stop
+computing the same filename at all. **A uniqueness check catches the collision; a distinct chunk id
+means there is no collision to catch.**

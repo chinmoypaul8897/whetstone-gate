@@ -134,7 +134,7 @@ that none is sent. `Q-196`/`Q-211` and `Q-151` likewise reported and not decided
 ## SESSION-TOKEN 6a4f28de — C18, BUILD 1 (THE SWEEP PATH) — 2026-09-05 — ✅ **`--block scored` EXISTS AND IS INVOCABLE. ⛔ THE SWEEP CANNOT START: `Q-216` AND `Q-218` ARE BOTH BLOCKING AND NEITHER IS MINE TO CLOSE**
 
 **Role:** BUILD. **Chunk:** C18 — ⚠️ **and that label is contested; see `Q-220`.**
-⚠️ **FULL RECORD: `docs/sessions/c18-build-1.txt`.**
+⚠️ **FULL RECORD: `docs/sessions/c18-sweep-build-1.txt`.** ⚠️ **NOT `c18-build-1.txt`, WHICH IS THE *OTHER* C18 BUILD'S RECORD AND WHICH THIS SESSION OVERWROTE AND RESTORED — `INC-170`.**
 ⚠️ **SPEND: ZERO. No provider call in any mode; this session held no token sanction and took none.**
 ⚠️ **`evals/` READ-ONLY AND NEVER WRITTEN.** `config/`, `PROTOCOL.md`, `HOLES.md`, `tests/goldens/`,
 `docs/reviews/`, `docs/render/`, `corpora/`, `README.md`, `RESULTS.md` and `CONTEXT.md` were **read
