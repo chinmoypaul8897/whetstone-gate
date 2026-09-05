@@ -16665,3 +16665,114 @@ what is unreachable is the *stronger* form the spec asks for.
 cryptographic claim means, `config/` is a pre-registration artefact, and **option D expires at the
 tag**. `CLAUDE.md` rule 1's exact shape: the spec is not merely ambiguous here, it is
 **unsatisfiable**, about something the sweep is about to depend on.
+
+---
+
+### ⚠️⚠️ `Q-215` — **CLASS A, OPEN, EXPIRING AT THE TAG: TWO VALUES DELIBERATELY KEPT OUT OF `config/` ON THE GROUND THAT THEY HAVE "NO BEARING ON ANY PUBLISHED NUMBER" HAVE NOW BEEN MEASURED BY A COMPLETED RUN, AND ONE OF THEM CAME WITHIN A SINGLE EPISODE OF MOVING THE VOID THRESHOLD**
+
+**Status:** **OPEN. Class A.** **Raised by:** C14 FIX (`3e91b7c5`), 2026-09-05, in its Gate 2 sweep,
+**after** the threshold was written. **Owner:** the architect. **Expiring: at `git tag prereg-v1`.**
+
+⚠️ **THIS IS A CATEGORY, NOT A LIST: values excluded from the freeze BECAUSE they were judged unable
+to touch a published number, judged that way BEFORE this project had ever completed a live run.**
+Two completed runs now exist. Both judgements are falsified by them.
+
+---
+
+#### 1. ⚠️⚠️ `_TIMEOUT_SECONDS = 180` TRUNCATED **NINE OF THE CALIBRATION'S THIRTY EPISODES**, AND ONE MORE BREACH AMONG THEM WOULD HAVE MOVED THE FROZEN THRESHOLD FROM **20% TO 25%**
+
+`src/whetstone_gate/driver/clients.py` declares it with this reasoning, verbatim:
+
+> *"⚠️ **Not a spec value and not in §8.6's table** — it is a transport detail with **no bearing on
+> any published number** … It exists so a hung socket cannot stall a lane forever; it is
+> **deliberately generous**, because a timeout that fired early would book a completed call as a
+> failure and hard rule 11 counts every dropped episode."*
+
+⚠️ **EVERY CLAUSE OF THAT SENTENCE IS FALSIFIED BY THE COMPLETED CALIBRATION. MEASURED, NOT ARGUED**
+— `evals/usage/gemma-26b-2026-09-0*.jsonl`, filtered to `cal__` episodes:
+
+    CAL calls by outcome : OK 545,  RATE_LIMITED 1,  ERROR 9
+    all NINE ERROR rows  : "error_type": "TimeoutError",  "total_tokens": 0
+    their episodes       : 2207 2211 2213 2216 2217 2221 2222 2228 2230
+
+**Those nine are EXACTLY the nine `UNEXPECTED_ERROR` truncations in the driver's own denominator
+block.** ⚠️ **So the calibration's truncation is not attacker failure and is not provider refusal —
+it is OUR OWN CLIENT SOCKET TIMEOUT**, and it "booked a completed call as a failure" nine times,
+which is the precise outcome the constant's comment says it was set generously to avoid.
+
+⚠️⚠️ **AND THE BEARING ON A PUBLISHED NUMBER IS ONE EPISODE WIDE — COMPUTED, NOT FEARED:**
+
+    11/30 = 36.67%  ->  95% Wilson lower 23.8657%  ->  floor to 5 pp  =  20%   <- FROZEN
+    12/30 = 40.00%  ->  95% Wilson lower 26.7126%  ->  floor to 5 pp  =  25%
+
+**Six of the nine timeout-killed episodes did not breach.** ⚠️ **A single breach among those six —
+in episodes our own transport cut short — would have set the void threshold 5 pp HIGHER, and a
+higher threshold makes a later VOID MORE likely.** So the constant excluded from the freeze for
+having "no bearing on any published number" sat one episode away from moving **the single number
+that decides whether this project may publish at all**, and it moved it in the direction that
+flatters us.
+
+⚠️ **THIS IS THE MECHANISM `INC-163` WAS MISSING AND IT IS RECORDED AS A CORRECTION**: `INC-163`
+diagnosed the *unparsed* half correctly and left the *truncation* half at "nine `UNEXPECTED_ERROR`".
+**`INC-164` carries the diagnosis.** ⚠️ **NOTHING IS RE-RUN. The calibration is single-shot and
+11/30 stands.** What is owed is the disclosure and the decision below.
+
+⚠️ **AND IT IS THE SECOND INSTANCE OF THIS CLASS, NOT THE FIRST.** `_USER_AGENT` — declared in the
+same module and excluded on the same grounds — cost **ten of the pilot's twenty episodes** to an
+HTTP 403 (`INC-145`, whose call 4 was *"BYTE-IDENTICAL to call 3 plus a User-Agent header"* and
+returned 200). **Nineteen episodes across two runs, from two values held outside the freeze because
+they could not matter.**
+
+---
+
+#### 2. §13.4's LANE-HOUR DIVISOR IS **2.7x–3.2x OPTIMISTIC**, AND THE ERROR PERMITS THE LARGER N
+
+`runner/n_rule.py:gemma_tokens_per_lane_hour()` returns **1,920,000**, derived from
+`config/lanes.yaml`'s two `tpm: 16000` rows — its docstring: *"the two Gemma lanes' **combined**
+32K TPM"*, i.e. **960,000 tokens/h PER LANE**. The calibration ran **one** lane and is the first
+live measurement of it:
+
+    attempt 4 only (29 episodes) : 8.0553 h,  2,837,460 tokens  ->  352,249 tokens/h  -> 2.73x
+    all 30 checkpoints           : 9.5539 h,  2,893,347 tokens  ->  302,845 tokens/h  -> 3.17x
+
+⚠️ **THE FIGURE IS STATED PER LANE ON PURPOSE.** An earlier pass of this sweep compared a
+**one-lane** measurement against the **two-lane** divisor and reported **6.34x**; that is wrong by
+exactly the factor of two and is recorded here rather than quietly dropped, because the corrected
+number is still the finding. **The lane was latency-bound, not limit-bound** — peak 6 calls per
+60 s against `rpm: 30`.
+
+⚠️ **WHY IT MATTERS AND WHICH WAY IT LEANS:** lane-hours are the **second conjunct** of the N rule
+(`branch_a_condition`: *"projected Gemma lane-time <= 32 h"*), and
+`n_decision.projected_lane_hour_budget_h: 32` is frozen. **Under-projecting lane-time permits the
+LARGER N**, so the error runs in the direction that buys us a bigger, better-looking run.
+⚠️ **This does NOT change any ruled N** — the rule reads the *pilot's* measured tokens/episode and
+the pilot refused to produce one (`Q-213`, `INC-142`) — but it means the projection the rule divides
+by has now been measured and does not check.
+
+---
+
+#### 3. AND A THIRD MEASUREMENT, REPORTED BECAUSE THE ARCHITECT NEEDS IT AND MUST **NOT** SUBSTITUTE IT
+
+`attacker.target_tokens_per_episode: 60000` is now measured at **144,668** tokens/episode over the
+20 completed calibration episodes — **2.41x** its registered value, on the same lane, same arm 1,
+same turn budget 20 as the dead pilot. ⚠️ **IT IS NOT THE PILOT'S FIGURE AND MUST NOT BE WRITTEN
+INTO `n_decision.measured_tokens_per_episode`.** The N rule reads *"the **PILOT's** measured
+tokens/episode"*, and `config/protocol.yaml` forbids the substitution in terms: *"Selected by C14's
+pilot … never by preference and never by schedule pressure."* **Substituting a calibration figure
+for a pilot figure is exactly the invention that key exists to prevent.** It is recorded because a
+later session will find the number and be tempted, and because the architect ruling `Q-213` and
+`INC-142`'s two legal routes should know it exists.
+
+---
+
+**THE QUESTION, IN THE FORM A RULING CAN ANSWER:** should `_TIMEOUT_SECONDS` (and `_USER_AGENT`)
+gain `config/` keys before `prereg-v1`, on the evidence that both have now demonstrably shaped a
+published denominator? ⚠️ **This session did NOT add them**: `config/` was open to it for exactly one
+key, adding a key is Class A, and the evidence above was found *after* Gate 1 had landed. **It is
+landable today and it is not landable after the tag.**
+
+⚠️ **AND THE HONEST COUNTER-ARGUMENT, STATED SO THE RULING IS NOT ONE-SIDED:** `Q-147` records the
+project's reasoning that transport and operator concerns legitimately live outside `config/`, and
+that reasoning was accepted for the call and token ceilings and is sound there. **The distinction
+this entry offers is EVIDENCE, not principle:** a value that has been measured moving a published
+denominator is no longer a transport detail, whatever it was when it was written.

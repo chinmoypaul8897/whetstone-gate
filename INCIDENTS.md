@@ -12927,3 +12927,65 @@ number rather than something a session must assemble from thirty per-episode sta
 ⚠️ **And the honest limit of even that: it would have made this run's degradation VISIBLE, not
 smaller. Nothing available inside the protocol would have made this calibration measure a
 non-degraded attacker, because the degradation is the attacker's, and the run is single-shot.**
+
+---
+
+## INC-164 — ⚠️⚠️ **THE CALIBRATION'S NINE `UNEXPECTED_ERROR` TRUNCATIONS WERE OUR OWN 180-SECOND SOCKET TIMEOUT, NOT THE ATTACKER AND NOT THE PROVIDER — AND THE CONSTANT THAT CAUSED THEM IS HELD OUTSIDE THE FREEZE ON THE STATED GROUND THAT IT HAS "NO BEARING ON ANY PUBLISHED NUMBER". IT SAT ONE EPISODE FROM MOVING THE VOID THRESHOLD**
+
+⚠️ **NUMBERED FROM `git show HEAD:INCIDENTS.md` immediately before the append** (`INC-137`), where
+the highest was `INC-163` — this session's own, one commit earlier.
+
+**Event:** the single-shot arm-1 calibration completed with 30 attempted / 20 completed / **10
+truncated**, of which nine carried `cause: UNEXPECTED_ERROR` and one `RATE_LIMIT_429`. `INC-163`
+recorded the truncation and quantified its bias but left the nine at their bare cause name. Filtering
+`evals/usage/gemma-26b-2026-09-0*.jsonl` to `cal__` episodes resolves them: **545 OK, 1
+RATE_LIMITED, 9 ERROR — and all nine ERROR rows read `"error_type": "TimeoutError"`,
+`"total_tokens": 0`**, on episodes 2207, 2211, 2213, 2216, 2217, 2221, 2222, 2228 and 2230 — **exactly
+the nine the driver booked.**
+
+**Action:** nothing was re-run, re-cut or deleted. The finding was measured, the threshold
+sensitivity computed, and both written to `QUESTIONS.md` `Q-215` and to
+`docs/sessions/c14-freeze-1.txt`. `evals/` was not written.
+
+**Expectation:** that a truncated calibration episode reflects the **attacker** running out of road —
+which is what `HOLES.md` §3.1 assumes when it reasons that *"a truncated episode is one the attacker
+did not get to finish, so it is less likely to carry a breach."* ⚠️ **Nine of the ten were our own
+client giving up on a socket.** The frozen text's reasoning about truncation is still directionally
+right, but its stated cause is not what happened here.
+
+**Missing:** the **cause** in the driver's denominator block. It prints `UNEXPECTED_ERROR : 9` — a
+bucket name, not a diagnosis — while the `error_type` that would have named it in one word was
+already being written to the usage ledger, in a different file, by a different writer. ⚠️ **Nobody
+had to correlate two files to learn this; the report just never printed the field it already had.**
+
+**Missed:** ⚠️ **the constant's own comment predicted this failure and was read as ruling it out.**
+`clients.py` says the timeout is *"deliberately generous, because a timeout that fired early would
+book a completed call as a failure and hard rule 11 counts every dropped episode"* — the exact
+outcome, named, with the exact rule it would offend, in the file that caused it. ⚠️ **And the same
+class had ALREADY been paid for once: `_USER_AGENT`, declared in the same module under the same
+"not a §8.6 constant" exclusion, cost TEN of the pilot's twenty episodes to an HTTP 403 four days
+earlier (`INC-145`).** The pilot's lesson was recorded as being about a header; it was about the
+category.
+
+**Diagnosis:** a value's exclusion from the freeze was decided on the **kind of thing it is** — a
+transport detail — rather than on **what it can reach**, and a 180-second client timeout can reach
+the denominator of every episode it truncates.
+
+**Fix:** ⚠️ **NONE IN CODE, AND NONE IN `config/`, AND BOTH ABSTENTIONS ARE DELIBERATE.** The
+calibration is **single-shot**: `PROCESS.md` §6b makes its output directory the record *"whatever
+number it contains"*, so re-running it with a longer timeout is the move §6b exists to forbid, and
+the incentive to do it points exactly where a rationalisation would. Adding a `config/` key is
+**Class A** and this session's `config/` sanction was one key, already spent on the threshold. **The
+change of record is `Q-215`, which is landable only before `prereg-v1` and is the architect's.** SHA
+in the FINAL OUTPUT block of `docs/sessions/c14-freeze-1.txt`.
+
+**Systemic guardrail:** ⚠️ **none yet — and the honest reason is that the two candidates are both
+somebody else's.** (i) The driver's denominator block should print the `error_type` distribution
+beside `UNEXPECTED_ERROR`, which is a `driver/` change outside this fence. (ii) The real guardrail
+is the **rule** that decides what enters `config/`: hard rule 9's tripwire scans using `CONTEXT.md`
+§8.6's table as its authoritative list, so **a value with no §8.6 row is a value the tripwire cannot
+look for** — and both `_TIMEOUT_SECONDS` and `_USER_AGENT` have no row *by design*. ⚠️ **§8.6's own
+third consistency direction — "every value in `config/` has an §8.6 row" — is the one §8.6 itself
+calls untested, and it is still untested; but note it would not have caught either of these, because
+they are not in `config/` at all. The direction that would catch them does not exist in any form.**
+That is stated plainly rather than dressed as a plan.

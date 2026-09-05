@@ -749,3 +749,68 @@
  SESSION'S, AND IT IS A CATCH-22 THIS SESSION DID NOT RESOLVE AND FLAGS RATHER THAN
  SOLVES: the value can only be known AFTER the tag exists, and `config/` may not be
  edited after the tag exists.  Whatever the resolution, it is not a FIX session's.
+
+=====================================================================================
+ ADDENDUM, SAME SESSION, SECOND COMMIT - FOUND AFTER GATE 1 HAD ALREADY LANDED
+=====================================================================================
+ ⚠️ The Gate 2 sweep's completeness critic returned AFTER the first commit. It found two
+ things the first four auditors missed, and this session VERIFIED BOTH FIRST-HAND rather
+ than relaying them. One of them is the most serious finding of the session.
+
+ 1. ⚠️⚠️ THE NINE `UNEXPECTED_ERROR` TRUNCATIONS WERE OUR OWN 180-SECOND SOCKET TIMEOUT.
+    MEASURED: filtering `evals/usage/gemma-26b-2026-09-0*.jsonl` to `cal__` episodes gives
+    OK 545, RATE_LIMITED 1, ERROR 9 -- and all NINE ERROR rows read
+    `"error_type": "TimeoutError", "total_tokens": 0`, on episodes 2207 2211 2213 2216
+    2217 2221 2222 2228 2230, which are EXACTLY the nine the driver booked.
+    `driver/clients.py` declares `_TIMEOUT_SECONDS = 180` as "a transport detail with NO
+    BEARING ON ANY PUBLISHED NUMBER ... deliberately generous, because a timeout that
+    fired early would book a completed call as a failure and hard rule 11 counts every
+    dropped episode."  ⚠️ IT DID EXACTLY THAT, NINE TIMES.
+    ⚠️ AND THE BEARING IS ONE EPISODE WIDE, COMPUTED NOT FEARED:
+        11/30 -> 95% Wilson lower 23.8657% -> floor 20%   <- FROZEN
+        12/30 -> 95% Wilson lower 26.7126% -> floor 25%
+    SIX of the nine timeout-killed episodes did not breach. ⚠️ ONE BREACH AMONG THOSE SIX
+    WOULD HAVE SET THE THRESHOLD 5 pp HIGHER -- and higher makes a later VOID MORE likely,
+    so the constant excluded from the freeze for being unable to touch a published number
+    sat one episode from moving THE number, in the direction that flatters us.
+    ⚠️ THIS IS THE DIAGNOSIS `INC-163` WAS MISSING. Recorded as `INC-164` and `Q-215`.
+    ⚠️ SECOND INSTANCE OF THE CLASS, NOT THE FIRST: `_USER_AGENT`, same module, same
+    exclusion, cost TEN of the pilot's twenty episodes to an HTTP 403 (`INC-145`).
+    NINETEEN EPISODES ACROSS TWO RUNS, FROM TWO VALUES HELD OUTSIDE THE FREEZE BECAUSE
+    THEY COULD NOT MATTER. ⚠️ NOTHING RE-RUN: single-shot. 11/30 and 20% STAND.
+
+ 2. S13.4's LANE-HOUR DIVISOR IS 2.7x-3.2x OPTIMISTIC, per lane, first live measurement:
+        attempt 4 only (29 eps) : 8.0553 h, 2,837,460 tok -> 352,249 tok/h -> 2.73x
+        all 30 checkpoints      : 9.5539 h, 2,893,347 tok -> 302,845 tok/h -> 3.17x
+    against `gemma_tokens_per_lane_hour()` = 1,920,000, whose docstring says that is the
+    TWO lanes' COMBINED rate, i.e. 960,000 PER LANE. The lane was latency-bound, not
+    limit-bound (peak 6 calls / 60 s against `rpm: 30`).
+    ⚠️ THE CRITIC REPORTED 6.34x BY COMPARING A ONE-LANE MEASUREMENT AGAINST THE TWO-LANE
+    DIVISOR. THAT IS WRONG BY EXACTLY A FACTOR OF TWO AND IS CORRECTED HERE RATHER THAN
+    REPEATED -- an agent's number was not taken at face value. The corrected figure is
+    still the finding, and lane-hours are the SECOND CONJUNCT of the N rule, where
+    under-projection permits the LARGER N.
+
+ 3. `attacker.target_tokens_per_episode: 60000` is now MEASURED at 144,668 -- 2.41x.
+    ⚠️ IT MUST NOT BE SUBSTITUTED into `n_decision.measured_tokens_per_episode`: the rule
+    reads the PILOT's figure and `config/` forbids the substitution in terms. Reported
+    because a later session will find it and be tempted.
+
+ 4. ⚠️ A FALSE POSITIVE, DISPROVED AND RECORDED SO IT IS NOT RE-LITIGATED: the critic
+    flagged that `config/protocol.yaml`'s comment names `3e91b7c5` while
+    `git cat-file -t 3e91b7c5` fails -- reading like `INC-158`'s class (a Fix SHA naming a
+    commit that does not exist). ⚠️ IT IS NOT A DEFECT. `3e91b7c5` is a SESSION TOKEN, not
+    a commit SHA; `QUESTIONS.md` carries its issued row; and `config/` already uses this
+    convention twice ("landed here by session `921cfaa4`", "Found by C2 BUILD (`f0c50283`)").
+
+ ⚠️ AND ONE DEFECT IN THIS SESSION'S OWN FIRST COMMIT, DISCLOSED RATHER THAN REWRITTEN:
+ `170f41c`'s message puts a BLANK LINE between `Session-Token: 3e91b7c5` and
+ `Co-Authored-By:`, which splits the trailer block, so `git interpret-trailers --parse`
+ and `%(trailers)` see only the Co-Authored-By line. ⚠️ IT WAS NOT AMENDED: `CLAUDE.md` S5
+ says "No history rewrite, ever", with no unpushed exception, and this session is not the
+ one to invent one. MEASURED CONSEQUENCE: NONE -- `make check-roles` is 21 passed / 0
+ failed / 3 n/a, E1 PASSES with the token found in the log, E4 does NOT list this commit
+ among those whose token sits outside the trailer block, and E5 reports no new malformed
+ trailer. Two commits already in `HEAD`'s ancestry (`625d9e9`, `291fd91`) carry the
+ identical form. The repo's dominant convention puts the two lines ADJACENT, and THIS
+ SECOND COMMIT DOES.
