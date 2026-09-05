@@ -1,0 +1,524 @@
+================================================================================
+C14 FIX - THE WITNESS RECORD - FINAL OUTPUT
+SESSION-TOKEN 6e2b8a53 | ROLE FIX | CHUNK C14 | 2026-09-05
+================================================================================
+
+PUSHED SHA: <filled in the printed report; this file is committed BEFORE the
+  STATUS/PROGRESS commit and BEFORE the push, and a journal cannot name a SHA
+  that does not exist when it is written>
+
+  COMMITS MADE, IN ORDER, EACH ONE VERIFIED BY `git show --numstat` AFTER IT
+  LANDED - never predicted before it (OF-216; INC-97 measured a Swept: line
+  whose arithmetic was wrong):
+
+    dd70f5a   INCIDENTS.md   180    0     INC-172
+    ca859b9   QUESTIONS.md   436    0     4 rulings, Q-235..Q-252, 2 token rows
+    7a60d76   README.md      137    9     S12.3, S12.4 x2, new S12.5
+    <this journal>                        docs/sessions/c14-witness-record-1.txt
+    <STATUS/PROGRESS>                     the LAST commit
+
+  README.md's 9 deletions are the SUPERSEDED sentences this session replaced BY
+  DESIGN and named in its commit message: Q-214's status clause (2), the secret
+  gist's table row (1), and the "recorded NOWHERE" block (6). NOTHING OF ANOTHER
+  SESSION'S WAS DELETED - every commit staged exactly one declared path from a
+  private index seeded from live HEAD.
+
+PATH CHECKED BEFORE A BYTE WAS WRITTEN (INC-170, dated this morning, in which a
+  session destroyed another's 1,045-line FINAL OUTPUT on a colliding filename):
+      test -e docs/sessions/c14-witness-record-1.txt   -> DOES NOT EXIST
+      ls docs/sessions/                                 -> 92 files, none this
+  C14 already holds c14-abort-{1,2,3}, c14-build-1, c14-floor-{fix,review}-1 and
+  c14-freeze-{1,2}. NONE was opened for writing at any point.
+
+================================================================================
+0. THE THING TO READ FIRST
+================================================================================
+
+  !! PROCESS.md S6a.2 STEP 7 WAS NOT DONE AND THE SCORED SWEEP STARTED ANYWAY.
+     STEP 7 ENDS: "Then, and only then, the first scored episode may run."
+
+  !! AND THE SCOPE, STATED EXACTLY, BECAUSE OVERSTATING IT WOULD BE AS DISHONEST
+     AS OMITTING IT:
+
+       THE SUBSTANTIVE PRECONDITION WAS MET, IN ORDER, AND IS CHECKABLE:
+
+         prereg-v1 cut            2026-09-05T09:05:17Z  (tagger; FORGEABLE)
+         PUBLIC witness gist      2026-09-05T09:14:25Z  (GitHub, server-side)
+         first scored provider    2026-09-05T09:17:22Z  (evals/usage/)
+         ----------------------------------------------------------------
+         GAP                                 00:02:57
+
+       WHAT WAS SKIPPED IS THE STEP THAT MAKES THE WITNESS *FINDABLE* BY ANYONE
+       BUT THE OPERATOR. Until today `git grep -i gist` over the tracked tree
+       returned NO gist id at all. The witness existed and was unfindable.
+       That is the defect. It is neither more nor less than that.
+
+  !! IT IS THE ARCHITECT'S ERROR, AND INC-172 SAYS SO IN ITS OPENING LINES: he
+     sequenced tag -> gist -> sweep and omitted the recording step that sits
+     between the second and the third. No session held INCIDENTS.md in its fence
+     at the moment the step was due.
+
+  !! TWO SESSIONS HAD ALREADY WRITTEN THIS VIOLATION DOWN IN CAPITALS AND
+     NEITHER COULD ACT ON IT. C21 BUILD 3 (8d3b04fe) raised it as Q-N; C19 BUILD
+     (2a7f95c1) raised the same gap as Q-232 and wrote into README S12.4 that
+     the fields were "recorded NOWHERE ... an owed item, not a closed one".
+     BOTH WERE FENCED OUT OF INCIDENTS.md - the one file the rule names as the
+     destination was the one file neither could open. That is INC-141's trap.
+
+  ZERO PROVIDER TOKENS SPENT. A SCORED SWEEP WAS RUNNING AND WRITING evals/
+  THROUGHOUT AND WAS NOT TOUCHED, PAUSED, SIGNALLED, OR READ A RESULT OUT OF.
+  src/, tests/, config/, evals/, PROTOCOL.md, HOLES.md, CONTEXT.md, PROCESS.md,
+  RESULTS.md, docs/submission/, docs/render/, docs/reviews/ and corpora/ WERE
+  READ AND NEVER WRITTEN. NO TAG CUT, MOVED OR DELETED. NO GIST PUBLISHED,
+  EDITED OR DELETED. .env NEVER OPENED. NOT SELF-CERTIFIED.
+
+================================================================================
+1. THE INCIDENT
+================================================================================
+
+  INC-172, at dd70f5a, in hard rule 13's EIGHT fields with Diagnosis and Missed
+  both filled. INCIDENTS.md headings: 169 -> 170.
+
+  Its Diagnosis, verbatim, because it is the two sentences that matter:
+
+    "PROCESS.md S6a.2's ordering gate is enforced by nothing but the operator
+     reading step 7 in sequence, and he sequenced tag -> gist -> sweep, skipping
+     the one step between gist and sweep that produces no artefact the next step
+     consumes. Every downstream check - RUN_DECLARED.md S7.1, make check-prereg,
+     the reviewer procedure - tests the freeze's *substance*, which was correct,
+     so nothing anywhere went red on a missing *record*."
+
+  Its Systemic guardrail is PROPOSED, NOT SHIPPED, and the reason is stated: a
+  preflight assertion refusing to dispatch a scored episode unless README S12
+  carries a 32-hex gist id and INCIDENTS.md carries its created_at - red at
+  09:17:22Z on 5 September, which is what makes it a real check rather than a
+  tautology. IT WAS NOT ADDED: src/ is untouchable while the sweep is live, a
+  crash-resume re-imports it, and this run cannot be repeated.
+
+================================================================================
+2. BOTH GISTS - created_at AND first_version, RECOVERED BY THE ONE CURL THAT
+   STILL WORKS TODAY AND WOULD WORK FOR NOTHING IF EITHER GIST WERE EVER EDITED
+================================================================================
+
+  curl -s https://api.github.com/gists/5e6478a57cb5903b55b0e12775db85e0
+  curl -s https://api.github.com/gists/a148d01a7bb609ef51713e097a7fcb89
+
+  ---------------------------------------------------------------------------
+  GIST #2 - THE PUBLIC WITNESS.  This is what the project's claim rests on.
+  ---------------------------------------------------------------------------
+    id                      5e6478a57cb5903b55b0e12775db85e0
+    public                  true
+    created_at              2026-09-05T09:14:25Z
+    updated_at              2026-09-05T09:14:26Z
+    len(history)            1
+    first_version           c8951a5a9ed2a8c22424e47467f050eb930fee5e
+    committed_at (oldest)   2026-09-05T09:14:25Z
+    filename                whetstone-gate-prereg-v1.txt
+
+  ---------------------------------------------------------------------------
+  GIST #1 - THE FIRST ATTEMPT, PUBLISHED **SECRET** AND LEFT IN PLACE.
+  !! RECORDED, NOT CONCEALED. Concealing it - or deleting it and publishing
+     only the 09:14:25Z one - WOULD BE THE EXACT DEFECT THIS ARTEFACT EXISTS TO
+     RULE OUT: deleting a failed timestamp attempt is indistinguishable, to any
+     reader, from deleting an inconvenient one.
+  ---------------------------------------------------------------------------
+    id                      a148d01a7bb609ef51713e097a7fcb89
+    public                  FALSE          <- measured, not assumed
+    created_at              2026-09-05T09:10:29Z
+    updated_at              2026-09-05T09:10:30Z
+    len(history)            1
+    first_version           54b2dc89378c7d6a05341997bf19efcd34428c56
+    committed_at (oldest)   2026-09-05T09:10:29Z
+    filename                whetstone-gate-prereg-v1.txt
+
+  WHY THERE ARE TWO: the first was published SECRET. A secret gist is UNLISTED,
+  not private - anyone holding the URL reads it - but it is not discoverable, so
+  it CANNOT be the public anchor PROCESS.md S6a specifies. A public one was
+  created 3m56s later with the same filename and the first was left in place.
+
+  !! len(history) == 1 ON BOTH IS THE FIELD NOBODY HAD LOOKED AT. Neither gist
+     has ever been edited, so the oldest revision IS the current one and
+     created_at == committed_at on both. THAT EQUALITY IS A MEASUREMENT TAKEN
+     TODAY, NOT A PROPERTY - it stops holding the instant anyone edits either
+     gist, which is exactly why S6a.2 orders the fields RECORDED rather than
+     re-derived on demand.
+
+  !! AND ONE THING THAT GOT BETTER, MEASURED HERE FOR THE FIRST TIME. README
+     S12.4 has said since 2a7f95c1 that the gist's BODY is unverified from
+     inside this repository, and it was right not to assume. This session
+     fetched the body and checked it:
+
+       the body's 10 manifest lines, written LF  ==  prereg-v1.sha256
+                                                     (diff clean, byte-identical)
+       sha256 of those 10 lines        ->  5ac111538247831f145260a275bf77df258a4fc21a22962a0419c954cd60acaf
+       COMBINED FINGERPRINT in body    ->  5ac111538247831f145260a275bf77df258a4fc21a22962a0419c954cd60acaf
+       PREREG_FINGERPRINT.txt here     ->  5ac111538247831f145260a275bf77df258a4fc21a22962a0419c954cd60acaf
+
+     THE WITNESS ATTESTS THIS FINGERPRINT. AND THE EVIDENTIARY STATUS DOES NOT
+     CHANGE: it is ONE SESSION'S NETWORK FETCH AT ONE TIME, not something this
+     repository proves about itself, so it is written into README S12.4's HALF
+     TWO and was DELIBERATELY NOT PROMOTED INTO HALF ONE.
+
+  !! ONE DISCREPANCY IN THE BODY, NAMED BECAUSE WE READ IT. Its prose line reads
+     "Published:  2026-09-05T09:10:00Z (approx)" - the minute of the SECRET
+     first attempt, carried forward unchanged into the public re-post. It is
+     wrong by ~4 minutes AND IN THE DIRECTION THAT FLATTERS US. It is not the
+     authoritative field and the body says so itself in its next paragraph. THE
+     GIST WAS NOT EDITED TO CORRECT IT - an edit would destroy the single-entry
+     history[] recorded above, which is worth more than a tidy line.
+
+  !! WHAT THE WITNESS IS *NOT*: THERE IS NO OPENTIMESTAMPS RECEIPT.
+     `find . -name '*.ots' -not -path './.git/*'` returns NOTHING. Three of this
+     project's own documents say otherwise and ONE OF THEM IS FROZEN -
+     PROTOCOL.md:1082-1083, CONTEXT.md:2107, PROCESS.md:714-717 and :1490. That
+     is Q-231, ruled RECORD, DO NOT FIX. The gist's server-assigned created_at
+     IS the witness and it is the ONLY one, so THE ANCHOR IS GITHUB'S WORD
+     RATHER THAN BITCOIN'S.
+     AND NO RECEIPT WAS STAMPED TODAY, DELIBERATELY: one created this evening
+     would witness an instant EIGHT HOURS AFTER the first scored episode, and an
+     anchor pointing at the wrong instant is WORSE than an absent one.
+
+================================================================================
+3. THE GIST_ID PLACEHOLDER - AND THIS SESSION DOES NOT CLAIM CREDIT FOR IT
+================================================================================
+
+  MEASURED at HEAD before this session wrote anything:
+
+      grep -c 'PENDING-RUN: GIST_ID' README.md            ->  0
+      git show HEAD:README.md | grep -c 'GIST_ID'         ->  0
+
+  !! THE PLACEHOLDER WAS ALREADY FILLED, BY C19 BUILD (2a7f95c1), THIS
+     AFTERNOON. The prompt directed this session to fill it; it was already
+     done, and saying "filled by me" would be claiming another session's work.
+
+  ITS VALUE, WHERE IT NOW STANDS, VERIFIED IN THE COMMITTED FILE:
+
+      README.md S12.1  ->  5e6478a57cb5903b55b0e12775db85e0
+      README.md S12.1  ->  "its created_at is 2026-09-05T09:14:25Z"
+
+  CONFIRMED AT ZERO REMAINING OCCURRENCES AFTER THIS SESSION'S OWN COMMIT.
+
+================================================================================
+4. !! CONFIRMATION: NO SWEEP-DEPENDENT PLACEHOLDER WAS FILLED
+================================================================================
+
+  MEASURED BEFORE AND AFTER, ON THE FULL MULTISET, NOT ON A TOTAL - a total can
+  hide a fill and a drop that cancel:
+
+                          BEFORE (HEAD)      AFTER (7a60d76)
+    <<PENDING-RUN: arm1>>        7                 7
+    <<PENDING-RUN: arm2>>        7                 7
+    <<PENDING-RUN: arm2S>>       7                 7
+    <<PENDING-RUN: arm3>>        7                 7
+    <<PENDING-RUN: arm4>>        7                 7
+    <<PENDING-RUN>>              2                 2
+    <<PENDING-RUN: name>>        1                 1
+    ------------------------------------------------------
+    TOTAL grep hits             38                38
+    of which ARM SLOTS          35                35   <- IDENTICAL
+
+  THE 35 ARM CELLS IN S3.1 WERE NOT TOUCHED. NO ARM NUMBER, NO ESCAPE COUNT, NO
+  BREACH RATE, NO VOID VERDICT AND NO DENOMINATOR APPEARS ANYWHERE IN THIS
+  SESSION'S WRITING.
+
+  AND THE STRONGER STATEMENT, WHICH IS THE ONE THAT MATTERS: NOTHING THIS
+  SESSION WROTE STATES, PREDICTS, OR LEAVES ROOM TO INFER A SCORED RESULT. The
+  three timestamps it publishes - 09:14:25Z, 09:17:22Z and the 2m57s between
+  them - are ORDERING facts about when the run STARTED. They say nothing about
+  what it found. NO VOID VERDICT WAS COMPUTED, HERE OR ANYWHERE: a VOID is a
+  determination about a COMPLETED scored run, and no scored run has completed.
+
+================================================================================
+5. THE FOUR RULINGS, TRANSCRIBED VERBATIM (hard rule 5), AT ca859b9
+================================================================================
+
+  Hard rule 5: "RULINGS ARE RECORDED VERBATIM in QUESTIONS.md before anything
+  else is touched." Word for word, not paraphrased, not summarised, not
+  reordered. Q-231 and Q-233 ALREADY HAVE ENTRIES IN THAT FILE AND THOSE ENTRIES
+  WERE NOT EDITED - the ruling is recorded in a new block and the entries are
+  cross-referenced by number, because rewriting an existing entry in place in a
+  tree with live sessions is how a record loses its history.
+
+  -- Q-249 (raised as Q-O by C21 BUILD 3, 8d3b04fe) ------------------------
+  "HOLES.md:276 still reads TODO_C14_CALIBRATION; config/protocol.yaml:368 reads
+   0.20; both are inside prereg-v1 and neither can be amended. config/ IS
+   OPERATIVE, because it is what the code loads and what void.void_threshold()
+   returns. THIS IS A PERMANENT DEFECT OF THE PRE-REGISTRATION AND IS PUBLISHED
+   AS ONE, IN THE README AND IN RESULTS.md, NOT BURIED.
+   tests/test_c14_prereg.py:389 STAYS RED AND MUST NOT BE EDITED - that red IS
+   the disclosure, and editing it to green would hide a defect in the artefact
+   whose whole purpose is to be checkable. Hard rule 4 ranks a frozen artefact
+   above CONTEXT.md and is silent on two frozen artefacts against each other;
+   this ruling fills that silence and says it is filling it."
+
+    DISCHARGED: README S12.5 (new) publishes both readings, names config/
+    operative, and states that the red test IS the disclosure.
+    !! tests/ WAS NOT TOUCHED. tests/test_c14_prereg.py:389 IS STILL RED.
+    !! THE RESULTS.md HALF IS OWED AND IS NOT DISCHARGED - RESULTS.md is named
+       in this session's exclusion list, and a session that writes into a file
+       it was fenced out of is the failure this process exists to prevent.
+    VERIFIED READ-ONLY at dd70f5a:
+      HOLES.md:276              `probe.void_threshold_breach_rate` =
+                                **`TODO_C14_CALIBRATION`** - an explicit sentinel
+      config/protocol.yaml:368  void_threshold_breach_rate: "0.20"
+      tests/test_c14_prereg.py:389
+                                def test_HOLES_md_probe_fields_agree_with_
+                                config_protocol_yaml_EXACTLY(
+
+  -- Q-250 (raised as Q-P by C21 BUILD 3, 8d3b04fe) ------------------------
+  "Q-214 option A is confirmed: ledger.genesis_hash froze at probe-v1's tag
+   object, so a scored and a calibration episode are cryptographically
+   indistinguishable. M-6 is IMPOSSIBLE - it is a hash fixed point - and is
+   published as a limitation with one honest sentence in the README. It is not
+   worked around."
+
+    DISCHARGED: README S12.3 ALREADY carried the honest sentence, written by
+    C19 BUILD - "the binding separates pre-probe-v1 from post-probe-v1, and
+    nothing else" - AND IT WAS NOT REWRITTEN. One status word moved: S12.3
+    described Q-214 as "Class A, OPEN"; it now records the confirmation and
+    cites Q-250. Nothing was worked around; no config value was touched.
+
+  -- Q-251 (raised as Q-Q by C21 BUILD 3, 8d3b04fe) ------------------------
+  "Q-A..Q-Q have never reached QUESTIONS.md because every C21 session was fenced
+   out of it - INC-141's trap one file over. TRANSCRIBE THEM UNDER REAL NUMBERS
+   NOW, attributed to the sessions that raised them. A fenced session's report is
+   NOT the register."
+
+    DISCHARGED: section 6 below. All seventeen, each attributed to its token.
+
+  -- Q-231 / Q-233 (both raised by C19 BUILD, 2a7f95c1) --------------------
+  "Record, do not fix: PROTOCOL.md's frozen S9 sentence overclaims the freeze
+   date by five days ('fixed by 31 August' against a gist reading 2026-09-05),
+   and PROCESS.md:1406 still records rung 4 as NOT FIRED. THE FROZEN ONE IS
+   UNFIXABLE AND IS PUBLISHED AS A LIMITATION; the true claim is weaker and
+   sufficient - FIXED BEFORE THE FIRST SCORED EPISODE."
+
+    DISCHARGED: PROTOCOL.md NOT edited (frozen, outside the fence). PROCESS.md
+    NOT edited (outside the fence). README S12.5 publishes the limitation and
+    states the weaker true claim in the ruling's own words - FIXED BEFORE THE
+    FIRST SCORED EPISODE - with the arithmetic that makes it checkable.
+    Q-231's OpenTimestamps half is in INC-172's closing paragraph.
+
+================================================================================
+6. THE LETTERED QUESTIONS, RENUMBERED - Q-235..Q-251, AT ca859b9
+================================================================================
+
+  Seventeen, in QUESTIONS.md for the first time, each attributed to the session
+  and token that raised it. THREE ARE CLOSED AND SAY SO; THE REST ARE OPEN.
+
+    was  is      raised by            state
+    ---  ------  -------------------  ------------------------------------------
+    Q-A  Q-235   C21 BUILD 1 9e2c81d4 OPEN  - FORM.md vs FORM_ANSWERS.md
+    Q-B  Q-236   C21 BUILD 1 9e2c81d4 OPEN  - which "S9 limitation sentence"
+    Q-C  Q-237   C21 BUILD 1 9e2c81d4 OPEN  - the sentence names AgentDojo, CUT
+    Q-D  Q-238   C21 BUILD 1 9e2c81d4 OPEN  - rule 8 says "short"; it is EMPTY
+    Q-E  Q-239   C21 BUILD 1 9e2c81d4 OPEN  - card's 5 fields vs rule 13's 8
+    Q-F  Q-240   C21 BUILD 1 9e2c81d4 OPEN  - !! HALF closed: the gist half is,
+                                              THE VIDEO HALF IS NOT
+    Q-G  Q-241   C21 BUILD 1 9e2c81d4 OPEN  - two ## INC-139 headings
+    Q-H  Q-242   C21 BUILD 1 9e2c81d4 OPEN  - PROGRESS.md top vs append-only
+    Q-I  Q-243   C21 BUILD 1 9e2c81d4 CLOSED by measurement - the row exists
+    Q-J  Q-244   C21 BUILD 2 6f2d47ba CLOSED by measurement - INC-157/159/161
+                                              exist; attempt 4 completed
+    Q-K  Q-245   C21 BUILD 2 6f2d47ba OPEN  - "ten questions"; the file held 9
+    Q-L  Q-246   C21 BUILD 2 6f2d47ba OPEN  - CONTEXT.md S1 unnarrowed claim 1
+    Q-M  Q-247   C21 BUILD 2 6f2d47ba OPEN  - line-number citations rot
+    Q-N  Q-248   C21 BUILD 3 8d3b04fe CLOSED by INC-172
+    Q-O  Q-249   C21 BUILD 3 8d3b04fe RULED (section 5)
+    Q-P  Q-250   C21 BUILD 3 8d3b04fe RULED (section 5)
+    Q-Q  Q-251   C21 BUILD 3 8d3b04fe RULED (section 5); this block is the
+                                              discharge
+
+  !! Q-242 IS THE ONE WHERE TWO SESSIONS READ ONE AMBIGUITY IN OPPOSITE
+     DIRECTIONS, AND THIS SESSION SAYS SO RATHER THAN QUIETLY PICKING. C21 BUILD
+     1 appended its PROGRESS.md entry at the FOOT to obey a literal "append
+     only". This session placed its entry at the HEAD, because CLAUDE.md S6 duty
+     3 says "newest on top" and this prompt does not carry "append" against
+     PROGRESS.md. Both readings are defensible; that is the argument for ruling
+     it rather than leaving each session to guess.
+
+  !! Q-243's SECOND-ORDER POINT IS STILL OPEN AND IS WORTH MORE THAN THE ROW: a
+     build session fenced out of QUESTIONS.md CANNOT COMMIT WITHOUT TURNING E1
+     RED. The fence and PROCESS.md S7a are, for such a session, mutually
+     unsatisfiable. INC-141 records it. IT HAPPENED AGAIN TO C21 BUILD 3, WHICH
+     CORRECTLY REFUSED TO WRITE ITS OWN ROW.
+
+  ONE NEW QUESTION RAISED BY THIS SESSION:
+
+    Q-252  THREE src/ DOCSTRINGS STILL SAY THE VOID THRESHOLD IS A SENTINEL AND
+           NO VOID VERDICT IS COMPUTABLE. ALL THREE ARE FALSE.
+             src/whetstone_gate/probe/void.py:12
+             src/whetstone_gate/results/blocks.py:25
+             src/whetstone_gate/results/blocks.py:158
+           MEASURED BY READING, NEVER BY IMPORTING - the sweep is live and a
+           crash-resume re-imports these modules.
+           !! DELIBERATELY NOT FIXED. src/ is outside this fence and a docstring
+           is not worth the risk to a run that cannot be repeated. RECORDED AS
+           OWED. It is a DOCUMENTATION defect, not a behavioural one: no
+           published number depends on those three strings. Related and already
+           open: Q-229, the live unskipped test asserting the same false thing.
+
+  TOKEN ROWS ADDED, BOTH IN THE SAME COMMIT:
+
+    | `6e2b8a53` | C14 | FIX   | 2026-09-05 |   this session
+    | `8d3b04fe` | C21 | BUILD | 2026-09-05 |   ISSUED, and C21 BUILD 3
+                                                CORRECTLY REFUSED TO WRITE ITS
+                                                OWN (INC-141). E1 was RED on its
+                                                commits until this row.
+
+  A DIFFERENT SESSION WRITING THAT ROW IS THE RIGHT SHAPE. A session vouching
+  for its own identity is the exact defect E1 exists to catch.
+
+================================================================================
+7. GIT - THE RECIPE, THE GUARD, AND EVERY "Swept:" LINE IN FULL
+================================================================================
+
+INC-139's CORRECTED RECIPE WAS USED FOR EVERY COMMIT: a private index in a fresh
+OS temp directory, `git read-tree HEAD` from ALWAYS-LIVE HEAD, NEVER a pinned
+SHA. Step 3 staged, snapshotted and committed in ONE command (OF-205). Step 4
+was `env -u GIT_INDEX_FILE git reset -- <the same path>`, NEVER `GIT_INDEX_FILE=`
+(INC-91: the empty spelling makes git read an empty index at path "" and report
+the whole repository staged for deletion). Step 5,
+`env -u GIT_INDEX_FILE git diff --cached --quiet`, EXITED 0 AFTER EVERY COMMIT.
+
+OF-213's first-command check on the SHARED index: `git diff --cached --name-only`
+was EMPTY and `git diff --cached --quiet` exited 0. !! IT WAS RUN AFTER THE READ
+ORDER HAD BEGUN, NOT BEFORE IT, WHICH IS WHERE OF-213 PUTS IT. That is a process
+slip by this session, it is recorded here rather than glossed, and the check was
+clean when it ran. C21 BUILD 3 recorded the identical slip this morning.
+
+!! AND ONE CHECK THIS SESSION ADDED BECAUSE INC-137 IS ABOUT EXACTLY THIS: every
+   shared file was hash-compared against HEAD IMMEDIATELY BEFORE ITS WRITE, not
+   once at the start. All five were byte-identical to HEAD:
+
+     INCIDENTS.md  c189a095...   QUESTIONS.md  d9ca9e7e...
+     README.md     0f9abfb7...   STATUS.md     ac33ad14...
+     PROGRESS.md   116ab928...
+
+   Every append was built from `git show HEAD:<file>` and NEVER from the working
+   tree. HEAD DID NOT MOVE UNDER THIS SESSION except by its own commits.
+
+DID A NAME-ONLY GUARD REFUSE? NO. Every staged snapshot listed exactly the one
+declared path, first time, with no retry and nothing forced past it.
+
+THE CONCURRENT SESSIONS' FILES WERE LEFT EXACTLY AS FOUND: everything the sweep
+is writing under evals/ - the scored episode ledgers, the checkpoints, the usage
+log, the liveness log and the run log. NONE was staged, committed, read for a
+result, or touched.
+
+THE "Swept:" LINES, IN FULL, WITH NO LINE COUNTS IN ANY OF THEM (OF-216: the
+message is composed BEFORE the --stat prints, so any number in it is a
+PREDICTION; INC-97 measured a Swept: line whose arithmetic was wrong):
+
+  dd70f5a  "Swept: NOTHING. One declared path, built from `git show
+            HEAD:INCIDENTS.md` and NEVER the working tree (INC-137), which was
+            verified byte-identical to HEAD immediately before the write. Append
+            only: no existing entry was edited, moved or erased; INC- headings
+            169 -> 170. No line counts in this message - the arithmetic is
+            `git show --numstat`'s (OF-216, INC-97)."
+
+  ca859b9  "Swept: NOTHING. One declared path, built from `git show
+            HEAD:QUESTIONS.md` and NEVER the working tree (INC-137), verified
+            byte-identical to HEAD immediately before the write. Pure insertion:
+            the two token rows go after the last existing row on a
+            uniqueness-checked anchor, the rest appends at the tail, and no
+            existing entry, row or heading was edited, moved or erased. No line
+            counts in this message - the arithmetic is `git show --numstat`'s
+            (OF-216, INC-97)."
+
+  7a60d76  "Swept: NOTHING. One declared path, built from `git show
+            HEAD:README.md` and NEVER the working tree (INC-137), verified
+            byte-identical to HEAD immediately before the write. Every hunk
+            verified to fall inside S12 before the commit. No line counts in
+            this message - the arithmetic is `git show --numstat`'s (OF-216,
+            INC-97)."
+
+  <this journal>  "Swept: NOTHING. One declared path, CHECKED NOT TO EXIST on
+            disk before a byte was written (INC-170), read from live HEAD, name
+            comparison matched."
+
+  <STATUS/PROGRESS>  "Swept: NOTHING. Two declared paths, both built from
+            `git show HEAD:<file>` and NEVER the working tree (INC-137).
+            STATUS.md's C14 row is APPENDED TO, never overwritten, and its
+            review-history column is never erased. No existing row, column or
+            entry was edited, moved or erased."
+
+AUTHORITATIVE ARITHMETIC, from `git show --numstat`, read AFTER each commit:
+
+    dd70f5a   INCIDENTS.md   180    0
+    ca859b9   QUESTIONS.md   436    0
+    7a60d76   README.md      137    9
+
+Every commit carries the trailer Session-Token: 6e2b8a53 and ends "(unreviewed)".
+
+ONE CLASS C DEVIATION, RECORDED (hard rule 2). CLAUDE.md S5 mandates the
+"(unreviewed)" marker for commits touching SOURCE OR TESTS, and none of these
+does. It was included because these artefacts genuinely are unreviewed and the
+marker is permanent and cannot mislead in that direction. C21 BUILD 2 and BUILD 3
+made the same call and recorded it the same way.
+
+NO TAG WAS CUT, MOVED OR DELETED. NO FORCE-PUSH. NO HISTORY REWRITE. NO amend.
+NO `git stash`, `checkout --`, `restore`, `clean`, or `reset --hard` at any
+point. NO GIST WAS PUBLISHED, EDITED OR DELETED. LF ONLY - every file written
+was verified at ZERO CR bytes and valid UTF-8 by a PYTHON BINARY READ, not by
+grep (this repository carries a grep.exe.stackdump and INC records a grep -c
+miscount).
+
+================================================================================
+8. SAFETY
+================================================================================
+
+  ZERO PROVIDER TOKENS. No provider call in any mode. This session held no token
+  sanction and took none. evals/usage/ was READ for one timestamp and never
+  written.
+
+  THE SWEEP: not run, not paused, not signalled, not killed, and NO SCORED
+  RESULT WAS READ OUT OF IT. The only facts taken from evals/ are the ORDERING
+  timestamps 09:17:07Z, 09:17:12Z and 09:17:22Z, which were already published in
+  README S12.4 and RESULTS.md before this session opened.
+
+  .env WAS NEVER OPENED, READ, ECHOED OR COMMITTED. No key name and no key value
+  appears in any file this session wrote.
+
+  FROZEN ARTEFACTS: INVARIANTS.md, PROTOCOL.md, HOLES.md, PROVENANCE.md,
+  RAZORPAY_SEMANTICS.md and config/ WERE READ AND NEVER WRITTEN. Two of them
+  contradict each other (Q-249) and one of them is wrong about OpenTimestamps
+  (Q-231). NEITHER WAS EDITED. The defects are published as limitations, which
+  is what hard rule 4 and CLAUDE.md S4 require.
+
+  tests/goldens/ NOT READ AND NOT WRITTEN. tests/ NOT WRITTEN - and
+  tests/test_c14_prereg.py:389 IS STILL RED, which the Q-249 ruling requires.
+
+  THROWAWAY WORK went to a fresh OS temp directory. Nothing was written into the
+  repository that is not one of the five declared paths.
+
+================================================================================
+9. WHAT THIS SESSION DID NOT DO
+================================================================================
+
+  Did not fill a sweep-dependent placeholder. Did not fill ANY placeholder - the
+    one it was told to fill was already filled by another session, and it says
+    so rather than claiming the work.
+  Did not print, estimate, predict or leave room to infer a scored result.
+  Did not compute a VOID verdict. None is computable from a partial run without
+    taking a result on a moving denominator - the defect this project exists to
+    name.
+  Did not edit a frozen artefact, including the two that contradict each other.
+  Did not edit tests/test_c14_prereg.py:389 to green. That red IS the disclosure.
+  Did not touch src/, though Q-252 records three docstrings there that are now
+    false. The sweep is live; a docstring is not worth the run.
+  Did not stamp an OpenTimestamps receipt. One made today would witness the
+    wrong instant and be WORSE than none.
+  Did not edit either gist - not even to fix the body's wrong "(approx)" date,
+    because an edit destroys the single-entry history[] this session recovered.
+  Did not delete the SECRET gist, and recorded its id instead.
+  Did not write RESULTS.md, which the Q-249 ruling also names. It is outside the
+    fence and the half is recorded as OWED, in README S12.5 and here.
+  Did not cut, move or delete a tag. Did not flip the repository public.
+  Did not rewrite an existing QUESTIONS.md or INCIDENTS.md entry in place.
+  Did not renumber INCIDENTS.md's duplicate ## INC-139 (Q-241).
+  Did not self-certify. A fresh adversarial review follows and has not run.
+
+================================================================================
+END OF FINAL OUTPUT - C14 FIX - SESSION-TOKEN 6e2b8a53
+================================================================================
