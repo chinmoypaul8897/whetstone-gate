@@ -148,6 +148,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `5b8c31e7` | C14 | FIX | 2026-09-05 |
 | `4c7e90ba` | C14 | FIX | 2026-09-05 |
 | `9f14a6d2` | C18 | BUILD | 2026-09-05 |
+| `2a7f95c1` | C19 | BUILD | 2026-09-05 |
 
 ⚠️⚠️ **THE `5d7e2b91` ROW IS SELF-RECORDED, AND IT IS THE ROW FOR A TOKEN THAT WAS ISSUED TO **TWO**
 LIVE SESSIONS.** `QUESTIONS.md` `Q-180` and `Q-187` — two independent detections of one event.
@@ -17667,3 +17668,242 @@ run the sweep, cut or move a tag, publish the gist, fill §8's start time, or to
 `tests/goldens/`, `config/`, `PROTOCOL.md`, `HOLES.md`, `CONTEXT.md`, `PROCESS.md`, `README.md`,
 `RESULTS.md`, `docs/render/`, `docs/reviews/`, `docs/submission/`, `corpora/`, or any path under
 `evals/` other than the one file it created. **Zero provider calls in any mode.**
+
+---
+
+## ⚠️⚠️ RAISED BY C19 BUILD — THE NUMBERS PASS (`2a7f95c1`), 2026-09-05 — `Q-229`…`Q-234`
+
+**Written while the scored sweep was running.** ⚠️ **ZERO PROVIDER SPEND. No provider call in any
+mode; this session held no token sanction and took none. `evals/`, `src/`, `tests/`,
+`tests/goldens/`, `config/`, `PROTOCOL.md`, `CONTEXT.md`, `PROCESS.md`, `HOLES.md`, `docs/render/`,
+`docs/reviews/`, `docs/submission/`, `corpora/` READ AND NEVER WRITTEN. NO TAG CUT OR MOVED. NO
+GIST. NOT SELF-CERTIFIED.**
+
+---
+
+### ⚠️⚠️ `Q-229` — **A LIVE, UNSKIPPED TEST ASSERTS THAT THE VOID THRESHOLD IS STILL A SENTINEL AND THAT NO VOID VERDICT IS COMPUTABLE. THE CALIBRATION LANDED AND BOTH ASSERTIONS MUST NOW FAIL. THE SUITE CARRIES A RED CAUSED BY THE PRE-REGISTRATION SUCCEEDING**
+
+**Status: OPEN. Class A** (it decides whether a test that pins a pre-registration state is flipped,
+and hard rule 6 governs the flip). **Raised by:** C19 BUILD (`2a7f95c1`), 2026-09-05, by reading
+source — **not by running the suite**, because a live sweep is importing the same modules.
+**Owner:** the architect, and then a session with a `tests/` fence.
+
+**MEASURED BY READING, NOT BY EXECUTION:**
+
+```
+tests/test_c10_probe.py:519
+    def test_the_void_threshold_is_a_SENTINEL_and_NO_VOID_VERDICT_IS_COMPUTABLE_TODAY():
+        ...
+        with pytest.raises(cfg.UndeterminedValue):
+            protocol.require("probe.void_threshold_breach_rate")     # :536-537
+        with pytest.raises(void_module.UndeterminedThreshold):        # :539
+            void_module.void_threshold()
+
+config/protocol.yaml:368     void_threshold_breach_rate: "0.20"      <- NOT a TODO_ sentinel
+src/whetstone_gate/config.py:89   SENTINEL_PREFIX = "TODO_"          <- require() raises only on these
+
+grep -n 'pytestmark\|skipif\|xfail' tests/test_c10_probe.py   ->  NOTHING
+```
+
+⚠️ **So `require()` returns the string `"0.20"`, `void_threshold()` returns `Fraction(1, 5)`, and
+both `pytest.raises` blocks must fail. The test is not skipped, not xfailed, and will run.**
+
+⚠️⚠️ **THIS IS THE PROJECT WORKING AND IT IS STILL A RED, AND BOTH HALVES OF THAT SENTENCE MATTER.**
+A test asserting *"no void verdict is computable"* **should** fail the instant a single-shot
+calibration makes one computable — that is precisely what a test pinning a pre-registration state is
+for, and `Q-106` wrote it to say *"it must stay that way until C14."* **C14 has happened.** But the
+test was not flipped when the value landed, so the suite now carries a failure a judge will see,
+whose cause is the pre-registration succeeding rather than anything breaking.
+
+**WHY THIS SESSION DID NOT FLIP IT.** `tests/` is outside its fence; the sweep is importing `src/`
+live; and **hard rule 6 requires a flip to cite the ruling and to be *provably* meaningful — it must
+fail on the old code.** That proof requires running the suite against a tree without a live
+experiment in it, which this session could not do and did not fake.
+
+**TWO STALE ASSERTIONS TRAVEL WITH IT, IN `src/`, ALSO UNFIXED AND ALSO OUTSIDE THE FENCE:**
+
+| where | what it says | measured |
+|---|---|---|
+| `probe/void.py:void_threshold()` docstring | *"⚠️ **Today this always raises.**"* | it no longer does |
+| `probe/void.py` module docstring, `:12` | describes the key as *"the sentinel `TODO_C14_CALIBRATION`"* | it is `"0.20"` |
+
+**OPTIONS:** **(a)** flip the test to assert the calibrated value and the returning loader, citing
+`Q-221`/`Q-189`(d), with the flip proved to fail on the pre-C14 `config/` — **this session's
+recommendation**, and it is a `tests/` change, not a `config/` one, so **it does not touch a frozen
+artefact and is landable after `prereg-v1`**; **(b)** leave it red and publish the red as a
+limitation — which `README.md` §7 and `RESULTS.md` §5 now do **in addition**, because a red that is
+going to be seen should be explained wherever it is seen; **(c)** skip or xfail it — **rejected
+here**, because hard rule 6 forbids weakening an assertion to get green and a skip is the weakest
+form of exactly that.
+
+⚠️ **PUBLISHED IN THE MEANTIME:** `README.md` §7 and `RESULTS.md` §5 both name the test, its file and
+line, and the reason it is red.
+
+---
+
+### ⚠️⚠️ `Q-230` — **`PROTOCOL.md` §9's REQUIRED-VERBATIM README PARAGRAPH SAYS THE GIST PROVES THE PROTOCOL WAS "FIXED BY 31 AUGUST". THE WITNESS READS 2026-09-05T09:14:25Z. THE FROZEN SENTENCE OVERCLAIMS BY FIVE DAYS**
+
+**Status: OPEN. Class A** (it concerns the wording of a claim in a **frozen** artefact that another
+document is *required* to reproduce verbatim). **Raised by:** C19 BUILD (`2a7f95c1`), 2026-09-05.
+**Owner:** the architect. ⚠️ **It cannot be fixed in the artefact — `PROTOCOL.md` is frozen by
+`prereg-v1` — so the only live question is how the README carries it.**
+
+**THE FROZEN TEXT, `PROTOCOL.md` §9, which says in terms that this sentence *"goes verbatim into the
+README"*:**
+
+> The gist proves the protocol was **fixed by 31 August**. It does not prove no earlier run happened —
+> nothing can, and the `RESULTS.md` timestamps are as self-asserted as any other. What is externally
+> witnessed is that **the scorecard was named before the numbers were published**, which is the
+> property `ai-playbook` B.9 asks for.
+
+**MEASURED:** the witness gist's server-assigned `created_at` is **`2026-09-05T09:14:25Z`**. **The
+protocol was not fixed by 31 August.** It was fixed on 5 September, **2 minutes and 57 seconds before
+the first scored episode's first provider call** (`09:17:22Z`, `evals/usage/gemma-26b-2026-09-05.jsonl`).
+
+⚠️ **THE DIRECTION IS THE WHOLE OF WHY THIS IS CLASS A.** The frozen sentence claims **more** than
+the evidence supports. A README carrying it verbatim and unqualified would be publishing a false
+date about the single artefact the project's honesty rests on — in a submission whose thesis is that
+other people's numbers are unsound.
+
+**WHAT THIS SESSION DID, AND WHY IT IS THE ONLY MOVE AVAILABLE TO A SESSION RATHER THAN AN
+ARCHITECT.** `README.md` §12.2 **quotes the frozen paragraph verbatim, as required**, and prints
+immediately beneath it the narrower claim the evidence supports, with the frozen text named as
+overclaiming and **not edited** — `CLAUDE.md` §4: *"If one is wrong, it is **not** edited: the run
+continues under the frozen protocol, the defect goes in `INCIDENTS.md`, and the finding is published
+as a limitation."* ⚠️ **A session may narrow a frozen claim on its own authority. It may not widen
+one, and it may not edit one.**
+
+**OPTIONS FOR THE ARCHITECT:** **(a)** accept the published limitation as landed — this session's
+recommendation; **(b)** rule that the README should carry only the narrowed form and drop the
+verbatim quotation, which trades one broken requirement for another (§9 *requires* the verbatim);
+**(c)** something else. **In every option `PROTOCOL.md` is unchanged, because it is frozen.**
+
+---
+
+### ⚠️⚠️ `Q-231` — **THREE DOCUMENTS, ONE OF THEM FROZEN, STATE THAT AN OPENTIMESTAMPS RECEIPT IS STAMPED ALONGSIDE THE GIST. THERE IS NO `.ots` FILE ANYWHERE AND `ots stamp` WAS NEVER RUN**
+
+**Status: OPEN. Class A.** **Raised by:** C19 BUILD (`2a7f95c1`), 2026-09-05. **Owner:** the
+architect. ⚠️ **`PROTOCOL.md` is frozen and cannot be corrected; `CONTEXT.md` and `PROCESS.md` are
+not frozen but are outside this session's fence.**
+
+| document | what it says | measured |
+|---|---|---|
+| **`PROTOCOL.md`:1082–1083** — ⚠️ **FROZEN by `prereg-v1`** | *"**OpenTimestamps is stamped alongside as a secondary, Bitcoin-backed anchor**"* — present tense, asserting it happened | ⚠️ **FALSE** |
+| `CONTEXT.md`:2107 | *"An OpenTimestamps receipt **is stamped** alongside it as a secondary…"* | ⚠️ **FALSE** |
+| `PROCESS.md`:714–717 | the publish recipe runs `ots stamp prereg-v1.sha256` and stages `prereg-v1.sha256.ots` **into the commit** | ⚠️ **not run; nothing staged** |
+| `PROCESS.md`:1490 | *"The OpenTimestamps receipt is a genuine trustless anchor"* | ⚠️ **FALSE** |
+
+```
+find . -name '*.ots' -not -path './.git/*'     ->   NOTHING
+```
+
+**The operator's own commit message at `879012a` states it plainly:** *"No OTS receipt:
+opentimestamps was not installed and the gist's server-assigned `created_at` is the witness."*
+⚠️ **So the fact is recorded in git history and contradicted in three tracked documents.**
+
+⚠️ **WHY THIS IS NOT COSMETIC.** The two anchors are **not interchangeable**. A gist is **GitHub's
+word**; an OTS receipt is **proof-of-work**. `PROCESS.md` §6a's own table calls OTS *"trustless"* and
+the gist *"trust in one company"*, and a reader who believes both anchors exist believes the freeze
+is trustlessly anchored **when it is anchored to a single company's database that the account owner
+can delete.** ⚠️ **That is a materially stronger claim than the evidence supports, and it is the
+project's central claim.**
+
+**PUBLISHED IN THE MEANTIME:** `README.md` §12.4 and `RESULTS.md` §2 both carry the table above, name
+`PROTOCOL.md` as frozen and wrong, and state that **the gist's `created_at` is the witness and the
+only one.** `README.md` §12.1's optional `ots verify` line — which would have invited a judge to run
+a command against a file that does not exist — **was removed.**
+
+**OPTIONS:** **(a)** stamp one now — ⚠️ **this session recommends AGAINST it without a ruling**: an
+OTS receipt created **after** the first scored episode witnesses the wrong instant and would be worse
+than none, because its own timestamp would prove the freeze was anchored **after** the run started;
+**(b)** correct `CONTEXT.md` and `PROCESS.md` (not frozen) and publish `PROTOCOL.md`'s error as a
+limitation — the honest minimum; **(c)** accept as published. **`PROTOCOL.md` is unchanged in every
+option.**
+
+---
+
+### ⚠️ `Q-232` — **`PROTOCOL.md` §9 REQUIRES THE OPERATOR TO RECORD THE GIST'S OLDEST `history[]` ENTRY'S `version` AND `committed_at`. ONLY `created_at` WAS RECORDED, AND `created_at` IS NOT THE FIELD THAT SURVIVES AN EDIT**
+
+**Status: OPEN. Class B.** **Raised by:** C19 BUILD (`2a7f95c1`), 2026-09-05. **Owner:** the
+operator. ⚠️ **This is recoverable — one `curl` recovers it — and it becomes unrecoverable if the
+gist is ever edited.**
+
+**`PROTOCOL.md` §9, verbatim:** *"What the operator must record afterwards, in **`INCIDENTS.md` and
+in the README**, is the gist's `created_at` and its **OLDEST** history entry's `version` and
+`committed_at`."* And, immediately above it: ⚠️ *"**A GIST CAN BE EDITED LATER, SO THE VERIFIER READS
+THE OLDEST ENTRY OF `history[]`, NEVER THE CURRENT STATE.**"*
+
+**MEASURED at `e7ffd9c`:**
+
+| field | recorded? | where |
+|---|---|---|
+| the gist **id** | ⚠️ **only in two commit-message bodies** (`879012a`, `e7ffd9c`) until this session put it in `README.md` §12.1 and `RESULTS.md` §2 | — |
+| `created_at` | ✅ `2026-09-05T09:14:25Z` | same |
+| **oldest `history[]` `version`** | ⚠️ **NOWHERE** | — |
+| **oldest `history[]` `committed_at`** | ⚠️ **NOWHERE** | — |
+| the **INCIDENTS.md** half of §9's requirement | ⚠️ **NOT DONE** — `INCIDENTS.md` carries no gist entry | — |
+
+⚠️ **THE CONSEQUENCE, STATED AS A GAP RATHER THAN A WORRY.** `README.md` §12.1's `curl` prints three
+fields. **This repository can be checked against one of them.** If the gist is edited after
+publication, `created_at`'s behaviour under every edit path is **undocumented** (`PROCESS.md`:661,
+`PROVENANCE.md`:757 both say so), and the field that would survive — the oldest history entry — was
+never written down. **A verifier following §9's own instruction has nothing to compare against.**
+
+⚠️ **AND `INCIDENTS.md` IS NOT IN THIS SESSION'S FENCE**, so §9's `INCIDENTS.md` half cannot be
+discharged here and is recorded as owed. **The README half is discharged** (§12.1, §12.4).
+
+---
+
+### ⚠️ `Q-233` — **`PROCESS.md` §14's OWN RUNG TABLE STILL RECORDS RUNG 4 AS *NOT FIRED*, SO THE DOCUMENT THAT DEFINES THE LADDER DISAGREES WITH EVERY DOCUMENT THAT REPORTS IT**
+
+**Status: OPEN. Class B** (a stale record, no number moves). **Raised by:** C19 BUILD (`2a7f95c1`),
+2026-09-05. **Owner:** the architect.
+
+**MEASURED:** `PROCESS.md`:1406 still carries rung 4 as **NOT FIRED**. **Rung 4 fired 2026-09-04
+05:27 UTC** (`INC-144`) and is recorded as FIRED in `PROTOCOL.md` §5.1 (**frozen, and the
+authority**), `INCIDENTS.md`, `README.md` §9.3 and §11, `RESULTS.md` §7, and `STATUS.md`.
+
+⚠️ **A reader who checks `PROCESS.md` §14 alone counts THREE fired rungs rather than four.** And
+`PROCESS.md` §14 is **also** the document quoted verbatim, in this repository and in the README, for
+the incomplete-denominator pre-authorisation — **where its text is exact.** So the same section is
+authoritative for one thing and stale for another.
+
+**HOW THIS SESSION HANDLED IT, since `PROCESS.md` is outside its fence:** `RESULTS.md` §7 now cites
+**`PROTOCOL.md` §5.1 for the rung count** and **`PROCESS.md` §14 only for the pre-authorisation**,
+and says in terms that citing §14 for both *"would be citing a document against itself."*
+
+⚠️ **THE STRUCTURAL FORM OF THIS IS ALREADY A KNOWN, UNCLOSED GAP** — `INCIDENTS.md` names the
+missing check in its own words: *"a tripwire asserting that no tracked file's prose claims a
+degradation rung is 'NOT FIRED' while `PROTOCOL.md` §5.1 records it as fired — which is a real check,
+is not written here."* **It is still not written.**
+
+---
+
+### ⚠️ `Q-234` — **THIS SESSION'S FENCE DOES NOT NAME `INCIDENTS.md` IN EITHER DIRECTION, WHILE `CLAUDE.md` §6 MAKES APPENDING TO IT AN END-OF-SESSION DUTY. NOTHING BROKE, SO NOTHING WAS WRITTEN — AND THE AMBIGUITY IS RECORDED RATHER THAN RESOLVED BY ASSUMPTION**
+
+**Status: OPEN. Class B.** **Raised by:** C19 BUILD (`2a7f95c1`), 2026-09-05. **Owner:** the
+architect. **Hard rule 1**: the card and the fence disagree, so it is written here and the unblocked
+work continued.
+
+**THE PROMPT'S FENCE, verbatim:** *"FENCE: `README.md`, `RESULTS.md`, `QUESTIONS.md`, `STATUS.md`,
+`PROGRESS.md`, `docs/sessions/`."* **Its exclusion list names** `src/`, `tests/`, `tests/goldens/`,
+`config/`, `evals/`, `PROTOCOL.md`, `CONTEXT.md`, `PROCESS.md`, `HOLES.md`, `docs/render/`,
+`docs/reviews/`, `docs/submission/`, `corpora/`, any tag, `.env`. ⚠️ **`INCIDENTS.md` is in neither
+list.**
+
+**`CLAUDE.md` §6 duty 4:** *"Append to `INCIDENTS.md` anything that broke, in rule 13's format."*
+
+**HOW IT WAS RESOLVED, AND THE RESOLUTION IS NARROW ON PURPOSE.** ⚠️ **Nothing broke in this
+session.** It ran nothing, spent nothing, executed no command against `src/` or `evals/`, and caused
+no failure. **Duty 4 is conditional and its condition was not met, so no entry was owed and none was
+written** — and an entry invented to satisfy a duty that did not fire is exactly what hard rule 13's
+*"An invented incident has no commit"* forbids. ⚠️ **The findings this session DID make are
+`QUESTIONS.md` entries because they are ambiguities and rulings, not failures of this session's own
+work** — `Q-229` through `Q-233` above.
+
+⚠️ **WHAT IS OWED AND IS NOT DISCHARGED:** `Q-230`, `Q-231` and `Q-232` each name something that
+`PROTOCOL.md` §9 or `CLAUDE.md` §4 says belongs in `INCIDENTS.md`. **None was written there, because
+this session read a fence that does not grant the file and chose to STOP rather than assume.**
+**The architect should either grant the fence or issue the entries to a session that has it.**
+
+---
