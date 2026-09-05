@@ -17,6 +17,13 @@ spends most of its effort trying to prove that its own "blocked" number means no
 > If our numbers are unsound, this submission is worse than worthless. Every rule in
 > [`CLAUDE.md`](CLAUDE.md) is that argument applied to ourselves.
 
+**Video (3:16, unlisted): <https://youtu.be/9AmN-raF6pk>** — ⚠️ **every figure in it was measured on
+2026-09-05 with the scored sweep in flight**, which is why the film says *"twenty-one episodes in"*;
+the final numbers land in [`RESULTS.md`](RESULTS.md) after the sweep, regenerated from the stored
+ledgers, and the film is not re-cut to match them. The URL was verified to resolve without a login on
+2026-09-05 by the session that recorded it (`1f7c3a9e`); the film itself is **unreviewed** — C20's review
+is folded into C21's ([§10](#10-the-review-trail--itself-a-published-result)).
+
 ---
 
 ## STATUS ⚠️ read this before any number in this document
@@ -55,6 +62,7 @@ below is estimated and no sweep-dependent placeholder was filled to produce it.*
 | **the review trail** | `docs/reviews/REVIEW_*.md`, counted from the files | ⚠️ **MOVED TWICE TODAY. `FAIL 16 · PASS 6` over TWENTY-TWO files** — two new reviews since 2026-09-04, **both FAIL**: `REVIEW_C17_1` and ⚠️ **`REVIEW_C14_FLOOR_1`, whose blocker was *"the sweep must not start on this floor"***. [§10](#10-the-review-trail--itself-a-published-result). **On 2026-09-04 this read `FAIL 14 · PASS 6` over 20 files** |
 | **placeholders** | `grep -o '<<PENDING-RUN[^>]*>>' README.md` | ⚠️ **35 UNFILLED SLOTS REMAIN, and the grep returns 38 — the difference is 3 PROSE mentions of the token itself, not slots.** **TWO slots were filled by this session and NEITHER depends on the sweep**: `GIST_ID` and `N-branch`. ⚠️⚠️ **THE 35 ARM CELLS IN [§3.1](#31-the-headline-table-shell) WERE NOT TOUCHED.** The breakdown is in [§18.2](#182--and-what-the-2026-09-05-numbers-pass-did-not-do--a-third-session-a-third-list-written-while-the-sweep-was-running) |
 | **the test suite** | see the precision note below | ⚠️ **NOT MEASURED BY THIS SESSION, DELIBERATELY.** `make test` runs `check-prereg` and imports `src/`, and **a sweep is live in this tree**. [§13.7](#137--a-suite-count-here-is-not-reproducible) says what it has always said: **run the target yourself.** The last two recorded counts, both red, are in the note below |
+| **the video** | `curl -sI https://youtu.be/9AmN-raF6pk`; a `GET` of the watch page; YouTube's oEmbed endpoint — all without a login | ⚠️ **ROW ADDED 2026-09-05 BY C21 BUILD `1f7c3a9e` AT `HEAD` = `69334b3` — LATER THAN THE REST OF THIS BOX, AND MEASURED BY THAT SESSION, NOT AT `e7ffd9c`.** **PUBLISHED, UNLISTED, RESOLVES: `https://youtu.be/9AmN-raF6pk`** → `303` → the watch page → `200`, `<title>` *"Whetstone Gate — a Razorpay MCP policy gate, attacked blind, on an answer key I didn't write"*; oEmbed `200`; the page's own player response carries `"lengthSeconds":"196"` (**3:16**), `"isUnlisted":true`, `"playabilityStatus":"OK"`. ⚠️⚠️ **EVERY FIGURE IN THE FILM WAS MEASURED ON 2026-09-05 WITH THE SWEEP IN FLIGHT — hence "twenty-one episodes in"; the final numbers are `RESULTS.md`'s, after the sweep, and the film is not re-cut.** ⚠️ **Unreviewed** — C20's review is folded into C21's ([§10](#10-the-review-trail--itself-a-published-result)); logged-out *playback* is the operator's check (`FORM_ANSWERS.md` O-9), not this measurement's. **Earlier on 2026-09-05, at `e7ffd9c`, `FORM_ANSWERS.md` §0.0 read "NO VIDEO URL EXISTS ANYWHERE" — that was true then** |
 
 ⚠️ **FOUR PRECISION NOTES, BECAUSE THE SHORT FORM OF EACH IS THE ONE THIS PROJECT WOULD BE CAUGHT ON.**
 

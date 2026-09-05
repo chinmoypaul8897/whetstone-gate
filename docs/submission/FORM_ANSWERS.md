@@ -9,6 +9,15 @@ reasoning stands in `docs/sessions/c21-build-2.txt`; BUILD 1's stands in `c21-bu
 NOT SELF-CERTIFIED: a fresh adversarial review (`full` + `submission`, persona 3) follows and has
 not run.**
 
+⚠️ **AMENDED ONCE SINCE, 2026-09-05, BY C21 BUILD `SESSION-TOKEN 1f7c3a9e`, AT `HEAD` = `69334b3` —
+§5 ONLY.** The `VIDEO_URL` placeholder in §5 is filled with a URL that session saw resolve before it
+wrote it; checklist item **O-5** is struck, not deleted; and the rows that described that placeholder
+(§0's "two that did not invert", §0.0's *the video* row, the sentence above §8's first table, and
+§8's two `VIDEO_URL` rows) carry a dated note **beside** BUILD 3's text, which is not erased.
+**Nothing else in this file was touched. Every other `PENDING-RUN` placeholder stands exactly as
+BUILD 3 left it**, and the count of placeholder-marker strings in this file, taken with `grep -o`
+before and after, moved by **exactly one: 22 → 21.**
+
 This file is what the operator pastes. `PROCESS.md` §12's C21 card (`PROCESS.md`:1343) requires it
 "verbatim and final", and `PROCESS.md`:1344's SUBMIT row makes **"the reviewed artefact is what is
 pasted"** the gate. A paragraph re-drafted in the form box has never been reviewed, and the form is
@@ -30,6 +39,10 @@ must not take on a prompt's word, so each was re-measured first-hand, one comman
 DIRECTION IS EXACTLY WHEN A SESSION STOPS CHECKING: THE VIDEO STILL DOES NOT EXIST, AND THE
 REPOSITORY IS STILL PRIVATE.** Both re-measured below; neither softened. **Nothing in this file was
 inherited from BUILD 2; every row was re-run.**
+⚠️ **2026-09-05, LATER, `1f7c3a9e`: THE FIRST OF THOSE TWO HAS NOW INVERTED AS WELL — THE VIDEO EXISTS,
+AND §5 CARRIES ITS URL, VERIFIED BEFORE IT WAS WRITTEN. THE REPOSITORY IS STILL PRIVATE** — re-measured,
+not carried: an unauthenticated `GET https://api.github.com/repos/chinmoypaul8897/whetstone-gate`
+returned `HTTP 404`, which is what a private repository returns.
 
 ---
 
@@ -67,7 +80,7 @@ writing — and each carries the UTC minute it was taken.
 | `INCIDENTS.md` entries | `grep -c "^## INC-"`; `sort \| uniq -d` | ⚠️ **169 headings, 168 distinct ids** — `## INC-139` still appears **twice**; `INC-104`/`105`/`106` reserved and never issued; highest id **`INC-171`** | ⚠️ **YES — BUILD 2 published 155** |
 | the review trail | `docs/reviews/REVIEW_*.md`, top level, **each verdict read** | ⚠️ **22 files · 16 FAIL · 6 PASS · 0 unrecorded.** New since BUILD 2: `REVIEW_C14_FLOOR_1.md` (**FAIL**). ⚠️ **BUILD 2 PUBLISHED "15 FAIL"; ITS OWN COUNT MISSED `REVIEW_8_1.md`, WHICH IS A FAIL — corrected here rather than carried** | ⚠️ **YES — 21 / 15 / 6, and one of those three figures was wrong** |
 | **C17's renderer** | `STATUS.md`:2196 | ⚠️ **REVIEW 1 FAILED; FIX 1 (`1b9e4c73`) HAS SINCE LANDED at `9d7cc48`** — *"all 2 BLOCKER + 5 HIGH + 7 of the 10 MEDIUM/LOW fixed, each test PROVED RED first. AWAITING RE-REVIEW — NOT SELF-CERTIFIED, `c17-pass` NOT CUT."* | ⚠️ **YES — the fix landed after BUILD 2 wrote** |
-| the video | `STATUS.md`:2199; `grep` over the tree | ⚠️ **STILL `todo - review folded`; NO VIDEO URL EXISTS ANYWHERE.** Re-measured, not assumed | **no** |
+| the video | `STATUS.md`:2199; `grep` over the tree | ⚠️ **STILL `todo - review folded`; NO VIDEO URL EXISTS ANYWHERE.** Re-measured, not assumed. ⚠️ **SUPERSEDED LATER ON 2026-09-05 BY `1f7c3a9e`: the URL now exists and is in §5 — `https://youtu.be/9AmN-raF6pk`, unlisted, 3:16, verified to resolve without a login before it was written** | **no** → ⚠️ **yes, later the same day (`1f7c3a9e`)** |
 | the repository's visibility | `PROCESS.md`:862 | ⚠️ **STILL PRIVATE.** The flip is C21's other half and the operator's act | **no** |
 | the git-history secret scan | `git-history-secret-scan.txt`:4; `git rev-list --count` | ⚠️ **committed at `HEAD = 90b6d6fa…`, now **102 commits** behind** | ⚠️ **YES — it was 57** |
 | `PROVENANCE.md` §1.5 | `PROVENANCE.md`:204, :208-209 | ⚠️ **STILL DATED 2026-08-30** — six days stale, and the C21 card names re-confirmation explicitly | **no** |
@@ -612,14 +625,45 @@ The witness gist is public and checkable today; the repository half is not, unti
 ## 5. THE EXACT VIDEO URL
 
 ```
-<<PENDING-RUN: VIDEO_URL>>
+https://youtu.be/9AmN-raF6pk
 ```
 
-⚠️ **No video URL exists in this repository. RE-MEASURED THIS AFTERNOON, NOT INHERITED** — because
-four other rows of this file inverted overnight and this one is the kind a session stops checking.
-`STATUS.md`:2199 still records C20's status as `todo - review folded`, and a search for a video URL
-across the tree returns nothing.
-**This is a placeholder and must not be pasted as-is** — checklist item **O-5**.
+✅ **FILLED 2026-09-05 BY C21 BUILD `SESSION-TOKEN 1f7c3a9e`, AT `HEAD` = `69334b3`, WITH THE SCORED
+SWEEP STILL LIVE IN `evals/`. VERIFIED BEFORE IT WAS WRITTEN, NOT TAKEN FROM THE PROMPT THAT SUPPLIED
+IT** — every line below is a measurement that session took, without a credential, cookie or login of
+any kind:
+
+- `curl -sI https://youtu.be/9AmN-raF6pk` → **`HTTP 303`** to `https://www.youtube.com/watch?v=9AmN-raF6pk`;
+  a `GET` of that page → **`HTTP 200`**, whose `<title>` is *"Whetstone Gate — a Razorpay MCP policy
+  gate, attacked blind, on an answer key I didn't write - YouTube"*.
+- YouTube's oEmbed endpoint for the same id → **`HTTP 200`**, `"title"` identical, `"type":"video"`,
+  `"provider_name":"YouTube"`.
+- The watch page's own player response: `"videoId":"9AmN-raF6pk"`, **`"lengthSeconds":"196"` =
+  3:16**, **`"isUnlisted":true`**, `"isPrivate":false`, `"playabilityStatus":{"status":"OK"}`.
+
+**So: unlisted, 3 minutes 16 seconds, and it resolves for a viewer with no login.** ⚠️ **What that
+session did NOT verify, and this file does not claim: that the video PLAYS in a logged-out browser** —
+`curl` fetches a page; it does not play one. That is checklist item **O-9**, the operator's, and it
+stays open in §7.
+
+⚠️⚠️ **READ THIS BEFORE COMPARING THE FILM AGAINST `RESULTS.md`. EVERY FIGURE SPOKEN OR SHOWN IN THE
+VIDEO WAS MEASURED ON 2026-09-05 WITH THE SCORED SWEEP IN FLIGHT, WHICH IS WHY THE FILM SAYS
+"TWENTY-ONE EPISODES IN".** The final numbers land in `RESULTS.md` after the sweep, regenerated from
+the stored ledgers, and the film is **not** re-cut to match them: a viewer who watches it after those
+numbers exist is watching a dated measurement, not a stale claim. ⚠️ *Provenance of that sentence,
+stated so it is not laundered into a measurement:* the session that filled this section **did not
+watch the film**; the length is the page's own `lengthSeconds`, but the phrase *"twenty-one episodes
+in"* and the measurement date are the operator's statements, recorded here beside the URL.
+
+⚠️ **AND WHAT THE FILL DOES NOT CHANGE: THE VIDEO IS UNREVIEWED.** C20's `code` review is folded into
+C21's (`INC-61`, `Q-083`; `STATUS.md`:2199), and that review has not run. **A URL was recorded; the
+film's content, its shot list against spec §18, and the RACE beat's renderer were not certified** —
+O-4b below stands (`REVIEW_C17_2.md` does not exist, `c17-pass` is not cut), and so does everything BUILD 3 wrote about it, immediately below.
+
+BUILD 3's paragraph here — *"No video URL exists in this repository. RE-MEASURED THIS AFTERNOON, NOT
+INHERITED … This is a placeholder and must not be pasted as-is — checklist item O-5"* — **was true at
+`e7ffd9c` and is superseded, not erased**: `git show 9371ac2:docs/submission/FORM_ANSWERS.md` still
+carries it, and `docs/sessions/c21-build-3.txt` still explains it.
 
 ⚠️⚠️ **AND THE THING THE OPERATOR MUST NOT LEARN ON CAMERA: THE RENDERER THE §18 RACE BEAT DEPENDS ON
 FAILED ITS REVIEW, HAS BEEN FIXED, AND THE FIX HAS NOT BEEN REVIEWED.**
@@ -1014,7 +1058,7 @@ measurement, and it is recorded rather than reconciled. **Times below are IST.**
 | **O-3** | Fill or strike every `<<PENDING-RUN: …>>` **this form carries** — §8. ⚠️ **AND NOTE WHAT CHANGED: `N` IS NO LONGER PENDING.** `n_decision.selected_branch` is **`30`**, frozen, so the **18** `<<PENDING-RUN: N>>` and **5** `<<PENDING-RUN: N-branch>>` occurrences in `README.md`, `STATUS.md` and `docs/render/` are now **fillable from `config/`** — they are a pre-registered value, **not** a sweep result. `OF-250` (:2642) records that nothing fails if one survives publication. | this file, then `README.md`, `STATUS.md`, `docs/render/` | ⚠️ **HARD GATE** |
 | **O-4** | Re-verify the perishable facts of `CONTEXT.md` §21 item 5 — see §7.1. ⚠️ **PF-5 is now PERFORMABLE for the first time**, and it is `curl`-cheap. | browser / terminal | ⚠️ **HARD GATE** |
 | **O-4b** | ⚠️ **A C17 RE-REVIEW — *not* another fix.** FIX 1 (`1b9e4c73`) landed at `9d7cc48` and reports both BLOCKERs and five HIGHs fixed with **every test proved red first**; ⚠️ **no adversarial session has confirmed it, `REVIEW_C17_2.md` does not exist, `c17-pass` is not cut, and three MEDIUM/LOW remain open by the fix session's own count.** **A build session's report is not evidence about its own output** — the rule BUILD 2 of this file broke on this exact artefact. | a REVIEW session | ⚠️ **HARD GATE on O-5** |
-| **O-5** | Record the video URL. §5 is a placeholder; `STATUS.md`:2199 has C20 at `todo`. ⚠️ **Do not shoot the RACE beat until O-4b lands.** | §5 of this file | ⚠️ **HARD GATE** |
+| **O-5** | ~~Record the video URL. §5 is a placeholder; `STATUS.md`:2199 has C20 at `todo`. ⚠️ **Do not shoot the RACE beat until O-4b lands.**~~ ✅ **DONE 2026-09-05 (`1f7c3a9e`) — §5 carries `https://youtu.be/9AmN-raF6pk`, verified to resolve before it was written. Struck, not deleted.** ⚠️ **Note the order in which it closed: the film was shot and published while O-4b was still open** (`REVIEW_C17_2.md` does not exist, `c17-pass` is not cut) — **recorded, not reconciled. O-9's logged-out playback check is still the operator's.** | §5 of this file | ~~⚠️ **HARD GATE**~~ ✅ **CLOSED** |
 | **O-6** | ⚠️ **Re-confirm that no payment method is attached to either provider account and write the new date into `PROVENANCE.md` §1.5.** It is dated **2026-08-30** there (`PROVENANCE.md`:204, :208-209) — **six days stale.** **No session can do this**: a session has no browser and no permitted credentials. ⚠️ **AND IT IS NOW HARDER THAN IT WAS: `PROVENANCE.md` IS FROZEN INSIDE `prereg-v1`.** Editing it breaks `PROTOCOL.md` §9's closing check and changes a digest inside the published fingerprint. **Class A — the architect's call, not the operator's**, and the likely correct form is an `INCIDENTS.md` entry plus a README line, **not** an edit to the frozen file. | provider billing pages, then a ruling | ⚠️ **HARD GATE** |
 | **O-7** | ⚠️ **Re-run the git-history secret scan.** The committed output records `HEAD = 90b6d6fa…`; measured this afternoon **`HEAD` is 102 commits past it** (it was 57 for BUILD 2). **The scan must cover the tree that goes public.** `PROCESS.md` §8 constrains the remedy: if it finds a key, revoke it at the provider and record the incident — **the history is NOT rewritten**, because a rewrite would destroy `probe-v1`, **`prereg-v1`** and every `cN-pass` tag. | terminal, then commit | ⚠️ **HARD GATE on O-8** |
 | **O-8** | **Flip the repository to public** — only after O-7's output is committed and O-A is fixed. `PROCESS.md`:862. ⚠️ **This is also what makes the pre-registration verifiable from a fresh clone at all** — §6.1(4). | GitHub settings | after O-7, O-A |
@@ -1075,10 +1119,12 @@ this repository carries a `grep.exe.stackdump` and `INC` records a `grep -c` mis
 **110 occurrences across 18 tracked files.**
 
 **In the form itself — one of these two still blocks the paste, and the other has been answered:**
+⚠️ *Amended 2026-09-05 by `1f7c3a9e`: the first row is now FILLED and no longer blocks the paste; the
+second's slot lives in `README.md`, outside this file, and this session did not touch it.*
 
 | Placeholder | Where it appears | What fills it | Filled by |
 |---|---|---|---|
-| `<<PENDING-RUN: VIDEO_URL>>` | §5 of this file | the unlisted video URL, playable logged-out | ⚠️ **STILL OPEN — C20 / operator, O-5** |
+| `<<PENDING-RUN: VIDEO_URL>>` | §5 of this file | the unlisted video URL, playable logged-out | ~~⚠️ **STILL OPEN — C20 / operator, O-5**~~ ✅ **FILLED 2026-09-05 by C21 BUILD `1f7c3a9e`: `https://youtu.be/9AmN-raF6pk` — resolves without a login (`HTTP 200`; oEmbed `200`; `isUnlisted:true`; 196 s = 3:16). This row's first cell NAMES the placeholder and is not a slot; the slot was §5's, and it is gone** |
 | `<<PENDING-RUN: GIST_ID>>` | referenced in §0.0, §0.2a and §6.1(4); lives at `README.md`:1491 | ⚠️ **THE VALUE NOW EXISTS: `5e6478a57cb5903b55b0e12775db85e0`.** It is unfilled only because `README.md` is outside this session's fence | ⚠️ **operator, O-B — mechanical** |
 
 **Elsewhere in the repository — measured this afternoon:**
@@ -1090,7 +1136,7 @@ this repository carries a `grep.exe.stackdump` and `INC` records a `grep -c` mis
 | `<<PENDING-RUN: N-branch>>` | 1 in `README.md`:324 (5 tree-wide) | `README.md`:324 | ⚠️ **YES — `selected_branch` is `30`, frozen** |
 | `<<PENDING-RUN: GIST_ID>>` | 1 in `README.md`:1491 (12 tree-wide) | `README.md`:1491 | ⚠️ **YES — O-B** |
 | `<<PENDING-RUN: N>>` | 18 tree-wide | `docs/render/README.md`:72; `docs/render/audit.py`:48; `docs/render/race.py`:93, :95; `STATUS.md`:20, :2196; `tests/test_c17_render.py`:346, :359 | ⚠️ **YES — a pre-registered value, not a result.** ⚠️ **BUILD 2's table cited :46, :44, :81 for the first three — ALL THREE MOVED at C17 FIX 1** |
-| `<<PENDING-RUN: VIDEO_URL>>` | 9 tree-wide | incl. `STATUS.md`:2510 | ⛔ **NO — O-5** |
+| `<<PENDING-RUN: VIDEO_URL>>` | 9 tree-wide | incl. `STATUS.md`:2510 | ~~⛔ **NO — O-5**~~ ✅ **FILLED IN THIS FILE 2026-09-05 (`1f7c3a9e`). The strings that remain tree-wide are earlier sessions' committed records (`docs/sessions/c21-build-{1,2}.txt`, `STATUS.md`'s C21 BUILD 1 block, `QUESTIONS.md`) and this table's two row keys — records of what WAS pending, not slots, and none was edited** |
 
 ⚠️ **`README.md` still carries exactly 39 occurrences over exactly 9 lines** — 28, 281, 289-293, 324,
 1491 — **re-counted first-hand and agreeing to the occurrence with the figure `README.md`:28 and
