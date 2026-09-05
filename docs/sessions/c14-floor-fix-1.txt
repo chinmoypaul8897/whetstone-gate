@@ -1,0 +1,551 @@
+================================================================================
+ C14 FIX - THE JUDGE-LANE STOP   SESSION-TOKEN 4c7e90ba   ROLE: FIX   2026-09-05
+================================================================================
+
+ THIS SESSION'S COMMITS, oldest first:
+   9750aab  chore(records)  INC-171 + Q-226, WRITTEN BEFORE A LINE OF CODE
+   a2f4cdc  fix(driver)     the fix + tests/test_c14_judge_lane_stop.py (NEW)
+   92f8cb8  chore(records)  this session's OWN wrong HEAD SHA, corrected
+   9bb0bfc  chore(records)  STATUS.md + PROGRESS.md
+   <this>   chore(journal)  this file - its own SHA cannot be inside it
+ PUSHED SHA: the last of these, stated as the first line of the report.
+
+ The full record is committed VERBATIM at docs/sessions/c14-floor-fix-1.txt
+ BEFORE this was printed. CLAUDE.md S6.1: the FILE is the record; this is the
+ copy. ! The path was CHECKED NOT TO EXIST before it was written - INC-170 is
+ this morning's entry about a session overwriting another's 1,045-line record
+ because two deliverables shared one chunk label, and `c14-floor-fix-1.txt`
+ was chosen by the prompt for exactly that reason.
+
+================================================================================
+0. THE HEADLINE - IS THE SWEEP UNBLOCKED?
+================================================================================
+
+ !! B-1 IS FIXED AND MEASURED CLOSED. THE SWEEP IS UNBLOCKED ON THIS DEFECT AND
+    ON NOTHING ELSE, AND IT IS NOT THIS SESSION'S TO START.
+
+ Before, on the committed tree, arm 2 of the pilot matrix: FIVE fault shapes
+ inside the gate judge's model call, FOUR of them killed `driver_run.execute`
+ with DenominatorError and no report at all. After: every one RETURNS, with its
+ OWN cause preserved, a reconciling denominator, and the count printed.
+
+    MODE      BEFORE                                    AFTER
+    none      RETURNED  (400 judge calls)               RETURNED  (400)
+    timeout   RAISED DenominatorError @ episode.py:195  RETURNED  UNEXPECTED_ERROR
+    runtime   RAISED DenominatorError @ episode.py:195  RETURNED  UNEXPECTED_ERROR
+    429       RAISED DenominatorError @ episode.py:195  RETURNED  RATE_LIMIT_429
+    500       RAISED DenominatorError @ episode.py:195  RETURNED  PROVIDER_ERROR
+    (every arm-1 row RETURNED in both - arm 1 has no judge, which is the whole
+     reason no test in this repository had ever seen it)
+
+ ! WHAT IS STILL OPEN AND IS NOT MINE:
+   - THIS SHIPS UNREVIEWED. A fresh adversarial review is owed (CLAUDE.md S6.9).
+     Nothing here is self-certified and NO TAG WAS CUT.
+   - Q-218 is a GO/NO-GO on LAUNCHING the sweep and stays the architect's. What
+     this session can say is that a judge-side fault no longer costs the run.
+   - H-1 (the floor's own `on_usage` can raise from inside its except clause) is
+     UNTOUCHED and open. It is outside the one finding this session was issued.
+   - M-1, M-2, M-3, L-1, L-2, Q-207, Q-208, Q-209: untouched, none closed.
+   - INC-166 / OF-240: LEFT ALONE, AND THE PROMPT'S CONDITION IS WHY. The prompt
+     says close it "IF AND ONLY IF THE REVIEW NAMED IT". REVIEW_C14_FLOOR_1.md
+     names OF-240 in S2.5 and says in terms it is "not raised as a new finding
+     and not carried to OPEN_FINDINGS.md". It also already carries a Fix SHA
+     (8171458, C18 BUILD 1). So it is NOT this session's and was not touched.
+
+ SPEND: ZERO. No provider call in any mode; this session held no token sanction
+ and took none. Every harness replaced driver/clients.py:_http_post with a
+ function that RAISES, so a reach for the real transport is an AssertionError
+ and not a spend. evals/ was READ AND NEVER WRITTEN; every run wrote to a fresh
+ OS temp directory. config/, PROTOCOL.md, tests/goldens/, CONTEXT.md, HOLES.md,
+ docs/render/, docs/reviews/, docs/submission/, README.md, RESULTS.md and
+ corpora/ were NOT WRITTEN. NO TAG CUT OR MOVED. THE SWEEP WAS NOT RUN.
+
+================================================================================
+1. GATE 0 - THE INCIDENT, WRITTEN AND COMMITTED BEFORE A LINE OF CODE
+================================================================================
+
+ INCIDENTS.md INC-171, committed at 9750aab. That commit contains NO source and
+ NO test change, deliberately, so the order is visible in the history and not
+ merely asserted here. Eight fields, Diagnosis and Missed filled.
+
+ EVENT      On arms 2, 2S and 3 the floor books its usage row, raises
+            LaneStopped from inside gate.decide, and the run dies one statement
+            later. `_Executor.execute` counts a turn at `attempted += 1`
+            (:655) and categorises it at `decided += 1` (:681), with
+            `gate.decide` between them at :680. On a judged arm that is
+            ModelGate.decide -> _JudgeClient.complete -> _MeteredCall.run.
+            `run_one_episode` catches the LaneStopped at :834 and its NEXT
+            statement, `executor.counts.reconcile()` at :837, raises
+            DenominatorError, which nothing catches.
+            RE-MEASURED FIRST-HAND, not copied from the review (table in S0).
+            Blast radius from Q-218: 90 of the sweep's 150 episodes.
+            NOT A REGRESSION: the review hashed every frame at 67839d0 vs
+            b01edaa and only `_MeteredCall.run` differs. A judge-side 429 killed
+            the run this way BEFORE the floor existed. What is new is that Q-200
+            states "THE RUN CONTINUES TO THE NEXT EPISODE".
+
+ ACTION     Nothing run, nothing retried, ZERO tokens. Ruling to Q-226 verbatim
+            first; then the incident; then, and only then, the code.
+
+ EXPECT-    Q-200's own words, and hard rule 11's "every dropped episode counted,
+ ATION      categorised and printed". A judge call IS a model call. The episode
+            WAS booked, correctly, with the correct cause - and then the process
+            died before one number reached the report. A guard that destroys the
+            record it guards is worse than no guard.
+
+ MISSING    A CATEGORY TO WRITE IT INTO. EpisodeCounts had three, and "counted,
+            then abandoned before it could be categorised" is representable in
+            none of them - so even a session that SAW the failure had nothing
+            honest to record. Smaller: the DenominatorError message states the
+            arithmetic and names neither the turn nor the cause, and the floor's
+            `raise ... from None` has already discarded the frame. Largest: NO
+            TEST ANYWHERE IN tests/ drove a LaneStopped out of a judge call on a
+            judged arm - the C14 file is arm 1 only and its fixture text does not
+            parse, so 384 of 384 turns were UNPARSED and gate.decide never ran.
+
+ MISSED     TWO SIGNALS, BOTH WRITTEN DOWN BY THIS PROJECT, BOTH READ AS
+            REASSURANCE.
+            (1) Q-202 enumerated four uncovered sites - world build, gate build,
+                ledger write, _publish - and NONE OF THEM IS INSIDE
+                `run_one_episode`. The one that fires is ONE STATEMENT past the
+                handler the floor's own LaneStopped is caught by. The gap was
+                written down accurately, and the accuracy of the four made the
+                absence of the fifth invisible.
+            (2) !! THE SELF-INCRIMINATING ONE. Q-144's ruling says of OF-240 that
+                it "cannot fire on this run ... it is merely not on this run's
+                path" - NAMING THE PRECONDITION, A JUDGED ARM PLUS A RESUME - and
+                the sweep is the first block to have both. TWO SESSIONS READ THAT
+                AS REASSURANCE RATHER THAN AS A DATED WARNING, and INC-166 is the
+                same sentence firing one file over, on the same block, HOURS
+                EARLIER. The general form nobody wrote: every finding scoped "not
+                on this run's path" is a DATED claim about A RUN, and it expires
+                the moment the next block is built.
+
+ DIAGNOSIS  `_Executor.execute` increments `attempted` BEFORE `gate.decide` and
+            the matching category AFTER it, so a LaneStopped raised inside the
+            judge's _MeteredCall abandons the turn between the two;
+            `run_one_episode`'s `executor.counts.reconcile()` then fires -
+            correctly, one statement past the handler and outside the floor - and
+            raises DenominatorError, which nothing catches. THE CLASS IS
+            UNCHANGED IN ALL FIVE INSTANCES: Q-174's DriverClientError,
+            Q-179(2)'s BucketError, INC-159's TimeoutError, INC-160's UsageError
+            from inside the BucketError handler, and this one. The escape ends
+            the run ONE FRAME OUTSIDE WHATEVER CATCH WAS LAST INSTALLED.
+
+ FIX        a2f4cdc (unreviewed). Section 2.
+
+ GUARDRAIL  tests/test_c14_judge_lane_stop.py - and its ARM is what makes it one.
+
+================================================================================
+2. GATE 1 - THE FIX, AND THE FOUR BINDING CONSTRAINTS EACH ANSWERED WHERE IT IS
+   ENFORCED RATHER THAN PROMISED
+================================================================================
+
+ ONE FILE UNDER src/: driver/episode.py, 96 insertions / 7 deletions (numstat,
+ authoritative, from `git show --numstat a2f4cdc`).
+
+ (a) EpisodeCounts gains a FOURTH turn category, `abandoned`, and a
+     `categorised()` helper written once and used twice - by `reconcile()` and by
+     the caller that maintains the identity - so the two cannot drift apart.
+ (b) `_Executor.execute` reads `categorised()` BEFORE the turn body, wraps the
+     body in `try: return self._run_turn(...)`, and on `except LaneStopped`
+     increments `abandoned` IF AND ONLY IF the turn reached no other category,
+     then RE-RAISES. The turn body moved into `_run_turn` UNCHANGED and at the
+     SAME indentation, so the diff is the wrapper and nothing else.
+ (c) The identity becomes attempted == decided + unparsed + off_surface +
+     abandoned; reconcile() keeps refusing anything else; the figure prints in
+     every episode's accounting INCLUDING AT ZERO (PROCESS.md S9).
+
+ ! THE ONE CHOICE THE RULING DID NOT NAME, AND IT IS DISCLOSED RATHER THAN
+   ABSORBED. Q-207 prices FOUR repairs and says every one is Class A because
+   every one changes what is printed. The ruling ORDERS the fix and names no
+   shape. So the order is the Class A authorisation and the SHAPE is this
+   session's; it is Q-207 option 1, and the other three are refused IN WRITING at
+   Q-226(a) with their costs:
+     2. move `attempted += 1` after categorisation -> the attacker call for that
+        turn WAS made and WAS billed; un-counting it is denominator shrinkage in
+        miniature, hard rule 11's named failure
+     3. roll `attempted` back -> same objection, plus a counter that decreases
+     4. catch the DenominatorError at run_one_episode -> !! SWALLOWS THE ONE
+        ASSERTION THAT DETECTS AN UNCOUNTED TURN. Q-207 calls it "the tempting
+        one" and the review says it would refuse it. Hard rule 6's shape applied
+        to an invariant.
+
+ CONSTRAINT 1 - DO NOT CAUSE-LAUNDER.
+   The handler catches LaneStopped ALONE, increments an integer and `raise`s the
+   SAME OBJECT. No `from`, no new exception, no cause argument anywhere in it.
+   MEASURED end to end: 429 -> RATE_LIMIT_429, 500 -> PROVIDER_ERROR, a bucket
+   refusal -> PACER_REFUSED, a TimeoutError and a bare RuntimeError ->
+   UNEXPECTED_ERROR. Three of the five tests assert the cause by name, and the
+   429 test asserts `cause != UNEXPECTED_ERROR` explicitly.
+
+ CONSTRAINT 2 - DO NOT WIDEN THE FLOOR INTO WORLD OR GATE CONSTRUCTION.
+   LaneStopped is raised in EXACTLY ONE PLACE in this program - _MeteredCall.run,
+   the model call - so this cannot book a failed world build, a failed gate
+   build, a LedgerEntryError, a CallProtocolError or an UnknownTool as anything.
+   All of those still stop the run loudly. Q-202's four sites stay OPEN and its
+   reasoning stands: booking a broken instrument as an episode outcome publishes
+   a measurement taken against it.
+
+ CONSTRAINT 3 - INTRODUCE NO NEW SPEC VALUE.
+   config/ was NOT OPENED and nothing was added to it. `abandoned` is a counter,
+   not a CONTEXT.md S8.6 constant, and the hard-rule-9 tripwire scans that table.
+   `make check-roles` F1/F2/F3 all PASS and F2 still reports exactly the two
+   pre-existing TODO_ sentinels.
+
+ CONSTRAINT 4 - NOTHING KEY-SHAPED IN A BOOKED RECORD.
+   This change books an INTEGER. The only thing this path stores from an
+   exception remains the floor's `type(exc).__name__` (INC-147's prefix-anchored
+   scan, INC-148's whole credential), and that is untouched. One test still
+   asserts it, in the file next door, and this file asserts the type name reaches
+   the usage row for both escape shapes.
+
+ ! WHAT MOVES IN A PRINTED RECORD, EXACTLY - because that is why Q-207 is Class A
+   - ONE LINE is added to each episode's PER-EPISODE TURN ACCOUNTING block; on a
+     run with no abandoned turn it reads `ABANDONED mid-turn   : 0`
+   - NO EXISTING COUNT CHANGES VALUE. attempted, decided, unparsed, off_surface,
+     denied, indeterminate, executed, turns_run and every token and call figure
+     are untouched; `truncated` is still turns_run < turn_budget
+   - !! NOTHING UNDER evals/ CHANGES SHAPE. runner/checkpoint.py:DOCUMENT_KEYS -
+     C11's FROZEN schema - carries NO per-turn counts at all, so no checkpoint,
+     no ledger and no usage row gains, loses or alters a field. The calibration's
+     and the pilot's committed logs still say exactly what they said. Only what a
+     FUTURE report prints changes, and only by one line.
+   - reconcile()'s refusal message names four categories instead of three. It is
+     a refusal string, not a published number.
+
+================================================================================
+3. GATE 2 - EVERY TEST PROVED RED FIRST, AND HOW IT WAS RED
+================================================================================
+
+ HOW THE PRE-FIX TREE WAS BUILT, because the first attempt at this was WRONG and
+ is recorded rather than hidden: `git archive HEAD` into a fresh OS temp
+ directory gives a tree with NO TAGS and NO corpora, so all six tests went red
+ on `RunRefused: probe-v1 does not resolve` and then on `the pinned attacker
+ corpora are not present` - RED FOR THE WRONG REASON, which proves nothing. The
+ measurement below is from a LOCAL CLONE of HEAD (`git clone --local`) in a fresh
+ OS temp directory, which carries the real tags, with corpora/fetched supplied as
+ a Windows JUNCTION to the live pinned trees (read-only; corpora/ is git-ignored
+ and 793 MB, and copying it was not an option). Verified before use:
+     imported from: <temp>/prefix/src/whetstone_gate/__init__.py
+     clone HEAD == live HEAD; `grep -c abandoned` on the clone's episode.py = 0
+ INC-17 is this repository's entry about a probe inside a clone testing the LIVE
+ repository and reporting the opposite of the truth, which is why the import path
+ is printed above rather than assumed.
+
+ PRE-FIX (clone of HEAD, no fix):  6 failed in 9.55s
+ POST-FIX (live tree, with fix) :  6 passed in 97.22s
+
+    TEST                                                RED WITH
+    ...JUDGE_CALL_IS_BOOKED...[TimeoutError]            DenominatorError @ episode.py:195
+    ...JUDGE_CALL_IS_BOOKED...[bare-RuntimeError]       DenominatorError @ episode.py:195
+    ...429_ON_THE_JUDGE_LANE_STAYS_A_429...             DenominatorError @ episode.py:195
+    ...PACER_REFUSAL...KEEPS_ITS_OWN_CAUSE              DenominatorError @ episode.py:195
+    ...RESUMED_JUDGED_ARM_FINISHES_THE_MATRIX...        DenominatorError @ episode.py:195
+    ...reconcile_STILL_REFUSES_A_TURN...                AssertionError on the MESSAGE
+
+ !! FIVE OF SIX ARE RED WITH THE DenominatorError ESCAPING `execute`, VERBATIM:
+    "turn counts do not reconcile: 5 attempted against 4 decided + 0 unparsed +
+     0 off-surface = 4. A turn in none of the three categories has left the
+     record without saying so (hard rule 11)"
+    - the exact failure this fix is about, NOT a structural AttributeError. The
+    exception-type census over the pre-fix run is 13 DenominatorError, 2
+    AssertionError, 0 TypeError, 0 AttributeError.
+
+ ! THE SIXTH IS SAID PLAINLY AND IS NOT PRESENTED AS A RED-TO-GREEN IT IS NOT.
+   `test_reconcile_STILL_REFUSES_A_TURN_THAT_REACHED_NO_CATEGORY_AT_ALL` is red
+   on the refusal MESSAGE ("a turn in none of the three categories"), and had it
+   got past that line the `abandoned=` keyword would be a TypeError. Neither is
+   the DenominatorError escaping. IT IS A REGRESSION GUARD, NOT EVIDENCE THAT B-1
+   WAS FIXED, and its own docstring says so. It exists because Q-207 option 4 was
+   to silence this detector, and only a test tells "booked into a category" apart
+   from "the check was swallowed".
+
+ ! AND EVERY TEST REFUSES TO PASS VACUOUSLY.
+   `_assert_the_judge_was_really_driven` asserts, per test: attacker_calls > 0;
+   judge_calls >= 25; SUM OF UNPARSED TURNS == 0; and decided > 0. That is the
+   direct rebuttal of H-2 - the existing arm-1 fixture counted 384 of 384 turns
+   UNPARSED and executed gate.decide zero times, so its headline property was
+   asserted on episodes that never reached a gate. The control run of this
+   harness makes 400 REAL judge calls over the 20-episode matrix.
+   The matrix is the SHIPPED one, read from config/: 20 episodes x 20 turns. It
+   was not shrunk, because a matrix smaller than the one that ships is exactly
+   the permissive double H-2 failed this chunk for.
+
+================================================================================
+4. THE RESUME CASE - THE REVIEW'S OWN PRECONDITION
+================================================================================
+
+ test_a_RESUMED_JUDGED_ARM_FINISHES_THE_MATRIX_AND_STILL_PRINTS_A_DENOMINATOR
+
+ Invocation 1: arm 2, a real 429 STATUS inside a judge call. One episode
+ completes, one is truncated and booked RATE_LIMIT_429, the lane stops and the
+ rest are never dispatched but ARE counted and categorised.
+ Invocation 2: the SAME output root, a healthy transport. A genuine resume.
+
+ ASSERTED: the published checkpoints equal `already_complete` exactly; the
+ resumed run dispatches precisely the matrix minus those; the denominator
+ reconciles to the WHOLE matrix (skipped episodes IN it - hard rule 11, INC-110);
+ the report actually prints - "RESUME AND IDEMPOTENCE", the SKIPPED count and
+ "PER-EPISODE TURN ACCOUNTING"; every resumed episode has cause None; and
+ `ABANDONED mid-turn   : 0` appears, because PROCESS.md S9 requires every zero to
+ print or a reader cannot tell absent from unmeasured.
+
+ ! IT ALSO CROSSES INC-166's PATH ON PURPOSE. A resumed JUDGED arm is where
+ OF-240's RunRefused fires inside `render`; 8171458 made that a printed refusal
+ stanza instead of an escape, and this test drives it. That is coverage of
+ somebody else's fix, not a claim on it.
+
+================================================================================
+5. THE AST-EXACT TEST DIFF - ast.FunctionDef / ast.Assert / pytest.raises
+================================================================================
+
+ Measured with `ast`, over `git show HEAD:<path>` versus the working tree, for
+ EVERY tests/*.py. Never `grep -c assert`. L-1 in the review is about a table
+ that reported RAW FunctionDef counts under a caption saying QUALIFIED, so both
+ are printed here and labelled.
+
+    FILE                                 raw fn   qual fn   ast.Assert   pytest.raises
+    tests/test_c14_judge_lane_stop.py    NEW 19    NEW 17      NEW 46         NEW 1
+
+    EXISTING tests/*.py FILES CHANGED BY THIS SESSION: 0
+
+ !! ZERO EXISTING TEST FILES WERE TOUCHED, so no assertion could be removed,
+ loosened, skipped or approximated (hard rule 6). There is no "REMOVED" list and
+ no "LOST AN ASSERTION" list to print, because there is no existing file to
+ compare. `git show --numstat a2f4cdc` confirms it independently:
+     96   7  src/whetstone_gate/driver/episode.py
+    581   0  tests/test_c14_judge_lane_stop.py
+
+================================================================================
+6. THE FULL SUITE, ATTRIBUTED PER TEST WITH comm(1) - NEVER BY SUBTRACTING
+   TOTALS
+================================================================================
+
+ !! THE TOTALS ARE NOT COMPARABLE AND THAT IS THE REASON THE PROMPT FORBIDS
+ SUBTRACTING THEM. The baseline runs in a CLONE that lacks the git-ignored,
+ PINNED vendored checkouts (Q-010: "the vendored source trees are 793 MB and are
+ pinned rather than committed"), so 58 tests could not even be collected there
+ and its `passed` count is smaller for a reason that has nothing to do with this
+ fix. The comparison below is on the SET OF FAILING NODE IDS, sorted, through
+ comm(1).
+
+    BEFORE  clone of HEAD, NO fix, this session's new test file copied in
+            34 failed, 1545 passed, 2 skipped, 58 ERRORS   in 1128.64s
+    AFTER   live tree, fix applied
+            16 failed, 1621 passed, 2 skipped,  0 errors    in 1247.35s
+
+ !! comm -13 before after  =  EMPTY.
+    NOT ONE TEST IN THIS REPOSITORY FAILS AFTER THIS FIX THAT WAS NOT ALREADY
+    FAILING BEFORE IT. Every one of the 16 standing reds below is in the BEFORE
+    set too (`comm -13` returns 0 lines), so none can be attributed to this
+    session - and because the after-only set is empty, no clone-side ERROR can
+    be masking a regression either: a test that errored in the clone and failed
+    live would appear in exactly that empty set.
+
+    comm -23 before after  =  18 lines, and all 18 are accounted for:
+      6  tests/test_c14_judge_lane_stop.py  - THIS SESSION'S OWN, red before the
+                                              fix and green after it (section 3)
+      8  tests/test_c3_tau2_enumeration.py  ) CLONE-ENVIRONMENT ONLY. They read
+      3  tests/test_c3_review_probes.py     ) the PINNED tau2 / domain-toolkit
+      1  tests/test_c13_camel_comparator.py ) checkouts, which are git-ignored
+                                            ) and therefore absent from a clone.
+                                            ) All four files are GREEN in the
+                                            ) live tree, before and after.
+
+ THE 16 STANDING REDS IN THE LIVE TREE, EVERY ONE PRE-EXISTING AND NONE MINE.
+ They are named rather than counted, because "16 reds" and "16 reds that are
+ somebody else's" are different statements and only the second is useful:
+
+    tests/test_arch_cal_build.py  (3)
+      test_Q191s_OWN_TRAILING_60s_TABLE_REPRODUCES_from_the_committed_log
+      test_the_SHIPPED_tpm_limit_REFUSES_call_7_WHICH_THE_CONTINUOUS_BUCKET_ADMITTED
+      test_the_committed_pilot_log_still_holds_the_EIGHT_NUMBERS_this_file_replays
+    tests/test_arch_lanes.py  (3)
+      test_the_committed_pilot_log_still_holds_the_EIGHT_numbers_INC_143_MEASURED
+      test_the_pacer_charges_AT_LEAST_the_actual_cost_ON_EVERY_SINGLE_CALL
+      test_the_top_up_introduces_NO_NEW_SPEC_VALUE
+    tests/test_c10_probe.py  (2)
+      test_every_constant_golden4_names_resolves_to_that_exact_config_key
+      test_the_void_threshold_is_a_SENTINEL_and_NO_VOID_VERDICT_IS_COMPUTABLE_TODAY
+    tests/test_c11_runner.py  (1)
+      test_config_is_not_edited_and_no_sentinel_is_resolved_by_this_chunk
+    tests/test_c12_benign.py  (1)
+      test_the_benign_package_imports_no_model_client_WAY_ONE_the_transitive_ast_walk
+    tests/test_c14_prereg.py  (1)
+      test_HOLES_md_probe_fields_agree_with_config_protocol_yaml_EXACTLY
+    tests/test_c18_results.py  (1)
+      test_the_review_trail_counts_FOURTEEN_FAILS_AND_SIX_PASSES_FROM_THE_FILES
+    tests/test_c7_ledger.py  (1)
+      test_Q069_nothing_in_this_repository_imports_the_ledger_yet
+    tests/test_c8_scorer.py  (2)
+      test_golden2_coverage_block_reproduces
+      test_null_is_not_empty_a_scorer_returning_empty_for_absent_subjects_passes_seven_of_eight
+    tests/test_lanes_operator_placeholders.py  (1)
+      test_the_camel_branch_is_decided_before_any_camel_run
+
+ ! SEVERAL OF THEM ARE VISIBLY THE CONCURRENT C14 FIX SESSION'S LIVE WORK, WHICH
+ IS WHY PER-TEST ATTRIBUTION WAS REQUIRED. `5b8c31e7` landed
+ `n_decision.measured_tokens_per_episode = 144668` and `selected_branch = 30`
+ into `config/protocol.yaml` today, and
+ `test_config_is_not_edited_and_no_sentinel_is_resolved_by_this_chunk` fails with
+ "DID NOT RAISE UndeterminedValue" - it asserts a sentinel still raises, and the
+ sentinel has been resolved. `test_c10_probe`, `test_c14_prereg` and
+ `test_lanes_operator_placeholders` are in the same family. THIS SESSION DID NOT
+ TOUCH config/ AND DID NOT TOUCH ANY OF THOSE TESTS, and it is not this session's
+ place to fix or to flip them.
+
+ ! THE HAZARD IS RECORDED RATHER THAN GLOSSED (OF-259). Both suites ran against a
+ tree other sessions may write to, and a suite total measured across that
+ attributes reds wrongly - which is precisely why the comparison above is a
+ comm(1) over node ids and not an arithmetic difference of totals.
+
+ TARGETED RUNS, ALSO RECORDED:
+   tests/test_c14_judge_lane_stop.py           6 passed in 97.22s   (live, fixed)
+   tests/test_c14_judge_lane_stop.py           6 failed in  9.55s   (clone, pre-fix)
+   test_c12_driver + test_c11_runner + test_c14_unexpected_escape
+                                               1 failed, 149 passed, 2 skipped
+                                               - the one red is
+                                               test_config_is_not_edited..., above
+   make check-roles                            21 passed, 0 failed, 3 n/a, exit 0
+
+================================================================================
+7. WHAT THIS SESSION DID NOT DO, NAMED SO NOTHING IS MISTAKEN FOR DONE
+================================================================================
+
+ - !! IT DID NOT SELF-CERTIFY AND IT CUT NO TAG. `c14-pass` does not exist and
+   this session did not create it. `prereg-v1` was not cut. No tag was moved, no
+   history rewritten, no force-push.
+ - IT DID NOT RUN THE SWEEP, THE CALIBRATION, THE PILOT OR ANY BLOCK, and it made
+   no provider call in any mode.
+ - IT DID NOT TOUCH config/ OR PROTOCOL.md. A concurrent C14 FIX session
+   (5b8c31e7) holds both; `git status --porcelain config/` was empty throughout
+   and this session never opened either for writing.
+ - IT DID NOT TOUCH evals/, tests/goldens/, CONTEXT.md, PROCESS.md, HOLES.md,
+   docs/render/, docs/reviews/, docs/submission/, README.md, RESULTS.md or
+   corpora/. docs/reviews/ in particular: THE REVIEW'S FINDINGS ARE NOT MINE TO
+   EDIT OR CLOSE, and none is marked closed anywhere.
+ - IT DID NOT FIX H-1. The floor's own `self.on_usage(...)` can raise an OSError
+   from inside its `except` clause, where no sibling handler sees it - INC-160's
+   mechanism living inside the fix for INC-160's class - and the review measured
+   the same exposure in ALL THREE sibling branches AND on the success path. It is
+   outside the one finding this session was issued (CLAUDE.md S1: a FIX session
+   "fixes only the findings named") and IT REMAINS OPEN. A reviewer should treat
+   an unwritable usage log as still able to kill a run.
+ - IT DID NOT FIX M-1 (the floor discards the traceback), M-2 (a booked
+   truncation biases the void-threshold denominator downward, which flatters us),
+   M-3 (`int(key.seed_or_task)` cannot drive a task-keyed block), L-1 or L-2.
+ - IT DID NOT CLOSE Q-207, Q-208, Q-209 OR Q-218. Q-226(a) records that Q-207 is
+   answered IN SUBSTANCE - the record now says `abandoned` - and says in terms
+   that closing it formally is the architect's. Q-218 is a GO/NO-GO on launching
+   the sweep and stays the architect's.
+ - !! IT DID NOT TOUCH INC-166 / OF-240, AND THE PROMPT'S OWN CONDITION IS WHY.
+   The prompt says to close INC-166 "IF AND ONLY IF THE REVIEW NAMED IT".
+   REVIEW_C14_FLOOR_1.md S2.5 names OF-240 and says in terms: "Not raised as a
+   new finding and not carried to OPEN_FINDINGS.md - it is already there." So the
+   review did NOT name it as a finding for this session, and INC-166 already
+   carries a Fix SHA (8171458, C18 BUILD 1). LEFT ALONE. The resume test in S4
+   happens to drive that fixed path, which is coverage, not a claim on it.
+
+================================================================================
+8. EVERY `Swept:` LINE
+================================================================================
+
+ ! FIVE COMMITS. The third is a correction this session made to ITSELF rather
+ than a defect left for a reviewer to find.
+
+ 9750aab  chore(records) - INCIDENTS.md (INC-171 appended), QUESTIONS.md (token
+          row + Q-226 appended). NO source and NO tests in this commit, on
+          purpose: hard rule 13 and CLAUDE.md S1 require the entry BEFORE a line
+          of code, and a commit is the only proof of order that survives.
+          MEASURED: +192/-0 and +129/-0.
+
+ a2f4cdc  fix(driver) - src/whetstone_gate/driver/episode.py and
+          tests/test_c14_judge_lane_stop.py NEW. No shared markdown in this
+          commit. MEASURED: 96/7 and 581/0.
+
+ 92f8cb8  chore(records) - QUESTIONS.md (Q-226's numbering note), INCIDENTS.md
+          (INC-171's measurement line). Prose only; no finding, no number and no
+          ruling changed. MEASURED: +11/-2 and +6/-1.
+
+ 9bb0bfc  chore(records) - STATUS.md (C14 review-history column APPENDED, the old
+          row minus its trailing pipe ASSERTED to be a PREFIX of the new one,
+          and EXACTLY ONE LINE of the file differing - line 2193, 30,894 ->
+          37,420 chars), PROGRESS.md (one entry, newest on top, the existing
+          file ASSERTED to be a SUFFIX of the new one).
+          MEASURED: 97/0 and 1/1.
+
+ <this>   chore(journal) - docs/sessions/c14-floor-fix-1.txt, this file, NEW.
+          The path was CHECKED NOT TO EXIST first, in code that REFUSES if it
+          does (INC-170). A commit cannot carry its own SHA, so this line says
+          <this> rather than a number that would have to be wrong.
+
+ LF only; CR byte count 0 on every shared file, verified in Python BEFORE and
+ AFTER each write. Each shared file was guarded against `git show HEAD:<file>`
+ immediately before its append and the write REFUSES on a mismatch (INC-137,
+ INC-140, INC-149). Every commit used the PROCESS.md S7b private-index recipe
+ with `git read-tree HEAD` and `env -u GIT_INDEX_FILE git reset --` (INC-139's
+ correction, NEVER `VAR=`), and `git diff --cached --quiet` on the SHARED index
+ was clean after every one.
+
+================================================================================
+9. HEAD MOVED UNDER THIS SESSION AND THE SESSION'S OWN SHA CLAIM WAS WRONG
+================================================================================
+
+ !! THIS SESSION STATED THE WRONG HEAD SHA IN THE ONE NOTE WHOSE JOB IS TO PROVE
+ THE NUMBERING IS SAFE, AND CORRECTED IT AT 92f8cb8 RATHER THAN LEAVING IT.
+
+ HEAD was 19c0738 when this session opened. The concurrent C14 FIX session
+ (5b8c31e7) committed 8fce8e6 - a PROTOCOL.md S6a.6 correction - while this one
+ was reading, so both appends actually ran against 8fce8e6. Q-226's INC-137 note
+ said "at HEAD = 19c0738" and INC-171 said "on LIVE HEAD = 19c0738".
+
+ CAUGHT BY the first push reporting `8fce8e6..a2f4cdc` where 19c0738..  was
+ expected, then confirmed by `git merge-base --is-ancestor` returning FALSE.
+
+ THE NUMBERING IS UNAFFECTED, MEASURED NOT ASSUMED:
+     git diff --numstat 19c0738 8fce8e6
+     13  3  PROTOCOL.md
+     13  3  docs/sessions/c14-freeze-2.txt
+ No QUESTIONS.md, no INCIDENTS.md, no `Q-` heading, no `INC-` heading. Q-225 and
+ INC-170 were still the highest when the append ran, and the append's guard
+ compared against `git show HEAD:` AT THE MOMENT IT RAN and would have refused on
+ any difference. AND THE MEASUREMENTS STAND: 8fce8e6 touches no src/ and no
+ tests/, so every frame INC-171's table was measured against is byte-identical at
+ both commits.
+
+ ALSO OBSERVED AND NOT TOUCHED: the untracked `du.exe.stackdump`,
+ `grep.exe.stackdump`, `rev/` and `verify.py` were present at this session's
+ start and are not this session's. They are STATUS.md's `P3`, which still blocks
+ the tag, and they are the operator's.
+
+================================================================================
+10. WHAT A REVIEWER SHOULD ATTACK FIRST
+================================================================================
+
+ 1. !! THE ACCOUNTING SHAPE, WHICH IS THE PART THE RULING DID NOT NAME. Q-207
+    calls all four repairs Class A. This session took option 1 and disclosed it
+    at Q-226(a) precisely so it can be overturned. If the architect wants a
+    different shape, the diff to reverse is one field, one helper, one printed
+    line and one `except` clause.
+ 2. THE BOOKING PREDICATE. `abandoned` is incremented only when
+    `categorised()` is unchanged across the turn body. Try to construct a path
+    that raises LaneStopped AFTER a category is taken, or one that takes a
+    category and then re-enters. I could not find one - LaneStopped is raised in
+    exactly one place - but the predicate is the thing to attack.
+ 3. WHETHER `turns_run` SHOULD STILL COUNT AN ABANDONED TURN. It does, unchanged,
+    so `truncated` and the printed "turns run N/20" include it. That is
+    deliberate (the attacker call for the turn was billed) and it is NOT
+    separately ruled. It is the nearest thing here to a number that moved.
+ 4. H-1, WHICH IS STILL OPEN AND STILL KILLS RUNS. An unwritable usage log
+    raises from inside an `except` clause on FOUR branches and on the success
+    path. Nothing in this session touches it.
+ 5. THE FIXTURE'S JUDGE DETECTOR. The fake transport tells a judge request from
+    an attacker one by looking for a line of the REAL
+    `gates/judge.py:JUDGE_REPLY_INSTRUCTION` in the request body - read off the
+    constant, never retyped - so it cannot silently stop matching. Break that and
+    the whole file's arm coverage evaporates, which is H-2 in a new costume.
+
+================================================================================
+ END OF RECORD
+================================================================================
