@@ -1,0 +1,276 @@
+================================================================================
+C21 BUILD - THE VIDEO URL - FINAL OUTPUT
+SESSION-TOKEN 1f7c3a9e | ROLE BUILD | CHUNK C21 | 2026-09-05
+================================================================================
+
+PUSHED SHA: <this journal's own commit - the LAST of three - printed as the
+  first line of the report. A file cannot carry its own SHA; the two commits
+  it CAN name are below, each verified by `git show --numstat` AFTER it
+  landed, never predicted (OF-216; INC-97)>
+
+    0309de9   feat(submission)  README.md                         8   0
+                                docs/submission/FORM_ANSWERS.md  56  10
+    735c6c9   chore(records)    PROGRESS.md                      72   0
+                                STATUS.md                         2   2
+    <this>    chore(journal)    docs/sessions/c21-video-url-1.txt   (new)
+
+  Parent of 0309de9: 69334b3, the HEAD this session opened on. Remote main
+  was at 69334b3 when this session started (`git ls-remote origin`).
+
+PATH CHECKED BEFORE A BYTE WAS WRITTEN (INC-170, in which a session destroyed
+  another's 1,045-line FINAL OUTPUT on a colliding filename):
+      test -e docs/sessions/c21-video-url-1.txt                -> does not exist
+      git cat-file -e <ref>:docs/sessions/c21-video-url-1.txt   -> none, over all 10 refs
+      git log --all --oneline -- docs/sessions/c21-video-url-1.txt -> 0 commits
+  Run twice: during the read order, and again immediately before this file
+  was written. C21 already held c21-build-1.txt, c21-build-2.txt and
+  c21-build-3.txt. None was opened for writing at any point.
+
+SPEND: ZERO. No provider call in any mode. No token sanction was held and
+  none was taken. `.env` never opened; no key name paired with a value.
+A SCORED SWEEP WAS LIVE AND WRITING evals/ THROUGHOUT. evals/ was not read,
+  written, paused or signalled. src/ was not touched. No tag cut, moved or
+  deleted. No gist published, edited or deleted. NOT SELF-CERTIFIED.
+
+================================================================================
+1. THE URL VERIFICATION - DONE FIRST, BEFORE ANY FILE WAS OPENED FOR WRITING
+================================================================================
+
+  The prompt supplied https://youtu.be/9AmN-raF6pk and said "do not write a
+  URL you have not seen resolve". Measured, without a credential, cookie or
+  login of any kind:
+
+    curl -sI https://youtu.be/9AmN-raF6pk
+        -> HTTP 303  Location: https://www.youtube.com/watch?v=9AmN-raF6pk&feature=youtu.be
+    curl -sL https://youtu.be/9AmN-raF6pk            (the watch page, GET)
+        -> HTTP 200
+        -> <title>Whetstone Gate — a Razorpay MCP policy gate, attacked blind,
+                  on an answer key I didn't write - YouTube</title>
+    https://www.youtube.com/oembed?url=...watch?v=9AmN-raF6pk&format=json
+        -> HTTP 200
+        -> "title":"Whetstone Gate — a Razorpay MCP policy gate, attacked
+                    blind, on an answer key I didn't write"
+        -> "type":"video", "provider_name":"YouTube"
+    the watch page's own player response (grep over the HTML):
+        -> "videoId":"9AmN-raF6pk"
+        -> "lengthSeconds":"196"          = 3:16   (approxDurationMs 195999)
+        -> "isUnlisted":true
+        -> "isPrivate":false
+        -> "playabilityStatus":{"status":"OK"
+
+  TITLE MATCHES. LENGTH MATCHES THE PROMPT'S 3:16. UNLISTED, FROM THE PAGE
+  ITSELF, not from the prompt.
+
+  NOT VERIFIED AND NOT CLAIMED ANYWHERE THIS SESSION WROTE: that the video
+  PLAYS in a logged-out browser. curl fetches a page; it does not play one.
+  That is FORM_ANSWERS.md checklist item O-9, the operator's, and it stays
+  open. AND THE FILM WAS NOT WATCHED: "twenty-one episodes in" and the
+  2026-09-05 measurement date are the operator's statements (this prompt's),
+  recorded beside the URL and labelled as such in every place they appear.
+
+  Re-measured while here, because FORM_ANSWERS.md pairs the two facts:
+    curl -s https://api.github.com/repos/chinmoypaul8897/whetstone-gate
+        -> HTTP 404 unauthenticated  = the repository is STILL PRIVATE.
+
+================================================================================
+2. THE PLACEHOLDER COUNT - BEFORE AND AFTER, EXACTLY ONE
+================================================================================
+
+  grep -o '<<PENDING-RUN[^>]*>>' docs/submission/FORM_ANSWERS.md | wc -l
+
+      HEAD 69334b3 blob, before        -> 22
+      the file 0309de9 committed       -> 21
+      DIFFERENCE                       ->  1   EXACTLY ONE
+
+  The one removed is section 5's slot (the fenced block under "## 5. THE
+  EXACT VIDEO URL"), replaced by the URL. The two VIDEO_URL strings that
+  remain are section 8's ROW KEYS - the table that LISTS placeholders - not
+  slots; each row now says FILLED beside its struck old status. Every other
+  placeholder in the file is byte-identical to BUILD 3's: GIST_ID, N,
+  N-branch, the arm cells, the bare one and the "..." form. None is this
+  session's; most depend on the sweep.
+
+  Same count on README.md:  38 before, 38 after. No README placeholder was
+  touched; the two README additions contain no marker string.
+
+  Enforced, not eyeballed: the build script asserted 22 -> 21 and 38 -> 38
+  on the blobs before anything reached the working tree, and the numbers
+  were re-taken on the written files before the commit.
+
+================================================================================
+3. THE TWO FILES CHANGED - git show --numstat 0309de9
+================================================================================
+
+    8    0   README.md
+    56   10  docs/submission/FORM_ANSWERS.md
+
+  docs/submission/FORM_ANSWERS.md (built from `git show HEAD:<file>`, eight
+  exact-match edits, each asserted to occur exactly once):
+    - header: a dated "AMENDED ONCE SINCE ... S5 ONLY" paragraph naming what
+      changed and what did not.
+    - S0 "the two that did NOT invert": a dated note that the first of the
+      two (the video) has now inverted; the repository is still private,
+      re-measured.
+    - S0.0 "the video" row: BUILD 3's cell kept, SUPERSEDED note appended;
+      "Moved since BUILD 2?" cell: "no" -> "no -> yes, later the same day".
+    - S5: the placeholder -> the URL; BUILD 3's five-line "No video URL
+      exists" paragraph replaced by: the verification above; the statement
+      that logged-out PLAYBACK is not verified (O-9); the sweep-in-flight
+      caveat with its provenance labelled; the statement that the video is
+      UNREVIEWED (C20's review folded into C21's, INC-61, Q-083) and that
+      O-4b stands (REVIEW_C17_2.md does not exist, c17-pass not cut); and a
+      pointer to BUILD 3's superseded text at
+      `git show 9371ac2:docs/submission/FORM_ANSWERS.md`.
+      The 10 deleted lines in the numstat are exactly: the placeholder line
+      (1), BUILD 3's five-line paragraph (5), and the four table/preamble
+      lines re-emitted with text appended (4). Nothing else was deleted.
+    - S7 O-5: STRUCK with ~~...~~, not deleted; "HARD GATE" struck, CLOSED
+      appended; a note that it closed while O-4b was still open - the film
+      was shot and published before any C17 re-review - recorded, not
+      reconciled.
+    - S8 preamble: a dated italic note that the first row is FILLED and no
+      longer blocks the paste.
+    - S8 row 1 (VIDEO_URL, in-form): old status struck, FILLED appended,
+      with the note that the row's first cell names the placeholder and is
+      not a slot.
+    - S8 row 2 (VIDEO_URL, tree-wide): old "NO - O-5" struck, FILLED IN THIS
+      FILE appended, with the note that the remaining tree-wide strings are
+      earlier sessions' committed records and this table's row keys.
+
+  README.md (built from `git show HEAD:<file>`, two insertions, no line
+  deleted):
+    - a one-line "Video (3:16, unlisted)" entry between the opening
+      blockquote and the STATUS box - the URL, that EVERY FIGURE IN IT WAS
+      MEASURED ON 2026-09-05 WITH THE SCORED SWEEP IN FLIGHT (hence
+      "twenty-one episodes in"), that the final numbers are RESULTS.md's
+      after the sweep and the film is not re-cut, that the URL was verified
+      to resolve without a login, and that the film is unreviewed.
+    - one new row "the video" at the FOOT of the STATUS box's table, which
+      says in its own cell that it was added later than the rest of the box
+      and measured at 69334b3 by 1f7c3a9e, NOT at e7ffd9c - because the box's
+      preamble says "every row below is as of e7ffd9c" and this row is not.
+      Same content as the top line plus the raw measurements; and the
+      sentence that earlier on 2026-09-05 FORM_ANSWERS.md S0.0 read "NO VIDEO
+      URL EXISTS ANYWHERE" and that this was true then.
+    Nothing else in README.md was touched - not the placeholders row, not
+    the review-trail table's C20/C21 rows, not S18.2's list.
+
+================================================================================
+4. THE RECORDS - git show --numstat 735c6c9
+================================================================================
+
+    72   0   PROGRESS.md      one entry, NEWEST ON TOP (CLAUDE.md S6 duty 3);
+                              the prior head entry (6e2b8a53) asserted intact,
+                              byte for byte, immediately after it (line 73).
+    2    2   STATUS.md        the C20 row and the C21 row, each APPENDED TO -
+                              the prior text of every cell asserted still
+                              present inside the new cell; line count 3179
+                              before and after. The C21 status WORD "todo" is
+                              left as it was: a build session does not move
+                              its own chunk's status (BUILD 3's recorded
+                              position); what this session did is in the
+                              review-history column with commit and numstat.
+                              BUILD 1's deliverable-table row at the foot of
+                              STATUS.md ("The exact video URL - NOT POSSIBLE -
+                              C20 is todo") is superseded by the C21 row's
+                              new text and LEFT STANDING.
+
+================================================================================
+5. EVERY Swept: LINE, VERBATIM FROM THE THREE COMMIT MESSAGES
+================================================================================
+
+  0309de9:
+  Swept: NOTHING. Two declared paths, each built from `git show HEAD:<file>`
+  and never the working tree (INC-137), each pinned by content hash at READ
+  time with `git hash-object -w` + `update-index --cacheinfo` (INC-137's
+  remedy) into a private index seeded from LIVE HEAD (INC-139's correction),
+  the staged name list compared to the declared list before the commit. LF
+  only, 0 CR in both files. No line counts in this message - `git show
+  --numstat` is the authority (OF-216, INC-97).
+
+  735c6c9:
+  Swept: NOTHING. Two declared paths, both built from `git show HEAD:<file>`
+  and NEVER the working tree (INC-137), each verified byte-identical to HEAD
+  in the working tree immediately before its write, each pinned by content
+  hash at read time into a private index seeded from LIVE HEAD (INC-139's
+  correction), the staged name list compared to the declared list before the
+  commit. No existing row, column or entry was edited, moved or erased. No
+  line counts in this message - `git show --numstat` is the authority.
+
+  <this journal's commit> (composed before it lands; the numstat, read
+  afterwards, is the authority and is printed in the report):
+  Swept: NOTHING. One declared path, a NEW file, checked not to exist on disk
+  or on any ref before it was written (INC-170), pinned by content hash into a
+  private index seeded from LIVE HEAD (INC-139's correction), the staged name
+  list compared to the declared list before the commit.
+
+  THE RECIPE, AS RUN THREE TIMES (PROCESS.md S7b with INC-139's correction):
+    export GIT_INDEX_FILE="$(mktemp -d)/index"          # fresh OS temp dir
+    git read-tree HEAD                                   # LIVE HEAD, never a SHA
+    blob=$(git hash-object -w -- <path>)                 # content pinned at READ time
+    git update-index --add --cacheinfo 100644,$blob,<path>
+    test "$(git diff --cached --name-only | sort)" = "<declared, sorted>" || STOP
+    git diff --cached --stat                             # listed my paths and NO others, all three times
+    git commit -F <message file>
+    env -u GIT_INDEX_FILE git reset -- <the same paths>  # env -u, never VAR=
+    env -u GIT_INDEX_FILE git diff --cached --quiet      # shared index CLEAN, all three times
+  Plus, before every working-tree write: `git hash-object <path>` equal to
+  `git rev-parse HEAD:<path>` for that path - so no concurrent session's
+  uncommitted edit to a shared file was overwritten (none existed at any of
+  the four writes). LF only: 0 CR bytes in every written file, last byte 0x0a,
+  verified with `tr -cd '\r' | wc -c` and `tail -c1 | xxd -p` before each
+  commit; the committed blob ids equal the pinned blob ids, checked after.
+
+================================================================================
+6. OWED - QUESTIONS.md IS OUTSIDE THIS FENCE
+================================================================================
+
+  The token row, to be written by the next session that holds QUESTIONS.md:
+
+      | 1f7c3a9e | C21 | BUILD | 2026-09-05 |
+
+  `make check-roles` E1 is RED on this token until then (INC-141's trap; the
+  row was NOT self-written - a session vouching for its own identity is the
+  shape E1 exists to catch). Nothing else is owed to QUESTIONS.md: this
+  session met no ambiguity that needed a ruling. The one judgement call it
+  made is recorded here rather than raised: the two VIDEO_URL row keys in
+  FORM_ANSWERS.md S8 were left in place, because removing them would have
+  dropped the marker count by THREE, and the prompt's rule was EXACTLY ONE.
+
+================================================================================
+7. WHAT THIS SESSION DID NOT DO
+================================================================================
+
+  - Did not fill GIST_ID, N, N-branch, any arm cell, the bare placeholder, or
+    the "..." form - anywhere. One placeholder, one file. 22 -> 21.
+  - Did not watch the film, and did not certify it against spec S18 or the
+    RACE renderer. O-4b stands: REVIEW_C17_2.md does not exist, c17-pass is
+    not cut. The film was shot and published while O-4b was open; that is
+    recorded in O-5's struck row, not reconciled.
+  - Did not verify logged-out PLAYBACK (O-9). curl fetched; it did not play.
+  - Did not flip the repository public (re-measured: api.github.com -> 404).
+  - Did not read a scored ledger, checkpoint or usage row. evals/ was not
+    opened. src/ was not opened.
+  - Did not edit QUESTIONS.md, INCIDENTS.md, RESULTS.md, PROTOCOL.md,
+    CONTEXT.md, PROCESS.md, HOLES.md, config/, tests/, tests/goldens/,
+    docs/reviews/, docs/render/, corpora/, or any tag. Did not edit README.md
+    beyond the two video references. Did not edit STATUS.md beyond the C20
+    and C21 rows. Did not move the C21 status word.
+  - Did not write an INCIDENTS.md entry: nothing broke, and the file is
+    outside this fence in any case. The one check that failed during the
+    session was this session's own over-strict assertion in its build
+    script (it demanded the old STATUS.md line survive as ONE contiguous
+    substring after a cell in the middle of it was extended); the check was
+    corrected to assert the two preserved pieces separately, and the edit it
+    guards was not changed. Nothing reached the working tree or the index
+    before the corrected script passed.
+  - Did not run make test, make eval or check-prereg: a sweep is live in
+    this tree and importing src/ under it is what README S13.7 says not to do.
+  - Did not use a subagent, a workflow, or any process that would have
+    opened this tree from a second context.
+  - Did not self-certify. A fresh adversarial review (`full` + `submission`,
+    persona 3) reads C20's output through C21's - it has not run.
+
+================================================================================
+END - C21 BUILD (THE VIDEO URL) - SESSION-TOKEN 1f7c3a9e
+================================================================================
