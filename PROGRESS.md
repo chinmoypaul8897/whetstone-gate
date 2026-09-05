@@ -1,3 +1,95 @@
+## SESSION-TOKEN 4d9e17b3 — C21, BUILD (THE GIT-HISTORY SECRET SCAN, RE-RUN) — 2026-09-05 — 🔴 **HOLD, DO NOT FLIP. THE SCAN IS RE-RUN AGAINST THE TREE THAT SHIPS AND FINDS A FIFTH HIT RUN 1 NEVER TRIAGED — PROVED SYNTHETIC BY DIGEST, AND STILL NOT SELF-CERTIFIED. `evals/` IS CLEAN, ANCHORED AND UNANCHORED. `.env` WAS NEVER TRACKED ON ANY REF, EVER**
+
+**Role:** BUILD. **Chunk:** C21 — the git-history secret scan only, the last precondition before the
+visibility flip (`PROCESS.md` §14 NEVER-CUT list). ⚠️ **FULL RECORD:
+`docs/sessions/c21-secret-scan-2.txt`** — path checked **not to exist on disk, in `HEAD`, or in any
+tree on any ref** before a byte was written (`INC-170`), because C21 already holds `c21-build-1.txt`,
+`c21-build-2.txt`, `c21-build-3.txt` and `c21-video-url-1.txt`.
+⚠️ **SPEND: ZERO.** No provider call in any mode; no sanction held, none taken. `.env` never opened.
+⚠️ **A SCORED SWEEP WAS LIVE AND WRITING `evals/` THROUGHOUT. `evals/` WAS NOT WRITTEN, PAUSED OR
+SIGNALLED** — its *committed* blobs were read, which is the job. **`src/` NOT IMPORTED AND NOT
+TOUCHED**; `make test` / `make eval` / `check-prereg` **not run** (README §13.7, live run).
+**NO TAG CUT OR MOVED. NO HISTORY REWRITTEN. THE REPOSITORY WAS NOT FLIPPED PUBLIC.**
+**NOT SELF-CERTIFIED.**
+
+**⚠️ THE VERDICT IS 🔴 HOLD, AND THE REASON IS NOT THAT A CREDENTIAL WAS FOUND.** No credential was
+found. The prompt's rule is that a hit which is **not one of the known four** stops the flip, and
+there is one. It is proved synthetic by digest below. **A build session does not get to widen its
+predecessor's allow-list and then certify itself** (`CLAUDE.md` §6.9). One minute of operator review
+closes it.
+
+**THE STALENESS, MEASURED RATHER THAN TAKEN FROM THE PROMPT:** run 1 covers `90b6d6fa`;
+`git rev-list --count 90b6d6fa..HEAD` → **121**, `git merge-base --is-ancestor` → linear,
+`2026-09-04 02:05:22 +0530` → `2026-09-05 20:33:22 +0530` = **42 h 28 m**.
+
+**THE PATTERNS, IMPORTED AND NOT RETYPED — WITHOUT IMPORTING `src/`.** `REVIEW_C0.md` F-05 records a
+mutant that cut the list to 1 of 8 and survived, so a retyped list is that mutant; but `src/` may not
+be imported under a live sweep. Both hold at once by parsing `HEAD:src/whetstone_gate/check_roles.py`
+(blob `6f1c044e`) with `ast` and `literal_eval`-ing the assignment — **8 of 8 recovered**, list
+sha256 `74c2cb60…53140dc`. **No drift since run 1**: no commit in `90b6d6fa..HEAD` touches the file
+and the block is byte-identical.
+
+**BOTH METHODS, WITH SCOPE AS NUMBERS.**
+- **A**, §8's literal `git log -p --all | grep -nEi` form: **27,686,592 B / 346,442 lines**, **8
+  matching lines** (run 1: 6).
+- **B**, all-objects: **3,818 objects** (616 commit / 1,642 tree / 1,552 blob / 8 tag),
+  **316,176,645 B**, **10 refs**, **608 reachable commits**, **46 unreachable objects incl. one
+  commit**. **5 hits** (run 1: 4).
+- `HEAD`: **0 hits / 577 tracked files / 17,884,995 B.**
+- `c15e9bfa` is **still unreachable and still invisible to method A** — the object that justifies the
+  stronger scan, 42 hours on.
+
+**THE FIFTH HIT.** `d62b3f05b5b892d6`, 52 B, blob `9bc75a11` = `tests/test_arch_lanes.py`, added
+`bc20e9e`, **removed by `9ebbfea` — `INC-148`'s own fix commit**. Not in `HEAD`. Payload strictly
+letter-digit alternating across all 48 positions; `sha256("gsk" + "_" + <HEAD's `_PLANTED` generator
+at 24 pairs>)` **equals** the digest of the matched bytes, and that generator regenerates HEAD's
+36-char tail exactly at 18 pairs. `INC-148` independently says the value *"was originally 52
+characters"*, rebuilt *"twelve characters shorter"* → 40 = HEAD's `_PLANTED`. Entry, lengths, two
+commits and digest all agree. **No byte was printed.**
+
+**⚠️ `evals/` — THE WHOLE POINT OF RE-RUNNING.** 114 blobs, **638,324 B**, 101 paths (checkpoints 41 ·
+episodes 41 · usage 7 · cal 6 · pilot 2 · scored 2), all four `evals/cal/*.log`. **ZERO hits.**
+`INC-147` measured `redaction.py`'s guard as **prefix-anchored**, so a second pass searched
+`_KEY_PREFIXES` (also by AST) with **no anchor at all** — **still zero**. **NO COMMITTED LEDGER ROW,
+USAGE ROW, CHECKPOINT, EPISODE OR CALIBRATION LOG CARRIES KEY MATERIAL OF ANY SHAPE THIS SCAN CAN
+DESCRIBE.** Only credential-adjacent word: `authorization`, 8×, every one the payment-domain
+`--s3-binding authorization-is-the-payment` (`Q-141`). ⚠️ **The live sweep's output is UNTRACKED and
+outside this scan; whoever commits it inherits the check.**
+
+**⚠️ A DEFECT IN §8's PRESCRIBED METHOD ITSELF.** GNU grep 3.0's ERE has no non-capturing group: it
+drops the `?` in `(?:RSA |EC |OPENSSH |PGP )?`, making `:RSA ` a literal alternative, so **the
+prescribed form misses the `<RSA>` private-key header** and matches a string that can never occur.
+Method B uses `check_roles`' own `re`, so the branch is honoured — **no private-key block of any
+variant exists in this history**. Second divergence: prescribed form case-**insensitive**, C1
+case-**sensitive**. **`PROCESS.md` NOT edited** (outside fence); OWED to `INCIDENTS.md` + `QUESTIONS.md`.
+
+**BEYOND THE PATTERNS, BECAUSE A PATTERN SCAN CANNOT SEE AN UNPREFIXED KEY.** Every object searched
+for solid 32–64-char alphanumeric runs with three character classes, excluding pure hex: **0 at
+entropy ≥ 5.0** (random base62 ≈ 5.95). ⚠️ **A zero proves nothing until the instrument is shown to
+fire**: at ≥ 4.75 it returns **exactly the two placeholders already proved**. A *validated* negative —
+still not a proof, and the file says so.
+
+**`.env`: NEVER TRACKED, ON ANY REF, EVER.** 0 commits ever touched the path, established from
+`git log --all` and the full object-path listing, **not** `.gitignore`. `.env.example`: names, no values.
+
+**⚠️ THE FINDING AGAINST THIS SESSION.** Its own pre-commit self-check **REFUSED the scan file's first
+draft** — six `private key block` hits, because the table demonstrating the grep defect had **written
+the real headers out**. That is `INC-93`/`INC-148`'s class a third time: a secret-shaped literal in
+the report about secret-shaped literals. Placeholders now. **The check was the control, not the care.**
+
+**Files:** `docs/submission/git-history-secret-scan.txt` (**appended**; run 1 preserved byte-for-byte
+as an exact prefix, verified), `STATUS.md` (**appended at the foot**, the convention its own C21 row
+records), this entry, `docs/sessions/c21-secret-scan-2.txt`. **Every shared-file append built from
+`git show HEAD:<file>`**, staged as an **exact blob** via `hash-object -w` + `update-index --cacheinfo`
+— `INC-137`'s named-but-never-used remedy — so no concurrent writer's bytes could be carried under
+this token. LF-only, byte-verified.
+
+**OWED (`QUESTIONS.md` outside this fence; E1 already RED and stays RED):**
+
+    | `1f7c3a9e` | C21 | BUILD | 2026-09-05 |
+    | `4d9e17b3` | C21 | BUILD | 2026-09-05 |
+
+
 ## SESSION-TOKEN 1f7c3a9e — C21, BUILD (THE VIDEO URL) — 2026-09-05 — ✅ **THE VIDEO URL IS RECORDED: `https://youtu.be/9AmN-raF6pk`, VERIFIED TO RESOLVE BEFORE IT WAS WRITTEN. EXACTLY ONE PLACEHOLDER FILLED — `FORM_ANSWERS.md` 22 → 21. ⛔ NOTHING ELSE IN THE PACK TOUCHED, NO SWEEP-DEPENDENT PLACEHOLDER FILLED, NO RESULT READ OUT OF THE RUN, THE FILM NOT WATCHED AND NOT REVIEWED**
 
 **Role:** BUILD. **Chunk:** C21 — the video URL only; *"a ten-minute task"* by its prompt's own words,

@@ -3176,3 +3176,80 @@ one.** ⚠️ **`make check-roles` E1 is GREEN at `HEAD` (100 issued rows) and g
 session's commits, because `8d3b04fe` has no row and `QUESTIONS.md` is on this session's
 may-not-write list. `INC-141`'s trap; the row was NOT self-written.** One line closes it:
 `| `8d3b04fe` | C21 | BUILD | 2026-09-05 |`.
+
+
+---
+
+## C21 BUILD — `4d9e17b3` — 2026-09-05 — 🔴 THE GIT-HISTORY SECRET SCAN WAS RE-RUN AGAINST THE TREE THAT SHIPS, AND IT SAYS **HOLD**
+
+⚠️ **APPENDED, NOT AN EDIT OF THE C21 ROW** — the convention that row itself records for
+`9e2c81d4`, `6f2d47ba` and `8d3b04fe`. **GATE 4's block above is NOT altered**: it is the true
+record of run 1 at `90b6d6fa` and it stays. This is run 2.
+
+**GATE 4, RE-RUN — 🔴 HOLD, DO NOT FLIP.** `docs/submission/git-history-secret-scan.txt` now carries
+an appended **RUN 2** section (run 1 preserved byte-for-byte as an exact prefix, verified). ⚠️ **THE
+COMMITTED SCAN COVERED `90b6d6fa`, WHICH THIS SESSION MEASURED AT 121 COMMITS AND 42 h 28 m STALE**
+(`git rev-list --count`, `git merge-base --is-ancestor` → linear). Re-run at `HEAD` = `61332b3`.
+
+**⚠️ WHY HOLD, STATED PLAINLY: A FIFTH HIT EXISTS THAT RUN 1 NEVER TRIAGED.** `d62b3f05b5b892d6`,
+52 bytes, blob `9bc75a11` = `tests/test_arch_lanes.py`, added `bc20e9e`, **removed by `9ebbfea` —
+`INC-148`'s own fix commit**. NOT in `HEAD`. **It is proved synthetic BY DIGEST**: strictly
+letter-digit alternating across all 48 payload positions, and `sha256("gsk" + "_" + <HEAD's own
+`_PLANTED` generator at 24 pairs>)` equals the digest of the matched bytes — the same generator
+`tests/test_arch_lanes.py:294` ships, which regenerates HEAD's 36-char tail exactly at 18 pairs.
+`INC-148` independently states the value *"was originally 52 characters"* and was rebuilt *"twelve
+characters shorter"*; 52 − 12 = 40 = HEAD's `_PLANTED`. ⚠️ **THIS SESSION STILL DOES NOT CERTIFY IT**
+(`CLAUDE.md` §6.9). A build session does not widen its predecessor's allow-list and then pass itself.
+
+**SCOPE, AS NUMBERS.** Method A, §8's literal `git log -p --all | grep -nEi` form: **27,686,592
+bytes / 346,442 lines** of patch stream, **8 matching lines** (run 1: 6). Method B, all-objects:
+**3,818 objects — 616 commit / 1,642 tree / 1,552 blob / 8 tag — 316,176,645 bytes**, **10 refs**
+(run 1: 9; `prereg-v1` did not exist then), **608 reachable commits**, **46 unreachable objects
+including one commit**. `HEAD`: **0 hits across 577 tracked files / 17,884,995 bytes**. The
+unreachable blob `c15e9bfa` is **still unreachable and still invisible to method A**, 42 hours on.
+
+**⚠️ `evals/` — THE ONE THING RUN 1 COULD NOT COVER, AND THE REASON THIS WAS RE-RUN.** 114 blobs,
+638,324 bytes, 101 paths (checkpoints 41 · episodes 41 · usage 7 · cal 6 · pilot 2 · scored 2),
+including all four `evals/cal/*.log`. **ZERO hits — anchored AND unanchored.** Because `INC-147`
+measured `redaction.py`'s guard as **PREFIX-ANCHORED**, a second pass searched the prefixes with
+**no anchor at all**: still zero. **NO COMMITTED LEDGER ROW, USAGE ROW, CHECKPOINT, EPISODE OR
+CALIBRATION LOG CARRIES KEY MATERIAL OF ANY SHAPE THIS SCAN CAN DESCRIBE.** The only
+credential-adjacent word is `authorization`, 8×, every one the payment-domain
+`--s3-binding authorization-is-the-payment` (`Q-141`) — checked, not assumed.
+⚠️ **LIMIT: the live sweep's output is UNTRACKED and therefore OUTSIDE this scan. Whoever commits it
+inherits this check.**
+
+**⚠️ A DEFECT IN `PROCESS.md` §8's OWN PRESCRIBED METHOD, MEASURED.** GNU grep 3.0's ERE has no
+non-capturing group, so `(?:RSA |EC |OPENSSH |PGP )?` loses its `?` and `:RSA ` becomes a literal
+alternative: **the prescribed form MISSES the `<RSA>` private-key header** and matches a string that
+can never occur instead. Method B uses `check_roles`' own Python `re`, so the branch is honoured and
+**no private-key block of any variant exists anywhere in this history**. Also: the prescribed form is
+case-**insensitive**, C1 is case-**sensitive** — they were never the same scan. ⚠️ **`PROCESS.md` was
+NOT edited** (outside fence); OWED to `INCIDENTS.md` and `QUESTIONS.md`.
+
+**`.env`: NEVER TRACKED, ON ANY REF, EVER** — re-established at 608 commits from `git log --all` over
+the path and the full object-path listing, **not** from `.gitignore`. 0 commits ever touched it.
+`.env.example` carries names, no values (verified).
+
+**⚠️ AND THE FINDING AGAINST THIS SESSION.** Its own pre-commit self-check **REFUSED the first draft
+of the scan file** with six `private key block` hits — R2.3's table had written the real headers out
+to demonstrate the grep defect. That is `INC-93`/`INC-148`'s class a third time: a secret-shaped
+literal inside the report about secret-shaped literals. The table now carries `<RSA>`/`<none>`
+placeholders. **The check was the control, not the care.**
+
+⚠️ **NOT DONE, DELIBERATELY:** repository **NOT** flipped public; **no tag** cut or moved; **no
+history rewritten**; `evals/`, `src/`, `tests/`, `config/`, `README.md`, `RESULTS.md`, `PROTOCOL.md`,
+`QUESTIONS.md`, `INCIDENTS.md` untouched; **ZERO token spend**, no provider call in any mode; `.env`
+never opened; `make test` / `make eval` / `check-prereg` **not run** (README §13.7, live sweep).
+
+### QUESTIONS OWED (`QUESTIONS.md` is outside this fence)
+
+⚠️ **`make check-roles` E1 is already RED and stays RED** until a session holding that file writes
+**both** rows — `1f7c3a9e`'s was never written either:
+
+    | `1f7c3a9e` | C21 | BUILD | 2026-09-05 |
+    | `4d9e17b3` | C21 | BUILD | 2026-09-05 |
+
+**Also owed:** the R2.3 grep defect (an `INCIDENTS.md` entry under hard rule 13, and a Class A
+question — §8's method is prescribed and it under-matches); and a ruling on the fifth hit, which is
+what 🔴 HOLD is waiting on.
