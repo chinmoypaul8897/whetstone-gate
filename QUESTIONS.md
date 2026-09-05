@@ -144,6 +144,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `7d4e2fa9` | C14 | FIX | 2026-09-05 |
 | `2f7a6d18` | C14 | REVIEW | 2026-09-05 |
 | `3e91b7c5` | C14 | FIX | 2026-09-05 |
+| `6a4f28de` | C18 | BUILD | 2026-09-05 |
 
 ⚠️⚠️ **THE `5d7e2b91` ROW IS SELF-RECORDED, AND IT IS THE ROW FOR A TOKEN THAT WAS ISSUED TO **TWO**
 LIVE SESSIONS.** `QUESTIONS.md` `Q-180` and `Q-187` — two independent detections of one event.
@@ -16776,3 +16777,252 @@ project's reasoning that transport and operator concerns legitimately live outsi
 that reasoning was accepted for the call and token ceilings and is sound there. **The distinction
 this entry offers is EVIDENCE, not principle:** a value that has been measured moving a published
 denominator is no longer a transport detail, whatever it was when it was written.
+
+
+---
+
+## ⚠️⚠️ RAISED BY C18 BUILD 1 — THE SWEEP PATH (`6a4f28de`), 2026-09-05 — `Q-216`…`Q-220`
+
+⚠️ **NUMBERS TAKEN FROM `git show HEAD:QUESTIONS.md` IMMEDIATELY BEFORE THE APPEND** (`INC-137`),
+at `HEAD` = `37a2032`, where the highest was **`Q-215`**. ⚠️ **AND THE HAZARD FIRED ONCE ALREADY IN
+THIS SESSION AND WAS CAUGHT BY RE-READING:** this block was first drafted as `Q-210`…`Q-215` against
+a read taken at `HEAD` = `ed5eb5c`, where the highest was `Q-209`. **HEAD MOVED UNDER THIS SESSION**
+(`INC-149`'s class) — the concurrent **C14 FIX** (`3e91b7c5`) landed `170f41c` and `37a2032`, taking
+`Q-210`…`Q-215` and `INC-162`…`INC-164` — and the collision was found only because the shared files
+were re-read before writing rather than after. **Nothing of theirs is edited or renumbered; these
+five renumber BENEATH `Q-215`**, exactly as `INC-159`/`INC-160` and the `Q-207`…`Q-209` block did.
+
+---
+
+### ⚠️⚠️ `Q-216` — **CLASS A, BLOCKING, AND IT IS THE ONE THAT STOPS THE SWEEP: `n_decision.measured_tokens_per_episode` IS STILL `TODO_C14_PILOT`, SO `load_scored()` REFUSES AND NO SCORED EPISODE CAN BE DISPATCHED — AND THE FIGURE IT SHOULD CARRY IS ITSELF CONTESTED, BECAUSE THE CALIBRATION'S OWN `decide_n` REFUSED TO SELECT N**
+
+**Status: OPEN. Class A. BLOCKING THE SWEEP.** **Raised by:** C18 BUILD 1 (`6a4f28de`), 2026-09-05.
+**Owner:** the architect. ⚠️ **This is not a defect in the path this session built; it is the
+precondition that path correctly refuses without.**
+
+**The mechanism, stated exactly.** `driver/scored.py:scored_n` reads
+`n_decision.measured_tokens_per_episode` through the one loader and hands it to
+`runner/n_rule.py:select_n` — C11's already-reviewed implementation of `CONTEXT.md` §13.4's rule as
+`Q-107` ruled it. N then names which of `PROTOCOL.md` §2.2's two pre-registered seed bands is read.
+**The key is a `TODO_` sentinel, so `config.require` raises `UndeterminedValue` and the block cannot
+be assembled.** Measured in this tree today:
+
+    $ python -m whetstone_gate.driver --dry-run --block scored ...
+    REFUSED - and the refusal is the outcome, not an error to work around:
+      protocol.yaml: 'n_decision.measured_tokens_per_episode' is not determined yet
+      (sentinel 'TODO_C14_PILOT'). Resolved by: C14 - the pilot's MEASURED tokens/episode
+      selects the N branch by the CONTEXT.md S13.4 rule. Never by preference, never by
+      schedule pressure.
+
+⚠️ **THE REFUSAL IS CORRECT AND THIS SESSION DELIBERATELY DID NOT ROUTE AROUND IT.** `PROTOCOL.md`
+§3, in capitals: *"Quietly shrinking N to a number the schedule can reach is the precise thing rule
+11 and `ai-playbook` B.9 forbid."* `config/` is a pre-registration artefact and is outside this
+session's fence in any case. **Typing N — even the N the arithmetic plainly yields — would be
+choosing the size of the published run by preference on the day of the deadline.**
+
+⚠️⚠️ **AND THE FIGURE IS CONTESTED, WHICH IS WHY THIS NEEDS A RULING RATHER THAN A KEYSTROKE.**
+The pilot **never produced one**: `INC-142` records it completed **0 of 20**. The **calibration**
+did complete, and its own report **REFUSED to select N**, verbatim from
+`evals/cal/run-attempt4-20260904T204118Z.log`:
+
+    tokens/episode over COMPLETED  (the S13.4 figure, ceil)        : 144668
+    tokens/episode over DENOMINATOR (disclosure; reads LOW)         : 96445
+    USABLE TO SELECT N                                             : False
+    N DECISION: REFUSED, and the refusal is the result -
+      the pilot measured 20 completed and 10 TRUNCATED episode(s), so tokens/episode may
+      not be averaged ... That is INCIDENTS.md INC-103's shape, running where it flatters
+
+**So there are at least four candidate answers and this session may not pick among them:**
+
+| # | candidate | figure | objection to it |
+|---|---|---|---|
+| 1 | the calibration's over-COMPLETED figure | **144,668** | `decide_n` refuses it — 10 of 30 truncated — and §13.4 names the **pilot** as the selector |
+| 2 | the calibration's over-DENOMINATOR figure | **96,445** | reads **LOW**, and low selects the **larger** N. `INC-103`'s direction exactly |
+| 3 | re-measure over the untruncated 20 only, treating `INC-164`'s nine timeout truncations as harness faults rather than episodes | not computed here | `INC-164` (landed today) shows the nine truncations were **our own 180 s socket timeout**, so the truncation that triggers the refusal may itself be a harness artefact. **This session did not compute it and must not** |
+| 4 | declare the branch on the arithmetic alone | — | **every** candidate above exceeds **both** conjuncts, so all of them select the same branch (below) |
+
+⚠️ **WHAT THIS SESSION *DID* MEASURE, BECAUSE IT NARROWS THE RULING WITHOUT MAKING IT.** Every
+candidate figure above is far past **both** of §13.4's conjuncts, so `Q-107`'s two readings agree at
+all of them and `Q-121` is not engaged:
+
+    conjunct 1 boundary (attacker.target_tokens_per_episode)  :  60,000
+    conjunct 2 break-even, RECOMPUTED, found by search        :  49,726   (49,727 fails)
+    candidate 1  144,668  -> 2.41x the first, 2.91x the second -> smaller branch
+    candidate 2   96,445  -> 1.61x the first, 1.94x the second -> smaller branch
+    projected lane-hours at the registered target             :  34.95 h vs a 32 h budget
+
+**So the ANSWER is not in doubt; only its PROVENANCE is.** That is precisely why it needs the
+architect and not a session: `PROTOCOL.md` §3 requires *"the pilot writes the measured figure and
+the selected branch into `PROTOCOL.md` before the tag"*, and what is owed is a **recorded
+derivation**, not a number that happens to be right.
+
+**OPTIONS AS THIS SESSION SEES THEM:**
+
+  **(a)** Rule that the **calibration's** over-COMPLETED figure stands in for the pilot's, land it
+  at `n_decision.measured_tokens_per_episode` with `selected_branch`, and record in `PROTOCOL.md`
+  §3 that the selector was the calibration because `INC-142` left the pilot with no figure. **The
+  `decide_n` refusal is then disclosed and over-ridden by a ruling, not by code.**
+  **(b)** Rule that the truncated ten are excluded as `INC-164` harness faults and land the
+  re-measured figure, with the exclusion recorded as a Class A deviation.
+  **(c)** Rule the branch directly from the arithmetic above, land `selected_branch`, and leave
+  `measured_tokens_per_episode` a sentinel — ⚠️ **this session's code would still refuse**, because
+  it reads the measured figure and derives; a ruling taking (c) must also say which key the code
+  should read, and that is a second, smaller ruling.
+
+⚠️ **WHICHEVER IS RULED, `config/` IS THE ARCHITECT'S OR THE OPERATOR'S TO EDIT AND IT IS LEGAL
+ONLY WHILE `prereg-v1` DOES NOT RESOLVE.** It does not resolve as of this commit (`git tag --list`
+shows `probe-v1` and no `prereg-v1`), so the window is open **now** and closes at the tag.
+
+---
+
+### ⚠️ `Q-217` — **CLASS A (naming only), OPEN: THE BLOCK LABEL IS `SCORED`, WHILE `PROTOCOL.md` §3.1 HEADS THAT ROW `M-ADV` AND USES *"scored"* AS ITS STATE. THE OTHER TWO BLOCKS TOOK THEIR ROW'S HEADING**
+
+**Status: OPEN. Class A on the label, and cheap.** **Raised by:** C18 BUILD 1 (`6a4f28de`).
+
+`driver/pilot.py`'s `PILOT_BLOCK = "PILOT"` and `driver/cal.py`'s `CAL_BLOCK = "CAL"` each carry the
+comment *"`PROTOCOL.md` §3.1 names the blocks; this is that row's own label."* §3.1's rows are
+headed **CAL**, **PILOT**, **M-ADV**, **T-NEG**, **AD-CMP**, **M-BEN**, **T-FP**, **L-STR**, and the
+column that reads *scored* is the **State** column, which also reads *scored* for T-NEG, M-BEN, T-FP
+and L-STR. **On the convention the other two blocks follow, this block's label is `M-ADV`.**
+
+**This session's build prompt named `SCORED` in terms and in capitals, so `SCORED` is what is
+built** — and the divergence is recorded rather than smoothed over.
+
+⚠️ **WHY IT IS CHEAP TO SETTLE AND WHY IT IS STILL WORTH ASKING.** Nothing derives meaning from the
+string; it is a label, not a spec value, and **both readings give the distinguishability the label
+exists for** — every slug begins `scored__`, collides with none of the 41 checkpoints on disk, and
+can never read as `cal__` or `pilot__`. ⚠️ **But it becomes expensive the moment one scored episode
+is written**, because `evals/` is append-only with operator-only deletion: a later rename would
+leave two labels for one block in one directory, which is the exact confusion `Q-189` correction 2
+exists about. **It costs one keystroke now and cannot be corrected after the first episode.**
+
+**OPTIONS: (a)** keep `SCORED` and add a line to `PROTOCOL.md` §3.1 noting the M-ADV row's runtime
+label; **(b)** rename to `M-ADV` for consistency with the other two blocks — ⚠️ note `EpisodeKey.slug`
+lower-cases and hyphens survive, so slugs would read `m-adv__1__2001__gemma-26b`; **(c)** rule that
+the State column is the label for every scored-state block, which would make T-NEG, M-BEN, T-FP and
+L-STR all `SCORED` too and is almost certainly **not** intended.
+
+---
+
+### ⚠️⚠️ `Q-218` — **CLASS A, GO/NO-GO: C14 REVIEW 1's OPEN BLOCKER B-1 SITS ON 90 OF THE SWEEP'S 150 EPISODES, AND THE SWEEP IS THE RUN IT DESTROYS**
+
+**Status: OPEN. Class A. Not this chunk's to fix, and it gates this chunk's run.** **Raised by:**
+C18 BUILD 1 (`6a4f28de`) as a **consequence**, not as a new finding; the finding is
+`docs/reviews/REVIEW_C14_FLOOR_1.md` §2.1, verdict **FAIL**, no tag cut.
+
+**B-1, in the review's own words:** `_Executor.execute` counts a turn at `episode.py:655` and
+categorises it at `:681`, with `gate.decide` between them at `:680`. On arms 2/2S/3 that call
+reaches the judge's `_MeteredCall.run`, so **any** `LaneStopped` it raises leaves
+`attempted > decided + unparsed + off_surface`; `run_one_episode` catches the `LaneStopped` at
+`:834` and then runs `executor.counts.reconcile()` at `:837`, **outside the floor**, which raises
+`DenominatorError`, which nothing catches. **`execute` never returns: no report, no denominator,
+every remaining episode unattempted.**
+
+⚠️ **WHAT THIS SESSION ADDS IS THE BLAST RADIUS ON THE BLOCK IT JUST BUILT, MEASURED FROM THE
+MATRIX:**
+
+    scored episodes total                     : 150
+    on arms 2 / 2S / 3, which call a judge     :  90   (60%)
+    on arms 1 / 4, which make ZERO judge calls :  60
+
+**A single 429, ceiling stop, `PACER_REFUSED` or timeout inside a judge call ends the whole run
+with no output.** The calibration — arm 1, **no judge at all** — could not reach this path, and the
+pilot ran arm 1 too (`Q-144`), so **the sweep is the first block that can trigger it, and it is the
+only block whose numbers are published.** `INC-161` records that the calibration's attempt 3 took a
+429 at its second call; the sweep runs 4,800 calls on one lane over days.
+
+⚠️ **THIS SESSION DID NOT FIX IT, DELIBERATELY.** `driver/episode.py` is inside this session's
+fence, but the defect is C14's under an open review **FAIL**, `CLAUDE.md` §1 gives the FIX session
+the duty of writing the `INCIDENTS.md` entry *before* changing a line, and a concurrent C14 session
+was live in this tree throughout. **Fixing another chunk's named BLOCKER from a build session is how
+two sessions land two different fixes for one defect.**
+
+**THE ASK: this is a GO/NO-GO on the sweep, not a backlog item.** Either B-1 lands first, or the
+sweep is launched knowing that a judge-side fault on 60% of its episodes costs the entire run's
+report — in which case that acceptance belongs in `evals/scored/RUN_DECLARED.md` in terms.
+
+---
+
+### ⚠️ `Q-219` — **FOUR CLASS B DEVIATIONS, RECORDED WITH THEIR RATIONALE (hard rule 2), AND ONE OF THEM CHANGES WHAT AN EXISTING BLOCK PRINTS**
+
+**Status: RECORDED, for judgement at review.** **Raised by:** C18 BUILD 1 (`6a4f28de`).
+
+**(a) EVERY MATRIX NOW DECLARES ITS DISPATCH ORDER.** `driver/run.py:execute` called
+`scheduler.pending(...)` and dispatched what it returned. That method **sorts by `EpisodeKey`**,
+whose field order is `(block, arm, seed_or_task, attacker_model)` — so **the scheduler's sort is
+arm-major** and every block inherited it. `PilotMatrix`, `CalMatrix` and `ScoredMatrix` each now
+carry `dispatch_order(pending)`; the first two return `sorted(pending)`, **which is the list
+`pending` already produced**, and `tests/test_c18_sweep.py` asserts that identity against
+`Scheduler.pending`'s own output. ⚠️ **A `hasattr` fallback was deliberately NOT used** — that is a
+silent default, and `driver/run.py:_agree` already records the RAW_SOURCE_SCAN tripwire refusing a
+dynamic reach by name as `INC-51`'s species.
+
+**(b) `--arm` IS NO LONGER `required=True` AT THE PARSER.** It is required for `--block pilot` and
+`--block cal` — **unchanged in effect**, `Q-144`, and both refusals are asserted — and **refused if
+given** for `--block scored`, because §13.4's M-ADV row is *"5 arms × N"* and the published claim is
+the comparison **between** them. Naming one arm would either run a block the pre-registration does
+not describe, or be silently ignored while the operator believed it obeyed. argparse's own
+`required` cannot express *"required for two of three choices"*, so the check moved into `main` in
+**both** directions. Both committed `RUN_DECLARED.md` commands are asserted to still parse.
+
+**(c) `RunResult.attacker_tokens` READS EACH RESUMED CHECKPOINT'S OWN `arm`.** It asked
+`matrix.arm`, which exists only because the pilot and the calibration each run one arm and **cannot
+exist on a five-arm matrix**. `arm` is a declared key of `runner/checkpoint.py:DOCUMENT_KEYS`, so it
+is read rather than inferred, and the refusal now **names the arms it actually found**. On a one-arm
+matrix the behaviour is identical, and that identity is asserted rather than argued.
+
+**(d) ⚠️ THE REPORT NO LONGER SELECTS N OUTSIDE THE PILOT, AND ITS HEADER NAMES THE BLOCK THAT RAN.
+THIS ONE CHANGES WHAT A FUTURE CAL OR PILOT REPORT PRINTS AND IS THE ONE TO JUDGE HARDEST.**
+`_measurement_lines` ran `decide_n` on **whatever block had just finished**. §13.4 names the
+selector in terms — *"the 31 Aug **pilot's** measured attacker tokens/episode"* — and `PROTOCOL.md`
+§3 adds *"No other branch. No post-hoc adjustment."* ⚠️ **A real scored run would have printed an N
+decision computed from its own tokens: the block sized by the very episodes it decides the size
+of**, which is the circularity §2.2 keeps the pilot's seeds disjoint to prevent, arriving through
+the report instead of through the seed block. Non-pilot blocks now get the **measurement** (an
+honest disclosure of what the block cost) and a **named refusal** in place of a decision.
+⚠️ **AND THE HEADER WAS A LITERAL, MEASURED IN THE CALIBRATION'S OWN COMMITTED LOG:**
+`evals/cal/run-attempt4-20260904T204118Z.log` prints `block label : CAL` at the top and
+`PILOT MEASUREMENT` at the bottom, over thirty CAL episodes. Nothing computed was wrong — the slugs
+are `cal__` throughout — but **the printed record named the wrong run.** The same log carries the
+limitation *"The pilot's ARM is not in config/ and was supplied by the caller"*, which is **false of
+the calibration**, whose arm §10.3 and frozen `HOLES.md` §3.5 both fix; that line is now printed
+only on the pilot's own block.
+
+⚠️ **THE SPENT ARTEFACTS ARE NOT TOUCHED BY ANY OF THIS.** The calibration's and the pilot's
+committed logs still say what they said; `evals/` was read and never written. Only what a **future**
+report prints changes.
+
+---
+
+### ⚠️ `Q-220` — **PROCESS, OPEN: `C18` NOW CARRIES TWO UNRELATED DELIVERABLES, EACH BUILT BY A DIFFERENT SESSION, AND `STATUS.md` HAS ONE ROW AND ONE REVIEW-HISTORY COLUMN FOR BOTH**
+
+**Status: OPEN. Process, not code.** **Raised by:** C18 BUILD 1 (`6a4f28de`).
+
+`PROCESS.md` §12's **C18** card reads *"`RESULTS.md` + `make eval`"*, and `STATUS.md`'s C18 row
+records that deliverable as **BUILT (attempt 1), UNREVIEWED, NO TAG** — `5a2c81df`, 3 Sep,
+`src/whetstone_gate/results/`, 11 modules, `tests/test_c18_results.py`, 91 tests. **This session's
+prompt issues `6a4f28de` as `C18 | BUILD` for a different deliverable entirely: the scored sweep
+path under `src/whetstone_gate/driver/`.**
+
+**This session did what its prompt named** — the prompt is unambiguous about the work, and stopping
+on the *label* would have delivered nothing on the day the sweep is the long pole. The token row is
+recorded as `C18 | BUILD` exactly as the prompt instructed. **But the ambiguity is real and it is
+recorded here rather than absorbed:**
+
+  - `make check-roles` **E2/E3 are unaffected** — measured: E2 tests build∩review per chunk and E3
+    tests one token holding more than one `(chunk, role)` pair. Two distinct BUILD tokens on one
+    chunk trip neither. **So nothing goes red, which is precisely why this needs saying out loud.**
+  - **A `full` review of "C18" now has two disjoint subjects.** `PROCESS.md` §10 template 2 requires
+    a from-scratch **reimplementation** and ≥20 self-generated vectors; a reviewer told *"review
+    C18"* cannot know whether that means the results pipeline, the sweep driver, or both.
+  - ⚠️ **`tests/goldens/README.md` records golden 6 as *"⏳ OWED — blocks C18"***, and hard rule 3
+    says *"a `full` chunk with no golden may not be built."* **That golden pins per-episode median
+    and IQR — the `RESULTS.md` deliverable — and pins nothing this session built.** So the rule bites
+    on one of the two deliverables and not the other, and one chunk label cannot carry both answers.
+
+**OPTIONS: (a)** allocate the sweep path its own chunk id (`C22`, or `C18-SWEEP` on the
+`C12-DRIVER` precedent, which `STATUS.md` already uses for exactly this situation) and move this
+session's token row to it; **(b)** keep one label and split the `STATUS.md` row's review-history
+column explicitly by deliverable; **(c)** rule that the sweep path is `ARCH` rather than a numbered
+chunk. ⚠️ **Whichever, the review type must be named per deliverable**, because golden 6's absence
+blocks one of them and not the other.

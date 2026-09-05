@@ -1,3 +1,101 @@
+## SESSION-TOKEN 6a4f28de — C18, BUILD 1 (THE SWEEP PATH) — 2026-09-05 — ✅ **`--block scored` EXISTS AND IS INVOCABLE. ⛔ THE SWEEP CANNOT START: `Q-216` AND `Q-218` ARE BOTH BLOCKING AND NEITHER IS MINE TO CLOSE**
+
+**Role:** BUILD. **Chunk:** C18 — ⚠️ **and that label is contested; see `Q-220`.**
+⚠️ **FULL RECORD: `docs/sessions/c18-build-1.txt`.**
+⚠️ **SPEND: ZERO. No provider call in any mode; this session held no token sanction and took none.**
+⚠️ **`evals/` READ-ONLY AND NEVER WRITTEN.** `config/`, `PROTOCOL.md`, `HOLES.md`, `tests/goldens/`,
+`docs/reviews/`, `docs/render/`, `corpora/`, `README.md`, `RESULTS.md` and `CONTEXT.md` were **read
+and never written**. **No tag cut or moved. THE SWEEP WAS NOT RUN. Not self-certified.**
+
+> ### ⚠️⚠️ THE DELIVERABLE IS THE **ORDER**, NOT THE MODULE
+> `Scheduler.pending` returns its list **sorted by `EpisodeKey`**, whose field order is
+> `(block, arm, seed_or_task, attacker_model)` — **so the scheduler's own sort is ARM-MAJOR**, and
+> `run.py` dispatched whatever it returned. The sweep is 150 episodes against a deadline and **will**
+> be cut off, so the question that matters is what it has delivered at the instant it stops.
+> **MEASURED over every one of the 151 prefixes of the real 150-key matrix:**
+>
+>     seed-major worst per-arm imbalance : 1
+>     arm-major  worst per-arm imbalance : 30   (a whole arm's worth = N)
+>     at a one-third cut-off, seed-major : {1:10, 2:10, 2S:10, 3:10, 4:10}
+>     at a one-third cut-off, arm-major  : {1:30, 2:20, 2S:0, 3:0, 4:0}
+>
+> The published claim is a **comparison between arms**. Arm-major truncation leaves three arms
+> **empty** — a third of the tokens spent on a number that cannot be published at all. Seed-major
+> leaves every arm at the same n **on the same seeds**, which is a real result with wide intervals
+> and is the **paired** comparison §12.3's counter-metric and §10.2's ARM CONFOUNDED rule both need.
+> `INC-165`. **Every matrix now DECLARES its order; pilot and cal return `sorted(...)`, which is the
+> list `pending` already produced, and the identity is asserted rather than argued.**
+
+**NOTHING IS TYPED, AND THE ONE VALUE THAT COULD HAVE BEEN IS A REFUSAL INSTEAD.** The five arms are
+`gates/verdict.py`'s, cross-checked against `n_rule.ARMS` — §13.4's projection multiplies by it, so
+if they diverged **the block that RUNS would not be the block whose lane-hours were PROJECTED**, and
+the projection is what selected N. N itself is **derived**: `n_decision.measured_tokens_per_episode`
+→ `n_rule.select_n` → the branch → `seeds.scored_n<N>_*`, cross-checked to carry exactly N seeds.
+⚠️ **That key is still `TODO_C14_PILOT`, so `load_scored()` REFUSES and the sweep cannot be
+dispatched.** The refusal is **correct** and this session deliberately did not route around it:
+`PROTOCOL.md` §3 says in capitals that *"quietly shrinking N to a number the schedule can reach is
+the precise thing rule 11 and `ai-playbook` B.9 forbid"*, and `config/` is outside this fence.
+⚠️ **AND THE FIGURE IS CONTESTED, WHICH IS WHY IT IS A RULING AND NOT A KEYSTROKE:** the pilot
+produced **none** (`INC-142`, 0 of 20) and the calibration's own report **REFUSED** to select N
+(*"USABLE TO SELECT N : False"*, 10 of 30 truncated — and `INC-164`, landed today, shows those ten
+were **our own 180 s socket timeout**). `Q-216` lays out four candidate figures and three options and
+**picks none.** ⚠️ **What this session did measure, because it narrows the ruling without making it:
+every candidate exceeds BOTH conjuncts** — 144,668 and 96,445 against a 60,000 boundary and a 49,726
+recomputed break-even — **so all of them select the same branch and `Q-121` is not engaged.**
+
+**THREE DEFECTS FOUND BY BUILDING IT, EACH PROVED RED FIRST.** (1) `RunResult.attacker_tokens` asked
+`matrix.arm`, which **cannot exist on a five-arm matrix**; it now reads each resumed checkpoint's
+own `arm`, a declared `DOCUMENT_KEYS` field. (2) ⚠️ **That `OF-240` refusal is raised from inside
+`render`, so it aborted the WHOLE REPORT** — 90 of 150 scored episodes are judged and the run spans
+days, so **every resume that skipped one judged episode would have printed nothing at all**: no
+denominator, no per-cause counts. Hard rule 11's named failure caused by a guard against a different
+error. The figure still refuses; the refusal is now **printed as the outcome** and everything else
+still prints (`INC-166`). (3) The report ran `decide_n` on **whatever block had just finished**, and
+its header was the literal `"PILOT MEASUREMENT"` — ⚠️ **the calibration's own committed log carries
+both, printing `block label : CAL` at the top and `PILOT MEASUREMENT` at the bottom over thirty CAL
+episodes**, plus a limitation about *"the pilot's ARM"* that is false of the calibration. A scored
+run would have printed **an N decision computed from the very episodes N decides the size of.** Only
+the pilot selects N now; the header names the block that ran; the arm limitation prints only where
+it is true. `Q-219`(d) — **this one changes what a future cal or pilot report prints and is the one
+to judge hardest.**
+
+**⛔ THE SECOND BLOCKER IS NOT MINE AND IT GATES THE RUN.** `docs/reviews/REVIEW_C14_FLOOR_1.md`'s
+**B-1** (verdict FAIL, no tag) means any `LaneStopped` inside a judge call raises `DenominatorError`
+out of `execute` — no report, no denominator, every remaining episode unattempted. ⚠️ **Measured on
+the matrix just built: that is 90 of 150 episodes, 60%.** The calibration and the pilot both ran
+**arm 1 with no judge at all**, so **the sweep is the first block that can trigger it and the only
+block whose numbers are published.** `driver/episode.py` is inside this fence and **it was
+deliberately not touched**: the defect is C14's under an open FAIL, a FIX session owes the incident
+entry first, and a concurrent C14 session was live in this tree throughout. `Q-218` is a **go/no-go**,
+not a backlog item.
+
+**HEAD MOVED UNDER THIS SESSION AND THE COLLISION WAS CAUGHT BY RE-READING, NOT BY LUCK.** Session
+start was `ed5eb5c`; the concurrent C14 FIX (`3e91b7c5`) landed `170f41c` and `37a2032` mid-session,
+taking `Q-210`…`Q-215` and `INC-162`…`INC-164` and committing the calibration's 30 checkpoints and
+four run logs — which had been **untracked** when this session began and measured so from
+`git archive ed5eb5c`. This session's questions **renumber beneath theirs** and nothing of theirs is
+edited (`INC-137`, `INC-140`, `INC-149`). ⚠️ **One consequence was a claim in this session's own new
+test file that became FALSE while it was being written** — it said the calibration's record was
+untracked, which was true and measured at `ed5eb5c` — and it is **corrected in `18f6477` rather than
+left standing**, restated as history so the `None` branch it explains is still a reachable case.
+
+**TESTS: `tests/test_c18_sweep.py`, a NEW file (`INC-138`) — 36 tests, 36 green, 0 skipped, +114
+`ast.Assert`.** ⚠️ **The AST-exact diff against `ed5eb5c` is ZERO change to every other test file**;
+`test_c18_sweep.py` is the only entry in it. **13 tests were PROVED RED** against a `git archive` of
+`ed5eb5c` carrying only the new module, each for the exact behaviour it pins; the rest are red at
+collection there because `driver/scored.py` does not exist. ⚠️ **One test is honestly NOT a
+behaviour-change red** and is reported as such: `THE_SCORED_BLOCK_MAY_NOT_RUN_BEFORE_probe_v1`
+re-asserts an existing guard for the new block, and it is red in the export only because a
+`git archive` tree is not a git repository.
+
+**Full suite: 1615 passed, 16 failed, 2 skipped.** ⚠️ **None of the 16 is this session's**, and the
+attribution is by cause rather than by a baseline: the whole of `test_c12_driver.py` — the driver's
+own suite, over the five modules this session edited — is **green**. Two of the 16 (`test_c10_probe`'s
+sentinel tests) are red **because the concurrent session landed the void threshold mid-run**, which
+is a correct consequence of their work, not a defect.
+
+---
+
 ## SESSION-TOKEN 3e91b7c5 — C14, FIX (THE FREEZE) — 2026-09-05 — ✅ **GATES 0–3 DONE. THE VOID THRESHOLD IS WRITTEN. NO TAG CUT.**
 
 **Role:** FIX. **Chunk:** C14. ⚠️ **FULL RECORD: `docs/sessions/c14-freeze-1.txt`.**

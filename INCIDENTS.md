@@ -12989,3 +12989,132 @@ third consistency direction — "every value in `config/` has an §8.6 row" — 
 calls untested, and it is still untested; but note it would not have caught either of these, because
 they are not in `config/` at all. The direction that would catch them does not exist in any form.**
 That is stated plainly rather than dressed as a plan.
+
+
+---
+
+## INC-165 — ⚠️⚠️ **THE SWEEP WOULD HAVE DISPATCHED ARM-MAJOR, AND A CUT-OFF RUN WOULD HAVE DELIVERED ARM 1 COMPLETE AND ARMS 2S, 3 AND 4 EMPTY — A THIRD OF THE TOKENS SPENT ON A NUMBER WITH NO COMPARISON IN IT. THE DEFAULT WAS INVISIBLE BECAUSE EVERY BLOCK THAT HAD EVER RUN HAD EXACTLY ONE ARM**
+
+**Event:** C18 BUILD 1 (`6a4f28de`) built `CONTEXT.md` §13.4's M-ADV block — the first block in this
+project with **more than one arm** — and traced what `driver/run.py:execute` would actually dispatch.
+`execute` called `scheduler.pending(keys, completed)` and dispatched the list it returned.
+`Scheduler.pending` **sorts by `EpisodeKey`**, and that dataclass is `order=True` over
+`(block, arm, seed_or_task, attacker_model)`. **So the scheduler's sort is arm-major**, and the
+matrix's own key order — whatever it was — was discarded between `matrix.keys()` and the dispatch
+loop.
+
+**Action:** the imbalance was measured over **every one of the 151 prefixes** of the real 150-key
+matrix, for both orders, rather than reasoned about:
+
+    seed-major worst per-arm imbalance, all 151 prefixes : 1
+    arm-major  worst per-arm imbalance, all 151 prefixes : 30   (a whole arm's worth = N)
+    at a one-third cut-off (L=50), seed-major            : {1:10, 2:10, 2S:10, 3:10, 4:10}
+    at a one-third cut-off (L=50), arm-major             : {1:30, 2:20, 2S:0, 3:0, 4:0}
+
+Every matrix now **declares** its dispatch order and `execute` asks for it. `ScoredMatrix` declares
+seed-major; `PilotMatrix` and `CalMatrix` declare `sorted(...)`, which is **the list `pending`
+already produced**, so neither spent block changes by a single key — asserted against
+`Scheduler.pending`'s own output, not argued.
+
+**Expectation:** the dispatch order should have been a property the block that publishes a
+comparison gets to **choose**. Instead it was a side effect of a dataclass field order chosen for a
+different purpose — `EpisodeKey` is `order=True` so that checkpoints sort and dispatch is
+deterministic, and `(block, arm, seed, model)` is the obvious field order for a key. **Nothing was
+wrong with that decision; it simply also decided something nobody had noticed it decided.**
+
+**Missing:** a test that asserts anything about the **relationship between arms** in a partial run.
+Every existing resume test — `test_c12_driver.py`'s `kill_mid_run_and_resume`, the calibration's,
+the pilot's — asserts counts, duplicates and denominators, and **all of them run a single-arm
+matrix**, where per-arm balance is vacuously true. There was no fixture in the repository on which
+this defect could have shown itself, which is why the whole-suite green said nothing about it.
+
+**Missed:** ⚠️ **`Scheduler.pending`'s own docstring states the mechanism in terms and this project
+read it as a reassurance for two weeks.** *"Sorted by the episode key, never by set or dictionary
+iteration order. A run whose dispatch order depends on a hash seed is a run whose partial results
+depend on it too."* The second sentence is exactly the right worry — **partial results depend on
+dispatch order** — and it was answered with *determinism* when the question it raises is
+*composition*. A deterministic arm-major order is perfectly reproducible and still yields nothing
+publishable. ⚠️ **And `PROCESS.md` §14 had already pre-authorised the cut-off case in writing** —
+*"If the sweep cannot finish the pre-registered N, the episodes that did not run are COUNTED,
+CATEGORISED AND PRINTED"* — so the project had written down that a truncated sweep was expected,
+and had never asked what a truncated sweep would **contain**.
+
+**Diagnosis:** `EpisodeKey`'s field order, chosen so keys sort deterministically, silently fixed the
+dispatch order of every block; the defect was unobservable because the pilot and the calibration
+each run one arm, so arm-major and seed-major are the same list for both.
+
+**Fix:** `8171458` — `driver/scored.py` (new) builds keys seed-major and carries
+`dispatch_order()`; `PilotMatrix` and `CalMatrix` carry it too, returning the scheduler's own sort;
+`driver/run.py:execute` dispatches `request.matrix.dispatch_order(scheduler.pending(...))`.
+`tests/test_c18_sweep.py` pins the imbalance at **1** over every prefix, pins the arm-major control
+at **30** beside it, and asserts the pilot's and calibration's orders are byte-for-byte unchanged.
+
+**Systemic guardrail:** ⚠️ **partial, not total, and the gap is named rather than papered over.**
+What is now guarded: `run.py` has no path that dispatches an order no matrix declared — every
+matrix must define `dispatch_order`, there is no `hasattr` fallback and no default, so a **fourth**
+block added later cannot inherit the sort by forgetting. What is **not** guarded: nothing forces a
+future multi-arm block's declared order to be *balanced under truncation*, and
+`truncation_imbalance()` is a function this file's tests call rather than an invariant the runner
+enforces. ⚠️ **The honest reason it is not enforced is that "balanced" is not always right** — a
+block whose arms are genuinely independent has no reason to interleave, and an invariant asserted
+where it does not apply is how a check gets weakened later. **The general lesson is recorded instead
+and it is the one worth carrying: a property that is vacuously true of every fixture you own is a
+property you have not tested.**
+
+---
+
+## INC-166 — ⚠️⚠️ **AN `OF-240` REFUSAL RAISED FROM INSIDE THE REPORT WOULD HAVE DESTROYED THE DENOMINATOR IT WAS PROTECTING: ON A RESUMED SWEEP, 90 OF 150 EPISODES WOULD HAVE PRINTED NOTHING AT ALL**
+
+**Event:** driving the newly-built scored matrix through a resume, `driver/run.py:execute` raised
+`RunRefused` and returned no report. The refusal is `RunResult.attacker_tokens`' `OF-240` guard: a
+checkpoint carries one `tokens_spent` and **no attacker/judge split**
+(`runner/checkpoint.py:DOCUMENT_KEYS`, C11's frozen schema), so a resumed episode on arms 2/2S/3
+cannot have its attacker share recovered. **That refusal is correct.** What was not correct is
+where it lands: `attacker_tokens` is called from `_measurement_lines`, which is called from
+`render`, which is the last thing `execute` does — **so the refusal aborted the whole report.**
+
+**Action:** measured on the block it would hit. **90 of the sweep's 150 episodes are on arms
+2/2S/3**, the run spans days by design and is expected to be resumed many times, so **every resume
+after the first judged episode completes would have produced no denominator, no per-cause counts and
+no per-lane budget.** The refusal is now caught in `_measurement_lines` and **printed as the
+outcome** — the shape that function already used for `decide_n` — and everything else still prints.
+The figure is **not** estimated, **not** defaulted and **not** silently zeroed; it is absent, by
+name, with its reason.
+
+**Expectation:** a guard against publishing a wrong number should cost that number and nothing else.
+Instead it cost every number in the report, including the counts hard rule 11 exists to force out.
+
+**Missing:** any resume test on a **judged** arm. `Q-144` ruled the pilot to **arm 1**, §10.3 fixes
+the calibration at **arm 1**, and `test_c12_driver.py`'s resume tests use `load_pilot(arm="1")` —
+so the one arm class that reaches this refusal had never been resumed in a test. The nearest test,
+`test_the_pilots_measured_figure_is_ATTACKER_tokens_only_and_is_split_BY_ROLE`, **does** use arm 2,
+and passes, because it never resumes.
+
+**Missed:** ⚠️ **`OF-240` was recorded as OPEN with the note that it "cannot fire on this run", and
+that phrasing was read as a description of the risk rather than of the coverage.** `Q-144`'s own
+ruling text says it: *"`OF-240` — the resumed-judged-arm token split that `runner/checkpoint.py`
+cannot recover — **cannot fire on this run** … `OF-240` stays OPEN; it is merely not on this run's
+path."* **The sentence names the exact precondition — a judged arm plus a resume — and the sweep is
+the first block that has both.** The finding was open, correctly scoped, and its scope was never
+re-checked against the next block to be built.
+
+**Diagnosis:** a refusal whose only caller sits inside the report renderer propagates out of
+`execute`, so a guard scoped to one figure took the whole run's output with it; it was invisible
+because no block that had ever run combined a gate judge with a resume.
+
+**Fix:** `8171458` — `_measurement_lines` catches `RunRefused` from `attacker_tokens` and renders it
+as a named `<BLOCK> MEASUREMENT: REFUSED` stanza stating that the denominator above is unaffected.
+`RunResult.attacker_tokens` additionally now reads each **resumed checkpoint's own** `arm` rather
+than `matrix.arm`, which does not exist on a five-arm matrix.
+`tests/test_c18_sweep.py::test_the_ATTACKER_TOKEN_REFUSAL_DOES_NOT_TAKE_THE_DENOMINATOR_DOWN_WITH_IT`
+drives a real resume on arm 2 and asserts the refusal, the reconciliation and the denominator all
+appear in one report.
+
+**Systemic guardrail:** **none — accepted, because** the general form (*"no refusal raised inside
+`render` may escape `execute`"*) would be a blanket `except` around the report, which is exactly the
+shape `Q-200`'s floor is careful **not** to be: it books what it catches under a named category, and
+a bare catch here would swallow a genuine `DriverError` and print a report that looked complete.
+⚠️ **The narrower guardrail that would work is `OF-240`'s actual fix — an attacker/judge split in
+the checkpoint schema — and that is `runner/checkpoint.py`, C11's frozen schema, outside this
+session's fence.** It is left OPEN as `OF-240` and named here as the thing that would close this
+class rather than contain it.
