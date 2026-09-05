@@ -178,6 +178,163 @@ the entry was re-based onto the live file instead of overwriting a concurrent se
 
 ---
 
+## SESSION-TOKEN 2a7f95c1 — C19, BUILD (THE NUMBERS PASS) — 2026-09-05 — ⚠️⚠️ **TWO METHOD CLAIMS FLIPPED TO TRUE AND ARE PUBLISHED WITH THEIR EVIDENCE. THE OTHER THREE DID NOT MOVE AND ARE NOT SOFTENED. NO SWEEP-DEPENDENT PLACEHOLDER WAS FILLED**
+
+**Role:** BUILD. **Chunk:** C19. ⚠️ **FULL RECORD: `docs/sessions/c19-numbers-1.txt`** — **NOT**
+`c19-build-1.txt`, which already holds the 2026-09-03 build's record. ⚠️ **`INC-170` is why: a
+session today overwrote another's 1,045-line FINAL OUTPUT because two deliverables shared one chunk
+label. The target path was checked to NOT EXIST before a byte was written.**
+⚠️ **SPEND: ZERO. No provider call in any mode; this session held no token sanction and took none.**
+⚠️ **THE SCORED SWEEP WAS RUNNING THROUGHOUT.** `evals/` READ AND NEVER WRITTEN. `src/`, `tests/`,
+`tests/goldens/`, `config/`, `PROTOCOL.md`, `CONTEXT.md`, `PROCESS.md`, `HOLES.md`, `docs/render/`,
+`docs/reviews/`, `docs/submission/`, `corpora/` READ AND NEVER WRITTEN. ⚠️ **NO `make` TARGET AND NO
+TEST WAS RUN.** NO TAG CUT OR MOVED. NO GIST. NOT SELF-CERTIFIED.
+
+**Measured at `HEAD` = `e7ffd9c`.** ⚠️ **`HEAD` moved to `9371ac2` under this session** — a
+concurrent C21 BUILD 3 — **and the move is named rather than absorbed: `git show --stat 9371ac2`
+touched `docs/submission/FORM.md` and `docs/submission/FORM_ANSWERS.md` only**, so nothing measured
+here changed.
+
+> ### ⚠️⚠️ THE TWO CLAIMS THAT FLIPPED, EACH VERIFIED FIRST-HAND RATHER THAN INHERITED
+>
+> **(1) A FREEZE WITNESSED OUTSIDE THIS REPOSITORY.**
+>
+>     git rev-parse prereg-v1            52d26ea97589d0c39cca013f2a78f191804be192   <- TAG OBJECT
+>     git rev-parse prereg-v1^{commit}   0ea555698f1c4a471e7be0738849f41511118051   <- COMMIT
+>     git ls-remote --tags origin        returns BOTH refs                          <- PUSHED
+>     PREREG_FINGERPRINT.txt             5ac111538247831f145260a275bf77df258a4fc21a22962a0419c954cd60acaf
+>     prereg-v1.sha256                   10 lines: 5 frozen .md + 2 config/ + commit/tree/tag
+>     §12.1's procedure, RE-RUN read-only -> MANIFEST MATCHES; recomputed sha256 == the fingerprint
+>     git log prereg-v1..HEAD -- <frozen set>   ->  EMPTY
+>
+> ⚠️⚠️ **THE ORDERING IS THE CLAIM. witness `2026-09-05T09:14:25Z` → first scored provider call
+> `2026-09-05T09:17:22Z` = 2 MIN 57 S.** The second is measured from
+> `evals/usage/gemma-26b-2026-09-05.jsonl`'s first `scored__1__2001__gemma-26b` row; the operator's
+> declared start (`09:17:07Z`) and the preflight liveness call (`09:17:12Z`) sit inside the gap and
+> are printed too. **All three are after the witness.**
+>
+> **(2) A COMPETENCE PROBE THAT VOIDS OUR OWN RUN.** `config/protocol.yaml:368`
+> `void_threshold_breach_rate: "0.20"` — **not a `TODO_` sentinel**, so `require()` returns it and
+> `probe/void.py:void_threshold()` returns `Fraction(1,5)` where it raised `UndeterminedThreshold`.
+> ⚠️ **A VOID VERDICT IS COMPUTABLE. NONE WAS COMPUTED**, here or anywhere — no scored run has
+> finished, and evaluating the rule on a denominator that is still moving is the defect this project
+> exists to name.
+
+### ⚠️ THE THREE THAT DID NOT MOVE — RE-MEASURED, NOT CARRIED
+
+| claim | state | evidence re-checked today |
+|---|---|---|
+| **policy-blind attacker** | **TRUE ONLY AS NARROWED** | seeded from published third-party corpora; `data/attacker_sys.txt` names four attack families in plain English; `OF-127` and `OF-133` (46 of 118 needles escape the guard) both **OPEN** |
+| **externally-authored answer key** | **TRUE ONLY AS NARROWED** | ⚠️ **T-FP CANNOT RUN AT ALL** — `Q-154` and `Q-155` both OPEN, `src/whetstone_gate/tau2/` still holds two files, no first-party `db_reward` call site; counter-metric **3 of 30** (`Q-158`, `benign/catalogue.py`'s `BUILDERS` = 3 beside `SCENARIOS_REQUIRED_BY_THE_PLAN = 30`) |
+| **`gates/` and `scorer/` share no first-party module** | **VERIFIED**, allow-list **EMPTY** | ⚠️ **its published index moved `119 → 120`** when `driver/scored.py` landed at `8171458`; **closures unchanged at 15 / 6 / intersection empty**, so the README now prints the closures and drops the index |
+
+### THE NUMBERS, RE-DERIVED RATHER THAN COPIED FROM THE PROMPT
+
+```
+CALIBRATION   11 / 30 = 36.666667%                     (attempt 4, 2026-09-04T20:41:18Z)
+              30 attempted = 20 completed + 10 truncated + 0 never started
+  Wilson SCORE two-sided 95%, z=1.959964  ->  [21.873921%, 54.486436%]   RECOMPUTED
+  Wilson SCORE one-sided 95%, z=1.644854  ->   23.865672%                RECOMPUTED
+  floor DOWN to 5 pp                      ->   20%   == config/protocol.yaml:368
+
+  BOTH FLOOR TO 20% ONLY BY ACCIDENT OF k=11. Recomputed independently, the two floors
+  DISAGREE at 15 of the 31 possible k: {6,8,10,12,15,17,18,20,21,23,24,27,28,29,30}
+  - INCLUDING BOTH NEIGHBOURS.   k=10 -> 20% / 15%     k=12 -> 25% / 20%
+  Q-195 STAYS OPEN and the README says so.
+
+  INC-164's sensitivity:  12/30 = 40.00% -> lower bound 26.7126% -> THRESHOLD 25%
+  ONE breach among the six non-breaching timed-out episodes would have moved it.
+
+N = 30        select_n(144668) -> 30, BOTH conjuncts failing (144,668>60,000; 59.20h>32h)
+              selected_branch: 30 AGREES BY IDENTITY.  break-even 49,726, cleared 2.91x
+              the figure is the CALIBRATION's, not the pilot's (Q-221)
+  WITHDRAWN:  Q-221's "A SMALLER N CANNOT INFLATE ANY CLAIM WE PUBLISH" is FALSE (Q-224,
+              INC-169).  0.95^30 = 21.4639%   vs   0.95^50 = 7.6945%   COMPUTED BY HAND
+
+SWEEP         running. 150 declared. THE DENOMINATOR IS 150 WHATEVER HAPPENS.
+              RUN_DECLARED.md §6.2, written BEFORE the run: "THIS RUN WILL NOT FINISH".
+              PROCESS.md §14 pre-authorises the partial n - counted, categorised, printed.
+```
+
+⚠️⚠️ **AND WHAT WAS NOT DONE WITH ANY OF IT. NO SWEEP-DEPENDENT PLACEHOLDER WAS FILLED.** The 35 arm
+cells in README §3.1 were **not touched**. Two slots were filled and **neither depends on the sweep**:
+`GIST_ID` and `N-branch`. **Raw grep 39 → 38 = 35 slots + 3 prose mentions**, and the README publishes
+that rule, because a count whose rule is unstated is the defect this project is about — **and that
+applies to a count of its own placeholders exactly as it applies to anyone else's escape rate.**
+
+### THE REVIEW TRAIL — RE-MEASURED FROM THE FILES, AND IT MOVED TWICE TODAY
+
+```
+FAIL 16 · PASS 6 · UNRECORDED 0   over TWENTY-TWO REVIEW_*.md      (was 14/6 over 20)
+```
+
+**Both new reviews FAILED.** `REVIEW_C17_1` — two BLOCKERs, *"C17 publishes no number … but it
+publishes SENTENCES, and these two sentences are false."* And ⚠️ **`REVIEW_C14_FLOOR_1`, whose blocker
+was _"The sweep must not start on this floor."_** That blocker was fixed by `4c7e90ba` and **measured
+closed** — five judge-call fault shapes, four of which had killed `driver_run.execute` with
+`DenominatorError`, now all return with their own cause and a reconciling denominator. ⚠️⚠️ **The fix
+SHIPS UNREVIEWED, `H-1` HIGH and five other findings are UNTOUCHED, and the sweep started anyway.
+That is recorded as the operator's decision, not smoothed into "the blocker was resolved."**
+
+**C14 and C17 move out of *unreviewed* into a bucket that did not exist yesterday — reviewed, FAILED,
+fixed, re-review owed — now C8, C14, C17. Unreviewed falls 14 → 12 and NOT ONE chunk moved into
+PASSED.** ⚠️ **`REVIEW_C14_FLOOR_1` reviewed the episode-driver FLOOR, not the freeze**, so README
+§9.1 states in terms that *"C14 · reviewed 1 · FAIL 1"* is **not** evidence the freeze was verified.
+
+### SIX FINDINGS RAISED — `Q-229` … `Q-234`
+
+- ⚠️⚠️ **`Q-229`** — `tests/test_c10_probe.py:519` is **UNSKIPPED** (no `pytestmark`, no `skipif`, no
+  `xfail`) and asserts `pytest.raises(cfg.UndeterminedValue)` on the void threshold plus
+  `pytest.raises(UndeterminedThreshold)`. **Both must now FAIL. The suite carries a RED caused by the
+  pre-registration SUCCEEDING.** Found by **reading**, not running — a live sweep is importing the
+  same modules — and the flip is owed to a session with a `tests/` fence, under hard rule 6.
+- ⚠️ **`Q-230`** — frozen `PROTOCOL.md` §9's **required-verbatim** README sentence says the gist
+  proves the protocol was *"fixed by 31 August"*. **The witness reads `2026-09-05T09:14:25Z`. The
+  frozen text OVERCLAIMS by five days.** Published as a limitation, not edited.
+- ⚠️ **`Q-231`** — **three documents, one of them FROZEN, say an OpenTimestamps receipt is stamped.**
+  `find . -name '*.ots'` returns **NOTHING**. The gist's `created_at` is the witness and the only one.
+- **`Q-232`** — §9's required **oldest `history[]` `version` and `committed_at`** are recorded
+  **nowhere**, and §9's `INCIDENTS.md` half is not done.
+- **`Q-233`** — `PROCESS.md`:1406 still records rung 4 as **NOT FIRED**.
+- **`Q-234`** — the fence names `INCIDENTS.md` in neither direction; **nothing broke, so nothing was
+  written**, and the ambiguity is recorded rather than resolved by assumption.
+
+### ⚠️ THREE PUBLISHED CLAIMS WITHDRAWN, EVERY ONE IN THE DIRECTION THAT TAKES THE CLAIM DOWN
+
+1. §12.2's *"fixed by 31 August"* → **"fixed before the first scored episode ran, by 2 m 57 s."**
+2. §12.3's *"at `prereg-v1` … every scored episode chains from it"* → ⚠️ **IMPOSSIBLE. The third
+   stage is a HASH FIXED POINT (`Q-214`, Class A, OPEN)**, so `genesis_hash` is frozen at
+   `probe-v1`'s id and **the scored ledgers carry the SAME root as the calibration ledgers** —
+   measured in `evals/episodes/scored__1__2001__gemma-26b.json`. **They are not cryptographically
+   distinguishable from each other.** What survives is the pre-`probe-v1` half.
+3. `Q-221`'s *"a smaller N cannot inflate any claim we publish"* → **false, withdrawn, cost published
+   beside the number.**
+
+### ⚠️ THE WITNESS'S EPISTEMIC STATUS IS SPLIT RATHER THAN LAUNDERED
+
+**MEASURED HERE:** the tag, its push, the manifest reproducing, the fingerprint reproducing, the
+empty `prereg-v1..HEAD`, and the `09:17:22Z` call. **THE OPERATOR'S REPORT:** the gist id and its
+`created_at` — which, **until this commit, existed in no file on any of this repository's commits,
+only in two commit-message bodies** (`879012a`, `e7ffd9c`). ⚠️ **And the gist's BODY is UNVERIFIED
+from inside this repository**: whether it carries `5ac1115382…` is the reader's `curl` to run, not
+ours to assert. ⚠️⚠️ **A FIRST GIST WAS PUBLISHED *SECRET* AT `09:10:29Z` AND LEFT IN PLACE** — a
+secret gist is unlisted, not a public anchor — **and it is disclosed rather than deleted, because
+deleting a failed timestamp attempt is indistinguishable from deleting an inconvenient one.**
+
+### FILES WRITTEN
+
+`README.md` (STATUS box rewritten; §3.2, §6.1, §7, §9.1, §9.3, §10, §11, §12, **new §12.4**, §18.2,
+§19), `RESULTS.md` (rewritten — a calibration section, a freeze-and-witness section, a
+sweep-in-flight section, ⚠️ **and an EMPTY escape table with the reason in its own caption**),
+`QUESTIONS.md` (`Q-229`…`Q-234` + the `2a7f95c1` token row), `STATUS.md` (C19's review-history column
+**appended to, never overwritten**), `PROGRESS.md` (this entry), `docs/sessions/c19-numbers-1.txt`.
+
+⚠️ **`QUESTIONS.md` and `STATUS.md` were rebuilt from `git show HEAD:<file>` and never staged from
+the working tree (`INC-137`); `git read-tree HEAD`, never a pinned SHA (`INC-139`); every internal
+README anchor was re-checked and three broken ones repaired; LF-only, byte-verified in Python.**
+
+---
+
 ## SESSION-TOKEN 9f14a6d2 — C18, BUILD (THE SCORED DECLARATION) — 2026-09-05 — ✅ **`evals/scored/RUN_DECLARED.md` IS WRITTEN AND PUSHED BEFORE THE RUN. ⛔ NOTHING RAN, NO TAG WAS CUT, NO GIST WAS PUBLISHED, AND §8's START TIME IS BLANK**
 
 **Role:** BUILD. **Chunk:** C18. ⚠️ **FULL RECORD: `docs/sessions/c18-scored-declared-1.txt`** —
