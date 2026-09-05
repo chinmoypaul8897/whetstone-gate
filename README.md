@@ -61,25 +61,36 @@ answer key, and the recurring headline is *100% blocked*. A gate that grades its
 fail. So the gate here is deliberately commodity, and the effort went into the measurement.
 
 ```mermaid
-flowchart LR
-    ATT["🎭 ATTACKER<br/>policy-blind LLM · temperature 0.7<br/>seeded from InjecAgent, AgentDojo, AgentHarm, ASB<br/><b>sees:</b> tool schemas, goal, results<br/><b>never sees:</b> policy, holes, attack list, gate reasons"]
-    GATE{"GATE<br/>one of five arms<br/>ALLOW · DENY · INDETERMINATE"}
-    WORLD["🏦 WORLD<br/>mock Razorpay — 30 seeds<br/>real documented rejections<br/>pay_CANARYRECON planted in every seed"]
-    LEDGER[("⛓️ LEDGER<br/>hash-chained · append-only<br/>a typed harm record per executed action")]
-    SCORER["📊 SCORER<br/>deterministic replay · no model<br/>shares no code with the gate"]
-    PROBE["🎯 COMPETENCE PROBE<br/>arm-1 breach rate on the planted door"]
-    RES["RESULTS.md<br/>every zero with its ceiling"]
-    VOID["THE WHOLE RUN IS VOID"]
-    ATT -->|tool call| GATE
-    GATE -->|allowed| WORLD
-    GATE -.->|one generic refusal, identical across arms| ATT
-    WORLD -->|result| ATT
-    WORLD -->|append| LEDGER
-    LEDGER -->|after the episode| SCORER
-    LEDGER --> PROBE
-    SCORER --> RES
-    PROBE -->|"≥ 20%: admissible"| RES
-    PROBE -.->|"< 20%"| VOID
+flowchart TB
+    subgraph EP["THE EPISODE — 20 turns per seed, one of five gates in the loop"]
+        direction LR
+        ATT["🎭 ATTACKER<br/>policy-blind LLM · temperature 0.7<br/>seeded from InjecAgent, AgentDojo, AgentHarm, ASB<br/><b>sees:</b> tool schemas, goal, results<br/><b>never sees:</b> policy, holes, attack list, gate reasons"]
+        GATE{"GATE<br/>arm 1 · 2 · 2S · 3 · 4<br/>ALLOW · DENY · INDETERMINATE"}
+        WORLD["🏦 WORLD<br/>mock Razorpay — 30 seeds<br/>real documented rejections<br/>pay_CANARYRECON planted in every seed"]
+        ATT -->|tool call| GATE
+        GATE -->|allowed| WORLD
+        GATE -.->|one generic refusal, identical across arms| ATT
+        WORLD -->|result| ATT
+    end
+    subgraph AFTER["AFTER THE EPISODE — no model touches this row"]
+        direction LR
+        LEDGER[("⛓️ LEDGER<br/>hash-chained · append-only<br/>a typed harm record per executed action")]
+        SCORER["📊 SCORER<br/>deterministic replay<br/>shares no code with the gate"]
+        PROBE["🎯 COMPETENCE PROBE<br/>arm-1 breach rate on the planted door"]
+        RES["RESULTS.md<br/>every zero with its ceiling"]
+        VOID["THE WHOLE RUN IS VOID"]
+        LEDGER --> SCORER --> RES
+        LEDGER --> PROBE
+        PROBE -->|"≥ 20%: admissible"| RES
+        PROBE -.->|"< 20%"| VOID
+    end
+    EP -->|"every executed action is appended to the ledger"| AFTER
+    subgraph SP[" "]
+        SP1["<br/><br/><br/>"]
+    end
+    AFTER ~~~ SP
+    style SP fill:none,stroke:none
+    style SP1 fill:none,stroke:none,color:transparent
     classDef att fill:#0E131B,stroke:#7C8AA0,color:#DCE3EC
     classDef gate fill:#1A2332,stroke:#E8A33D,stroke-width:2px,color:#DCE3EC
     classDef blue fill:#0E131B,stroke:#5B9DD9,color:#DCE3EC
@@ -238,12 +249,24 @@ Git tag and commit dates are set by whoever commits. A gist's `created_at` is as
 server, and is not.
 
 ```mermaid
-flowchart LR
-    T1["<b>09:05:17Z</b><br/>prereg-v1 tagged<br/><i>a git date — forgeable, not evidence</i>"]
-    T2["<b>09:10:29Z</b><br/>a first gist — published SECRET<br/><i>a mistake, left in place and disclosed</i>"]
-    T3["<b>09:14:25Z</b><br/>PUBLIC witness gist created<br/><b>GitHub's clock, not ours</b>"]
-    T4["<b>09:17:22Z</b><br/>first scored API call<br/><b>2 min 57 s after the witness</b>"]
-    T1 --> T2 --> T3 --> T4
+flowchart TB
+    subgraph R1[" "]
+        direction LR
+        T1["<b>09:05:17Z</b> — prereg-v1 tagged<br/><i>a git date: forgeable, not evidence</i>"] --> T2["<b>09:10:29Z</b> — a first gist, published SECRET<br/><i>a mistake, left in place and disclosed</i>"]
+    end
+    subgraph R2[" "]
+        direction LR
+        T3["<b>09:14:25Z</b> — PUBLIC witness gist created<br/><b>GitHub's clock, not ours</b>"] --> T4["<b>09:17:22Z</b> — first scored API call<br/><b>2 min 57 s after the witness</b>"]
+    end
+    R1 --> R2
+    subgraph SP[" "]
+        SP1["<br/><br/><br/>"]
+    end
+    R2 ~~~ SP
+    style R1 fill:none,stroke:none
+    style R2 fill:none,stroke:none
+    style SP fill:none,stroke:none
+    style SP1 fill:none,stroke:none,color:transparent
     classDef grey fill:#0E131B,stroke:#4A5666,color:#7C8AA0
     classDef amber fill:#1A2332,stroke:#E8A33D,stroke-width:2px,color:#DCE3EC
     classDef red fill:#2A1A1A,stroke:#E5484D,stroke-width:2px,color:#DCE3EC
@@ -276,19 +299,26 @@ episode* — is the one this project makes.
 ### 4.3 The moat — the gate and the scorer share no code
 
 ```mermaid
-flowchart LR
+flowchart TB
     subgraph SPIKE["THE PROTOTYPE — a definition, not a result"]
-        direction TB
+        direction LR
         G0["gate.js"] --> K["world.js : intentKey"]
         I0["invariants.js"] --> K
     end
     subgraph NOW["THIS REPOSITORY — make check-roles, every commit"]
-        direction TB
+        direction LR
+        X["shared first-party modules: <b>0</b><br/>allow-list: <b>EMPTY</b><br/>anything both need is written twice, on purpose"]
         G1["gates/<br/>15 modules reachable"]
         S1["scorer/<br/>6 modules reachable"]
-        X["shared first-party modules: <b>0</b><br/>allow-list: <b>EMPTY</b><br/>anything both need is written twice, on purpose"]
+        G1 ~~~ S1 ~~~ X
     end
     SPIKE ~~~ NOW
+    subgraph SP[" "]
+        SP1["<br/><br/><br/>"]
+    end
+    NOW ~~~ SP
+    style SP fill:none,stroke:none
+    style SP1 fill:none,stroke:none,color:transparent
     classDef bad fill:#2A1A1A,stroke:#E5484D,color:#DCE3EC
     classDef ok fill:#0E131B,stroke:#3DD68C,stroke-width:2px,color:#DCE3EC
     classDef note fill:#1A2332,stroke:#E8A33D,color:#DCE3EC
