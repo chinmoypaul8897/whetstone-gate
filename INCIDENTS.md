@@ -13253,3 +13253,73 @@ and the correct action is to WAIT, not to reset."* ⚠️ **And the honest limit
 the false positive, not the race.** Two sessions sharing one `.git/index` is the underlying condition,
 and §7b's private-index recipe already fixes it **for the session that follows the recipe** — it
 cannot fix it for the session that does not, and nothing here can tell which one the neighbour is.
+
+
+---
+
+## INC-169 — ⚠️⚠️ **THIS SESSION PUBLISHED A FALSE JUSTIFYING SENTENCE INTO TWO PRE-REGISTRATION ARTEFACTS, AND IT WAS REFUTED USING THE VOCABULARY THIS SESSION HAD WRITTEN INTO ONE OF THEM FOUR HOURS EARLIER. IT WAS CAUGHT BY ADVERSARIAL VERIFICATION, NOT BY JUDGEMENT — THE SECOND TIME IN ONE DAY THAT SENTENCE IS TRUE OF A C14 FIX SESSION**
+
+**Date:** 2026-09-05 (C14 FIX — THE SECOND FREEZE PASS, `5b8c31e7`). Fix SHA under **Fix**.
+
+**Event:** committing `c3aa9b4` and `d42a32c` put this sentence into `config/protocol.yaml` and, in
+its `PROTOCOL.md` §6a.5 form, into a document the external witness fingerprint covers:
+
+> "Both choices read the figure HIGH, and HIGH selects the SMALLER N — the direction that cannot
+> inflate anything this project publishes."
+
+It restates `Q-221`'s own *"A SMALLER N CANNOT INFLATE ANY CLAIM WE PUBLISH"*. ⚠️ **The second
+clause is FALSE.** `probe/void.py:is_void` is `rate < threshold` over arm 1's scored episode count,
+**which IS N**, so at every true breach rate below the 20% threshold **N=30 is more likely than N=50
+to FAIL to void a degraded run** — 7.32% against 2.45% at a true 0.10, a **2.98×** higher chance of
+publishing a run that should have been VOID. And P(publishing *"0 escapes"*) at a true 0.05 is
+**21.46% at N=30 against 7.69% at N=50**.
+
+**Action:** the sentence was **withdrawn from both artefacts before the tag**, replaced by the
+measured tables, and `PROTOCOL.md`'s manifest row re-measured a second time. **No value moved** —
+both keys read `144668` and `30` before and after, verified through the loader; `config/` edit 2 is
+one hunk, `443,445c443,469`. `QUESTIONS.md` **`Q-224`** carries the refutation; `Q-221`'s quotation
+is **not** amended, because hard rule 5 requires a ruling verbatim.
+
+**Expectation:** that a conservative-direction argument about a sample size is either true or false
+on its own terms. ⚠️ **It is neither — it is CLAIM-DEPENDENT, and this project publishes claims that
+run both ways.** A smaller N is conservative for an **escape-rate** claim (wider intervals, a higher
+published ceiling) and **anti-conservative** for a **no-difference** claim and for the **void rule**,
+which is the one `PROTOCOL.md` §6 calls *"the single number that decides whether the run is
+publishable."*
+
+**Missing:** ⚠️ **any check that two pre-registration artefacts do not contradict each other on the
+same axis.** `make check-prereg` compares **digests**, not **claims**; `tests/test_c14_prereg.py`
+compares `HOLES.md`'s probe fields against `config/` **values**. **Nothing reads two artefacts'
+PROSE for a contradiction**, and here `config/protocol.yaml` asserted that a smaller N cannot inflate
+anything while `PROTOCOL.md` §6a.4 — in the same commit series — defined *"makes a later VOID LESS
+likely"* as **the self-serving direction**. Both would have been frozen and witnessed together.
+
+**Missed:** ⚠️⚠️ **THE REFUTATION USED THIS SESSION'S OWN SENTENCE, FROM THE SECTION IT HAD WRITTEN
+FOUR HOURS EARLIER, AND THE SESSION DID NOT APPLY IT TO ITSELF.** §6a.4's *"a lower threshold makes a
+later VOID LESS likely — which is the self-serving direction"* is the exact test the N claim fails,
+and this session wrote that sentence, in bold, and then wrote the contradicting one **in the same
+file**. ⚠️ **And it had the disproving arithmetic in hand from its own first command:** it computed
+the completed-only mean **109,066.9** at the very start, noticed it was **not** 144,668, and used
+that to find the shipped definition — then transcribed a ruling saying 144,668 *"is the mean over
+COMPLETED episodes only"* **without noticing the sentence it had already disproved.**
+
+**Diagnosis:** the direction-of-bias argument was evaluated against **one** published quantity — the
+escape rate, where a smaller N genuinely is conservative — and generalised to *"anything this project
+publishes"* without enumerating the others, of which the void rule runs the opposite way.
+
+**Fix:** the withdrawal above, in `config/protocol.yaml` and `PROTOCOL.md` §6a.5, both **before**
+`prereg-v1` exists so neither is a frozen-artefact amendment. SHA in the FINAL OUTPUT block of
+`docs/sessions/c14-freeze-2.txt`.
+
+**Systemic guardrail:** ⚠️ **partial, and the honest part is that the mechanised half is small.**
+What worked was **process, not code**: the sentence was refuted by adversarial lenses this session
+commissioned against its own already-committed work, one of which was instructed only to *"try to
+REFUTE"* the direction-of-bias claim. **That is repeatable and cost nothing but time, and it is the
+guardrail actually being proposed** — a direction-of-bias claim in a frozen artefact gets an
+adversarial pass **before** the freeze, not a proofread. ⚠️ **What would mechanise it is a test that
+every published direction-of-bias claim names the quantity it is about**, and that is not writable
+as an assertion over prose. ⚠️ **And the honest limit: this is `INC-162`'s shape for the third time
+in one day** — a C14 FIX session's own draft, in a frozen-set file, caught by something other than
+the session's judgement. Twice by a test (`INC-162`, `INC-167`) and once by a commissioned refutation.
+**The common factor is not the subject matter; it is that a session documenting its own decision is
+the worst-placed reader of it.**

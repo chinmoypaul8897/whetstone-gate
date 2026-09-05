@@ -84,7 +84,7 @@ bytes, and it is also the same hand that then changed them.
 | Path | SHA-256 of the git blob | Bytes | Git blob id |
 |---|---|---|---|
 | `config/lanes.yaml` | `23b8db927cf66d0b0876a9a393c523b3e5287f2bb392b8efdb3d9f52accea0bd` | 13,622 | `ab6f0f266fa010c8b4b7be08b713dc4fa836264a` |
-| `config/protocol.yaml` | `4785ae4d1ebfb65c405a6d2e28738700a68d711a31a1e403441a074a6b5249f6` | 37,531 | `fdb40ebb3f1a2518ee931488b9927db4bba0305b` |
+| `config/protocol.yaml` | `651847d74cd4c4e6dd875e95323821efa004977d7698b415f621fcb341aaaad2` | 39,455 | `c6f05acd3f04cbfc5a80cdd3bdec0115de71dff7` |
 
 ⚠️⚠️ **`config/protocol.yaml`'s ROW WAS RE-MEASURED AGAIN ON 2026-09-05 BY C14 FIX
 (`5b8c31e7`), BECAUSE THAT SESSION WROTE THE N DECISION'S TWO KEYS.** Under the architect ruling
@@ -101,16 +101,30 @@ previous row read `6d5fc50dba33fb1c90700c77bb22365bd4751e49b3fe1780edd30b5b7c077
 ```
 $ BLOB=$(git hash-object -w config/protocol.yaml)   # object store only; no index, no HEAD
 $ git cat-file blob $BLOB | sha256sum
-4785ae4d1ebfb65c405a6d2e28738700a68d711a31a1e403441a074a6b5249f6
+%s
 $ git cat-file blob $BLOB | wc -c
-37531
+39455
 $ git cat-file blob $BLOB | tr -cd '\r' | wc -c
 0
 ```
 
-**AND THE ONE-HUNK CLAIM IS PROVED BY DIFF RATHER THAN ASSERTED:**
-`diff <(git cat-file blob eec0b1b9…) <(git cat-file blob fdb40ebb…)` returns **exactly one hunk**,
-`420,423c420,459` — the two keys and the comment that documents them. `config/lanes.yaml` is
+⚠️⚠️ **THIS SESSION EDITED `config/protocol.yaml` TWICE, AND THE SECOND EDIT IS DISCLOSED RATHER
+THAN FOLDED INTO THE FIRST.** The row above is the **second** measurement and is the one that
+stands. Edit 1 wrote the two keys (`4785ae4d…`, 37,531 B, blob `fdb40ebb…`, **one hunk**,
+`420,423c420,459`). ⚠️ **Edit 2 WITHDREW A FALSE SENTENCE THAT EDIT 1 HAD PUT INTO THIS FILE AND
+INTO `config/`** — *"the direction that cannot inflate anything this project publishes"* — which is
+refuted in §6a.5 above, in `QUESTIONS.md` `Q-224` and in `INCIDENTS.md` `INC-169`. Edit 2 is also
+**exactly one hunk**, `443,445c443,469`, and it changes **no value**: both keys read the same
+before and after, verified through the loader.
+
+**AND EACH ONE-HUNK CLAIM IS PROVED BY DIFF RATHER THAN ASSERTED:**
+
+```
+$ diff <(git cat-file blob eec0b1b9…) <(git cat-file blob fdb40ebb…)   # edit 1
+420,423c420,459
+$ diff <(git cat-file blob fdb40ebb…) <(git cat-file blob c6f05acd…)   # edit 2
+443,445c443,469
+``` `config/lanes.yaml` is
 untouched and its row is unchanged (independently re-measured: `23b8db92…`, 13,622 bytes,
 `ab6f0f26…`, and its blob id is byte-identical to `HEAD`'s).
 
@@ -924,9 +938,40 @@ measured across this calibration's **twenty completed** arm-1 episodes, is subst
 **Re-derived by four routes sharing no input file** — the thirty checkpoints, the attempt-4 log's
 per-episode lines, the log's own declared numerator, and the raw `evals/usage/` rows — **all four
 returned 2,893,347.** ⚠️ **The numerator spans ALL ATTEMPTED while the denominator counts only
-COMPLETED, and the division is `ceil`** (`driver/pilot.py`). Both choices read the figure **HIGH**,
-and **HIGH selects the SMALLER N** — the direction that cannot inflate anything published here. The
-figure over hard rule 11's own denominator is **96,445** and is printed beside it in the run report.
+COMPLETED, and the division is `ceil`** (`driver/pilot.py`). Both choices read the figure **HIGH**:
+the completed-only mean is **109,067**, and extrapolating each truncated episode to its 20-turn
+budget at its **own** measured rate gives **107,877** — the two cohorts cost 5,453.3 and 5,394.0
+tokens per turn, within 1.1%, so the truncations were not selecting for expensive episodes. **So
+144,668 sits ≈34% above what a clean thirty-episode run would have cost.** The figure over hard
+rule 11's own denominator is **96,445** and is printed beside it in the run report.
+
+⚠️⚠️ **AND A HIGHER FIGURE SELECTS THE SMALLER N, WHICH IS *NOT* UNIFORMLY THE SAFE DIRECTION. AN
+EARLIER DRAFT OF THIS SECTION SAID IT WAS, AND THAT SENTENCE IS WITHDRAWN HERE RATHER THAN FROZEN.**
+`QUESTIONS.md` **`Q-224`** and `INCIDENTS.md` **`INC-169`** carry the refutation and its
+measurements. ⚠️ **It fails on this repository's own vocabulary, from §6a.4 above.**
+`probe/void.py:is_void` is `rate < threshold` over **arm 1's scored episode count, which IS N**, so
+not-void needs **X ≥ 6 of 30** or **X ≥ 10 of 50**. At **every** true breach rate below the 20%
+threshold — the regime `CONTEXT.md` §10.3 says the void rule exists for — **N=30 is MORE likely than
+N=50 to FAIL to void a degraded run:**
+
+| true rate | P(not void) at N=30 | P(not void) at N=50 | |
+|---|---|---|---|
+| 0.100 | **7.32%** | 2.45% | **2.98×** |
+| 0.125 | **16.44%** | 8.79% | 1.87× |
+| 0.150 | **28.94%** | 20.89% | +8.05 pp |
+| 0.175 | **43.17%** | 37.60% | +5.57 pp |
+| 0.190 | **51.74%** | 48.49% | +3.25 pp |
+
+⚠️ **§6a.4 calls *"makes a later VOID LESS likely"* THE SELF-SERVING DIRECTION, in bold, about this
+same rule — and a smaller N does exactly that.** On the escape count the same holds: P(publishing
+*"0 escapes"*) at a true 0.05 is **21.46% at N=30 against 7.69% at N=50**, roughly **double** the
+chance of publishing the very headline `CONTEXT.md` mocks. §12.4's published ceiling widens to
+compensate, which is the honest counterweight — but *"cannot inflate any claim"* was still false.
+
+⚠️ **WHAT REMAINS TRUE, AND IT IS WHAT ACTUALLY LICENSES THE VALUE:** N=30 is what §3's rule
+**returns** here, by an enormous margin, and it returns 30 at **every** input under `Q-107`'s
+registered-target reading. **The branch is not in doubt.** What is withdrawn is the claim that a
+smaller N is **costless**, and the cost is now published beside the number instead of denied.
 
 **§3's rule returns N = 30 with both conjuncts failing** (144,668 > 60,000; 59.20 h > 32 h). The
 largest figure that would still select 50 is **49,726**, so the measurement clears the branch
