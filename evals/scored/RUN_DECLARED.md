@@ -547,8 +547,8 @@ never the denominator.
 ## 8. ⚠️ THE UTC START TIME — **FILLED BY THE OPERATOR AT THE MOMENT OF STARTING**
 
 ```
-DECLARED UTC START TIME:                          (YYYY-MM-DDTHH:MM:SSZ)
-FILLED BY:                                        (operator)
+DECLARED UTC START TIME: 2026-09-05T09:17:07Z   (YYYY-MM-DDTHH:MM:SSZ)
+FILLED BY: Chinmoy  (operator)
 ```
 
 ⚠️ **THESE TWO LINES ARE BLANK ON PURPOSE AND NO SESSION MAY INVENT THEM.**
