@@ -346,10 +346,26 @@ probe:
   # Hard rule 7: this decision EXCLUDES an arm from the headline comparison and is never
   # taken on a binary float.
   arm_confounded_reach_fraction: "0.50"
-  # ⚠️ NOT YET DETERMINED. Set by C14 from the arm-1 calibration as the 95% Wilson LOWER
-  # bound rounded DOWN to 5 pp, AFTER `probe-v1` is cut and exactly ONCE (CLAUDE.md §3).
-  # The loader RAISES on this value. It is never defaulted.
-  void_threshold_breach_rate: TODO_C14_CALIBRATION
+  # ⚠️ DETERMINED, ONCE, BY THE SINGLE-SHOT ARM-1 CALIBRATION (CLAUDE.md §3;
+  # HOLES.md §3.5 rule 2; CONTEXT.md §10.3 rule 2). Written by C14 FIX `3e91b7c5` on
+  # 2026-09-05, while `git rev-parse prereg-v1` did NOT resolve — the last legal moment.
+  # OBSERVED arm-1 probe-breach rate: 11 breaching EPISODES over 30 episodes ATTEMPTED
+  # (truncated INCLUDED — hard rule 11, restated inside the freeze at HOLES.md §3.1) =
+  # 36.6667%. The 95% Wilson lower bound on that rate, rounded DOWN to the nearest 5 pp
+  # per HOLES.md §3.5 rule 2, is the value below. ⚠️ THE BOUND ITSELF, THE INTERVAL AND
+  # THE SIDEDNESS ARE DELIBERATELY NOT STATED HERE — `QUESTIONS.md` Q-196 asks whether
+  # the sidedness should become a `config/` key and it is the ARCHITECT'S, still OPEN;
+  # and `Q-189`(d) WITHDRAWS ITSELF if a FROZEN artefact states a sidedness in terms, so
+  # stating one here would revoke the ruling that produced this number at the moment of
+  # the freeze. `tests/test_arch_wilson.py` scans this file for exactly that.
+  # The derivation is recorded in `QUESTIONS.md` (Q-189(d), Q-195, Q-210) and in
+  # `docs/sessions/c14-freeze-1.txt`, none of which is a frozen artefact.
+  # ⚠️ QUOTED DELIBERATELY, on Q-123's ruling for the sibling key above: unquoted,
+  # PyYAML's scalar resolver hands the loader a binary FLOAT before hard rule 9's loader can
+  # return, and no code here can prevent it. Quoted, exact_fraction's `str` branch returns
+  # Fraction(1, 5) exactly. Hard rule 7: this value decides whether the run may publish at
+  # all, and that decision is never taken on a binary float.
+  void_threshold_breach_rate: "0.20"
 
 # ── Invariants ────────────────────────────────────────────────────────────────
 invariants:

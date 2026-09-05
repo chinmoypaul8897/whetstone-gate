@@ -84,7 +84,33 @@ bytes, and it is also the same hand that then changed them.
 | Path | SHA-256 of the git blob | Bytes | Git blob id |
 |---|---|---|---|
 | `config/lanes.yaml` | `23b8db927cf66d0b0876a9a393c523b3e5287f2bb392b8efdb3d9f52accea0bd` | 13,622 | `ab6f0f266fa010c8b4b7be08b713dc4fa836264a` |
-| `config/protocol.yaml` | `2480da6a1a885ce1bf5a30777cb224c0048e1c2038e0100deb1bd8f8ecc8f496` | 33,479 | `bae20f6fa87afbfaef9dbef2481a2b7ca577d295` |
+| `config/protocol.yaml` | `6d5fc50dba33fb1c90700c77bb22365bd4751e49b3fe1780edd30b5b7c077aed` | 34,849 | `eec0b1b920f95ea8aa1f2b89d7e98530c4561638` |
+
+⚠️⚠️ **`config/protocol.yaml`'s ROW WAS RE-MEASURED AGAIN ON 2026-09-05 BY C14 FIX (`3e91b7c5`),
+BECAUSE THAT SESSION WROTE THE VOID THRESHOLD — THE LAST `config/` EDIT THIS PROJECT WILL EVER
+MAKE.** `probe.void_threshold_breach_rate` moved from the sentinel `TODO_C14_CALIBRATION` to
+**`"0.20"`**, derived from the single-shot arm-1 calibration (`HOLES.md` §3.5 rule 2,
+`CONTEXT.md` §10.3 rule 2, `QUESTIONS.md` `Q-189`(d)). ⚠️ **Legal only because
+`git rev-parse prereg-v1` DID NOT RESOLVE, verified as that session's first act.**
+
+⚠️ **RE-MEASURED, NEVER COPIED — `INC-139` IS THE ENTRY ABOUT THIS EXACT ROW STANDING STALE,
+AND `Q-181` IS WHY `make check-prereg` CANNOT CATCH ONE BEFORE THE TAG.** The previous row read
+`2480da6a1a885ce1bf5a30777cb224c0048e1c2038e0100deb1bd8f8ecc8f496`, **33,479 bytes**, blob
+`bae20f6fa87afbfaef9dbef2481a2b7ca577d295`, and it was **verified CORRECT against `HEAD` BEFORE
+the file was edited**, so the difference is this session's one edit and nothing else:
+
+```
+$ BLOB=$(git hash-object -w config/protocol.yaml)   # object store only; no index, no HEAD
+$ git cat-file blob $BLOB | sha256sum
+6d5fc50dba33fb1c90700c77bb22365bd4751e49b3fe1780edd30b5b7c077aed
+$ git cat-file blob $BLOB | wc -c
+34849
+```
+
+**AND THE ONE-HUNK CLAIM IS PROVED BY DIFF RATHER THAN ASSERTED**, the way `ARCH NIGHT 1` proved
+its own: `diff <(git cat-file blob bae20f6f…) <(git cat-file blob eec0b1b9…)` returns **exactly
+one hunk**, `349,352c349,368` — the key and the comment that documents it. `config/lanes.yaml`
+is untouched and its row is unchanged (re-measured: `23b8db92…`, 13,622 bytes, `ab6f0f26…`).
 
 ⚠️⚠️ **`config/protocol.yaml`'s ROW WAS RE-MEASURED AGAIN ON 2026-09-04 BY ARCH CAL BUILD 1
 (`8f3c72e1`), BECAUSE THAT SESSION'S OWN COMMIT CHANGED THE FILE — TWICE.** Both edits are
