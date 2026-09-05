@@ -1753,8 +1753,12 @@ the commit → the tag object, **so writing the tag's id into the file changes t
 fixed point**, not an ordering problem, and the same argument kills the tag's commit id and its tree
 id. The escape that worked for `probe-v1` is closed, because `prereg-v1` freezes `config/` and the
 reviewer's own check (`git log prereg-v1..HEAD -- … config/` *"must be EMPTY"*) would show the
-amendment to the judge. `QUESTIONS.md` **`Q-214`**, **Class A, OPEN**, and `PROTOCOL.md` §6 records
-the impossibility rather than papering it.
+amendment to the judge. `QUESTIONS.md` **`Q-214`** — ⚠️ **RULED 2026-09-05: OPTION A CONFIRMED, `Q-250`.** *"`M-6` is
+IMPOSSIBLE — it is a hash fixed point — and is published as a limitation with one honest sentence in
+the README. It is not worked around."* **This paragraph said `Q-214` was `Class A, OPEN` until that
+ruling; the impossibility it describes is unchanged and nothing here is softened — what changed is
+that the architect has now confirmed there is no fix to look for.** `PROTOCOL.md` §6 records the
+impossibility rather than papering it.
 
 ⚠️ **THE MEASURED CONSEQUENCE, STATED AS A LOSS BECAUSE THAT IS WHAT IT IS.** `config/protocol.yaml`
 is **frozen** at `genesis_hash: 170bd3ff4abfdd8f87f64055972a60c82cc54efc` — `probe-v1`'s id — so
@@ -1829,12 +1833,57 @@ checkable from inside this repository and was not assumed** — a witness whose 
 manifest witnesses nothing. **The `curl` in [§12.1](#121-the-reviewer-procedure--run-this) is where
 that check happens, and it is the reader's to run, not ours to assert.**
 
-⚠️ **ONE THING PROTOCOL.md §9 REQUIRES AND THIS REPOSITORY DOES NOT HAVE.** §9 says the operator must
-record *"the gist's `created_at` and its **OLDEST** history entry's `version` and `committed_at`"*,
-because **a gist can be edited later and the verifier must read `history[]`, never the current
-state.** ⚠️ **The `created_at` is recorded. The oldest history entry's `version` and `committed_at`
-are recorded NOWHERE.** So a reader who runs §12.1's command gets three fields and this repository
-can be checked against only one of them. **That is an owed item, not a closed one.**
+⚠️⚠️ **AND ON 2026-09-05 A SESSION RAN THAT `curl` AND THE BODY MATCHES — WHICH IS BETTER NEWS THAN
+THE PARAGRAPH ABOVE COULD OFFER, AND IT DOES **NOT** MOVE INTO *HALF ONE*.** `6e2b8a53` fetched the
+gist body, extracted its ten manifest lines and compared them against this repository's own
+`prereg-v1.sha256`:
+
+```
+the gist body's 10 manifest lines, written LF   ==  prereg-v1.sha256   (diff clean, byte-identical)
+sha256 of those 10 lines                        ->  5ac111538247831f145260a275bf77df258a4fc21a22962a0419c954cd60acaf
+the COMBINED FINGERPRINT printed in the body    ->  5ac111538247831f145260a275bf77df258a4fc21a22962a0419c954cd60acaf
+PREREG_FINGERPRINT.txt in this repository       ->  5ac111538247831f145260a275bf77df258a4fc21a22962a0419c954cd60acaf
+```
+
+**The witness attests THIS fingerprint.** ⚠️ **AND ITS EVIDENTIARY STATUS IS UNCHANGED, WHICH IS WHY
+IT IS WRITTEN HERE IN *HALF TWO* AND NOT PROMOTED INTO *HALF ONE*:** it is **a network fetch made by
+one session at one time**, not something this repository proves about itself. **Read it as *"measured
+by `6e2b8a53` on 2026-09-05, and reproducible by any reader who runs the same `curl`"* — the check is
+still the reader's, and this line only says that when we finally ran it, it came back clean.**
+
+⚠️ **ONE DISCREPANCY IN THE BODY, NAMED BECAUSE WE READ IT AND WOULD OTHERWISE BE SUPPRESSING IT.**
+The body's own prose line reads `Published:  2026-09-05T09:10:00Z (approx)` — **the minute of the
+SECRET first attempt, carried forward unchanged into the public re-post.** It is wrong by ≈ 4 minutes
+and ⚠️ **in the direction that flatters us** (earlier than the truth). **It is not the authoritative
+field and the body says so itself in its next paragraph** — *"the authoritative timestamp for this
+pre-registration is THIS GIST'S server-assigned `created_at`, not any git date"* — and the
+authoritative field reads **`2026-09-05T09:14:25Z`**, which is the figure every document here
+publishes. ⚠️ **The gist is NOT edited to tidy the prose:** an edit would destroy the single-entry
+`history[]` recorded below, and that is worth more than a tidy line.
+
+⚠️⚠️ **THE ONE THING `PROTOCOL.md` §9 REQUIRES AND THIS REPOSITORY DID NOT HAVE — NOW RECORDED, AND
+THE OWED ITEM IS CLOSED.** §9 says the operator must record *"the gist's `created_at` and its
+**OLDEST** history entry's `version` and `committed_at`"*, because **a gist can be edited later and
+the verifier must read `history[]`, never the current state.** ⚠️ **Until `6e2b8a53` this section
+read *"The `created_at` is recorded. The oldest history entry's `version` and `committed_at` are
+recorded NOWHERE … That is an owed item, not a closed one."* **It was right, and it is now closed by
+running §12.1's `curl`** — for the first time, ≈ 8 h 45 m after the first scored episode, which is
+itself a violation and is recorded as `INCIDENTS.md` **`INC-172`** rather than glossed here.
+
+| field, as `PROTOCOL.md` §9 names it | **the PUBLIC witness** `5e6478a5…` | the **SECRET** first attempt `a148d01a…` |
+|---|---|---|
+| `created_at` | **`2026-09-05T09:14:25Z`** | `2026-09-05T09:10:29Z` |
+| **oldest `history[]` `version`** (§6a.2's `first_version`) | **`c8951a5a9ed2a8c22424e47467f050eb930fee5e`** | `54b2dc89378c7d6a05341997bf19efcd34428c56` |
+| **oldest `history[]` `committed_at`** | **`2026-09-05T09:14:25Z`** | `2026-09-05T09:10:29Z` |
+| `len(history)` | **1** | **1** |
+| `public` | `true` | ⚠️ **`false`** |
+
+⚠️ **`len(history) == 1` IS THE FIELD THAT MATTERS AND IT IS THE ONE NOBODY HAD LOOKED AT.** Neither
+gist has ever been edited, so the oldest revision **is** the current one and `created_at ==
+`committed_at`` on both. **That equality is a measurement taken on 2026-09-05, not a property** — it
+stops holding the instant anyone edits either gist, **which is exactly why §6a.2 orders these fields
+recorded rather than re-derived on demand.** ⚠️ **A reader who runs §12.1's command now gets three
+fields and can check this repository against all three of them.**
 
 ⚠️⚠️ **AND THE OVERCLAIM THIS README REFUSES, WHICH IS PRINTED IN THREE OF THIS PROJECT'S OWN
 DOCUMENTS — ONE OF THEM FROZEN.**
@@ -1861,7 +1910,7 @@ WOULD BE THE ONLY THING WORSE THAN THE FACT: THERE WERE TWO GISTS, AND THE FIRST
 
 | # | UTC | what |
 |---|---|---|
-| 1 | **`2026-09-05T09:10:29Z`** | ⚠️ **A FIRST GIST, PUBLISHED *SECRET*, AND LEFT IN PLACE RATHER THAN DELETED.** ⚠️ **Its id is recorded NOWHERE in this repository**, so nothing here can identify it |
+| 1 | **`2026-09-05T09:10:29Z`** | ⚠️ **A FIRST GIST, PUBLISHED *SECRET*, AND LEFT IN PLACE RATHER THAN DELETED.** ⚠️⚠️ **ITS ID IS `a148d01a7bb609ef51713e097a7fcb89`**, recorded here and in `INCIDENTS.md` `INC-172` — **this row read *"its id is recorded NOWHERE in this repository, so nothing here can identify it"* until `6e2b8a53` fetched it.** Measured: **`"public": false`**, `created_at` `2026-09-05T09:10:29Z`, `len(history)` **1**, oldest `version` `54b2dc89378c7d6a05341997bf19efcd34428c56` |
 | 2 | **`2026-09-05T09:14:25Z`** | the **PUBLIC** gist `5e6478a57cb5903b55b0e12775db85e0` — **the witness** |
 
 ⚠️ **A SECRET GIST IS NOT THE ANCHOR `PROCESS.md` §6a SPECIFIES.** It is *unlisted*, not private —
@@ -1879,6 +1928,85 @@ fixed 2 minutes and 57 seconds before the first scored episode called a provider
 this repository had to be trusted to establish it.** ⚠️ **The check is the reader's. This section's
 job is to make sure they know exactly which half we are asking them to take on trust until they run
 it.**
+
+---
+
+### 12.5 ⚠️⚠️ Two defects of the pre-registration itself — published here, because the artefact whose whole purpose is to be checkable is the last one that may be quietly repaired
+
+⚠️ **Both were ruled on 2026-09-05 and both rulings are the same shape: *record, do not fix*.** They
+are transcribed verbatim in [`QUESTIONS.md`](QUESTIONS.md) under `Q-249` and `Q-231`/`Q-233`.
+**Neither is repaired, because repairing either means editing a frozen artefact** — and a
+pre-registration that can be edited after the fact witnesses nothing.
+
+#### **(1) TWO FROZEN FILES DISAGREE ABOUT THE VOID THRESHOLD, AND BOTH ARE INSIDE `prereg-v1`**
+
+**Measured, read-only:**
+
+| frozen file | what it says the void threshold is |
+|---|---|
+| **`HOLES.md`:276** — frozen at **both** `probe-v1` and `prereg-v1` | ``probe.void_threshold_breach_rate`` = **`TODO_C14_CALIBRATION`** — *"an explicit sentinel. The loader RAISES on it."* |
+| **`config/protocol.yaml`:368** — frozen at `prereg-v1` | `void_threshold_breach_rate: "0.20"` |
+
+⚠️ **Both files are covered by the manifest a reader verifies in [§12.1](#121-the-reviewer-procedure--run-this).**
+Their `sha256` lines sit four rows apart in `prereg-v1.sha256`. **The fingerprint reproduces exactly,
+and what it certifies is a frozen set that contradicts itself.**
+
+> ### **RULING (architect, 2026-09-05), transcribed verbatim:**
+> *"`config/` IS OPERATIVE, because it is what the code loads and what `void.void_threshold()`
+> returns. THIS IS A PERMANENT DEFECT OF THE PRE-REGISTRATION AND IS PUBLISHED AS ONE, IN THE README
+> AND IN `RESULTS.md`, NOT BURIED. `tests/test_c14_prereg.py:389` STAYS RED AND MUST NOT BE EDITED —
+> that red IS the disclosure, and editing it to green would hide a defect in the artefact whose whole
+> purpose is to be checkable. Hard rule 4 ranks a frozen artefact above `CONTEXT.md` and is silent on
+> two frozen artefacts against each other; this ruling fills that silence and says it is filling it."*
+
+**So: the operative threshold is `0.20`, and it is `0.20` because `config/` is what the code loads —
+not because the two files were reconciled.** ⚠️ **`tests/test_c14_prereg.py:389`
+(`test_HOLES_md_probe_fields_agree_with_config_protocol_yaml_EXACTLY`) IS RED, AND IT IS SUPPOSED TO
+BE.** A judge running `make test` will see it fail. **That red is this defect's disclosure, it is
+load-bearing, and no session may edit it green** — hard rule 6 forbids weakening a test, and here
+turning it green would additionally conceal the very thing it detected. ⚠️ **How this happened is on
+the record too:** `Q-225` row 4 named this exact outcome **before the tag was cut** and called the
+option that produced it *"legal ONLY until the tag"*. **It did not land in time. The tag was cut
+anyway, and the tag is permanent.**
+
+#### **(2) `PROTOCOL.md`'s FROZEN §9 SENTENCE OVERCLAIMS THE FREEZE DATE BY FIVE DAYS**
+
+[§12.2](#122--what-this-does-and-does-not-prove) reproduces, because `PROTOCOL.md` §9 **requires**
+this README to reproduce it verbatim, the sentence *"The gist proves the protocol was **fixed by 31
+August**."* ⚠️ **The gist reads `2026-09-05T09:14:25Z`. The frozen sentence overclaims by five days.**
+
+> ### **RULING (architect, 2026-09-05), transcribed verbatim:**
+> *"Record, do not fix: `PROTOCOL.md`'s frozen §9 sentence overclaims the freeze date by five days
+> ('fixed by 31 August' against a gist reading 2026-09-05) … THE FROZEN ONE IS UNFIXABLE AND IS
+> PUBLISHED AS A LIMITATION; the true claim is weaker and sufficient — FIXED BEFORE THE FIRST SCORED
+> EPISODE."*
+
+⚠️⚠️ **SO READ §12.2's REQUIRED SENTENCE AS THE WEAKER CLAIM, WHICH IS THE ONE THIS PROJECT ACTUALLY
+MAKES AND THE ONLY ONE IT CAN SUPPORT:**
+
+> ## **The protocol was fixed BEFORE THE FIRST SCORED EPISODE — not by 31 August.**
+>
+> `2026-09-05T09:14:25Z` (the gist's server-assigned `created_at`) → `2026-09-05T09:17:22Z` (the first
+> scored episode's first provider call). **The gap is `00:02:57`.** One side is GitHub's timestamp,
+> the other is a row in a committed file, **and the weaker claim is the one the evidence carries.**
+
+**`PROTOCOL.md` is frozen and is not edited.** The contradiction stands in the artefact, the narrower
+true claim is stated here, and the difference between them is published rather than reconciled —
+which is the same discipline this project applies to everyone else's numbers.
+
+⚠️ **AND THE THIRD ITEM IN THIS FAMILY, WHICH IS NOT A DEFECT OF THE FREEZE BUT IS READ ALONGSIDE
+IT:** `PROTOCOL.md` §9, `CONTEXT.md` and `PROCESS.md` all describe an **OpenTimestamps receipt**, and
+there is none — see [§12.4](#124-the-witness--what-exists-what-does-not-and-which-half-this-repository-can-prove).
+⚠️ **No receipt was stamped after the fact, deliberately: an `ots` receipt created on the evening of 5
+September would witness an instant EIGHT HOURS AFTER the first scored episode, and an anchor pointing
+at the wrong instant is worse than an absent one.** `QUESTIONS.md` `Q-231`.
+
+⚠️ **WHAT IS OWED AND IS NOT DISCHARGED HERE:** the `Q-249` ruling requires this defect published *"in
+the README **and** in `RESULTS.md`"*. **The README half is this subsection. The `RESULTS.md` half is
+not written** — `RESULTS.md` was outside the fence of the session that recorded the ruling
+(`6e2b8a53`), and a session that writes into a file it was fenced out of is the failure this project's
+process exists to prevent. **It is owed, and naming it here is how it stays owed rather than
+forgotten.**
 
 ---
 
