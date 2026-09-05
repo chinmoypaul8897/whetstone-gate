@@ -906,7 +906,19 @@ FIRST HALF IS THE MOVE THIS PROJECT EXISTS TO CRITICISE:**
    this carefully because overstating it would be as dishonest as omitting it: **the freeze was
    witnessed before the run; the witness was not written down before the run, and §6a.2 makes that
    an ordering requirement rather than a courtesy.** **O-B closes it; nothing can un-skip it.**
-6. ⚠️⚠️ **THE FREEZE CHUNK ITSELF FAILED ITS FIRST ADVERSARIAL REVIEW, AND THE TAG WAS CUT ANYWAY.**
+6. ⚠️⚠️ **THE FROZEN TEXT THAT SAYS WHAT THE GIST PROVES OVERCLAIMS BY FIVE DAYS, AND IT CANNOT BE
+   CORRECTED.** `PROTOCOL.md`:1098 — **inside `prereg-v1`**, digest `bfe23e9e…` in
+   `prereg-v1.sha256` — carries, as the sentence §9 requires the README to reproduce **verbatim**:
+   *"The gist proves the protocol was **fixed by 31 August**."* ⚠️ **The witness gist's
+   server-assigned `created_at` is `2026-09-05T09:14:25Z`.** The frozen sentence was written when
+   31 August was the intended freeze date and **it is now false by five days, in the direction that
+   claims more than the evidence supports.** ⚠️ **The true claim is strictly weaker and still
+   sufficient: the protocol was fixed BEFORE THE FIRST SCORED EPISODE, by 2 minutes 57 seconds, and
+   that is what this submission asserts.** The same sentence appears at `PROCESS.md`:804 and
+   `CONTEXT.md`:2113, neither of which is frozen. **`PROTOCOL.md` is, so the defect is published as
+   a limitation and not edited** — hard rule 4 and `CLAUDE.md` §4. **No paragraph in §2 or §3
+   carries the 31-August form.**
+7. ⚠️⚠️ **THE FREEZE CHUNK ITSELF FAILED ITS FIRST ADVERSARIAL REVIEW, AND THE TAG WAS CUT ANYWAY.**
    `docs/reviews/REVIEW_C14_FLOOR_1.md`, dated 2026-09-05, **VERDICT: FAIL** — against **C14, the
    chunk that owns `probe-v1`, `prereg-v1`, the pilot, the calibration and the external witness.**
    There is no `c14-pass` tag. **So the pre-registration this submission rests on was frozen by a
