@@ -3051,3 +3051,128 @@ call was made in any mode. No `N` and no void threshold written. No tag cut or m
 opened. `docs/reviews/` untouched — the live C14 REVIEW session holds it. The uncommitted
 `evals/usage/gemma-26b-2026-09-04.jsonl` still keeps `test_the_object_store_and_the_working_tree_agree`
 and six replay tests red, and **only the operator may commit that file.**
+
+---
+
+## ⚠️⚠️ APPENDED BY C21 BUILD 3 (`8d3b04fe`), 2026-09-05 — **FOUR STATE ROWS INVERTED OVERNIGHT AND EVERY ONE INVERTED IN THIS PROJECT'S FAVOUR**
+
+⚠️ **APPENDED, NOT MERGED INTO ANY LIVE ROW.** The C21 row at `STATUS.md`:2200 still reads `todo`
+and this session did not edit it — no C21 review has run, and C21's own build session is not
+entitled to move its status. ⚠️ **That means the one row a reviewer reads first is the one place
+this work is invisible, which is now the third C21 session for which that is true.**
+
+**Deliverable:** `docs/submission/FORM_ANSWERS.md`, rewritten at **`9371ac2`** `(unreviewed)`;
+`docs/submission/FORM.md` amended; journal at `docs/sessions/c21-build-3.txt` (**`6baf6ca`**).
+⚠️ **SPEND: ZERO.** No provider call in any mode by this session or by any of the sixteen subagents
+it ran; no tag cut, moved or deleted; no gist published, edited or deleted; `evals/` **read and
+never written while a scored sweep was live inside it**; `tests/goldens/` never opened for writing.
+**NOT SELF-CERTIFIED.**
+
+### ⚠️ WHAT MOVED SINCE C21 BUILD 2 (`6f2d47ba`, 2026-09-04), MEASURED ONE COMMAND AT A TIME
+
+| BUILD 2 published | Measured at `e7ffd9c`, 2026-09-05, 09:30Z–10:01Z |
+|---|---|
+| *"`prereg-v1` DOES NOT RESOLVE"* | ⚠️ **RESOLVES.** `52d26ea9…` → commit `0ea5556`, tagger `09:05:17Z`, **PUSHED** |
+| *"the witness gist DOES NOT EXIST"* | ⚠️ **PUBLIC.** `5e6478a57cb5903b55b0e12775db85e0`, `created_at` **`2026-09-05T09:14:25Z`** |
+| *"NO calibration episode has completed"* | ⚠️ **30 attempted / 20 completed / 10 truncated / 0 never started.** Attempt 4, `2026-09-04T20:41:18Z`. Thirty ledgers on disk |
+| *"no VOID verdict is computable on any input"* | ⚠️ **`void_threshold_breach_rate: "0.20"`, FROZEN.** A verdict is **computable**; **none has been computed** |
+
+> ## ⚠️⚠️ **THE PUBLIC GIST PRECEDES THE FIRST SCORED PROVIDER CALL BY 2 MINUTES 57 SECONDS.**
+> `09:17:22Z − 09:14:25Z`. The left-hand side is assigned by GitHub server-side with no
+> client-settable date field; the right-hand side is a line in `evals/usage/`.
+> ⚠️ **AND WHAT IT IS NOT: no OTS receipt exists; a FIRST gist was published SECRET at `09:10:29Z`
+> and left in place; NEITHER GIST IS RECORDED ANYWHERE IN THIS REPOSITORY; and `PROCESS.md` §6a.2
+> step 7 — *"Then, and only then, the first scored episode may run"* — was undischarged when the run
+> began.** The substantive precondition **was** met; the recording step was not.
+
+### ⚠️ THE CALIBRATION RAN AND THIS FILE HAD NEVER RECORDED IT
+
+⚠️ **`STATUS.md`'s C14 row at :2193 still reads *"THE CALIBRATION DID NOT RUN AND COULD NOT"* and
+*"N DECISION: REFUSED … remain `TODO_C14_PILOT`"*.** Both are now false, and **this session did not
+edit that row** — it is C14's, and a C21 build session correcting another chunk's live status row is
+the shape this process exists to prevent. **Recorded here instead, with the measurements:**
+`config/protocol.yaml`:368 `void_threshold_breach_rate: "0.20"`; :482 `selected_branch: 30`;
+:483 `measured_tokens_per_episode: 144668`. Observed rate **11 / 30 = 36.67%**; 95% Wilson lower
+bound **23.8657%**, floored to **20%** by a rule frozen at `probe-v1` **before the number existed**.
+⚠️ **The derivation reproduces independently: `HOLES.md`'s own reader-check over the thirty stored
+ledgers returns the same 11 seeds and the same first-breach turn indices `INC-163` quotes.**
+
+### ⚠️⚠️ FOUR FINDINGS NOTHING ELSE IN THIS REPOSITORY CARRIES, ALL REPRODUCED FIRST-HAND
+
+1. **`HOLES.md`:276 AND `config/protocol.yaml`:368 NOW DISAGREE ABOUT THE VOID THRESHOLD, AND BOTH
+   ARE FROZEN.** `HOLES.md` still says `TODO_C14_CALIBRATION` and does not contain `0.20` anywhere.
+   **`tests/test_c14_prereg.py`:389 is RED as a direct consequence and the red is PERMANENT.**
+   `QUESTIONS.md` `Q-225` row 4 named this outcome **before** the tag was cut. Raised as **`Q-O`**.
+2. **`tests/test_c10_probe.py`:519 IS RED AND ITS NAME IS NOW A FALSE STATEMENT.**
+   `test_the_void_threshold_is_a_SENTINEL_and_NO_VOID_VERDICT_IS_COMPUTABLE_TODAY` asserts the
+   loader raises; measured, `void.void_threshold()` **returns `Fraction(1, 5)`**.
+3. ⚠️ **THE SHIPPED SOURCE STILL LIES ABOUT ITSELF.** `src/whetstone_gate/probe/void.py`:10-16 and
+   `src/whetstone_gate/results/blocks.py`:23-31 — the module docstrings of **the two modules that
+   own the void decision** — both still assert *"no VOID verdict is computable from `config/` on any
+   input"*. **A judge who opens `void.py` to read the rule is told the rule cannot fire.** `src/`
+   and `tests/` are outside this fence; operator item **O-D**.
+4. **`ledger.genesis_hash` FROZE AT `probe-v1`'s TAG OBJECT** (`config/protocol.yaml`:396), so **a
+   scored episode and a calibration episode chain from the same genesis and are cryptographically
+   indistinguishable from each other.** `Q-214`'s option D *"evaporates at the tag"*. **M-6 is not
+   merely open; it is unfixable.** Raised as **`Q-P`**.
+
+### ⚠️ CORRECTIONS TO BUILD 2, AND ONE OF THEM WAS WRONG WHEN COMMITTED RATHER THAN STALE
+
+- **The review trail is 22 files · 16 FAIL · 6 PASS.** BUILD 2 published **15 FAIL across 21**.
+  `REVIEW_C14_FLOOR_1.md` is new (2026-09-05, **FAIL**, against **C14 — the freeze chunk itself**,
+  and `prereg-v1` was cut anyway) — that is staleness. ⚠️ **But `REVIEW_8_1.md` is also a FAIL and
+  BUILD 2's count did not include it: 21 files as 15 + 6 closed arithmetically, which is exactly why
+  the miss survived.** Corrected in the deliverable with its cause named.
+- `INCIDENTS.md` **155 → 169 headings**, 168 distinct ids, `INC-139` still duplicated, highest
+  `INC-171`.
+- **Every volatile citation moved in seventeen hours** — `config/protocol.yaml` ×7,
+  `QUESTIONS.md` ×3, `docs/render/` ×3, and `CONTEXT.md`'s unnarrowed claim-1 form is at **:145**,
+  not the **:139** BUILD 2's journal recorded.
+- **C17 FIX 1 landed** (`1b9e4c73` at `9d7cc48`). **O-4b is therefore a C17 RE-REVIEW, not another
+  fix** — no `REVIEW_C17_2.md`, no `c17-pass`, three MEDIUM/LOW open by the fix session's own count,
+  and **a build session's report is not evidence about its own output.**
+
+### THE FIVE METHOD CLAIMS — TWO MOVED; THE OTHER THREE WERE RE-RUN *BECAUSE OF THAT*
+
+| # | Claim | Verdict | How |
+|---|---|---|---|
+| 1 | policy-blind attacker | **TRUE ONLY AS NARROWED**, unmoved | `git diff --stat 2126abf..HEAD` over every artefact it rests on → **EMPTY** |
+| 2 | externally-authored answer key | **TRUE ONLY AS NARROWED** — T-FP still **cannot run at any size** | `Q-154` (:12325) and `Q-155` (:12365) re-read; both `Status: OPEN` |
+| 3 | competence probe that VOIDS our run | ⚠️ **FROZEN, TAGGED *AND NOW CALIBRATED*. NO VERDICT COMPUTED** | no scored run has finished |
+| 4 | freeze witnessed outside the repository | ⚠️ **TRUE — and verified by RUNNING `PROCESS.md` §6a.3** | `MANIFEST MATCHES`; `5ac11153…` == `PREREG_FINGERPRINT.txt`; `git log prereg-v1..HEAD --` over the frozen set → **EMPTY** |
+| 5 | `gates/`/`scorer/` share no first-party module | ✅ **VERIFIED** | `check-roles` re-run: 21/0/3, allow-list **0**, closure **15/6 unchanged**, index 119 → **120** (the new module is in `driver/`, outside both closures) |
+
+### ⚠️ THE SCORED SWEEP — MEASURED AT `10:01:04Z`, STATED WITH ITS MINUTE BECAUSE IT MOVES
+
+**RUNNING.** Interpreter PID 60255 alive; declared start `09:17:07Z` (`e7ffd9c`); **4 scored episode
+ledgers on disk** — arms 1, 2, 2s, 3, all seed 2001; `evals/` holds **105 files**.
+⚠️ **THE ONE DENOMINATOR FACT THIS SESSION PUBLISHED, AND WHY IT IS NOT A RESULT:**
+`scored__1__2001` is `truncated: true`, `cause: UNEXPECTED_ERROR`, **16 of 20 turns** —
+**`INC-164`'s exact defect, the 180-second socket timeout held OUTSIDE the freeze on the recorded
+ground that it has *"no bearing on any published number"*. It is bearing on one in real time.**
+Hard rule 11 requires every truncated episode to be counted, categorised and kept **in** the
+denominator, so publishing this is the rule rather than an exception to it.
+⚠️ **NO SCORED RESULT, ESTIMATE OR PLACEHOLDER WAS FILLED. No ledger entry, harm component or gate
+verdict was read.**
+
+### THE CHECKLIST, REBUILT — AND THE FOUR ITEMS BUILD 2 NEVER HAD
+
+**Six of BUILD 2's twenty items closed in under 24 hours** (`M-1`…`M-4`, `O-0`, and `O-2`'s
+`6f2d47ba` row). **New and blocking:** **`O-A`** `README.md`'s STATUS box is false in at least six
+rows and is the first screen a judge reads; **`O-B`** record both gists and confirm the published
+body carries `5ac11153…`; **`O-C`** `RESULTS.md` is still the 2026-09-04 stub; **`O-D`** the source
+and two tests still say the threshold does not exist. ⚠️ **`README.md` and `RESULTS.md` are held by
+session `2a7f95c1` and this session touched neither.** ⚠️ **`O-6` is now self-contradictory: the C21
+card requires the no-payment-method re-confirmation *"recorded in `PROVENANCE.md` §1.5 with the new
+date"*, and `prereg-v1` froze `PROVENANCE.md` this morning.** Full list at `FORM_ANSWERS.md` §7.
+
+### QUESTIONS OWED (`QUESTIONS.md` is outside this fence)
+
+**`Q-J` is CLOSED by measurement** — the abort entries exist (`INC-157`, `INC-159`, `INC-161`) and
+attempt 4 completed. **`Q-N`, `Q-O`, `Q-P`, `Q-Q` are added.** ⚠️ **`Q-Q` is the one about this
+process: `grep -c "Q-L" QUESTIONS.md` → **0**. None of the lettered questions has ever reached
+`QUESTIONS.md`, which is `CLAUDE.md` §6 duty 6 unmet across all three C21 sessions — including this
+one.** ⚠️ **`make check-roles` E1 is GREEN at `HEAD` (100 issued rows) and goes RED on this
+session's commits, because `8d3b04fe` has no row and `QUESTIONS.md` is on this session's
+may-not-write list. `INC-141`'s trap; the row was NOT self-written.** One line closes it:
+`| `8d3b04fe` | C21 | BUILD | 2026-09-05 |`.
