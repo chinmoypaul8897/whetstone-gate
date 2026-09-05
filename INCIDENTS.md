@@ -13732,8 +13732,11 @@ sweep that produces no artefact the next step consumes. **Every downstream check
 §7.1, `make check-prereg`, the reviewer procedure — tests the freeze's *substance*, which was
 correct, so nothing anywhere went red on a missing *record*.**
 
-**Fix:** `<the QUESTIONS.md and README.md commits of this session, 6e2b8a53 — their SHAs are listed
-in docs/sessions/c14-witness-record-1.txt §6 and in this session's FINAL OUTPUT>`. Both gists'
+**Fix:** **`ca859b9`** (`QUESTIONS.md` — the four rulings verbatim, `Q-235`…`Q-252`, the two token
+rows) and **`7a60d76`** (`README.md` §12 — the owed `history[]` fields, the secret gist's id, the
+body check, and §12.5). ⚠️ **This entry was committed FIRST, at `dd70f5a`, before either — hard
+rule 13 — so its `Fix` field named them as forward references until this line replaced them with
+the SHAs they landed at. The session record is `docs/sessions/c14-witness-record-1.txt` §7.** Both gists'
 `created_at`, `public` flag, oldest `history[]` `version` and `committed_at` are recorded above and in
 `README.md` §12.4; **the secret gist's id is recorded in this repository for the first time**;
 `README.md`'s `<<PENDING-RUN: GIST_ID>>` was already filled by `2a7f95c1` and is confirmed here at
