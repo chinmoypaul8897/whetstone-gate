@@ -147,6 +147,7 @@ appears that was never issued**, or if a token is reused across roles.
 | `6a4f28de` | C18 | BUILD | 2026-09-05 |
 | `5b8c31e7` | C14 | FIX | 2026-09-05 |
 | `4c7e90ba` | C14 | FIX | 2026-09-05 |
+| `9f14a6d2` | C18 | BUILD | 2026-09-05 |
 
 ⚠️⚠️ **THE `5d7e2b91` ROW IS SELF-RECORDED, AND IT IS THE ROW FOR A TOKEN THAT WAS ISSUED TO **TWO**
 LIVE SESSIONS.** `QUESTIONS.md` `Q-180` and `Q-187` — two independent detections of one event.
@@ -17551,3 +17552,118 @@ findings named"*) and **remains open**. `M-1`, `M-2`, `M-3`, `L-1` and `L-2` are
 `INC-166`/`OF-240` was **not** touched either: the review names it in §2.5 and says in terms that it
 is *"not raised as a new finding and not carried to `OPEN_FINDINGS.md`"*, and it already carries a
 Fix SHA (`8171458`). **The review's findings are not this session's to edit or close.**
+
+## ⚠️⚠️ RAISED BY C18 BUILD — THE SCORED DECLARATION (`9f14a6d2`), 2026-09-05 — `Q-227`…`Q-228`
+
+⚠️ **NUMBERED FROM `git show HEAD:QUESTIONS.md` IMMEDIATELY BEFORE THE APPEND** (`INC-137`), at
+**LIVE HEAD = `92f8cb8`**, where the highest was **`Q-226`**. ⚠️ **HEAD MOVED TWICE UNDER THIS
+SESSION WHILE IT WAS READING** — `9750aab` → `a2f4cdc` → `92f8cb8`, all three the concurrent
+**C14 FIX** session (`4c7e90ba`), which was live in this working tree throughout. The SHA above is the
+one measured **at the moment the append ran**, not the one HEAD carried when this session opened, and
+that distinction is `92f8cb8`'s own subject. **The append refused unless `QUESTIONS.md` still equalled
+`HEAD`'s blob byte for byte** (`INC-140`, `INC-149`). **Nothing of anybody else's text was edited,
+renumbered or reordered.**
+
+---
+
+### ⚠️⚠️ RULING ON `Q-217` — **THE BLOCK LABEL IS `SCORED`. RECORDED BEFORE THE DECLARATION NAMED IT** (hard rule 5)
+
+**Status: `Q-217` is RULED.** **Issued to:** C18 BUILD (`9f14a6d2`), 2026-09-05, in that session's
+prompt. **Transcribed here before `evals/scored/RUN_DECLARED.md` was written.**
+
+**THE RULING, IN THE PROMPT'S OWN WORDS, TRANSCRIBED RATHER THAN PARAPHRASED:**
+
+> "block          scored (label `SCORED`; ⚠️ Q-217 RULED — PROTOCOL.md's row heading reads M-ADV and
+> its state column reads scored; the architect ruled SCORED, and config/'s own keys are
+> `scored_n30_*`. Record the ruling and the rejected reading.)"
+
+⚠️ **STATED HONESTLY: THE ARCHITECT ISSUED NO SEPARATELY QUOTED RULING TEXT BEYOND THAT LINE**, so
+what is recorded above is the prompt's own sentence, copied. **It is not dressed up as a longer
+quotation than it was.**
+
+**THE GROUND THE RULING GIVES:** `config/protocol.yaml`'s own keys are `seeds.scored_n30_first` /
+`_last`. **The seed band this block reads is already named *scored* inside a pre-registration
+artefact**, so the runtime label agrees with the frozen file the run actually reads.
+
+**THE REJECTED READING, RECORDED BECAUSE `Q-217` ASKED FOR IT AND BECAUSE A RULING WITHOUT ITS
+ALTERNATIVE IS AN ASSERTION:** `PROTOCOL.md` §3.1 **heads that row `M-ADV`** and uses *"scored"* only
+as the row's **State** column — a column that also reads *scored* for T-NEG, M-BEN, T-FP and L-STR.
+`driver/pilot.py` and `driver/cal.py` each took their row's **heading** (`PILOT`, `CAL`), so on the
+convention the other two blocks follow this block's label would be **`M-ADV`**, and `EpisodeKey.slug`
+would produce `m-adv__1__2001__gemma-26b`. **That is `Q-217` option (b), and it is rejected.**
+`Q-217` option (c) — the State column as the label for every scored-state block, which would make
+T-NEG, M-BEN, T-FP and L-STR all `SCORED` too — was already described in the entry as *"almost
+certainly not intended"* and is likewise not taken.
+
+⚠️ **NOTHING WAS RENAMED AND NO CODE CHANGED.** `driver/scored.py:SCORED_BLOCK` already read
+`"SCORED"` because C18 BUILD 1's prompt named it in terms; **this ruling makes that choice a decision
+rather than an inheritance**, which is the whole content of the question. **The declaration records it
+at §1.2 with the rejected reading printed beside it.**
+
+---
+
+### ⚠️ `Q-227` — **THE SCORED SWEEP'S CEILINGS, SANCTIONED AND RECORDED VERBATIM (hard rule 12), AND THE ONE TERM INSIDE THEM THAT NOTHING HAS MEASURED**
+
+**Status: SANCTIONED.** **Issued to:** C18 BUILD (`9f14a6d2`), 2026-09-05, in that session's prompt.
+**Recorded here as a record, not raised as a question.**
+
+**THE SANCTION, IN THE PROMPT'S OWN WORDS:**
+
+> "ceilings       4,800 calls / 24,400,200 tokens   ⚠️ SANCTIONED BY THE ARCHITECT 2026-09-05, and
+> ⚠️ DERIVED, NOT CHOSEN: 150x20 attacker + 90x20 judge calls; 150x144,668 attacker
+> + 1,800x1,500 judge tokens. ⚠️ PUBLISH THAT ARITHMETIC IN THE DECLARATION."
+
+**IT IS PUBLISHED, IN FULL, AT `evals/scored/RUN_DECLARED.md` §5**, and re-derived there rather than
+copied. Hard rule 12 requires **both** a call ceiling and a token ceiling, **per lane**, and
+⚠️ **the reference attacker and the gate judge are the SAME lane** (`config/lanes.yaml`,
+`gemma-26b`; `INC-111`), so these two figures are **one lane's budget covering two roles**. `config/`
+carries no `call_ceiling` and no `token_ceiling` under any name, and both driver flags remain
+`required=True` — **a default is exactly how an unsanctioned run happens.**
+
+⚠️⚠️ **THE ONE THING ADVERSE TO THE SANCTION, RECORDED AGAINST IT RATHER THAN LEFT FOR A REVIEW
+TO FIND: THE JUDGE TERM IS A TARGET, NOT A MEASUREMENT.**
+`gate_judge.target_tokens_per_call` = 1,500 is `CONTEXT.md` §13.3's pre-registered **secondary
+target**. **No judged episode has ever run against a live provider in this project** — the pilot and
+the calibration were both arm 1 and recorded `judge=0` on every episode. **So 2,700,000 of the
+24,400,200 rests on a number nothing has measured.** It is acceptable **only because a ceiling is not
+a measurement**: one that is too low costs episodes and lies about nothing, one that is too high costs
+money, and neither moves any published rate. **Declared at §5.1 item 3.**
+
+---
+
+### ⚠️⚠️ `Q-228` — **`Q-218`'s GO/NO-GO IS ANSWERED BY `a2f4cdc` LANDING, AND THE ANSWER IS "LAUNCH ON UNREVIEWED CODE". ⚠️ AND `Q-183` IS DECLARED IN THE PRE-REGISTRATION AND DELIBERATELY NOT RULED**
+
+**Status: RECORDED, for the review that is owed.** Not a new finding — a consequence, and a scope
+statement about what this session did **not** do. **Raised by:** C18 BUILD (`9f14a6d2`).
+
+**(a) `Q-218` IS ANSWERED IN SUBSTANCE, AND THE RESIDUE IS DECLARED.** `Q-218` set the go/no-go:
+*"Either B-1 lands first, or the sweep is launched knowing a judge-side fault on 60% of its episodes
+costs the entire run's report — and that acceptance belongs in `evals/scored/RUN_DECLARED.md` in
+terms."* ⚠️ **B-1 LANDED AT `a2f4cdc`, HOURS BEFORE THE DECLARATION WAS WRITTEN**, under `Q-226`
+and `INC-171`. **What is declared in terms at §7.4 is the residue:** the fix closing a blocker on
+**90 of 150** episodes was written today, by one session, and **has been read by nobody else**;
+`Q-207` priced four repairs and called **every one of them Class A**; and the run is launched on it
+anyway **because the alternative is not launching.** ⚠️ **That sentence is in the
+pre-registration, before the run, rather than in a limitation afterwards.**
+
+**(b) ⚠️⚠️ `Q-183` IS DECLARED AND IS DELIBERATELY NOT RULED, AND NOT FIXED.** The gate judge
+reaches `clients.py:1019`'s `_google_body(messages, temperature if temperature is not None else 0.0)`,
+substituting a **literal `0.0`** on the Google branch, beneath a docstring stating **in capitals** that
+no temperature is sent; **both judge lanes are `provider: google`**; `gate_judge:` holds one key and no
+temperature. ⚠️ **It governs every arm 2 / 2S / 3 verdict in this run — 90 of 150 episodes — and
+it could not touch the pilot or the calibration, both of which ran arm 1 with no gate.** `Q-188`
+records that `Q-183`'s own stop clause fired and the literal stays.
+
+⚠️ **THE PROMPT SAID: DECLARE IT; DO NOT FIX IT AND DO NOT RULE IT. THAT IS WHAT WAS DONE**, and
+the reason is worth stating rather than obeyed silently: `src/` and `config/` are outside this
+session's fence, a **concurrent session held `src/` throughout**, and **a build session ruling a
+Class A question is how a defect becomes a decision nobody made.** The declaration carries it at
+§4.1 and in the §0 disclosure table. ⚠️ **The consequence is stated plainly there: this run's
+judged verdicts are produced at a temperature no pre-registered value declares, and the
+pre-registration says so before the first judged episode rather than after it.**
+
+**(c) WHAT THIS SESSION DID NOT DO, ENUMERATED SO A REVIEW DOES NOT HAVE TO INFER IT.** It did not
+run the sweep, cut or move a tag, publish the gist, fill §8's start time, or touch `src/`, `tests/`,
+`tests/goldens/`, `config/`, `PROTOCOL.md`, `HOLES.md`, `CONTEXT.md`, `PROCESS.md`, `README.md`,
+`RESULTS.md`, `docs/render/`, `docs/reviews/`, `docs/submission/`, `corpora/`, or any path under
+`evals/` other than the one file it created. **Zero provider calls in any mode.**
