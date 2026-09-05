@@ -1,3 +1,92 @@
+## SESSION-TOKEN 6e2b8a53 — C14, FIX (THE WITNESS RECORD) — 2026-09-05 — ⚠️⚠️ **`PROCESS.md` §6a.2 STEP 7 WAS NOT DONE AND THE SCORED SWEEP STARTED ANYWAY — `INC-172`. ⚠️ AND THE SUBSTANTIVE PRECONDITION IT GUARDS *WAS* MET, IN ORDER, WITH 2 min 57 s TO SPARE. BOTH GISTS ARE NOW IN THIS REPOSITORY, INCLUDING THE ONE PUBLISHED *SECRET*. ⛔ NO PLACEHOLDER FILLED, NO VERDICT COMPUTED, NO RESULT READ OUT OF THE RUN**
+
+**Role:** FIX. **Chunk:** C14. ⚠️ **FULL RECORD: `docs/sessions/c14-witness-record-1.txt`** — path
+checked **not to exist on disk OR on any ref** before a byte was written, because `INC-170` is dated
+today and C14 already held seven session records.
+⚠️ **SPEND: ZERO.** No provider call in any mode; this session held no token sanction and took none.
+⚠️ **A SCORED SWEEP WAS LIVE AND WRITING `evals/` THROUGHOUT. IT WAS NOT TOUCHED, PAUSED, SIGNALLED,
+OR READ A RESULT OUT OF.** No tag cut, moved or deleted. No gist published, edited or deleted.
+`.env` never opened. **NOT SELF-CERTIFIED.**
+
+> ### ⚠️⚠️ THE VIOLATION, AND ITS SCOPE STATED EXACTLY — BECAUSE OVERSTATING IT WOULD BE AS DISHONEST AS OMITTING IT
+>
+> `PROCESS.md` §6a.2 step 7 ends *"**Then, and only then, the first scored episode may run.**"* The
+> gist's `created_at` and `first_version` were never written into `INCIDENTS.md` or the README, and
+> the sweep started regardless. ⚠️ **IT IS THE ARCHITECT'S ERROR AND `INC-172` SAYS SO**: he sequenced
+> *tag → gist → sweep* and omitted the step between the second and the third.
+>
+>     prereg-v1 cut          2026-09-05T09:05:17Z   tagger date - FORGEABLE
+>     PUBLIC witness gist    2026-09-05T09:14:25Z   GitHub, server-assigned
+>     first scored call      2026-09-05T09:17:22Z   evals/usage/
+>     ---------------------------------------------------------------------
+>     GAP                               00:02:57
+>
+> ⚠️ **THE SUBSTANTIVE PRECONDITION — tag, then public gist, then first scored call — WAS MET, IN THAT
+> ORDER, AND IS CHECKABLE WITHOUT TRUSTING US.** One side of that subtraction is GitHub's timestamp;
+> the other is a row in a committed file. ⚠️ **WHAT WAS SKIPPED IS THE STEP THAT MAKES THE WITNESS
+> *FINDABLE* BY ANYONE BUT THE OPERATOR.** Until today `git grep -i gist` over the tracked tree
+> returned **no gist id at all**. **The witness existed and was unfindable. That is the defect, and it
+> is neither more nor less than that.**
+
+> ### ⚠️⚠️ BOTH GISTS — AND THE `history[]` FIELDS THAT ONE `curl` STILL RECOVERED TODAY AND NOTHING RECOVERS ONCE A GIST IS EDITED
+>
+>                              PUBLIC (the witness)          SECRET (first attempt)
+>     id                       5e6478a57cb5903b55b0e12775db85e0   a148d01a7bb609ef51713e097a7fcb89
+>     public                   true                          FALSE   <- measured
+>     created_at               2026-09-05T09:14:25Z          2026-09-05T09:10:29Z
+>     first_version            c8951a5a9ed2a8c22424e47467f050eb930fee5e
+>                                                            54b2dc89378c7d6a05341997bf19efcd34428c56
+>     committed_at (oldest)    2026-09-05T09:14:25Z          2026-09-05T09:10:29Z
+>     len(history)             1                             1
+>
+> ⚠️ **`len(history) == 1` on both is the field nobody had looked at**: neither gist has ever been
+> edited, so `created_at == committed_at` — **a measurement taken today, not a property.**
+> ⚠️⚠️ **THE SECRET ONE IS RECORDED, NOT CONCEALED.** Concealing it — or deleting it and publishing
+> only the `09:14:25Z` one — **would be the exact defect this artefact exists to rule out**: deleting
+> a failed timestamp attempt is indistinguishable from deleting an inconvenient one.
+
+**WHAT WAS WRITTEN.** `INCIDENTS.md` **`INC-172`** (`dd70f5a`) in hard rule 13's eight fields, with
+`Diagnosis` and `Missed` filled — the `Missed` being that **C21 BUILD 3 (`8d3b04fe`) and C19 BUILD
+(`2a7f95c1`) had both written this violation down in capitals hours earlier and were both fenced out
+of `INCIDENTS.md`**, which is `INC-141`'s trap one file over. `QUESTIONS.md` (`ca859b9`) — **the four
+architect rulings transcribed VERBATIM** (hard rule 5) as `Q-249`, `Q-250`, `Q-251` and the
+`Q-231`/`Q-233` pair, **the seventeen lettered questions renumbered `Q-235`…`Q-251`** and attributed
+to the tokens that raised them, **`Q-252` raised**, and the two token rows. `README.md` §12 only
+(`7a60d76`) — the owed `history[]` fields, the secret gist's id, the gist body checked against the
+manifest, and **a new §12.5 publishing two permanent defects of the pre-registration**.
+
+⚠️ **TWO TOKEN ROWS, AND THE SECOND IS THE POINT.** `| 6e2b8a53 | C14 | FIX | 2026-09-05 |` and
+`| 8d3b04fe | C21 | BUILD | 2026-09-05 |`. The second was **issued**, and **C21 BUILD 3 correctly
+refused to write its own** — *"turning E1 green by writing my own issued-token row would be the exact
+shape of the defect E1 exists to catch."* **E1 was red on its commits until this row. A different
+session writing it is the right shape.**
+
+⚠️ **THE `Q-249` RULING, AND THE HALF OF IT THIS SESSION COULD NOT DISCHARGE.** `HOLES.md`:276 reads
+`TODO_C14_CALIBRATION` and `config/protocol.yaml`:368 reads `"0.20"`; **both are inside `prereg-v1`
+and neither can be amended.** `config/` is **operative**. ⚠️ **`tests/test_c14_prereg.py`:389 STAYS
+RED AND WAS NOT EDITED — that red IS the disclosure.** The ruling requires publication *"in the README
+**and** in `RESULTS.md`"*; **`README.md` §12.5 is the README half, and the `RESULTS.md` half is OWED**
+— that file is in this session's exclusion list.
+
+⚠️ **`Q-252` RAISED AND DELIBERATELY NOT FIXED.** Three `src/` docstrings —
+`probe/void.py`:12, `results/blocks.py`:25 and :158 — still state the void threshold is a sentinel and
+no void verdict is computable. **All three are false.** Measured **by reading, never by importing**.
+⚠️ **`src/` is untouchable while the sweep is live: a crash-resume re-imports it and this run cannot
+be repeated. A docstring is not worth the run.** Recorded as owed.
+
+⚠️⚠️ **NO SWEEP-DEPENDENT PLACEHOLDER WAS FILLED, MEASURED ON THE FULL MULTISET BEFORE AND AFTER —
+`arm1..arm4` and `arm2S` at 7 each, `<<PENDING-RUN>>` at 2, `<<PENDING-RUN: name>>` at 1; 38 grep
+hits, 35 arm slots, IDENTICAL.** ⚠️ **AND `<<PENDING-RUN: GIST_ID>>` WAS ALREADY FILLED BY
+`2a7f95c1` THIS AFTERNOON — this session measured it at ZERO occurrences before it wrote anything and
+does not claim the work.** ⚠️ **No arm number, escape count, breach rate, denominator or VOID verdict
+appears anywhere in this session's writing. No VOID was computed: a VOID is a determination about a
+COMPLETED scored run, and no scored run has completed.**
+
+⚠️ **AND WHAT THE WITNESS IS NOT: THERE IS NO OPENTIMESTAMPS RECEIPT** (`Q-231`, ruled *record, do not
+fix*), **and none was stamped today** — a receipt made this evening would witness an instant **eight
+hours after** the first scored episode, and an anchor pointing at the wrong instant is worse than an
+absent one. **The anchor is GitHub's word, not Bitcoin's, and every document here now says so.**
+
 ## SESSION-TOKEN 8d3b04fe — C21, BUILD (THE SUBMISSION PACK, REVISION 3) — 2026-09-05 — ⚠️⚠️ **FOUR OF BUILD 2's STATE ROWS INVERTED OVERNIGHT AND EVERY ONE INVERTED IN THIS PROJECT'S FAVOUR. `prereg-v1` RESOLVES, THE WITNESS GIST IS PUBLIC AND PRECEDES THE FIRST SCORED EPISODE BY 2 min 57 s, THE CALIBRATION COMPLETED AND THE VOID THRESHOLD IS `0.20`. ⛔ NO SCORED RESULT EXISTS, NO VERDICT HAS BEEN COMPUTED, AND NOT ONE PLACEHOLDER WAS FILLED**
 
 **Role:** BUILD. **Chunk:** C21. ⚠️ **FULL RECORD: `docs/sessions/c21-build-3.txt`** — path checked
