@@ -1,3 +1,75 @@
+## SESSION-TOKEN 1f7c3a9e — C21, BUILD (THE VIDEO URL) — 2026-09-05 — ✅ **THE VIDEO URL IS RECORDED: `https://youtu.be/9AmN-raF6pk`, VERIFIED TO RESOLVE BEFORE IT WAS WRITTEN. EXACTLY ONE PLACEHOLDER FILLED — `FORM_ANSWERS.md` 22 → 21. ⛔ NOTHING ELSE IN THE PACK TOUCHED, NO SWEEP-DEPENDENT PLACEHOLDER FILLED, NO RESULT READ OUT OF THE RUN, THE FILM NOT WATCHED AND NOT REVIEWED**
+
+**Role:** BUILD. **Chunk:** C21 — the video URL only; *"a ten-minute task"* by its prompt's own words,
+and it was treated as one. ⚠️ **FULL RECORD: `docs/sessions/c21-video-url-1.txt`** — path checked
+**not to exist on disk OR on any ref** before a byte was written (`INC-170`), because C21 already
+held `c21-build-1.txt`, `c21-build-2.txt` and `c21-build-3.txt`; it is committed as the **LAST** of this
+session's three commits so that it names the other two with their real `--numstat`s.
+⚠️ **SPEND: ZERO.** No provider call in any mode; no token sanction was held and none was taken.
+`.env` never opened; no key name paired with a value.
+⚠️ **A SCORED SWEEP WAS LIVE AND WRITING `evals/` THROUGHOUT. `evals/` WAS NOT READ, WRITTEN, PAUSED
+OR SIGNALLED; `src/` WAS NOT TOUCHED.** No tag cut, moved or deleted. **NOT SELF-CERTIFIED.**
+
+**THE URL, VERIFIED BEFORE IT WAS WRITTEN — without a credential, cookie or login, and not taken
+from the prompt that supplied it:**
+
+- `curl -sI https://youtu.be/9AmN-raF6pk` → **`HTTP 303`** → `https://www.youtube.com/watch?v=9AmN-raF6pk` →
+  **`HTTP 200`**, `<title>` *"Whetstone Gate — a Razorpay MCP policy gate, attacked blind, on an
+  answer key I didn't write - YouTube"*.
+- YouTube's oEmbed endpoint → **`HTTP 200`**, same title, `"type":"video"`.
+- the watch page's own player response: **`"lengthSeconds":"196"` = 3:16**, **`"isUnlisted":true`**,
+  `"isPrivate":false`, `"playabilityStatus":{"status":"OK"}`.
+- ⚠️ **Not verified and not claimed: logged-out PLAYBACK** — `curl` fetches a page; it does not play
+  one. That is O-9, the operator's. ⚠️ **And the film was not watched:** *"twenty-one episodes in"*
+  and the 2026-09-05 measurement date are the operator's statements, recorded beside the URL and
+  labelled as such everywhere they appear.
+
+**WHAT WAS WRITTEN — two deliverable paths, one commit, `0309de9` `(unreviewed)`, `git show --numstat`
+read AFTER it landed: `README.md 8/0`, `docs/submission/FORM_ANSWERS.md 56/10`:**
+
+- `docs/submission/FORM_ANSWERS.md` — §5's placeholder replaced by the URL, with the verification
+  above, the sweep-in-flight caveat, and the statement that the video is **unreviewed**; O-5 struck
+  (`~~…~~`), not deleted, with the note that it closed while O-4b (the C17 re-review) was still open
+  — recorded, not reconciled; the header, §0's *"two that did not invert"*, §0.0's *the video* row,
+  §8's preamble and §8's two `VIDEO_URL` row keys annotated **beside** BUILD 3's text, which stands.
+  ⚠️ **The count of placeholder-marker strings, `grep -o` on the `HEAD` blob and on the written file,
+  moved 22 → 21. EXACTLY ONE.** The two `VIDEO_URL` strings that remain are §8's row keys — the
+  table that *lists* placeholders — not slots. Every other placeholder is byte-identical; none is
+  this session's and most depend on the sweep.
+- `README.md` — a one-line **Video** entry between the opening blockquote and the STATUS box, and one
+  new row at the foot of the STATUS box's table, each stating **3:16** and that **every figure in the
+  film was measured on 2026-09-05 with the scored sweep in flight**, hence *"twenty-one episodes
+  in"*; the new row says it was added later than the rest of the box and measured at `0309de9`'s
+  parent, not at `e7ffd9c`. ⚠️ **README placeholder count 38 before, 38 after.**
+
+**WHAT THIS SESSION DID NOT DO:** did not fill `GIST_ID`, `N`, `N-branch`, any `arm` cell, or any
+other placeholder anywhere; did not certify the film against spec §18 or the RACE renderer
+(`REVIEW_C17_2.md` does not exist; `c17-pass` is not cut); did not flip the repository public —
+re-measured, not assumed: an unauthenticated `GET api.github.com/repos/chinmoypaul8897/whetstone-gate`
+returns `404`; did not edit `QUESTIONS.md`, `INCIDENTS.md`, `RESULTS.md`, `PROTOCOL.md`, `CONTEXT.md`,
+`PROCESS.md`, `HOLES.md`, `config/`, `src/`, `tests/`, `tests/goldens/`, `docs/reviews/`,
+`docs/render/`, `corpora/`, anything under `evals/`, or any tag; did not open a scored ledger or
+checkpoint. **Nothing broke** — no `INCIDENTS.md` entry is owed by this session, and `INCIDENTS.md`
+is outside its fence in any case.
+
+⚠️ **OWED — `QUESTIONS.md` is outside this fence:** the token row
+`| 1f7c3a9e | C21 | BUILD | 2026-09-05 |`. `make check-roles` E1 is red on this token until the next
+session that holds that file writes it (`INC-141`'s trap; the row was NOT self-written).
+
+**GIT:** `PROCESS.md` §7b with `INC-139`'s correction — a private index in a fresh OS temp directory,
+`git read-tree HEAD` (live, never a pinned SHA), each path's content pinned at READ time with
+`git hash-object -w` + `update-index --cacheinfo` (`INC-137`), the staged name list compared to the
+declared path list before every commit, shared-file content built from `git show HEAD:<file>` and
+never the working tree, and `env -u GIT_INDEX_FILE git reset -- <paths>` afterwards with the shared
+index proved clean. LF only, 0 CR in every written file, byte-verified. **Three commits:** `0309de9`
+(the two deliverables) → this `STATUS.md` / `PROGRESS.md` append, which cannot name itself → the
+journal, LAST, which names both. **`STATUS.md`'s C20 and C21 rows are APPENDED TO, never
+overwritten** — the C21 status *word* is left as it was, because a build session does not move its
+own chunk's status; the C21 BUILD 1 block's *"NOT POSSIBLE — C20 is `todo`"* row is superseded by the
+C21 row's new text and left standing.
+
+---
+
 ## SESSION-TOKEN 6e2b8a53 — C14, FIX (THE WITNESS RECORD) — 2026-09-05 — ⚠️⚠️ **`PROCESS.md` §6a.2 STEP 7 WAS NOT DONE AND THE SCORED SWEEP STARTED ANYWAY — `INC-172`. ⚠️ AND THE SUBSTANTIVE PRECONDITION IT GUARDS *WAS* MET, IN ORDER, WITH 2 min 57 s TO SPARE. BOTH GISTS ARE NOW IN THIS REPOSITORY, INCLUDING THE ONE PUBLISHED *SECRET*. ⛔ NO PLACEHOLDER FILLED, NO VERDICT COMPUTED, NO RESULT READ OUT OF THE RUN**
 
 **Role:** FIX. **Chunk:** C14. ⚠️ **FULL RECORD: `docs/sessions/c14-witness-record-1.txt`** — path
