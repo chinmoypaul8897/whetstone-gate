@@ -21,3 +21,11 @@ ran, `RESULTS.md` came into existence, degradation rung 4 fired and was executed
 renderer was built and the single-shot calibration was declared and attempted. **This pointer's own
 content did not need to change**, which is the property it was created to have — and `QUESTIONS.md`
 was outside that session's fence too, so `Q-A` is still owed.
+⚠️ **C21 BUILD 3 (`SESSION-TOKEN 8d3b04fe`, 2026-09-05) rewrote it again**, because four of BUILD 2's
+load-bearing state rows inverted overnight and every one of them inverted in this project's favour:
+`prereg-v1` was cut and pushed, the fingerprint was published and verifies, the single-shot
+calibration completed and set the void threshold to `20%`, and **a public witness gist was posted
+2 minutes 57 seconds before the first scored episode.** **This pointer's own content still did not
+need to change** — and `QUESTIONS.md` was outside that session's fence too, so **`Q-A` is still
+owed, now alongside `Q-B`…`Q-Q`, none of which has ever reached `QUESTIONS.md` at all**
+(`FORM_ANSWERS.md` §0.4, `Q-Q`).
