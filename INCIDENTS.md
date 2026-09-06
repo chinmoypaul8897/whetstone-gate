@@ -13825,9 +13825,8 @@ the numerical coincidence was mistaken for the mechanism. **The gate never saw 2
 zero, and the two numbers have nothing to do with each other.**
 
 **Fix:** `RESULTS.md` §2.1 now states the measured mechanism, prints the clause-by-clause trace, and
-**withdraws the false sentence explicitly rather than replacing it silently** — published in the
-commit that carries this entry; its SHA is recorded by the following commit, which corrects
-`README.md`. ⚠️ **The film is NOT re-cut.** It speaks the false sentence at 1:52 and it is already
+**withdraws the false sentence explicitly rather than replacing it silently** — published at **`9bcb559`**, the commit
+that carries this entry; `README.md` is corrected in the commit that follows it. ⚠️ **The film is NOT re-cut.** It speaks the false sentence at 1:52 and it is already
 submitted and linked; a correction beside it is honest and a quiet re-upload is not.
 
 **Systemic guardrail:** ⚠️ **the finding this replaces it with is STRONGER than the one it kills,
@@ -13882,8 +13881,7 @@ generator*.
 never summing the four components read close enough to compliance to pass a careful author's eye.
 
 **Fix:** `RESULTS.md` §2, republished at the full N as per-episode medians with IQR and non-zero
-episode counts, with the correction stated in the file rather than made silently — in the commit
-that carries this entry; SHA recorded by the following commit.
+episode counts, with the correction stated in the file rather than made silently — **`9bcb559`**.
 
 **Systemic guardrail:** ⚠️ **none that is enforceable today, and the reason is named rather than
 papered over.** The real guardrail is to make `make eval` runnable so no hand path exists, and that
