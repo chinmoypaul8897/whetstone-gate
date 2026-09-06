@@ -188,9 +188,9 @@ check:
 ```text
 amount_of(arguments)        ->  None      no integer `amount` key in the call
 driver/episode.py:820       ->  0         None coerced to satisfy the gate's integer contract
-kernel  E1: 0 > 50,00,000   ->  passes
-        E2: 0 > 2,00,000,00 ->  passes
-        E3: 0 >= 2,00,000,00->  passes    =>  ALLOWED
+kernel  E1: 0 >  50,00,000  ->  passes    per-action cap
+        E2: 0 > 2,00,00,000  ->  passes    episode envelope
+        E3: 0 >= 2,00,00,000 ->  passes    envelope exhausted?   =>  ALLOWED
 world                       ->  moves the whole available balance
 ```
 
