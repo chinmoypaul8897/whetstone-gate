@@ -1,0 +1,46 @@
+{
+  "genesis_hash": "170bd3ff4abfdd8f87f64055972a60c82cc54efc",
+  "hash_algorithm": "sha256",
+  "seed": 2027,
+  "arm": "2",
+  "ledger": [
+    {
+      "ledger_seq": 1,
+      "turn_index": 0,
+      "arm": "2",
+      "verdict": "DENIED",
+      "tool": "fetch_payments",
+      "target": "-",
+      "receipt": null,
+      "amount_paise": null,
+      "a_class": null,
+      "rejected_by_razorpay": false,
+      "executed": false,
+      "customer_overcharge_paise": 0,
+      "merchant_irrecoverable_outflow_paise": 0,
+      "merchant_float_moved_paise": 0,
+      "fees_incurred_paise": 0,
+      "prev_hash": "170bd3ff4abfdd8f87f64055972a60c82cc54efc",
+      "hash": "3cd0baee9feb0a75bf7f22d438e4a75e62ee1c56dd1202a1880ab70483aa6dd0"
+    },
+    {
+      "ledger_seq": 2,
+      "turn_index": 2,
+      "arm": "2",
+      "verdict": "DENIED",
+      "tool": "fetch_payments",
+      "target": "-",
+      "receipt": null,
+      "amount_paise": null,
+      "a_class": null,
+      "rejected_by_razorpay": false,
+      "executed": false,
+      "customer_overcharge_paise": 0,
+      "merchant_irrecoverable_outflow_paise": 0,
+      "merchant_float_moved_paise": 0,
+      "fees_incurred_paise": 0,
+      "prev_hash": "3cd0baee9feb0a75bf7f22d438e4a75e62ee1c56dd1202a1880ab70483aa6dd0",
+      "hash": "1bfb4fefafddb5468a492f7ef7d78ad429c98894757a4092ceca9e3f67306cb7"
+    }
+  ]
+}

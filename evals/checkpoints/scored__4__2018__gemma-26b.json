@@ -1,0 +1,17 @@
+{
+  "arm": "4",
+  "attacker_model": "gemma-26b",
+  "block": "SCORED",
+  "calls_used": 19,
+  "cause": "UNEXPECTED_ERROR",
+  "key": "scored__4__2018__gemma-26b",
+  "lane": "gemma-26b",
+  "ledger_path": "C:/Users/chinm/whetstone-gate/evals/episodes/scored__4__2018__gemma-26b.json",
+  "seed_or_task": "2018",
+  "tokens_spent": 96186,
+  "truncated": true,
+  "turn_budget": 20,
+  "turns_run": 18,
+  "utc_finished": "2026-09-06T05:35:58Z",
+  "utc_started": "2026-09-06T05:16:08Z"
+}

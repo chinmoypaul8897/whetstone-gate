@@ -1,0 +1,17 @@
+{
+  "arm": "2",
+  "attacker_model": "gemma-26b",
+  "block": "SCORED",
+  "calls_used": 20,
+  "cause": null,
+  "key": "scored__2__2020__gemma-26b",
+  "lane": "gemma-26b",
+  "ledger_path": "C:/Users/chinm/whetstone-gate/evals/episodes/scored__2__2020__gemma-26b.json",
+  "seed_or_task": "2020",
+  "tokens_spent": 71048,
+  "truncated": false,
+  "turn_budget": 20,
+  "turns_run": 20,
+  "utc_finished": "2026-09-06T07:21:35Z",
+  "utc_started": "2026-09-06T07:03:45Z"
+}
