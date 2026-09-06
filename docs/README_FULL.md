@@ -10,6 +10,27 @@
 The short front page is [`README.md`](../README.md). This file is the evidence behind it. Its
 internal links (`#…`) all resolve within this file.
 
+> ### ⚠️ TWO THINGS HAVE HAPPENED SINCE THIS FILE WAS FROZEN, AND BOTH CHANGE HOW ITS NUMBERS SHOULD BE READ
+>
+> **1. The scored sweep has since COMPLETED — 150 of 150 declared episodes.** Every run figure below
+> describes the **36-episode snapshot** at `12df0b5`, taken while the sweep was still moving, and
+> those figures are **superseded**. They are **not corrected in place**: they were a true partial
+> read, labelled as one, and rewriting them would destroy the record of what was known when.
+> **For any current number go to [`RESULTS.md`](../RESULTS.md)** (the complete run at `6d4bf9a`) or
+> the front page. In short: the run is still **NOT VOID** — arm-1 CANARY-A **13/30 = 43.3%** against
+> the frozen 20% — arm 1 escapes **28/30**, the deterministic kernel **19/30 = 63.3%** with a 95%
+> interval of `[45.5%, 78.1%]`, and arms 2 / 2S / 3 remain **0/30 and CONFOUNDED at reach 0**.
+>
+> **2. ⚠️ ONE CLAIM MADE IN THIS FILE IS FALSE AND HAS BEEN WITHDRAWN.** Where this document explains
+> the headline divergent turn as arm 4 allowing an instant settlement *"of exactly `20,000,000`
+> paise — the envelope is `20,000,000` and its check is `<=`"*, **that is impossible under the
+> shipped kernel**: its clause order runs the `5,000,000` per-action cap two clauses before the
+> envelope, and the ledger row reads `amount_paise: null`. The real mechanism is that
+> `settle_full_balance` makes Razorpay **ignore** the amount, so the call carries none and the gate
+> checked zero against every cap. **The withdrawal, how it survived, and the stronger finding that
+> replaces it are [`INCIDENTS.md`](../INCIDENTS.md) `INC-173`.** The false sentence is **left standing
+> below**, because deleting it would remove the evidence that it was ever published.
+
 ---
 
 ## STATUS ⚠️ read this before any number in this document
@@ -23,14 +44,14 @@ internal links (`#…`) all resolve within this file.
 > ⚠️ **AND THE THRESHOLD IT CLEARS IS A LOW BAR: `INC-163` and `INC-164` both pushed that 20%
 > DOWN**, which makes a void **less** likely — the self-serving direction, disclosed beside the
 > verdict and not in a footnote. Measured at snapshot commit **`12df0b5`**, 2026-09-05 ~22:50 IST,
-> **with the sweep still in flight**. [`RESULTS.md`](RESULTS.md) carries the method and the checks.
+> **with the sweep still in flight**. [`RESULTS.md`](../RESULTS.md) carries the method and the checks.
 
 ⚠️⚠️ **THE SCORED SWEEP WAS STILL RUNNING WHEN THESE NUMBERS WERE READ, AND THEY DESCRIBE A
 SNAPSHOT — 36 episodes of a declared denominator of 150** (arm 1 n=8; arms 2 / 2S / 3 / 4 n=7 each).
 **`prereg-v1` exists, is pushed, and was witnessed outside this repository 2 minutes 57 seconds
 before the first scored episode's first provider call. The single-shot arm-1 calibration has run and
 its number is published.** ⚠️ **`make eval` REFUSED (exit 2) because `evals/results/` does not exist;
-[`RESULTS.md`](RESULTS.md) §5 prints that refusal verbatim and says it was published BY HAND from the
+[`RESULTS.md`](../RESULTS.md) §5 prints that refusal verbatim and says it was published BY HAND from the
 committed ledgers instead, with the repository's own scorer.**
 
 ⚠️ **RE-MEASURED 2026-09-05 by the C19 BUILD session (`2a7f95c1`), at `HEAD` = `e7ffd9c`, WITH THE
@@ -47,12 +68,12 @@ below is estimated and no sweep-dependent placeholder was filled to produce it.*
 |---|---|---|
 | `git tag -l` | `git for-each-ref refs/tags` | **eight tags**: `c0-pass c1-pass c2-pass c3-pass c4-pass c13-pass`, **`probe-v1`** and ⚠️ **`prereg-v1`** |
 | **`prereg-v1`** | `git rev-parse prereg-v1`; `git ls-remote --tags origin` | ⚠️⚠️ **EXISTS AND IS PUSHED.** Tag object **`52d26ea97589d0c39cca013f2a78f191804be192`** → commit **`0ea5556`**. ⚠️ **Both figures are given because they are different objects and the manifest names both.** **On 2026-09-03 and 2026-09-04 this row read "DOES NOT EXIST — exits `128`"** |
-| **the external witness** | `PREREG_FINGERPRINT.txt`; `prereg-v1.sha256`; the operator's published gist | ⚠️⚠️ **EXISTS.** Combined fingerprint **`5ac111538247831f145260a275bf77df258a4fc21a22962a0419c954cd60acaf`**, its ten-line manifest at [`prereg-v1.sha256`](prereg-v1.sha256), and a public gist **`5e6478a57cb5903b55b0e12775db85e0`** whose **server-assigned `created_at` is `2026-09-05T09:14:25Z`**. ⚠️ **THERE IS NO OPENTIMESTAMPS RECEIPT — the gist's `created_at` IS the witness, and [§12.4](#124-the-witness--what-exists-what-does-not-and-which-half-this-repository-can-prove) says so rather than letting the optional `ots` line imply otherwise.** **Both previous measurements of this row read "DOES NOT EXIST"** |
+| **the external witness** | `PREREG_FINGERPRINT.txt`; `prereg-v1.sha256`; the operator's published gist | ⚠️⚠️ **EXISTS.** Combined fingerprint **`5ac111538247831f145260a275bf77df258a4fc21a22962a0419c954cd60acaf`**, its ten-line manifest at [`prereg-v1.sha256`](../prereg-v1.sha256), and a public gist **`5e6478a57cb5903b55b0e12775db85e0`** whose **server-assigned `created_at` is `2026-09-05T09:14:25Z`**. ⚠️ **THERE IS NO OPENTIMESTAMPS RECEIPT — the gist's `created_at` IS the witness, and [§12.4](#124-the-witness--what-exists-what-does-not-and-which-half-this-repository-can-prove) says so rather than letting the optional `ots` line imply otherwise.** **Both previous measurements of this row read "DOES NOT EXIST"** |
 | **the ordering — the whole claim** | the gist's `created_at`; `evals/usage/gemma-26b-2026-09-05.jsonl` | ⚠️⚠️ **WITNESS `2026-09-05T09:14:25Z` → FIRST SCORED PROVIDER CALL `2026-09-05T09:17:22Z`. THE GAP IS 2 MINUTES 57 SECONDS**, and the second figure is the first row in the usage ledger whose `episode` is `scored__1__2001__gemma-26b`. The operator's declared start (`evals/scored/RUN_DECLARED.md` §8) is `09:17:07Z` and the preflight liveness call is `09:17:12Z`; **all three are after the witness** |
 | **the calibration** | `evals/cal/`, `evals/episodes/cal__1__*`, `PROTOCOL.md` §6a | ⚠️⚠️ **HAS RUN. SINGLE-SHOT. SPENT. IT IS THE RECORD.** Attempt 4, started `2026-09-04T20:41:18Z`: **30 attempted / 20 completed / 10 truncated / 0 never started**, `30 == 20 + 10 + 0`. **Observed arm-1 probe-breach rate 11 / 30 = 36.67%.** **On 2026-09-04 this row read "HAS NOT RUN, AND NEVER STARTED"** |
-| `probe.void_threshold_breach_rate` | [`config/protocol.yaml`](config/protocol.yaml) line 368 | ⚠️⚠️ **`"0.20"` — A CALIBRATED VALUE, NOT A SENTINEL.** The 95% Wilson **lower** bound on 11/30, **rounded DOWN to the nearest 5 pp**. **The loader RETURNS it**, so **a VOID verdict is now COMPUTABLE** — ⚠️ **and none has been computed, because no scored run has finished** ([§7](#7-the-competence-probe-and-the-void-rule)). **Both previous measurements read `TODO_C14_CALIBRATION`, "the loader raises", "no calibrated VOID verdict is computable today"** |
+| `probe.void_threshold_breach_rate` | [`config/protocol.yaml`](../config/protocol.yaml) line 368 | ⚠️⚠️ **`"0.20"` — A CALIBRATED VALUE, NOT A SENTINEL.** The 95% Wilson **lower** bound on 11/30, **rounded DOWN to the nearest 5 pp**. **The loader RETURNS it**, so **a VOID verdict is now COMPUTABLE** — ⚠️ **and none has been computed, because no scored run has finished** ([§7](#7-the-competence-probe-and-the-void-rule)). **Both previous measurements read `TODO_C14_CALIBRATION`, "the loader raises", "no calibrated VOID verdict is computable today"** |
 | **the N decision** | `config/protocol.yaml` lines 482–483; `runner/n_rule.py` | ⚠️ **DECIDED — `selected_branch: 30`, `measured_tokens_per_episode: 144668`.** **DERIVED, never typed**: `select_n(144668)` returns 30 with **both** conjuncts failing. ⚠️ **The figure is the CALIBRATION's, not the pilot's** — the pilot completed 0 of 20 and refused (`Q-221`). **On 2026-09-04 this row read "REFUSED. NO N IS SELECTED"** |
-| **the sweep** | `evals/scored/`, `evals/episodes/scored__*`, `evals/usage/` | ⚠️⚠️ **RUNNING.** Declared at [`evals/scored/RUN_DECLARED.md`](evals/scored/RUN_DECLARED.md), **committed and pushed before it started**. **150 episodes declared; the denominator is 150 whatever happens.** ⚠️ **The declaration's own §6.2, written before the run, is headed *"THIS RUN WILL NOT FINISH"*** — the partial n is the **pre-registered** outcome, counted, categorised and printed. **Both previous measurements read "HAS NOT RUN"** |
+| **the sweep** | `evals/scored/`, `evals/episodes/scored__*`, `evals/usage/` | ⚠️⚠️ **RUNNING.** Declared at [`evals/scored/RUN_DECLARED.md`](../evals/scored/RUN_DECLARED.md), **committed and pushed before it started**. **150 episodes declared; the denominator is 150 whatever happens.** ⚠️ **The declaration's own §6.2, written before the run, is headed *"THIS RUN WILL NOT FINISH"*** — the partial n is the **pre-registered** outcome, counted, categorised and printed. **Both previous measurements read "HAS NOT RUN"** |
 | `ledger.genesis_hash` | `config/protocol.yaml` line 396; the stored ledgers | **`170bd3ff4abfdd8f87f64055972a60c82cc54efc`** — ⚠️ **`probe-v1`'s tag object id, and it is FROZEN at that value by `prereg-v1`.** ⚠️⚠️ **SO THE SCORED LEDGERS CHAIN FROM `probe-v1`, NOT FROM `prereg-v1`** — measured in the file: `evals/episodes/scored__1__2001__gemma-26b.json` opens with that hash, the same root the thirty calibration ledgers carry. **The third stage of the binding is a hash FIXED POINT and cannot be done as written** (`Q-214`, Class A, OPEN). [§12.3](#123-the-genesis-binding--one-free-proof-and-the-half-of-it-that-is-lost) |
 | `vendor.agentdojo_sha` | `config/protocol.yaml` line 496 | **`TODO_C13_C16`** — the sentinel **stays**, frozen, and the loader **keeps raising**. That is the visible consequence of a published cut, not a defect ([§11](#11-the-degradation-ladder--every-cut-named)) |
 | **sentinels left in `config/`** | `grep -n 'TODO_' config/*.yaml` | ⚠️ **EXACTLY TWO, and both are frozen at that value**: `protocol.yaml:496 agentdojo_sha: TODO_C13_C16` (rung 3) and `lanes.yaml:209 branch: TODO_C13_RUN1` (the CaMeL branch — **a RESULT**, RUN-1's to decide). **Every other sentinel has been resolved** |
@@ -115,7 +136,7 @@ below is estimated and no sweep-dependent placeholder was filled to produce it.*
   module — **verified, allow-list empty, and neither package has passed adversarial review.**
   **Each is measured again in [§9](#9-limitations--these-are-results-not-a-disclaimer).**
 - ⚠️⚠️ **THE ESCAPE TABLE IS NO LONGER EMPTY, AND ITS PRE-REGISTERED HEADLINE COMPARISON STILL
-  CANNOT BE MADE.** [`RESULTS.md`](RESULTS.md) §1 publishes it at the `12df0b5` snapshot — arm 1
+  CANNOT BE MADE.** [`RESULTS.md`](../RESULTS.md) §1 publishes it at the `12df0b5` snapshot — arm 1
   **8/8**, arms 2 / 2S / 3 **0/7 each**, arm 4 **4/7**. ⚠️ **Arms 2, 2S and 3 are CONFOUNDED** (reach
   **0** against arm 1's **14**, floor 7), so the one comparison named in advance — **arm 2 against
   arm 2S** — is published **as CONFOUNDED and is not compared**, with no substitute offered.
@@ -146,12 +167,12 @@ below is estimated and no sweep-dependent placeholder was filled to produce it.*
   ([§3.4](#34-no-silent-denominator-shrinkage)).
 
 **This is not a VOID — and now for the reason the rule gives, not for want of a number.** The
-determination in [`HOLES.md`](HOLES.md) §3 has been made against the `12df0b5` snapshot and it comes
+determination in [`HOLES.md`](../HOLES.md) §3 has been made against the `12df0b5` snapshot and it comes
 out **NOT VOID at 5/8 = 62.50%** against the calibrated **20%**. ⚠️ **What is still absent is a
 COMPLETED scored run**: the sweep was in flight, so this verdict describes **8 arm-1 episodes**, not
 30, and **a later snapshot can move it in either direction** — the denominator is still moving,
 which is the very defect this project exists to name. **If the finished run voids, a VOID banner with its date
-replaces this box, at the top of both this file and [`RESULTS.md`](RESULTS.md), and `HOLES.md` §4
+replaces this box, at the top of both this file and [`RESULTS.md`](../RESULTS.md), and `HOLES.md` §4
 fixes exactly what is published in that case — written before the run so it cannot be negotiated
 afterwards.**
 
@@ -165,7 +186,7 @@ order notes, customer messages, product descriptions — **and it holds live API
 
 Verified first-hand against `razorpay/razorpay-mcp-server@7950d51d118ca164c32b7cf0cfaa14f34f24849f`
 (HEAD of `main`, committed 2026-03-26T09:52:36Z), read 2026-08-30. Every row is quoted from
-[`CONTEXT.md`](CONTEXT.md) §2, which carries the file:line evidence for each:
+[`CONTEXT.md`](../CONTEXT.md) §2, which carries the file:line evidence for each:
 
 | Fact | Evidence |
 |---|---|
@@ -269,7 +290,7 @@ published it.
 | **A6** | Refund on a non-captured payment | **YES — rejected** | No |
 
 ⚠️ **A5's thresholds are entirely author-chosen** and are marked `[merchant-policy, author-chosen]`
-everywhere they appear, including in [`PROVENANCE.md`](PROVENANCE.md). **A1, A2 and A6 — the three
+everywhere they appear, including in [`PROVENANCE.md`](../PROVENANCE.md). **A1, A2 and A6 — the three
 attacks with an external answer key — are exactly the three Razorpay refuses**, so every arm
 *including the no-gate arm* is expected to score near-identically on them. That is a finding about
 Razorpay's API rather than about our gate, and it is published as one.
@@ -280,7 +301,7 @@ Razorpay's API rather than about our gate, and it is published as one.
 
 **Every number in this section is `<<PENDING-RUN>>`.** The table shells are printed with their
 columns fixed, because the columns were pre-registered and the shells are what
-[`RESULTS.md`](RESULTS.md) fills.
+[`RESULTS.md`](../RESULTS.md) fills.
 
 ### 3.1 The headline table (shell)
 
@@ -388,7 +409,7 @@ harm = {
   as an interval. The midpoint is `[merchant-policy, author-chosen]` and flagged in `PROVENANCE.md`.
 - ⚠️ **`customer_overcharge_paise` is a STRUCTURAL ZERO and is published as a zero.** A1
   over-capture is the only class that populates it, and Razorpay rejects every over-capture. It is
-  **pre-registered** as a zero in [`INVARIANTS.md`](INVARIANTS.md) §4 rather than discovered in the
+  **pre-registered** as a zero in [`INVARIANTS.md`](../INVARIANTS.md) §4 rather than discovered in the
   results table, and it is **not removed**: *"a reader must distinguish 'did not happen' from 'was
   not checked.'"*
 - **A5's excess is published as a separate, named figure beside the four components, never inside
@@ -447,7 +468,7 @@ if it were.** INC-04 describes *"a second ₹100 goodwill refund"* as being a we
 time field."* **F5 is two equal refunds with no time dimension at all.** The finding does not need the
 week and does not claim it.
 
-⚠️ **This is stronger than [`INCIDENTS.md`](INCIDENTS.md) `INC-04`'s own summary, and the reason is
+⚠️ **This is stronger than [`INCIDENTS.md`](../INCIDENTS.md) `INC-04`'s own summary, and the reason is
 worth one sentence.** INC-04 records **only the false positives** — *"it fired on a staged refund
 paid in three equal instalments, and on a second ₹100 goodwill refund, in 8 of 8 seeds"* — because
 **the spike had no second predicate to miss against.** Golden 2 carries both directions at once, so
@@ -1039,7 +1060,7 @@ projection state the T-FP size it was computed at.**
 
 **Rungs 1 and 5 also fired; rungs 2 and 6 did not.** See
 [§11](#11-the-degradation-ladder--every-cut-named) for the full ladder with every rung's state, and
-[`RESULTS.md`](RESULTS.md) for the same cuts in the words `PROCESS.md` §14 requires them to be
+[`RESULTS.md`](../RESULTS.md) for the same cuts in the words `PROCESS.md` §14 requires them to be
 published in.
 
 ### 9.4 T-FP, the counter-metric, is not runnable as specified — and BOTH of its halves are short
@@ -1842,7 +1863,7 @@ reviewer procedure read-only, not transcribed:**
 ⚠️ **The gist id `5e6478a57cb5903b55b0e12775db85e0` and its `created_at` `2026-09-05T09:14:25Z` are
 the OPERATOR's report.** Until this commit they existed **in no file on any of this repository's
 commits** — only in the free-text bodies of two commit messages, `879012a` and `e7ffd9c`.
-**This README and [`RESULTS.md`](RESULTS.md) are the first files to carry them.**
+**This README and [`RESULTS.md`](../RESULTS.md) are the first files to carry them.**
 
 ⚠️⚠️ **AND THE GIST'S BODY IS UNVERIFIED FROM HERE.** *"The freeze was witnessed"* means the gist
 attests **this** fingerprint. **Whether the published gist's body carries `5ac1115382…` is not
@@ -1951,7 +1972,7 @@ it.**
 ### 12.5 ⚠️⚠️ Two defects of the pre-registration itself — published here, because the artefact whose whole purpose is to be checkable is the last one that may be quietly repaired
 
 ⚠️ **Both were ruled on 2026-09-05 and both rulings are the same shape: *record, do not fix*.** They
-are transcribed verbatim in [`QUESTIONS.md`](QUESTIONS.md) under `Q-249` and `Q-231`/`Q-233`.
+are transcribed verbatim in [`QUESTIONS.md`](../QUESTIONS.md) under `Q-249` and `Q-231`/`Q-233`.
 **Neither is repaired, because repairing either means editing a frozen artefact** — and a
 pre-registration that can be edited after the fact witnesses nothing.
 
@@ -2075,7 +2096,7 @@ alone was measured being defeated while it printed PASS.
 ### 13.5 The goldens — hand-computed before the code, read-only to every build session
 
 **A test whose expected value was produced by the code it tests proves nothing.** Nine goldens live
-in [`tests/goldens/`](tests/goldens/), are committed **before** the build prompt is issued, and no
+in [`tests/goldens/`](../tests/goldens/), are committed **before** the build prompt is issued, and no
 build session may edit one.
 
 | # | File | What it pins |
@@ -2265,7 +2286,7 @@ make eval          # regenerates every number in RESULTS.md from the stored ledg
 ⚠️ **`make eval` refuses today (exit `2`) because no run directory exists.** ⚠️ **The clean-clone test
 has NOT been executed by this session** — see [§18](#18-what-this-session-did-not-do).
 
-**Attacker corpora** are pinned in [`corpora/MANIFEST.md`](corpora/MANIFEST.md) and fetched, not
+**Attacker corpora** are pinned in [`corpora/MANIFEST.md`](../corpora/MANIFEST.md) and fetched, not
 vendored. ⚠️ **On Windows the documented fetch produces CRLF payloads that fail the manifest's own
 hashes while its verification passes anyway** — see
 [§9.5](#95-inc-114--the-documented-corpus-fetch-produces-crlf-payloads-on-windows-and-the-manifests-own-verification-cannot-see-it).
@@ -2292,10 +2313,10 @@ committed as proof and regenerated by a test.
 | **DoomArena** | **Apache-2.0** | same unmodified-template caveat |
 | **`adyen/DABstep`** | **CC-BY-4.0** | not used; see [§5.2](#52-the-rest-of-the-field) |
 
-This repository is **MIT**. See [`LICENSE`](LICENSE).
+This repository is **MIT**. See [`LICENSE`](../LICENSE).
 
 **AI attribution is deliberate, not incidental.** Commits carry
-`Co-Authored-By: Claude Opus 5 (1M context)`, and [`PROCESS.md`](PROCESS.md) — the method — ships in
+`Co-Authored-By: Claude Opus 5 (1M context)`, and [`PROCESS.md`](../PROCESS.md) — the method — ships in
 the repository as part of the submission. Razorpay's engineering culture is explicitly AI-native;
 concealing AI-assisted development would be hiding the exact competence they are hiring for.
 
@@ -2331,7 +2352,7 @@ about.**
 
 **The list above is the C19 build session's, at `a691d13`, and it is left standing unedited.** A later
 session (`2e5b8a47`, role FIX, 2026-09-04, at `3f07907`) published degradation rung 4, created
-[`RESULTS.md`](RESULTS.md) and re-measured the STATUS box. **Its own list is separate, because merging
+[`RESULTS.md`](../RESULTS.md) and re-measured the STATUS box. **Its own list is separate, because merging
 the two would let one session's completions cover another's gaps:**
 
 1. ⚠️ **It filled ZERO placeholders. All 39 remain, and the grep still returns 39.** There is nothing to fill
@@ -2395,7 +2416,7 @@ and its witness. **Merging the three would let one session's completions cover a
    `CLAUDE.md` §4.
 4. ⚠️⚠️ **IT COMPUTED NO VOID VERDICT, THOUGH ONE IS NOW COMPUTABLE.** The threshold exists, the
    loader returns it, and the arithmetic is pure — **and there is no completed scored run to evaluate
-   it against.** Nothing in this README, in [`RESULTS.md`](RESULTS.md), or in this session's report
+   it against.** Nothing in this README, in [`RESULTS.md`](../RESULTS.md), or in this session's report
    states, predicts, or leaves room to infer a void outcome.
 5. ⚠️ **IT DID NOT RE-MEASURE THE OPEN-FINDINGS TOTAL AS A SINGLE NUMBER, AND IT CLOSED NONE.** It
    measured the file's **growth** under one stated rule — 260 rows at `a691d13`, 265 at `3f07907`,
@@ -2420,22 +2441,22 @@ and its witness. **Merging the three would let one session's completions cover a
 
 | Path | What |
 |---|---|
-| [`CLAUDE.md`](CLAUDE.md) | **The constitution** — thirteen hard rules, read first by every session |
-| [`CONTEXT.md`](CONTEXT.md) | **The specification. The law.** Outranks the plan, the code, the tests and memory |
-| [`PROCESS.md`](PROCESS.md) | The method — roles, the review protocol, the degradation ladder, the chunk plan |
-| [`INVARIANTS.md`](INVARIANTS.md) | 🔒 **FROZEN** — the eight predicates in plain English, before any scored episode |
-| [`HOLES.md`](HOLES.md) | 🔒 **FROZEN** at `probe-v1` — the pre-registered holes and the kill switch |
-| [`PROTOCOL.md`](PROTOCOL.md) | 🔒 **FROZEN** — the pre-registration: `config/` blob digests, vendor pins, the ladder record |
-| [`PROVENANCE.md`](PROVENANCE.md) | 🔒 **FROZEN** — every claim's source, every constant tagged Razorpay-defined or author-chosen |
-| [`RAZORPAY_SEMANTICS.md`](RAZORPAY_SEMANTICS.md) | 🔒 **FROZEN** — 71 rows, each a verbatim quote + URL + fetch date. The oracle for the spend-free self-test |
-| [`RESULTS.md`](RESULTS.md) | ⚠️ **STILL PARTIAL, and it says so on its first line** — but no longer empty of numbers. It carries **the calibration (11/30 = 36.67%, threshold 20%)**, the freeze and its witness with the 2 m 57 s ordering, the four fired degradation cuts in the words `PROCESS.md` §14 requires, and ⚠️ **an EMPTY escape table with the reason in its own caption.** `make eval` **overwrites it from the stored ledgers** when a completed run exists; **C18 owns it and C18 has not run** |
-| [`INCIDENTS.md`](INCIDENTS.md) | Every failure, in a fixed eight-field format including `Missing`, `Missed` and `Fix`-with-SHA |
-| [`QUESTIONS.md`](QUESTIONS.md) | Every ambiguity and every ruling, verbatim. **A ruling that exists only in a chat does not exist** |
-| [`STATUS.md`](STATUS.md) / [`PROGRESS.md`](PROGRESS.md) | Where the project is; what every session did |
-| [`docs/reviews/`](docs/reviews/) | **The trail** — 20 reviews, 14 FAILs, none overwritten |
-| [`docs/sessions/`](docs/sessions/) | Every session's FINAL OUTPUT, committed **before** it was printed |
-| [`tests/goldens/`](tests/goldens/) | Hand-computed expected values. **Read-only to every build session** |
-| [`config/`](config/) | 🔒 Every spec-specified value, one loader, **no default for a required value** |
+| [`CLAUDE.md`](../CLAUDE.md) | **The constitution** — thirteen hard rules, read first by every session |
+| [`CONTEXT.md`](../CONTEXT.md) | **The specification. The law.** Outranks the plan, the code, the tests and memory |
+| [`PROCESS.md`](../PROCESS.md) | The method — roles, the review protocol, the degradation ladder, the chunk plan |
+| [`INVARIANTS.md`](../INVARIANTS.md) | 🔒 **FROZEN** — the eight predicates in plain English, before any scored episode |
+| [`HOLES.md`](../HOLES.md) | 🔒 **FROZEN** at `probe-v1` — the pre-registered holes and the kill switch |
+| [`PROTOCOL.md`](../PROTOCOL.md) | 🔒 **FROZEN** — the pre-registration: `config/` blob digests, vendor pins, the ladder record |
+| [`PROVENANCE.md`](../PROVENANCE.md) | 🔒 **FROZEN** — every claim's source, every constant tagged Razorpay-defined or author-chosen |
+| [`RAZORPAY_SEMANTICS.md`](../RAZORPAY_SEMANTICS.md) | 🔒 **FROZEN** — 71 rows, each a verbatim quote + URL + fetch date. The oracle for the spend-free self-test |
+| [`RESULTS.md`](../RESULTS.md) | ⚠️ **STILL PARTIAL, and it says so on its first line** — but no longer empty of numbers. It carries **the calibration (11/30 = 36.67%, threshold 20%)**, the freeze and its witness with the 2 m 57 s ordering, the four fired degradation cuts in the words `PROCESS.md` §14 requires, and ⚠️ **an EMPTY escape table with the reason in its own caption.** `make eval` **overwrites it from the stored ledgers** when a completed run exists; **C18 owns it and C18 has not run** |
+| [`INCIDENTS.md`](../INCIDENTS.md) | Every failure, in a fixed eight-field format including `Missing`, `Missed` and `Fix`-with-SHA |
+| [`QUESTIONS.md`](../QUESTIONS.md) | Every ambiguity and every ruling, verbatim. **A ruling that exists only in a chat does not exist** |
+| [`STATUS.md`](../STATUS.md) / [`PROGRESS.md`](../PROGRESS.md) | Where the project is; what every session did |
+| [`docs/reviews/`](../docs/reviews/) | **The trail** — 20 reviews, 14 FAILs, none overwritten |
+| [`docs/sessions/`](../docs/sessions/) | Every session's FINAL OUTPUT, committed **before** it was printed |
+| [`tests/goldens/`](../tests/goldens/) | Hand-computed expected values. **Read-only to every build session** |
+| [`config/`](../config/) | 🔒 Every spec-specified value, one loader, **no default for a required value** |
 | `src/whetstone_gate/` | `world` · `ledger` · `scorer` · `gates` · `attacker` · `benign` · `probe` · `runner` · `driver` · `tau2` · `camel_comparator` · `results` |
 
 ---

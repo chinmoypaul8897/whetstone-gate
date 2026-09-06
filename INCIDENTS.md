@@ -13891,3 +13891,66 @@ this file is a hand path with no rule enforcement in it. ⚠️ **The cheap inte
 can be checked: a hand-written `RESULTS.md` must carry the assembler's own median caption verbatim,
 or it must say in the same paragraph that it is not medians and why.** This file now does the
 former.
+
+---
+
+## INC-175 — ⚠️ the repository was flipped PUBLIC over a scan whose own committed verdict was `🔴 HOLD`, on an operator ruling that existed only in a chat — which this project's own governing sentence says does not exist
+
+**Date:** 2026-09-07 (the flip and the ruling were 2026-09-05; this entry is the record being
+written four days late, which is itself the failure. Fix SHA under **Fix**.)
+
+**Event:** `docs/submission/git-history-secret-scan.txt` run 2 ended, and still ends, with
+**`🔴 HOLD. THE REPOSITORY MUST NOT BE FLIPPED PUBLIC UNTIL AN OPERATOR RULES ON`** the fifth pattern
+hit. ⚠️ **The repository was flipped public on 2026-09-05 anyway.** A ruling clearing that hold
+**was** made — the architect characterised the fifth hit as a non-credential from its length and its
+alternating letter-digit structure, and the operator accepted it and flipped — **but it was made in
+conversation and written into no file.** For four days the public repository carried, in its own
+submission folder, a committed instruction not to do the thing that had been done, with no recorded
+answer anywhere in the tree.
+
+**Action:** re-ran the whole scan (run 3, 2026-09-07) over 1,892 objects and 891 tracked files at
+`HEAD = 3aef221`, **re-derived the fifth hit's identity first-hand instead of transcribing the
+remembered ruling**, and wrote the ruling, its author, its date, and the four-day gap into the file
+as `R3.6`. The re-derivation found stronger evidence than the original ruling had: the string is
+assigned to a variable literally named `_PLANTED` in `tests/test_arch_lanes.py`, its own source
+comment explains the prefix was chosen to exercise `runner/redaction.py`'s scanned-prefix list, it
+lives only in `INC-147`/`INC-148`'s commits, and **it is in no tree reachable from `HEAD`**.
+
+**Expectation:** `QUESTIONS.md`'s governing sentence is *"A ruling that exists only in a chat does
+not exist."* By this project's own rule the flip proceeded on a ruling that **did not exist**, and
+the one artefact a reader would consult to check the precondition said, in capitals, that the
+precondition was unmet.
+
+**Missing:** ⚠️ **nothing connects a committed `HOLD` to the act it gates.** The scan file can say
+"do not flip" and the flip is a click in a GitHub settings page; no check reads that verdict, and
+`check_roles`' own C2 reports `n/a` for the scan rather than reading its conclusion. **A precondition
+whose satisfaction nothing verifies is a comment, not a gate** — and this one was written by the
+session that most wanted it satisfied.
+
+**Missed:** ⚠️⚠️ **THIS IS THE SECOND TIME THE SAME SHAPE HAS OCCURRED IN THIS PROJECT, AND THE FIRST
+WAS RECORDED THIRTY-SIX HOURS EARLIER.** `INC-172` records `PROCESS.md` §6a.2 step 7 — the witness
+gist's coordinates — being written into the repository **8 h 45 m after** the first scored episode
+rather than before it, with the diagnosis *"a duty whose only destination is a file the session may
+not open."* **This is that mechanism again**, one artefact along: an operator act gated on a written
+record, performed on a spoken one. The entry naming the pattern was in the file, and the pattern
+recurred anyway.
+
+**Diagnosis:** the deadline compressed a written ruling into a spoken one, and the spoken form was
+sufficient to unblock the operator's next action, so nothing forced it into a file; **the ruling's
+only consumer was a human who had already heard it**, and the artefact that needed it had no reader.
+
+**Fix:** run 3 of the scan, appended to `docs/submission/git-history-secret-scan.txt` at the commit
+carrying this entry, which records the ruling verbatim with its author and both dates, re-derives its
+basis from first-hand evidence, and closes the hold **on that evidence rather than on the memory of a
+conversation**. ⚠️ **Run 2's `🔴 HOLD` is NOT edited or removed.** It stands exactly as written, four
+days unanswered, above the section that answers it.
+
+**Systemic guardrail:** ⚠️ **none that is mechanical, and the honest reason is that the gated act is
+outside the repository.** The flip is a setting on GitHub; no test in this tree can observe it, so no
+test can require the scan's verdict to be green first. **What is available is a rule, and it is
+narrower and more checkable than "record your rulings":** *a scan report that ends in a HOLD is the
+only artefact permitted to lift it, so the next run of the scan must open by answering the previous
+run's verdict or state that it cannot.* Run 3 does exactly that in `R3.0` and `R3.6`. ⚠️ **AND THE
+DEEPER ONE, WHICH THIS PROJECT KEEPS PAYING FOR AND HAS NOW PAID TWICE:** an operator duty whose
+destination file is outside the acting session's fence will be discharged verbally and lost.
+`INC-172` recommended giving that duty an owner; **it was not given one, and this is the recurrence.**
